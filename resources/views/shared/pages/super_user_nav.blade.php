@@ -31,11 +31,29 @@
                 </li>
 
                 <li class="nav-header font-weight-bold">Modules</li>
-                <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
+                {{-- <li class="nav-item has-treeview">
+                    <a href="{{ route('hr_memo') }}" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
-                        <p>[Clark] HR MEMO/Approval </p>
+                        <p>HR MEMO/Approval </p>
                     </a>
+                </li> --}}
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p> HR Memo/Approval </p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('hr_memo_exam') }}" class="nav-link">
+                                <p> Examinations</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('hr_memo') }}" class="nav-link">
+                                <p> Memo/Approval</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <li class="nav-item has-treeview">
