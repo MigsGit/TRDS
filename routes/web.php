@@ -10,8 +10,9 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('blank');
@@ -45,7 +46,7 @@ Route::group(['namespace' => 'HrMemo'], function (){
     Route::get('/get_device_name', 'HrMemoController@getDeviceName')->name('get_device_name');
     Route::get('/get_users', 'HrMemoController@getUsers')->name('get_users');
     Route::get('/get_employee_details', 'HrMemoController@getEmployeeDetails')->name('get_employee_details');
-    
+
     // HrMemoExaminationController
     Route::get('/view_examinations', 'HrMemoExaminationController@viewExaminationsInfo')->name('view_examinations');
     Route::post('/add_examinations', 'HrMemoExaminationController@addExaminationsInfo')->name('add_examinations');
@@ -55,11 +56,17 @@ Route::group(['namespace' => 'HrMemo'], function (){
 });
 
 // USER CONTROLLER
+
+// Route::group(['namespace' => 'User'], function (){
+// });
+Route::get('/view_users', 'UserController@view_users')->name('user.view_users');
+Route::get('/get_user_levels', 'UserController@get_user_levels')->name('user.get_user_levels');
+
+
 // Route::post('/sign_in', 'UserController@sign_in')->name('sign_in');
 // Route::post('/sign_out', 'UserController@sign_out')->name('sign_out');
 // Route::post('/change_pass', 'UserController@change_pass')->name('change_pass');
 // Route::post('/change_user_stat', 'UserController@change_user_stat')->name('change_user_stat');
-// Route::get('/view_users', 'UserController@view_users');
 // Route::post('/add_user', 'UserController@add_user');
 // Route::get('/get_user_by_id', 'UserController@get_user_by_id');
 // Route::get('/get_user_list', 'UserController@get_user_list');

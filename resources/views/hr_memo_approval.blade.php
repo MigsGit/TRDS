@@ -262,7 +262,8 @@
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Employee Number</span>
                                             </div>
-                                                <input type="text" class="form-control form-control-sm" name="employeen_umber" id="employeeNumber" required>
+                                                {{-- <input type="text" class="form-control form-control-sm" name="employeen_umber" id="employeeNumber" required> --}}
+                                                <select class="form-control form-control-sm select2bs5 selectEmpNo" type="text" name="employeen_umber" id="employeeNumber" required></select>
                                         </div>
                                     </div>
                                 </div>

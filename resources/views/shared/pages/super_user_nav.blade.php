@@ -15,6 +15,12 @@
     <div class="sidebar">
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-item has-treeview fixed-bottom">
+                    <a href="{{ url('../RapidX') }}" class="nav-link">
+                        <i class="nav-icon fas fa-arrow-left"></i>
+                        <p>Return to RapidX</p>
+                    </a>
+                </li>
                 <li class="nav-item has-treeview">
                     <a href="{{ route('blank') }}" class="nav-link">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -95,13 +101,6 @@
                     <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
                         <i class="nav-icon fas fa-list-alt"></i>
                         <p>[Chris] Qualification / Certification </p>
-                    </a>
-                </li>
-
-                <li class="nav-item has-treeview fixed-bottom">
-                    <a href="{{ url('../RapidX') }}" class="nav-link">
-                        <i class="nav-icon fas fa-arrow-left"></i>
-                        <p>Return to RapidX</p>
                     </a>
                 </li>
             </ul>

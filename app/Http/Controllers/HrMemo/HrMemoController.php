@@ -122,61 +122,134 @@ class HrMemoController extends Controller
     //     ->make(true);
     // }
 
-    public function getEmployeeDetails(Request $request){
-        $hris = DB::connection('mysql_systemone')->select("
-                SELECT 
-                    'db_hris' AS source,
-                    CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
-                    tbl_EmployeeInfo.DateHired,
-                    CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
-                    CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
-                    tbl_Training.Venue,
-                    vw_Trainee.Remarks,
-                    tbl_Training.Title,
-                    tbl_Department.Department,
-                    tbl_Division.Division
-                FROM vw_Trainee
-                INNER JOIN tbl_EmployeeInfo ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid
-                INNER JOIN tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
-                INNER JOIN tbl_Section ON tbl_EmployeeInfo.fkSection = tbl_Section.pkid
-                INNER JOIN tbl_Department ON tbl_EmployeeInfo.fkDepartment = tbl_Department.pkid
-                INNER JOIN tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
-                INNER JOIN tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
-                WHERE tbl_EmployeeInfo.EmpNo = ?
-                LIMIT 1
-                ", [$request->employee_number]);
+    // public function getEmployeeDetails(Request $request){
+    //     $hris = DB::connection('mysql_systemone')->select("
+    //             SELECT 
+    //                 'db_hris' AS source,
+    //                 CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
+    //                 tbl_EmployeeInfo.DateHired,
+    //                 CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
+    //                 CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
+    //                 tbl_Training.Venue,
+    //                 vw_Trainee.Remarks,
+    //                 tbl_Training.Title,
+    //                 tbl_Department.Department,
+    //                 tbl_Division.Division
+    //             FROM vw_Trainee
+    //             INNER JOIN tbl_EmployeeInfo ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid
+    //             INNER JOIN tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
+    //             INNER JOIN tbl_Section ON tbl_EmployeeInfo.fkSection = tbl_Section.pkid
+    //             INNER JOIN tbl_Department ON tbl_EmployeeInfo.fkDepartment = tbl_Department.pkid
+    //             INNER JOIN tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
+    //             INNER JOIN tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
+    //             WHERE tbl_EmployeeInfo.EmpNo = ?
+    //             LIMIT 1
+    //             ", [$request->employee_number]);
 
-        // return $hris;
-        if($hris == null || empty($hris)){
-            $subcon = DB::connection('mysql_subcon')->select("
-                    SELECT 
-                        'db_subcon' AS source,
-                        CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
-                        tbl_EmployeeInfo.DateHired,
-                        CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
-                        CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
-                        tbl_Training.Venue,
-                        COALESCE(vw_Trainee.Remarks, 'No Record') AS Remarks,
-                        tbl_Training.Title,
-                        tbl_Department.Department,
-                        tbl_Division.Division
-                    FROM tbl_EmployeeInfo
-                    LEFT JOIN db_hris.vw_Trainee ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid
-                    LEFT JOIN db_hris.tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
-                    INNER JOIN db_hris.tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
-                    INNER JOIN db_hris.tbl_Section ON tbl_EmployeeInfo.fkSection = tbl_Section.pkid
-                    INNER JOIN db_hris.tbl_Department ON tbl_EmployeeInfo.fkDepartment = tbl_Department.pkid
-                    INNER JOIN db_hris.tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
-                    WHERE tbl_EmployeeInfo.EmpNo = ?
-                    LIMIT 1
-                    ", [$request->employee_number]);
+    //     if($hris == null || empty($hris)){
+    //         $subcon = DB::connection('mysql_subcon')->select("
+    //                 SELECT 
+    //                     'db_subcon' AS source,
+    //                     CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
+    //                     tbl_EmployeeInfo.DateHired,
+    //                     CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
+    //                     CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
+    //                     tbl_Training.Venue,
+    //                     COALESCE(vw_Trainee.Remarks, 'No Record') AS Remarks,
+    //                     tbl_Training.Title,
+    //                     tbl_Department.Department,
+    //                     tbl_Division.Division
+    //                 FROM tbl_EmployeeInfo
+    //                 LEFT JOIN db_hris.vw_Trainee ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid
+    //                 LEFT JOIN db_hris.tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
+    //                 INNER JOIN db_hris.tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
+    //                 INNER JOIN db_hris.tbl_Section ON tbl_EmployeeInfo.fkSection = tbl_Section.pkid
+    //                 INNER JOIN db_hris.tbl_Department ON tbl_EmployeeInfo.fkDepartment = tbl_Department.pkid
+    //                 INNER JOIN db_hris.tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
+    //                 WHERE tbl_EmployeeInfo.EmpNo = ?
+    //                 LIMIT 1
+    //                 ", [$request->employee_number]);
                     
-            $training_details = $subcon;
-        }else{
-            $training_details = $hris;
+    //         $training_details = $subcon;
+    //     }else{
+    //         $training_details = $hris;
+    //     }
+
+    //     return response()->json($training_details);
+    // }
+
+    public function getEmployeeDetails(Request $request)
+    {
+        $empNo = $request->employee_number;
+
+        $hrisQuery = "
+            SELECT 
+                'db_hris' AS source,
+                tbl_EmployeeInfo.EmpNo,
+                CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
+                tbl_EmployeeInfo.DateHired,
+                CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
+                CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
+                tbl_Training.Venue,
+                vw_Trainee.Remarks,
+                tbl_Training.Title,
+                tbl_Department.Department,
+                tbl_Division.Division
+            FROM vw_Trainee
+            INNER JOIN tbl_EmployeeInfo ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid AND tbl_EmployeeInfo.EmpStatus = 1
+            INNER JOIN tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
+            INNER JOIN tbl_Section ON tbl_EmployeeInfo.fkSection = tbl_Section.pkid
+            INNER JOIN tbl_Department ON tbl_EmployeeInfo.fkDepartment = tbl_Department.pkid
+            INNER JOIN tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
+            INNER JOIN tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
+        ";
+
+        $subconQuery = "
+            SELECT 
+                'db_subcon' AS source,
+                tbl_EmployeeInfo.EmpNo,
+                CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
+                tbl_EmployeeInfo.DateHired,
+                CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
+                CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
+                tbl_Training.Venue,
+                COALESCE(vw_Trainee.Remarks, 'No Record') AS Remarks,
+                tbl_Training.Title,
+                tbl_Department.Department,
+                tbl_Division.Division
+            FROM tbl_EmployeeInfo
+            LEFT JOIN db_hris.vw_Trainee ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid AND tbl_EmployeeInfo.EmpStatus = 1
+            LEFT JOIN db_hris.tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
+            INNER JOIN db_hris.tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
+            INNER JOIN db_hris.tbl_Section ON tbl_EmployeeInfo.fkSection = tbl_Section.pkid
+            INNER JOIN db_hris.tbl_Department ON tbl_EmployeeInfo.fkDepartment = tbl_Department.pkid
+            INNER JOIN db_hris.tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
+        ";
+
+        // CASE 1: Employee number exists
+        if (!empty($empNo)) {
+
+            $hris = DB::connection('mysql_systemone')
+                ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
+
+            if (!empty($hris)) {
+                return response()->json($hris);
+            }
+
+            // fallback to subcon
+            $subcon = DB::connection('mysql_subcon')
+                ->select($subconQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
+
+            return response()->json($subcon);
         }
 
-        return response()->json($training_details);
+        // CASE 2: No employee number → run both and merge
+        $hris = DB::connection('mysql_systemone')->select($hrisQuery);
+        $subcon = DB::connection('mysql_subcon')->select($subconQuery);
+
+        $merged = array_merge($hris, $subcon);
+
+        return response()->json($merged);
     }
 
     public function addHrMemoInfo(Request $request){

@@ -260,6 +260,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         $tbody.html(defaultExamRow);
 
         getExaminations($('#tblExamination tr:last').find('.selectExamTitle'));
+        selectEmployeeDetails($('.selectEmpNo'));
         $modalTD.modal('show');
     });
 
@@ -419,38 +420,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         dtTraineeDetails.clear().draw();
         dtTraineeDetails.rows.add(traineeDetailsArray).draw();
         $modalTD.modal('hide');
-
-        // console.log('exam_title', $('#tblExamination').find('title').text());
-        
-        // $('.itemCheckbox:checked').each(function (){
-        //     let id = $(this).data('checkbox-id');
-        //     let $row = $(this).closest('tr');
-
-        //     // build object from row inputs
-        //     let item = {
-        //         id: id,
-        //         master_carton_no: $row.find(`[data-master_carton-id="${id}"]`).val(),
-        //         item_no: $row.find(`[data-item_no-id="${id}"]`).val(),
-        //         lot_no: $row.find(`[data-lot_no-id="${id}"]`).val(),
-        //         qty: $row.find(`[data-quantity-id="${id}"]`).val(),
-        //         package_qty: $row.find(`[data-package_qty-id="${id}"]`).val(),
-        //         remarks: $row.find(`[data-remarks-id="${id}"]`).val(),
-
-        //         // optional fields from top of form
-        //         po_no: $('#txtPONumber').val(),
-        //         parts_code: $('#txtPartsCode').val(),
-        //         device_name: $('#txtDeviceName').val(),
-        //         package_category: $('#txtPackageCategory').val()
-        //     };
-
-        //     // ACCUMULATE (no duplicates)
-        //     if (!traineeDetailsList[id]) {
-        //         traineeDetailsList[id] = item;
-        //     }
-        // });
-
-        // updatePreShipmentTable();
-        // $modalTD.modal('hide');
     });
 }
 
@@ -469,6 +438,48 @@ function updateRemoveButtons($table, measure_type, array = null){
         $table.find('.removeRow').prop('disabled', false);
     }
     
+}
+
+function selectEmployeeDetails(cboElement, examId = null, mode = null){
+    let result = '<option value="" disabled selected> Select One </option>';
+    $.ajax({
+        method: "get",
+        url: "get_employee_details",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value="" disabled selected>--Loading--</option>';
+        },
+        success: function (response) {
+            console.log(response);
+            
+            if(response.length > 0){
+                    result = '<option value="" disabled selected> Select Examination </option>';
+
+                if(mode == 'Export'){
+                    result += '<option value="ALL"> ALL </option>';
+                }
+
+                for (let di = 0; di < response.length; di++) {
+                    result += '<option value="' + response[di]['id'] + '">' + response[di]['examination_name'] + '</option>';
+                }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+            cboElement.html(result);
+            if(examId != null){
+                cboElement.val(examId).trigger('change');
+            }
+
+            if(mode == 'view'){
+                cboElement.prop('disabled', true).trigger('change.select2');
+            }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
 }
 
 function getExaminations(cboElement, examId = null, mode = null){

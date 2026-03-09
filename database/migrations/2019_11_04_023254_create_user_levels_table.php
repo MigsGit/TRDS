@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserAccessModulesTable extends Migration
+class CreateUserLevelsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,12 @@ class CreateUserAccessModulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_access_modules', function (Blueprint $table) {
+        Schema::create('user_levels', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('users_id')->nullable();
-            $table->longText('user_modules_id')->nullable();
+            $table->string('user_level');
+            $table->integer('status');
+            $table->softDeletes();
+
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ class CreateUserAccessModulesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_access_modules');
+        Schema::dropIfExists('user_levels');
     }
 }
