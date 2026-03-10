@@ -9,13 +9,13 @@ $(document).ready(function () {
     const dtHMA = initHrMemoApprovalTable($table);
     const $tableTD = $('#tblTraineeDetails');
     const dtTraineeDetails = initTraineeDetailsTable($tableTD);
-    const $modalTD = $('#modalTraineeDetails');                   
-    const $formTD = $('#formTraineeDetails');                   
-    const $addButtonTD = $('#btnAddTrainee');             
-    const $addButtonExam = $('#btnAddExamination');             
-    const $tableExam = $('#tblExamination');       
+    const $modalTD = $('#modalTraineeDetails');
+    const $formTD = $('#formTraineeDetails');
+    const $addButtonTD = $('#btnAddTrainee');
+    const $addButtonExam = $('#btnAddExamination');
+    const $tableExam = $('#tblExamination');
 
-    // --------------------------------------
+    // ------       --------------------------------
     // Initialize global AJAX setup (once per project)
     // --------------------------------------
     $.ajaxSetup({
@@ -117,7 +117,10 @@ function initTraineeDetailsTable($table1, url1 = 'view_trainee_details') {
             {
                 data: "action",
                 render: function (data){
-                    return "<button class='btn btn-md btn-danger removeRow' data-id='" + data.id + "' title='Remove Row' type='button'><i class='fa fa-times'></i></button>";
+                    let actionButtons;
+                    actionButtons = "<button class='btn btn-md btn-danger removeRow mr-1' data-id='" + data.id + "' title='Remove Row' type='button'><i class='fa fa-times'></i></button>";
+                    actionButtons += "<button class='btn btn-md btn-secondary editRow' data-id='" + data.id + "' type='button'><i class='fas fa-edit'></i></button>";
+                    return actionButtons;
 
                     // return "<td id='removeRow'>
                     //             '<center>'
@@ -260,13 +263,13 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         $tbody.html(defaultExamRow);
 
         getExaminations($('#tblExamination tr:last').find('.selectExamTitle'));
-        selectEmployeeDetails($('.selectEmpNo'));
+        selectEmpNo($('.selectEmpNo'));
         $modalTD.modal('show');
     });
 
     // Handle employee number input
-    $('#employeeNumber').on('input', function(){ 
-        let empNo = $(this).val();
+    $('#employeeNumber').on('change', function(){
+        let empNo = $(this).find('option:selected').text();
         $.ajax({
             type: "GET",
             url: "get_employee_details",
@@ -275,14 +278,14 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             success: function (response) {
                 emp_details = response[0];
                 console.log('emp_details', emp_details);
-                
-                $formTD.find('#employeeName').val(emp_details.emp_name);
+
+                $formTD.find('#employeeName').val(emp_details.EmpName);
                 $formTD.find('#dateHired').val(emp_details.DateHired);
-                $formTD.find('#posDeptSection').val(emp_details.pos_dept_section);
+                $formTD.find('#position').val(emp_details.Position);
                 $formTD.find('#trainingVenue').val(emp_details.Venue);
                 // $formTD.find('#endorsementDate').val(emp_details.emp_name);
-                $formTD.find('#deptSection').val(emp_details.Department).trigger('change');
-                $formTD.find('#prodAllocation').val(emp_details.Section).trigger('change');
+                $formTD.find('#department').val(emp_details.Department);
+                $formTD.find('#prodAllocation').val(emp_details.Section);
             }
         });
     });
@@ -386,39 +389,73 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         traineeDetailsArray = traineeDetailsArray.filter(item => item.action.id != id);
         dtTraineeDetails.clear().rows.add(traineeDetailsArray).draw();
         updateRemoveButtons($tableTD, 'Array', traineeDetailsArray);
+        console.log('Updated traineeDetailsArray after removal', traineeDetailsArray);
+    });
+
+    $tableTD.on('click', '.editRow', function(e) {
+        e.preventDefault();
+        let id = $(this).data("id");
+        let trainee = traineeDetailsArray.find(item => item.action.id == id);
+        console.log('traineeDetailsArray', trainee);
+        $modalTD.modal('show');
     });
 
     // Submit formTraineeDetails
     $('#btnAddTraineeDetailsToList').on('click', function (e) {
         e.preventDefault();
-        let employeeNumber = $formTD.find('#employeeNumber').val();
-        let employeeName = $formTD.find('#employeeName').val();
-        let trainingVenue = $formTD.find('#trainingVenue').val();
+        let empId = $formTD.find('#employeeNumber').val();
         let endorsementDate = $formTD.find('#endorsementDate').val();
+
+        if(empId == null){
+            showError('Please select an employee.');
+            return;
+        }
+
+        if(endorsementDate == ''){
+            showError('Please fill up the Endorsement date.');
+            return;
+        }
+
+        let empType = $formTD.find('#employeeNumber').find('option:selected').data('emp_type');
+        let empNumber = $formTD.find('#employeeNumber').find('option:selected').text();
+        let empName = $formTD.find('#employeeName').val();
+        let trainingVenue = $formTD.find('#trainingVenue').val();
         let exam_list = [];
+        let hasError = false;
 
         $('.data-row').each(function (){
             let exam_title = $(this).find('.selectExamTitle').val();
             let result = $(this).find('#result').val();
             let remarks = $(this).find('#remarks').val();
 
+            if(exam_title == null || result == null || remarks == ''){
+                showError('Please fill in all examination details.');
+                hasError = true;
+                return false; // stops the .each loop
+            }
+
             exam_list.push({exam_title, result, remarks});
         });
+
+        if(hasError){
+            return; // stop the rest of the function
+        }
 
         let counterNow = traineeIdCounter++;
 
         let traineeDetailsList = {
-            action: {id: counterNow, status: 1},
-            emp_no: employeeNumber,
-            emp_name : employeeName,
+            action: {id: counterNow, emp_id: empId, emp_type: empType},
+            emp_no: empNumber,
+            emp_name : empName,
             traning_venue: trainingVenue,
             endorsement_date: endorsementDate,
             exam_detals: exam_list
         }
-    
+
         traineeDetailsArray.push(traineeDetailsList);
         dtTraineeDetails.clear().draw();
         dtTraineeDetails.rows.add(traineeDetailsArray).draw();
+        showSuccess('Trainee details added to the list.');
         $modalTD.modal('hide');
     });
 }
@@ -429,7 +466,7 @@ function updateRemoveButtons($table, measure_type, array = null){
         length = $table.find('.data-row').length;
     }else{
         // measure_type = 'Array';
-        length = array.length;
+            length = array.length;
     }
 
     if (length == 1){
@@ -437,37 +474,33 @@ function updateRemoveButtons($table, measure_type, array = null){
     } else {
         $table.find('.removeRow').prop('disabled', false);
     }
-    
+
 }
 
-function selectEmployeeDetails(cboElement, examId = null, mode = null){
+function selectEmpNo(cboElement, empId = null, mode = null){
     let result = '<option value="" disabled selected> Select One </option>';
     $.ajax({
         method: "get",
-        url: "get_employee_details",
+        url: "get_emp_no_dropdown_details",
         dataType: "json",
         beforeSend: function(){
             result = '<option value="" disabled selected>--Loading--</option>';
         },
         success: function (response) {
             console.log(response);
-            
-            if(response.length > 0){
-                    result = '<option value="" disabled selected> Select Examination </option>';
 
-                if(mode == 'Export'){
-                    result += '<option value="ALL"> ALL </option>';
-                }
+            if(response.length > 0){
+                    result = '<option value="" disabled selected> Select Employee No </option>';
 
                 for (let di = 0; di < response.length; di++) {
-                    result += '<option value="' + response[di]['id'] + '">' + response[di]['examination_name'] + '</option>';
-                }
+                    result += '<option value="' + response[di]['pkid'] + '" data-emp_type="' + response[di]['emp_type'] + '">' + response[di]['EmpNo'] + '</option>';
+                            }
             }else{
                 result = '<option value="0" selected disabled> -- No record found -- </option>';
             }
             cboElement.html(result);
-            if(examId != null){
-                cboElement.val(examId).trigger('change');
+            if(empId != null){
+                cboElement.val(empId).trigger('change');
             }
 
             if(mode == 'view'){

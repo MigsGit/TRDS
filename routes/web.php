@@ -78,6 +78,7 @@ Route::controller(HrMemoController::class)->group(function () {
     Route::get('/get_device_name', 'getDeviceName')->name('get_device_name');
     Route::get('/get_users', 'getUsers')->name('get_users');
     Route::get('/get_employee_details', 'getEmployeeDetails')->name('get_employee_details');
+    Route::get('/get_emp_no_dropdown_details', 'getEmpNoDropdownDetails')->name('get_emp_no_dropdown_details');
 });
 
 // USER CONTROLLER

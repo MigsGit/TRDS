@@ -199,28 +199,6 @@
                                 </div>
                             </div>
                         </div>
-
-                            {{-- Multiple Data for Category --}}
-                            {{-- <div class="row mt-5">
-                                <div class="col">
-                                    <div class="table-responsive">
-                                        <table class="table table-sm" id="tblTraineeCategoryDetails">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 5%;">Action</th>
-                                                    <th style="width: 10%;">Exam</th>
-                                                    <th style="width: 10%;">Exam Result</th>
-                                                    <th style="width: 10%;">Training Remarks</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div> --}}
-
-                        {{-- </div> --}}
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -244,7 +222,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="formTraineeDetails">
+                    <form method="post" id="formTraineeDetails" autocomplete="off">
                         @csrf
                         <div class="input-group input-group-sm mb-3" hidden>
                             <div class="input-group-prepend w-50">
@@ -285,7 +263,7 @@
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Training Venue</span>
                                             </div>
-                                                <input type="text" class="form-control form-control-sm" name="training_venue" id="trainingVenue">
+                                                <input type="text" class="form-control form-control-sm" name="training_venue" id="trainingVenue" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -294,9 +272,10 @@
                                     <div class="col">
                                         <div class="input-group input-group-sm mb-3">
                                             <div class="input-group-prepend w-50">
-                                                <span class="input-group-text w-100">Department/Section</span>
+                                                <span class="input-group-text w-100">Department</span>
                                             </div>
-                                                <select class="form-control select2bs5" type="text" name="dept_section" id="deptSection"  required></select>
+                                                <input type="text" class="form-control form-control-sm" name="department" id="department" readonly>
+                                                {{-- <select class="form-control select2bs5" type="text" name="dept_section" id="deptSection"  required></select> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -319,9 +298,9 @@
                                     <div class="col">
                                         <div class="input-group input-group-sm mb-3">
                                             <div class="input-group-prepend w-50">
-                                                <span class="input-group-text w-100">Position/Dept./Section</span>
+                                                <span class="input-group-text w-100">Position</span>
                                             </div>
-                                                <input type="text" class="form-control form-control-sm" name="pos_dept_section" id="posDeptSection" readonly>
+                                                <input type="text" class="form-control form-control-sm" name="position" id="position" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -341,9 +320,10 @@
                                     <div class="col">
                                         <div class="input-group input-group-sm mb-3">
                                             <div class="input-group-prepend w-50">
-                                                <span class="input-group-text w-100">Product Allocation</span>
+                                                <span class="input-group-text w-100">Product Allocation (Section)</span>
                                             </div>
-                                                <select class="form-control select2bs5" type="text" name="prod_allocation" id="prodAllocation" required></select>
+                                                <input type="text" class="form-control form-control-sm" name="prod_allocation" id="prodAllocation" readonly>
+                                                {{-- <select class="form-control select2bs5" type="text" name="prod_allocation" id="prodAllocation" required></select> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -376,7 +356,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" id="btnAddTraineeDetailsToList">Add To List</button>
+                    <button type="submit" class="btn btn-success" id="btnAddTraineeDetailsToList">Add To List</button>
                 </div>
             </div>
         </div>

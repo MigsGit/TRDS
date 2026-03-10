@@ -72,129 +72,51 @@ class HrMemoController extends Controller
         ->make(true);
     }
 
-    // public function viewTraineeDetails(Request $request){
-    //     $hr_memo_details = HrMemo::with(['defects.defect_item', 'situations', 'improvements'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
+    public function getEmpNoDropdownDetails(Request $request)
+    {
+        $hrisQuery = "
+            SELECT
+                pkid,
+                EmpNo,
+                1 AS emp_type
+            FROM tbl_EmployeeInfo
+            WHERE EmpStatus = 1
+        ";
 
-    //     return DataTables::of($hr_memo_details)
-    //     ->addColumn('action', function($hr_memo_details){
-    //         $result = "";
-    //         $result .= "<center>";
+        $subconQuery = "
+            SELECT
+                pkid,
+                EmpNo,
+                2 AS emp_type
+            FROM tbl_EmployeeInfo
+            WHERE EmpStatus = 1
+        ";
 
-    //         // $canManage  = $globalUser && in_array($globalUser->position, [0,1,2,3]);
-    //         $isActive   = $hr_memo_details->status == 0;
-    //         $isDisabled = $hr_memo_details->status == 1;
-    //         $id = $hr_memo_details->id;
+        $hris = DB::connection('mysql_systemone')->select($hrisQuery);
+        $subcon = DB::connection('mysql_subcon')->select($subconQuery);
 
-    //         if ($isActive) {
-    //             // if ($canManage) {
-    //                 $result .= $this->actionButton('btn-secondary btnEdit', 'fa-pen-to-square', $id, 'mr-1');
-    //                 $result .= $this->actionButton('btn-danger btnDisable', 'fa-ban', $id);
-    //             // } else {
-    //             //     $result .= $this->actionButton('btn-info btnView', 'fa-eye', $id, 'mr-1');
-    //             // }
-    //         }
+        $merged = array_merge($hris, $subcon);
 
-    //         if ($isDisabled) {
-    //             $result .= $this->actionButton('btn-info btnView', 'fa-eye', $id, 'mr-1');
-
-    //             // if ($canManage) {
-    //                 $result .= $this->actionButton('btn-success btnEnable', 'fa-rotate-left', $id);
-    //             // }
-    //         }
-
-    //         $result .= "</center>";
-    //         return $result;
-    //     })
-    //     ->addColumn('status_label', function($pth_details){
-    //         $result = "";
-    //         $result .= "<center>";
-
-    //         if($pth_details->status == 0){
-    //             $result .= "<span class='badge rounded-pill bg-success'>Active</span>";
-    //         }else{
-    //             $result .= "<span class='badge rounded-pill bg-danger'>Inactive</span>";
-    //         }
-    //         $result .= "</center>";
-
-    //         return $result;
-    //     })
-    //     ->rawColumns(['action', 'status_label'])
-    //     ->make(true);
-    // }
-
-    // public function getEmployeeDetails(Request $request){
-    //     $hris = DB::connection('mysql_systemone')->select("
-    //             SELECT 
-    //                 'db_hris' AS source,
-    //                 CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
-    //                 tbl_EmployeeInfo.DateHired,
-    //                 CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
-    //                 CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
-    //                 tbl_Training.Venue,
-    //                 vw_Trainee.Remarks,
-    //                 tbl_Training.Title,
-    //                 tbl_Department.Department,
-    //                 tbl_Division.Division
-    //             FROM vw_Trainee
-    //             INNER JOIN tbl_EmployeeInfo ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid
-    //             INNER JOIN tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
-    //             INNER JOIN tbl_Section ON tbl_EmployeeInfo.fkSection = tbl_Section.pkid
-    //             INNER JOIN tbl_Department ON tbl_EmployeeInfo.fkDepartment = tbl_Department.pkid
-    //             INNER JOIN tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
-    //             INNER JOIN tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
-    //             WHERE tbl_EmployeeInfo.EmpNo = ?
-    //             LIMIT 1
-    //             ", [$request->employee_number]);
-
-    //     if($hris == null || empty($hris)){
-    //         $subcon = DB::connection('mysql_subcon')->select("
-    //                 SELECT 
-    //                     'db_subcon' AS source,
-    //                     CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
-    //                     tbl_EmployeeInfo.DateHired,
-    //                     CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
-    //                     CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
-    //                     tbl_Training.Venue,
-    //                     COALESCE(vw_Trainee.Remarks, 'No Record') AS Remarks,
-    //                     tbl_Training.Title,
-    //                     tbl_Department.Department,
-    //                     tbl_Division.Division
-    //                 FROM tbl_EmployeeInfo
-    //                 LEFT JOIN db_hris.vw_Trainee ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid
-    //                 LEFT JOIN db_hris.tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
-    //                 INNER JOIN db_hris.tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
-    //                 INNER JOIN db_hris.tbl_Section ON tbl_EmployeeInfo.fkSection = tbl_Section.pkid
-    //                 INNER JOIN db_hris.tbl_Department ON tbl_EmployeeInfo.fkDepartment = tbl_Department.pkid
-    //                 INNER JOIN db_hris.tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
-    //                 WHERE tbl_EmployeeInfo.EmpNo = ?
-    //                 LIMIT 1
-    //                 ", [$request->employee_number]);
-                    
-    //         $training_details = $subcon;
-    //     }else{
-    //         $training_details = $hris;
-    //     }
-
-    //     return response()->json($training_details);
-    // }
+        return response()->json($merged);
+    }
 
     public function getEmployeeDetails(Request $request)
     {
         $empNo = $request->employee_number;
 
         $hrisQuery = "
-            SELECT 
+            SELECT
                 'db_hris' AS source,
-                tbl_EmployeeInfo.EmpNo,
-                CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
+                CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS EmpName,
                 tbl_EmployeeInfo.DateHired,
                 CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
-                CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
                 tbl_Training.Venue,
                 vw_Trainee.Remarks,
                 tbl_Training.Title,
-                tbl_Department.Department,
-                tbl_Division.Division
+                tbl_Position.Position AS Position,
+                tbl_Department.Department AS Department,
+                tbl_Section.Section AS Section,
+                tbl_Division.Division AS Division
             FROM vw_Trainee
             INNER JOIN tbl_EmployeeInfo ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid AND tbl_EmployeeInfo.EmpStatus = 1
             INNER JOIN tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
@@ -205,18 +127,18 @@ class HrMemoController extends Controller
         ";
 
         $subconQuery = "
-            SELECT 
+            SELECT
                 'db_subcon' AS source,
-                tbl_EmployeeInfo.EmpNo,
-                CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
+                CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS EmpName,
                 tbl_EmployeeInfo.DateHired,
                 CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
-                CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
                 tbl_Training.Venue,
                 COALESCE(vw_Trainee.Remarks, 'No Record') AS Remarks,
                 tbl_Training.Title,
-                tbl_Department.Department,
-                tbl_Division.Division
+                tbl_Position.Position AS Position,
+                tbl_Department.Department AS Department,
+                tbl_Section.Section AS Section,
+                tbl_Division.Division AS Division
             FROM tbl_EmployeeInfo
             LEFT JOIN db_hris.vw_Trainee ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid AND tbl_EmployeeInfo.EmpStatus = 1
             LEFT JOIN db_hris.tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
@@ -227,7 +149,7 @@ class HrMemoController extends Controller
         ";
 
         // CASE 1: Employee number exists
-        if (!empty($empNo)) {
+        // if (!empty($empNo)) {
 
             $hris = DB::connection('mysql_systemone')
                 ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
@@ -241,15 +163,15 @@ class HrMemoController extends Controller
                 ->select($subconQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
 
             return response()->json($subcon);
-        }
+        // }
 
-        // CASE 2: No employee number → run both and merge
-        $hris = DB::connection('mysql_systemone')->select($hrisQuery);
-        $subcon = DB::connection('mysql_subcon')->select($subconQuery);
+        // // CASE 2: No employee number → run both and merge
+        // $hris = DB::connection('mysql_systemone')->select($hrisQuery);
+        // $subcon = DB::connection('mysql_subcon')->select($subconQuery);
 
-        $merged = array_merge($hris, $subcon);
+        // $merged = array_merge($hris, $subcon);
 
-        return response()->json($merged);
+        // return response()->json($merged);
     }
 
     public function addHrMemoInfo(Request $request){
