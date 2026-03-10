@@ -662,6 +662,7 @@ function ChangeUserStatus(){
             if(response['validation'] == 'hasError'){
                 toastr.error('User activation failed!');
             }else{
+                
                 if(response['result'] == 1){
                     // check if the value of txtChangeUserStatUserStat is 1, this is use for activation,
                     // since the default value of txtChangeUserStatUserStat is 2, this is use for deactivation.

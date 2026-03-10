@@ -1,4 +1,7 @@
 <?php
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\QuestionnairesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +26,42 @@ Route::get('/dashboard', function () {
     return view('blank');
 })->name('dashboard');
 
+Route::get('/questionnaire', function () {
+    return view('theoretical_exam/questionnaire');
+})->name('questionnaire');
+
+// QUESTIONNAIRES CONTROLLER
+// Route::get('/view_questionnaire', 'QuestionnairesController@viewQuestionnaire');
+// Route::get('/get_systemone_hris_department', 'QuestionnairesController@getSystemoneHrisDepartment');
+// Route::get('/get_systemone_hris_position', 'QuestionnairesController@getSystemoneHrisPosition');
+// Route::get('/get_systemone_hris_section', 'QuestionnairesController@getSystemoneHrisSection');
+// Route::post('/create_update_questionnaire', 'QuestionnairesController@createUpdateQuestionnaire');
+// Route::get('/get_questionnaire_by_id', 'QuestionnairesController@getQuestionnaireById');
+// Route::post('/change_questionnaire_status', 'QuestionnairesController@changeQuestionnaireStatus');
+
+// Route::get('/view_questionnaire_details', 'QuestionnairesController@viewQuestionnaireDetails');
+// Route::post('/create_update_questionnaire_details', 'QuestionnairesController@createUpdateQuestionnaireDetails');
+Route::controller(QuestionnairesController::class)->group(function () {
+    // Questionnaires main routes
+    Route::get('view_questionnaire', 'viewQuestionnaire');
+    Route::get('get_systemone_hris_department', 'getSystemoneHrisDepartment');
+    Route::get('get_systemone_hris_position', 'getSystemoneHrisPosition');
+    Route::get('get_systemone_hris_section', 'getSystemoneHrisSection');
+    Route::post('create_update_questionnaire', 'createUpdateQuestionnaire');
+    Route::get('get_questionnaire_by_id', 'getQuestionnaireById');
+    Route::post('change_questionnaire_status', 'changeQuestionnaireStatus');
+
+    // Questionnaires details routes
+    Route::get('view_questionnaire_details', 'viewQuestionnaireDetails');
+    Route::post('create_update_questionnaire_details', 'createUpdateQuestionnaireDetails');
+});
+
+
+
+
+// =======================================================================================================
+// =======================================================================================================
+// =======================================================================================================
 // USER CONTROLLER
 // Route::post('/sign_in', 'UserController@sign_in')->name('sign_in');
 // Route::post('/sign_out', 'UserController@sign_out')->name('sign_out');

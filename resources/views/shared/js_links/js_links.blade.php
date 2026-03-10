@@ -38,11 +38,29 @@
 
 <script type="text/javascript" src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1581152197/smartwizard/jquery.smartWizard.min.js"></script>
 
+<script>
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "3000",
+        "timeOut": "5000",
+        "extendedTimeOut": "3000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut",
+        "iconClass":  "toast-custom"
+    };
+</script>
+
 <!-- Custom JS -->
-<script src="{{ asset('public/js/my_js/CustomerClaim.js') }}"></script>
-<script src="{{ asset('public/js/my_js/Common.js') }}"></script>
-<script src="{{ asset('public/js/my_js/RapidXUser.js') }}"></script>
-<script src="{{ asset('public/js/my_js/EmailRecipient.js') }}"></script>
-<script src="{{ asset('public/js/my_js/ProductClassification.js') }}"></script>
+<script src="@php echo asset("public/js/my_js/Common.js?".date("YmdHis")) @endphp"></script>
+<script src="@php echo asset("public/js/my_js/Questionnaires.js?".date("YmdHis")) @endphp"></script>
 
 {{-- <script src="https://cdn.jsdelivr.net/npm/@coreui/coreui@4.0.2/dist/js/coreui.bundle.min.js"></script> --}}
