@@ -62,7 +62,7 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-        
+
         'rapidx' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
@@ -91,6 +91,26 @@ return [
             'database' => env('DB_DATABASE_SYSTEMONE', 'forge'),
             'username' => env('DB_USERNAME_SYSTEMONE', 'forge'),
             'password' => env('DB_PASSWORD_SYSTEMONE', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+        'mysql_subcon' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST_SUBCON', '192.168.3.240'),
+            'port' => env('DB_PORT_SUBCON', '3306'),
+            'database' => env('DB_DATABASE_SUBCON', 'forge'),
+            'username' => env('DB_USERNAME_SUBCON', 'forge'),
+            'password' => env('DB_PASSWORD_SUBCON', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',

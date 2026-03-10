@@ -22,13 +22,6 @@
                     </a>
                 </li>
                 <li class="nav-item has-treeview">
-                    <a href="{{ url('../RapidX') }}" class="nav-link">
-                        <i class="nav-icon fas fa-arrow-left"></i>
-                        <p>Return to RapidX</p>
-                    </a>
-                </li>
-
-                <li class="nav-item has-treeview">
                     <a href="{{ route('blank') }}" class="nav-link">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
@@ -83,42 +76,12 @@
                     </a>
                 </li>
 
-                {{-- <li class="nav-item has-treeview">
+                <li class="nav-item has-treeview">
                     <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
                         <i class="nav-icon fas fa-list-alt"></i>
                         <p>[Chan] Theoretical Exam </p>
                     </a>
-                </li> --}}
-
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-cogs"></i>
-                        <p>
-                            [Chan] Theoretical Exam 
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('questionnaire') }}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Questionnaire</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Examination</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Exam Result</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li> 
+                </li>
 
                 <li class="nav-item has-treeview">
                     <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">

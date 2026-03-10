@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserLevelsTable extends Migration
+class CreateHrMemoExaminationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateUserLevelsTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_levels', function (Blueprint $table) {
+        Schema::create('hr_memo_examinations', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('user_level');
-            $table->integer('status');
+            $table->string('examination_name');
+            $table->text('description')->nullable();
+            $table->string('status')->default(0)->comment('0 - Active, 1 - Inactive');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ class CreateUserLevelsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_levels');
+        Schema::dropIfExists('hr_memo_examinations');
     }
 }
