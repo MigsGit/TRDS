@@ -982,9 +982,15 @@ const getEmpIdData = (id) => {
         success: function (response) {
             console.log(response);
             let middlename = "";
+            $('#systemoneEmpId').val(response['empInfo'][0]['pkid']);
             $('#txtAddfirstName').val(response['empInfo'][0]['FirstName']);
             $('#txtAddMiddleName').val(response['empInfo'][0]['MiddleName']);
             $('#txtAddLastName').val(response['empInfo'][0]['LastName']);
+            $('#txtAddLastName').val(response['empInfo'][0]['LastName']);
+            $('#txtAddUserPosition').val(response['empInfo'][0]['Position']);
+            $('#txtAddUserSection').val(response['empInfo'][0]['Section']);
+            $('#rapidxEmpId').val(response['rapidxUser']['id']);
+            $('#txtAddUserEmail').val(response['rapidxUser']['email']);
 
 		    // $username = strtolower(substr($fname, 0, 1).substr($mname, 0,1).$lname);
             if(/^[a-zA-Z0-9]*$/.test(response['empInfo'][0]['MiddleName'].substring(0,1)) == true) {

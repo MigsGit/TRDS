@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserRequest;
 use App\Imports\CSVUserImport;
 use App\Jobs\SendUserPasswordJob;
 use App\Model\OQCStamp;
 use App\Model\UserLevel;
+use App\RapidXUser;
 use App\User;
 use Auth;
 use DataTables;
@@ -236,13 +238,25 @@ class UserController extends Controller
     }
 
     // Add User
-    public function add_user(Request $request){
+    public function add_user(UserRequest $userRequest){
         date_default_timezone_set('Asia/Manila');
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $userRequestValidated = $userRequest->validated();
+            $has_email = 0;
+            $userId = User::insertGetId(
+                $userRequestValidated
+            );
+            DB::commit();
+            return response()->json(['result' => "1",'is_success' => 'true']);
 
-        $data = $request->all();
-
+        } catch (\Throwable $th) {
+            DB::rollback();
+            throw $th;
+        }
+        return;
         $email = '';
-        $has_email = 0;
         // $password = 'pmi1234' . Str::random(10);
         $password = 'pmi12345';
 
@@ -518,5 +532,22 @@ class UserController extends Controller
     	$user_levels = UserLevel::all();
 
     	return response()->json(['user_levels' => $user_levels]);
+    }
+
+    public function get_emp_details_by_id(Request $request){
+
+
+        $hris_data = DB::connection('mysql_systemone')
+        ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
+        $rapidxUser = RapidXUser::where('employee_number',$request->empId)->first();
+        if(count($hris_data) > 0){
+            return response()->json(['empInfo' => $hris_data, 'rapidxUser' => $rapidxUser]);
+        }
+        else{
+            $subcon_data = DB::connection('mysql_systemone')
+            ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
+            return response()->json(['empInfo' => $subcon_data,'rapidxUser' => $rapidxUser]);
+        }
+
     }
 }
