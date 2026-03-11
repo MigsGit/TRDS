@@ -110,7 +110,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-sm-4">
-                                <input type="hidden" id="txtHrMemoApprovalId" name="hr_memo_id">
+                                <input type="hidden" id="txtHrMemoId" name="hr_memo_id">
 
                                 <div class="form-group">
                                     <label>Document No</label>
@@ -150,7 +150,7 @@
                             <div class="col-sm-8">
                                 <div class="form-group">
                                     <label>Subject</label>
-                                    <input type="text" class="form-control" name="subject" id="subject" value="" >
+                                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Enter Subject" required>
                                 </div>
 
                                 <div class="form-group">
@@ -160,15 +160,15 @@
 
                                 <div class="form-group">
                                     <label>To</label>
-                                    <select class="form-control" name="to" id="selectTo" required>
-                                        <option value="" disabled selected> Select To/s </option>
+                                    <select class="form-control select2bs5 selectToRecipients" name="to[]" id="selectTo" multiple required>
+                                        {{-- <option value="" disabled selected> Select To/s </option> --}}
                                     </select>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Cc</label>
-                                    <select class="form-control" name="cc" id="selectCc" required>
-                                        <option value="" disabled selected> Select Cc/s </option>
+                                    <select class="form-control select2bs5 selectCcRecipients" name="cc[]" id="selectCc" multiple required>
+                                        {{-- <option value="" disabled selected> Select Cc/s </option> --}}
                                     </select>
                                 </div>
                             </div>

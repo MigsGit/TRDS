@@ -211,11 +211,8 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         traineeDetailsList = {};
         traineeIdCounter = 1; //set counter to 1 every new memo
 
-        // updatePreShipmentTable($tableTD);
-        // getSituations($('#selectSituation'));
-        // getPic($('#tblTraineeDetails #selectPic'));
-        // getPic($('#tblTraineeDetails tr:last').find('.selectPic'));
-        // $('#modalHrMemoApproval').modal('show');
+        selectEmailRecipients($('.selectToRecipients'));
+        selectEmailRecipients($('.selectCcRecipients'));
         $modal.modal('show');
     });
 
@@ -344,19 +341,19 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     // Submit form (Add / Edit)
     $form.on('submit', function (e) {
         e.preventDefault();
-        saveHrMemoApproval($form, $modal, dtHMA);
+        saveHrMemoApproval($form, $modal, dtHMA, traineeDetailsArray);
     });
 
     // Edit button
     $table.on('click', '.btnEdit', function () {
         const id = $(this).data('id');
-        fetchHrMemoApprovalById(id, $modal, $tableTD, $form, 'edit');
+        fetchHrMemoById(id, $modal, $tableTD, $form, 'edit');
     });
 
     // View button
     $table.on('click', '.btnView', function () {
         const id = $(this).data('id');
-        fetchHrMemoApprovalById(id, $modal, $tableTD, $form, 'view');
+        fetchHrMemoById(id, $modal, $tableTD, $form, 'view');
     });
 
     // Disable button
@@ -396,7 +393,15 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         e.preventDefault();
         let id = $(this).data("id");
         let trainee = traineeDetailsArray.find(item => item.action.id == id);
-        console.log('traineeDetailsArray', trainee);
+        $tableTD.find('#endorsementDate').val(trainee.endorsement_date);
+
+        selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
+
+        trainee.exam_details.forEach(function (exam) {
+            getExaminations($('#tblExamination tr:last').find('.selectExamTitle'), exam.exam_title);
+            $('#tblExamination tr:last').find('#result').val(exam.result);
+            $('#tblExamination tr:last').find('#remarks').val(exam.remarks);
+        });
         $modalTD.modal('show');
     });
 
@@ -449,7 +454,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             emp_name : empName,
             traning_venue: trainingVenue,
             endorsement_date: endorsementDate,
-            exam_detals: exam_list
+            exam_details: exam_list
         }
 
         traineeDetailsArray.push(traineeDetailsList);
@@ -475,6 +480,45 @@ function updateRemoveButtons($table, measure_type, array = null){
         $table.find('.removeRow').prop('disabled', false);
     }
 
+}
+
+function selectEmailRecipients(cboElement, rapidxId = null, mode = null){
+    let result = '<option value="" disabled selected> Select Name/s </option>';
+    $.ajax({
+        method: "get",
+        url: "get_email_recipients_dropdown_details",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value="" disabled selected>--Loading--</option>';
+        },
+        success: function (response) {
+            console.log(response);
+
+            if(response.length > 0){
+                    result = '<option value="" disabled selected> Select Name/s </option>';
+
+                for (let i = 0; i < response.length; i++) {
+                    result += '<option value="' + response[i]['id'] + '" data-email="' + response[i]['email'] + '">' + response[i]['name'] + '</option>';
+                }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+
+            cboElement.html(result);
+            if(rapidxId != null){
+                cboElement.val(rapidxId).trigger('change');
+            }
+
+            if(mode == 'view'){
+                cboElement.prop('disabled', true).trigger('change.select2');
+            }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
 }
 
 function selectEmpNo(cboElement, empId = null, mode = null){
@@ -684,9 +728,10 @@ function getPic(cboElement, picId = null, $mode = null){
 /**
  * Save (add/update) hr_memo_approval data
  */
-function saveHrMemoApproval($form, $modal, dtHrMemoApproval) {
+function saveHrMemoApproval($form, $modal, dtHrMemoApproval, appendArray) {
     let form = $form[0];
     let formData = new FormData(form);
+    formData.append('trainee_details', JSON.stringify(appendArray));
 
     $.ajax({
         url: 'add_hr_memo',
@@ -703,6 +748,7 @@ function saveHrMemoApproval($form, $modal, dtHrMemoApproval) {
                 dtHrMemoApproval.draw(false);
                 $modal.modal('hide');
                 $form[0].reset();
+                traineeDetailsArray = [];
                 showSuccess('Successfully saved!');
             }
         },
@@ -716,7 +762,7 @@ function saveHrMemoApproval($form, $modal, dtHrMemoApproval) {
 /**
  * Fetch hr_memo_approval data by ID
  */
-function fetchHrMemoApprovalById(id, $modal, $tableTD, $form, $mode) {
+function fetchHrMemoById(id, $modal, $tableTD, $form, $mode) {
     $.ajax({
         type: 'GET',
         url: 'get_hr_memo_by_id',
@@ -727,76 +773,46 @@ function fetchHrMemoApprovalById(id, $modal, $tableTD, $form, $mode) {
                 disableForm($form);
             }
 
-            // Show Reupload Div & Exisiting Filename
-            $form.find("#btnReuploadTriggerDiv").removeClass('d-none');
-            $form.find("#btnReuploadTrigger").removeClass('d-none');
-            $form.find("#btnReuploadTrigger").prop('checked', false);
-            $form.find("#btnReuploadTriggerLabel").removeClass('d-none');
-            $form.find("#illustrationOfDefectFileName").removeClass('d-none');
+            // Populate modal fields
+            $form.find('#txtHrMemoId').val(response.id);
+            $form.find('#documentNo').val(response.document_no);
+            $form.find('#subject').val(response.subject);
+            $form.find('#reason').val(response.reason);
+            $form.find('#classification').val(response.classification);
+            $form.find('#dateFiled').val(response.date_filed);
 
-            // Hide Upload Attachment section, remove required attribute
-            $form.find("#illustrationOfDefect").addClass('d-none');
-            $form.find("#illustrationOfDefect").removeAttr('required');
+            // $tableTD.find('tbody').empty();
+            // for(let index = 0; index < response.improvements.length; index++){
 
-            // Populate modal fields (adjust names per hr_memo_approval)
-            $form.find('#txtHrMemoApprovalId').val(response.id);
-            $form.find('#situation').val(response.situation);
-            $form.find('#section').val(response.section);
-            $form.find('#dateEncountered').val(response.date_encountered);
-            $form.find('#illustrationOfDefectFileName').val(response.defects.illustration_of_defect);
+            //     let rowImprovements = `
+            //         <tr class="data-row">
+            //             <td id="removeRow">
+            //                 <center><button ${$mode === 'view' ? 'disabled' : ''} class="btn btn-md btn-danger removeRow" title="Remove Row" type="button"><i class="fa fa-times"></i></button></center>
+            //             </td>
+            //             <td>
+            //                 <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="factor[]">${response.improvements[index].factor}</textarea>
+            //             </td>
+            //             <td>
+            //                 <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="cause[]">${response.improvements[index].cause}</textarea>
+            //             </td>
+            //             <td>
+            //                 <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="analysis[]">${response.improvements[index].analysis}</textarea>
+            //             </td>
+            //             <td>
+            //                 <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="counter_measure[]">${response.improvements[index].counter_measure}</textarea>
+            //             </td>
+            //             <td>
+            //                 <select ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-lg select2bs5 selectPic" name="pic[]"></select>
+            //             </td>
+            //             <td>
+            //                 <input ${$mode === 'view' ? 'disabled' : ''} type="date" class="form-control form-control-lg" name="implementation_date[]" value="${response.improvements[index].implementation_date}">
+            //             </td>
+            //         </tr>
+            //     `;
 
-            let download_file ='<a href="download_file/'+response.id+'" target="_blank">';
-                download_file +='<button type="button" class="btn btn-primary btn-sm d-none" name="download_file" id="downloadFile">';
-                download_file +=     '<i class="fa-solid fa-file-arrow-down"></i>';
-                download_file +=         '&nbsp;';
-                download_file +=         'See Attachment';
-                download_file +='</button>';
-                download_file +='</a>';
-
-            $form.find('#attachmentDiv').append(download_file);
-
-            // Show Download Button
-            $form.find("#downloadFile").removeClass('d-none');
-
-            // getDeviceName($('#selectDeviceName'), response.section, response.model, $mode);
-            // getDefects($('#defectId'), response.defects.defect_id, $mode);
-            // getSituations($('#selectSituation'), response.situation, $mode);
-
-            $form.find('#noOfOccurrence').val(response.defects.no_of_occurrence);
-            $form.find('#rootCause').val(response.defects.root_cause);
-
-            $tableTD.find('tbody').empty();
-            for(let index = 0; index < response.improvements.length; index++){
-
-                let rowImprovements = `
-                    <tr class="data-row">
-                        <td id="removeRow">
-                            <center><button ${$mode === 'view' ? 'disabled' : ''} class="btn btn-md btn-danger removeRow" title="Remove Row" type="button"><i class="fa fa-times"></i></button></center>
-                        </td>
-                        <td>
-                            <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="factor[]">${response.improvements[index].factor}</textarea>
-                        </td>
-                        <td>
-                            <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="cause[]">${response.improvements[index].cause}</textarea>
-                        </td>
-                        <td>
-                            <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="analysis[]">${response.improvements[index].analysis}</textarea>
-                        </td>
-                        <td>
-                            <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="counter_measure[]">${response.improvements[index].counter_measure}</textarea>
-                        </td>
-                        <td>
-                            <select ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-lg select2bs5 selectPic" name="pic[]"></select>
-                        </td>
-                        <td>
-                            <input ${$mode === 'view' ? 'disabled' : ''} type="date" class="form-control form-control-lg" name="implementation_date[]" value="${response.improvements[index].implementation_date}">
-                        </td>
-                    </tr>
-                `;
-
-                $tableTD.find('tbody').append(rowImprovements);
-                getPic($('#tblTraineeDetails tr:last').find('.selectPic'), response.improvements[index].pic, $mode);
-            }
+            //     $tableTD.find('tbody').append(rowImprovements);
+            //     getPic($('#tblTraineeDetails tr:last').find('.selectPic'), response.improvements[index].pic, $mode);
+            // }
 
             $modal.modal('show');
         },

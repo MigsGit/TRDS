@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\HrMemo;
 use App\Http\Controllers\Controller;
 use DataTables;
+use App\RapidXUser;
 use App\Model\Hr\HrMemo;
 use App\Model\Hr\HrMemoEmailRecipients;
 use App\Model\Hr\HrMemoTraineeDetails;
@@ -23,7 +24,7 @@ class HrMemoController extends Controller
 
     public function viewHrMemoInfo(Request $request){
         // $globalUser = session('global_user');
-        $hr_memo_details = HrMemo::with(['defects.defect_item', 'situations', 'improvements'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
+        $hr_memo_details = HrMemo::with(['email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
 
         return DataTables::of($hr_memo_details)
         ->addColumn('action', function($hr_memo_details){
@@ -31,26 +32,23 @@ class HrMemoController extends Controller
             $result .= "<center>";
 
             // $canManage  = $globalUser && in_array($globalUser->position, [0,1,2,3]);
-            $isActive   = $hr_memo_details->status == 0;
-            $isDisabled = $hr_memo_details->status == 1;
+            $isPending   = $hr_memo_details->status == 1;
+            $isForApproval = $hr_memo_details->status == 2;
             $id = $hr_memo_details->id;
 
-            if ($isActive) {
+            if ($isPending) {
                 // if ($canManage) {
-                    $result .= $this->actionButton('btn-secondary btnEdit', 'fa-pen-to-square', $id, 'mr-1');
-                    $result .= $this->actionButton('btn-danger btnDisable', 'fa-ban', $id);
+                    $result .= $this->actionButton('btn-secondary btnEdit', 'fas fa-edit', $id, 'mr-1');
+                    $result .= $this->actionButton('btn-danger btnDisable', 'fas fa-ban', $id);
                 // } else {
                 //     $result .= $this->actionButton('btn-info btnView', 'fa-eye', $id, 'mr-1');
                 // }
             }
 
-            if ($isDisabled) {
-                $result .= $this->actionButton('btn-info btnView', 'fa-eye', $id, 'mr-1');
-
-                // if ($canManage) {
-                    $result .= $this->actionButton('btn-success btnEnable', 'fa-rotate-left', $id);
-                // }
-            }
+            // if ($isForApproval) {
+            //     $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
+            //     $result .= $this->actionButton('btn-success btnEnable', 'fas fa-undo', $id);
+            // }
 
             $result .= "</center>";
             return $result;
@@ -59,10 +57,12 @@ class HrMemoController extends Controller
             $result = "";
             $result .= "<center>";
 
-            if($pth_details->status == 0){
-                $result .= "<span class='badge rounded-pill bg-success'>Active</span>";
+            if($pth_details->status == 1){
+                $result .= "<span class='badge rounded-pill bg-primary'>Pending</span>";
+            }else if($pth_details->status == 2){
+                $result .= "<span class='badge rounded-pill bg-info'>For Approval</span>";
             }else{
-                $result .= "<span class='badge rounded-pill bg-danger'>Inactive</span>";
+                $result .= "<span class='badge rounded-pill bg-success'>Done</span>";
             }
             $result .= "</center>";
 
@@ -70,6 +70,12 @@ class HrMemoController extends Controller
         })
         ->rawColumns(['action', 'status_label'])
         ->make(true);
+    }
+
+    public function getEmailRecipientsDropdownDetails(Request $request)
+    {
+        $emails = RapidXUser::select('id', 'name', 'email')->whereNotNull('email')->where('user_stat', 1)->get();
+        return response()->json($emails);
     }
 
     public function getEmpNoDropdownDetails(Request $request)
@@ -175,22 +181,17 @@ class HrMemoController extends Controller
     }
 
     public function addHrMemoInfo(Request $request){
+        // return $request->all();
+        // return $trainees = json_decode($request->trainee_details, true);
         $validation = array(
-            'situation' => 'required',
-            'section' => 'required',
-            'date_encountered' => 'required',
-            'model' => 'required',
-            'illustration_of_defect' => ['nullable','file','mimes:jpg,jpeg,png,webp','max:10240'], // 5MB
-            'no_of_occurrence' => 'required',
-            'defect_id' => 'required',
-            // 'root_cause' => 'required',
-            'factor.*' => 'required|string',
-            'cause.*' => 'required|string',
-            'analysis.*' => 'required|string',
-            'counter_measure.*' => 'required|string',
-            'implementation_date.*' => 'required|string',
-            // 'improvement_action.*' => 'required|string',
-            // 'improvement_action_remarks.*' => 'required|string'
+            'subject' => 'required',
+            'from' => 'required',
+            'classification' => 'required',
+            'reason' => 'required',
+            'date_filed' => 'required',
+            'to' => 'required',
+            'cc' => 'required',
+            'trainee_details' => 'required'
         );
 
         $data = $request->all();
@@ -202,84 +203,99 @@ class HrMemoController extends Controller
             DB::beginTransaction();
 
             try{
-                $history_data_array = array(
-                    'date_encountered' => $request->date_encountered,
-                    'situation' => $request->situation,
-                    'section' => $request->section,
-                    'model' => $request->model
+                //Control Number Generation
+                $lastest_id = HrMemo::whereNull('deleted_at')->latest('id')->first();
+                if($lastest_id == null){
+                    $counter = 1;
+                }else{
+                    $last_control_no = $lastest_id->document_no;
+                    $last_control_no = explode("-", $last_control_no);
+                    $dateCode = date('my'); // month + year (2 digits)
+                    if($last_control_no[1] == $dateCode){
+                        $counter = $last_control_no[2];
+                        $counter++;
+                    }else{
+                        $counter = 1;
+                    }
+                }
+
+                if(strlen($counter) == 1){
+                    $digit_prefix = '00';
+                }else if(strlen($counter) == 2){
+                    $digit_prefix = '0';
+                }
+
+                $hr_memo_data_array = array(
+                    'classification' => $request->classification,
+                    'reason' => $request->reason,
+                    'from' => $request->from,
+                    'subject' => $request->subject,
+                    'date_filed' => $request->date_filed
                 );
 
-                if(isset($request->history_id)){ // EDIT
-                    $history_id = $request->history_id;
+                if(isset($request->hr_memo_id)){ // EDIT
+                    $hr_memo_id = $request->hr_memo_id;
 
-                    PartTroubleHistory::where('id', $request->history_id)
-                    ->update($history_data_array);
+                    HrMemo::where('id', $request->hr_memo_id)
+                    ->update($hr_memo_data_array);
+
                 }else{ // ADD
-                    $history_id = PartTroubleHistory::insertGetId($history_data_array);
+                    $document_no = 'HRS TRAINING-'.date('ym').'-'.$digit_prefix.$counter;
+                    $hr_memo_data_array['document_no'] = $document_no;
+                    $hr_memo_id = HrMemo::insertGetId($hr_memo_data_array);
                 }
 
-                // DELETE OLD PthsDefects ON UPDATE
-                PthsDefects::where('history_id', $request->history_id)->delete();
-
-                if ($request->defect_id){
-
-                    if($request->hasFile('illustration_of_defect')){
-                        // FILE HANDLING
-                        $uploadedFile = $request->file('illustration_of_defect');
-
-                        // Get the original filename parts
-                        $filename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-                        $file_extension = $uploadedFile->getClientOriginalExtension();
-
-                        // 🔹 Remove special characters (keep only letters, numbers, spaces, dash, underscore)
-                        $cleanName = preg_replace('/[^\p{L}\p{N} _-]/u', '', $filename);
-                        // 🔹 Replace spaces with underscores for safety
-                        $cleanName = str_replace(' ', '_', $cleanName);
-                        // 🔹 Add timestamp or unique ID if needed
-                        $cleanedFilename = $cleanName . '.' . $file_extension;
-
-                        // use cleanedFilename to be saved to storage
-                        $file_attachment = $cleanedFilename;
-
-                        Storage::putFileAs('public/file_attachments', $request->illustration_of_defect, $file_attachment);
-                    }else{
-                        // use existing filename
-                        $file_attachment = $request->illustration_of_defect_filename;
-                    }
-
-                    $pths_defects_data = [
-                        'history_id'                => $history_id,
-                        'defect_id'                 => $request->defect_id,
-                        'illustration_of_defect'    => $file_attachment,
-                        'no_of_occurrence'          => $request->no_of_occurrence,
-                        'root_cause'                => $request->root_cause,
-                    ];
-
-                    PthsDefects::insert($pths_defects_data);
+                // DELETE OLD HrMemo Email Recipients ON UPDATE
+                HrMemoEmailRecipients::where('hr_memo_id', $request->hr_memo_id)->delete();
+                // SAVE NEW HrMemo Email Recipients
+                foreach ($request->to as $i => $value){
+                    HrMemoEmailRecipients::insert([
+                        'hr_memo_id' => $hr_memo_id,
+                        'user_id' => $request->to[$i],
+                        'type' => 'to'
+                    ]);
                 }
 
-                // DELETE OLD Improvement Actions ON UPDATE
-                PthsImprovements::where('history_id', $request->history_id)->delete();
+                foreach ($request->cc as $i => $value){
+                    HrMemoEmailRecipients::insert([
+                        'hr_memo_id' => $hr_memo_id,
+                        'user_id' => $request->cc[$i],
+                        'type' => 'cc'
+                    ]);
+                }
 
-                // SAVE NEW Improvement Actions
-                if ($request->factor){
-                    foreach ($request->factor as $i => $value){
-                        PthsImprovements::insert([
-                            'history_id'          => $history_id,
-                            'factor'              => $request->factor[$i],
-                            'cause'               => $request->cause[$i],
-                            'analysis'            => $request->analysis[$i],
-                            'counter_measure'     => $request->counter_measure[$i],
-                            'pic'                 => $request->pic[$i],
-                            'implementation_date' => $request->implementation_date[$i]
-                            // 'improvement_actions'  => $request->improvement_action[$i],
-                            // 'remarks'              => $request->improvement_action_remarks[$i]
-                        ]);
+                // DELETE OLD HrMemo Trainee Details ON UPDATE
+                HrMemoTraineeDetails::where('hr_memo_id', $request->hr_memo_id)->delete();
+
+                // DELETE OLD HrMemo Trainee Category Details ON UPDATE
+                HrMemoTraineeCategoryDetails::where('hr_memo_id', $request->hr_memo_id)->delete();
+
+                $trainees = json_decode($request->trainee_details, true);
+                if ($trainees){
+                    foreach ($trainees as $td) {
+                        // SAVE NEW HrMemo Trainee Details
+                        $trainee_detail_id = HrMemoTraineeDetails::insertGetId([
+                                                'hr_memo_id'          => $hr_memo_id,
+                                                'hris_id'             => $td['action']['emp_id'],
+                                                'employment_type'     => $td['action']['emp_type'],
+                                                'employee_no'         => $td['emp_no']
+                                            ]);
+
+                        foreach ($td['exam_details'] as $ed) {
+                            // SAVE NEW HrMemo Trainee Category Details
+                            HrMemoTraineeCategoryDetails::insert([
+                                'hr_memo_id'          => $hr_memo_id,
+                                'trainee_details_id'  => $trainee_detail_id,
+                                'category'            => $ed['exam_title'],
+                                'result'              => $ed['result'],
+                                'training_remarks'    => $ed['remarks']
+                            ]);
+                        }
                     }
                 }
 
                 DB::commit();
-                return response()->json(['result' => 1, 'msg' => 'Transaction Succesful']);
+                return response()->json(['result' => 1, 'msg' => 'Hr Memo information saved successfully.']);
             }catch(Exemption $e){
                 DB::rollback();
                 return $e;
@@ -288,14 +304,14 @@ class HrMemoController extends Controller
     }
 
     public function getHrMemoById(Request $request){
-        return PartTroubleHistory::with(['defects.defect_item', 'improvements'])->where('id', $request->id)->first();
+        return HrMemo::with(['email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->where('id', $request->id)->first();
     }
 
     public function updateHrMemoStatus(Request $request){
         DB::beginTransaction();
 
         try {
-            $defect = PartTroubleHistory::findOrFail($request->id);
+            $defect = HrMemo::findOrFail($request->id);
 
             $defect->status = $defect->status == 1 ? 0 : 1;
             $defect->save();
@@ -325,155 +341,8 @@ class HrMemoController extends Controller
         }
     }
 
-    //====================================== DOWNLOAD FILE ======================================
-    public function downloadFile(Request $request, $id){
-        $file_name = PartTroubleHistory::with('defects')->where('id', $id)->first();
-        // return $file_name->defects->illustration_of_defect;
-        $filename = $file_name->defects->illustration_of_defect;
-        $filePath =  storage_path() . "/app/public/file_attachments/" . $filename;
-
-        $mimeType = mime_content_type($filePath);
-        // return $mimeType;
-
-        if (str_starts_with($mimeType, 'image/')) {
-            return response()->file($filePath, [
-                'Content-Type'        => $mimeType,
-                'Content-Disposition' => 'inline; filename="' . $filename . '"',
-                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                'Pragma'        => 'no-cache',
-                'Expires'       => '0',
-            ]);
-        }
-    }
-
-    private function getMaterialsFrom($connection){
-        return DB::connection($connection)
-            ->table('tbl_wbs_material_kitting')
-            ->select('device_name')
-            ->whereNotNull('device_name')
-            ->groupBy('device_name')
-            ->orderBy('device_name')
-            ->pluck('device_name');
-    }
-
     public function getUsers(Request $request){
         $users = User::where('status', 0)->get();
         return response()->json(['users_data' => $users]);
-    }
-
-    public function getDeviceName(Request $request){
-        $self = $this;
-
-        $section = $request->input('section'); // ts, cn, yf, ppd
-        $materials = collect();
-
-        // Only run queries if a section is provided
-        if ($section) {
-
-            // TS section
-            if ($section == 'TS') {
-                $materials = $materials->merge($self->getMaterialsFrom('wbs_ts'));
-            }
-
-            // CN section
-            if ($section == 'CN') {
-                $materials = $materials->merge($self->getMaterialsFrom('wbs_cn'));
-            }
-
-            // YF section
-            if ($section == 'YF') {
-                $materials = $materials->merge($self->getMaterialsFrom('wbs_yf'));
-            }
-
-            // PPD section (different DB, only run if selected)
-            if ($section == 'PPD') {
-                $ppd_results = DB::connection('mysql_rapid')->select("
-                    SELECT DeviceName
-                    FROM tbl_dieset t1
-                    WHERE Rev = (
-                        SELECT MAX(NULLIF(Rev, ''))
-                        FROM tbl_dieset t2
-                        WHERE t2.DeviceName = t1.DeviceName
-                    )
-                    OR (Rev = '' AND NOT EXISTS (
-                        SELECT 1
-                        FROM tbl_dieset t3
-                        WHERE t3.DeviceName = t1.DeviceName
-                            AND t3.Rev <> ''
-                    ))
-                    ORDER BY DeviceName
-                ");
-
-                // Extract only DeviceName and wrap for JSON
-                foreach ($ppd_results as $row) {
-                    $materials->push($row->DeviceName);
-                }
-            }
-
-            // Deduplicate, sort, and format for JSON
-            $materials = $materials
-                ->unique()
-                ->sort() // sort alphabetically
-                ->values() // reset keys
-                ->map(function ($value) {
-                    return array('materials' => $value);
-                })
-                ->values() // reset keys after map
-                ->toArray();
-        }
-
-        // If no section selected, return empty array
-        return response()->json($materials);
-    }
-
-    public function getCountOfNoOfOccurrence(Request $request){
-
-        [$year, $month] = explode('-', $request->date_encountered);
-
-        if ($month >= 4) {
-            // April to December
-            $start = $year . '-04-01';
-            $end   = ($year + 1) . '-03-31';
-        } else {
-            // January to March
-            $start = ($year - 1) . '-04-01';
-            $end   = $year . '-03-31';
-        }
-
-        $count =  PartTroubleHistory::
-                where('section', $request->section)
-                ->where('model', $request->model)
-                ->whereBetween('date_encountered', [$start, $end])
-                ->whereHas('defects', function ($query) use ($request){
-                    $query->where('defect_id', $request->defect_id)
-                            ->whereNull('deleted_at');
-                })
-                ->whereHas('situations', function ($query) use ($request){
-                    $query->where('id', $request->situation)
-                            ->where('status', 0);
-                })
-                ->where('status', 0)
-                ->whereNull('deleted_at')
-                ->count();
-
-                // +1 because current occurrence is not yet included
-                $ordinal = $this->ordinal($count + 1);
-
-                return response()->json([
-                    'count'   => $count,
-                    'ordinal' => $ordinal
-                ]);
-    }
-
-    private function ordinal($number){
-        if (!in_array($number % 100, [11, 12, 13])) {
-            switch ($number % 10) {
-                case 1: return $number . 'st';
-                case 2: return $number . 'nd';
-                case 3: return $number . 'rd';
-            }
-        }
-
-        return $number . 'th';
     }
 }
