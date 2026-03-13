@@ -4,14 +4,20 @@ namespace App\Model\Hr;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
+use App\Model\SystemOneHrisEmpInfo;
+use App\Model\SystemOneSubconEmpInfo;
 
 class HrMemoTraineeDetails extends Model
 {
-    // public function systemone_emp_details()
-    // {
-    //     return $this->hasOne
-    //     // return $this->hasOne(HrMemoTraineeCategoryDetails::class, 'trainee_details_id', 'id');
-    // }
+    public function hris_emp_info()
+    {
+        return $this->hasOne(SystemOneHrisEmpInfo::class, 'pkid', 'hris_id')->where('vw_employeeinfo.EmpStatus', 1);
+    }
+
+    public function subcon_emp_info()
+    {
+        return $this->hasOne(SystemOneSubconEmpInfo::class, 'pkid', 'hris_id')->where('vw_employeeinfo.EmpStatus', 1);
+    }
 
     public function emp_exam_details()
     {

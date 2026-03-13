@@ -6,7 +6,9 @@ use App\Http\Requests\UserRequest;
 use App\Imports\CSVUserImport;
 use App\Jobs\SendUserPasswordJob;
 use App\Model\OQCStamp;
+use App\Model\UserAccessModule;
 use App\Model\UserLevel;
+use App\Model\UserModule;
 use App\RapidXUser;
 use App\User;
 use Auth;
@@ -22,6 +24,27 @@ use QrCode;
 
 class UserController extends Controller
 {
+
+    public function save_user_module_access(Request $request){
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $arrUserModulesId = $request->arrUserModulesId;
+            $selectedEmployeeNumber = $request->selectedEmployeeNumber;
+            UserAccessModule::whereIn('users_id',$selectedEmployeeNumber)->delete();
+            collect($selectedEmployeeNumber)->map(function($rowSelectedEmployeeNumber) use ($arrUserModulesId){
+                UserAccessModule::insert([
+                    'users_id' => $rowSelectedEmployeeNumber,
+                    'user_modules_id' => implode(',',$arrUserModulesId),
+                ]);
+            });
+            DB::commit();
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
     // Sign In
     public function sign_in(Request $request){
         $user_data = array(
@@ -236,6 +259,51 @@ class UserController extends Controller
             ->rawColumns(['label1', 'action1', 'checkbox'])
             ->make(true);
     }
+    //View Users
+	public function view_user_module_access(){
+    	$userModule = UserModule::with([
+                    'rapidx_user_updated_by',
+                ])
+                ->get();
+
+        return DataTables::of($userModule)
+            ->addColumn('rawBulkCheckBox', function($row){
+                $result = '';
+                $result .= '<center>';
+                $result .= "<input class='checkBulkIqcInspection' type='checkbox' pkid-received='".$row->id."' id='checkBulkIqcInspection'>";
+                $result .= '</center>';
+                return $result;
+            })
+            ->addColumn('action', function($row){
+                $result = '<center><div class="btn-group">
+                          <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
+                            <i class="fa fa-cog"></i>
+                          </button>
+                          <div class="dropdown-menu dropdown-menu-right">';
+                if($row->status == 1){
+                	$result .= '<button class="dropdown-item aEditUser" type="button" user-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalEditUser" data-keyboard="false">Edit</button>';
+
+                    $result .= '<button class="dropdown-item aChangeUserStat" type="button" user-id="' . $row->id . '" status="2" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalChangeUserStat" data-keyboard="false">Deactivate</button>';
+
+                    $result .= '<button class="dropdown-item aResetUserPass" user-id="' . $row->id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalResetUserPass" data-keyboard="false">Reset Password</button>';
+
+                    // $result .= '<button class="dropdown-item aGenUserBarcode" user-id="' . $row->id . '" employee-id="' . $row->employee_id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalGenUserBarcode">Generate Barcode</button>';
+                }
+                else{
+                    $result .= '<button class="dropdown-item aChangeUserStat" type="button" style="padding: 1px 1px; text-align: center;" user-id="' . $row->id . '" status="1" data-toggle="modal" data-target="#modalChangeUserStat" data-keyboard="false">Activate</button>';
+                }
+
+                $result .= '</div>
+                        </div></center>';
+
+                return $result;
+            })
+            ->addColumn('updated_by', function($row){
+                return $row->updated_by ;
+            })
+            ->rawColumns(['action', 'updated_by','rawBulkCheckBox'])
+            ->make(true);
+    }
 
     // Add User
     public function add_user(UserRequest $userRequest){
@@ -323,10 +391,29 @@ class UserController extends Controller
         return response()->json(['user' => $user]);
     }
 
-    public function get_user_list(Request $request){
-        $users = User::all();
+    public function get_user_list(Request $request){ //nmodify
 
-        return response()->json(['users' => $users]);
+        $users = User::with([
+            'rapidx_rapidx_user_no',
+            'rapidx_system_one_subcon_emp_info',
+            'rapidx_system_one_hris_emp_info'
+        ])->get();
+
+       $userCollection =  collect($users)->map(function($rowUsers){
+            if($rowUsers->rapidx_system_one_subcon_emp_info!= null){
+                $userHris = $rowUsers->rapidx_system_one_subcon_emp_info;
+            }
+            else if($rowUsers->rapidx_system_one_hris_emp_info != null){
+                $userHris = $rowUsers->rapidx_system_one_hris_emp_info;
+            }
+            return [
+             'users' => $rowUsers,
+             'userDetails' => $userHris,
+            ];
+        });
+
+
+        return response()->json(['userCollection' => $userCollection]);
     }
 
     // Get User By Batch

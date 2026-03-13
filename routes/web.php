@@ -82,11 +82,15 @@ Route::controller(HrMemoController::class)->group(function () {
 // USER CONTROLLER
 Route::controller(UserController::class)->group(function () {
     Route::post('/add_user', 'add_user');
+    Route::post('/save_user_module_access', 'save_user_module_access');
 
 
     Route::get('/view_users', 'view_users')->name('user.view_users');
+    Route::get('/view_user_module_access', 'view_user_module_access')->name('user.get_emp_details_by_id');
     Route::get('/get_user_levels', 'get_user_levels')->name('user.get_user_levels');
     Route::get('/get_emp_details_by_id', 'get_emp_details_by_id')->name('user.get_emp_details_by_id');
+    Route::get('/get_user_list', 'get_user_list');
+
 });
 
 
@@ -97,7 +101,6 @@ Route::controller(UserController::class)->group(function () {
 // Route::post('/change_pass', 'change_pass')->name('change_pass');
 // Route::post('/change_user_stat', 'change_user_stat')->name('change_user_stat');
 // Route::get('/get_user_by_id', 'get_user_by_id');
-// Route::get('/get_user_list', 'get_user_list');
 // Route::get('/get_user_by_batch', 'get_user_by_batch');
 // Route::get('/get_user_by_stat', 'get_user_by_stat');
 // Route::post('/edit_user', 'edit_user');

@@ -942,19 +942,20 @@ function GetUserList(cboElement){
             cboElement.html(result);
         },
         success: function(JsonObject){
+            let userCollection = JsonObject['userCollection'];
             result = '';
-            if(JsonObject['users'].length > 0){
-                result = '<option value="">N/A</option>';
-                for(let index = 0; index < JsonObject['users'].length; index++){
-                    let disabled = '';
+            if(userCollection.length > 0){
 
-                    if(JsonObject['users'][index].status == 2){
-                      disabled = 'disabled';
-                    }
-                    else{
-                      disabled = '';
-                    }
-                    result += '<option data-code="' + JsonObject['users'][index].employee_id + '" value="' + JsonObject['users'][index].id + '" ' + disabled + '>' + JsonObject['users'][index].name + '</option>';
+
+
+                result = '<option value="">N/A</option>';
+                for(let index = 0; index < userCollection.length; index++){
+                    let disabled = '';
+                    let empNo = userCollection[index].users.rapidx_emp_o;
+                    let usersId = userCollection[index].users.id;
+                    let userDetails = userCollection[index].userDetails;
+                    let fullName = userDetails['FirstName']+' '+userDetails['LastName'];
+                    result += '<option emp-no="' + empNo + '" value="' + usersId + '">' + fullName + '</option>';
                 }
             }
             else{

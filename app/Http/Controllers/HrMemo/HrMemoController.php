@@ -8,6 +8,7 @@ use App\Model\Hr\HrMemo;
 use App\Model\Hr\HrMemoEmailRecipients;
 use App\Model\Hr\HrMemoTraineeDetails;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -278,7 +279,8 @@ class HrMemoController extends Controller
                                                 'hr_memo_id'          => $hr_memo_id,
                                                 'hris_id'             => $td['action']['emp_id'],
                                                 'employment_type'     => $td['action']['emp_type'],
-                                                'employee_no'         => $td['emp_no']
+                                                'employee_no'         => $td['emp_no'],
+                                                'endorsement_date'    => $td['endorsement_date']
                                             ]);
 
                         foreach ($td['exam_details'] as $ed) {
@@ -304,7 +306,61 @@ class HrMemoController extends Controller
     }
 
     public function getHrMemoById(Request $request){
-        return HrMemo::with(['email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->where('id', $request->id)->first();
+        $hrMemo = HrMemo::with([
+            'email_recipients.rapidx_user',
+            'trainee_details.emp_exam_details.exam_info',
+            'trainee_details'  // Load trainee_details first
+        ])
+        ->where('id', $request->id)
+        ->first();
+
+        // return $hrMemo;
+        if ($hrMemo && $hrMemo->trainee_details) {
+            foreach($hrMemo->trainee_details as $td){
+                if ($td->employment_type == 1) {
+                    // HRIS employee
+                    $td->load(['hris_emp_info' => function ($q) {
+                        $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                        ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                        ->select(
+                            'vw_employeeinfo.*',
+                            'tbl_Training.Venue as Venue'
+                        );
+                    }]);
+                } else {
+                    // Subcon employee
+                    $td->load(['subcon_emp_info' => function ($q) {
+                        $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                        ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                        ->select(
+                            'vw_employeeinfo.*',
+                            'tbl_Training.Venue as Venue'
+                        );
+                    }]);
+                }
+            }
+        }
+
+        return response()->json($hrMemo);
+        // return $hrMemo;
+
+        // return HrMemo::with(['email_recipients.rapidx_user',
+        //                 'trainee_details.emp_exam_details.exam_info',
+        //                 'trainee_details.hris_emp_info' => function ($q) {
+        //                     $q->where('trainee_details.employment_type', 1)
+        //                         ->join('vw_Trainee', 'tbl_EmployeeInfo.pkid', '=', 'vw_Trainee.fkEmployee')
+        //                         ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+        //                         ->select('tbl_EmployeeInfo.*', DB::raw('CONCAT(tbl_EmployeeInfo.FirstName, " ", tbl_EmployeeInfo.LastName) as EmpName'), 'tbl_Training.Venue as Venue');
+        //                 },
+        //                 'trainee_details.subcon_emp_info' => function ($q) {
+        //                     $q->where('trainee_details.employment_type', 2)
+        //                         ->join('vw_Trainee', 'tbl_EmployeeInfo.pkid', '=', 'vw_Trainee.fkEmployee')
+        //                         ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+        //                         ->select('tbl_EmployeeInfo.*', DB::raw('CONCAT(tbl_EmployeeInfo.FirstName, " ", tbl_EmployeeInfo.LastName) as EmpName'), 'tbl_Training.Venue as Venue');
+        //                 },
+        //             ])
+        //             ->where('id', $request->id)
+        //             ->first();
     }
 
     public function updateHrMemoStatus(Request $request){

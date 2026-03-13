@@ -39,7 +39,7 @@
       </div><!-- /.container-fluid -->
     </section>
 
-    <!-- Main content -->txtAddUserEmpId
+    <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
         <div class="row">
@@ -53,9 +53,11 @@
 
                <!-- Start Page Content -->
                <div class="card-body">
-                <div style="float: right;">
 
+                <div style="float: right;">
                   <button class="btn btn-primary" data-toggle="modal" data-target="#modalAddUser" id="btnShowAddUserModal"><i class="fa fa-user-plus"></i> Add User</button>
+
+                  <button class="btn btn-primary" data-toggle="modal" data-target="#modalAddUserModuleAccess" id="btnAddUserModuleAccess"><i class="fa fa-user-plus"></i> Add User Module Access</button>
                 </div> <br><br>
                 <div class="table responsive">
                   <table id="tblUsers" class="table table-sm table-bordered table-striped table-hover" style="width: 100%;">
@@ -89,7 +91,7 @@
       <div class="modal-content modal-sm">
         <div class="modal-header">
           <h4 class="modal-title" id="h4ChangeUserTitle"><i class="fa fa-user"></i> Change Status</h4>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -101,7 +103,7 @@
             <input type="hidden" name="status" placeholder="Status" id="txtChangeUserStatUserStat">
           </div>
           <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-bs-dismiss="modal">No</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
             <button type="submit" id="btnChangeUserStat" class="btn btn-dark"><i id="iBtnChangeUserStatIcon" class="fa fa-check"></i> Yes</button>
           </div>
         </form>
@@ -117,7 +119,7 @@
       <div class="modal-content modal-sm">
         <div class="modal-header">
           <h4 class="modal-title"><i class="fa fa-user"></i> Reset User Password</h4>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -128,7 +130,7 @@
             <input type="hidden" name="user_id" placeholder="User Id" id="txtResetUserPassUserId">
           </div>
           <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-bs-dismiss="modal">No</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
             <button type="submit" id="btnResetUserPass" class="btn btn-dark"><i id="iBtnResetUserPassIcon" class="fa fa-check"></i> Yes</button>
           </div>
         </form>
@@ -145,7 +147,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title"><i class="fa fa-qrcode"></i> Generate QR Code</h4>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -159,7 +161,7 @@
             </center>
         </div>
         <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           <button type="submit" id="btnPrintUserBarcode" class="btn btn-dark"><i id="iBtnPrintUserBarcodeIcon" class="fa fa-print"></i> Print</button>
         </div>
       </div>
@@ -174,7 +176,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title"><i class="fa fa-file-excel"></i> Import User</h4>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -191,7 +193,7 @@
             </div>
           </div>
           <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button type="submit" id="btnImportUser" class="btn btn-primary"><i id="iBtnImportUserIcon" class="fa fa-check"></i> Import</button>
           </div>
         </form>
@@ -208,7 +210,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title"><i class="fa fa-user-plus"></i> Add User</h4>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -271,7 +273,7 @@
                     <label>Position</label>
                       <input type="text" class="form-control read-only" name="position"  id="txtAddUserPosition">
                   </div>
-  
+
                   <div class="form-group">
                       <label>Section</label>
                       <input type="text" class="form-control read-only" name="section" id="txtAddUserSection">
@@ -280,25 +282,66 @@
             </div>
           </div>
           <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button type="button" id="btnAddUser" class="btn btn-dark"><i id="iBtnAddUserIcon" class="fa fa-check"></i> Save</button>
           </div>
         </form>
       </div>
       <!-- /.modal-content -->
     </div>
-    <!-- /.modal-dialog -->
+  </div>
+  <div class="modal fade" id="modalAddUserModuleAccess">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title"><i class="fa fa-user-plus"></i> Add User</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+                <div class="form-group">
+                    <label>Employee Number</label>
+                    <select class="form-control select2bs4" name="selected_employee_number[]" id="selectedEmployeeNumber" style="width: 100%;" multiple>
+                    </select>
+                </div>
+            <br><br>
+            <table id="tblUserModuleAccess" class="table table-sm table-bordered table-striped table-hover" style="width: 100%;">
+                <thead>
+                  <tr>
+                    <th><center> <input class="" type="checkbox" id="checkBulkIqcInspectionSelectAll"> </center></th>
+                    <th>Module Name</th>
+                    <th>Updated by</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+              </table>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" id="btnSubmitUserModuleAccess" class="btn btn-dark"><i id="ibtnSubmitUserModuleAccess" class="fa fa-check"></i> Save</button>
+            </div>
+        </div>
+      </div>
+    </div>
   </div>
   <!-- /.modal -->
   @endsection
 
   @section('js_content')
   <script type="text/javascript">
-      let dataTableUsers;
+    let dataTableUsers;
     let genUserqrcode = "";
     let imgResultUserQrCode = '';
     let qrCodeName = '';
     let arrSelectedUsers = [];
+    globalVar = {
+        arrUserModulesId : []
+    }
+    tbl = {
+        tblUserModuleAccess:'#tblUserModuleAccess',
+    }
     $(document).ready(function () {
         //Initialize Select2 Elements
         $('.select2').select2();
@@ -335,6 +378,34 @@
             { "data" : "user_level.user_level" },
             { "data" : "label1" },
             { "data" : "action1", orderable:false, searchable:false }
+            ],
+
+        //   "columnDefs": [
+        //     {
+        //       "targets": [3, 5],
+        //       "data": null,
+        //       "defaultContent": "N/A"
+        //     },
+        //     // { "visible": false, "targets": 1 }
+        //   ],
+            "order": [[ 1, "asc" ]],
+        });//end of dataTableUsers
+
+        dtUserModuleAccess = $("#tblUserModuleAccess").DataTable({
+        "processing" : false,
+            "serverSide" : true,
+            "ajax" : {
+            url: "view_user_module_access",
+            // data: function (param){
+            //     param.status = $("#selEmpStat").val();
+            // }
+            },
+
+            "columns":[
+                { "data" : "rawBulkCheckBox", orderable:false, searchable:false },
+                { "data" : "module_name" },
+                { "data" : "updated_by" },
+                { "data" : "action", orderable:false, searchable:false },
             ],
 
         //   "columnDefs": [
@@ -664,7 +735,67 @@
             getEmpIdData($(this).val());
           }
         });
-      });
+
+        $('#btnAddUserModuleAccess').click(function (e) {
+            e.preventDefault();
+            // getUserDetails();
+            GetUserList( $('#selectedEmployeeNumber'));
+        });
+
+        $(tbl.tblUserModuleAccess).on('click','#checkBulkIqcInspection','tr', function () {
+            let row = $(this).closest('tr'); // Get the parent row of the checkbox
+            let pkidReceived = $(this).attr('pkid-received');
+            if ($(this).prop('checked')) {
+                row.attr('style', 'background:#90EE90;');
+                $(this).each(function () {
+                    globalVar.arrUserModulesId.push(pkidReceived);
+                    console.log('arrUserModulesId',globalVar.arrUserModulesId);
+                });
+            }else{
+                row.attr('style', 'background:white;');
+                $(this).each(function () {
+                    let indexPkidReceived = globalVar.arrUserModulesId.indexOf(pkidReceived);
+                    globalVar.arrUserModulesId.splice(indexPkidReceived, 1);
+                    console.log('arrSplice_fkid_document',globalVar.arrUserModulesId);
+                });
+            }
+            $('#countBulkIqcInspection').text(`${globalVar.arrUserModulesId.length}`);
+            console.log(globalVar.arrUserModulesId);
+            
+        });
+
+        $('#checkBulkIqcInspectionSelectAll').on('change', function() {
+            let isChecked = this.checked;
+            $('.checkBulkIqcInspection').prop('checked', isChecked).trigger('change');; // Toggle all row checkboxes
+            if (isChecked) {
+                $('.checkBulkIqcInspection').each(function() {
+                    let row = $(this).closest('tr');
+                    row.attr('style', 'background:#90EE90;');
+                    globalVar.arrUserModulesId.push($(this).attr('pkid-received'));
+                });
+            } else {
+                // dataTable.iqcTsWhsPackaging.page.len(10).draw();
+                globalVar.arrUserModulesId = [];
+            }
+            $('#countBulkIqcInspection').text(`${globalVar.arrUserModulesId.length}`);
+            console.log(globalVar.arrUserModulesId);
+        });
+
+        $('#btnSubmitUserModuleAccess').click(function (e) { 
+            e.preventDefault();
+            let data = {
+                arrUserModulesId : globalVar.arrUserModulesId,
+                selectedEmployeeNumber : $('#selectedEmployeeNumber').val(),
+            }
+            let serializedData = {}
+            console.log(data);
+            
+            call_ajax_serialize(data,serializedData , 'save_user_module_access', function(response){
+                console.log(response);
+                
+            });
+        });
+    });
   </script>
   @endsection
 {{-- @endauth --}}

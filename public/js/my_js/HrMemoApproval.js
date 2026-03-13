@@ -107,7 +107,7 @@ function initHrMemoApprovalTable($table, url = 'view_hr_memo') {
 /**
  * Initialize DataTable
  */
-function initTraineeDetailsTable($table1, url1 = 'view_trainee_details') {
+function initTraineeDetailsTable($table1) {
     return $table1.DataTable({
         ordering: false,
         searching: false,
@@ -280,7 +280,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
                 $formTD.find('#dateHired').val(emp_details.DateHired);
                 $formTD.find('#position').val(emp_details.Position);
                 $formTD.find('#trainingVenue').val(emp_details.Venue);
-                // $formTD.find('#endorsementDate').val(emp_details.emp_name);
                 $formTD.find('#department').val(emp_details.Department);
                 $formTD.find('#prodAllocation').val(emp_details.Section);
             }
@@ -347,13 +346,15 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     // Edit button
     $table.on('click', '.btnEdit', function () {
         const id = $(this).data('id');
-        fetchHrMemoById(id, $modal, $tableTD, $form, 'edit');
+        // traineeDetailsArray = [];
+        fetchHrMemoById(id, $modal, dtTraineeDetails, $form, 'edit', traineeDetailsArray);
     });
 
     // View button
     $table.on('click', '.btnView', function () {
         const id = $(this).data('id');
-        fetchHrMemoById(id, $modal, $tableTD, $form, 'view');
+        // traineeDetailsArray = [];
+        fetchHrMemoById(id, $modal, dtTraineeDetails, $form, 'view', traineeDetailsArray);
     });
 
     // Disable button
@@ -393,6 +394,9 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         e.preventDefault();
         let id = $(this).data("id");
         let trainee = traineeDetailsArray.find(item => item.action.id == id);
+        console.log('trainees', trainee);
+        console.log('edit traineeDetailsArray', traineeDetailsArray);
+
         $tableTD.find('#endorsementDate').val(trainee.endorsement_date);
 
         selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
@@ -599,132 +603,6 @@ function getExaminations(cboElement, examId = null, mode = null){
     });
 }
 
-function getDeviceName(cboElement, section, deviceName = null, mode = null){
-    let result = '<option value="" disabled selected> Select Series Name </option>';
-    $.ajax({
-        method: "get",
-        url: "get_device_name",
-        data: { section },
-        dataType: "json",
-        beforeSend: function(){
-            result = '<option value="" disabled selected>--Loading--</option>';
-        },
-        success: function (response) {
-            console.log('response', response);
-            $('#selectDeviceName').prop('disabled', false);
-            if(response.length > 0){
-                    result = '<option value="" disabled selected> Select Series Name </option>';
-
-                if(mode == 'Export'){
-                    result += '<option value="ALL"> ALL </option>';
-                }
-
-                for (let dni = 0; dni < response.length; dni++) {
-                    result += '<option value="' + response[dni]['materials'] + '">' + response[dni]['materials'] + '</option>';
-                }
-            }else{
-                // result = '<option value="0" selected disabled> -- No record found -- </option>';
-                result = '<option value="" disabled selected>--Loading--</option>';
-            }
-            cboElement.html(result);
-            if(deviceName != null){
-                cboElement.val(deviceName).trigger('change');
-            }
-
-            if(mode == 'view'){
-                cboElement.prop('disabled', true).trigger('change.select2');
-            }
-        },
-        error: function(data, xhr, status) {
-            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
-            cboElement.html(result);
-            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
-        }
-    });
-}
-
-function getSituations(cboElement, situationId = null, mode = null){
-    let result = '<option value="" disabled selected> Select Situation </option>';
-    $.ajax({
-        method: "get",
-        url: "get_situations",
-        // data: { section },
-        dataType: "json",
-        beforeSend: function(){
-            result = '<option value="" disabled selected>--Loading--</option>';
-        },
-        success: function (response) {
-            if(response.length > 0){
-                    result = '<option value="" disabled selected> Select Situation </option>';
-
-                if(mode == 'Export'){
-                    result += '<option value="ALL"> ALL </option>';
-                }
-
-                for (let si = 0; si < response.length; si++){
-                    result += '<option value="' + response[si]['id'] + '">' + response[si]['situation_name'] + '</option>';
-                }
-            }else{
-                result = '<option value="0" selected disabled> -- No record found -- </option>';
-            }
-            cboElement.html(result);
-            if(situationId != null){
-                cboElement.val(situationId).trigger('change');
-            }
-
-            if(mode === 'view'){
-                cboElement.prop('disabled', true).trigger('change.select2');
-            }
-        },
-        error: function(data, xhr, status) {
-            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
-            cboElement.html(result);
-            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
-        }
-    });
-}
-
-function getPic(cboElement, picId = null, $mode = null){
-    let result = '<option value="" disabled selected> Select Person-In Charge </option>';
-    $.ajax({
-        method: "get",
-        url: "get_users",
-        dataType: "json",
-        beforeSend: function(){
-            result = '<option value="" disabled selected>--Loading--</option>';
-        },
-        success: function (response) {
-            let users = response.users_data;
-            if(users.length > 0){
-                    result = '<option value="" disabled selected> Select Person-In Charge </option>';
-
-                for (let ui = 0; ui < users.length; ui++) {
-                    let id = users[ui]['id'];
-                    let name = users[ui]['name'];
-
-                    result += '<option value="'+id+'">' + name + '</option>';
-                }
-            }else{
-                result = '<option value="0" selected disabled> -- No record found -- </option>';
-            }
-            cboElement.html(result);
-
-            if (picId != null) {
-                cboElement.val(picId).trigger('change');
-            }
-
-            if($mode === 'view'){
-                cboElement.prop('disabled', true).trigger('change.select2');
-            }
-        },
-        error: function(data, xhr, status){
-            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
-            cboElement.html(result);
-            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
-        }
-    });
-}
-
 /**
  * Save (add/update) hr_memo_approval data
  */
@@ -762,7 +640,7 @@ function saveHrMemoApproval($form, $modal, dtHrMemoApproval, appendArray) {
 /**
  * Fetch hr_memo_approval data by ID
  */
-function fetchHrMemoById(id, $modal, $tableTD, $form, $mode) {
+function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray) {
     $.ajax({
         type: 'GET',
         url: 'get_hr_memo_by_id',
@@ -781,38 +659,63 @@ function fetchHrMemoById(id, $modal, $tableTD, $form, $mode) {
             $form.find('#classification').val(response.classification);
             $form.find('#dateFiled').val(response.date_filed);
 
-            // $tableTD.find('tbody').empty();
-            // for(let index = 0; index < response.improvements.length; index++){
+            let toIds = [];
+            let ccIds = [];
 
-            //     let rowImprovements = `
-            //         <tr class="data-row">
-            //             <td id="removeRow">
-            //                 <center><button ${$mode === 'view' ? 'disabled' : ''} class="btn btn-md btn-danger removeRow" title="Remove Row" type="button"><i class="fa fa-times"></i></button></center>
-            //             </td>
-            //             <td>
-            //                 <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="factor[]">${response.improvements[index].factor}</textarea>
-            //             </td>
-            //             <td>
-            //                 <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="cause[]">${response.improvements[index].cause}</textarea>
-            //             </td>
-            //             <td>
-            //                 <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="analysis[]">${response.improvements[index].analysis}</textarea>
-            //             </td>
-            //             <td>
-            //                 <textarea ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-sm" name="counter_measure[]">${response.improvements[index].counter_measure}</textarea>
-            //             </td>
-            //             <td>
-            //                 <select ${$mode === 'view' ? 'disabled' : ''} class="form-control form-control-lg select2bs5 selectPic" name="pic[]"></select>
-            //             </td>
-            //             <td>
-            //                 <input ${$mode === 'view' ? 'disabled' : ''} type="date" class="form-control form-control-lg" name="implementation_date[]" value="${response.improvements[index].implementation_date}">
-            //             </td>
-            //         </tr>
-            //     `;
+            response.email_recipients.forEach(function(item){
 
-            //     $tableTD.find('tbody').append(rowImprovements);
-            //     getPic($('#tblTraineeDetails tr:last').find('.selectPic'), response.improvements[index].pic, $mode);
-            // }
+                if(item.type === 'to'){
+                    toIds.push(item.user_id);
+                }
+
+                if(item.type === 'cc'){
+                    ccIds.push(item.user_id);
+                }
+
+            });
+
+            selectEmailRecipients($('.selectToRecipients'), toIds);
+            selectEmailRecipients($('.selectCcRecipients'), ccIds);
+
+            let exam_list = [];
+            traineeIdCounter = 1; //set counter to 1 every new memo
+
+            response.trainee_details.forEach(function(item){
+                let counterNow = traineeIdCounter++;
+
+                if(item.employment_type == 1){ //HRIS
+                    empName = item.hris_emp_info.EmpName;
+                    trainingVenue = item.hris_emp_info.Venue;
+                }else if(item.employment_type == 2){ //SUBCON
+                    empName = item.subcon_emp_info.EmpName;
+                    training_venue = item.subcon_emp_info.Venue;
+                }
+
+                //ongoing
+                let traineeDetailsList = {
+                    action: {id: counterNow, emp_id: item.hris_id, emp_type: item.employment_type},
+                    emp_no: item.employee_no,
+                    emp_name: empName,
+                    traning_venue: trainingVenue,
+                    endorsement_date: item.endorsement_date,
+                    exam_details: exam_list
+                }
+
+                $traineeDetailsArray.push(traineeDetailsList);
+
+                item.emp_exam_details.forEach(function(exam_item){
+                    let exam_title = exam_item.category;
+                    let result = exam_item.result;
+                    let remarks = exam_item.training_remarks;
+
+                    exam_list.push({exam_title, result, remarks});
+                });
+            });
+
+            console.log('traineeDetailsArray', $traineeDetailsArray);
+
+            $table.clear().draw();
+            $table.rows.add($traineeDetailsArray).draw();
 
             $modal.modal('show');
         },
