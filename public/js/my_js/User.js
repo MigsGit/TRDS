@@ -942,19 +942,20 @@ function GetUserList(cboElement){
             cboElement.html(result);
         },
         success: function(JsonObject){
+            let userCollection = JsonObject['userCollection'];
             result = '';
-            if(JsonObject['users'].length > 0){
-                result = '<option value="">N/A</option>';
-                for(let index = 0; index < JsonObject['users'].length; index++){
-                    let disabled = '';
+            if(userCollection.length > 0){
 
-                    if(JsonObject['users'][index].status == 2){
-                      disabled = 'disabled';
-                    }
-                    else{
-                      disabled = '';
-                    }
-                    result += '<option data-code="' + JsonObject['users'][index].employee_id + '" value="' + JsonObject['users'][index].id + '" ' + disabled + '>' + JsonObject['users'][index].name + '</option>';
+
+
+                result = '<option value="">N/A</option>';
+                for(let index = 0; index < userCollection.length; index++){
+                    let disabled = '';
+                    let empNo = userCollection[index].users.rapidx_emp_o;
+                    let usersId = userCollection[index].users.id;
+                    let userDetails = userCollection[index].userDetails;
+                    let fullName = userDetails['FirstName']+' '+userDetails['LastName'];
+                    result += '<option emp-no="' + empNo + '" value="' + usersId + '">' + fullName + '</option>';
                 }
             }
             else{
@@ -982,9 +983,15 @@ const getEmpIdData = (id) => {
         success: function (response) {
             console.log(response);
             let middlename = "";
+            $('#systemoneEmpId').val(response['empInfo'][0]['pkid']);
             $('#txtAddfirstName').val(response['empInfo'][0]['FirstName']);
             $('#txtAddMiddleName').val(response['empInfo'][0]['MiddleName']);
             $('#txtAddLastName').val(response['empInfo'][0]['LastName']);
+            $('#txtAddLastName').val(response['empInfo'][0]['LastName']);
+            $('#txtAddUserPosition').val(response['empInfo'][0]['Position']);
+            $('#txtAddUserSection').val(response['empInfo'][0]['Section']);
+            $('#rapidxEmpId').val(response['rapidxUser']['id']);
+            $('#txtAddUserEmail').val(response['rapidxUser']['email']);
 
 		    // $username = strtolower(substr($fname, 0, 1).substr($mname, 0,1).$lname);
             if(/^[a-zA-Z0-9]*$/.test(response['empInfo'][0]['MiddleName'].substring(0,1)) == true) {

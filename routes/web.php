@@ -78,23 +78,32 @@ Route::controller(HrMemoExaminationController::class)->group(function () {
        Route::post('/update_examinations_status', 'updateExaminationsStatus')->name('update_examinations_status');
        Route::get('/get_examinations', 'getExaminations')->name('get_examinations');
 });
+
 Route::controller(HrMemoController::class)->group(function () {
     Route::get('/view_hr_memo', 'viewHrMemoInfo')->name('view_hr_memo');
     Route::get('/view_trainee_details', 'viewTraineeDetails')->name('view_trainee_details');
     Route::post('/add_hr_memo', 'addHrMemoInfo')->name('add_hr_memo');
     Route::get('/get_hr_memo_by_id', 'getHrMemoById')->name('get_hr_memo_by_id');
     Route::post('/update_hr_memo_status', 'updateHrMemoStatus')->name('update_hr_memo_status');
-    Route::get('/download_file/{id}', 'downloadFile')->name('download_file');
-    Route::get('/get_count_no_of_occurrence', 'getCountOfNoOfOccurrence')->name('get_count_no_of_occurrence');
-    Route::get('/get_device_name', 'getDeviceName')->name('get_device_name');
     Route::get('/get_users', 'getUsers')->name('get_users');
     Route::get('/get_employee_details', 'getEmployeeDetails')->name('get_employee_details');
+    Route::get('/get_emp_no_dropdown_details', 'getEmpNoDropdownDetails')->name('get_emp_no_dropdown_details');
+    Route::get('/get_email_recipients_dropdown_details', 'getEmailRecipientsDropdownDetails')->name('get_email_recipients_dropdown_details');
+    Route::get('/send_hr_memo_mail', 'sendHrMemoMail')->name('send_hr_memo_mail');
 });
 
 // USER CONTROLLER
 Route::controller(UserController::class)->group(function () {
+    Route::post('/add_user', 'add_user');
+    Route::post('/save_user_module_access', 'save_user_module_access');
+
+
     Route::get('/view_users', 'view_users')->name('user.view_users');
+    Route::get('/view_user_module_access', 'view_user_module_access')->name('user.get_emp_details_by_id');
     Route::get('/get_user_levels', 'get_user_levels')->name('user.get_user_levels');
+    Route::get('/get_emp_details_by_id', 'get_emp_details_by_id')->name('user.get_emp_details_by_id');
+    Route::get('/get_user_list', 'get_user_list');
+
 });
 
 
@@ -125,9 +134,7 @@ Route::controller(TrainingRequestController::class)->group(function () {
 // Route::post('/sign_out', 'sign_out')->name('sign_out');
 // Route::post('/change_pass', 'change_pass')->name('change_pass');
 // Route::post('/change_user_stat', 'change_user_stat')->name('change_user_stat');
-// Route::post('/add_user', 'add_user');
 // Route::get('/get_user_by_id', 'get_user_by_id');
-// Route::get('/get_user_list', 'get_user_list');
 // Route::get('/get_user_by_batch', 'get_user_by_batch');
 // Route::get('/get_user_by_stat', 'get_user_by_stat');
 // Route::post('/edit_user', 'edit_user');

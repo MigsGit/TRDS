@@ -2,11 +2,13 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
+use App\Model\SystemOneHrisEmpInfo;
+use App\Model\SystemOneSubconEmpInfo;
+use App\Model\UserLevel;
+use App\RapidXUser;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Model\UserLevel;
-use App\Model\OQCStamp;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {

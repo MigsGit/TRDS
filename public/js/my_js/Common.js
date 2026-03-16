@@ -46,3 +46,58 @@ const ajaxRequest = (options) => {
         }
     });
 };
+
+/* Call basic ajax for submit */
+const  call_ajax = (data = null, handler, fn,elFormId =null) => {
+    alert('call_ajax')
+    data = $.param(data);
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        data: data,
+        url: handler,
+        beforeSend: function(){
+            // console.log('call_ajax elFormId',elFormId);
+            // return;
+            $('#modal-loading').modal('show');
+            if(elFormId !=null){
+                elFormId[0].reset();
+            }
+        },
+        success: function (result) {
+            fn(result);
+            $('#modal-loading').modal('hide');
+
+        },
+        error: function (result) {
+            fn(result);
+            $('#modal-loading').modal('hide');
+        }
+    });
+}
+
+const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId =null) => {
+    data = $.param(data) + '&' + serialized_data;
+	$.ajax({
+        type: "post",
+        dataType: "json",
+        data: data,
+        url: handler,
+        beforeSend: function(){
+            $('#modal-loading').modal('show');
+            if(elFormId !=null){
+                elFormId[0].reset();
+            }
+        },
+        success: function (result) {
+            fn(result);
+            $('#modal-loading').modal('hide');
+
+        },
+        error: function (result) {
+            alert('error ajax');
+            $('#modal-loading').modal('hide');
+
+        }
+    });
+}
