@@ -20,6 +20,7 @@ class CreateQuestionnaireDetailsTable extends Migration
             $table->unsignedTinyInteger('category_type')->comment = '0-Single/Multiple Answer, 1-Identification/Essay, 2-Multiple Grid';
             $table->unsignedTinyInteger('points')->nullable();
             $table->string('type')->nullable();
+            $table->unsignedTinyInteger('exam_no')->nullable();
             $table->string('image')->nullable();
             $table->longText('description')->nullable();
             $table->json('answer_choices_question')->nullable();

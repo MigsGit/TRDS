@@ -235,7 +235,13 @@ const CreateUpdateQuestionnaireDetails = () => {
             }else if(response['hasError'] == 1){
                 alert('Saving failed!');
             }else{
+                console.log('Done!')
+
                 $('#modalCreateUpdateQuestionnaireDetails').modal('hide');
+                $('#singleMultipleAnswer').empty();
+                $('#identificationEssay').empty();
+                $('#multipleGrid').empty();
+                $('#formCreateUpdateQuestionnaireDetails')[0].reset();
                 toastr.success('Saved!');
                 dataQuestionnaireDetails.draw();
             }
@@ -247,4 +253,79 @@ const CreateUpdateQuestionnaireDetails = () => {
     };
 
     ajaxRequest(ajaxGetCreateUpdateQuestionnaireDetails);
+};
+
+const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRevision) => {
+    const ajaxGetQuestionnaireDetailsById = {
+        url: "get_questionnaire_details_by_id",
+        method: "GET",
+        data: {
+            questionnaireDetailId: questionnaireDetailId,
+            questionnaireDetailRevision: questionnaireDetailRevision
+        },
+        dataType: "json",
+
+        beforeSendCallback: function(){
+        },
+
+        successCallback: function(response){
+            let getQuestionnaireDetials = response[0];
+            console.log('getQuestionnaireDetails:', getQuestionnaireDetials);
+
+            if(getQuestionnaireDetials.length === 0){
+                return;
+            }
+            
+
+            $('#slctQuestionnaireCategoryType').val(getQuestionnaireDetials.category_type).trigger('change')
+            $('#nmbrQuestionnairePoints').val(getQuestionnaireDetials.points)
+
+            let parsedData = JSON.parse(getQuestionnaireDetials.answer_choices_question);
+            let question = parsedData[0].question;
+            let choices = parsedData[0].choices;
+            let answer  = parsedData[0].answer;
+
+            switch (getQuestionnaireDetials.category_type) {
+                case 0:
+                    $('#txtQuestionnaireQuestion').val(question);
+                    $('.divChoices').empty();
+                    $('#btnAddChoice').click();
+        
+                    for(let i = 1; i < choices.length; i++){
+                        $('#btnAddChoice').click();
+                    }
+        
+                    $('.divChoices .input-group').each(function(index){
+                        let choiceValue = choices[index];
+        
+                        $(this).find("input[name='choices[]']").val(choiceValue);
+        
+                        if(choiceValue === answer){
+                            $(this)
+                                .find('.chkAnswer')
+                                .prop('checked', true)
+                                .trigger('change');
+                        }
+                    });
+                    break;
+
+                case 1:
+                    
+                    break;
+
+                case 2:
+                    
+                    break;
+                default:
+                    console.log('IRROR');
+                    break;
+            }
+        },
+
+        errorCallback: function(xhr, status, error){
+            console.log('Ajax Error:', xhr.responseText);
+        }
+    };
+
+    ajaxRequest(ajaxGetQuestionnaireDetailsById);
 };

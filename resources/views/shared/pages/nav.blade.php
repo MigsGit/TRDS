@@ -69,11 +69,32 @@
                     </ul>
                 </li>
 
-                <li class="nav-item has-treeview">
+                {{-- <li class="nav-item has-treeview">
                     <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
                         <p>[Darren] Training Request/Approval </p>
                     </a>
+                </li> --}}
+
+                 <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p> Training Request/Approval  </p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
+                    </a>
+
+                     <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('training_request') }}" class="nav-link">
+                                <p> Training Request</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('training_request_approval') }}" class="nav-link">
+                                <p> Traning Approval</p>
+                            </a>
+                        </li>
+                    </ul>
+
                 </li>
 
                 <li class="nav-item has-treeview">
