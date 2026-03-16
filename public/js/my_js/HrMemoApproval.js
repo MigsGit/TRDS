@@ -139,7 +139,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
         $addButtonTD.data('counter', traineeIdCounter)
         // console.log('btn counter', $addButtonTD.data('counter'));
-        
+
         selectEmailRecipients($('.selectToRecipients'));
         selectEmailRecipients($('.selectCcRecipients'));
         $modal.modal('show');
@@ -722,7 +722,7 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray)
                 $form.find('#btnAddTrainee').prop('hidden', true);
             } else if(response.status == 1) {
                 console.log('show save, hide approval');
-                
+
                 $form.find('#btnSubmitHrMemoApproval').removeClass('d-none');
                 $form.find('#btnApprove').addClass('d-none');
                 $form.find('#btnDisapprove').addClass('d-none');
@@ -817,7 +817,7 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray)
 
 function disableForm($form, status = null){
     console.log('disabled form & buttons');
-    
+
     $form.find('input, textarea, select').prop('disabled', true);
 }
 
@@ -829,7 +829,7 @@ function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null) {
     // $.ajax({
     //     type: 'POST',
     //     url: 'update_hr_memo_status',
-    //     data: { 
+    //     data: {
     //         id: id,
     //         new_status: updateToStatus
     //     },

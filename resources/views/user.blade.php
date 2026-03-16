@@ -761,7 +761,7 @@
             }
             $('#countBulkIqcInspection').text(`${globalVar.arrUserModulesId.length}`);
             console.log(globalVar.arrUserModulesId);
-            
+
         });
 
         $('#checkBulkIqcInspectionSelectAll').on('change', function() {
@@ -781,7 +781,17 @@
             console.log(globalVar.arrUserModulesId);
         });
 
-        $('#btnSubmitUserModuleAccess').click(function (e) { 
+        // Individual row checkbox selection
+        $(tbl.tblUserModuleAccess).on('change', '.checkBulkIqcInspection', function() {
+            let pkid = $(this).attr('pkid-received'); // Get ID
+            let row = $(this).closest('tr'); // Get the row
+            if (this.checked) {
+                row.attr('style', 'background:#90EE90;');
+            } else {
+                row.attr('style', 'background:white;'); // Remove highlight class
+            }
+        });
+        $('#btnSubmitUserModuleAccess').click(function (e) {
             e.preventDefault();
             let data = {
                 arrUserModulesId : globalVar.arrUserModulesId,
@@ -789,10 +799,10 @@
             }
             let serializedData = {}
             console.log(data);
-            
+
             call_ajax_serialize(data,serializedData , 'save_user_module_access', function(response){
                 console.log(response);
-                
+
             });
         });
     });

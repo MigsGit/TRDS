@@ -32,6 +32,9 @@ class UserController extends Controller
             $arrUserModulesId = $request->arrUserModulesId;
             $selectedEmployeeNumber = $request->selectedEmployeeNumber;
             UserAccessModule::whereIn('users_id',$selectedEmployeeNumber)->delete();
+            // UserAccessModule::whereIn('users_id',$selectedEmployeeNumber)->update([
+            //     'deleted_at' => now(),
+            // ]);
             collect($selectedEmployeeNumber)->map(function($rowSelectedEmployeeNumber) use ($arrUserModulesId){
                 UserAccessModule::insert([
                     'users_id' => $rowSelectedEmployeeNumber,
