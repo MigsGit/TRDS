@@ -2,6 +2,7 @@
 use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
 use App\Http\Controllers\QuestionnairesController;
+use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -14,6 +15,10 @@ Route::get('/', function () {
 Route::get('/user_master', function () {
     return view('user');
 })->name('user_master');
+
+Route::get('/training_attendance', function () {
+    return view('training_attendance');
+})->name('training_attendance');
 
 Route::get('/hr_memo_exam', function () {
     return view('hr_memo_examination');
@@ -94,15 +99,13 @@ Route::controller(UserController::class)->group(function () {
     Route::get('/get_user_list', 'get_user_list');
 
 });
-
-
-
-
+Route::controller(TrainingAttendanceController::class)->group(function () {
+    Route::get('/view_training_attendance', 'view_training_attendance');
+});
 // Route::post('/sign_in', 'sign_in')->name('sign_in');
 // Route::post('/sign_out', 'sign_out')->name('sign_out');
 // Route::post('/change_pass', 'change_pass')->name('change_pass');
 // Route::post('/change_user_stat', 'change_user_stat')->name('change_user_stat');
-// Route::get('/get_user_by_id', 'get_user_by_id');
 // Route::get('/get_user_by_batch', 'get_user_by_batch');
 // Route::get('/get_user_by_stat', 'get_user_by_stat');
 // Route::post('/edit_user', 'edit_user');

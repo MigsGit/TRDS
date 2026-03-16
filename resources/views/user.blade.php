@@ -57,14 +57,14 @@
                 <div style="float: right;">
                   <button class="btn btn-primary" data-toggle="modal" data-target="#modalAddUser" id="btnShowAddUserModal"><i class="fa fa-user-plus"></i> Add User</button>
 
-                  <button class="btn btn-primary" data-toggle="modal" data-target="#modalAddUserModuleAccess" id="btnAddUserModuleAccess"><i class="fa fa-user-plus"></i> Add User Module Access</button>
+                  <button class="btn btn-outline-primary" data-toggle="modal" data-target="#modalAddUserModuleAccess" id="btnAddUserModuleAccess"><i class="fa fa-user-plus"></i> Add Module Access</button>
                 </div> <br><br>
                 <div class="table responsive">
                   <table id="tblUsers" class="table table-sm table-bordered table-striped table-hover" style="width: 100%;">
                     <thead>
                       <tr>
-                        <th>ID</th>
-                        <th>Name</th>
+                        <th>Emp No</th>
+                        <th>Full Name</th>
                         <th>User Level</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -309,7 +309,7 @@
             <table id="tblUserModuleAccess" class="table table-sm table-bordered table-striped table-hover" style="width: 100%;">
                 <thead>
                   <tr>
-                    <th><center> <input class="" type="checkbox" id="checkBulkIqcInspectionSelectAll"> </center></th>
+                    <th><center> <input class="" type="checkbox" id="checkBulkUserModuleSelectAll"> </center></th>
                     <th>Module Name</th>
                     <th>Updated by</th>
                     <th>Action</th>
@@ -373,11 +373,11 @@
             },
 
             "columns":[
-            { "data" : "id" },
-            { "data" : "rapidx_emp_no" },
-            { "data" : "user_level.user_level" },
-            { "data" : "label1" },
-            { "data" : "action1", orderable:false, searchable:false }
+                { "data" : "rapidx_emp_no" },
+                { "data" : "fullname" },
+                { "data" : "user_level.user_level" },
+                { "data" : "label1" },
+                { "data" : "action1", orderable:false, searchable:false }
             ],
 
         //   "columnDefs": [
@@ -742,7 +742,7 @@
             GetUserList( $('#selectedEmployeeNumber'));
         });
 
-        $(tbl.tblUserModuleAccess).on('click','#checkBulkIqcInspection','tr', function () {
+        $(tbl.tblUserModuleAccess).on('click','#checkBulkUserModule','tr', function () {
             let row = $(this).closest('tr'); // Get the parent row of the checkbox
             let pkidReceived = $(this).attr('pkid-received');
             if ($(this).prop('checked')) {
@@ -764,11 +764,11 @@
 
         });
 
-        $('#checkBulkIqcInspectionSelectAll').on('change', function() {
+        $('#checkBulkUserModuleSelectAll').on('change', function() {
             let isChecked = this.checked;
-            $('.checkBulkIqcInspection').prop('checked', isChecked).trigger('change');; // Toggle all row checkboxes
+            $('.checkBulkUserModule').prop('checked', isChecked).trigger('change');; // Toggle all row checkboxes
             if (isChecked) {
-                $('.checkBulkIqcInspection').each(function() {
+                $('.checkBulkUserModule').each(function() {
                     let row = $(this).closest('tr');
                     row.attr('style', 'background:#90EE90;');
                     globalVar.arrUserModulesId.push($(this).attr('pkid-received'));
@@ -782,7 +782,7 @@
         });
 
         // Individual row checkbox selection
-        $(tbl.tblUserModuleAccess).on('change', '.checkBulkIqcInspection', function() {
+        $(tbl.tblUserModuleAccess).on('change', '.checkBulkUserModule', function() {
             let pkid = $(this).attr('pkid-received'); // Get ID
             let row = $(this).closest('tr'); // Get the row
             if (this.checked) {

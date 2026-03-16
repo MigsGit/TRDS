@@ -214,8 +214,10 @@ class UserController extends Controller
 
     //View Users
 	public function view_users(){
-    	$users = User::with([
+    $users = User::with([
                     'user_level',
+                    'rapidx_system_one_subcon_emp_info',
+                    'rapidx_system_one_hris_emp_info',
                 ])
                 ->get();
 
@@ -223,13 +225,27 @@ class UserController extends Controller
             ->addColumn('label1', function($user){
                 $result = "";
 
-                if($user->status == 1){
+                if(blank($user->deleted_at)){
                     $result .= '<span class="badge badge-pill badge-success">Active</span>';
                 }
                 else{
                     $result .= '<span class="badge badge-pill badge-danger">Inactive</span>';
                 }
 
+                return $result;
+            })
+            ->addColumn('fullname', function($user){
+                $result = "";
+
+                if(filled($user->rapidx_system_one_hris_emp_info)){
+                    $userHris = $user->rapidx_system_one_hris_emp_info;
+                }
+                else{
+                    $userHris = $user->rapidx_system_one_subcon_emp_info;
+
+                    $result .= '<span class="badge badge-pill badge-danger">Inactive</span>';
+                }
+                return $userHris->FirstName.' '.$userHris->LastName;
                 return $result;
             })
             ->addColumn('action1', function($user){
@@ -259,7 +275,7 @@ class UserController extends Controller
             ->addColumn('checkbox', function($user){
                 return '<center><input type="checkbox" class="chkUser" user-id="' . $user->id . '"></center>';
             })
-            ->rawColumns(['label1', 'action1', 'checkbox'])
+            ->rawColumns(['label1', 'action1', 'checkbox','fullname'])
             ->make(true);
     }
     //View Users
@@ -273,7 +289,7 @@ class UserController extends Controller
             ->addColumn('rawBulkCheckBox', function($row){
                 $result = '';
                 $result .= '<center>';
-                $result .= "<input class='checkBulkIqcInspection' type='checkbox' pkid-received='".$row->id."' id='checkBulkIqcInspection'>";
+                $result .= "<input class='checkBulkUserModule' type='checkbox' pkid-received='".$row->id."' id='checkBulkUserModule'>";
                 $result .= '</center>';
                 return $result;
             })
