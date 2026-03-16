@@ -254,19 +254,8 @@ class UserController extends Controller
                             <i class="fa fa-cog"></i>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">';
-                if($user->status == 1){
-                	$result .= '<button class="dropdown-item aEditUser" type="button" user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalEditUser" data-keyboard="false">Edit</button>';
-
-                    $result .= '<button class="dropdown-item aChangeUserStat" type="button" user-id="' . $user->id . '" status="2" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalChangeUserStat" data-keyboard="false">Deactivate</button>';
-
-                    $result .= '<button class="dropdown-item aResetUserPass" user-id="' . $user->id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalResetUserPass" data-keyboard="false">Reset Password</button>';
-
-                    // $result .= '<button class="dropdown-item aGenUserBarcode" user-id="' . $user->id . '" employee-id="' . $user->employee_id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalGenUserBarcode">Generate Barcode</button>';
-                }
-                else{
-                    $result .= '<button class="dropdown-item aChangeUserStat" type="button" style="padding: 1px 1px; text-align: center;" user-id="' . $user->id . '" status="1" data-toggle="modal" data-target="#modalChangeUserStat" data-keyboard="false">Activate</button>';
-                }
-
+                $result .= '<button class="dropdown-item aEditUser" type="button" user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUser" data-keyboard="false">Edit</button>';
+                // $result .= '<button class="dropdown-item aGenUserBarcode" user-id="' . $user->id . '" employee-id="' . $user->employee_id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalGenUserBarcode">Generate Barcode</button>';
                 $result .= '</div>
                         </div></center>';
 
@@ -331,13 +320,19 @@ class UserController extends Controller
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
             $userRequestValidated = $userRequest->validated();
-            $has_email = 0;
-            $userId = User::insertGetId(
-                $userRequestValidated
-            );
+            $rapidxUserId = $userRequest->user_id;
+            if(blank($rapidxUserId)){ //add
+                $userRequestValidated['created_at'] = now();
+                $userId = User::insertGetId(
+                    $userRequestValidated
+                );
+            }else{ //edit
+                $userId = User::where('id',$rapidxUserId)->update(
+                    $userRequestValidated
+                );
+            }
             DB::commit();
             return response()->json(['result' => "1",'is_success' => 'true']);
-
         } catch (\Throwable $th) {
             DB::rollback();
             throw $th;
@@ -405,9 +400,29 @@ class UserController extends Controller
 
     // Get User By Id
     public function get_user_by_id(Request $request){
-        $user = User::where('id', $request->user_id)->get();
+        $users = User::with([
+            'rapidx_rapidx_user_no',
+            'rapidx_system_one_subcon_emp_info',
+            'rapidx_system_one_hris_emp_info'
+        ])
+        ->where('id',$request->user_id)
+        ->get();
 
-        return response()->json(['user' => $user]);
+       $userCollection =  collect($users)->map(function($rowUsers){
+            if($rowUsers->rapidx_system_one_subcon_emp_info!= null){
+                $userHris = $rowUsers->rapidx_system_one_subcon_emp_info;
+            }
+            else if($rowUsers->rapidx_system_one_hris_emp_info != null){
+                $userHris = $rowUsers->rapidx_system_one_hris_emp_info;
+            }
+            return [
+             'users' => $rowUsers,
+             'userDetails' => $userHris,
+            ];
+        });
+
+
+        return response()->json(['userCollection' => $userCollection]);
     }
 
     public function get_user_list(Request $request){ //nmodify

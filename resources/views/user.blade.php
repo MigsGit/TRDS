@@ -224,6 +224,7 @@
             <div class="row">
               <div class="col-sm-12">
                 <div class="form-group">
+                    <input type="number" class="form-control" name="user_id" id="userId" readonly>
                     <input type="number" class="form-control" name="rapidx_emp_id" id="rapidxEmpId" readonly>
                     <input type="number" class="form-control" name="systemone_emp_id" id="systemoneEmpId" readonly>
                 </div>
@@ -360,8 +361,6 @@
         $(this).closest('tr').addClass('table-active');
         });
 
-        // GetUserLevel($(".selectUserLevel"));
-
         dataTableUsers = $("#tblUsers").DataTable({
         "processing" : false,
             "serverSide" : true,
@@ -379,15 +378,6 @@
                 { "data" : "label1" },
                 { "data" : "action1", orderable:false, searchable:false }
             ],
-
-        //   "columnDefs": [
-        //     {
-        //       "targets": [3, 5],
-        //       "data": null,
-        //       "defaultContent": "N/A"
-        //     },
-        //     // { "visible": false, "targets": 1 }
-        //   ],
             "order": [[ 1, "asc" ]],
         });//end of dataTableUsers
 
@@ -551,22 +541,7 @@
         $(document).on('click', '.aEditUser', function(){
           let userId = $(this).attr('user-id');
           $("#txtEditUserId").val(userId);
-          GetUserLevel($(".selectUserLevel"));
-
           GetUserByIdToEdit(userId);
-          $("#txtEditUserName").removeClass('is-invalid');
-          $("#txtEditUserName").attr('title', '');
-          $("#txtEditUserUserName").removeClass('is-invalid');
-          $("#txtEditUserUserName").attr('title', '');
-          $("#txtEditUserEmail").removeClass('is-invalid');
-          $("#txtEditUserEmail").attr('title', '');
-          $("#txtEditUserEmpId").removeClass('is-invalid');
-          $("#txtEditUserEmpId").attr('title', '');
-          $("#selEditUserLevel").removeClass('is-invalid');
-          $("#selEditUserLevel").attr('title', '');
-          $("#txtEditUserName").focus();
-          // $("#selEditUserLevel").select2('val', '0');
-          $("#chkEditUserWithEmail").prop('checked', 'checked');
         });
 
         $("#chkEditUserWithEmail").click(function(){
@@ -587,41 +562,6 @@
         $("#formEditUser").submit(function(event){
           event.preventDefault();
           EditUser();
-        });
-
-        // Change User Status
-        $(document).on('click', '.aChangeUserStat', function(){
-          let userStat = $(this).attr('status');
-          let userId = $(this).attr('user-id');
-
-          $("#txtChangeUserStatUserId").val(userId);
-          $("#txtChangeUserStatUserStat").val(userStat);
-
-          if(userStat == 1){
-            $("#lblChangeUserStatLabel").text('Are you sure to activate?');
-            $("#h4ChangeUserTitle").html('<i class="fa fa-user"></i> Activate User');
-          }
-          else{
-            $("#lblChangeUserStatLabel").text('Are you sure to deactivate?');
-            $("#h4ChangeUserTitle").html('<i class="fa fa-user"></i> Deactivate User');
-          }
-        });
-
-        $("#formChangeUserStat").submit(function(event){
-          event.preventDefault();
-          ChangeUserStatus();
-        });
-
-        // Reset User Password
-        $(document).on('click', '.aResetUserPass', function(){
-          let userId = $(this).attr('user-id');
-
-          $("#txtResetUserPassUserId").val(userId);
-        });
-
-        $("#formResetUserPass").submit(function(event){
-          event.preventDefault();
-          ResetUserPass();
         });
 
         $(document).on('click', '.aGenUserBarcode', function(){
@@ -804,6 +744,14 @@
                 console.log(response);
 
             });
+        });
+        $('#modalAddUser').on('hidden.bs.modal', function (e) {
+            // $(selector).val();
+            // $("#userId").val('');
+            let params = {
+                frmId : $('#formAddUser')
+            }
+            resetFormValues(params);
         });
     });
   </script>

@@ -1,7 +1,7 @@
 /**
  * Reusable function for using Ajax Request
- * 
- * @param {object} options 
+ *
+ * @param {object} options
  */
 const ajaxRequest = (options) => {
     var defaults = {
@@ -10,7 +10,7 @@ const ajaxRequest = (options) => {
         data: {},
         headers: {},
         dataType: 'json',
-        processData: true, 
+        processData: true,
         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
         beforeSendCallback: null,
         successCallback: () => {},
@@ -49,7 +49,6 @@ const ajaxRequest = (options) => {
 
 /* Call basic ajax for submit */
 const  call_ajax = (data = null, handler, fn,elFormId =null) => {
-    alert('call_ajax')
     data = $.param(data);
     $.ajax({
         type: "GET",
@@ -100,4 +99,20 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
 
         }
     });
+}
+
+const resetFormValues = (params) => {
+    // Reset values
+    params.frmId[0].reset();
+    
+    // params.frmId[0].reset();
+
+    // Reset hidden input fields
+    // $("select[name='user_level']", $('#formAddUser')).val(0).trigger('change');
+
+    // Remove invalid & title validation
+    $('div').find('input').removeClass('is-invalid');
+    $("div").find('input').attr('title', '');
+    $('div').find('select').removeClass('is-invalid');
+    $("div").find('select').attr('title', '');
 }
