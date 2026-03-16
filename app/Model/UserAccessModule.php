@@ -9,4 +9,5 @@ class UserAccessModule extends Model
    protected $fillable = [
         'deleted_at'
    ];
+   
 }

@@ -98,6 +98,7 @@ Route::controller(UserController::class)->group(function () {
     Route::get('/get_emp_details_by_id', 'get_emp_details_by_id')->name('user.get_emp_details_by_id');
     Route::get('/get_user_list', 'get_user_list');
     Route::get('/get_user_by_id', 'get_user_by_id');
+    Route::get('/get_user_module_access', 'get_user_module_access');
 
 });
 Route::controller(TrainingAttendanceController::class)->group(function () {

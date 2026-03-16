@@ -295,7 +295,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title"><i class="fa fa-user-plus"></i> Add User</h4>
+          <h4 class="modal-title"><i class="fa fa-user-plus"></i> Add Module Access</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -542,6 +542,12 @@
           let userId = $(this).attr('user-id');
           $("#txtEditUserId").val(userId);
           GetUserByIdToEdit(userId);
+        });
+        $(document).on('click', '.aEditModuleAccess', function(){
+          let userId = $(this).attr('user-id');
+          $("#txtEditUserId").val(userId);
+          GetUserModuleAccess(userId)
+          GetUserList( $('#selectedEmployeeNumber'));
         });
 
         $("#chkEditUserWithEmail").click(function(){

@@ -596,4 +596,13 @@
             }
         });
     }
+    const GetUserModuleAccess = (userId) =>{
+        let data = {
+            user_id : userId
+        }
+        call_ajax(data,'get_user_module_access',function(response){
+            console.log(response);
+            
+        })
+    }
 // });

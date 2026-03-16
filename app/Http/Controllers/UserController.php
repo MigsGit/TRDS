@@ -255,6 +255,7 @@ class UserController extends Controller
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">';
                 $result .= '<button class="dropdown-item aEditUser" type="button" user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUser" data-keyboard="false">Edit</button>';
+                $result .= '<button class="dropdown-item aEditModuleAccess" type="button" user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUserModuleAccess" data-keyboard="false">Edit Module</button>';
                 // $result .= '<button class="dropdown-item aGenUserBarcode" user-id="' . $user->id . '" employee-id="' . $user->employee_id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalGenUserBarcode">Generate Barcode</button>';
                 $result .= '</div>
                         </div></center>';
@@ -670,5 +671,15 @@ class UserController extends Controller
             return response()->json(['empInfo' => $subcon_data,'rapidxUser' => $rapidxUser]);
         }
 
+    }
+
+    public function get_user_module_access(Request $request){
+        return 'true' ;
+        UserAccessModule::with([''])->get();
+        try {
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 }
