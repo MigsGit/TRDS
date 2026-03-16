@@ -2,6 +2,7 @@
 use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
 use App\Http\Controllers\QuestionnairesController;
+use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -23,6 +24,14 @@ Route::get('/hr_memo', function () {
     return view('hr_memo_approval');
 })->name('hr_memo');
 
+Route::get('/training_request', function () {
+    return view('training_request');
+})->name('training_request');
+
+Route::get('/training_request_approval', function () {
+    return view('training_request_approval');
+})->name('training_request_approval');
+
 Route::get('/dashboard', function () {
     return view('blank');
 })->name('dashboard');
@@ -42,6 +51,7 @@ Route::get('/questionnaire', function () {
 
 // Route::get('/view_questionnaire_details', 'QuestionnairesController@viewQuestionnaireDetails');
 // Route::post('/create_update_questionnaire_details', 'QuestionnairesController@createUpdateQuestionnaireDetails');
+
 Route::controller(QuestionnairesController::class)->group(function () {
     // Questionnaires main routes
     Route::get('view_questionnaire', 'viewQuestionnaire');
@@ -55,6 +65,7 @@ Route::controller(QuestionnairesController::class)->group(function () {
     // Questionnaires details routes
     Route::get('view_questionnaire_details', 'viewQuestionnaireDetails');
     Route::post('create_update_questionnaire_details', 'createUpdateQuestionnaireDetails');
+    Route::get('get_questionnaire_details_by_id', 'getQuestionnaireDetailsById');
 });
 
 
@@ -93,6 +104,27 @@ Route::controller(UserController::class)->group(function () {
     Route::get('/get_emp_details_by_id', 'get_emp_details_by_id')->name('user.get_emp_details_by_id');
     Route::get('/get_user_list', 'get_user_list');
 
+});
+
+
+Route::controller(TrainingRequestController::class)->group(function () {
+
+    //TRAINING REQUEST
+    Route::get('/get_training_requests', 'getTrainingRequests')->name('get_training_requests');
+    Route::post('/add_training_request', 'addTrainingRequest')->name('add_training_request');
+    Route::get('/get_training_request_details', 'getTrainingRequestDetails')->name('get_training_request_details');
+
+    // FOR DROPDOWNS
+    Route::get('/get_hris_department', 'getHRISSectionByDepartment')->name('get_hris_department');
+    Route::get('/get_hris_divisions', 'getHRISDivisions')->name('get_hris_divisions');
+    Route::get('/get_hris_sections', 'getHRISSections')->name('get_hris_sections');
+    Route::get('/get_user_conformance', 'getUserConformance')->name('get_user_conformance');
+    Route::get('/get_requestor', 'getRequestor')->name('get_requestor');
+
+    // MEMO DOCS
+    Route::get('/get_memo_docs', 'getMemoDocs')->name('get_memo_docs');
+    Route::get('/get_memo_doc_details', 'getMemoDocsDetails')->name('get_memo_doc_details');
+    
 });
 
 
