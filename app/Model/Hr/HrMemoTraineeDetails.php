@@ -11,12 +11,12 @@ class HrMemoTraineeDetails extends Model
 {
     public function hris_emp_info()
     {
-        return $this->hasOne(SystemOneHrisEmpInfo::class, 'pkid', 'hris_id')->where('vw_employeeinfo.EmpStatus', 1);
+        return $this->hasOne(SystemOneHrisEmpInfo::class, 'pkid', 'hris_id');
     }
 
     public function subcon_emp_info()
     {
-        return $this->hasOne(SystemOneSubconEmpInfo::class, 'pkid', 'hris_id')->where('vw_employeeinfo.EmpStatus', 1);
+        return $this->hasOne(SystemOneSubconEmpInfo::class, 'pkid', 'hris_id');
     }
 
     public function emp_exam_details()

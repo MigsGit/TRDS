@@ -179,7 +179,7 @@
                             <div class="col">
                                 <div class="table-responsive">
                                     <div class="d-flex justify-content-between">
-                                        <button type="button" id="btnAddTrainee" class="btn btn-primary"><i class="fa fa-plus"></i> Add Trainee</button>
+                                        <button type="button" id="btnAddTrainee" data-counter="" class="btn btn-primary"><i class="fa fa-plus"></i> Add Trainee</button>
                                     </div>
                                     <br>
                                     <table class="table table-sm table-bordered" id="tblTraineeDetails" style="width: 100%;">
@@ -200,9 +200,24 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" id="btnSubmitHrMemoApproval" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
+                    <div class="modal-footer">
+                        {{-- <div class="row"> --}}
+                            <div class="col-md-6 justify-content-start">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+
+                            <div class="col-md-6 justify-content-end">
+                                <button type="button" id="btnApprove" class="btn btn-success float-right d-none">
+                                    <i class="fa fa-thumbs-up"></i> Approve
+                                </button>
+
+                                <button type="button" id="btnDisapprove" class="btn btn-danger float-right mr-2 d-none">
+                                    <i class="fa fa-thumbs-down"></i> Disapprove
+                                </button>
+
+                                <button type="submit" id="btnSubmitHrMemoApproval" class="btn btn-success float-right"><i class="fa fa-check"></i> Save</button>
+                            </div>
+                        {{-- </div> --}}
                     </div>
                 </form>
             </div>

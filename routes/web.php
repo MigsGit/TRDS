@@ -67,6 +67,7 @@ Route::controller(HrMemoExaminationController::class)->group(function () {
        Route::post('/update_examinations_status', 'updateExaminationsStatus')->name('update_examinations_status');
        Route::get('/get_examinations', 'getExaminations')->name('get_examinations');
 });
+
 Route::controller(HrMemoController::class)->group(function () {
     Route::get('/view_hr_memo', 'viewHrMemoInfo')->name('view_hr_memo');
     Route::get('/view_trainee_details', 'viewTraineeDetails')->name('view_trainee_details');
@@ -77,6 +78,7 @@ Route::controller(HrMemoController::class)->group(function () {
     Route::get('/get_employee_details', 'getEmployeeDetails')->name('get_employee_details');
     Route::get('/get_emp_no_dropdown_details', 'getEmpNoDropdownDetails')->name('get_emp_no_dropdown_details');
     Route::get('/get_email_recipients_dropdown_details', 'getEmailRecipientsDropdownDetails')->name('get_email_recipients_dropdown_details');
+    Route::get('/send_hr_memo_mail', 'sendHrMemoMail')->name('send_hr_memo_mail');
 });
 
 // USER CONTROLLER

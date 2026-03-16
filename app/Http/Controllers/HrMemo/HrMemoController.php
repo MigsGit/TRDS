@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\HrMemo;
 use App\Http\Controllers\Controller;
 use DataTables;
+// use Mail;
+use Illuminate\Support\Facades\Mail;
+
 use App\RapidXUser;
 use App\Model\Hr\HrMemo;
 use App\Model\Hr\HrMemoEmailRecipients;
@@ -25,7 +28,7 @@ class HrMemoController extends Controller
 
     public function viewHrMemoInfo(Request $request){
         // $globalUser = session('global_user');
-        $hr_memo_details = HrMemo::with(['email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
+        $hr_memo_details = HrMemo::with(['prepared_by_info', 'noted_by_info', 'email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
 
         return DataTables::of($hr_memo_details)
         ->addColumn('action', function($hr_memo_details){
@@ -33,23 +36,41 @@ class HrMemoController extends Controller
             $result .= "<center>";
 
             // $canManage  = $globalUser && in_array($globalUser->position, [0,1,2,3]);
-            $isPending   = $hr_memo_details->status == 1;
-            $isForApproval = $hr_memo_details->status == 2;
+
             $id = $hr_memo_details->id;
 
+            $isPending   = $hr_memo_details->status == 1;
+            $isCancelled = $hr_memo_details->status == 2;
+            $isForApproval = $hr_memo_details->status == 3;
+            $isApproved = $hr_memo_details->status == 4;
+            $isDisapproved = $hr_memo_details->status == 5;
+
             if ($isPending) {
-                // if ($canManage) {
+                // if($canManage){
                     $result .= $this->actionButton('btn-secondary btnEdit', 'fas fa-edit', $id, 'mr-1');
+                    $result .= $this->actionButton('btn-success btnFinalSubmit', 'fas fa-check-square', $id, 'mr-1');
                     $result .= $this->actionButton('btn-danger btnDisable', 'fas fa-ban', $id);
-                // } else {
+                // }else{
                 //     $result .= $this->actionButton('btn-info btnView', 'fa-eye', $id, 'mr-1');
                 // }
             }
 
-            // if ($isForApproval) {
-            //     $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
-            //     $result .= $this->actionButton('btn-success btnEnable', 'fas fa-undo', $id);
-            // }
+            if ($isCancelled){
+                $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
+                $result .= $this->actionButton('btn-success btnEnable', 'fas fa-undo', $id);
+            }
+
+            if ($isForApproval){
+                $result .= $this->actionButton('btn-success btnView', 'fas fa-check-square', $id, 'mr-1');
+            }
+
+            if ($isApproved){
+                $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
+            }
+
+            if ($isDisapproved){
+                $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
+            }
 
             $result .= "</center>";
             return $result;
@@ -59,17 +80,48 @@ class HrMemoController extends Controller
             $result .= "<center>";
 
             if($pth_details->status == 1){
-                $result .= "<span class='badge rounded-pill bg-primary'>Pending</span>";
+                $result .= "<span class='badge rounded-pill bg-info'>Pending</gspan>";
             }else if($pth_details->status == 2){
-                $result .= "<span class='badge rounded-pill bg-info'>For Approval</span>";
+                $result .= "<span class='badge rounded-pill bg-secondary'>Cancelled</span>";
+            }else if($pth_details->status == 3){
+                $result .= "<span class='badge rounded-pill bg-primary'>For Approval</span>";
+            }else if($pth_details->status == 4){
+                $result .= "<span class='badge rounded-pill bg-success'>Approved</span>";
+            }else if($pth_details->status == 5){
+                $result .= "<span class='badge rounded-pill bg-danger'>Disapproved</span>";
             }else{
-                $result .= "<span class='badge rounded-pill bg-success'>Done</span>";
+                $result .= "<span class='badge rounded-pill bg-info'>N/A</span>";
             }
             $result .= "</center>";
 
             return $result;
         })
-        ->rawColumns(['action', 'status_label'])
+        ->addColumn('reason_label', function($pth_details){
+            $result = "";
+            $result .= "<center>";
+
+            if($pth_details->status == 1){
+                $result .= "<span'>Newly Hired</span>";
+            }else if($pth_details->status == 2){
+                $result .= "<span'>Maternity Leave</span>";
+            }else if($pth_details->status == 3){
+                $result .= "<span'>Sick Leave</span>";
+            }else if($pth_details->status == 4){
+                $result .= "<span'>Vacation Leave</span>";
+            }else if($pth_details->status == 5){
+                $result .= "<span'>Promoted</span>";
+            }else if($pth_details->status == 6){
+                $result .= "<span'>Transferred</span>";
+            }else if($pth_details->status == 7){
+                $result .= "<span'>Regularization</span>";
+            }else{
+                $result .= "<span'>N/A</span>";
+            }
+            $result .= "</center>";
+
+            return $result;
+        })
+        ->rawColumns(['action', 'reason_label', 'status_label'])
         ->make(true);
     }
 
@@ -171,14 +223,6 @@ class HrMemoController extends Controller
 
             return response()->json($subcon);
         // }
-
-        // // CASE 2: No employee number → run both and merge
-        // $hris = DB::connection('mysql_systemone')->select($hrisQuery);
-        // $subcon = DB::connection('mysql_subcon')->select($subconQuery);
-
-        // $merged = array_merge($hris, $subcon);
-
-        // return response()->json($merged);
     }
 
     public function addHrMemoInfo(Request $request){
@@ -211,7 +255,7 @@ class HrMemoController extends Controller
                 }else{
                     $last_control_no = $lastest_id->document_no;
                     $last_control_no = explode("-", $last_control_no);
-                    $dateCode = date('my'); // month + year (2 digits)
+                    $dateCode = date('ym'); // month + year (2 digits)
                     if($last_control_no[1] == $dateCode){
                         $counter = $last_control_no[2];
                         $counter++;
@@ -249,21 +293,27 @@ class HrMemoController extends Controller
                 // DELETE OLD HrMemo Email Recipients ON UPDATE
                 HrMemoEmailRecipients::where('hr_memo_id', $request->hr_memo_id)->delete();
                 // SAVE NEW HrMemo Email Recipients
-                foreach ($request->to as $i => $value){
-                    HrMemoEmailRecipients::insert([
+                $to = [];
+                $cc = [];
+
+                foreach ($request->to as $toUserId){
+                    $to[] = [
                         'hr_memo_id' => $hr_memo_id,
-                        'user_id' => $request->to[$i],
+                        'user_id' => $toUserId,
                         'type' => 'to'
-                    ]);
+                    ];
                 }
 
-                foreach ($request->cc as $i => $value){
-                    HrMemoEmailRecipients::insert([
+                foreach ($request->cc as $ccUserId){
+                    $cc[] = [
                         'hr_memo_id' => $hr_memo_id,
-                        'user_id' => $request->cc[$i],
+                        'user_id' => $ccUserId,
                         'type' => 'cc'
-                    ]);
+                    ];
                 }
+                
+                HrMemoEmailRecipients::insert($to);
+                HrMemoEmailRecipients::insert($cc);
 
                 // DELETE OLD HrMemo Trainee Details ON UPDATE
                 HrMemoTraineeDetails::where('hr_memo_id', $request->hr_memo_id)->delete();
@@ -315,7 +365,7 @@ class HrMemoController extends Controller
         ->first();
 
         // return $hrMemo;
-        if ($hrMemo && $hrMemo->trainee_details) {
+        // if ($hrMemo && $hrMemo->trainee_details) {
             foreach($hrMemo->trainee_details as $td){
                 if ($td->employment_type == 1) {
                     // HRIS employee
@@ -339,59 +389,33 @@ class HrMemoController extends Controller
                     }]);
                 }
             }
-        }
+        // }
 
         return response()->json($hrMemo);
-        // return $hrMemo;
-
-        // return HrMemo::with(['email_recipients.rapidx_user',
-        //                 'trainee_details.emp_exam_details.exam_info',
-        //                 'trainee_details.hris_emp_info' => function ($q) {
-        //                     $q->where('trainee_details.employment_type', 1)
-        //                         ->join('vw_Trainee', 'tbl_EmployeeInfo.pkid', '=', 'vw_Trainee.fkEmployee')
-        //                         ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-        //                         ->select('tbl_EmployeeInfo.*', DB::raw('CONCAT(tbl_EmployeeInfo.FirstName, " ", tbl_EmployeeInfo.LastName) as EmpName'), 'tbl_Training.Venue as Venue');
-        //                 },
-        //                 'trainee_details.subcon_emp_info' => function ($q) {
-        //                     $q->where('trainee_details.employment_type', 2)
-        //                         ->join('vw_Trainee', 'tbl_EmployeeInfo.pkid', '=', 'vw_Trainee.fkEmployee')
-        //                         ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-        //                         ->select('tbl_EmployeeInfo.*', DB::raw('CONCAT(tbl_EmployeeInfo.FirstName, " ", tbl_EmployeeInfo.LastName) as EmpName'), 'tbl_Training.Venue as Venue');
-        //                 },
-        //             ])
-        //             ->where('id', $request->id)
-        //             ->first();
     }
 
     public function updateHrMemoStatus(Request $request){
         DB::beginTransaction();
 
         try {
-            $defect = HrMemo::findOrFail($request->id);
+            $memo = HrMemo::findOrFail($request->id);
 
-            $defect->status = $defect->status == 1 ? 0 : 1;
-            $defect->save();
+            $memo->status = $request->new_status;
+            $memo->save();
 
             DB::commit(); // ✅ commit here
 
             return response()->json([
                 'success' => true,
-                'new_status' => $defect->status,
-                'message' => 'Past Trouble History Record status updated successfully.'
+                'new_status' => $memo->status,
+                'message' => 'Hr Memo status updated successfully.'
             ]);
         } catch (\Throwable $e) { // ✅ catch everything including DB errors
             DB::rollBack(); // ✅ rollback only if it fails
 
-            // log the error so you can see what’s happening
-            \Log::error('Past Trouble History Record status update failed', [
-                'error' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-            ]);
-
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update Past Trouble History Record status.',
+                'message' => 'Failed to update Hr Memo status.',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -400,5 +424,53 @@ class HrMemoController extends Controller
     public function getUsers(Request $request){
         $users = User::where('status', 0)->get();
         return response()->json(['users_data' => $users]);
+    }
+
+    public function sendHrMemoMail(Request $request){
+        $hr_memo = HrMemo::with(['prepared_by_info', 'noted_by_info', 'email_recipients.rapidx_user'])->where('id', $request->hr_memo_id)->whereNull('deleted_at')->first();
+        // return $hr_memo;
+        // $data = ['application' => $hr_memo, 'approver_details' => $approver_details];
+
+        $send_to = [];
+        $send_cc = [];
+
+        foreach ($hr_memo->email_recipients as $recipient){
+            if($recipient->type == 'to'){
+                $send_to[] = $recipient->rapidx_user->email;
+            }else if($recipient->type == 'cc'){
+                $send_cc[] = $recipient->rapidx_user->email;
+            }
+        }
+
+        // if($hr_memo){
+            switch ($request->status) {
+                case 3: { //FOR APPROVAL
+                        Mail::send('mail.hr_memo_mail', ['hr_memo' => $hr_memo], function ($message) use ($send_to, $send_cc, $hr_memo) {
+                            $message->to($send_to)->subject('TRDSv2 Memo: ' . $hr_memo->subject);
+
+                            if(!empty($send_cc)){
+                                $message->cc($send_cc);
+                            }
+                        });
+                        
+                        break;
+                    }
+                case 4: { //APPROVED
+                        
+                        break;
+                    }
+                case 5: { //DISAPPROVED
+                        
+                        break;
+                    }
+                default: {
+                        $result = "---";
+                        break;
+                    }
+            }
+            return response()->json(['result' => 1]);
+        // }else{
+        //     return response()->json(['result' => 2]);
+        // }
     }
 }
