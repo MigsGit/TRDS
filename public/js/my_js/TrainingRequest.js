@@ -1,19 +1,24 @@
 
 
-$(document).ready(function() {
-    // Your code here
-    $('.select2bs5').select2({
-        theme: 'bootstrap4'
+$(document).ready(function() {    
+    // Apply Select2 to all select elements inside any modal dynamically
+    $('.modal').on('shown.bs.modal', function () {
+        $(this).find('.select2bs5').each(function() {
+            $(this).select2({
+                theme: 'bootstrap-5',
+                dropdownParent: $(this).closest('.modal') // Ensures correct parent modal
+            });
+        });
     });
 
-    const $trainingRequestTable = $('#tblTrainingRequest');                           
-    const AddTrainingform = $('#formAddTrainingRequest');                                    
-    const modalAddTrainingRequest = $('#modalAddTrainingRequest');                                  
-    const addRequestTrainingBtn = $('#btnShowModalRequestTraining');   
+    const $trainingRequestTable = $('#tblTrainingRequest');
+    const AddTrainingform = $('#formAddTrainingRequest');
+    const modalAddTrainingRequest = $('#modalAddTrainingRequest');
+    const addRequestTrainingBtn = $('#btnShowModalRequestTraining');
     const selectFilterId = $('#selectFilterId');
-    const requestEmployeeBtn = $('#btnAddTrainee');   
+    const requestEmployeeBtn = $('#btnAddTrainee');
     const modalAddEmployee = $('#modalAddEmployee');
-    
+
     const trainingRequestTable = $trainingRequestTable.DataTable({
         processing: true,
         serverSide: true,
@@ -35,12 +40,54 @@ $(document).ready(function() {
         ]
     });
 
+    const trainingRequestDetailsTable = $('#tblRequestedEmployeeDetails').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: 'get_requested_employee_details',
+            type: 'GET',
+            // data: function(d) {
+            //     d.request_id = $('#documentNo').val(); // Pass the request ID to fetch details for that specific request
+            // }
+        },
+        columns: [
+            { data: 'employee_name', name: 'employee_name' },
+            { data: 'department', name: 'department' },
+            { data: 'section', name: 'section' },
+            { data: 'job_function', name: 'job_function' },
+            { data: 'area_allocation', name: 'area_allocation' }
+        ]
+    });
+
+    const tblRequestedEmployeeByMemoDoc = $('#tblRequestedEmployeeByMemoDoc').DataTable({
+        processing: true,
+        serverSide: false,
+        ajax: {
+            url: 'get_memo_doc_employee_details',
+            type: 'GET'
+        },
+        columns: [
+            { data: 'emp_no' },
+            { data: 'name' },
+            { data: 'position' },
+            { data: 'department' },
+            { data: 'section' },
+            { data: 'training_title' },
+            { data: 'training_result' },
+            { data: 'remarks' },
+            { data: 'training_venue' },
+            { data: 'training_endorsement_date' }
+        ]
+    })
+
+
+
     selectFilterId.change(function(){
         trainingRequestTable.ajax.reload();
     });
 
     addRequestTrainingBtn.on('click', function() {
-
+        $('#btnSubmitTrainingRequest').show();
         AddTrainingform[0].reset();
 
         modalAddTrainingRequest.modal('show');
@@ -102,6 +149,7 @@ $(document).ready(function() {
                 $('#selectReason').val(response.reason).trigger('change').prop('disabled', true);
 
                 $('#txtTrainingDescription').val(response.training_description);
+                $('#btnSubmitTrainingRequest').hide();
             }
         });
     });
@@ -109,9 +157,10 @@ $(document).ready(function() {
     AddTrainingform.on('submit', function(e) {
         e.preventDefault();
         // console.log(e);
+       
 
         $.ajax({
-            url: 'add_training_request', 
+            url: 'add_training_request',
             method: 'POST',
             data: AddTrainingform.serialize(),
             success: function(response) {
@@ -120,7 +169,7 @@ $(document).ready(function() {
                     trainingRequestTable.draw(); // Refresh the DataTable
                 }else{
                     toastr.error(response.message);
-                    
+
                 }
                 // Handle success (e.g., show a success message, update the table, etc.)
                 // alert('Training request added successfully!');
@@ -136,33 +185,34 @@ $(document).ready(function() {
         // console.log('Request Employee button clicked');
         modalAddEmployee.modal('show');
         getMemoDocs();
-        
+        tblRequestedEmployeeByMemoDoc.draw();
+
     });
 
     $('#selectMemoDocNo').on('change', function(){
+
         let memoDocId = $(this).val();
 
         if(memoDocId){
-            $.ajax({
-                url: 'get_memo_doc_details', 
-                method: 'GET',
-                data: { id: memoDocId },
-                success: function(response) {
-                    console.log(response);
-                    // $('#txtMemoDetails').val(response.details);
-                }
-            });
+
+            tblRequestedEmployeeByMemoDoc.ajax.url(
+                'get_memo_doc_employee_details?memo_doc_id=' + memoDocId
+            ).load();
+
         }else{
-            // $('#txtMemoDetails').val('');
+
+            tblRequestedEmployeeByMemoDoc.clear().draw();
+
         }
+
     });
 
-    
+
     function getHrisDepartments(){
 
         $.ajax({
             url: 'get_hris_department', // Update with your actual route
-            method: 'GET',  
+            method: 'GET',
             success: function(response) {
                 // Clear existing options
                 // console.log(response);
@@ -181,7 +231,7 @@ $(document).ready(function() {
 
         $.ajax({
             url: 'get_hris_sections', // Update with your actual route
-            method: 'GET',  
+            method: 'GET',
             success: function(response) {
                 // Clear existing options
                 // console.log(response);
@@ -200,7 +250,7 @@ $(document).ready(function() {
 
         $.ajax({
             url: 'get_user_conformance', // Update with your actual route
-            method: 'GET',  
+            method: 'GET',
             // data: { id: id },
             success: function(response) {
                 // Handle the response as needed

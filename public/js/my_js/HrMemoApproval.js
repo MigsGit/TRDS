@@ -147,7 +147,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
     // add trainee details button
     $addButtonTD.on('click', function (){
-        console.log('btn counter', $addButtonTD.data('counter'));
+        // console.log('btn counter', $addButtonTD.data('counter'));
 
         $formTD[0].reset();
         $formTD.find('input[type="hidden"]').val('');
@@ -567,7 +567,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
         // traineeDetailsArray.push(traineeDetailsList);
         $addButtonTD.data('counter', traineeIdCounter);
-        console.log('btn counter', $addButtonTD.data('counter'));
+        // console.log('btn counter', $addButtonTD.data('counter'));
 
         dtTraineeDetails.clear().draw();
         dtTraineeDetails.rows.add(traineeDetailsArray).draw();
@@ -846,7 +846,7 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray)
             });
 
             $form.find('#btnAddTrainee').data('counter', traineeIdCounter);
-            console.log('btn counter', $form.find('#btnAddTrainee').data('counter'));
+            // console.log('btn counter', $form.find('#btnAddTrainee').data('counter'));
 
             console.log('traineeDetailsArray', $traineeDetailsArray);
 

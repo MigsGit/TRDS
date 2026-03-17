@@ -113,6 +113,8 @@ Route::controller(TrainingRequestController::class)->group(function () {
     Route::get('/get_training_requests', 'getTrainingRequests')->name('get_training_requests');
     Route::post('/add_training_request', 'addTrainingRequest')->name('add_training_request');
     Route::get('/get_training_request_details', 'getTrainingRequestDetails')->name('get_training_request_details');
+    Route::get('/get_requested_employee_details', 'getRequestedEmployeeDetails')->name('get_requested_employee_details');
+    
 
     // FOR DROPDOWNS
     Route::get('/get_hris_department', 'getHRISSectionByDepartment')->name('get_hris_department');
@@ -124,6 +126,7 @@ Route::controller(TrainingRequestController::class)->group(function () {
     // MEMO DOCS
     Route::get('/get_memo_docs', 'getMemoDocs')->name('get_memo_docs');
     Route::get('/get_memo_doc_details', 'getMemoDocsDetails')->name('get_memo_doc_details');
+    Route::get('/get_memo_doc_employee_details', 'getMemoDocEmployeeDetails')->name('get_memo_doc_employee_details');
     
 });
 

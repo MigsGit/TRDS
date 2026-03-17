@@ -108,7 +108,7 @@
 
 @section('js_content')
     <script type="text/javascript">
-
+        <script src="{{ asset('public/js/my_js/HrMemoExamination.js') }}?<?=time()?>"></script>
     </script>
 @endsection
 

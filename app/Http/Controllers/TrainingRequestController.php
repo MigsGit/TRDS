@@ -6,6 +6,7 @@ use App\Model\SystemOneHrisDepartment;
 use App\Model\SystemOneHrisDivision;
 use App\Model\SystemOneHrisSection;
 use App\Model\TrainingRequest;
+use App\Model\TrainingRequestDetails;
 use App\Model\Hr\HrMemo;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
 use App\Model\User;
@@ -220,6 +221,22 @@ class TrainingRequestController extends Controller
         return response()->json($memoDocDetails);
     }
 
-    // public function get
+    public function getRequestedEmployeeDetails(Request $request){
+        $trainingRequestDetails = TrainingRequestDetails::all();
+
+         return DataTables()->of($trainingRequestDetails)
+
+        // ->rawColumns(['action', 'status', 'conformance_user','receiving', 'tu_head_approval','date_filed'])
+        ->make(true);
+    }
+
+    public function getMemoDocEmployeeDetails(Request $request){
+        $trainingRequestDetails = TrainingRequestDetails::all();
+
+         return DataTables()->of($trainingRequestDetails)
+
+        // ->rawColumns(['action', 'status', 'conformance_user','receiving', 'tu_head_approval','date_filed'])
+        ->make(true);
+    }
     
 }
