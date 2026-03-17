@@ -14,9 +14,4 @@ class UserAccessModule extends Model
     {
         return $this->hasMany(UserModule::class, 'id', 'user_modules_id');
     }
-
-    // public function conformance_user()
-    // {
-    //     return $this->hasOne(User::class, 'id', 'users_id');
-    // }
 }

@@ -2,7 +2,8 @@
 
 namespace App\Imports;
 
-use App\User;
+use App\Model\User;
+
 use Maatwebsite\Excel\Concerns\ToModel;
 use Auth;
 

@@ -10,7 +10,7 @@ use App\Model\UserAccessModule;
 use App\Model\UserLevel;
 use App\Model\UserModule;
 use App\RapidXUser;
-use App\User;
+use App\Model\User;
 use Auth;
 use DataTables;
 use Illuminate\Http\Request;
@@ -402,7 +402,7 @@ class UserController extends Controller
     // Get User By Id
     public function get_user_by_id(Request $request){
         $users = User::with([
-            'rapidx_rapidx_user_no',
+            'users',
             'rapidx_system_one_subcon_emp_info',
             'rapidx_system_one_hris_emp_info'
         ])
@@ -429,7 +429,7 @@ class UserController extends Controller
     public function get_user_list(Request $request){ //nmodify
 
         $users = User::with([
-            'rapidx_rapidx_user_no',
+            'users',
             'rapidx_system_one_subcon_emp_info',
             'rapidx_system_one_hris_emp_info'
         ])->get();
@@ -453,7 +453,7 @@ class UserController extends Controller
 
     // Get User By Batch
     public function get_user_by_batch(Request $request){
-        $users;
+     return   $users;
 
         if($request->user_id == 0){
             $users = User::all();

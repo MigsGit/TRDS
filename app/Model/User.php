@@ -23,4 +23,10 @@ class User extends Model
     public function users(){
         return $this->hasOne(RapidXUser::class, 'id', 'rapidx_emp_id');
     }
+    public function rapidx_system_one_hris_emp_info(){
+        return $this->hasOne(SystemOneHrisEmpInfo::class, 'EmpNo', 'rapidx_emp_no');
+    }
+    public function rapidx_system_one_subcon_emp_info(){
+        return $this->hasOne(SystemOneSubconEmpInfo::class, 'EmpNo', 'rapidx_emp_no');
+    }
 }
