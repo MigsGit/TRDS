@@ -6,7 +6,7 @@
             <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="" class="nav-link">System Title</a>
+            <a href="" class="nav-link">Training Record Database System v2</a>
         </li>
     </ul>
 

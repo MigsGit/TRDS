@@ -209,7 +209,7 @@
                                     <table class="table table-sm table-bordered" id="tblRequestedEmployeeDetails" style="width: 100%;">
                                         <thead>
                                             <tr>
-                                                <th>Action</th>
+                                                <th>Actionss</th>
                                                 <th>Date Hired</th>
                                                 <th>Employee No</th>
                                                 <th>Name</th>
@@ -218,8 +218,6 @@
                                                 <th>Result</th>
                                                 <th>Remarks</th>
                                                 <th>Venue</th>
-                                                <th>From Station/Production</th>
-                                                <th>To Station/Production</th>
                                                 <th>Endorsement Date</th>
                                             </tr>
                                         </thead>
@@ -236,8 +234,8 @@
                                                 <th>Employee No</th>
                                                 <th>Name</th>
                                                 <th>Position/Dept./Section</th>
-                                                <th>From Station/Production</th>
-                                                <th>To Station/Production</th>
+                                                {{-- <th>From Station/Production</th> --}}
+                                                {{-- <th>To Station/Production</th> --}}
                                             </tr>
                                         </thead>
                                     </table>
@@ -269,7 +267,7 @@
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" id="btnSubmitHrMemoApproval" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
+                        <button type="submit" id="btnSubmitTrainingRequest" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
                     </div>
                 </form>
             </div>
@@ -309,7 +307,7 @@
                             <div class="col">
                                 <div class="table-responsive">
                                     <br>
-                                    <table class="table table-sm table-bordered" id="tblRequestEmployeeDetails" style="width: 100%;">
+                                    <table class="table table-sm table-bordered" id="tblRequestedEmployeeByMemoDoc" style="width: 100%;">
                                         <thead>
                                             <tr>
                                                 <th>Action</th>
@@ -321,8 +319,6 @@
                                                 <th>Result</th>
                                                 <th>Remarks</th>
                                                 <th>Venue</th>
-                                                <th>From Station/Production</th>
-                                                <th>To Station/Production</th>
                                                 <th>Endorsement Date</th>
                                             </tr>
                                         </thead>

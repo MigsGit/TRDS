@@ -11,6 +11,8 @@ class CreateTrainingRequestsTable extends Migration
      *
      * @return void
      */
+
+    
     public function up()
     {
         Schema::create('training_requests', function (Blueprint $table) {

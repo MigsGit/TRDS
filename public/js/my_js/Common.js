@@ -3,6 +3,7 @@
  *
  * @param {object} options
  */
+
 const ajaxRequest = (options) => {
     var defaults = {
         url: '',

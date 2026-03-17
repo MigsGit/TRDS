@@ -15,7 +15,7 @@
         <head>
             <meta charset="utf-8">
             <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <title>System Title | @yield('title')</title>
+            <title>Training Record Database System v2 | @yield('title')</title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <link rel="shortcut icon" type="image/png" href="{{ asset('public/images/favicon.ico') }}">
 
