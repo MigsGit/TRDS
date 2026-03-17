@@ -14,6 +14,17 @@
             vertical-align: middle;
         }
 
+        /* #tableQuestionnaireDetails tbody td {
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        #tableQuestionnaireDetails thead th {
+            font-size: 15px;
+            text-align: center;
+            vertical-align: middle;
+        } */
+
         .removeQuestion {
             position: absolute;
             top: 2px;
@@ -22,10 +33,10 @@
             font-size: 0.75rem;
         }
 
-        /* Option remove button - top right */
         th.position-relative {
             position: relative;
         }
+
         .removeOption {
             position: absolute;
             top: 2px;
@@ -136,7 +147,7 @@
 
                                     <div class="form-group mb-0">
                                         <label class="font-weight-bold">Position: </label>
-                                        <select class="form-control select2bs4 get-systemone-hris-position" name="questionnaire_position" id="slctQuestionnairePosition" required></select>
+                                        <select class="form-control select2bs5 get-systemone-hris-position" name="questionnaire_position" id="slctQuestionnairePosition" required></select>
                                     </div>
                                 </div>
 
@@ -156,12 +167,12 @@
 
                                     <div class="form-group">
                                         <label class="font-weight-bold">Department: </label>
-                                        <select class="form-control select2bs4 get-systemone-hris-department" name="questionnaire_department" id="slctQuestionnaireDepartment" required></select>
+                                        <select class="form-control select2bs5 get-systemone-hris-department" name="questionnaire_department" id="slctQuestionnaireDepartment" required></select>
                                     </div>
 
                                     <div class="form-group">
                                         <label class="font-weight-bold">Product Line: </label>
-                                        <select class="form-control select2bs4 get-systemone-hris-section" name="questionnaire_product_line" id="slctQuestionnaireProductLine" required></select>
+                                        <select class="form-control select2bs5 get-systemone-hris-section" name="questionnaire_product_line" id="slctQuestionnaireProductLine" required></select>
                                     </div>
                                 </div>
                             </div>
@@ -230,12 +241,13 @@
                         </button>
                     </div>
                     <div class="table-responsive">
-                        <table id="tableQuestionnaireDetails" class="table table-bordered table-hover w-100">
+                        <table id="tableQuestionnaireDetails" class="table table-bordered table-hover nowrap w-100">
                             <thead>
                                 <tr>
                                     <th>Action</th>
                                     <th>Status</th>
                                     <th>Type</th>
+                                    <th>No.</th>
                                     <th>Image</th>
                                     <th>Description</th>
                                     <th>Question</th>
@@ -265,7 +277,9 @@
                 <form method="post" id="formCreateUpdateQuestionnaireDetails" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
-                        <input type="hidden" name="questionnaire_details_id" id="txtCreateUpdateQuestionnaireDetailsId">
+                        <input type="hidden" name="questionnaire_details_pkid" id="txtCreateUpdateQuestionnaireDetailsPkid">
+                        <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsFkid">
+                        <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsRevision">
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -273,7 +287,7 @@
                                         <div class="input-group-prepend w-50">
                                             <span class="input-group-text w-100"><strong>Category: &nbsp; </strong></span>
                                         </div>
-                                        <select class="form-control" name="questionnaire_category_type" id="slctQuestionnaireCategoryType" required>
+                                        <select class="form-control reset-value" name="questionnaire_category_type" id="slctQuestionnaireCategoryType" required>
                                             <option value="" selected disabled>-- Select Category --</option>
                                             <option value="0">Single / Multiple Answer</option>
                                             <option value="1">Identification / Essay</option>
@@ -287,7 +301,7 @@
                                         <div class="input-group-prepend w-50">
                                             <span class="input-group-text w-100"><strong>Point(s): &nbsp; </strong></span>
                                         </div>
-                                        <input type="number" class="form-control" name="questionnaire_points" id="nmbrQuestionnairePoints" required>
+                                        <input type="number" class="form-control reset-value" name="questionnaire_points" id="nmbrQuestionnairePoints" required>
                                     </div>
                                 </div>
 
@@ -299,7 +313,7 @@
                                         <button type="button" class="btn btn-sm btn-dark btnViewAttachment">
                                             <i class="fa fa-eye"></i> View
                                         </button>
-                                        <input type="file" class="form-control" id="fileUploadImage" name="upload_image" accept="image/jpeg, image/png">                                    
+                                        <input type="file" class="form-control reset-value" id="fileUploadImage" name="upload_image" accept="image/jpeg, image/png">                                    
                                     </div>
 
                                     <div class="input-group d-none" id="txtAttachment" name="div_txt_attachment">
@@ -355,14 +369,22 @@
     <script type="text/javascript">
     let dataQuestionnaire
     let dataQuestionnaireDetails
+    let questionnaireDetailId
+    let questionnaireDetailRevision
     let questionnaireId
     let questionnaireStatus
     let questionnaireRevision
     let html = ''
 
         $(document).ready(function () {
-            $('.select2bs4').select2({
-                theme: 'bootstrap4'
+            $('.select2bs5').select2({
+                theme: 'bootstrap-5'
+            });
+
+            $(document).on('hidden.bs.modal', function () {
+                if ($('.modal.show').length) {
+                    $('body').addClass('modal-open');
+                }
             });
 
             // ===============================================================================================================================================
@@ -465,20 +487,20 @@
             questionnaireExamTitle = $(this).attr('questionnaire-exam_title');
 
             $('.questionnaireTitle').text(questionnaireExamTitle);
-            $('#txtCreateUpdateQuestionnaireDetailsId').val(questionnaireId);
+            $('#txtCreateUpdateQuestionnaireDetailsFkid').val(questionnaireId);
+            $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireRevision);
             dataQuestionnaireDetails.draw();
         });
 
         dataQuestionnaireDetails = $("#tableQuestionnaireDetails").DataTable({
-            "processing" : false,
-            "serverSide" : true,
+            "processing": false,
+            "serverSide": true,
             "responsive": true,
-            // "order": [[3, "asc"],[3, "asc"]],
             "language": {
                 "info": "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
                 "lengthMenu": "Show _MENU_ Questionnaire Record",
             },
-            "ajax" : {
+            "ajax": {
                 url: "view_questionnaire_details",
                 type: "GET",
                 data: function(data){
@@ -486,34 +508,39 @@
                     data.questionnaireRevision = questionnaireRevision;
                 }
             },
-            "columns":[
-                { "data" : "action", orderable:false, searchable:false},
-                { "data" : "status"},
-                { "data" : "category_type",
+            "columns": [
+                { "data": "action", orderable: false, searchable: false },
+                { "data": "status" },
+                { 
+                    "data": "category_type",
                     "defaultContent": 'N/A',
                     "name": 'Category',
                     "orderable": true,
                     "searchable": true,
                     "render": function (data, type, row) {
-                        console.log('row: ', row);
                         switch (Number(row.category_type)) {
-                            case 0:
-                                return "CHOICES";
-                            case 1:
-                                return "TEXT";
-                            case 2:
-                                return "GRID";
-                            default:
-                                return "Unknown";
+                            case 0: return "CHOICES";
+                            case 1: return "TEXT";
+                            case 2: return "GRID";
+                            default: return "Unknown";
                         }
-                    },
+                    }
                 },
-                { "data" : "image"},
-                { "data" : "description"},
-                { "data" : "question"},
-                { "data" : "choices"},
-                { "data" : "answer"},
-                { "data" : "points"}
+                { "data": "exam_no" },
+                { "data": "image" },
+                { 
+                    "data": "description",
+                    "createdCell": function(td, cellData, rowData, row, col) {
+                        $(td).css({
+                            'white-space': 'normal',
+                            'word-break': 'break-word'
+                        });
+                    }
+                },
+                { "data": "question" },
+                { "data": "choices" },
+                { "data": "answer" },
+                { "data": "points" }
             ],
         });
 
@@ -556,6 +583,7 @@
             switch (typeOfQuestion) {
                 case '0':
                     console.log('CHOICES');
+                    html += '<input type="hidden" name="answer[]" id="choiceAnswerHidden">';
                     html += '<div class="input-group-prepend w-25">'
                     html += '   <span class="input-group-text w-100"><strong>Question: &nbsp; </strong></span>'
                     html += '</div>'
@@ -578,7 +606,7 @@
                     html += '                   </span>'
                     html += '               </div>'
                     html += '               <input type="text" class="form-control" name="choices[]" placeholder="Option" required>'
-                    html += '               <input type="text" class="form-control txtAnswer" name="answer[]" value="0" style="display:none;">'
+                    html += '               <input type="text" class="form-control txtAnswer" style="display:none;">'
                     html += '               <div class="input-group-append">'
                     html += '                   <button type="button" class="btn btn-danger btnRemoveChoice">'
                     html += '                   <i class="fa fa-trash"></i>'
@@ -609,7 +637,7 @@
                     html += '    </select>'
                     html += '</div>'
                     html += '<div class="col-md-12 mb-3">'
-                    html += '   <input type="text" class="form-control d-none" name="identification" id="txtIdentification" placeholder="Answer for identification" disabled>'
+                    html += '   <input type="text" class="form-control d-none" name="identification[]" id="txtIdentification" placeholder="Answer for identification" disabled>'
                     html += '</div>'
 
                     $('#identificationEssay').append(html);
@@ -618,8 +646,8 @@
                 case '2':
                     console.log('GRID');
                     html += '<input type="hidden" name="questionnaire_question" id="questionnaireQuestionHidden">';
-                    html += '<input type="hidden" name="choices" id="choicesHidden">';
-                    html += '<input type="hidden" name="answer" id="answerHidden">';
+                    html += '<input type="hidden" name="choices" id="gridChoicesHidden">';
+                    html += '<input type="hidden" name="answer" id="gridAnswerHidden">';
                     html += '<div class="input-group-prepend w-25">';
                     html += '   <span class="input-group-text w-100"><strong>Description: &nbsp;</strong></span>';
                     html += '</div>';
@@ -667,7 +695,7 @@
                 break;
             }
         });
-        
+
         // ===================================================================================================
         // ========================================== FOR CHOICES ============================================
         // ===================================================================================================
@@ -682,7 +710,7 @@
             html += '       </span>';
             html += '   </div>';
             html += '   <input type="text" class="form-control" name="choices[]" placeholder="Option" required>';
-            html += '   <input type="hidden" class="txtAnswer" name="answer[]" value="0">';
+            html += '   <input type="hidden" class="txtAnswer">';
             html += '   <div class="input-group-append">';
             html += '       <button type="button" class="btn btn-danger btnRemoveChoice">';
             html += '           <i class="fa fa-trash"></i>';
@@ -700,11 +728,20 @@
 
         $(document).on("change", ".chkAnswer", function (e) {
             e.preventDefault();
-            if($(this).is(":checked")){
-                $(this).closest(".input-group").find(".txtAnswer").val(1);
-            }else{
-                $(this).closest(".input-group").find(".txtAnswer").val(0);
-            }       
+
+            let groupContainer = $(this).closest(".divChoices");
+            let answers = [];
+
+            groupContainer.find(".input-group").each(function () {
+                let checkbox = $(this).find(".chkAnswer");
+
+                if (checkbox.is(":checked")) {
+                    let choiceText = $(this).find("input[name='choices[]']").val();
+                    answers.push(choiceText);
+                }
+            });
+
+            $('#choiceAnswerHidden').val(answers)
         });
 
         // ====================================================================================================
@@ -763,7 +800,7 @@
             });
 
             $('#questionnaireQuestionHidden').val(JSON.stringify(questions));
-            $('#choicesHidden').val(JSON.stringify(options));
+            $('#gridChoicesHidden').val(JSON.stringify(options));
         }
 
         // Add question
@@ -807,7 +844,7 @@
             $(`input[data-row=${row}]`).prop('checked', false);
             $(this).prop('checked', true);
             selectedAnswers[row] = column;
-            $('#answerHidden').val(JSON.stringify(selectedAnswers));
+            $('#gridAnswerHidden').val(JSON.stringify(selectedAnswers));
         });
 
         $("#formCreateUpdateQuestionnaireDetails").submit(function(event){
@@ -815,6 +852,17 @@
             CreateUpdateQuestionnaireDetails();
         });
 
+        $(document).on('click', '.actionUpdateQuestionnaireDetails',function(e){
+            e.preventDefault();
+
+            questionnaireDetailsId = $(this).attr('questionnaire_detail-id');
+            questionnaireDetailRevision = $(this).attr('questionnaire_detail-revision');
+
+            $('#txtCreateUpdateQuestionnaireDetailsPkid').val(questionnaireDetailsId);
+            $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireDetailRevision);
+
+            GetQuestionnaireDetailsById(questionnaireDetailsId,questionnaireDetailRevision)
+        });
 
     </script>
 @endsection

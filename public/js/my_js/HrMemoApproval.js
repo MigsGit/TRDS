@@ -194,6 +194,53 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         selectEmpNo($('.selectEmpNo'));
         $modalTD.modal('show');
     });
+    // $addButtonTD.on('click', function (){ // KINOMENT KO NAGE-ERROR
+
+    //     $formTD[0].reset();
+    //     $formTD.find('input[type="hidden"]').val('');
+
+    //     // Remove all rows except template row
+    //     $($tableExam).find('tbody tr:not(.data-row)').remove();
+
+    //     // Clear template row inputs
+    //     $($tableExam).find('.data-row input').val('');
+
+    //     // <select class="form-control form-control-sm select2bs5 selectTitle" name="title[]" required></select>
+    //     // <select class="form-control form-control-sm select2bs5 selectResult" name="result[]" required></select>
+    //     // Remove any additional rows except the default one
+    //     const defaultExamRow = `
+    //         <tr class="data-row" data-checkbox-id=''>
+    //             <td>
+    //                 <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" required></select>
+    //             </td>
+    //             <td>
+    //                 <select class="form-control form-control-md" name="result[]" id="result" required>
+    //                     <option value="" disabled selected>Select Result</option>
+    //                     <option value="1">Passed</option>
+    //                     <option value="2">Failed</option>
+    //                     <option value="3">Complied</option>
+    //                 </select>
+    //             </td>
+    //             <td>
+    //                 <input type="text" class="form-control form-control-md" name="remarks[]" id="remarks" required></input>
+    //             </td>
+    //             <td id="removeRow">
+    //                 <center>
+    //                     <button class="btn btn-md btn-danger removeRow" title="Remove Row" type="button" disabled>
+    //                         <i class="fa fa-times"></i>
+    //                     </button>
+    //                 </center>
+    //             </td>
+    //         </tr>
+    //     `;
+
+    //     const $tbody = $($tableExam).find('tbody');
+    //     $tbody.html(defaultExamRow);
+
+    //     getExaminations($('#tblExamination tr:last').find('.selectExamTitle'));
+    //     selectEmployeeDetails($('.selectEmpNo'));
+    //     $modalTD.modal('show');
+    // });
 
     // Handle employee number input
     $('#employeeNumber').on('change', function(){
