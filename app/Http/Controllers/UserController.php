@@ -269,7 +269,7 @@ class UserController extends Controller
             ->make(true);
     }
     //View Users
-	public function view_user_module_access(){
+	public function view_user_module_access(Request $request){
     	$userModule = UserModule::with([
                     'rapidx_user_updated_by',
                 ])
@@ -308,7 +308,7 @@ class UserController extends Controller
                 return $result;
             })
             ->addColumn('updated_by', function($row){
-                return $row->updated_by ;
+                return $row->rapidx_user_updated_by->name ?? "" ;
             })
             ->rawColumns(['action', 'updated_by','rawBulkCheckBox'])
             ->make(true);
@@ -570,27 +570,6 @@ class UserController extends Controller
         catch(\Exception $e){
             return response()->json(['result' => "0"]);
         }
-
-        // if(count($user) <= 0){
-        //     try{
-        //         if(isset($request->qrcode)){
-        //             $qrcode = QrCode::format('png')
-        //                     ->size(200)->errorCorrection('H')
-        //                     ->generate($request->qrcode);
-
-        //             return response()->json(['result' => "1", 'qrcode' => "data:image/png;base64," . base64_encode($qrcode)]);
-        //         }
-        //         else{
-        //             return response()->json(['result' => "0"]);
-        //         }
-        //     }
-        //     catch(\Exception $e){
-        //         return response()->json(['result' => "0"]);
-        //     }
-        // }
-        // else{
-        //     return response()->json(['result' => "2"]);
-        // }
     }
 
     public function import_user(Request $request)
@@ -675,7 +654,7 @@ class UserController extends Controller
 
     public function get_user_module_access(Request $request){
         return 'true' ;
-        UserAccessModule::with([''])->get();
+        UserAccessModule::with(['user'])->get();
         try {
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {

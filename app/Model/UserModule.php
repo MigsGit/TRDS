@@ -12,4 +12,7 @@ class UserModule extends Model
     public function rapidx_user_updated_by(){
         return $this->hasOne(RapidXUser::class, 'id', 'updated_by');
     }
+    public function user_module(){
+        return $this->hasOne(RapidXUser::class, 'id', 'updated_by');
+    }
 }
