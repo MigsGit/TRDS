@@ -2,6 +2,7 @@
 use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
 use App\Http\Controllers\QuestionnairesController;
+use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -100,8 +101,8 @@ Route::controller(HrMemoController::class)->group(function () {
 Route::controller(UserController::class)->group(function () {
     Route::post('/add_user', 'add_user');
     Route::post('/save_user_module_access', 'save_user_module_access');
-
-
+    
+    
     Route::get('/view_users', 'view_users')->name('user.view_users');
     Route::get('/view_user_module_access', 'view_user_module_access')->name('user.get_emp_details_by_id');
     Route::get('/get_user_levels', 'get_user_levels')->name('user.get_user_levels');
@@ -109,34 +110,40 @@ Route::controller(UserController::class)->group(function () {
     Route::get('/get_user_list', 'get_user_list');
     Route::get('/get_user_by_id', 'get_user_by_id');
     Route::get('/get_user_module_access', 'get_user_module_access');
-
+    
 });
 
 
 Route::controller(TrainingRequestController::class)->group(function () {
-
+    
     //TRAINING REQUEST
     Route::get('/get_training_requests', 'getTrainingRequests')->name('get_training_requests');
     Route::post('/add_training_request', 'addTrainingRequest')->name('add_training_request');
     Route::get('/get_training_request_details', 'getTrainingRequestDetails')->name('get_training_request_details');
     Route::get('/get_requested_employee_details', 'getRequestedEmployeeDetails')->name('get_requested_employee_details');
-
-
+    
+    
     // FOR DROPDOWNS
     Route::get('/get_hris_department', 'getHRISSectionByDepartment')->name('get_hris_department');
     Route::get('/get_hris_divisions', 'getHRISDivisions')->name('get_hris_divisions');
     Route::get('/get_hris_sections', 'getHRISSections')->name('get_hris_sections');
     Route::get('/get_user_conformance', 'getUserConformance')->name('get_user_conformance');
     Route::get('/get_requestor', 'getRequestor')->name('get_requestor');
-
+    
     // MEMO DOCS
     Route::get('/get_memo_docs', 'getMemoDocs')->name('get_memo_docs');
     Route::get('/get_memo_doc_details', 'getMemoDocsDetails')->name('get_memo_doc_details');
     Route::get('/get_memo_doc_employee_details', 'getMemoDocEmployeeDetails')->name('get_memo_doc_employee_details');
-
+    
 });
 
+Route::controller(TrainingAttendanceController::class)->group(function () {
+    Route::get('/view_training_attendance', 'view_training_attendance');
 
+    // view_training_attendance
+});
+
+    
 
 
 // Route::post('/sign_in', 'sign_in')->name('sign_in');
