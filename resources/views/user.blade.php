@@ -223,7 +223,7 @@
             </div>
             <div class="row">
               <div class="col-sm-12">
-                <div class="form-group">
+                <div class="form-group d-none">
                     <input type="number" class="form-control" name="user_id" id="userId" readonly>
                     <input type="number" class="form-control" name="rapidx_emp_id" id="rapidxEmpId" readonly>
                     <input type="number" class="form-control" name="systemone_emp_id" id="systemoneEmpId" readonly>
@@ -250,10 +250,10 @@
                 </div>
                 <div class="form-group">
                   <label>Username</label>
-                    <input type="text read-only" class="form-control" name="username" id="txtAddUserUserName">
+                    <input type="text read-only" class="form-control" name="username" id="txtAddUserUserName" readonly>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group d-none">
                     <div class="row">
                       <div class="col-sm-6">
                         <input type="checkbox" name="with_email" id="chkAddUserWithEmail" checked="checked">
@@ -272,12 +272,12 @@
 
                 <div class="form-group">
                     <label>Position</label>
-                      <input type="text" class="form-control read-only" name="position"  id="txtAddUserPosition">
+                      <input type="text" class="form-control read-only" name="position"  id="txtAddUserPosition" readonly>
                   </div>
 
                   <div class="form-group">
                       <label>Section</label>
-                      <input type="text" class="form-control read-only" name="section" id="txtAddUserSection">
+                      <input type="text" class="form-control read-only" name="section" id="txtAddUserSection" readonly>
                   </div>
               </div>
             </div>

@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserAccessModuleRequest;
 use App\Http\Requests\UserRequest;
 use App\Imports\CSVUserImport;
 use App\Jobs\SendUserPasswordJob;
 use App\Model\OQCStamp;
+use App\Model\User;
 use App\Model\UserAccessModule;
 use App\Model\UserLevel;
 use App\Model\UserModule;
 use App\RapidXUser;
-use App\Model\User;
 use Auth;
 use DataTables;
 use Illuminate\Http\Request;
@@ -25,12 +26,12 @@ use QrCode;
 class UserController extends Controller
 {
 
-    public function save_user_module_access(Request $request){
+    public function save_user_module_access(UserAccessModuleRequest $userAccessModuleRequest){
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            $arrUserModulesId = $request->arrUserModulesId;
-            $selectedEmployeeNumber = $request->selectedEmployeeNumber;
+            $arrUserModulesId = $userAccessModuleRequest->arrUserModulesId;
+            $selectedEmployeeNumber = $userAccessModuleRequest->selectedEmployeeNumber;
             UserAccessModule::whereIn('users_id',$selectedEmployeeNumber)->delete();
             // UserAccessModule::whereIn('users_id',$selectedEmployeeNumber)->update([
             //     'deleted_at' => now(),
