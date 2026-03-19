@@ -20,22 +20,24 @@ use Illuminate\Support\Facades\Cache;
 
 class HrMemoController extends Controller
 {
-    private function actionButton($class, $icon, $id, $extraClass = ''){
-        return "<button class='btn {$class} btn-sm {$extraClass}' data-id='{$id}'>
+    private function actionButton($class, $icon, $id, $extraClass = '', $approval = false){
+        return "<button class='btn {$class} btn-sm {$extraClass}' data-id='{$id}' data-approval='{$approval}'>
                     <i class='fa-solid {$icon}'></i>
                 </button>";
     }
 
     public function viewHrMemoInfo(Request $request){
-        // $globalUser = session('global_user');
+        $globalUser = session('global_user');
+        $user_access = explode(',', $globalUser->user_modules_id);
+
         $hr_memo_details = HrMemo::with(['prepared_by_info', 'noted_by_info', 'email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
 
         return DataTables::of($hr_memo_details)
-        ->addColumn('action', function($hr_memo_details){
+        ->addColumn('action', function($hr_memo_details) use ($user_access){
             $result = "";
             $result .= "<center>";
 
-            // $canManage  = $globalUser && in_array($globalUser->position, [0,1,2,3]);
+            $canApprove  = in_array(6, $user_access);
 
             $id = $hr_memo_details->id;
 
@@ -45,7 +47,7 @@ class HrMemoController extends Controller
             $isApproved = $hr_memo_details->status == 4;
             $isDisapproved = $hr_memo_details->status == 5;
 
-            if ($isPending) {
+            if($isPending) {
                 // if($canManage){
                     $result .= $this->actionButton('btn-secondary btnEdit', 'fas fa-edit', $id, 'mr-1');
                     $result .= $this->actionButton('btn-success btnFinalSubmit', 'fas fa-check-square', $id, 'mr-1');
@@ -53,22 +55,22 @@ class HrMemoController extends Controller
                 // }else{
                 //     $result .= $this->actionButton('btn-info btnView', 'fa-eye', $id, 'mr-1');
                 // }
-            }
-
-            if ($isCancelled){
+            } else if ($isCancelled){
                 $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
                 $result .= $this->actionButton('btn-success btnEnable', 'fas fa-undo', $id);
+            }else if($isForApproval){
+                if($canApprove){
+                    $result .= $this->actionButton('btn-success btnView', 'fas fa-check-square', $id, 'mr-1', 'true');
+                }else{
+                    $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
+                }
             }
-
-            if ($isForApproval){
-                $result .= $this->actionButton('btn-success btnView', 'fas fa-check-square', $id, 'mr-1');
-            }
-
-            if ($isApproved){
-                $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
-            }
-
-            if ($isDisapproved){
+            // else if ($isApproved){
+            //     $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
+            // }else if ($isDisapproved){
+            //     $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
+            // }
+            else{
                 $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
             }
 
@@ -311,7 +313,7 @@ class HrMemoController extends Controller
                         'type' => 'cc'
                     ];
                 }
-                
+
                 HrMemoEmailRecipients::insert($to);
                 HrMemoEmailRecipients::insert($cc);
 
@@ -452,15 +454,15 @@ class HrMemoController extends Controller
                                 $message->cc($send_cc);
                             }
                         });
-                        
+
                         break;
                     }
                 case 4: { //APPROVED
-                        
+
                         break;
                     }
                 case 5: { //DISAPPROVED
-                        
+
                         break;
                     }
                 default: {

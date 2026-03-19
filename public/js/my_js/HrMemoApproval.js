@@ -139,7 +139,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
         $addButtonTD.data('counter', traineeIdCounter)
         // console.log('btn counter', $addButtonTD.data('counter'));
-        
+
         selectEmailRecipients($('.selectToRecipients'));
         selectEmailRecipients($('.selectCcRecipients'));
         $modal.modal('show');
@@ -331,8 +331,9 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     // View button
     $table.on('click', '.btnView', function () {
         const id = $(this).data('id');
+        const approval = $(this).data('approval');
         traineeDetailsArray = [];
-        fetchHrMemoById(id, $modal, dtTraineeDetails, $form, 'view', traineeDetailsArray);
+        fetchHrMemoById(id, $modal, dtTraineeDetails, $form, 'view', traineeDetailsArray, approval);
     });
 
     // Disable button
@@ -747,7 +748,7 @@ function saveHrMemoApproval($form, $modal, dtHrMemoApproval, appendArray) {
 /**
  * Fetch hr_memo_approval data by ID
  */
-function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray) {
+function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray, approval = false) {
     $.ajax({
         type: 'GET',
         url: 'get_hr_memo_by_id',
@@ -758,7 +759,7 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray)
                 disableForm($form, response.status);
             }
 
-            if (response.status == 3) {
+            if (response.status == 3 && approval == true){
                 console.log('hide save, show approval');
 
                 $form.find('#btnSubmitHrMemoApproval').addClass('d-none');
@@ -767,17 +768,16 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray)
 
                 $form.find('#btnAddTrainee').prop('disabled', true);
                 $form.find('#btnAddTrainee').prop('hidden', true);
-            } else if(response.status == 1) {
+            }else if(response.status == 1) {
                 console.log('show save, hide approval');
-                
+
                 $form.find('#btnSubmitHrMemoApproval').removeClass('d-none');
                 $form.find('#btnApprove').addClass('d-none');
                 $form.find('#btnDisapprove').addClass('d-none');
 
                 $form.find('#btnAddTrainee').prop('disabled', false);
                 $form.find('#btnAddTrainee').prop('hidden', false);
-
-            } else if(response.status != 1 && response.status != 3){
+            }else{
                 console.log('hide all');
                 $form.find('#btnSubmitHrMemoApproval').addClass('d-none');
                 $form.find('#btnApprove').addClass('d-none');
@@ -864,7 +864,7 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray)
 
 function disableForm($form, status = null){
     console.log('disabled form & buttons');
-    
+
     $form.find('input, textarea, select').prop('disabled', true);
 }
 
@@ -872,33 +872,32 @@ function disableForm($form, status = null){
  * Disable or update hr_memo_approval status
  */
 function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null) {
-    SendHrMemoMail(id, updateToStatus);
-    // $.ajax({
-    //     type: 'POST',
-    //     url: 'update_hr_memo_status',
-    //     data: { 
-    //         id: id,
-    //         new_status: updateToStatus
-    //     },
-    //     dataType: 'json',
-    //     success: function (response) {
-    //         if(response.success == true) {
-    //             showSuccess('Status updated successfully.');
-    //             if(modal != null){
-    //                 modal.modal('hide');
-    //             }
+    $.ajax({
+        type: 'POST',
+        url: 'update_hr_memo_status',
+        data: {
+            id: id,
+            new_status: updateToStatus
+        },
+        dataType: 'json',
+        success: function (response) {
+            if(response.success == true) {
+                showSuccess('Status updated successfully.');
+                if(modal != null){
+                    modal.modal('hide');
+                }
 
-    //             if(updateToStatus > 2){
-    //                 SendHrMemoMail(id, updateToStatus);
-    //             }
-    //             dtHMA.draw();
-    //         }
-    //     },
-    //     error: function (xhr) {
-    //         console.error('Status update failed:', xhr.responseText);
-    //         showError('Failed to update status.');
-    //     }
-    // });
+                if(updateToStatus > 2){
+                    SendHrMemoMail(id, updateToStatus);
+                }
+                dtHMA.draw();
+            }
+        },
+        error: function (xhr) {
+            console.error('Status update failed:', xhr.responseText);
+            showError('Failed to update status.');
+        }
+    });
 }
 
 function SendHrMemoMail(hr_memo_id, updateToStatus){

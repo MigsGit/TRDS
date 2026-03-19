@@ -276,30 +276,40 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
                 return;
             }
             
-
             $('#slctQuestionnaireCategoryType').val(getQuestionnaireDetials.category_type).trigger('change')
             $('#nmbrQuestionnairePoints').val(getQuestionnaireDetials.points)
 
-            let parsedData = JSON.parse(getQuestionnaireDetials.answer_choices_question);
-            let question = parsedData[0].question;
-            let choices = parsedData[0].choices;
-            let answer  = parsedData[0].answer;
+            let getData  = JSON.parse(getQuestionnaireDetials.answer_choices_question)
+            let question    = getData[0].question
+            let choices     = getData[0].choices
+            let answer      = getData[0].answer
+            let image       = getQuestionnaireDetials.image
+
+            if(!image){
+                $('#txtAttachment').addClass('d-none')
+                $('#fileAttachment').removeClass('d-none')
+            }else{
+                $('#fileAttachment').addClass('d-none')
+                $('#txtAttachment').removeClass('d-none')
+            }
+
+            $('#txteUploadImage').val(image)
 
             switch (getQuestionnaireDetials.category_type) {
                 case 0:
                     $('#txtQuestionnaireQuestion').val(question);
                     $('.divChoices').empty();
                     $('#btnAddChoice').click();
-        
+
                     for(let i = 1; i < choices.length; i++){
                         $('#btnAddChoice').click();
                     }
-        
+
                     $('.divChoices .input-group').each(function(index){
                         let choiceValue = choices[index];
-        
+
                         $(this).find("input[name='choices[]']").val(choiceValue);
-        
+
                         if(choiceValue === answer){
                             $(this)
                                 .find('.chkAnswer')
@@ -310,14 +320,46 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
                     break;
 
                 case 1:
-                    
+                    $('#txtQuestionnaireQuestion').val(question);
+                    $('#txtQuestionType').val(getQuestionnaireDetials.type).trigger('change');
+                    $('#txtIdentification').val(answer)
                     break;
 
                 case 2:
-                    
+                    $('#txtQuestionnaireDescription').val(getQuestionnaireDetials.description)
+                    let rawData = getQuestionnaireDetials.answer_choices_question;
+                
+                    if (!rawData) return;
+                
+                    let getData = JSON.parse(rawData);
+                
+                    getQuestions = [];
+                    getOptions = [];
+                    getSelectedAnswers = [];
+                
+                    if (getData.length > 0) {
+                        getOptions = getData[0].choices;
+                    }
+                
+                    getData.forEach((item, index) => {
+                        getQuestions.push(item.question);
+                        getSelectedAnswers[index] = item.answer;
+                    });
+                
+                    renderTable();
+                
+                    getSelectedAnswers.forEach((ans, rowIndex) => {
+                        if (ans !== null) {
+                            let radio = $(`input[data-row="${rowIndex}"][data-column="${ans}"]`);
+                            radio.prop('checked', true);
+                        }
+                    });
+                
+                    $('#gridAnswerHidden').val(JSON.stringify(getSelectedAnswers));
+                
                     break;
                 default:
-                    console.log('IRROR');
+                    console.log('IRRORMAN');
                     break;
             }
         },

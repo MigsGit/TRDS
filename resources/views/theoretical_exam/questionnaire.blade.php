@@ -14,16 +14,12 @@
             vertical-align: middle;
         }
 
-        /* #tableQuestionnaireDetails tbody td {
-            font-size: 14px;
-            vertical-align: middle;
+        #tableQuestionnaire thead th {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa; /* Light header color */
+            z-index: 5;
         }
-
-        #tableQuestionnaireDetails thead th {
-            font-size: 15px;
-            text-align: center;
-            vertical-align: middle;
-        } */
 
         .removeQuestion {
             position: absolute;
@@ -77,7 +73,7 @@
                                         <i class="fa fa-plus fa-md"></i> Create New Record
                                     </button>
                                 </div>
-                                <div class="table-responsive">
+                                <div class="table-responsive" style="max-height: 80vh; overflow-y: auto;">
                                     <table id="tableQuestionnaire" class="table table-bordered table-hover w-100">
                                         <thead>
                                             <tr>
@@ -317,10 +313,10 @@
                                     </div>
 
                                     <div class="input-group d-none" id="txtAttachment" name="div_txt_attachment">
-                                        <button type="button" class="btn btn-dark" id="btnReUploadFile" disabled>
+                                        <button type="button" class="btn btn-dark" id="btnReUploadFile">
                                             <i class="fa fa-file"></i> Click here to re-upload the file
                                         </button>
-                                        <button type="button" class="btn btn-dark btnViewAttachment" id="getAttachment" value="0">
+                                        <button type="button" class="btn btn-secondary btnViewAttachment" id="getAttachment" value="0">
                                             <i class="fa fa-eye"></i> View
                                         </button>
                                         <input type="text" class="form-control" id="txteUploadImage" name="upload_image" readonly disabled>
@@ -385,6 +381,17 @@
                 if ($('.modal.show').length) {
                     $('body').addClass('modal-open');
                 }
+
+                $(this).find('form').each(function () {
+                    this.reset();
+                });
+
+                $('#txtAttachment').addClass('d-none')
+                $('#fileAttachment').removeClass('d-none')
+                
+                $('#singleMultipleAnswer').empty();
+                $('#identificationEssay').empty();
+                $('#multipleGrid').empty();
             });
 
             // ===============================================================================================================================================
@@ -415,7 +422,7 @@
                         "orderable": true,
                         "searchable": true,
                         "render": function (data, type, row) {
-                            console.log('row: ', row);
+
                             switch (row.category) {
                                 case 0:
                                     return "Newly Hired";
@@ -549,7 +556,7 @@
 
             let checkFile = $(this).closest('.input-group').find('input[type="file"]')[0];  
             if(!checkFile || !checkFile.files){
-                let fileName = $('#fileUploadImage').val()
+                let fileName = $('#txteUploadImage').val()
                 console.log('fileName: ', fileName);
                 let url = `storage/app/public/questionnaire_attachment/${fileName}`;
                 window.open(url, '_blank');
@@ -574,10 +581,6 @@
 
         $('#slctQuestionnaireCategoryType').change(function (e) { 
             e.preventDefault();
-            $('#singleMultipleAnswer').empty();
-            $('#identificationEssay').empty();
-            $('#multipleGrid').empty();
-
             let typeOfQuestion = $(this).val()
             html = ''
             switch (typeOfQuestion) {
@@ -750,7 +753,7 @@
         $(document).on('change', '#txtQuestionType', function (e) { 
             e.preventDefault();
             let questionTypeValue = $(this).val()
-            console.log('questionTypeValue: ', questionTypeValue);
+
             if(questionTypeValue == 'Identification'){
                 $('#txtIdentification').removeClass('d-none').prop({'disabled': false, 'required': true})
             }else{
@@ -761,36 +764,38 @@
         // ====================================================================================================
         // ============================================== GRID ================================================
         // ====================================================================================================
-        let questions = [];
-        let options = [];
-        let selectedAnswers = [];
+        let getQuestions = [];
+        let getOptions = [];
+        let getSelectedAnswers = [];
 
         function renderTable() {
             // Table header
             $('#questionTable thead tr').html('<th>Question</th>');
 
-            options.forEach((opt, idx) => {
+            getOptions.forEach((options, getIndex) => {
                 $('#questionTable thead tr').append(`
                     <th class="position-relative">
-                        ${opt} 
-                        <button type="button" class="btn btn-sm btn-secondary removeOption" data-index="${idx}" style="position:absolute; top:2px; right:2px;">&times;</button>
+                        ${options} 
+                        <button type="button" class="btn btn-sm btn-secondary removeOption" data-index="${getIndex}" style="position:absolute; top:2px; right:2px;">&times;</button>
                     </th>
                 `);
             });
 
             // Table body
             $('#questionTable tbody').html('');
-            questions.forEach((q, qIndex) => {
+            getQuestions.forEach((question, questionIndex) => {
                 let row = `<tr>
                     <td class="position-relative" style="padding-left:1rem;">
-                        <button class="btn btn-sm btn-secondary removeQuestion" data-index="${qIndex}" style="margin-right:5px;">&times;</button>
-                        ${q}
+                        <button class="btn btn-sm btn-secondary removeQuestion" data-index="${questionIndex}" style="margin-right:5px;">&times;</button>&nbsp;
+                        ${question}
                     </td>`;
 
-                options.forEach((opt, oIndex) => {
-                    let radioId = `q${qIndex}_o${oIndex}`;
+                getOptions.forEach((options, optionIndex) => {
+                    let radioId = `question${questionIndex}_option${optionIndex}`;
+                    let checked = getSelectedAnswers[questionIndex] == (optionIndex + 1) ? 'checked' : '';
+
                     row += `<td class="text-center">
-                                <input type="radio" id="${radioId}" data-row="${qIndex}" data-column="${oIndex + 1}">
+                                <input type="radio" id="${radioId}" data-row="${questionIndex}" data-column="${optionIndex + 1}" ${checked}>
                                 <label for="${radioId}" class="sr-only"></label>
                             </td>`;
                 });
@@ -799,15 +804,15 @@
                 $('#questionTable tbody').append(row);
             });
 
-            $('#questionnaireQuestionHidden').val(JSON.stringify(questions));
-            $('#gridChoicesHidden').val(JSON.stringify(options));
+            $('#questionnaireQuestionHidden').val(JSON.stringify(getQuestions));
+            $('#gridChoicesHidden').val(JSON.stringify(getOptions));
         }
 
         // Add question
         $(document).on('click', '#btnAddQuestion', function() {
-            let q = $('#txtQuestion').val().trim();
-            if (!q) return alert("Please enter a question!");
-            questions.push(q);
+            let question = $('#txtQuestion').val().trim();
+            if (!question) return alert("Please enter a question!");
+            getQuestions.push(question);
             renderTable();
             $('#txtQuestion').val('');
         });
@@ -815,16 +820,16 @@
         // Remove question
         $(document).on('click', '.removeQuestion', function() {
             let index = $(this).data('index');
-            questions.splice(index, 1);
-            selectedAnswers.splice(index, 1);
+            getQuestions.splice(index, 1);
+            getSelectedAnswers.splice(index, 1);
             renderTable();
         });
 
         // Add option
         $(document).on('click', '#btnAddOption', function() {
-            let opt = $('#txtOption').val().trim();
-            if (!opt) return alert("Please enter an option!");
-            options.push(opt);
+            let optionBtn = $('#txtOption').val().trim();
+            if (!optionBtn) return alert("Please enter an option!");
+            getOptions.push(optionBtn);
             renderTable();
             $('#txtOption').val('');
         });
@@ -832,7 +837,7 @@
         // Remove option
         $(document).on('click', '.removeOption', function() {
             let index = $(this).data('index');
-            options.splice(index, 1);
+            getOptions.splice(index, 1);
             renderTable();
         });
 
@@ -843,8 +848,8 @@
 
             $(`input[data-row=${row}]`).prop('checked', false);
             $(this).prop('checked', true);
-            selectedAnswers[row] = column;
-            $('#gridAnswerHidden').val(JSON.stringify(selectedAnswers));
+            getSelectedAnswers[row] = column;
+            $('#gridAnswerHidden').val(JSON.stringify(getSelectedAnswers));
         });
 
         $("#formCreateUpdateQuestionnaireDetails").submit(function(event){
@@ -864,5 +869,10 @@
             GetQuestionnaireDetailsById(questionnaireDetailsId,questionnaireDetailRevision)
         });
 
+        $('#btnReUploadFile').click(function (e) { 
+            e.preventDefault();
+            $('#fileAttachment').removeClass('d-none')
+            $('#txtAttachment').addClass('d-none')
+        });
     </script>
 @endsection

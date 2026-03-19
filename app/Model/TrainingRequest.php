@@ -2,6 +2,7 @@
 
 namespace App\Model;
 
+use App\Model\TrainingRequestDetails;
 use App\RapidXUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,8 +25,16 @@ class TrainingRequest extends Model
         'section_head'  
     ];
 
-    public function conformance_user(){
+    public function section_head_user(){
         return $this->hasOne(RapidXUser::class, 'id', 'section_head');
+    }
+
+    public function requestor(){
+        return $this->hasOne(RapidXUser::class, 'id', 'created_by');
+    }
+
+    public function training_request_details(){
+        return $this->hasMany(TrainingRequestDetails::class, 'training_request_id', 'id');
     }
 
 }

@@ -25,6 +25,11 @@ class CreateTrainingRequestDetailsTable extends Migration
                 ->constrained('hr_memos')
                 ->cascadeOnDelete();
 
+            $table->foreignId('hr_memo_trainee_details_id')
+                ->nullable()
+                ->constrained('hr_memo_trainee_details')
+                ->cascadeOnDelete();
+
             $table->string('emp_no')->nullable();
             $table->date('date_hired')->nullable();
 

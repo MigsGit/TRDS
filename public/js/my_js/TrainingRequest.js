@@ -11,13 +11,13 @@ $(document).ready(function() {
         });
     });
 
+    
+
     const $trainingRequestTable = $('#tblTrainingRequest');
     const AddTrainingform = $('#formAddTrainingRequest');
     const modalAddTrainingRequest = $('#modalAddTrainingRequest');
     const addRequestTrainingBtn = $('#btnShowModalRequestTraining');
     const selectFilterId = $('#selectFilterId');
-    const requestEmployeeBtn = $('#btnAddTrainee');
-    const modalAddEmployee = $('#modalAddEmployee');
 
     const trainingRequestTable = $trainingRequestTable.DataTable({
         processing: true,
@@ -34,52 +34,42 @@ $(document).ready(function() {
             { data: 'status', name: 'status' },
             { data: 'ctrl_number', name: 'ctrl_number' },
             { data: 'date_filed', name: 'date_filed' },
-            { data: 'conformance_user', name: 'conformance_user' },
+            { data: 'section_head_user', name: 'section_head_user' },
             { data: 'receiving', name: 'receiving' },
             { data: 'tu_head_approval', name: 'tu_head_approval' }
         ]
     });
 
-    const trainingRequestDetailsTable = $('#tblRequestedEmployeeDetails').DataTable({
+    const tblEmployeeListByMemoDoc = $('#tblEmployeeListByMemoDoc').DataTable({
         processing: true,
-        serverSide: true,
+        serverSide: false,
+        autoWidth: false, // Disable default autoWidth
+        responsive: true, // Enable responsive behavior
         ajax: {
-            url: 'get_requested_employee_details',
+            url: 'get_employee_list_by_memo_doc',
             type: 'GET',
-            // data: function(d) {
-            //     d.request_id = $('#documentNo').val(); // Pass the request ID to fetch details for that specific request
-            // }
+            data: function(d){
+                d.memo_doc_id = $('#selectMemoDocNo').val();
+            }
         },
         columns: [
-            { data: 'employee_name', name: 'employee_name' },
-            { data: 'department', name: 'department' },
-            { data: 'section', name: 'section' },
-            { data: 'job_function', name: 'job_function' },
-            { data: 'area_allocation', name: 'area_allocation' }
+            { data: 'action', orderable: false, searchable: false, width: '50px' },
+            { data: 'date_hired', width: '100px' },
+            { data: 'emp_no', width: '80px' },
+            { data: 'name', width: '150px' },
+            { data: 'position', width: '250px' },
+            { data: 'training_title', width: '250px' },
+            { data: 'training_result', width: '120px' },
+            { data: 'remarks', width: '200px' },
+            { data: 'training_venue', width: '150px' },
+            { data: 'training_endorsement_date', width: '120px' }
+        ],
+        columnDefs: [
+            { targets: '_all', className: 'text-nowrap' } // prevent wrapping, keeps widths based on content
         ]
     });
 
-    const tblRequestedEmployeeByMemoDoc = $('#tblRequestedEmployeeByMemoDoc').DataTable({
-        processing: true,
-        serverSide: false,
-        ajax: {
-            url: 'get_memo_doc_employee_details',
-            type: 'GET'
-        },
-        columns: [
-            { data: 'emp_no' },
-            { data: 'name' },
-            { data: 'position' },
-            { data: 'department' },
-            { data: 'section' },
-            { data: 'training_title' },
-            { data: 'training_result' },
-            { data: 'remarks' },
-            { data: 'training_venue' },
-            { data: 'training_endorsement_date' }
-        ]
-    })
-
+    
 
 
     selectFilterId.change(function(){
@@ -93,7 +83,7 @@ $(document).ready(function() {
         modalAddTrainingRequest.modal('show');
 
         // show employee table
-        $('#tblRequestedEmployeeDetails').closest('.tbl').show();
+        $('#tblEmployeeListByMemoDoc').closest('.tbl').show();
 
         // hide training details table
         $('#tblRequestedTrainingDetails').closest('.table-responsive').attr('hidden', true);
@@ -104,17 +94,16 @@ $(document).ready(function() {
         getHrisSection();
         getUserConformance();
         getRequestor();
+        getMemoDocs();
     });
-
 
     $trainingRequestTable.on('click', '.btnViewTrainingRequest', function () {
         const requestId = $(this).data('id');
-
         modalAddTrainingRequest.modal('show');
-        modalAddTrainingRequest.find('.modal-title').text('Training Request Details');
+        modalAddTrainingRequest.find('.modal-title').text('View Training Request Details');
 
         // hide add table
-        $('#tblRequestedEmployeeDetails').closest('.tbl').hide();
+        $('#tblEmployeeListByMemoDoc').closest('.tbl').hide();
 
         // show view table
         $('#tblRequestedTrainingDetails').closest('.table-responsive').removeAttr('hidden');
@@ -126,6 +115,7 @@ $(document).ready(function() {
             success: function(response) {
 
                 const created_at = new Date(response.created_at);
+                const memoDocId = response.training_request_details[0].training_memo_doc_id;
 
                 const formattedDate = created_at.toLocaleString('en-US', {
                     year: 'numeric',
@@ -139,10 +129,12 @@ $(document).ready(function() {
 
                 $('#documentNo').val(response.ctrl_number);
                 $('#dateFiled').val(formattedDate);
-                $('#txtRequestor').val(response.requestor_name);
+                $('#txtRequestor').val(response.requestor.name);
 
-                $('#selectDepartment').val(response.department_id).trigger('change');
-                $('#selectSection').val(response.section_id).trigger('change');
+                getHrisDepartments(response.department_id,true);
+                getHrisSection(response.section_id,true);
+                getUserConformance(response.section_head_user.id,true);
+                getMemoDocs(memoDocId, true);
 
                 $('#selectJobFunction').val(response.job_function).trigger('change').prop('disabled', true);
                 $('#selectAreaLine').val(response.area_allocation).trigger('change').prop('disabled', true);
@@ -150,103 +142,304 @@ $(document).ready(function() {
 
                 $('#txtTrainingDescription').val(response.training_description);
                 $('#btnSubmitTrainingRequest').hide();
+
+                if ($.fn.DataTable.isDataTable('#tblRequestedTrainingDetails')) {
+                    // Clear and reload existing table
+                    const table = $('#tblRequestedTrainingDetails').DataTable();
+                    table.clear().rows.add(response.training_request_details).draw();
+                } else {
+                    // Initialize DataTable for the first time
+                    $('#tblRequestedTrainingDetails').DataTable({
+                        data: response.training_request_details,
+                        columns: [
+                            { data: 'date_hired', name: 'date_hired' },
+                            { data: 'emp_no', name: 'emp_no' },
+                            { data: 'name', name: 'name' },
+                            { 
+                                data: 'pos_dept_section', 
+                                name: 'pos_dept_section', 
+                                render : function(data, type, row) {
+                                    return `${row.position} / ${row.department} / ${row.section}`;
+                                }
+                            }
+                        ],
+                        responsive: true,
+                        paging: false,
+                        searching: false,
+                        ordering: false,
+                        autoWidth: false
+                    });
+                }
+            }
+            
+        });
+
+    });
+
+    $trainingRequestTable.on('click', '.btnConformTrainingRequest', function () {
+        const requestId = $(this).data('id');
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You are about to conform this training request?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, confirm it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Example AJAX request to confirm
+                $.ajax({
+                    url: 'confirm_training_request', // Your route here
+                    method: 'POST',
+                    data: {
+                        id: requestId,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if(response.result == 1){
+                            Swal.fire(
+                                'Confirmed!',
+                                response.message,
+                                'success'
+                            );
+                            trainingRequestTable.ajax.reload();
+                        } else {
+                            Swal.fire(
+                                'Failed!',
+                                response.message,
+                                'error'
+                            );
+                        }
+                    },
+                    error: function(xhr){
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred while confirming the request.',
+                            'error'
+                        );
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+        });
+    });
+
+    $trainingRequestTable.on('click', '.btnReceiveTrainingRequest', function () {
+        const requestId = $(this).data('id');
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You are about to receive this training request?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, receive it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Example AJAX request to confirm
+                $.ajax({
+                    url: 'receive_training_request', // Your route here
+                    method: 'POST',
+                    data: {
+                        id: requestId,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if(response.result == 1){
+                            Swal.fire(
+                                'Confirmed!',
+                                response.message,
+                                'success'
+                            );
+                            trainingRequestTable.ajax.reload();
+                        } else {
+                            Swal.fire(
+                                'Failed!',
+                                response.message,
+                                'error'
+                            );
+                        }
+                    },
+                    error: function(xhr){
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred while confirming the request.',
+                            'error'
+                        );
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+        });
+    });
+
+    $trainingRequestTable.on('click', '.btnApproveTrainingRequest', function () {
+        const requestId = $(this).data('id');
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You are about to approve this training request?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, approve it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Example AJAX request to confirm
+                $.ajax({
+                    url: 'approve_training_request', // Your route here
+                    method: 'POST',
+                    data: {
+                        id: requestId,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if(response.result == 1){
+                            Swal.fire(
+                                'Confirmed!',
+                                response.message,
+                                'success'
+                            );
+                            trainingRequestTable.ajax.reload();
+                        } else {
+                            Swal.fire(
+                                'Failed!',
+                                response.message,
+                                'error'
+                            );
+                        }
+                    },
+                    error: function(xhr){
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred while confirming the request.',
+                            'error'
+                        );
+                        console.error(xhr.responseText);
+                    }
+                });
             }
         });
     });
 
     AddTrainingform.on('submit', function(e) {
         e.preventDefault();
-        // console.log(e);
-       
+
+        let table = $('#tblEmployeeListByMemoDoc').DataTable();
+        let data = table.rows().data().toArray();
+        let formData = Object.fromEntries(new FormData($('#formAddTrainingRequest')[0]));
+
+        let employees = data.map(row => ({
+            id: row.id,   // make sure your server actually sends an 'id'
+            emp_no: row.emp_no,
+            date_hired: row.date_hired,
+            name: row.name,
+            position: row.position,
+            training_title: row.training_title,
+            training_result: row.training_result,
+            remarks: row.remarks,
+            training_venue: row.training_venue,
+            training_endorsement_date: row.training_endorsement_date
+        }));
 
         $.ajax({
             url: 'add_training_request',
             method: 'POST',
-            data: AddTrainingform.serialize(),
+            data: {
+                ...formData,   
+                employees: employees,
+                memo_doc_id: $('#selectMemoDocNo').val(),
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
             success: function(response) {
-                if(response['result'] == 1){
+                if(response.result == 1){
                     toastr.success(response.message);
                     trainingRequestTable.draw(); // Refresh the DataTable
-                }else{
+                } else {
                     toastr.error(response.message);
-
                 }
-                // Handle success (e.g., show a success message, update the table, etc.)
-                // alert('Training request added successfully!');
-                // Optionally, you can refresh the training request table here
-                // For example, you can make an AJAX call to fetch the updated list of training requests and update the table
+                modalAddTrainingRequest.modal('hide');
+            },
+            error: function(xhr, status, error){
+                console.error(xhr.responseText);
+                toastr.error('An error occurred while adding the training request.');
             }
         });
 
-        modalAddTrainingRequest.modal('hide');
-    });
-
-    requestEmployeeBtn.on('click', function() {
-        // console.log('Request Employee button clicked');
-        modalAddEmployee.modal('show');
-        getMemoDocs();
-        tblRequestedEmployeeByMemoDoc.draw();
-
+        
     });
 
     $('#selectMemoDocNo').on('change', function(){
 
-        let memoDocId = $(this).val();
-
-        if(memoDocId){
-
-            tblRequestedEmployeeByMemoDoc.ajax.url(
-                'get_memo_doc_employee_details?memo_doc_id=' + memoDocId
-            ).load();
-
+        if($(this).val()){
+            tblEmployeeListByMemoDoc.ajax.reload();
         }else{
-
-            tblRequestedEmployeeByMemoDoc.clear().draw();
-
+            tblEmployeeListByMemoDoc.clear().draw();
         }
 
     });
 
+    $('#tblEmployeeListByMemoDoc').on('click', '.btnRemoveEmployeeFromMemoDoc', function(){
+        let table = $('#tblEmployeeListByMemoDoc').DataTable();
+        let row = $(this).closest('tr');
 
-    function getHrisDepartments(){
+        table.row(row).remove().draw(false); // no reload
+    });
 
+
+    function getHrisDepartments(selectedDepartmentId = null, isViewMode = false) {
         $.ajax({
-            url: 'get_hris_department', // Update with your actual route
+            url: 'get_hris_department',
             method: 'GET',
             success: function(response) {
-                // Clear existing options
-                // console.log(response);
-                $('#selectDepartment').empty();
-                // Add a default option
-                $('#selectDepartment').append('<option value="">Select Department</option>');
-                // Populate the dropdown with the response data
+                const $select = $('#selectDepartment');
+                $select.empty();
+                $select.append('<option value="" disabled selected>Select Department</option>');
+
                 $.each(response, function(index, department) {
-                    $('#selectDepartment').append('<option value="' + department.pkid + '">' + department.Department + '</option>');
+                    $select.append('<option value="' + department.pkid + '">' + department.Department + '</option>');
                 });
+
+                // Only set a selected value if provided
+                if (selectedDepartmentId) {
+                    $select.val(selectedDepartmentId);
+                }
+                $select.prop('disabled', isViewMode).trigger('change');
             }
         });
     }
 
-     function getHrisSection(){
+    function getHrisSection(selectedSectionId = null, isViewMode = false) {
 
         $.ajax({
-            url: 'get_hris_sections', // Update with your actual route
+            url: 'get_hris_sections',
             method: 'GET',
             success: function(response) {
-                // Clear existing options
-                // console.log(response);
-                $('#selectSection').empty();
-                // Add a default option
-                $('#selectSection').append('<option value="">Select Section</option>');
-                // Populate the dropdown with the response data
+                const $select = $('#selectSection');
+                $select.empty();
+                $select.append('<option value="" disabled selected>Select Section</option>');
+
                 $.each(response, function(index, section) {
-                    $('#selectSection').append('<option value="' + section.pkid + '">' + section.Section + ' - ' + section.department.Department + '</option>');
+                    $select.append('<option value="' + section.pkid + '">' + section.Section + ' - ' + section.department.Department + '</option>');
                 });
+
+                if (selectedSectionId) {
+                    $select.val(selectedSectionId);
+                }
+
+                $select.prop('disabled', isViewMode).trigger('change');
             }
         });
     }
 
-    function getUserConformance(){
+    function getUserConformance(selectedUserId = null, isViewMode = false) {
 
         $.ajax({
             url: 'get_user_conformance', // Update with your actual route
@@ -255,11 +448,18 @@ $(document).ready(function() {
             success: function(response) {
                 // Handle the response as needed
                 // console.log(response);
-                $('#selectSectionHead').empty();
-                $('#selectSectionHead').append('<option value="">Select Conformance User</option>');
+                const $select = $('#selectSectionHead');
+                $select.empty();
+                $select.append('<option value="" disabled selected>Select Conformance User</option>');
                 $.each(response, function(index, user) {
-                    $('#selectSectionHead').append('<option value="' + user.users.id + '">' + user.users.name + '</option>');
+                    $select.append('<option value="' + user.users.id + '">' + user.users.name + '</option>');
                 });
+
+                if (selectedUserId) {
+                    $select.val(selectedUserId);
+                }
+
+                $select.prop('disabled', isViewMode).trigger('change');
             }
         });
     }
@@ -276,23 +476,32 @@ $(document).ready(function() {
         });
     }
 
-    function getMemoDocs(){
+    function getMemoDocs(selectedMemoId = null, isViewMode = false) {
         $.ajax({
-            url: 'get_memo_docs', // Update with your actual route
+            url: 'get_memo_docs',
             method: 'GET',
             success: function(response) {
-                // Handle the response as needed
-                // console.log(response);
-                $('#selectMemoDocNo').val(response.document_no);
-                $('#selectMemoDocNo').empty();
-                $('#selectMemoDocNo').append('<option value="">Select Memo Document</option>');
+                const $select = $('#selectMemoDocNo');
+                $select.empty();
+                $select.append('<option value="" disabled>Select Memo Document</option>');
 
                 $.each(response, function(index, memo) {
-                    $('#selectMemoDocNo').append('<option value="' + memo.id + '">' + memo.document_no + '</option>');
+                    $select.append('<option value="' + memo.id + '">' + memo.document_no + '</option>');
                 });
+
+                // Set selected only after options are added
+                if (selectedMemoId) {
+                    $select.val(selectedMemoId);
+                } else {
+                    $select.val(''); // clear selection in Add mode
+                }
+
+                // Enable or disable depending on mode
+                $select.prop('disabled', isViewMode).trigger('change');
             }
         });
     }
+
 
 });
 

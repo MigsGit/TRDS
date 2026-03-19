@@ -15,7 +15,7 @@
     <div class="sidebar">
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                <li class="nav-item has-treeview fixed-bottom">
+                <li class="nav-item has-treeview">
                     <a href="{{ url('../RapidX') }}" class="nav-link">
                         <i class="nav-icon fas fa-arrow-left"></i>
                         <p>Return to RapidX</p>
@@ -68,17 +68,23 @@
                         <p> Training Request/Approval  </p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
                     </a>
 
-                     <ul class="nav nav-treeview">
+                    <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ route('training_request') }}" class="nav-link">
                                 <p> Training Request</p>
+                            </a>
+                        </li>
+                        {{-- <p>{{ $globalUser }}</p> --}}
+                        {{-- <li class="nav-item">
+                            <a href="{{ route('training_request_conformance') }}" class="nav-link">
+                                <p> Traning Conformance</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('training_request_approval') }}" class="nav-link">
                                 <p> Traning Approval</p>
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
 
                 </li>
