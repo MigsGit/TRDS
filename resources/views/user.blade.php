@@ -378,6 +378,7 @@
                 { "data" : "label1" },
                 { "data" : "action1", orderable:false, searchable:false }
             ],
+           
             "order": [[ 1, "asc" ]],
         });//end of dataTableUsers
 
@@ -407,6 +408,23 @@
         //     // { "visible": false, "targets": 1 }
         //   ],
             "order": [[ 1, "asc" ]],
+            "drawCallback": function(settings) {
+                // Look for all checkboxes in the table
+                $('.checkBulkUserModule').each(function() {
+                    if ($(this).is(':checked')) {
+                        // If checked, find the closest <tr> and add the highlight class
+                        // $(this).closest('tr').css('background-color', '#d4edda'); // Light green
+                        // $(this).closest('tr').css('color', '#155724'); // Dark green text
+                        $(this).closest('tr').attr('style', 'background:#90EE90;');
+                        globalVar.arrUserModulesId.push($(this).attr('pkid-received'));
+                        
+                    } else {
+                        // If not checked, ensure it has the default background
+                        $(this).closest('tr').css('background-color', '');
+                        $(this).closest('tr').css('color', '');
+                    }
+                });
+            },  
         });//end of dataTableUsers
 
         $(document).on('click', '.chkUser', function(){
@@ -545,9 +563,11 @@
         });
         $(document).on('click', '.aEditModuleAccess', function(){
           let userId = $(this).attr('user-id');
+          let rapidxEmpNo = $(this).attr('rapidx-emp-no');
+
           $("#txtEditUserId").val(userId);
-          GetUserModuleAccess(userId)
-          GetUserList( $('#selectedEmployeeNumber'));
+          GetUserList( $('#selectedEmployeeNumber'),userId);
+          dtUserModuleAccess.ajax.url('view_user_module_access?users_id='+userId).draw();
         });
 
         $("#chkEditUserWithEmail").click(function(){
@@ -740,24 +760,27 @@
         $('#btnSubmitUserModuleAccess').click(function (e) {
             e.preventDefault();
             let data = {
-                arrUserModulesId : globalVar.arrUserModulesId,
-                selectedEmployeeNumber : $('#selectedEmployeeNumber').val(),
+                arrUserModulesId : globalVar.arrUserModulesId.toSorted((a, b) => a - b),
+                selectedEmployeeNumber : $('#selectedEmployeeNumber').val()
             }
             let serializedData = {}
             console.log(data);
 
             call_ajax_serialize(data,serializedData , 'save_user_module_access', function(response){
                 console.log(response);
-
+                $('#modalAddUserModuleAccess').modal('hide');
             });
         });
         $('#modalAddUser').on('hidden.bs.modal', function (e) {
-            // $(selector).val();
-            // $("#userId").val('');
             let params = {
                 frmId : $('#formAddUser')
             }
             resetFormValues(params);
+        });
+        $('#modalAddUserModuleAccess').on('hidden.bs.modal', function (e) {
+            globalVar.arrUserModulesId = [];
+            $('#selectedEmployeeNumber').val('');
+            dtUserModuleAccess.ajax.url('view_user_module_access?users_id='+'').draw();
         });
     });
   </script>

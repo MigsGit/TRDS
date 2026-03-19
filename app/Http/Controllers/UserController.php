@@ -255,7 +255,7 @@ class UserController extends Controller
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">';
                 $result .= '<button class="dropdown-item aEditUser" type="button" user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUser" data-keyboard="false">Edit</button>';
-                $result .= '<button class="dropdown-item aEditModuleAccess" type="button" user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUserModuleAccess" data-keyboard="false">Edit Module</button>';
+                $result .= '<button class="dropdown-item aEditModuleAccess" type="button"  rapidx-emp-no= "'.$user->rapidx_emp_no .'"  user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUserModuleAccess" data-keyboard="false">Edit Module</button>';
                 // $result .= '<button class="dropdown-item aGenUserBarcode" user-id="' . $user->id . '" employee-id="' . $user->employee_id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalGenUserBarcode">Generate Barcode</button>';
                 $result .= '</div>
                         </div></center>';
@@ -270,16 +270,38 @@ class UserController extends Controller
     }
     //View Users
 	public function view_user_module_access(Request $request){
+        $usersId =  $request->users_id ?? '';
+        // usersId
     	$userModule = UserModule::with([
                     'rapidx_user_updated_by',
                 ])
-                ->get();
-
+        ->orderBy('id','asc');
+        $count = 0;
+        $usersId;
+        $userAccessModule = [];
+        // if(filled($usersId)){
+        //     $userAccessModule =  UserAccessModule::where('users_id',$usersId)->first('user_modules_id');
+        //     $userAccessModule = explode(',',$userAccessModule->user_modules_id);
+        // }
+      
+        if (filled($usersId)) {
+            $userAccess = UserAccessModule::where('users_id', $usersId)->first();
+            $userAccessModule = $userAccess ? explode(',', $userAccess->user_modules_id) : [];
+        } else {
+            $userAccessModule = [];
+        }
         return DataTables::of($userModule)
-            ->addColumn('rawBulkCheckBox', function($row){
+            ->addColumn('rawBulkCheckBox', function($row) use($userAccessModule,$usersId){
+                $isChecked = "";
+                if (filled($usersId)) {
+                    // Check if the current row ID is inside the user's access array
+                    if (in_array($row->id, $userAccessModule)) {
+                        $isChecked = "checked";
+                    }
+                }
                 $result = '';
                 $result .= '<center>';
-                $result .= "<input class='checkBulkUserModule' type='checkbox' pkid-received='".$row->id."' id='checkBulkUserModule'>";
+                $result .= "<input class='checkBulkUserModule' $isChecked type='checkbox' pkid-received='".$row->id."' id='checkBulkUserModule'>";
                 $result .= '</center>';
                 return $result;
             })
@@ -652,9 +674,9 @@ class UserController extends Controller
 
     }
 
-    public function get_user_module_access(Request $request){
-        return 'true' ;
-        UserAccessModule::with(['user'])->get();
+    public function get_user_module_access(Request $request){ //nmodify view
+        return $userAccessModule =  UserAccessModule::where('users_id',$request->user_id)
+       ->get();
         try {
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {

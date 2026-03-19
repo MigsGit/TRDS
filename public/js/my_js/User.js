@@ -499,7 +499,7 @@
         });
     }
 
-    function GetUserList(cboElement){
+    function GetUserList(cboElement,userId=null){
         let result = '<option value="">N/A</option>';
         $.ajax({
             url: 'get_user_list',
@@ -528,6 +528,9 @@
                 }
 
                 cboElement.html(result);
+                if(userId != null){
+                    cboElement.val(userId).attr('readonly',true);
+                }
             },
             error: function(data, xhr, status){
                 result = '<option value=""> -- Reload Again -- </option>';

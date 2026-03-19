@@ -83,6 +83,9 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
         dataType: "json",
         data: data,
         url: handler,
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
         beforeSend: function(){
             $('#modal-loading').modal('show');
             if(elFormId !=null){
