@@ -123,7 +123,7 @@ class QuestionnairesController extends Controller
         ];
 
         if($validator->fails()){
-            return response()->json(['validationHasError' => 1, 'error' => $validator->messages()]);
+            return response()->json(['validationHasError' => 1, 'error' => $validator->errors()]);
         }else{
             DB::beginTransaction();
             try{
@@ -386,7 +386,7 @@ class QuestionnairesController extends Controller
         }
 
         if($validator->fails()){
-            return response()->json(['validationHasError' => 1, 'error' => $validator->messages()]);
+            return response()->json(['validationHasError' => 1, 'error' => $validator->errors()]);
         }else{
             // DB::beginTransaction();
             // try{
