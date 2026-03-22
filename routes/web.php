@@ -81,10 +81,11 @@ Route::middleware('checkSession')->group(function(){
         Route::post('create_update_questionnaire_details', 'createUpdateQuestionnaireDetails');
         Route::get('get_questionnaire_details_by_id', 'getQuestionnaireDetailsById');
     });
-
+    
     Route::controller(ExaminationController::class)->group(function () {
-        Route::get('/exam', 'exam_dashboard')->name('exam.exam_dashboard');           
-        Route::get('/exam/start_exam/{id}/{revision}', 'start_exam')->name('exam.start_exam');
+        Route::get('exam', 'examDashboard')->name('examDashboard');
+        Route::get('exam/startExam/{id}/{revision}', 'startExam')->name('startExam');
+        Route::get('get_exam_training_request_control_no', 'getExamTrainingRequestControlNo');
     });
 
 
@@ -120,7 +121,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/view_users', 'view_users')->name('user.view_users');
         Route::get('/view_user_module_access', 'view_user_module_access')->name('user.get_emp_details_by_id');
         Route::get('/get_user_levels', 'get_user_levels')->name('user.get_user_levels');
-        Route::get('/get_emp_details_by_id', 'get_emp_details_by_id')->name('user.get_emp_details_by_id');
+        // Route::get('/get_emp_details_by_id', 'get_emp_details_by_id')->name('user.get_emp_details_by_id');
         Route::get('/get_user_list', 'get_user_list');
 
     });

@@ -363,14 +363,14 @@
 
 @section('js_content')
     <script type="text/javascript">
-    let dataQuestionnaire
-    let dataQuestionnaireDetails
-    let questionnaireDetailId
-    let questionnaireDetailRevision
-    let questionnaireId
-    let questionnaireStatus
-    let questionnaireRevision
-    let html = ''
+        let dataQuestionnaire
+        let dataQuestionnaireDetails
+        let questionnaireDetailId
+        let questionnaireDetailRevision
+        let questionnaireId
+        let questionnaireStatus
+        let questionnaireRevision
+        let html = ''
 
         $(document).ready(function () {
             $('.select2bs5').select2({
@@ -444,435 +444,435 @@
                     { "data" : "passing_score"}
                 ],
             });
-        });
 
-        $("#formCreateUpdateQuestionnaire").submit(function(event){
-            event.preventDefault();
-            CreateUpdateQuestionnaire();
-        });
-
-        $(document).on('click', '.actionUpdateQuestionnaire',function(e){
-            e.preventDefault();
-
-            questionnaireId = $(this).attr('questionnaire-id');
-
-            $('#txtCreateUpdateQuestionnaireId').val(questionnaireId);
-            GetQuestionnaireById(questionnaireId);
-        });
-
-        $(document).on('click', '.actionChangeQuestionnaireStatus',function(e){
-            e.preventDefault();
-
-            questionnaireStatus = $(this).attr('status');
-            questionnaireId     = $(this).attr('questionnaire-id');
-
-            $("#txtChangeQuestionnaireStatusId").val(questionnaireId);
-            $("#txtChangeQuestionnaireStatus").val(questionnaireStatus);
-
-            if(questionnaireStatus == 0){
-                $("#lblChangeQuestionnaireStatusLabel").text('Are you sure to activate?');
-                $("#h4ChangeQuestionnaireStatusTitle").html('<i class="fa fa-question-circle"></i> Activate Questionnaire');
-            }else{
-                $("#lblChangeQuestionnaireStatusLabel").text('Are you sure to deactivate?');
-                $("#h4ChangeQuestionnaireStatusTitle").html('<i class="fa fa-question-circle"></i> Deactivate Questionnaire');
-            }
-        });
-
-        $("#formChangeQuestionnaireStatus").submit(function(event){
-            event.preventDefault();
-            ChangeQuestionnaireStatus();
-        });
-
-        // ===============================================================================================================================================
-        // ============================================================ QUESTIONNAIRE DETAILS ============================================================
-        // ===============================================================================================================================================
-        $(document).on('click', '.actionQuestionnaireDetails',function(e){
-            e.preventDefault();
-
-            questionnaireId = $(this).attr('questionnaire-id');
-            questionnaireRevision = $(this).attr('questionnaire-revision');
-            questionnaireExamTitle = $(this).attr('questionnaire-exam_title');
-
-            $('.questionnaireTitle').text(questionnaireExamTitle);
-            $('#txtCreateUpdateQuestionnaireDetailsFkid').val(questionnaireId);
-            $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireRevision);
-            dataQuestionnaireDetails.draw();
-        });
-
-        dataQuestionnaireDetails = $("#tableQuestionnaireDetails").DataTable({
-            "processing": false,
-            "serverSide": true,
-            "responsive": true,
-            "language": {
-                "info": "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
-                "lengthMenu": "Show _MENU_ Questionnaire Record",
-            },
-            "ajax": {
-                url: "view_questionnaire_details",
-                type: "GET",
-                data: function(data){
-                    data.questionnaireId = questionnaireId;
-                    data.questionnaireRevision = questionnaireRevision;
-                }
-            },
-            "columns": [
-                { "data": "action", orderable: false, searchable: false },
-                { "data": "status" },
-                { 
-                    "data": "category_type",
-                    "defaultContent": 'N/A',
-                    "name": 'Category',
-                    "orderable": true,
-                    "searchable": true,
-                    "render": function (data, type, row) {
-                        switch (Number(row.category_type)) {
-                            case 0: return "CHOICES";
-                            case 1: return "TEXT";
-                            case 2: return "GRID";
-                            default: return "Unknown";
-                        }
-                    }
-                },
-                { "data": "exam_no" },
-                { "data": "image" },
-                { 
-                    "data": "description",
-                    "createdCell": function(td, cellData, rowData, row, col) {
-                        $(td).css({
-                            'white-space': 'normal',
-                            'word-break': 'break-word'
-                        });
-                    }
-                },
-                { "data": "question" },
-                { "data": "choices" },
-                { "data": "answer" },
-                { "data": "points" }
-            ],
-        });
-
-        $('.btnViewAttachment').click(function (e) { 
-            e.preventDefault();
-
-            let checkFile = $(this).closest('.input-group').find('input[type="file"]')[0];  
-            if(!checkFile || !checkFile.files){
-                let fileName = $('#txteUploadImage').val()
-                console.log('fileName: ', fileName);
-                let url = `storage/app/public/questionnaire_attachment/${fileName}`;
-                window.open(url, '_blank');
-            }else{
-                if(checkFile.files.length === 0){
-                    alert('Please upload the attachment first.');
+            $("#formCreateUpdateQuestionnaire").submit(function(event){
+                event.preventDefault();
+                CreateUpdateQuestionnaire();
+            });
+    
+            $(document).on('click', '.actionUpdateQuestionnaire',function(e){
+                e.preventDefault();
+    
+                questionnaireId = $(this).attr('questionnaire-id');
+    
+                $('#txtCreateUpdateQuestionnaireId').val(questionnaireId);
+                GetQuestionnaireById(questionnaireId);
+            });
+    
+            $(document).on('click', '.actionChangeQuestionnaireStatus',function(e){
+                e.preventDefault();
+    
+                questionnaireStatus = $(this).attr('status');
+                questionnaireId     = $(this).attr('questionnaire-id');
+    
+                $("#txtChangeQuestionnaireStatusId").val(questionnaireId);
+                $("#txtChangeQuestionnaireStatus").val(questionnaireStatus);
+    
+                if(questionnaireStatus == 0){
+                    $("#lblChangeQuestionnaireStatusLabel").text('Are you sure to activate?');
+                    $("#h4ChangeQuestionnaireStatusTitle").html('<i class="fa fa-question-circle"></i> Activate Questionnaire');
                 }else{
-                    let attachment = checkFile.files[0];
-                    let view = new FileReader();
-
-                    view.onload = function (e) {
-                        let newTab = window.open();
-                        newTab.document.write(
-                            '<iframe width="100%" height="100%" src="' + e.target.result + '"></iframe>'
-                        );
-                    };
-
-                    view.readAsDataURL(attachment);
-                }              
-            }
-        });
-
-        $('#slctQuestionnaireCategoryType').change(function (e) { 
-            e.preventDefault();
-            let typeOfQuestion = $(this).val()
-            html = ''
-            switch (typeOfQuestion) {
-                case '0':
-                    console.log('CHOICES');
-                    html += '<input type="hidden" name="answer[]" id="choiceAnswerHidden">';
-                    html += '<div class="input-group-prepend w-25">'
-                    html += '   <span class="input-group-text w-100"><strong>Question: &nbsp; </strong></span>'
-                    html += '</div>'
-                    html += '<textarea class="form-control" name="questionnaire_question[]" id="txtQuestionnaireQuestion" required></textarea>'
-                    html += '<div class="col-md-12 mt-3" style="border-top: 1px solid">'
-                    html += '   <div class="form-group row mt-2">'
-                    html += '       <label class="col-md-8 col-form-label">'
-                    html += '           Choices ( Select the correct answer )'
-                    html += '       </label>'
-                    html += '       <div class="col-md-4 text-right">'
-                    html += '           <button type="button" class="btn btn-dark btn-sm" id="btnAddChoice">'
-                    html += '               <i class="fa fa-plus"></i> Add Choice'
-                    html += '           </button>'
-                    html += '       </div>'
-                    html += '       <div class="col-12 divChoices mt-2">'
-                    html += '           <div class="input-group input-group-md mb-3">'
-                    html += '               <div class="input-group-prepend">'
-                    html += '                   <span class="input-group-text">'
-                    html += '                       <input type="checkbox" class="chkAnswer" value="0">'
-                    html += '                   </span>'
-                    html += '               </div>'
-                    html += '               <input type="text" class="form-control" name="choices[]" placeholder="Option" required>'
-                    html += '               <input type="text" class="form-control txtAnswer" style="display:none;">'
-                    html += '               <div class="input-group-append">'
-                    html += '                   <button type="button" class="btn btn-danger btnRemoveChoice">'
-                    html += '                   <i class="fa fa-trash"></i>'
-                    html += '                   </button>'
-                    html += '               </div>'
-                    html += '           </div>'
-                    html += '       </div>'
-                    html += '   </div>'
-                    html += '</div>'
-
-                    $('#singleMultipleAnswer').append(html);
-                break;
-
-                case '1':
-                    console.log('TEXT');
-                    html += '<div class="input-group-prepend w-25">'
-                    html += '   <span class="input-group-text w-100"><strong>Question: &nbsp; </strong></span>'
-                    html += '</div>'
-                    html += '<textarea class="form-control" name="questionnaire_question[]" id="txtQuestionnaireQuestion" required></textarea>'
-                    html += '<div class="input-group mt-3 mb-3">'
-                    html += '    <div class="input-group-prepend w-25">'
-                    html += '        <span class="input-group-text w-100"><strong>Type of Question: &nbsp;</strong></span>'
-                    html += '    </div>'
-                    html += '    <select class="form-control" name="question_type" id="txtQuestionType" required>'
-                    html += '        <option value="" selected disabled>-- Select Question Type --</option>'
-                    html += '        <option value="Identification">Identification</option>'
-                    html += '        <option value="Essay">Essay</option>'
-                    html += '    </select>'
-                    html += '</div>'
-                    html += '<div class="col-md-12 mb-3">'
-                    html += '   <input type="text" class="form-control d-none" name="identification[]" id="txtIdentification" placeholder="Answer for identification" disabled>'
-                    html += '</div>'
-
-                    $('#identificationEssay').append(html);
-                break;
-
-                case '2':
-                    console.log('GRID');
-                    html += '<input type="hidden" name="questionnaire_question" id="questionnaireQuestionHidden">';
-                    html += '<input type="hidden" name="choices" id="gridChoicesHidden">';
-                    html += '<input type="hidden" name="answer" id="gridAnswerHidden">';
-                    html += '<div class="input-group-prepend w-25">';
-                    html += '   <span class="input-group-text w-100"><strong>Description: &nbsp;</strong></span>';
-                    html += '</div>';
-                    html += '<textarea class="form-control" name="questionnaire_description" id="txtQuestionnaireDescription" required></textarea>';
-                    html += '<div class="col-12 mt-3" style="border-top: 1px solid">';
-                    html += '    <div class="input-group input-group-md mt-3 mb-2">';
-                    html += '        <div class="input-group-prepend w-25">';
-                    html += '            <span class="input-group-text w-100">';
-                    html += '                <strong>Question:</strong>';
-                    html += '            </span>';
-                    html += '        </div>';
-                    html += '        <input type="text" class="form-control" id="txtQuestion" placeholder="Question">';
-                    html += '        <div class="input-group-append">';
-                    html += '            <button type="button" class="btn btn-sm btn-dark" id="btnAddQuestion" style="width:150px;">';
-                    html += '               <i class="fa fa-plus"></i> Add Question';
-                    html += '            </button>';
-                    html += '        </div>';
-                    html += '    </div>';
-                    html += '    <div class="input-group input-group-md">';
-                    html += '        <div class="input-group-prepend w-25">';
-                    html += '            <span class="input-group-text w-100">';
-                    html += '                <strong>Option:</strong>';
-                    html += '            </span>';
-                    html += '        </div>';
-                    html += '        <input type="text" class="form-control" id="txtOption" placeholder="Option">';
-                    html += '        <div class="input-group-append">';
-                    html += '            <button type="button" class="btn btn-sm btn-dark" id="btnAddOption" style="width:150px;">';
-                    html += '               <i class="fa fa-plus"></i> Add Option';
-                    html += '            </button>';
-                    html += '        </div>';
-                    html += '    </div>';
-                    html += '</div>';
-                    html += '<div class="table-responsive mt-3">';
-                    html += '  <table class="table table-bordered table-striped" id="questionTable">';
-                    html += '    <thead><tr><th>Question</th></tr></thead>';
-                    html += '    <tbody></tbody>';
-                    html += '  </table>';
-                    html += '</div>';
-
-                    $('#multipleGrid').append(html);
-                break;
-
-                default:
-
-                break;
-            }
-        });
-
-        // ===================================================================================================
-        // ========================================== FOR CHOICES ============================================
-        // ===================================================================================================
-        $(document).on("click", "#btnAddChoice", function (e) {
-            e.preventDefault();
-
-            html = '';
-            html += '<div class="input-group input-group-md mb-3">';
-            html += '   <div class="input-group-prepend">';
-            html += '       <span class="input-group-text">';
-            html += '           <input type="checkbox" class="chkAnswer" value="0">';
-            html += '       </span>';
-            html += '   </div>';
-            html += '   <input type="text" class="form-control" name="choices[]" placeholder="Option" required>';
-            html += '   <input type="hidden" class="txtAnswer">';
-            html += '   <div class="input-group-append">';
-            html += '       <button type="button" class="btn btn-danger btnRemoveChoice">';
-            html += '           <i class="fa fa-trash"></i>';
-            html += '       </button>';
-            html += '   </div>';
-            html += '</div>';
-
-            $(".divChoices").append(html);
-        });
-
-        $(document).on("click", ".btnRemoveChoice", function (e) {
-            e.preventDefault();
-            $(this).closest(".input-group").remove();
-        });
-
-        $(document).on("change", ".chkAnswer", function (e) {
-            e.preventDefault();
-
-            let groupContainer = $(this).closest(".divChoices");
-            let answers = [];
-
-            groupContainer.find(".input-group").each(function () {
-                let checkbox = $(this).find(".chkAnswer");
-
-                if (checkbox.is(":checked")) {
-                    let choiceText = $(this).find("input[name='choices[]']").val();
-                    answers.push(choiceText);
+                    $("#lblChangeQuestionnaireStatusLabel").text('Are you sure to deactivate?');
+                    $("#h4ChangeQuestionnaireStatusTitle").html('<i class="fa fa-question-circle"></i> Deactivate Questionnaire');
                 }
             });
-
-            $('#choiceAnswerHidden').val(answers)
-        });
-
-        // ====================================================================================================
-        // ============================================ FOR TEXT ==============================================
-        // ====================================================================================================
-        $(document).on('change', '#txtQuestionType', function (e) { 
-            e.preventDefault();
-            let questionTypeValue = $(this).val()
-
-            if(questionTypeValue == 'Identification'){
-                $('#txtIdentification').removeClass('d-none').prop({'disabled': false, 'required': true})
-            }else{
-                $('#txtIdentification').addClass('d-none').prop({'disabled': true, 'required': false})
-            }
-        });
-
-        // ====================================================================================================
-        // ============================================== GRID ================================================
-        // ====================================================================================================
-        let getQuestions = [];
-        let getOptions = [];
-        let getSelectedAnswers = [];
-
-        function renderTable() {
-            // Table header
-            $('#questionTable thead tr').html('<th>Question</th>');
-
-            getOptions.forEach((options, getIndex) => {
-                $('#questionTable thead tr').append(`
-                    <th class="position-relative">
-                        ${options} 
-                        <button type="button" class="btn btn-sm btn-secondary removeOption" data-index="${getIndex}" style="position:absolute; top:2px; right:2px;">&times;</button>
-                    </th>
-                `);
+    
+            $("#formChangeQuestionnaireStatus").submit(function(event){
+                event.preventDefault();
+                ChangeQuestionnaireStatus();
             });
 
-            // Table body
-            $('#questionTable tbody').html('');
-            getQuestions.forEach((question, questionIndex) => {
-                let row = `<tr>
-                    <td class="position-relative" style="padding-left:1rem;">
-                        <button class="btn btn-sm btn-secondary removeQuestion" data-index="${questionIndex}" style="margin-right:5px;">&times;</button>&nbsp;
-                        ${question}
-                    </td>`;
-
-                getOptions.forEach((options, optionIndex) => {
-                    let radioId = `question${questionIndex}_option${optionIndex}`;
-                    let checked = getSelectedAnswers[questionIndex] == (optionIndex + 1) ? 'checked' : '';
-
-                    row += `<td class="text-center">
-                                <input type="radio" id="${radioId}" data-row="${questionIndex}" data-column="${optionIndex + 1}" ${checked}>
-                                <label for="${radioId}" class="sr-only"></label>
-                            </td>`;
+            // ===============================================================================================================================================
+            // ============================================================ QUESTIONNAIRE DETAILS ============================================================
+            // ===============================================================================================================================================
+            $(document).on('click', '.actionQuestionnaireDetails',function(e){
+                e.preventDefault();
+    
+                questionnaireId = $(this).attr('questionnaire-id');
+                questionnaireRevision = $(this).attr('questionnaire-revision');
+                questionnaireExamTitle = $(this).attr('questionnaire-exam_title');
+    
+                $('.questionnaireTitle').text(questionnaireExamTitle);
+                $('#txtCreateUpdateQuestionnaireDetailsFkid').val(questionnaireId);
+                $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireRevision);
+                dataQuestionnaireDetails.draw();
+            });
+    
+            dataQuestionnaireDetails = $("#tableQuestionnaireDetails").DataTable({
+                "processing": false,
+                "serverSide": true,
+                "responsive": true,
+                "language": {
+                    "info": "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
+                    "lengthMenu": "Show _MENU_ Questionnaire Record",
+                },
+                "ajax": {
+                    url: "view_questionnaire_details",
+                    type: "GET",
+                    data: function(data){
+                        data.questionnaireId = questionnaireId;
+                        data.questionnaireRevision = questionnaireRevision;
+                    }
+                },
+                "columns": [
+                    { "data": "action", orderable: false, searchable: false },
+                    { "data": "status" },
+                    { 
+                        "data": "category_type",
+                        "defaultContent": 'N/A',
+                        "name": 'Category',
+                        "orderable": true,
+                        "searchable": true,
+                        "render": function (data, type, row) {
+                            switch (Number(row.category_type)) {
+                                case 0: return "CHOICES";
+                                case 1: return "TEXT";
+                                case 2: return "GRID";
+                                default: return "Unknown";
+                            }
+                        }
+                    },
+                    { "data": "exam_no" },
+                    { "data": "image" },
+                    { 
+                        "data": "description",
+                        "createdCell": function(td, cellData, rowData, row, col) {
+                            $(td).css({
+                                'white-space': 'normal',
+                                'word-break': 'break-word'
+                            });
+                        }
+                    },
+                    { "data": "question" },
+                    { "data": "choices" },
+                    { "data": "answer" },
+                    { "data": "points" }
+                ],
+            });
+    
+            $('.btnViewAttachment').click(function (e) { 
+                e.preventDefault();
+    
+                let checkFile = $(this).closest('.input-group').find('input[type="file"]')[0];  
+                if(!checkFile || !checkFile.files){
+                    let fileName = $('#txteUploadImage').val()
+                    console.log('fileName: ', fileName);
+                    let url = `storage/app/public/questionnaire_attachment/${fileName}`;
+                    window.open(url, '_blank');
+                }else{
+                    if(checkFile.files.length === 0){
+                        alert('Please upload the attachment first.');
+                    }else{
+                        let attachment = checkFile.files[0];
+                        let view = new FileReader();
+    
+                        view.onload = function (e) {
+                            let newTab = window.open();
+                            newTab.document.write(
+                                '<iframe width="100%" height="100%" src="' + e.target.result + '"></iframe>'
+                            );
+                        };
+    
+                        view.readAsDataURL(attachment);
+                    }              
+                }
+            });
+    
+            $('#slctQuestionnaireCategoryType').change(function (e) { 
+                e.preventDefault();
+                let typeOfQuestion = $(this).val()
+                html = ''
+                switch (typeOfQuestion) {
+                    case '0':
+                        console.log('CHOICES');
+                        html += '<input type="hidden" name="answer[]" id="choiceAnswerHidden">';
+                        html += '<div class="input-group-prepend w-25">'
+                        html += '   <span class="input-group-text w-100"><strong>Question: &nbsp; </strong></span>'
+                        html += '</div>'
+                        html += '<textarea class="form-control" name="questionnaire_question[]" id="txtQuestionnaireQuestion" required></textarea>'
+                        html += '<div class="col-md-12 mt-3" style="border-top: 1px solid">'
+                        html += '   <div class="form-group row mt-2">'
+                        html += '       <label class="col-md-8 col-form-label">'
+                        html += '           Choices ( Select the correct answer )'
+                        html += '       </label>'
+                        html += '       <div class="col-md-4 text-right">'
+                        html += '           <button type="button" class="btn btn-dark btn-sm" id="btnAddChoice">'
+                        html += '               <i class="fa fa-plus"></i> Add Choice'
+                        html += '           </button>'
+                        html += '       </div>'
+                        html += '       <div class="col-12 divChoices mt-2">'
+                        html += '           <div class="input-group input-group-md mb-3">'
+                        html += '               <div class="input-group-prepend">'
+                        html += '                   <span class="input-group-text">'
+                        html += '                       <input type="checkbox" class="chkAnswer" value="0">'
+                        html += '                   </span>'
+                        html += '               </div>'
+                        html += '               <input type="text" class="form-control" name="choices[]" placeholder="Option" required>'
+                        html += '               <input type="text" class="form-control txtAnswer" style="display:none;">'
+                        html += '               <div class="input-group-append">'
+                        html += '                   <button type="button" class="btn btn-danger btnRemoveChoice">'
+                        html += '                   <i class="fa fa-trash"></i>'
+                        html += '                   </button>'
+                        html += '               </div>'
+                        html += '           </div>'
+                        html += '       </div>'
+                        html += '   </div>'
+                        html += '</div>'
+    
+                        $('#singleMultipleAnswer').append(html);
+                    break;
+    
+                    case '1':
+                        console.log('TEXT');
+                        html += '<div class="input-group-prepend w-25">'
+                        html += '   <span class="input-group-text w-100"><strong>Question: &nbsp; </strong></span>'
+                        html += '</div>'
+                        html += '<textarea class="form-control" name="questionnaire_question[]" id="txtQuestionnaireQuestion" required></textarea>'
+                        html += '<div class="input-group mt-3 mb-3">'
+                        html += '    <div class="input-group-prepend w-25">'
+                        html += '        <span class="input-group-text w-100"><strong>Type of Question: &nbsp;</strong></span>'
+                        html += '    </div>'
+                        html += '    <select class="form-control" name="question_type" id="txtQuestionType" required>'
+                        html += '        <option value="" selected disabled>-- Select Question Type --</option>'
+                        html += '        <option value="Identification">Identification</option>'
+                        html += '        <option value="Essay">Essay</option>'
+                        html += '    </select>'
+                        html += '</div>'
+                        html += '<div class="col-md-12 mb-3">'
+                        html += '   <input type="text" class="form-control d-none" name="identification[]" id="txtIdentification" placeholder="Answer for identification" disabled>'
+                        html += '</div>'
+    
+                        $('#identificationEssay').append(html);
+                    break;
+    
+                    case '2':
+                        console.log('GRID');
+                        html += '<input type="hidden" name="questionnaire_question" id="questionnaireQuestionHidden">';
+                        html += '<input type="hidden" name="choices" id="gridChoicesHidden">';
+                        html += '<input type="hidden" name="answer" id="gridAnswerHidden">';
+                        html += '<div class="input-group-prepend w-25">';
+                        html += '   <span class="input-group-text w-100"><strong>Description: &nbsp;</strong></span>';
+                        html += '</div>';
+                        html += '<textarea class="form-control" name="questionnaire_description" id="txtQuestionnaireDescription" required></textarea>';
+                        html += '<div class="col-12 mt-3" style="border-top: 1px solid">';
+                        html += '    <div class="input-group input-group-md mt-3 mb-2">';
+                        html += '        <div class="input-group-prepend w-25">';
+                        html += '            <span class="input-group-text w-100">';
+                        html += '                <strong>Question:</strong>';
+                        html += '            </span>';
+                        html += '        </div>';
+                        html += '        <input type="text" class="form-control" id="txtQuestion" placeholder="Question">';
+                        html += '        <div class="input-group-append">';
+                        html += '            <button type="button" class="btn btn-sm btn-dark" id="btnAddQuestion" style="width:150px;">';
+                        html += '               <i class="fa fa-plus"></i> Add Question';
+                        html += '            </button>';
+                        html += '        </div>';
+                        html += '    </div>';
+                        html += '    <div class="input-group input-group-md">';
+                        html += '        <div class="input-group-prepend w-25">';
+                        html += '            <span class="input-group-text w-100">';
+                        html += '                <strong>Option:</strong>';
+                        html += '            </span>';
+                        html += '        </div>';
+                        html += '        <input type="text" class="form-control" id="txtOption" placeholder="Option">';
+                        html += '        <div class="input-group-append">';
+                        html += '            <button type="button" class="btn btn-sm btn-dark" id="btnAddOption" style="width:150px;">';
+                        html += '               <i class="fa fa-plus"></i> Add Option';
+                        html += '            </button>';
+                        html += '        </div>';
+                        html += '    </div>';
+                        html += '</div>';
+                        html += '<div class="table-responsive mt-3">';
+                        html += '  <table class="table table-bordered table-striped" id="questionTable">';
+                        html += '    <thead><tr><th>Question</th></tr></thead>';
+                        html += '    <tbody></tbody>';
+                        html += '  </table>';
+                        html += '</div>';
+    
+                        $('#multipleGrid').append(html);
+                    break;
+    
+                    default:
+    
+                    break;
+                }
+            });
+    
+            // ===================================================================================================
+            // ========================================== FOR CHOICES ============================================
+            // ===================================================================================================
+            $(document).on("click", "#btnAddChoice", function (e) {
+                e.preventDefault();
+    
+                html = '';
+                html += '<div class="input-group input-group-md mb-3">';
+                html += '   <div class="input-group-prepend">';
+                html += '       <span class="input-group-text">';
+                html += '           <input type="checkbox" class="chkAnswer" value="0">';
+                html += '       </span>';
+                html += '   </div>';
+                html += '   <input type="text" class="form-control" name="choices[]" placeholder="Option" required>';
+                html += '   <input type="hidden" class="txtAnswer">';
+                html += '   <div class="input-group-append">';
+                html += '       <button type="button" class="btn btn-danger btnRemoveChoice">';
+                html += '           <i class="fa fa-trash"></i>';
+                html += '       </button>';
+                html += '   </div>';
+                html += '</div>';
+    
+                $(".divChoices").append(html);
+            });
+    
+            $(document).on("click", ".btnRemoveChoice", function (e) {
+                e.preventDefault();
+                $(this).closest(".input-group").remove();
+            });
+    
+            $(document).on("change", ".chkAnswer", function (e) {
+                e.preventDefault();
+    
+                let groupContainer = $(this).closest(".divChoices");
+                let answers = [];
+    
+                groupContainer.find(".input-group").each(function () {
+                    let checkbox = $(this).find(".chkAnswer");
+    
+                    if (checkbox.is(":checked")) {
+                        let choiceText = $(this).find("input[name='choices[]']").val();
+                        answers.push(choiceText);
+                    }
                 });
-
-                row += '</tr>';
-                $('#questionTable tbody').append(row);
+    
+                $('#choiceAnswerHidden').val(answers)
             });
-
-            $('#questionnaireQuestionHidden').val(JSON.stringify(getQuestions));
-            $('#gridChoicesHidden').val(JSON.stringify(getOptions));
-        }
-
-        // Add question
-        $(document).on('click', '#btnAddQuestion', function() {
-            let question = $('#txtQuestion').val().trim();
-            if (!question) return alert("Please enter a question!");
-            getQuestions.push(question);
-            renderTable();
-            $('#txtQuestion').val('');
-        });
-
-        // Remove question
-        $(document).on('click', '.removeQuestion', function() {
-            let index = $(this).data('index');
-            getQuestions.splice(index, 1);
-            getSelectedAnswers.splice(index, 1);
-            renderTable();
-        });
-
-        // Add option
-        $(document).on('click', '#btnAddOption', function() {
-            let optionBtn = $('#txtOption').val().trim();
-            if (!optionBtn) return alert("Please enter an option!");
-            getOptions.push(optionBtn);
-            renderTable();
-            $('#txtOption').val('');
-        });
-
-        // Remove option
-        $(document).on('click', '.removeOption', function() {
-            let index = $(this).data('index');
-            getOptions.splice(index, 1);
-            renderTable();
-        });
-
-        // Handle radio click per row
-        $(document).on('click', 'input[type=radio]', function() {
-            let row = $(this).data('row');
-            let column = $(this).data('column');
-
-            $(`input[data-row=${row}]`).prop('checked', false);
-            $(this).prop('checked', true);
-            getSelectedAnswers[row] = column;
-            $('#gridAnswerHidden').val(JSON.stringify(getSelectedAnswers));
-        });
-
-        $("#formCreateUpdateQuestionnaireDetails").submit(function(event){
-            event.preventDefault();
-            CreateUpdateQuestionnaireDetails();
-        });
-
-        $(document).on('click', '.actionUpdateQuestionnaireDetails',function(e){
-            e.preventDefault();
-
-            questionnaireDetailsId = $(this).attr('questionnaire_detail-id');
-            questionnaireDetailRevision = $(this).attr('questionnaire_detail-revision');
-
-            $('#txtCreateUpdateQuestionnaireDetailsPkid').val(questionnaireDetailsId);
-            $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireDetailRevision);
-
-            GetQuestionnaireDetailsById(questionnaireDetailsId,questionnaireDetailRevision)
-        });
-
-        $('#btnReUploadFile').click(function (e) { 
-            e.preventDefault();
-            $('#fileAttachment').removeClass('d-none')
-            $('#txtAttachment').addClass('d-none')
+    
+            // ====================================================================================================
+            // ============================================ FOR TEXT ==============================================
+            // ====================================================================================================
+            $(document).on('change', '#txtQuestionType', function (e) { 
+                e.preventDefault();
+                let questionTypeValue = $(this).val()
+    
+                if(questionTypeValue == 'Identification'){
+                    $('#txtIdentification').removeClass('d-none').prop({'disabled': false, 'required': true})
+                }else{
+                    $('#txtIdentification').addClass('d-none').prop({'disabled': true, 'required': false})
+                }
+            });
+    
+            // ====================================================================================================
+            // ============================================== GRID ================================================
+            // ====================================================================================================
+            let getQuestions = [];
+            let getOptions = [];
+            let getSelectedAnswers = [];
+    
+            function renderTable() {
+                // Table header
+                $('#questionTable thead tr').html('<th>Question</th>');
+    
+                getOptions.forEach((options, getIndex) => {
+                    $('#questionTable thead tr').append(`
+                        <th class="position-relative">
+                            ${options} 
+                            <button type="button" class="btn btn-sm btn-secondary removeOption" data-index="${getIndex}" style="position:absolute; top:2px; right:2px;">&times;</button>
+                        </th>
+                    `);
+                });
+    
+                // Table body
+                $('#questionTable tbody').html('');
+                getQuestions.forEach((question, questionIndex) => {
+                    let row = `<tr>
+                        <td class="position-relative" style="padding-left:1rem;">
+                            <button class="btn btn-sm btn-secondary removeQuestion" data-index="${questionIndex}" style="margin-right:5px;">&times;</button>&nbsp;
+                            ${question}
+                        </td>`;
+    
+                    getOptions.forEach((options, optionIndex) => {
+                        let radioId = `question${questionIndex}_option${optionIndex}`;
+                        let checked = getSelectedAnswers[questionIndex] == (optionIndex + 1) ? 'checked' : '';
+    
+                        row += `<td class="text-center">
+                                    <input type="radio" id="${radioId}" data-row="${questionIndex}" data-column="${optionIndex + 1}" ${checked}>
+                                    <label for="${radioId}" class="sr-only"></label>
+                                </td>`;
+                    });
+    
+                    row += '</tr>';
+                    $('#questionTable tbody').append(row);
+                });
+    
+                $('#questionnaireQuestionHidden').val(JSON.stringify(getQuestions));
+                $('#gridChoicesHidden').val(JSON.stringify(getOptions));
+            }
+    
+            // Add question
+            $(document).on('click', '#btnAddQuestion', function() {
+                let question = $('#txtQuestion').val().trim();
+                if (!question) return alert("Please enter a question!");
+                getQuestions.push(question);
+                renderTable();
+                $('#txtQuestion').val('');
+            });
+    
+            // Remove question
+            $(document).on('click', '.removeQuestion', function() {
+                let index = $(this).data('index');
+                getQuestions.splice(index, 1);
+                getSelectedAnswers.splice(index, 1);
+                renderTable();
+            });
+    
+            // Add option
+            $(document).on('click', '#btnAddOption', function() {
+                let optionBtn = $('#txtOption').val().trim();
+                if (!optionBtn) return alert("Please enter an option!");
+                getOptions.push(optionBtn);
+                renderTable();
+                $('#txtOption').val('');
+            });
+    
+            // Remove option
+            $(document).on('click', '.removeOption', function() {
+                let index = $(this).data('index');
+                getOptions.splice(index, 1);
+                renderTable();
+            });
+    
+            // Handle radio click per row
+            $(document).on('click', 'input[type=radio]', function() {
+                let row = $(this).data('row');
+                let column = $(this).data('column');
+    
+                $(`input[data-row=${row}]`).prop('checked', false);
+                $(this).prop('checked', true);
+                getSelectedAnswers[row] = column;
+                $('#gridAnswerHidden').val(JSON.stringify(getSelectedAnswers));
+            });
+    
+            $("#formCreateUpdateQuestionnaireDetails").submit(function(event){
+                event.preventDefault();
+                CreateUpdateQuestionnaireDetails();
+            });
+    
+            $(document).on('click', '.actionUpdateQuestionnaireDetails',function(e){
+                e.preventDefault();
+    
+                questionnaireDetailsId = $(this).attr('questionnaire_detail-id');
+                questionnaireDetailRevision = $(this).attr('questionnaire_detail-revision');
+    
+                $('#txtCreateUpdateQuestionnaireDetailsPkid').val(questionnaireDetailsId);
+                $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireDetailRevision);
+    
+                GetQuestionnaireDetailsById(questionnaireDetailsId,questionnaireDetailRevision)
+            });
+    
+            $('#btnReUploadFile').click(function (e) { 
+                e.preventDefault();
+                $('#fileAttachment').removeClass('d-none')
+                $('#txtAttachment').addClass('d-none')
+            });
         });
     </script>
 @endsection

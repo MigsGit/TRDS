@@ -121,7 +121,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('exam.exam_dashboard') }}" class="nav-link">
+                            <a href="{{ route('examDashboard') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Examination</p>
                             </a>

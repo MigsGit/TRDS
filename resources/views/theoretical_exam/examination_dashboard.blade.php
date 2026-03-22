@@ -136,7 +136,7 @@
                                 </div>
 
                                 <div class="exam-footer">
-                                    <a href="{{ route('exam.start_exam', ['id' => $category->id, 'revision' => $category->revision]) }}"
+                                    <a href="{{ route('startExam', ['id' => $category->id, 'revision' => $category->revision]) }}"
                                         class="btn-start">
                                         Start Exam
                                     </a>

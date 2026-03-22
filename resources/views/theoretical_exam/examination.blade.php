@@ -23,6 +23,10 @@
     .exam-scroll-container::-webkit-scrollbar-thumb:hover {
         background: #555;
     }
+
+    .class-disabled{
+        pointer-events: none;
+    }
 </style>
 
 <div class="content-wrapper">
@@ -45,57 +49,47 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="font-weight-bold">Category: </label>
-                                        <select class="form-control select2bs5 get-systemone-hris-department" name="questionnaire_department" id="slctQuestionnaireDepartment" required></select>
+                                        <label class="font-weight-bold">Training Request Ctrl No.: </label>
+                                        <select class="form-control select2bs5 get-training_request-ctrl_no" name="exam_training_request_ctrl_no" id="slctExamTrainingRequestCtrlNo" required></select>
                                     </div>
-        
+
                                     <div class="form-group">
-                                        <label class="font-weight-bold">Title: </label>
-                                        <textarea class="form-control" rows="2" name="questionnaire_title" id="txtQuestionnaireTitle" required></textarea>
+                                        <label class="font-weight-bold">Employee No.: </label>
+                                        <select class="form-control select2bs5 get-training_request-employee_no" name="exam_training_request_employee_no" id="slctExamTrainingRequestEmployeeNo" required disabled></select>
                                     </div>
-        
+
                                     <div class="form-group">
-                                        <label class="font-weight-bold">Purpose: </label>
+                                        <label class="font-weight-bold">Name: </label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control" name="questionnaire_purpose" id="txtQuestionnairePurpose" required>
+                                            <input type="text" class="form-control" name="exam_training_request_name" id="txtExamTrainingRequestName" required readonly>
                                         </div>
                                     </div>
-        
-                                    <div class="form-group mb-0">
-                                        <label class="font-weight-bold">Position: </label>
-                                        <select class="form-control select2bs5 get-systemone-hris-position" name="questionnaire_position" id="slctQuestionnairePosition" required></select>
-                                    </div>
                                 </div>
-        
+
                                 <!-- Right Column -->
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="font-weight-bold">Passing Score: </label>
+                                        <label class="font-weight-bold">Date Hired: </label>
+                                            <input type="date" class="form-control" name="exam_training_request_date_hired" id="txtExamTrainingRequestDateHired" required readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Date Examination: </label>
                                         <div class="input-group">
-                                            <input type="number" class="form-control" name="questionnaire_passing_score" id="nmbrQuestionnairePassingScore" required>
+                                            <input type="date" class="form-control" name="exam_training_request_date_examination" id="nmbrExamTrainingRequestDateExamination" required readonly>
                                         </div>
                                     </div>
         
                                     <div class="form-group">
-                                        <label class="font-weight-bold">Instruction: </label>
-                                        <textarea class="form-control" rows="2" name="questionnaire_instruction" id="txtQuestionnaireInstruction" required></textarea>
-                                    </div>
-        
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">Department: </label>
-                                        <select class="form-control select2bs5 get-systemone-hris-department" name="questionnaire_department" id="slctQuestionnaireDepartment" required></select>
-                                    </div>
-        
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">Product Line: </label>
-                                        <select class="form-control select2bs5 get-systemone-hris-section" name="questionnaire_product_line" id="slctQuestionnaireProductLine" required></select>
+                                        <label class="font-weight-bold">Examination Take: </label>
+                                            <input type="number" class="form-control" name="exam_training_request_examination_take" id="txtExamTrainingRequestExaminationTake" required readonly>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer d-flex justify-content-end mb-3">
-                            <button type="submit" class="btn btn-success">Submit Exam</button>
-                        </div>
+                        <button type="submit" class="btn btn-dark" id="btnNext">
+                            <i class="fas fa-arrow-right"></i> Next
+                        </button>
                     </div>
                 </div>
             </div>
@@ -225,4 +219,20 @@
         </div>
     </section>
 </div>
+@endsection
+
+
+@section('js_content')
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.select2bs5').select2({ theme: 'bootstrap-5' });
+
+            GetExamTrainingRequestControlNo($('.get-training_request-ctrl_no'));
+
+            $('#btnNext').click(function (e) { 
+                e.preventDefault();
+                console.log('object');
+            });
+        });
+    </script>
 @endsection

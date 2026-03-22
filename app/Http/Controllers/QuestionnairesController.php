@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 use App\Model\Questionnaires;
 use App\Model\QuestionnaireDetails;
