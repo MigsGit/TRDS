@@ -91,176 +91,6 @@
                 <form method="post" id="formAddTrainingRequest" autocomplete="off">
                     @csrf
                     <div class="modal-body">
-
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="input-group  mb-3">
-                                    <div class="input-group-prepend w-50">
-                                        <span class="input-group-text w-100" id="basic-addon1">Control Number</span>
-                                    </div>
-                                    <input type="text" class="form-control" name="document_no"  placeholder="Auto Generated" id="documentNo" readonly>
-
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6">
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend w-50">
-                                        <span class="input-group-text w-100" id="basic-addon1">Date Filed</span>
-                                    </div>
-                                    <input type="text" class="form-control" name="date_filed" value="<?= date('Y-m-d') ?>" id="dateFiled" required readonly>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="header">
-                                <h5 class="text-info"><i class="fa fa-info-circle"></i> Request Details</h5>
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="input-group  mb-3">
-                                        <div class="input-group-prepend w-50">
-                                            <span class="input-group-text w-100" id="basic-addon1">Department</span>
-                                        </div>
-                                        <select name="department" id="selectDepartment" class="form-control select2bs5" required></select>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-6">
-                                    <div class="input-group  mb-3">
-                                        <div class="input-group-prepend w-50">
-                                            <span class="input-group-text w-100" id="basic-addon1">Section</span>
-                                        </div>
-                                        <select name="section" id="selectSection" class="form-control select2bs5" required></select>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-6">
-                                    <div class="input-group  mb-3">
-                                        <div class="input-group-prepend w-50">
-                                            <span class="input-group-text w-100" id="basic-addon1">Job Function</span>
-                                        </div>
-                                        <select name="job_function" id="selectJobFunction" class="form-control select2bs5" required>
-                                            <option value="0" selected disabled>Select One</option>
-                                            <option value="1">Operator</option>
-                                            <option value="2">Material Handler</option>
-                                            <option value="3">Inspector</option>
-                                            <option value="4">Technician</option>
-                                            <option value="5">Engineer</option>
-                                            <option value="6">Supervisor</option>
-                                            <option value="7">Clerk</option>
-                                        </select>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-6">
-                                    <div class="input-group  mb-3">
-                                        <div class="input-group-prepend w-50">
-                                            <span class="input-group-text w-100" id="basic-addon1">Area/Line Allocation</span>
-                                        </div>
-                                        <select name="area_line" id="selectAreaLine" class="form-control select2bs5" required>
-                                            <option value="0" selected disabled>Select One</option>
-                                            <option value="1">Automotive Line</option>
-                                            <option value="2">Non-Automotive Line</option>
-                                        </select>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-12">
-                                    <div class="input-group  mb-3">
-                                        <div class="input-group-prepend w-20">
-                                            <span class="input-group-text w-100" id="basic-addon1">Reason</span>
-                                        </div>
-                                        <select name="reason" id="selectReason" class="form-control select2bs5" required>
-                                            <option value="0" selected disabled>Select Reason</option>
-                                            <option value="1">Newly Hired</option>
-                                            <option value="2">Regularization</option>
-                                            <option value="3">Transferred from other assembly line</option>
-                                            <option value="4">Transferred from other section/department/division</option>
-                                            <option value="5">ML/SL/VL (whose leave reached at least 1 month)</option>
-                                            <option value="6">New Product/Line</option>
-                                            <option value="7">Flexibility Certification</option>
-                                            <option value="8">Re-certification</option>
-                                        </select>
-
-                                    </div>
-                                </div>
-                        </div>
-
-                        <div class="row mt-2">
-                            <div class="col">
-                                <div class="table-responsive tbl">
-                                    <div class="d-flex justify-content-between">
-                                        <button type="button" id="btnAddTrainee" class="btn btn-primary"><i class="fa fa-plus"></i> Request Employee</button>
-                                    </div>
-                                    <br>
-                                    <table class="table table-sm table-bordered" id="tblRequestedEmployeeDetails" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th>Actionss</th>
-                                                <th>Date Hired</th>
-                                                <th>Employee No</th>
-                                                <th>Name</th>
-                                                <th>Position/Dept./Section</th>
-                                                <th>Title</th>
-                                                <th>Result</th>
-                                                <th>Remarks</th>
-                                                <th>Venue</th>
-                                                <th>Endorsement Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div class="table-responsive" hidden>
-                                    <table id="tblRequestedTrainingDetails" class="table table-bordered table-striped table-hover" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th>Date Hired</th>
-                                                <th>Employee No</th>
-                                                <th>Name</th>
-                                                <th>Position/Dept./Section</th>
-                                                {{-- <th>From Station/Production</th> --}}
-                                                {{-- <th>To Station/Production</th> --}}
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mt-4">
-                            <div class="col-sm-6">
-                                <div class="input-group  mb-3">
-                                    <div class="input-group-prepend w-50">
-                                        <span class="input-group-text w-100" id="basic-addon1">Requestor</span>
-                                    </div>
-                                    <input type="text" class="form-control" name="requestor" id="txtRequestor" readonly>
-                                    {{-- <input type="hidden" class="form-control" name="requestor_id" id="txtRequestorId" readonly> --}}
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6">
-                                 <div class="input-group  mb-3">
-                                    <div class="input-group-prepend w-50">
-                                        <span class="input-group-text w-100" id="basic-addon1">Section Head</span>
-                                    </div>
-                                    <select name="section_head" id="selectSectionHead" class="form-control select2bs5" required></select></select>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -351,32 +181,19 @@
         TrainingAttendance : '#tblTrainingAttendance'
     }
     dtTrainingAttendance = $(tbl.TrainingAttendance).DataTable({
-        "processing" : false,
-            "serverSide" : true,
-            "ajax" : {
-            url: "view_training_attendance",
-            // data: function (param){
-            //     param.status = $("#selEmpStat").val();
-            // }
-            },
-
-            "columns":[
-                { "data" : "rawBulkCheckBox", orderable:false, searchable:false },
-                { "data" : "module_name" },
-                { "data" : "updated_by" },
-                { "data" : "action", orderable:false, searchable:false },
-            ],
-
-        //   "columnDefs": [
-        //     {
-        //       "targets": [3, 5],
-        //       "data": null,
-        //       "defaultContent": "N/A"
-        //     },
-        //     // { "visible": false, "targets": 1 }
-        //   ],
-            "order": [[ 1, "asc" ]],
-        });//end of dataTableUsers
+    "processing" : false,
+        "serverSide" : true,
+        "ajax" : {
+        url: "view_training_attendance",
+        },
+        "columns":[
+            { "data" : "action", orderable:false, searchable:false },
+            { "data" : "ctrl_number" },
+            { "data" : "date_filed" },
+            { "data" : "received_date" },
+        ],
+        "order": [[ 1, "asc" ]],
+    });//end of dataTableUsers
 
     </script>
 @endsection
