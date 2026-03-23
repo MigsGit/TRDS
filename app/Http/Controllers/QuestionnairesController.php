@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 use App\Model\Questionnaires;
 use App\Model\QuestionnaireDetails;
@@ -123,7 +123,7 @@ class QuestionnairesController extends Controller
         ];
 
         if($validator->fails()){
-            return response()->json(['validationHasError' => 1, 'error' => $validator->messages()]);
+            return response()->json(['validationHasError' => 1, 'error' => $validator->errors()]);
         }else{
             DB::beginTransaction();
             try{
@@ -207,7 +207,7 @@ class QuestionnairesController extends Controller
             
             if($questionnaire_detail->status == 0){
                 $result .= '<button type="button" class="btn btn-dark btn-sm text-center actionUpdateQuestionnaireDetails mr-2" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" data-toggle="modal" data-target="#modalCreateUpdateQuestionnaireDetails" title="Update Questionnaire Details"><i class="fas fa-edit"></i></button>';
-                $result .= '<button type="button" class="btn btn-info btn-sm text-center actionChangeQuestionnaireStatus" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" status="1" data-toggle="modal" data-target="#modalChangeQuestionnaireDetailsStatus" title="Deactive Questionnaire"><i class="fas fa-redo"></i></button>';
+                $result .= '<button type="button" class="btn btn-danger btn-sm text-center actionChangeQuestionnaireStatus" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" status="1" data-toggle="modal" data-target="#modalChangeQuestionnaireDetailsStatus" title="Deactive Questionnaire"><i class="fas fa-redo"></i></button>';
             }else{
                 $result .= '<button type="button" class="btn btn-warning btn-sm text-center actionChangeQuestionnaireStatus" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" status="0" data-toggle="modal" data-target="#modalChangeQuestionnaireDetailsStatus" title="Activate Questionnaire"><i class="fas fa-redo"></i></button>';
             }
@@ -386,7 +386,7 @@ class QuestionnairesController extends Controller
         }
 
         if($validator->fails()){
-            return response()->json(['validationHasError' => 1, 'error' => $validator->messages()]);
+            return response()->json(['validationHasError' => 1, 'error' => $validator->errors()]);
         }else{
             // DB::beginTransaction();
             // try{
