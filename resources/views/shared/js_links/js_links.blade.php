@@ -39,14 +39,35 @@
 
 <script type="text/javascript" src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1581152197/smartwizard/jquery.smartWizard.min.js"></script>
 
+<script>
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "3000",
+        "timeOut": "5000",
+        "extendedTimeOut": "3000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut",
+        "iconClass":  "toast-custom"
+    };
+</script>
+
 <!-- Custom JS -->
+<script src="{{ asset('public/js/my_js/Questionnaires.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/User.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/CustomerClaim.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/Common.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/RapidXUser.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/EmailRecipient.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/ProductClassification.js') }}?<?=time()?>"></script>
-<script src="{{ asset('public/js/my_js/HrMemoApproval.js') }}?<?=time()?>"></script>
-<script src="{{ asset('public/js/my_js/HrMemoExamination.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/TrainingRequest.js') }}?<?=time()?>"></script>
 
 {{-- <script src="https://cdn.jsdelivr.net/npm/@coreui/coreui@4.0.2/dist/js/coreui.bundle.min.js"></script> --}}

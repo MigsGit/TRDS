@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserAccessModuleRequest;
+use App\Http\Requests\UserRequest;
 use App\Imports\CSVUserImport;
 use App\Jobs\SendUserPasswordJob;
 use App\Model\OQCStamp;
+use App\Model\User;
+use App\Model\UserAccessModule;
 use App\Model\UserLevel;
-use App\User;
+use App\Model\UserModule;
+use App\RapidXUser;
 use Auth;
 use DataTables;
 use Illuminate\Http\Request;
@@ -20,6 +25,30 @@ use QrCode;
 
 class UserController extends Controller
 {
+
+    public function save_user_module_access(UserAccessModuleRequest $userAccessModuleRequest){
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $arrUserModulesId = $userAccessModuleRequest->arrUserModulesId;
+            $selectedEmployeeNumber = $userAccessModuleRequest->selectedEmployeeNumber;
+            UserAccessModule::whereIn('users_id',$selectedEmployeeNumber)->delete();
+            // UserAccessModule::whereIn('users_id',$selectedEmployeeNumber)->update([
+            //     'deleted_at' => now(),
+            // ]);
+            collect($selectedEmployeeNumber)->map(function($rowSelectedEmployeeNumber) use ($arrUserModulesId){
+                UserAccessModule::insert([
+                    'users_id' => $rowSelectedEmployeeNumber,
+                    'user_modules_id' => implode(',',$arrUserModulesId),
+                ]);
+            });
+            DB::commit();
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
     // Sign In
     public function sign_in(Request $request){
         $user_data = array(
@@ -186,8 +215,10 @@ class UserController extends Controller
 
     //View Users
 	public function view_users(){
-    	$users = User::with([
+    $users = User::with([
                     'user_level',
+                    'rapidx_system_one_subcon_emp_info',
+                    'rapidx_system_one_hris_emp_info',
                 ])
                 ->get();
 
@@ -195,7 +226,7 @@ class UserController extends Controller
             ->addColumn('label1', function($user){
                 $result = "";
 
-                if($user->status == 1){
+                if(blank($user->deleted_at)){
                     $result .= '<span class="badge badge-pill badge-success">Active</span>';
                 }
                 else{
@@ -204,25 +235,29 @@ class UserController extends Controller
 
                 return $result;
             })
+            ->addColumn('fullname', function($user){
+                $result = "";
+
+                if(filled($user->rapidx_system_one_hris_emp_info)){
+                    $userHris = $user->rapidx_system_one_hris_emp_info;
+                }
+                else{
+                    $userHris = $user->rapidx_system_one_subcon_emp_info;
+
+                    $result .= '<span class="badge badge-pill badge-danger">Inactive</span>';
+                }
+                return $userHris->FirstName.' '.$userHris->LastName;
+                return $result;
+            })
             ->addColumn('action1', function($user){
                 $result = '<center><div class="btn-group">
                           <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
                             <i class="fa fa-cog"></i>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">';
-                if($user->status == 1){
-                	$result .= '<button class="dropdown-item aEditUser" type="button" user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalEditUser" data-keyboard="false">Edit</button>';
-
-                    $result .= '<button class="dropdown-item aChangeUserStat" type="button" user-id="' . $user->id . '" status="2" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalChangeUserStat" data-keyboard="false">Deactivate</button>';
-
-                    $result .= '<button class="dropdown-item aResetUserPass" user-id="' . $user->id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalResetUserPass" data-keyboard="false">Reset Password</button>';
-
-                    // $result .= '<button class="dropdown-item aGenUserBarcode" user-id="' . $user->id . '" employee-id="' . $user->employee_id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalGenUserBarcode">Generate Barcode</button>';
-                }
-                else{
-                    $result .= '<button class="dropdown-item aChangeUserStat" type="button" style="padding: 1px 1px; text-align: center;" user-id="' . $user->id . '" status="1" data-toggle="modal" data-target="#modalChangeUserStat" data-keyboard="false">Activate</button>';
-                }
-
+                $result .= '<button class="dropdown-item aEditUser" type="button" user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUser" data-keyboard="false">Edit</button>';
+                $result .= '<button class="dropdown-item aEditModuleAccess" type="button"  rapidx-emp-no= "'.$user->rapidx_emp_no .'"  user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUserModuleAccess" data-keyboard="false">Edit Module</button>';
+                // $result .= '<button class="dropdown-item aGenUserBarcode" user-id="' . $user->id . '" employee-id="' . $user->employee_id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalGenUserBarcode">Generate Barcode</button>';
                 $result .= '</div>
                         </div></center>';
 
@@ -231,18 +266,103 @@ class UserController extends Controller
             ->addColumn('checkbox', function($user){
                 return '<center><input type="checkbox" class="chkUser" user-id="' . $user->id . '"></center>';
             })
-            ->rawColumns(['label1', 'action1', 'checkbox'])
+            ->rawColumns(['label1', 'action1', 'checkbox','fullname'])
+            ->make(true);
+    }
+    //View Users
+	public function view_user_module_access(Request $request){
+        $usersId =  $request->users_id ?? '';
+        // usersId
+    	$userModule = UserModule::with([
+                    'rapidx_user_updated_by',
+                ])
+        ->orderBy('id','asc');
+        $count = 0;
+        $usersId;
+        $userAccessModule = [];
+        // if(filled($usersId)){
+        //     $userAccessModule =  UserAccessModule::where('users_id',$usersId)->first('user_modules_id');
+        //     $userAccessModule = explode(',',$userAccessModule->user_modules_id);
+        // }
+      
+        if (filled($usersId)) {
+            $userAccess = UserAccessModule::where('users_id', $usersId)->first();
+            $userAccessModule = $userAccess ? explode(',', $userAccess->user_modules_id) : [];
+        } else {
+            $userAccessModule = [];
+        }
+        return DataTables::of($userModule)
+            ->addColumn('rawBulkCheckBox', function($row) use($userAccessModule,$usersId){
+                $isChecked = "";
+                if (filled($usersId)) {
+                    // Check if the current row ID is inside the user's access array
+                    if (in_array($row->id, $userAccessModule)) {
+                        $isChecked = "checked";
+                    }
+                }
+                $result = '';
+                $result .= '<center>';
+                $result .= "<input class='checkBulkUserModule' $isChecked type='checkbox' pkid-received='".$row->id."' id='checkBulkUserModule'>";
+                $result .= '</center>';
+                return $result;
+            })
+            ->addColumn('action', function($row){
+                $result = '<center><div class="btn-group">
+                          <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
+                            <i class="fa fa-cog"></i>
+                          </button>
+                          <div class="dropdown-menu dropdown-menu-right">';
+                if($row->status == 1){
+                	$result .= '<button class="dropdown-item aEditUser" type="button" user-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalEditUser" data-keyboard="false">Edit</button>';
+
+                    $result .= '<button class="dropdown-item aChangeUserStat" type="button" user-id="' . $row->id . '" status="2" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalChangeUserStat" data-keyboard="false">Deactivate</button>';
+
+                    $result .= '<button class="dropdown-item aResetUserPass" user-id="' . $row->id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalResetUserPass" data-keyboard="false">Reset Password</button>';
+
+                    // $result .= '<button class="dropdown-item aGenUserBarcode" user-id="' . $row->id . '" employee-id="' . $row->employee_id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalGenUserBarcode">Generate Barcode</button>';
+                }
+                else{
+                    $result .= '<button class="dropdown-item aChangeUserStat" type="button" style="padding: 1px 1px; text-align: center;" user-id="' . $row->id . '" status="1" data-toggle="modal" data-target="#modalChangeUserStat" data-keyboard="false">Activate</button>';
+                }
+
+                $result .= '</div>
+                        </div></center>';
+
+                return $result;
+            })
+            ->addColumn('updated_by', function($row){
+                return $row->rapidx_user_updated_by->name ?? "" ;
+            })
+            ->rawColumns(['action', 'updated_by','rawBulkCheckBox'])
             ->make(true);
     }
 
     // Add User
-    public function add_user(Request $request){
+    public function add_user(UserRequest $userRequest){
         date_default_timezone_set('Asia/Manila');
-
-        $data = $request->all();
-
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $userRequestValidated = $userRequest->validated();
+            $rapidxUserId = $userRequest->user_id;
+            if(blank($rapidxUserId)){ //add
+                $userRequestValidated['created_at'] = now();
+                $userId = User::insertGetId(
+                    $userRequestValidated
+                );
+            }else{ //edit
+                $userId = User::where('id',$rapidxUserId)->update(
+                    $userRequestValidated
+                );
+            }
+            DB::commit();
+            return response()->json(['result' => "1",'is_success' => 'true']);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            throw $th;
+        }
+        return;
         $email = '';
-        $has_email = 0;
         // $password = 'pmi1234' . Str::random(10);
         $password = 'pmi12345';
 
@@ -304,20 +424,59 @@ class UserController extends Controller
 
     // Get User By Id
     public function get_user_by_id(Request $request){
-        $user = User::where('id', $request->user_id)->get();
+        $users = User::with([
+            'users',
+            'rapidx_system_one_subcon_emp_info',
+            'rapidx_system_one_hris_emp_info'
+        ])
+        ->where('id',$request->user_id)
+        ->get();
 
-        return response()->json(['user' => $user]);
+       $userCollection =  collect($users)->map(function($rowUsers){
+            if($rowUsers->rapidx_system_one_subcon_emp_info!= null){
+                $userHris = $rowUsers->rapidx_system_one_subcon_emp_info;
+            }
+            else if($rowUsers->rapidx_system_one_hris_emp_info != null){
+                $userHris = $rowUsers->rapidx_system_one_hris_emp_info;
+            }
+            return [
+             'users' => $rowUsers,
+             'userDetails' => $userHris,
+            ];
+        });
+
+
+        return response()->json(['userCollection' => $userCollection]);
     }
 
-    public function get_user_list(Request $request){
-        $users = User::all();
+    public function get_user_list(Request $request){ //nmodify
 
-        return response()->json(['users' => $users]);
+        $users = User::with([
+            'users',
+            'rapidx_system_one_subcon_emp_info',
+            'rapidx_system_one_hris_emp_info'
+        ])->get();
+
+       $userCollection =  collect($users)->map(function($rowUsers){
+            if($rowUsers->rapidx_system_one_subcon_emp_info!= null){
+                $userHris = $rowUsers->rapidx_system_one_subcon_emp_info;
+            }
+            else if($rowUsers->rapidx_system_one_hris_emp_info != null){
+                $userHris = $rowUsers->rapidx_system_one_hris_emp_info;
+            }
+            return [
+             'users' => $rowUsers,
+             'userDetails' => $userHris,
+            ];
+        });
+
+
+        return response()->json(['userCollection' => $userCollection]);
     }
 
     // Get User By Batch
     public function get_user_by_batch(Request $request){
-        $users;
+     return   $users;
 
         if($request->user_id == 0){
             $users = User::all();
@@ -434,27 +593,6 @@ class UserController extends Controller
         catch(\Exception $e){
             return response()->json(['result' => "0"]);
         }
-
-        // if(count($user) <= 0){
-        //     try{
-        //         if(isset($request->qrcode)){
-        //             $qrcode = QrCode::format('png')
-        //                     ->size(200)->errorCorrection('H')
-        //                     ->generate($request->qrcode);
-
-        //             return response()->json(['result' => "1", 'qrcode' => "data:image/png;base64," . base64_encode($qrcode)]);
-        //         }
-        //         else{
-        //             return response()->json(['result' => "0"]);
-        //         }
-        //     }
-        //     catch(\Exception $e){
-        //         return response()->json(['result' => "0"]);
-        //     }
-        // }
-        // else{
-        //     return response()->json(['result' => "2"]);
-        // }
     }
 
     public function import_user(Request $request)
@@ -518,5 +656,32 @@ class UserController extends Controller
     	$user_levels = UserLevel::all();
 
     	return response()->json(['user_levels' => $user_levels]);
+    }
+
+    public function get_emp_details_by_id(Request $request){
+
+
+        $hris_data = DB::connection('mysql_systemone')
+        ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
+        $rapidxUser = RapidXUser::where('employee_number',$request->empId)->first();
+        if(count($hris_data) > 0){
+            return response()->json(['empInfo' => $hris_data, 'rapidxUser' => $rapidxUser]);
+        }
+        else{
+            $subcon_data = DB::connection('mysql_systemone')
+            ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
+            return response()->json(['empInfo' => $subcon_data,'rapidxUser' => $rapidxUser]);
+        }
+
+    }
+
+    public function get_user_module_access(Request $request){ //nmodify view
+        return $userAccessModule =  UserAccessModule::where('users_id',$request->user_id)
+       ->get();
+        try {
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 }

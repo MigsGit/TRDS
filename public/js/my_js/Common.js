@@ -1,78 +1,122 @@
-// Reset Form values function
-function resetFormValues(){
+/**
+ * Reusable function for using Ajax Request
+ *
+ * @param {object} options
+ */
+
+const ajaxRequest = (options) => {
+    var defaults = {
+        url: '',
+        method: 'GET',
+        data: {},
+        headers: {},
+        dataType: 'json',
+        processData: true,
+        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+        beforeSendCallback: null,
+        successCallback: () => {},
+        errorCallback: () => {}
+    };
+
+    // Merge default options with user-provided options
+    options = $.extend({}, defaults, options);
+
+    if (options.data instanceof FormData) {
+        options.processData = false;
+        options.contentType = false;
+    }
+
+    $.ajax({
+        url: options.url,
+        method: options.method,
+        data: options.data,
+        headers: options.headers,
+        dataType: options.dataType,
+        processData: options.processData,
+        contentType: options.contentType,
+        beforeSend(xhr) {
+            if (typeof options.beforeSendCallback === 'function') {
+                options.beforeSendCallback(xhr);
+            }
+        },
+        success(response) {
+            options.successCallback(response);
+        },
+        error(xhr, status, error) {
+            options.errorCallback(xhr, status, error);
+        }
+    });
+};
+
+/* Call basic ajax for submit */
+const  call_ajax = (data = null, handler, fn,elFormId =null) => {
+    data = $.param(data);
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        data: data,
+        url: handler,
+        beforeSend: function(){
+            // console.log('call_ajax elFormId',elFormId);
+            // return;
+            $('#modal-loading').modal('show');
+            if(elFormId !=null){
+                elFormId[0].reset();
+            }
+        },
+        success: function (result) {
+            fn(result);
+            $('#modal-loading').modal('hide');
+
+        },
+        error: function (result) {
+            fn(result);
+            $('#modal-loading').modal('hide');
+        }
+    });
+}
+
+const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId =null) => {
+    data = $.param(data) + '&' + serialized_data;
+	$.ajax({
+        type: "post",
+        dataType: "json",
+        data: data,
+        url: handler,
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        beforeSend: function(){
+            $('#modal-loading').modal('show');
+            if(elFormId !=null){
+                elFormId[0].reset();
+            }
+        },
+        success: function (result) {
+            fn(result);
+            $('#modal-loading').modal('hide');
+
+        },
+        error: function (result) {
+            alert('error ajax');
+            $('#modal-loading').modal('hide');
+
+        }
+    });
+}
+
+const resetFormValues = (params) => {
     // Reset values
-    $("#formAddCustomerClaim")[0].reset();
-    $('select[name="quarter"]', $("#formAddCustomerClaim")).val(0).trigger('change');
-    $('select[name="customer"]', $("#formAddCustomerClaim")).val(0).trigger('change');
-    $('select[name="sender_name"]', $("#formAddCustomerClaim")).val(0).trigger('change');
-    $('select[name="contributor"]', $("#formAddCustomerClaim")).val(0).trigger('change');
-    $('select[name="validity"]', $("#formAddCustomerClaim")).val(0).trigger('change');
-    $('select[name="product_classification"]', $("#formAddCustomerClaim")).val(0).trigger('change');
-    $('select[name="automotive"]', $("#formAddCustomerClaim")).val(0).trigger('change');
-    $('select[name="defect_category_class"]', $("#formAddCustomerClaim")).val(0).trigger('change');
+    params.frmId[0].reset();
+    
+    // params.frmId[0].reset();
+
+    // Reset hidden input fields
+    // $("select[name='user_level']", $('#formAddUser')).val(0).trigger('change');
 
     // Remove invalid & title validation
     $('div').find('input').removeClass('is-invalid');
     $("div").find('input').attr('title', '');
     $('div').find('select').removeClass('is-invalid');
     $("div").find('select').attr('title', '');
-    $("div").find('input[type="date"]').attr('title', '');
-
-    $('#chkActualDateReceivedClaim').attr('checked', false);
-    $('#txtAddActualDateReceivedOfClaim').attr('disabled', true);
-    $('#chkdateReturnClaim').attr('checked', false);
-    $('#txtAddDateReturnOfClaimSample').attr('disabled', true);
 }
-
-
-// Reset values when modalAddCustomerClaim(Modal) is closed
-$("#modalAddCustomerClaim").on('hidden.bs.modal', function(){
-    resetFormValues();
-});
-
-
-// Reset Form values function
-function resetFormValuesEmailRecipient(){
-    // Reset values
-    $("#formAddEmailRecipient")[0].reset();
-
-    // Reset hidden input fields
-    $("input[name='user_id']", $('#formAddEmailRecipient')).val('');
-    $("input[name='email_recipient_id']", $('#formAddEmailRecipient')).val('');
-    $("input[name='recipient_name']", $('#formAddEmailRecipient')).val('');
-
-    // Reset values
-    $("select[name='recipient_name_display']", $('#formAddEmailRecipient')).val(0).trigger('change');
-    $("select[name='section']", $('#formAddEmailRecipient')).val(0).trigger('change');
-
-    // Remove invalid & title validation
-    $('div').find('input').removeClass('is-invalid');
-    $("div").find('input').attr('title', '');
-    $('div').find('select').removeClass('is-invalid');
-    $("div").find('select').attr('title', '');
-}
-
-
-$("#modalAddEmailRecipient").on('hidden.bs.modal', function(){
-    resetFormValuesEmailRecipient();
-});
-
-
-// Reset Form(Product Classification) values function
-function resetFormValuesProductClassification(){
-    // Reset values
-    $("#formAddProductClassification")[0].reset();
-
-    // Reset hidden input fields
-    $("input[name='product_name']", $('#formAddProductClassification')).val('');
-    $("input[name='product_details']", $('#formAddProductClassification')).val('');
-
-    // Remove invalid & title validation
-    $('div').find('input').removeClass('is-invalid');
-    $("div").find('input').attr('title', '');
-}
-
-
-$("#modalAddProductClassification").on('hidden.bs.modal', function(){
-    resetFormValuesProductClassification();
-});

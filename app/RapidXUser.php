@@ -8,6 +8,10 @@ use App\RapidXDepartment;
 class RapidXUser extends Model
 {
     protected $table = 'users';
+
+    protected $hidden = [
+        'password',
+    ];
     protected $connection = 'rapidx';
 
     public function department(){

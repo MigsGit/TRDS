@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\HrMemo;
 use App\Http\Controllers\Controller;
 use DataTables;
+// use Mail;
+use Illuminate\Support\Facades\Mail;
+
+use App\RapidXUser;
 use App\Model\Hr\HrMemo;
 use App\Model\Hr\HrMemoEmailRecipients;
 use App\Model\Hr\HrMemoTraineeDetails;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +28,7 @@ class HrMemoController extends Controller
 
     public function viewHrMemoInfo(Request $request){
         // $globalUser = session('global_user');
-        $hr_memo_details = HrMemo::with(['defects.defect_item', 'situations', 'improvements'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
+        $hr_memo_details = HrMemo::with(['prepared_by_info', 'noted_by_info', 'email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
 
         return DataTables::of($hr_memo_details)
         ->addColumn('action', function($hr_memo_details){
@@ -31,25 +36,40 @@ class HrMemoController extends Controller
             $result .= "<center>";
 
             // $canManage  = $globalUser && in_array($globalUser->position, [0,1,2,3]);
-            $isActive   = $hr_memo_details->status == 0;
-            $isDisabled = $hr_memo_details->status == 1;
+
             $id = $hr_memo_details->id;
 
-            if ($isActive) {
-                // if ($canManage) {
-                    $result .= $this->actionButton('btn-secondary btnEdit', 'fa-pen-to-square', $id, 'mr-1');
-                    $result .= $this->actionButton('btn-danger btnDisable', 'fa-ban', $id);
-                // } else {
+            $isPending   = $hr_memo_details->status == 1;
+            $isCancelled = $hr_memo_details->status == 2;
+            $isForApproval = $hr_memo_details->status == 3;
+            $isApproved = $hr_memo_details->status == 4;
+            $isDisapproved = $hr_memo_details->status == 5;
+
+            if ($isPending) {
+                // if($canManage){
+                    $result .= $this->actionButton('btn-secondary btnEdit', 'fas fa-edit', $id, 'mr-1');
+                    $result .= $this->actionButton('btn-success btnFinalSubmit', 'fas fa-check-square', $id, 'mr-1');
+                    $result .= $this->actionButton('btn-danger btnDisable', 'fas fa-ban', $id);
+                // }else{
                 //     $result .= $this->actionButton('btn-info btnView', 'fa-eye', $id, 'mr-1');
                 // }
             }
 
-            if ($isDisabled) {
-                $result .= $this->actionButton('btn-info btnView', 'fa-eye', $id, 'mr-1');
+            if ($isCancelled){
+                $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
+                $result .= $this->actionButton('btn-success btnEnable', 'fas fa-undo', $id);
+            }
 
-                // if ($canManage) {
-                    $result .= $this->actionButton('btn-success btnEnable', 'fa-rotate-left', $id);
-                // }
+            if ($isForApproval){
+                $result .= $this->actionButton('btn-success btnView', 'fas fa-check-square', $id, 'mr-1');
+            }
+
+            if ($isApproved){
+                $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
+            }
+
+            if ($isDisapproved){
+                $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
             }
 
             $result .= "</center>";
@@ -59,142 +79,103 @@ class HrMemoController extends Controller
             $result = "";
             $result .= "<center>";
 
-            if($pth_details->status == 0){
-                $result .= "<span class='badge rounded-pill bg-success'>Active</span>";
+            if($pth_details->status == 1){
+                $result .= "<span class='badge rounded-pill bg-info'>Pending</gspan>";
+            }else if($pth_details->status == 2){
+                $result .= "<span class='badge rounded-pill bg-secondary'>Cancelled</span>";
+            }else if($pth_details->status == 3){
+                $result .= "<span class='badge rounded-pill bg-primary'>For Approval</span>";
+            }else if($pth_details->status == 4){
+                $result .= "<span class='badge rounded-pill bg-success'>Approved</span>";
+            }else if($pth_details->status == 5){
+                $result .= "<span class='badge rounded-pill bg-danger'>Disapproved</span>";
             }else{
-                $result .= "<span class='badge rounded-pill bg-danger'>Inactive</span>";
+                $result .= "<span class='badge rounded-pill bg-info'>N/A</span>";
             }
             $result .= "</center>";
 
             return $result;
         })
-        ->rawColumns(['action', 'status_label'])
+        ->addColumn('reason_label', function($pth_details){
+            $result = "";
+            $result .= "<center>";
+
+            if($pth_details->status == 1){
+                $result .= "<span'>Newly Hired</span>";
+            }else if($pth_details->status == 2){
+                $result .= "<span'>Maternity Leave</span>";
+            }else if($pth_details->status == 3){
+                $result .= "<span'>Sick Leave</span>";
+            }else if($pth_details->status == 4){
+                $result .= "<span'>Vacation Leave</span>";
+            }else if($pth_details->status == 5){
+                $result .= "<span'>Promoted</span>";
+            }else if($pth_details->status == 6){
+                $result .= "<span'>Transferred</span>";
+            }else if($pth_details->status == 7){
+                $result .= "<span'>Regularization</span>";
+            }else{
+                $result .= "<span'>N/A</span>";
+            }
+            $result .= "</center>";
+
+            return $result;
+        })
+        ->rawColumns(['action', 'reason_label', 'status_label'])
         ->make(true);
     }
 
-    // public function viewTraineeDetails(Request $request){
-    //     $hr_memo_details = HrMemo::with(['defects.defect_item', 'situations', 'improvements'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
+    public function getEmailRecipientsDropdownDetails(Request $request)
+    {
+        $emails = RapidXUser::select('id', 'name', 'email')->whereNotNull('email')->where('user_stat', 1)->get();
+        return response()->json($emails);
+    }
 
-    //     return DataTables::of($hr_memo_details)
-    //     ->addColumn('action', function($hr_memo_details){
-    //         $result = "";
-    //         $result .= "<center>";
+    public function getEmpNoDropdownDetails(Request $request)
+    {
+        $hrisQuery = "
+            SELECT
+                pkid,
+                EmpNo,
+                1 AS emp_type
+            FROM tbl_EmployeeInfo
+            WHERE EmpStatus = 1
+        ";
 
-    //         // $canManage  = $globalUser && in_array($globalUser->position, [0,1,2,3]);
-    //         $isActive   = $hr_memo_details->status == 0;
-    //         $isDisabled = $hr_memo_details->status == 1;
-    //         $id = $hr_memo_details->id;
+        $subconQuery = "
+            SELECT
+                pkid,
+                EmpNo,
+                2 AS emp_type
+            FROM tbl_EmployeeInfo
+            WHERE EmpStatus = 1
+        ";
 
-    //         if ($isActive) {
-    //             // if ($canManage) {
-    //                 $result .= $this->actionButton('btn-secondary btnEdit', 'fa-pen-to-square', $id, 'mr-1');
-    //                 $result .= $this->actionButton('btn-danger btnDisable', 'fa-ban', $id);
-    //             // } else {
-    //             //     $result .= $this->actionButton('btn-info btnView', 'fa-eye', $id, 'mr-1');
-    //             // }
-    //         }
+        $hris = DB::connection('mysql_systemone')->select($hrisQuery);
+        $subcon = DB::connection('mysql_subcon')->select($subconQuery);
 
-    //         if ($isDisabled) {
-    //             $result .= $this->actionButton('btn-info btnView', 'fa-eye', $id, 'mr-1');
+        $merged = array_merge($hris, $subcon);
 
-    //             // if ($canManage) {
-    //                 $result .= $this->actionButton('btn-success btnEnable', 'fa-rotate-left', $id);
-    //             // }
-    //         }
-
-    //         $result .= "</center>";
-    //         return $result;
-    //     })
-    //     ->addColumn('status_label', function($pth_details){
-    //         $result = "";
-    //         $result .= "<center>";
-
-    //         if($pth_details->status == 0){
-    //             $result .= "<span class='badge rounded-pill bg-success'>Active</span>";
-    //         }else{
-    //             $result .= "<span class='badge rounded-pill bg-danger'>Inactive</span>";
-    //         }
-    //         $result .= "</center>";
-
-    //         return $result;
-    //     })
-    //     ->rawColumns(['action', 'status_label'])
-    //     ->make(true);
-    // }
-
-    // public function getEmployeeDetails(Request $request){
-    //     $hris = DB::connection('mysql_systemone')->select("
-    //             SELECT 
-    //                 'db_hris' AS source,
-    //                 CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
-    //                 tbl_EmployeeInfo.DateHired,
-    //                 CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
-    //                 CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
-    //                 tbl_Training.Venue,
-    //                 vw_Trainee.Remarks,
-    //                 tbl_Training.Title,
-    //                 tbl_Department.Department,
-    //                 tbl_Division.Division
-    //             FROM vw_Trainee
-    //             INNER JOIN tbl_EmployeeInfo ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid
-    //             INNER JOIN tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
-    //             INNER JOIN tbl_Section ON tbl_EmployeeInfo.fkSection = tbl_Section.pkid
-    //             INNER JOIN tbl_Department ON tbl_EmployeeInfo.fkDepartment = tbl_Department.pkid
-    //             INNER JOIN tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
-    //             INNER JOIN tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
-    //             WHERE tbl_EmployeeInfo.EmpNo = ?
-    //             LIMIT 1
-    //             ", [$request->employee_number]);
-
-    //     if($hris == null || empty($hris)){
-    //         $subcon = DB::connection('mysql_subcon')->select("
-    //                 SELECT 
-    //                     'db_subcon' AS source,
-    //                     CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
-    //                     tbl_EmployeeInfo.DateHired,
-    //                     CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
-    //                     CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
-    //                     tbl_Training.Venue,
-    //                     COALESCE(vw_Trainee.Remarks, 'No Record') AS Remarks,
-    //                     tbl_Training.Title,
-    //                     tbl_Department.Department,
-    //                     tbl_Division.Division
-    //                 FROM tbl_EmployeeInfo
-    //                 LEFT JOIN db_hris.vw_Trainee ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid
-    //                 LEFT JOIN db_hris.tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
-    //                 INNER JOIN db_hris.tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
-    //                 INNER JOIN db_hris.tbl_Section ON tbl_EmployeeInfo.fkSection = tbl_Section.pkid
-    //                 INNER JOIN db_hris.tbl_Department ON tbl_EmployeeInfo.fkDepartment = tbl_Department.pkid
-    //                 INNER JOIN db_hris.tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
-    //                 WHERE tbl_EmployeeInfo.EmpNo = ?
-    //                 LIMIT 1
-    //                 ", [$request->employee_number]);
-                    
-    //         $training_details = $subcon;
-    //     }else{
-    //         $training_details = $hris;
-    //     }
-
-    //     return response()->json($training_details);
-    // }
+        return response()->json($merged);
+    }
 
     public function getEmployeeDetails(Request $request)
     {
         $empNo = $request->employee_number;
 
         $hrisQuery = "
-            SELECT 
+            SELECT
                 'db_hris' AS source,
-                tbl_EmployeeInfo.EmpNo,
-                CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
+                CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS EmpName,
                 tbl_EmployeeInfo.DateHired,
                 CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
-                CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
                 tbl_Training.Venue,
                 vw_Trainee.Remarks,
                 tbl_Training.Title,
-                tbl_Department.Department,
-                tbl_Division.Division
+                tbl_Position.Position AS Position,
+                tbl_Department.Department AS Department,
+                tbl_Section.Section AS Section,
+                tbl_Division.Division AS Division
             FROM vw_Trainee
             INNER JOIN tbl_EmployeeInfo ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid AND tbl_EmployeeInfo.EmpStatus = 1
             INNER JOIN tbl_Position ON tbl_EmployeeInfo.fkPosition = tbl_Position.pkid
@@ -205,18 +186,18 @@ class HrMemoController extends Controller
         ";
 
         $subconQuery = "
-            SELECT 
+            SELECT
                 'db_subcon' AS source,
-                tbl_EmployeeInfo.EmpNo,
-                CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS emp_name,
+                CONCAT(tbl_EmployeeInfo.FirstName, ' ', tbl_EmployeeInfo.LastName) AS EmpName,
                 tbl_EmployeeInfo.DateHired,
                 CONCAT_WS(' - ', tbl_Training.PeriodFrom, tbl_Training.PeriodTo) AS fromto,
-                CONCAT(tbl_Position.Position, '/', tbl_Department.Department, '/', tbl_Section.Section) AS pos_dept_section,
                 tbl_Training.Venue,
                 COALESCE(vw_Trainee.Remarks, 'No Record') AS Remarks,
                 tbl_Training.Title,
-                tbl_Department.Department,
-                tbl_Division.Division
+                tbl_Position.Position AS Position,
+                tbl_Department.Department AS Department,
+                tbl_Section.Section AS Section,
+                tbl_Division.Division AS Division
             FROM tbl_EmployeeInfo
             LEFT JOIN db_hris.vw_Trainee ON vw_Trainee.fkEmployee = tbl_EmployeeInfo.pkid AND tbl_EmployeeInfo.EmpStatus = 1
             LEFT JOIN db_hris.tbl_Training ON vw_Trainee.fkTraining = tbl_Training.pkid
@@ -227,7 +208,7 @@ class HrMemoController extends Controller
         ";
 
         // CASE 1: Employee number exists
-        if (!empty($empNo)) {
+        // if (!empty($empNo)) {
 
             $hris = DB::connection('mysql_systemone')
                 ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
@@ -241,34 +222,21 @@ class HrMemoController extends Controller
                 ->select($subconQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
 
             return response()->json($subcon);
-        }
-
-        // CASE 2: No employee number → run both and merge
-        $hris = DB::connection('mysql_systemone')->select($hrisQuery);
-        $subcon = DB::connection('mysql_subcon')->select($subconQuery);
-
-        $merged = array_merge($hris, $subcon);
-
-        return response()->json($merged);
+        // }
     }
 
     public function addHrMemoInfo(Request $request){
+        // return $request->all();
+        // return $trainees = json_decode($request->trainee_details, true);
         $validation = array(
-            'situation' => 'required',
-            'section' => 'required',
-            'date_encountered' => 'required',
-            'model' => 'required',
-            'illustration_of_defect' => ['nullable','file','mimes:jpg,jpeg,png,webp','max:10240'], // 5MB
-            'no_of_occurrence' => 'required',
-            'defect_id' => 'required',
-            // 'root_cause' => 'required',
-            'factor.*' => 'required|string',
-            'cause.*' => 'required|string',
-            'analysis.*' => 'required|string',
-            'counter_measure.*' => 'required|string',
-            'implementation_date.*' => 'required|string',
-            // 'improvement_action.*' => 'required|string',
-            // 'improvement_action_remarks.*' => 'required|string'
+            'subject' => 'required',
+            'from' => 'required',
+            'classification' => 'required',
+            'reason' => 'required',
+            'date_filed' => 'required',
+            'to' => 'required',
+            'cc' => 'required',
+            'trainee_details' => 'required'
         );
 
         $data = $request->all();
@@ -280,84 +248,106 @@ class HrMemoController extends Controller
             DB::beginTransaction();
 
             try{
-                $history_data_array = array(
-                    'date_encountered' => $request->date_encountered,
-                    'situation' => $request->situation,
-                    'section' => $request->section,
-                    'model' => $request->model
+                //Control Number Generation
+                $lastest_id = HrMemo::whereNull('deleted_at')->latest('id')->first();
+                if($lastest_id == null){
+                    $counter = 1;
+                }else{
+                    $last_control_no = $lastest_id->document_no;
+                    $last_control_no = explode("-", $last_control_no);
+                    $dateCode = date('ym'); // month + year (2 digits)
+                    if($last_control_no[1] == $dateCode){
+                        $counter = $last_control_no[2];
+                        $counter++;
+                    }else{
+                        $counter = 1;
+                    }
+                }
+
+                if(strlen($counter) == 1){
+                    $digit_prefix = '00';
+                }else if(strlen($counter) == 2){
+                    $digit_prefix = '0';
+                }
+
+                $hr_memo_data_array = array(
+                    'classification' => $request->classification,
+                    'reason' => $request->reason,
+                    'from' => $request->from,
+                    'subject' => $request->subject,
+                    'date_filed' => $request->date_filed
                 );
 
-                if(isset($request->history_id)){ // EDIT
-                    $history_id = $request->history_id;
+                if(isset($request->hr_memo_id)){ // EDIT
+                    $hr_memo_id = $request->hr_memo_id;
 
-                    PartTroubleHistory::where('id', $request->history_id)
-                    ->update($history_data_array);
+                    HrMemo::where('id', $request->hr_memo_id)
+                    ->update($hr_memo_data_array);
+
                 }else{ // ADD
-                    $history_id = PartTroubleHistory::insertGetId($history_data_array);
+                    $document_no = 'HRS TRAINING-'.date('ym').'-'.$digit_prefix.$counter;
+                    $hr_memo_data_array['document_no'] = $document_no;
+                    $hr_memo_id = HrMemo::insertGetId($hr_memo_data_array);
                 }
 
-                // DELETE OLD PthsDefects ON UPDATE
-                PthsDefects::where('history_id', $request->history_id)->delete();
+                // DELETE OLD HrMemo Email Recipients ON UPDATE
+                HrMemoEmailRecipients::where('hr_memo_id', $request->hr_memo_id)->delete();
+                // SAVE NEW HrMemo Email Recipients
+                $to = [];
+                $cc = [];
 
-                if ($request->defect_id){
-
-                    if($request->hasFile('illustration_of_defect')){
-                        // FILE HANDLING
-                        $uploadedFile = $request->file('illustration_of_defect');
-
-                        // Get the original filename parts
-                        $filename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-                        $file_extension = $uploadedFile->getClientOriginalExtension();
-
-                        // 🔹 Remove special characters (keep only letters, numbers, spaces, dash, underscore)
-                        $cleanName = preg_replace('/[^\p{L}\p{N} _-]/u', '', $filename);
-                        // 🔹 Replace spaces with underscores for safety
-                        $cleanName = str_replace(' ', '_', $cleanName);
-                        // 🔹 Add timestamp or unique ID if needed
-                        $cleanedFilename = $cleanName . '.' . $file_extension;
-
-                        // use cleanedFilename to be saved to storage
-                        $file_attachment = $cleanedFilename;
-
-                        Storage::putFileAs('public/file_attachments', $request->illustration_of_defect, $file_attachment);
-                    }else{
-                        // use existing filename
-                        $file_attachment = $request->illustration_of_defect_filename;
-                    }
-
-                    $pths_defects_data = [
-                        'history_id'                => $history_id,
-                        'defect_id'                 => $request->defect_id,
-                        'illustration_of_defect'    => $file_attachment,
-                        'no_of_occurrence'          => $request->no_of_occurrence,
-                        'root_cause'                => $request->root_cause,
+                foreach ($request->to as $toUserId){
+                    $to[] = [
+                        'hr_memo_id' => $hr_memo_id,
+                        'user_id' => $toUserId,
+                        'type' => 'to'
                     ];
-
-                    PthsDefects::insert($pths_defects_data);
                 }
 
-                // DELETE OLD Improvement Actions ON UPDATE
-                PthsImprovements::where('history_id', $request->history_id)->delete();
+                foreach ($request->cc as $ccUserId){
+                    $cc[] = [
+                        'hr_memo_id' => $hr_memo_id,
+                        'user_id' => $ccUserId,
+                        'type' => 'cc'
+                    ];
+                }
+                
+                HrMemoEmailRecipients::insert($to);
+                HrMemoEmailRecipients::insert($cc);
 
-                // SAVE NEW Improvement Actions
-                if ($request->factor){
-                    foreach ($request->factor as $i => $value){
-                        PthsImprovements::insert([
-                            'history_id'          => $history_id,
-                            'factor'              => $request->factor[$i],
-                            'cause'               => $request->cause[$i],
-                            'analysis'            => $request->analysis[$i],
-                            'counter_measure'     => $request->counter_measure[$i],
-                            'pic'                 => $request->pic[$i],
-                            'implementation_date' => $request->implementation_date[$i]
-                            // 'improvement_actions'  => $request->improvement_action[$i],
-                            // 'remarks'              => $request->improvement_action_remarks[$i]
-                        ]);
+                // DELETE OLD HrMemo Trainee Details ON UPDATE
+                HrMemoTraineeDetails::where('hr_memo_id', $request->hr_memo_id)->delete();
+
+                // DELETE OLD HrMemo Trainee Category Details ON UPDATE
+                HrMemoTraineeCategoryDetails::where('hr_memo_id', $request->hr_memo_id)->delete();
+
+                $trainees = json_decode($request->trainee_details, true);
+                if ($trainees){
+                    foreach ($trainees as $td) {
+                        // SAVE NEW HrMemo Trainee Details
+                        $trainee_detail_id = HrMemoTraineeDetails::insertGetId([
+                                                'hr_memo_id'          => $hr_memo_id,
+                                                'hris_id'             => $td['action']['emp_id'],
+                                                'employment_type'     => $td['action']['emp_type'],
+                                                'employee_no'         => $td['emp_no'],
+                                                'endorsement_date'    => $td['endorsement_date']
+                                            ]);
+
+                        foreach ($td['exam_details'] as $ed) {
+                            // SAVE NEW HrMemo Trainee Category Details
+                            HrMemoTraineeCategoryDetails::insert([
+                                'hr_memo_id'          => $hr_memo_id,
+                                'trainee_details_id'  => $trainee_detail_id,
+                                'category'            => $ed['exam_title'],
+                                'result'              => $ed['result'],
+                                'training_remarks'    => $ed['remarks']
+                            ]);
+                        }
                     }
                 }
 
                 DB::commit();
-                return response()->json(['result' => 1, 'msg' => 'Transaction Succesful']);
+                return response()->json(['result' => 1, 'msg' => 'Hr Memo information saved successfully.']);
             }catch(Exemption $e){
                 DB::rollback();
                 return $e;
@@ -366,72 +356,69 @@ class HrMemoController extends Controller
     }
 
     public function getHrMemoById(Request $request){
-        return PartTroubleHistory::with(['defects.defect_item', 'improvements'])->where('id', $request->id)->first();
+        $hrMemo = HrMemo::with([
+            'email_recipients.rapidx_user',
+            'trainee_details.emp_exam_details.exam_info',
+            'trainee_details'  // Load trainee_details first
+        ])
+        ->where('id', $request->id)
+        ->first();
+
+        // return $hrMemo;
+        // if ($hrMemo && $hrMemo->trainee_details) {
+            foreach($hrMemo->trainee_details as $td){
+                if ($td->employment_type == 1) {
+                    // HRIS employee
+                    $td->load(['hris_emp_info' => function ($q) {
+                        $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                        ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                        ->select(
+                            'vw_employeeinfo.*',
+                            'tbl_Training.Venue as Venue'
+                        );
+                    }]);
+                } else {
+                    // Subcon employee
+                    $td->load(['subcon_emp_info' => function ($q) {
+                        $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                        ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                        ->select(
+                            'vw_employeeinfo.*',
+                            'tbl_Training.Venue as Venue'
+                        );
+                    }]);
+                }
+            }
+        // }
+
+        return response()->json($hrMemo);
     }
 
     public function updateHrMemoStatus(Request $request){
         DB::beginTransaction();
 
         try {
-            $defect = PartTroubleHistory::findOrFail($request->id);
+            $memo = HrMemo::findOrFail($request->id);
 
-            $defect->status = $defect->status == 1 ? 0 : 1;
-            $defect->save();
+            $memo->status = $request->new_status;
+            $memo->save();
 
             DB::commit(); // ✅ commit here
 
             return response()->json([
                 'success' => true,
-                'new_status' => $defect->status,
-                'message' => 'Past Trouble History Record status updated successfully.'
+                'new_status' => $memo->status,
+                'message' => 'Hr Memo status updated successfully.'
             ]);
         } catch (\Throwable $e) { // ✅ catch everything including DB errors
             DB::rollBack(); // ✅ rollback only if it fails
 
-            // log the error so you can see what’s happening
-            \Log::error('Past Trouble History Record status update failed', [
-                'error' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-            ]);
-
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update Past Trouble History Record status.',
+                'message' => 'Failed to update Hr Memo status.',
                 'error' => $e->getMessage(),
             ], 500);
         }
-    }
-
-    //====================================== DOWNLOAD FILE ======================================
-    public function downloadFile(Request $request, $id){
-        $file_name = PartTroubleHistory::with('defects')->where('id', $id)->first();
-        // return $file_name->defects->illustration_of_defect;
-        $filename = $file_name->defects->illustration_of_defect;
-        $filePath =  storage_path() . "/app/public/file_attachments/" . $filename;
-
-        $mimeType = mime_content_type($filePath);
-        // return $mimeType;
-
-        if (str_starts_with($mimeType, 'image/')) {
-            return response()->file($filePath, [
-                'Content-Type'        => $mimeType,
-                'Content-Disposition' => 'inline; filename="' . $filename . '"',
-                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                'Pragma'        => 'no-cache',
-                'Expires'       => '0',
-            ]);
-        }
-    }
-
-    private function getMaterialsFrom($connection){
-        return DB::connection($connection)
-            ->table('tbl_wbs_material_kitting')
-            ->select('device_name')
-            ->whereNotNull('device_name')
-            ->groupBy('device_name')
-            ->orderBy('device_name')
-            ->pluck('device_name');
     }
 
     public function getUsers(Request $request){
@@ -439,119 +426,51 @@ class HrMemoController extends Controller
         return response()->json(['users_data' => $users]);
     }
 
-    public function getDeviceName(Request $request){
-        $self = $this;
+    public function sendHrMemoMail(Request $request){
+        $hr_memo = HrMemo::with(['prepared_by_info', 'noted_by_info', 'email_recipients.rapidx_user'])->where('id', $request->hr_memo_id)->whereNull('deleted_at')->first();
+        // return $hr_memo;
+        // $data = ['application' => $hr_memo, 'approver_details' => $approver_details];
 
-        $section = $request->input('section'); // ts, cn, yf, ppd
-        $materials = collect();
+        $send_to = [];
+        $send_cc = [];
 
-        // Only run queries if a section is provided
-        if ($section) {
-
-            // TS section
-            if ($section == 'TS') {
-                $materials = $materials->merge($self->getMaterialsFrom('wbs_ts'));
-            }
-
-            // CN section
-            if ($section == 'CN') {
-                $materials = $materials->merge($self->getMaterialsFrom('wbs_cn'));
-            }
-
-            // YF section
-            if ($section == 'YF') {
-                $materials = $materials->merge($self->getMaterialsFrom('wbs_yf'));
-            }
-
-            // PPD section (different DB, only run if selected)
-            if ($section == 'PPD') {
-                $ppd_results = DB::connection('mysql_rapid')->select("
-                    SELECT DeviceName
-                    FROM tbl_dieset t1
-                    WHERE Rev = (
-                        SELECT MAX(NULLIF(Rev, ''))
-                        FROM tbl_dieset t2
-                        WHERE t2.DeviceName = t1.DeviceName
-                    )
-                    OR (Rev = '' AND NOT EXISTS (
-                        SELECT 1
-                        FROM tbl_dieset t3
-                        WHERE t3.DeviceName = t1.DeviceName
-                            AND t3.Rev <> ''
-                    ))
-                    ORDER BY DeviceName
-                ");
-
-                // Extract only DeviceName and wrap for JSON
-                foreach ($ppd_results as $row) {
-                    $materials->push($row->DeviceName);
-                }
-            }
-
-            // Deduplicate, sort, and format for JSON
-            $materials = $materials
-                ->unique()
-                ->sort() // sort alphabetically
-                ->values() // reset keys
-                ->map(function ($value) {
-                    return array('materials' => $value);
-                })
-                ->values() // reset keys after map
-                ->toArray();
-        }
-
-        // If no section selected, return empty array
-        return response()->json($materials);
-    }
-
-    public function getCountOfNoOfOccurrence(Request $request){
-
-        [$year, $month] = explode('-', $request->date_encountered);
-
-        if ($month >= 4) {
-            // April to December
-            $start = $year . '-04-01';
-            $end   = ($year + 1) . '-03-31';
-        } else {
-            // January to March
-            $start = ($year - 1) . '-04-01';
-            $end   = $year . '-03-31';
-        }
-
-        $count =  PartTroubleHistory::
-                where('section', $request->section)
-                ->where('model', $request->model)
-                ->whereBetween('date_encountered', [$start, $end])
-                ->whereHas('defects', function ($query) use ($request){
-                    $query->where('defect_id', $request->defect_id)
-                            ->whereNull('deleted_at');
-                })
-                ->whereHas('situations', function ($query) use ($request){
-                    $query->where('id', $request->situation)
-                            ->where('status', 0);
-                })
-                ->where('status', 0)
-                ->whereNull('deleted_at')
-                ->count();
-
-                // +1 because current occurrence is not yet included
-                $ordinal = $this->ordinal($count + 1);
-
-                return response()->json([
-                    'count'   => $count,
-                    'ordinal' => $ordinal
-                ]);
-    }
-
-    private function ordinal($number){
-        if (!in_array($number % 100, [11, 12, 13])) {
-            switch ($number % 10) {
-                case 1: return $number . 'st';
-                case 2: return $number . 'nd';
-                case 3: return $number . 'rd';
+        foreach ($hr_memo->email_recipients as $recipient){
+            if($recipient->type == 'to'){
+                $send_to[] = $recipient->rapidx_user->email;
+            }else if($recipient->type == 'cc'){
+                $send_cc[] = $recipient->rapidx_user->email;
             }
         }
 
-        return $number . 'th';
+        // if($hr_memo){
+            switch ($request->status) {
+                case 3: { //FOR APPROVAL
+                        Mail::send('mail.hr_memo_mail', ['hr_memo' => $hr_memo], function ($message) use ($send_to, $send_cc, $hr_memo) {
+                            $message->to($send_to)->subject('TRDSv2 Memo: ' . $hr_memo->subject);
+
+                            if(!empty($send_cc)){
+                                $message->cc($send_cc);
+                            }
+                        });
+                        
+                        break;
+                    }
+                case 4: { //APPROVED
+                        
+                        break;
+                    }
+                case 5: { //DISAPPROVED
+                        
+                        break;
+                    }
+                default: {
+                        $result = "---";
+                        break;
+                    }
+            }
+            return response()->json(['result' => 1]);
+        // }else{
+        //     return response()->json(['result' => 2]);
+        // }
     }
 }

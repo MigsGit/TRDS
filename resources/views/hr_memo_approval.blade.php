@@ -110,7 +110,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-sm-4">
-                                <input type="hidden" id="txtHrMemoApprovalId" name="hr_memo_id">
+                                <input type="hidden" id="txtHrMemoId" name="hr_memo_id">
 
                                 <div class="form-group">
                                     <label>Document No</label>
@@ -150,7 +150,7 @@
                             <div class="col-sm-8">
                                 <div class="form-group">
                                     <label>Subject</label>
-                                    <input type="text" class="form-control" name="subject" id="subject" value="" >
+                                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Enter Subject" required>
                                 </div>
 
                                 <div class="form-group">
@@ -160,15 +160,15 @@
 
                                 <div class="form-group">
                                     <label>To</label>
-                                    <select class="form-control" name="to" id="selectTo" required>
-                                        <option value="" disabled selected> Select To/s </option>
+                                    <select class="form-control select2bs5 selectToRecipients" name="to[]" id="selectTo" multiple required>
+                                        {{-- <option value="" disabled selected> Select To/s </option> --}}
                                     </select>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Cc</label>
-                                    <select class="form-control" name="cc" id="selectCc" required>
-                                        <option value="" disabled selected> Select Cc/s </option>
+                                    <select class="form-control select2bs5 selectCcRecipients" name="cc[]" id="selectCc" multiple required>
+                                        {{-- <option value="" disabled selected> Select Cc/s </option> --}}
                                     </select>
                                 </div>
                             </div>
@@ -179,7 +179,7 @@
                             <div class="col">
                                 <div class="table-responsive">
                                     <div class="d-flex justify-content-between">
-                                        <button type="button" id="btnAddTrainee" class="btn btn-primary"><i class="fa fa-plus"></i> Add Trainee</button>
+                                        <button type="button" id="btnAddTrainee" data-counter="" class="btn btn-primary"><i class="fa fa-plus"></i> Add Trainee</button>
                                     </div>
                                     <br>
                                     <table class="table table-sm table-bordered" id="tblTraineeDetails" style="width: 100%;">
@@ -199,32 +199,25 @@
                                 </div>
                             </div>
                         </div>
-
-                            {{-- Multiple Data for Category --}}
-                            {{-- <div class="row mt-5">
-                                <div class="col">
-                                    <div class="table-responsive">
-                                        <table class="table table-sm" id="tblTraineeCategoryDetails">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 5%;">Action</th>
-                                                    <th style="width: 10%;">Exam</th>
-                                                    <th style="width: 10%;">Exam Result</th>
-                                                    <th style="width: 10%;">Training Remarks</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div> --}}
-
-                        {{-- </div> --}}
                     </div>
-                    <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" id="btnSubmitHrMemoApproval" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
+                    <div class="modal-footer">
+                        {{-- <div class="row"> --}}
+                            <div class="col-md-6 justify-content-start">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+
+                            <div class="col-md-6 justify-content-end">
+                                <button type="button" id="btnApprove" class="btn btn-success float-right d-none">
+                                    <i class="fa fa-thumbs-up"></i> Approve
+                                </button>
+
+                                <button type="button" id="btnDisapprove" class="btn btn-danger float-right mr-2 d-none">
+                                    <i class="fa fa-thumbs-down"></i> Disapprove
+                                </button>
+
+                                <button type="submit" id="btnSubmitHrMemoApproval" class="btn btn-success float-right"><i class="fa fa-check"></i> Save</button>
+                            </div>
+                        {{-- </div> --}}
                     </div>
                 </form>
             </div>
@@ -244,7 +237,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="formTraineeDetails">
+                    <form method="post" id="formTraineeDetails" autocomplete="off">
                         @csrf
                         <div class="input-group input-group-sm mb-3" hidden>
                             <div class="input-group-prepend w-50">
@@ -285,7 +278,7 @@
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Training Venue</span>
                                             </div>
-                                                <input type="text" class="form-control form-control-sm" name="training_venue" id="trainingVenue">
+                                                <input type="text" class="form-control form-control-sm" name="training_venue" id="trainingVenue" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -294,9 +287,10 @@
                                     <div class="col">
                                         <div class="input-group input-group-sm mb-3">
                                             <div class="input-group-prepend w-50">
-                                                <span class="input-group-text w-100">Department/Section</span>
+                                                <span class="input-group-text w-100">Department</span>
                                             </div>
-                                                <select class="form-control select2bs5" type="text" name="dept_section" id="deptSection"  required></select>
+                                                <input type="text" class="form-control form-control-sm" name="department" id="department" readonly>
+                                                {{-- <select class="form-control select2bs5" type="text" name="dept_section" id="deptSection"  required></select> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -319,9 +313,9 @@
                                     <div class="col">
                                         <div class="input-group input-group-sm mb-3">
                                             <div class="input-group-prepend w-50">
-                                                <span class="input-group-text w-100">Position/Dept./Section</span>
+                                                <span class="input-group-text w-100">Position</span>
                                             </div>
-                                                <input type="text" class="form-control form-control-sm" name="pos_dept_section" id="posDeptSection" readonly>
+                                                <input type="text" class="form-control form-control-sm" name="position" id="position" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -341,9 +335,10 @@
                                     <div class="col">
                                         <div class="input-group input-group-sm mb-3">
                                             <div class="input-group-prepend w-50">
-                                                <span class="input-group-text w-100">Product Allocation</span>
+                                                <span class="input-group-text w-100">Product Allocation (Section)</span>
                                             </div>
-                                                <select class="form-control select2bs5" type="text" name="prod_allocation" id="prodAllocation" required></select>
+                                                <input type="text" class="form-control form-control-sm" name="prod_allocation" id="prodAllocation" readonly>
+                                                {{-- <select class="form-control select2bs5" type="text" name="prod_allocation" id="prodAllocation" required></select> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -376,7 +371,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" id="btnAddTraineeDetailsToList">Add To List</button>
+                    <button type="submit" class="btn btn-success" id="btnAddTraineeDetailsToList">Add To List</button>
                 </div>
             </div>
         </div>
@@ -385,7 +380,7 @@
 
 @section('js_content')
     <script type="text/javascript">
-
+        <script src="{{ asset('public/js/my_js/HrMemoApproval.js') }}?<?=time()?>"></script>
     </script>
 @endsection
 
