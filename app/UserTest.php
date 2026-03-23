@@ -19,10 +19,4 @@ class User extends Authenticatable
     public function user_level(){
         return $this->hasOne(UserLevel::class, 'id', 'user_level_id');
     }
-
-    
-
-    // public function oqc_stamps(){
-    //     return $this->hasMany(OQCStamp::class, 'user_id', 'id');
-    // }
 }

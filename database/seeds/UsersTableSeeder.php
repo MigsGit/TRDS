@@ -1,6 +1,6 @@
 <?php
 
-use App\User;
+use App\Model\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
