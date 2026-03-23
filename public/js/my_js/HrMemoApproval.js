@@ -142,6 +142,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
         selectEmailRecipients($('.selectToRecipients'));
         selectEmailRecipients($('.selectCcRecipients'));
+        selectEmailRecipients($('.selectNotedBy'), '', true);
         $modal.modal('show');
     });
 
@@ -594,9 +595,10 @@ function updateRemoveButtons($table, measure_type, array = null, cboElement){
 
 }
 
-function selectEmailRecipients(cboElement, rapidxId = null, mode = null){
+function selectEmailRecipients(cboElement, rapidxId = null, hr_only = false){
     let result = '<option value="" disabled selected> Select Name/s </option>';
     $.ajax({
+        data: { hr_only },
         method: "get",
         url: "get_email_recipients_dropdown_details",
         dataType: "json",
@@ -617,13 +619,14 @@ function selectEmailRecipients(cboElement, rapidxId = null, mode = null){
             }
 
             cboElement.html(result);
+
             if(rapidxId != null){
                 cboElement.val(rapidxId).trigger('change');
             }
 
-            if(mode == 'view'){
-                cboElement.prop('disabled', true).trigger('change.select2');
-            }
+            // if(mode == 'view'){
+            //     cboElement.prop('disabled', true).trigger('change.select2');
+            // }
         },
         error: function(data, xhr, status) {
             result = '<option value="0" selected disabled> -- Reload Again -- </option>';
@@ -794,6 +797,8 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
             $form.find('#reason').val(response.reason);
             $form.find('#classification').val(response.classification);
             $form.find('#dateFiled').val(response.date_filed);
+            $form.find('#preparedById').val(response.prepared_by);
+            $form.find('#preparedByName').val(response.prepared_by_info.name);
 
             let toIds = [];
             let ccIds = [];
@@ -810,6 +815,7 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
 
             selectEmailRecipients($('.selectToRecipients'), toIds);
             selectEmailRecipients($('.selectCcRecipients'), ccIds);
+            selectEmailRecipients($('.selectNotedBy'), response.noted_by, true);
 
             traineeIdCounter = 1; //set counter to 1 every new memo
 

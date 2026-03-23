@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 
 class CheckSession
 {
@@ -27,7 +28,11 @@ class CheckSession
         ->where('rapidx_emp_id', $_SESSION['rapidx_user_id'])
         ->first();
 
+        // attach new data
+        $user->name = $_SESSION['rapidx_name'];
+
         session(['global_user' => $user]);
+        View::share('globalUser', $user);
         // return $next($request);
         return $next($request);
     }

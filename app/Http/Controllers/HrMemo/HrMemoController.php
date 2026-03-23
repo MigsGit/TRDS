@@ -37,7 +37,7 @@ class HrMemoController extends Controller
             $result = "";
             $result .= "<center>";
 
-            $canApprove  = in_array(6, $user_access);
+            $canApprove  = in_array(9, $user_access);
 
             $id = $hr_memo_details->id;
 
@@ -129,7 +129,13 @@ class HrMemoController extends Controller
 
     public function getEmailRecipientsDropdownDetails(Request $request)
     {
-        $emails = RapidXUser::select('id', 'name', 'email')->whereNotNull('email')->where('user_stat', 1)->get();
+        $emails = RapidXUser::select('id', 'name', 'email')
+                ->whereNotNull('email')
+                ->where('user_stat', 1)
+                ->when($request->hr_only == 'true', function ($query) use ($request) {
+                    return $query->where('department_id', 29); //HRD
+                })
+                ->get();
         return response()->json($emails);
     }
 
@@ -277,7 +283,9 @@ class HrMemoController extends Controller
                     'reason' => $request->reason,
                     'from' => $request->from,
                     'subject' => $request->subject,
-                    'date_filed' => $request->date_filed
+                    'date_filed' => $request->date_filed,
+                    'prepared_by' => $request->prepared_by,
+                    'noted_by' => $request->noted_by,
                 );
 
                 if(isset($request->hr_memo_id)){ // EDIT
@@ -361,7 +369,8 @@ class HrMemoController extends Controller
         $hrMemo = HrMemo::with([
             'email_recipients.rapidx_user',
             'trainee_details.emp_exam_details.exam_info',
-            'trainee_details'  // Load trainee_details first
+            'trainee_details',  // Load trainee_details first
+            'prepared_by_info',
         ])
         ->where('id', $request->id)
         ->first();
