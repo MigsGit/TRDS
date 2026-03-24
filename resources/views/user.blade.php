@@ -711,8 +711,11 @@
         });
         $('#btnSubmitUserModuleAccess').click(function (e) {
             e.preventDefault();
+            let arrUserModulesIdFilter = globalVar.arrUserModulesId.toSorted((a, b) => a - b)
+            let arrUserModulesIdFilterUnique = [...new Set(arrUserModulesIdFilter)];
+
             let data = {
-                arrUserModulesId : globalVar.arrUserModulesId.toSorted((a, b) => a - b),
+                arrUserModulesId : arrUserModulesIdFilterUnique,
                 selectedEmployeeNumber : $('#selectedEmployeeNumber').val()
             }
             let serializedData = {}

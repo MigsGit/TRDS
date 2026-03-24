@@ -480,8 +480,12 @@ $(document).ready(function() {
         $.ajax({
             url: 'get_memo_docs',
             method: 'GET',
+            data: {
+                selectedMemoId: selectedMemoId // ✅ send it
+            },
             success: function(response) {
                 const $select = $('#selectMemoDocNo');
+                // console.log('clarkyyyboy', selectedMemoId);
                 $select.empty();
                 $select.append('<option value="" disabled>Select Memo Document</option>');
 

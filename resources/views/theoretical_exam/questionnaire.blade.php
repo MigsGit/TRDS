@@ -397,6 +397,7 @@
             // ===============================================================================================================================================
             // ================================================================ QUESTIONNAIRE ================================================================
             // ===============================================================================================================================================
+            // GetExamTrainingRequestControlNo($('.get-systemone-hris-department'))
             GetSystemOneHrisDepartment($('.get-systemone-hris-department'))
             GetSystemOneHrisPosition($('.get-systemone-hris-position'))
             GetSystemOneHrisSection($('.get-systemone-hris-section'))

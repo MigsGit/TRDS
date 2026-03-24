@@ -295,7 +295,7 @@ class TrainingRequestController extends Controller
             TrainingRequestDetails::updateOrCreate(
                 [
 
-                    'training_request_id' => $trainingRequestId,
+                    'training_request_id' => $trainingRequestId,   
                     'training_memo_doc_id' => $memoDocId,
                     'hr_memo_trainee_details_id' => $hrmemoDocsId,
                     'emp_no' => $emp['emp_no']
@@ -320,7 +320,7 @@ class TrainingRequestController extends Controller
                 'training_result' => implode(',', $explodedResult),
             ];
         }
-
+        
 
         if($trainingRequest){
             return response()->json(['result' => 1, 'message' => 'Training request added successfully']);
@@ -333,7 +333,7 @@ class TrainingRequestController extends Controller
     public function getUserConformance(Request $request){
         // return 'asd';
         $trainingRequest = User::whereHas('user_access_module', function ($query) {
-            $query->where('user_modules_id', 6);
+            $query->whereIn('user_modules_id', [5,6]); 
         })
         ->with(['users'])
         ->get();
@@ -358,25 +358,35 @@ class TrainingRequestController extends Controller
         return response()->json($trainingRequestDetails);
 
     }
-
+    
     public function getMemoDocs(Request $request){
-        // Get memo
-        $memo = HrMemo::with([
-            'trainee_details',
-            'trainee_details.hris_emp_info',
-            'trainee_details.emp_exam_details',
-            'trainee_details.emp_exam_details.exam_info'
-        ])
-        ->whereHas('trainee_details', function ($query) {
-            $query->whereNotIn('id', function ($subquery) {
-                $subquery->select('hr_memo_trainee_details_id')
-                    ->from('training_request_details')
-                    ->whereNotNull('hr_memo_trainee_details_id');
-            });
-        })
-        ->get();
+        $selectedMemoId = $request->selectedMemoId;
 
-    return response()->json($memo);
+        $memo = HrMemo::with([
+                'trainee_details',
+                'trainee_details.hris_emp_info',
+                'trainee_details.emp_exam_details',
+                'trainee_details.emp_exam_details.exam_info'
+            ])
+            ->where(function ($query) use ($selectedMemoId) {
+
+                $query->whereHas('trainee_details', function ($q) {
+                    $q->whereNotIn('id', function ($subquery) {
+                        $subquery->select('hr_memo_trainee_details_id')
+                            ->from('training_request_details')
+                            ->whereNotNull('hr_memo_trainee_details_id');
+                    });
+                });
+
+                if ($selectedMemoId) {
+                    $query->orWhere('id', $selectedMemoId); // ✅ FIX: use HrMemo.id
+                }
+
+            })
+            ->where('status', 6)
+            ->get();
+
+        return response()->json($memo);
     }
 
     public function getMemoDocsDetails(Request $request){
@@ -397,6 +407,7 @@ class TrainingRequestController extends Controller
             'trainee_details.emp_exam_details.exam_info'
         ])
         ->where('id', $memoDocId)
+        ->where('status', 6)
         ->first();
 
 
@@ -468,7 +479,7 @@ class TrainingRequestController extends Controller
         ->addColumn('name', function($td){
             if($td->employment_type == 1){
                 return $td->hris_emp_info->EmpName ?? '';
-            }else{
+            }else{               
                 return $td->subcon_emp_info->EmpName ?? '';
             }
         })
@@ -494,7 +505,7 @@ class TrainingRequestController extends Controller
                 return $td->subcon_emp_info->Position ?? '';
 
             }
-
+            
         })
 
         ->addColumn('training_title', function($td){
@@ -535,7 +546,7 @@ class TrainingRequestController extends Controller
         $trainingRequest = TrainingRequest::find($request->id);
         if($trainingRequest){
             $trainingRequest->status = 1; // Update status to "Conformed"
-            $trainingRequest->section_head_date = date('Y-m-d H:i:s');
+            $trainingRequest->section_head_date = date('Y-m-d H:i:s'); 
             $trainingRequest->save();
             return response()->json(['result' => 1, 'message' => 'Training request conformed successfully']);
         } else {
@@ -549,8 +560,8 @@ class TrainingRequestController extends Controller
         $trainingRequest = TrainingRequest::find($request->id);
         if($trainingRequest){
             $trainingRequest->status = 2; // Update status to "Received"
-            $trainingRequest->received_by = $_SESSION['rapidx_user_id'];
-            $trainingRequest->received_date = date('Y-m-d H:i:s');
+            $trainingRequest->received_by = $_SESSION['rapidx_user_id']; 
+            $trainingRequest->received_date = date('Y-m-d H:i:s'); 
             $trainingRequest->save();
             return response()->json(['result' => 1, 'message' => 'Training request received successfully']);
         } else {
@@ -564,8 +575,8 @@ class TrainingRequestController extends Controller
         $trainingRequest = TrainingRequest::find($request->id);
         if($trainingRequest){
             $trainingRequest->status = 3; // Update status to "Approved"
-            $trainingRequest->tu_head_approver = $_SESSION['rapidx_user_id'];
-            $trainingRequest->tu_head_approve_date = date('Y-m-d H:i:s');
+            $trainingRequest->tu_head_approver = $_SESSION['rapidx_user_id']; 
+            $trainingRequest->tu_head_approve_date = date('Y-m-d H:i:s'); 
             $trainingRequest->save();
             return response()->json(['result' => 1, 'message' => 'Training request approved successfully']);
         } else {

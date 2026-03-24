@@ -159,7 +159,7 @@
                                             <option value="6">Supervisor</option>
                                             <option value="7">Clerk</option>
                                         </select>
-
+                                        
                                     </div>
                                 </div>
 
@@ -173,7 +173,7 @@
                                             <option value="1">Automotive Line</option>
                                             <option value="2">Non-Automotive Line</option>
                                         </select>
-
+                                        
                                     </div>
                                 </div>
 
@@ -193,7 +193,7 @@
                                             <option value="7">Flexibility Certification</option>
                                             <option value="8">Re-certification</option>
                                         </select>
-
+                                        
                                     </div>
                                 </div>
                         </div>
@@ -213,7 +213,7 @@
                                     <select name="memo_doc_no" id="selectMemoDocNo" class="form-control select2bs5" required></select>
                                 </div>
                             </div>
-
+                            
                         </div>
 
                         <div class="row mt-2">
@@ -288,7 +288,7 @@
         <!-- /.modal-dialog -->
     </div>
     <!-- /.modal -->
-
+    
 
     <div class="modal fade" id="modalSubmitEmployeeList" data-backdrop="static">
         <div class="modal-dialog modal-xl">
@@ -312,7 +312,7 @@
                                     <select name="memo_doc_no" id="selectMemoDocNo" class="form-control select2bs5" required></select>
                                 </div>
                             </div>
-
+                            
                         </div>
 
                         <div class="row mt-2">
