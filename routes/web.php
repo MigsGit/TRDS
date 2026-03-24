@@ -6,7 +6,6 @@ use App\Http\Controllers\HrMemo\HrMemoExaminationController;
 use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\TrainingAttendanceController;
-use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -272,14 +271,11 @@ Route::middleware('checkSession')->group(function(){
     });
 
     // Route::post('/import_user', 'import_user');
-});
 
-Route::controller(TrainingAttendanceController::class)->group(function () {
-    Route::get('/view_training_attendance', 'view_training_attendance');
-    Route::get('/view_training_attendance_request', 'view_training_attendance_request');
+    Route::controller(TrainingAttendanceController::class)->group(function () {
+        Route::get('/view_training_attendance', 'view_training_attendance');
+        Route::get('/view_training_attendance_request', 'view_training_attendance_request');
 
-});
-
-});
+    });
 
 });
