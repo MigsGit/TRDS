@@ -370,8 +370,11 @@
         let questionnaireId
         let questionnaireStatus
         let questionnaireRevision
+        let getQuestions = [];
+        let getOptions = [];
+        let getSelectedAnswers = [];
         let html = ''
-
+            
         $(document).ready(function () {
             $('.select2bs5').select2({
                 theme: 'bootstrap-5'
@@ -397,7 +400,6 @@
             // ===============================================================================================================================================
             // ================================================================ QUESTIONNAIRE ================================================================
             // ===============================================================================================================================================
-            // GetExamTrainingRequestControlNo($('.get-systemone-hris-department'))
             GetSystemOneHrisDepartment($('.get-systemone-hris-department'))
             GetSystemOneHrisPosition($('.get-systemone-hris-position'))
             GetSystemOneHrisSection($('.get-systemone-hris-section'))
@@ -764,50 +766,6 @@
             // ====================================================================================================
             // ============================================== GRID ================================================
             // ====================================================================================================
-            let getQuestions = [];
-            let getOptions = [];
-            let getSelectedAnswers = [];
-    
-            function renderTable() {
-                // Table header
-                $('#questionTable thead tr').html('<th>Question</th>');
-    
-                getOptions.forEach((options, getIndex) => {
-                    $('#questionTable thead tr').append(`
-                        <th class="position-relative">
-                            ${options} 
-                            <button type="button" class="btn btn-sm btn-secondary removeOption" data-index="${getIndex}" style="position:absolute; top:2px; right:2px;">&times;</button>
-                        </th>
-                    `);
-                });
-    
-                // Table body
-                $('#questionTable tbody').html('');
-                getQuestions.forEach((question, questionIndex) => {
-                    let row = `<tr>
-                        <td class="position-relative" style="padding-left:1rem;">
-                            <button class="btn btn-sm btn-secondary removeQuestion" data-index="${questionIndex}" style="margin-right:5px;">&times;</button>&nbsp;
-                            ${question}
-                        </td>`;
-    
-                    getOptions.forEach((options, optionIndex) => {
-                        let radioId = `question${questionIndex}_option${optionIndex}`;
-                        let checked = getSelectedAnswers[questionIndex] == (optionIndex + 1) ? 'checked' : '';
-    
-                        row += `<td class="text-center">
-                                    <input type="radio" id="${radioId}" data-row="${questionIndex}" data-column="${optionIndex + 1}" ${checked}>
-                                    <label for="${radioId}" class="sr-only"></label>
-                                </td>`;
-                    });
-    
-                    row += '</tr>';
-                    $('#questionTable tbody').append(row);
-                });
-    
-                $('#questionnaireQuestionHidden').val(JSON.stringify(getQuestions));
-                $('#gridChoicesHidden').val(JSON.stringify(getOptions));
-            }
-    
             // Add question
             $(document).on('click', '#btnAddQuestion', function() {
                 let question = $('#txtQuestion').val().trim();
