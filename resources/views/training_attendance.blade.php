@@ -41,16 +41,6 @@
                                         <i class="fa fa-plus fa-md me-2"></i> Add Training Attendance
                                     </button>
                                 </div>
-
-                                {{-- <div class="float-sm-left mb-4 col-2">
-                                    <select class="form-control selectFilter" name="select_filter" id="selectFilterId">
-                                        <option value="4" selected>All Training Request</option>
-                                        <option value="1">Conformance</option>
-                                        <option value="2">Receiving</option>
-                                        <option value="3">TU Head Approval</option>
-                                    </select>
-                                </div> --}}
-
                                 <div class="table-responsive">
                                     <table id="tblTrainingAttendance" class="table table-bordered table-striped table-hover" style="width: 100%;">
                                         <thead>
@@ -63,10 +53,8 @@
                                         </thead>
                                     </table>
                                 </div>
-
                             </div>
                             <!-- !-- End Page Content -->
-
                         </div>
                         <!-- /.card -->
                     </div>
@@ -79,112 +67,73 @@
     <!-- /.content-wrapper -->
 
     <!-- MODALS -->
-    <div class="modal fade" id="modalAddTrainingRequest" data-backdrop="static">
+    <div class="modal fade" id="modalViewTrainingAttendanceRequest" data-backdrop="static">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-plus"></i> Training Request Form</h4>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> Training Attendance Details</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form method="post" id="formAddTrainingRequest" autocomplete="off">
-                    @csrf
-                    <div class="modal-body">
+                <div class="modal-body">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                          <label>Ctrl No</label>
+                            <input type="text" class="form-control" name="trainingAttendanceCtrlNo" id="trainingAttendanceCtrlNo" readonly>
+                        </div>
                     </div>
-                    <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" id="btnSubmitTrainingRequest" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                          <label>From</label>
+                            <input type="date" class="form-control" name="trainingAttendanceCtrlNo" id="trainingAttendanceCtrlNo">
+                        </div>
                     </div>
-                </form>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                          <label>To</label>
+                            <input type="date" class="form-control" name="trainingAttendanceCtrlNo" id="trainingAttendanceCtrlNo">
+                        </div>
+                    </div>
+                    <table class="table table-sm table-bordered" id="tblTrainingAttendanceRequest" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Employee No</th>
+                                <th>Name</th>
+                                <th>Date From</th>
+                                <th>Date To</th>
+                                <th>Training Hours</th>
+                                <th>Reason/Remarks of Absence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" id="btnSubmitTrainingAttendance" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
+                </div>
             </div>
             <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->
     </div>
     <!-- /.modal -->
-
-
-    <div class="modal fade" id="modalAddEmployee" data-backdrop="static">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-plus"></i> Add Employee</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form method="post" id="formAddEmployee" autocomplete="off">
-                    @csrf
-                    <div class="modal-body">
-
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="input-group  mb-3">
-                                    <div class="input-group-prepend w-30">
-                                        <span class="input-group-text w-100" id="basic-addon1">Memo Doc No.</span>
-                                    </div>
-                                    <select name="memo_doc_no" id="selectMemoDocNo" class="form-control select2bs5" required></select>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="row mt-2">
-                            <div class="col">
-                                <div class="table-responsive">
-                                    <br>
-                                    <table class="table table-sm table-bordered" id="tblRequestedEmployeeByMemoDoc" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th>Action</th>
-                                                <th>Date Hired</th>
-                                                <th>Employee No</th>
-                                                <th>Name</th>
-                                                <th>Position/Dept./Section</th>
-                                                <th>Title</th>
-                                                <th>Result</th>
-                                                <th>Remarks</th>
-                                                <th>Venue</th>
-                                                <th>Endorsement Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mt-4">
-
-                        </div>
-
-                    </div>
-                    <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" id="btnSubmitHrMemoApproval" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
-                    </div>
-                </form>
-            </div>
-            <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-    </div>
-
-
 @endsection
 
 @section('js_content')
     <script type="text/javascript">
     tbl = {
-        TrainingAttendance : '#tblTrainingAttendance'
+        TrainingAttendance : '#tblTrainingAttendance',
+        TrainingAttendanceRequest : '#tblTrainingAttendanceRequest'
     }
     dtTrainingAttendance = $(tbl.TrainingAttendance).DataTable({
     "processing" : false,
         "serverSide" : true,
         "ajax" : {
-        url: "view_training_attendance",
+            url: "view_training_attendance",
         },
         "columns":[
             { "data" : "action", orderable:false, searchable:false },
@@ -193,7 +142,31 @@
             { "data" : "received_date" },
         ],
         "order": [[ 1, "asc" ]],
-    });//end of dataTableUsers
+    });
+
+    dtViewTrainingAttendanceRequest = $(tbl.TrainingAttendanceRequest).DataTable({
+    "processing" : false,
+        "serverSide" : true,
+        "ajax" : {
+            url: "view_training_attendance_request",
+            // data: function (param){
+            //     param.trainingRequestsId = '';
+            // },
+        },
+        "columns":[
+            { "data" : "action", orderable:false, searchable:false },
+            { "data" : "emp_no" },
+            { "data" : "name" },
+            { "data" : "training_endorsement_date" },//date from
+            { "data" : "training_endorsement_date" },//date to
+            { "data" : "training_endorsement_date" }, //hours time in out
+            { "data" : "training_endorsement_date" }, //remarks
+        ],
+        "order": [[ 1, "asc" ]],
+    });
+    $(tbl.TrainingAttendance).on('click','#checkBulkUserModule','tr', function () {
+
+    });
 
     </script>
 @endsection

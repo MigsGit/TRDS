@@ -371,38 +371,3 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
 
     ajaxRequest(ajaxGetQuestionnaireDetailsById);
 };
-
-// const GetExamTrainingRequestControlNo = (element) => { 
-//     const ajaxGetExamTrainingRequestControlNo = {
-//         url: 'get_exam_training_request_control_no',
-//         method: 'GET',
-        
-//         successCallback: (response) => {
-//             console.log('object');
-//             const examTrainingRequestControlNo = response || [];
-//             let result = '';
-
-//             if (examTrainingRequestControlNo.length > 0) {
-//                 result += '<option value="" disabled selected>Select Control No</option>';
-
-//                 examTrainingRequestControlNo.forEach(item => {
-//                     const controlNo = item?.ctrl_number ?? 'No Control No';
-//                     result += `<option value="${controlNo}">${controlNo}</option>`;
-//                 });
-//             } else {
-//                 result = '<option value="" disabled selected>Not found</option>';
-//             }
-
-//             element.html(result);
-//         },
-
-//         errorCallback(xhr, status, error) {
-//             console.log("STATUS:", status);
-//             console.log("ERROR:", error);
-//             console.log("RESPONSE:", xhr.responseText); // 🔥 importante
-//             // result.errorCallback(xhr, status, error);
-//         }
-//     };
-
-//     ajaxRequest(ajaxGetExamTrainingRequestControlNo);
-// };

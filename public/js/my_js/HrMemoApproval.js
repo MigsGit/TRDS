@@ -104,11 +104,11 @@ function initTraineeDetailsTable($table1) {
                 render: function (data){
                     let actionButtons;
 
-                    if(data.status > 1){ //View
-                        actionButtons = "<button class='btn btn-md btn-secondary viewTDRow' data-id='" + data.id + "' type='button'><i class='fa-solid fas fa-eye'></i></button>";
-                    }else{ //Add/Edit
+                    if(data.status == 1 || data.status == 4 || data.status == 7){ //Add/Edit
                         actionButtons = "<button class='btn btn-md btn-danger removeTDRow mr-1' data-id='" + data.id + "' title='Remove Row' type='button'><i class='fa fa-times'></i></button>";
                         actionButtons += "<button class='btn btn-md btn-secondary editTDRow' data-id='" + data.id + "' type='button'><i class='fas fa-edit'></i></button>";
+                    }else{ //View
+                        actionButtons = "<button class='btn btn-md btn-secondary viewTDRow' data-id='" + data.id + "' type='button'><i class='fa-solid fas fa-eye'></i></button>";
                     }
 
                     return actionButtons;
@@ -142,6 +142,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
         selectEmailRecipients($('.selectToRecipients'));
         selectEmailRecipients($('.selectCcRecipients'));
+        selectEmailRecipients($('.selectNotedBy'), '', true);
         $modal.modal('show');
     });
 
@@ -336,20 +337,20 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         fetchHrMemoById(id, $modal, dtTraineeDetails, $form, 'view', traineeDetailsArray, approval);
     });
 
-    // Disable button
-    $table.on('click', '.btnDisable', function () {
-        const id = $(this).data('id');
-        let updateStatusTo = 2; //cancelled
-        confirmAction('Are you sure you want to disable this?', function () {
-            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo);
-        });
-    });
-
     // Enable button
     $table.on('click', '.btnEnable', function () {
         const id = $(this).data('id');
         let updateStatusTo = 1; //pending
         confirmAction('Are you sure you want to enable this?', function () {
+            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo);
+        });
+    });
+
+    // Disable button
+    $table.on('click', '.btnDisable', function () {
+        const id = $(this).data('id');
+        let updateStatusTo = 2; //cancelled
+        confirmAction('Are you sure you want to disable this?', function () {
             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo);
         });
     });
@@ -363,10 +364,30 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         });
     });
 
-    // Approve button
-    $form.on('click', '#btnApprove', function () {
+    // Disapprove button
+    $form.on('click', '#btnHRDisapprove', function () {
         const id = $form.find('#txtHrMemoId').val();
-        let updateStatusTo = 4; //aproved
+        let updateStatusTo = 4; //disapproved
+        // let forApproval = true;
+        confirmAction('Disapprove HR Memo Document?', function () {
+            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
+        });
+    });
+
+    // Approve button
+    $form.on('click', '#btnHRApprove', function () {
+        const id = $form.find('#txtHrMemoId').val();
+        let updateStatusTo = 5; //approved
+        // let forApproval = true;
+        confirmAction('Approve HR Memo Document?', function () {
+            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
+        });
+    });
+
+    // Approve button
+    $form.on('click', '#btnTUApprove', function () {
+        const id = $form.find('#txtHrMemoId').val();
+        let updateStatusTo = 6; //approved
         // let forApproval = true;
         confirmAction('Approve HR Memo Document?', function () {
             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
@@ -374,9 +395,9 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     });
 
     // Disapprove button
-    $form.on('click', '#btnDisapprove', function () {
+    $form.on('click', '#btnTUDisapprove', function () {
         const id = $form.find('#txtHrMemoId').val();
-        let updateStatusTo = 5; //disapproved
+        let updateStatusTo = 7; //disapproved
         // let forApproval = true;
         confirmAction('Disapprove HR Memo Document?', function () {
             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
@@ -594,9 +615,10 @@ function updateRemoveButtons($table, measure_type, array = null, cboElement){
 
 }
 
-function selectEmailRecipients(cboElement, rapidxId = null, mode = null){
+function selectEmailRecipients(cboElement, rapidxId = null, hr_only = false){
     let result = '<option value="" disabled selected> Select Name/s </option>';
     $.ajax({
+        data: { hr_only },
         method: "get",
         url: "get_email_recipients_dropdown_details",
         dataType: "json",
@@ -617,13 +639,14 @@ function selectEmailRecipients(cboElement, rapidxId = null, mode = null){
             }
 
             cboElement.html(result);
+
             if(rapidxId != null){
                 cboElement.val(rapidxId).trigger('change');
             }
 
-            if(mode == 'view'){
-                cboElement.prop('disabled', true).trigger('change.select2');
-            }
+            // if(mode == 'view'){
+            //     cboElement.prop('disabled', true).trigger('change.select2');
+            // }
         },
         error: function(data, xhr, status) {
             result = '<option value="0" selected disabled> -- Reload Again -- </option>';
@@ -759,29 +782,47 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
                 disableForm($form, response.status);
             }
 
-            if (response.status == 3 && approval == true){
-                console.log('hide save, show approval');
+            if (response.status == 3 && approval == true){ //HR APPROVAL
+                console.log('hide save & TU approval, show HR approval');
 
                 $form.find('#btnSubmitHrMemoApproval').addClass('d-none');
-                $form.find('#btnApprove').removeClass('d-none');
-                $form.find('#btnDisapprove').removeClass('d-none');
+                $form.find('#btnHRApprove').removeClass('d-none');
+                $form.find('#btnHRDisapprove').removeClass('d-none');
+                $form.find('#btnTUApprove').addClass('d-none');
+                $form.find('#btnTUDisapprove').addClass('d-none');
 
                 $form.find('#btnAddTrainee').prop('disabled', true);
                 $form.find('#btnAddTrainee').prop('hidden', true);
-            }else if(response.status == 1) {
-                console.log('show save, hide approval');
+            }else if (response.status == 5 && approval == true){ //TU Receiving
+                console.log('hide save & HR approval, show TU approval');
+
+                $form.find('#btnSubmitHrMemoApproval').addClass('d-none');
+                $form.find('#btnHRApprove').addClass('d-none');
+                $form.find('#btnHRDisapprove').addClass('d-none');
+                $form.find('#btnTUApprove').removeClass('d-none');
+                $form.find('#btnTUDisapprove').removeClass('d-none');
+
+                $form.find('#btnAddTrainee').prop('disabled', true);
+                $form.find('#btnAddTrainee').prop('hidden', true);
+            }else if(response.status == 1 || response.status == 4 || response.status == 7){ //Pending, HR & TU Disapproved
+                console.log('show save, hide ALL approval');
 
                 $form.find('#btnSubmitHrMemoApproval').removeClass('d-none');
-                $form.find('#btnApprove').addClass('d-none');
-                $form.find('#btnDisapprove').addClass('d-none');
+                $form.find('#btnHRApprove').addClass('d-none');
+                $form.find('#btnHRDisapprove').addClass('d-none');
+                $form.find('#btnTUApprove').addClass('d-none');
+                $form.find('#btnTUDisapprove').addClass('d-none');
 
                 $form.find('#btnAddTrainee').prop('disabled', false);
                 $form.find('#btnAddTrainee').prop('hidden', false);
+                $form.find('input, textarea, select').prop('disabled', false);
             }else{
                 console.log('hide all');
                 $form.find('#btnSubmitHrMemoApproval').addClass('d-none');
-                $form.find('#btnApprove').addClass('d-none');
-                $form.find('#btnDisapprove').addClass('d-none');
+                $form.find('#btnHRApprove').addClass('d-none');
+                $form.find('#btnHRDisapprove').addClass('d-none');
+                $form.find('#btnTUApprove').addClass('d-none');
+                $form.find('#btnTUDisapprove').addClass('d-none');
 
                 $form.find('#btnAddTrainee').prop('disabled', true);
                 $form.find('#btnAddTrainee').prop('hidden', true);
@@ -794,6 +835,8 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
             $form.find('#reason').val(response.reason);
             $form.find('#classification').val(response.classification);
             $form.find('#dateFiled').val(response.date_filed);
+            $form.find('#preparedById').val(response.prepared_by);
+            $form.find('#preparedByName').val(response.prepared_by_info.name);
 
             let toIds = [];
             let ccIds = [];
@@ -810,6 +853,7 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
 
             selectEmailRecipients($('.selectToRecipients'), toIds);
             selectEmailRecipients($('.selectCcRecipients'), ccIds);
+            selectEmailRecipients($('.selectNotedBy'), response.noted_by, true);
 
             traineeIdCounter = 1; //set counter to 1 every new memo
 

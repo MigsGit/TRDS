@@ -6,6 +6,7 @@ use App\Http\Controllers\HrMemo\HrMemoExaminationController;
 use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\TrainingAttendanceController;
+use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -176,6 +177,9 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_training_requests', 'getTrainingRequests')->name('get_training_requests');
         Route::post('/add_training_request', 'addTrainingRequest')->name('add_training_request');
         Route::get('/get_training_request_details', 'getTrainingRequestDetails')->name('get_training_request_details');
+        Route::post('/confirm_training_request', 'confirmTrainingRequest')->name('confirm_training_request');
+        Route::post('/receive_training_request', 'receiveTrainingRequest')->name('receive_training_request');
+        Route::post('/approve_training_request', 'approveTrainingRequest')->name('approve_training_request');
         Route::get('/get_requested_employee_details', 'getRequestedEmployeeDetails')->name('get_requested_employee_details');
         Route::get('/training_request', 'index')->name('training_request');
 
@@ -186,10 +190,14 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_hris_sections', 'getHRISSections')->name('get_hris_sections');
         Route::get('/get_user_conformance', 'getUserConformance')->name('get_user_conformance');
         Route::get('/get_requestor', 'getRequestor')->name('get_requestor');
+        Route::get('/get_training_request_filter', 'getTrainingRequestsViewFilter')->name('get_training_request_filter');
 
         // MEMO DOCS
         Route::get('/get_memo_docs', 'getMemoDocs')->name('get_memo_docs');
         Route::get('/get_memo_doc_details', 'getMemoDocsDetails')->name('get_memo_doc_details');
+        Route::get('/get_employee_list_by_memo_doc', 'getEmployeeListByMemoDoc')->name('get_employee_list_by_memo_doc');
+        Route::post('/save_memo_doc_employees', 'saveMemoDocEmployees')->name('save_memo_doc_employees');
+
         Route::get('/get_memo_doc_employee_details', 'getMemoDocEmployeeDetails')->name('get_memo_doc_employee_details');
 
         // =======================================================================================================
@@ -254,23 +262,7 @@ Route::middleware('checkSession')->group(function(){
             Route::get('/get_memo_doc_details', 'getMemoDocsDetails')->name('get_memo_doc_details');
             Route::get('/get_employee_list_by_memo_doc', 'getEmployeeListByMemoDoc')->name('get_employee_list_by_memo_doc');
             Route::post('/save_memo_doc_employees', 'saveMemoDocEmployees')->name('save_memo_doc_employees');
-
         });
-
-
-
-
-        // Route::post('/sign_in', 'sign_in')->name('sign_in');
-        // Route::post('/sign_out', 'sign_out')->name('sign_out');
-        // Route::post('/change_pass', 'change_pass')->name('change_pass');
-        // Route::post('/change_user_stat', 'change_user_stat')->name('change_user_stat');
-        // Route::get('/get_user_by_id', 'get_user_by_id');
-        // Route::get('/get_user_by_batch', 'get_user_by_batch');
-        // Route::get('/get_user_by_stat', 'get_user_by_stat');
-        // Route::post('/edit_user', 'edit_user');
-        // Route::post('/reset_password', 'reset_password');
-        // Route::get('/generate_user_qrcode', 'generate_user_qrcode');
-        // Route::post('/import_user', 'import_user');
     });
 
     Route::controller(TrainingAttendanceController::class)->group(function () {
@@ -279,17 +271,15 @@ Route::middleware('checkSession')->group(function(){
         // view_training_attendance
     });
 
-
-
-
-    // Route::post('/sign_in', 'sign_in')->name('sign_in');
-    // Route::post('/sign_out', 'sign_out')->name('sign_out');
-    // Route::post('/change_pass', 'change_pass')->name('change_pass');
-    // Route::post('/change_user_stat', 'change_user_stat')->name('change_user_stat');
-    // Route::get('/get_user_by_batch', 'get_user_by_batch');
-    // Route::get('/get_user_by_stat', 'get_user_by_stat');
-    // Route::post('/edit_user', 'edit_user');
-    // Route::post('/reset_password', 'reset_password');
-    // Route::get('/generate_user_qrcode', 'generate_user_qrcode');
     // Route::post('/import_user', 'import_user');
+});
+
+Route::controller(TrainingAttendanceController::class)->group(function () {
+    Route::get('/view_training_attendance', 'view_training_attendance');
+    Route::get('/view_training_attendance_request', 'view_training_attendance_request');
+
+});
+
+});
+
 });

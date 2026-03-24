@@ -117,8 +117,6 @@ $(document).ready(function() {
                 const created_at = new Date(response.created_at);
                 const memoDocId = response.training_request_details[0].training_memo_doc_id;
 
-                console.log('clarkyboy', memoDocId);
-
                 const formattedDate = created_at.toLocaleString('en-US', {
                     year: 'numeric',
                     month: 'long',

@@ -94,6 +94,7 @@
                 </div>
             </div>
 
+
             <div class="d-none" id="stepTwo"> 
                 <form action="" method="POST">
                     @csrf
@@ -154,7 +155,6 @@
                                                         class="form-control"
                                                         placeholder="Enter your answer">
                                                 @endif
-
                                                 @if($question->type == 'Essay')
                                                     <textarea name="answers[{{ $question->id }}]"
                                                             class="form-control"

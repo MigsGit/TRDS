@@ -109,3 +109,4 @@ const GetExamTrainingRequestEmployeeNo = (element, selectedControlNo) => {
         element.html('<option value="" disabled selected>Error loading data</option>');
     }
 };
+
