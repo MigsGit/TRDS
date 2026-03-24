@@ -16,6 +16,13 @@ class CreateTrainingAttendancesTable extends Migration
         Schema::create('training_attendances', function (Blueprint $table) {
             //NOTE: present = scan, manual the absent, other status
             //FAQS: Manual din ba ang pag create ng attendance or automatic get sa training request details?
+            /*
+            Click Ctrl Number / TR ID
+            Scan Emp No - automatic date from/start
+            Scan Emp No - automatic date to/end
+            Training Hours - automatic get from start & end
+
+            */
             $table->id();
             $table->foreignId('training_request_details_id')
                 ->nullable()

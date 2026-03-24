@@ -225,12 +225,20 @@
                             </div>
 
                             <div class="col-md-6 justify-content-end">
-                                <button type="button" id="btnApprove" class="btn btn-success float-right d-none">
-                                    <i class="fa fa-thumbs-up"></i> Approve
+                                <button type="button" id="btnHRApprove" class="btn btn-success float-right d-none">
+                                    <i class="fa fa-thumbs-up"></i>HR Approve
                                 </button>
 
-                                <button type="button" id="btnDisapprove" class="btn btn-danger float-right mr-2 d-none">
-                                    <i class="fa fa-thumbs-down"></i> Disapprove
+                                <button type="button" id="btnHRDisapprove" class="btn btn-danger float-right mr-2 d-none">
+                                    <i class="fa fa-thumbs-down"></i>HR Disapprove
+                                </button>
+
+                                <button type="button" id="btnTUApprove" class="btn btn-success float-right d-none">
+                                    <i class="fa fa-thumbs-up"></i>TU Approve
+                                </button>
+
+                                <button type="button" id="btnTUDisapprove" class="btn btn-danger float-right mr-2 d-none">
+                                    <i class="fa fa-thumbs-down"></i>TU Disapprove
                                 </button>
 
                                 <button type="submit" id="btnSubmitHrMemoApproval" class="btn btn-success float-right"><i class="fa fa-check"></i> Save</button>

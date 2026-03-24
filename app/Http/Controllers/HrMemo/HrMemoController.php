@@ -43,11 +43,13 @@ class HrMemoController extends Controller
 
             $isPending   = $hr_memo_details->status == 1;
             $isCancelled = $hr_memo_details->status == 2;
-            $isForApproval = $hr_memo_details->status == 3;
-            $isApproved = $hr_memo_details->status == 4;
-            $isDisapproved = $hr_memo_details->status == 5;
+            $isForHRApproval = $hr_memo_details->status == 3;
+            $isHRDisapproved = $hr_memo_details->status == 4;
+            $isForTUReceiving = $hr_memo_details->status == 5;
+            // $isTUReceived = $hr_memo_details->status == 6;
+            $isTUDisapproved = $hr_memo_details->status == 7;
 
-            if($isPending) {
+            if($isPending){
                 // if($canManage){
                     $result .= $this->actionButton('btn-secondary btnEdit', 'fas fa-edit', $id, 'mr-1');
                     $result .= $this->actionButton('btn-success btnFinalSubmit', 'fas fa-check-square', $id, 'mr-1');
@@ -58,19 +60,23 @@ class HrMemoController extends Controller
             } else if ($isCancelled){
                 $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
                 $result .= $this->actionButton('btn-success btnEnable', 'fas fa-undo', $id);
-            }else if($isForApproval){
+            }else if($isForHRApproval){
                 if($canApprove){
                     $result .= $this->actionButton('btn-success btnView', 'fas fa-check-square', $id, 'mr-1', 'true');
                 }else{
                     $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
                 }
             }
-            // else if ($isApproved){
-            //     $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
-            // }else if ($isDisapproved){
-            //     $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
-            // }
-            else{
+            else if ($isForTUReceiving){
+                if($canApprove){
+                    $result .= $this->actionButton('btn-success btnView', 'fas fa-check-square', $id, 'mr-1', 'true');
+                }else{
+                    $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
+                }
+            }else if ($isHRDisapproved || $isTUDisapproved){
+                $result .= $this->actionButton('btn-secondary btnEdit', 'fas fa-edit', $id, 'mr-1');
+                $result .= $this->actionButton('btn-success btnFinalSubmit', 'fas fa-check-square', $id, 'mr-1');
+            }else{
                 $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
             }
 
@@ -86,11 +92,15 @@ class HrMemoController extends Controller
             }else if($pth_details->status == 2){
                 $result .= "<span class='badge rounded-pill bg-secondary'>Cancelled</span>";
             }else if($pth_details->status == 3){
-                $result .= "<span class='badge rounded-pill bg-primary'>For Approval</span>";
+                $result .= "<span class='badge rounded-pill bg-primary'>For HR Approval</span>";
             }else if($pth_details->status == 4){
-                $result .= "<span class='badge rounded-pill bg-success'>Approved</span>";
+                $result .= "<span class='badge rounded-pill bg-danger'>HR Disapproved</span>";
             }else if($pth_details->status == 5){
-                $result .= "<span class='badge rounded-pill bg-danger'>Disapproved</span>";
+                $result .= "<span class='badge rounded-pill bg-primary'>For TU Receiving</span>";
+            }else if($pth_details->status == 6){
+                $result .= "<span class='badge rounded-pill bg-success'>TU Received</span>";
+            }else if($pth_details->status == 7){
+                $result .= "<span class='badge rounded-pill bg-danger'>TU Disapproved</span>";
             }else{
                 $result .= "<span class='badge rounded-pill bg-info'>N/A</span>";
             }
