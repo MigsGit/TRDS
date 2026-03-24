@@ -333,7 +333,7 @@ class TrainingRequestController extends Controller
     public function getUserConformance(Request $request){
         // return 'asd';
         $trainingRequest = User::whereHas('user_access_module', function ($query) {
-            $query->where('user_modules_id', 6); 
+            $query->whereIn('user_modules_id', [5,6]); 
         })
         ->with(['users'])
         ->get();
@@ -360,23 +360,33 @@ class TrainingRequestController extends Controller
     }
     
     public function getMemoDocs(Request $request){
-        // Get memo
-        $memo = HrMemo::with([
-            'trainee_details',
-            'trainee_details.hris_emp_info',
-            'trainee_details.emp_exam_details',
-            'trainee_details.emp_exam_details.exam_info'
-        ])
-        ->whereHas('trainee_details', function ($query) {
-            $query->whereNotIn('id', function ($subquery) {
-                $subquery->select('hr_memo_trainee_details_id')
-                    ->from('training_request_details')
-                    ->whereNotNull('hr_memo_trainee_details_id');
-            });
-        })
-        ->get();
+        $selectedMemoId = $request->selectedMemoId;
 
-    return response()->json($memo);
+        $memo = HrMemo::with([
+                'trainee_details',
+                'trainee_details.hris_emp_info',
+                'trainee_details.emp_exam_details',
+                'trainee_details.emp_exam_details.exam_info'
+            ])
+            ->where(function ($query) use ($selectedMemoId) {
+
+                $query->whereHas('trainee_details', function ($q) {
+                    $q->whereNotIn('id', function ($subquery) {
+                        $subquery->select('hr_memo_trainee_details_id')
+                            ->from('training_request_details')
+                            ->whereNotNull('hr_memo_trainee_details_id');
+                    });
+                });
+
+                if ($selectedMemoId) {
+                    $query->orWhere('id', $selectedMemoId); // ✅ FIX: use HrMemo.id
+                }
+
+            })
+            ->where('status', 6)
+            ->get();
+
+        return response()->json($memo);
     }
 
     public function getMemoDocsDetails(Request $request){
@@ -397,6 +407,7 @@ class TrainingRequestController extends Controller
             'trainee_details.emp_exam_details.exam_info'
         ])
         ->where('id', $memoDocId)
+        ->where('status', 6)
         ->first();
 
 

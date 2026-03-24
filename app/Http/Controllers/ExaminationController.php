@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Model\TrainingRequest;
 use App\Model\Questionnaires;
 use App\Model\QuestionnaireDetails;
+use App\Model\TrainingRequestDetails;
 
 class ExaminationController extends Controller
 {
@@ -34,18 +35,23 @@ class ExaminationController extends Controller
 
         return view('theoretical_exam.examination', compact('exam', 'questions'));
     }
-    
 
-    // public function getExamTrainingRequestControlNo(Request $request){
-    //     date_default_timezone_set('Asia/Manila');
+    public function getExamTrainingRequestControlNo(Request $request){
+        date_default_timezone_set('Asia/Manila');
+        $get_tr_control_no = TrainingRequest::where('status', '3')
+            ->select('ctrl_number','status')
+            ->distinct()
+            ->orderBy('ctrl_number', 'ASC')
+            ->get();
 
-    //     // $get_tr_control_no = TrainingRequest::where('status', '3')
-    //     //     ->select('ctrl_number')
-    //     //     ->distinct()
-    //     //     ->orderBy('ctrl_number', 'ASC')
-    //     //     ->get();
-    //     $get_tr_control_no = Questionnaires::all();
-    //     echo json_encode($get_tr_control_no);
-    //     return response()->json($get_tr_control_no);
-    // }
+        return response()->json($get_tr_control_no);
+    }
+
+    public function getExamTrainingRequestEmployeeNo(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
+        $get_tr_employee_no = TrainingRequest::with(['training_request_details'])->where('ctrl_number', $request->controlNo)->where('status', '3')->get();
+
+        return response()->json($get_tr_employee_no);
+    }
 }

@@ -312,8 +312,8 @@
                   <tr>
                     <th><center> <input class="" type="checkbox" id="checkBulkUserModuleSelectAll"> </center></th>
                     <th>Module Name</th>
-                    <th>Updated by</th>
-                    <th>Action</th>
+                    {{-- <th>Updated by</th> --}}
+                    {{-- <th>Action</th> --}}
                   </tr>
                 </thead>
               </table>
@@ -378,7 +378,7 @@
                 { "data" : "label1" },
                 { "data" : "action1", orderable:false, searchable:false }
             ],
-           
+
             "order": [[ 1, "asc" ]],
         });//end of dataTableUsers
 
@@ -395,8 +395,8 @@
             "columns":[
                 { "data" : "rawBulkCheckBox", orderable:false, searchable:false },
                 { "data" : "module_name" },
-                { "data" : "updated_by" },
-                { "data" : "action", orderable:false, searchable:false },
+                // { "data" : "updated_by" },
+                // { "data" : "action", orderable:false, searchable:false },
             ],
 
         //   "columnDefs": [
@@ -417,14 +417,14 @@
                         // $(this).closest('tr').css('color', '#155724'); // Dark green text
                         $(this).closest('tr').attr('style', 'background:#90EE90;');
                         globalVar.arrUserModulesId.push($(this).attr('pkid-received'));
-                        
+
                     } else {
                         // If not checked, ensure it has the default background
                         $(this).closest('tr').css('background-color', '');
                         $(this).closest('tr').css('color', '');
                     }
                 });
-            },  
+            },
         });//end of dataTableUsers
 
         $(document).on('click', '.chkUser', function(){
@@ -759,8 +759,11 @@
         });
         $('#btnSubmitUserModuleAccess').click(function (e) {
             e.preventDefault();
+            let arrUserModulesIdFilter = globalVar.arrUserModulesId.toSorted((a, b) => a - b)
+            let arrUserModulesIdFilterUnique = [...new Set(arrUserModulesIdFilter)];
+
             let data = {
-                arrUserModulesId : globalVar.arrUserModulesId.toSorted((a, b) => a - b),
+                arrUserModulesId : arrUserModulesIdFilterUnique,
                 selectedEmployeeNumber : $('#selectedEmployeeNumber').val()
             }
             let serializedData = {}

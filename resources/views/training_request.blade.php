@@ -267,7 +267,7 @@
                             </div>
 
                             <div class="col-sm-6">
-                                 <div class="input-group  mb-3">
+                                <div class="input-group  mb-3">
                                     <div class="input-group-prepend w-50">
                                         <span class="input-group-text w-100" id="basic-addon1">Section Head</span>
                                     </div>

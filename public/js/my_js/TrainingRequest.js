@@ -117,6 +117,8 @@ $(document).ready(function() {
                 const created_at = new Date(response.created_at);
                 const memoDocId = response.training_request_details[0].training_memo_doc_id;
 
+                console.log('clarkyboy', memoDocId);
+
                 const formattedDate = created_at.toLocaleString('en-US', {
                     year: 'numeric',
                     month: 'long',
@@ -480,8 +482,12 @@ $(document).ready(function() {
         $.ajax({
             url: 'get_memo_docs',
             method: 'GET',
+            data: {
+                selectedMemoId: selectedMemoId // ✅ send it
+            },
             success: function(response) {
                 const $select = $('#selectMemoDocNo');
+                // console.log('clarkyyyboy', selectedMemoId);
                 $select.empty();
                 $select.append('<option value="" disabled>Select Memo Document</option>');
 

@@ -284,7 +284,7 @@ class UserController extends Controller
         //     $userAccessModule =  UserAccessModule::where('users_id',$usersId)->first('user_modules_id');
         //     $userAccessModule = explode(',',$userAccessModule->user_modules_id);
         // }
-      
+
         if (filled($usersId)) {
             $userAccess = UserAccessModule::where('users_id', $usersId)->first();
             $userAccessModule = $userAccess ? explode(',', $userAccess->user_modules_id) : [];
