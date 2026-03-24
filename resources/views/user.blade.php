@@ -312,8 +312,6 @@
                   <tr>
                     <th><center> <input class="" type="checkbox" id="checkBulkUserModuleSelectAll"> </center></th>
                     <th>Module Name</th>
-                    <th>Updated by</th>
-                    <th>Action</th>
                   </tr>
                 </thead>
               </table>
@@ -345,9 +343,6 @@
     }
     $(document).ready(function () {
         //Initialize Select2 Elements
-        $('.select2').select2();
-
-        //Initialize Select2 Elements
         $('.select2bs4').each(function () {
             $(this).select2({
                 theme: 'bootstrap-5',
@@ -357,8 +352,8 @@
         });
 
         $(document).on('click','#tblUsers tbody tr',function(e){
-        $(this).closest('tbody').find('tr').removeClass('table-active');
-        $(this).closest('tr').addClass('table-active');
+            $(this).closest('tbody').find('tr').removeClass('table-active');
+            $(this).closest('tr').addClass('table-active');
         });
 
         dataTableUsers = $("#tblUsers").DataTable({
@@ -378,7 +373,7 @@
                 { "data" : "label1" },
                 { "data" : "action1", orderable:false, searchable:false }
             ],
-           
+
             "order": [[ 1, "asc" ]],
         });//end of dataTableUsers
 
@@ -395,8 +390,6 @@
             "columns":[
                 { "data" : "rawBulkCheckBox", orderable:false, searchable:false },
                 { "data" : "module_name" },
-                { "data" : "updated_by" },
-                { "data" : "action", orderable:false, searchable:false },
             ],
 
         //   "columnDefs": [
@@ -417,14 +410,14 @@
                         // $(this).closest('tr').css('color', '#155724'); // Dark green text
                         $(this).closest('tr').attr('style', 'background:#90EE90;');
                         globalVar.arrUserModulesId.push($(this).attr('pkid-received'));
-                        
+
                     } else {
                         // If not checked, ensure it has the default background
                         $(this).closest('tr').css('background-color', '');
                         $(this).closest('tr').css('color', '');
                     }
                 });
-            },  
+            },
         });//end of dataTableUsers
 
         $(document).on('click', '.chkUser', function(){
@@ -489,7 +482,6 @@
           }
         });
 
-
         // Add User
         $("#btnAddUser").on('click', function(event){
           event.preventDefault();
@@ -514,45 +506,6 @@
           // $("#chkAddUserSendEmail").prop('checked', 'checked');
           $("#chkAddUserWithEmail").prop('checked', 'checked');
           GetUserLevel($(".selectUserLevel"));
-        });
-
-        $("#chkAddUserWithEmail").click(function(){
-          if($(this).prop('checked')) {
-            $("#txtAddUserEmail").removeAttr('disabled');
-            // $("#chkAddUserSendEmail").removeAttr('disabled');
-            // $("#chkAddUserSendEmail").prop('checked', 'checked');
-          }
-          else{
-            $("#txtAddUserEmail").prop('disabled', 'disabled');
-            $("#txtAddUserEmail").val('');
-            // $("#chkAddUserSendEmail").prop('disabled', 'disabled');
-            // $("#chkAddUserSendEmail").removeAttr('checked');
-          }
-        });
-
-        $("#chkAddUserWithOQCStamp").click(function(){
-          if($(this).prop('checked')) {
-            $("#txtAddUserOQCStamp").removeAttr('disabled');
-          }
-          else{
-            $("#txtAddUserOQCStamp").prop('disabled', 'disabled');
-            $("#txtAddUserOQCStamp").val('');
-          }
-        });
-
-        // Edit User
-        $("#btnEditUserGenBarcode").click(function(){
-          let qrcode = $("#txtEditUserEmpId").val();
-          GenerateUserQRCode(qrcode, 2, $("#txtEditUserId").val()); // For Edit
-        });
-
-        $("#chkEditUserWithOQCStamp").click(function(){
-          if($(this).prop('checked')) {
-            $("#txtEditUserOQCStamp").removeAttr('disabled');
-          }
-          else{
-            $("#txtEditUserOQCStamp").prop('disabled', 'disabled');
-          }
         });
 
         // Edit User
@@ -727,7 +680,6 @@
             }
             $('#countBulkIqcInspection').text(`${globalVar.arrUserModulesId.length}`);
             console.log(globalVar.arrUserModulesId);
-
         });
 
         $('#checkBulkUserModuleSelectAll').on('change', function() {

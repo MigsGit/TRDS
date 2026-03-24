@@ -22,13 +22,14 @@ Route::get('/training_attendance', function () {
 Route::get('/hr_memo_exam', function () {
     return view('hr_memo_examination');
 })->name('hr_memo_exam');
-    Route::get('/', function () {
-        return view('blank');
-    })->name('blank');
 
-    Route::get('/user_master', function () {
-        return view('user');
-    })->name('user_master');
+Route::get('/', function () {
+    return view('blank');
+})->name('blank');
+
+Route::get('/user_master', function () {
+    return view('user');
+})->name('user_master');
 
 Route::get('/training_request', function () {
     return view('training_request');
@@ -285,6 +286,7 @@ Route::controller(TrainingRequestController::class)->group(function () {
 
 Route::controller(TrainingAttendanceController::class)->group(function () {
     Route::get('/view_training_attendance', 'view_training_attendance');
+    Route::get('/view_training_attendance_request', 'view_training_attendance_request');
 
     // view_training_attendance
 });

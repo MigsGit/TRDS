@@ -549,8 +549,15 @@
             },
             dataType: "json",
             success: function (response) {
-                console.log(response);
-                let middlename = "";
+                console.log();
+                if(response['empInfo'].length == 0){
+                    let params = {
+                        frmId : $('#formAddUser')
+                    }
+                    resetFormValues(params);
+                    selAddUserLevel
+                    $('#selAddUserLevel').val('');
+                }
                 $('#systemoneEmpId').val(response['empInfo'][0]['pkid']);
                 $('#txtAddfirstName').val(response['empInfo'][0]['FirstName']);
                 $('#txtAddMiddleName').val(response['empInfo'][0]['MiddleName']);
@@ -605,7 +612,7 @@
         }
         call_ajax(data,'get_user_module_access',function(response){
             console.log(response);
-            
+
         })
     }
 // });
