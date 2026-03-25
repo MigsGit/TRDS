@@ -1,4 +1,4 @@
-@php $layout = 'layouts.layout'; @endphp
+@php $layout = 'layouts.super_user_layout'; @endphp
 
 {{-- Here I removed the @auth because the dashboard isn't loading properly --}}
 @extends($layout)

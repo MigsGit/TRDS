@@ -273,8 +273,12 @@ Route::middleware('checkSession')->group(function(){
     // Route::post('/import_user', 'import_user');
 
     Route::controller(TrainingAttendanceController::class)->group(function () {
+        Route::post('/save_attendance', 'save_attendance');
+
+        Route::get('/view_training_attendance_summary', 'view_training_attendance_summary');
         Route::get('/view_training_attendance', 'view_training_attendance');
         Route::get('/view_training_attendance_request', 'view_training_attendance_request');
+
 
     });
 
