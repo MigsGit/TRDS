@@ -43,24 +43,31 @@
                         <p>HR MEMO/Approval </p>
                     </a>
                 </li> --}}
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p> HR Memo/Approval </p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('hr_memo_exam') }}" class="nav-link">
-                                <p> Examinations</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('hr_memo') }}" class="nav-link">
-                                <p> Memo/Approval</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                <?php
+                    $user_access = explode(',', $globalUser->user_modules_id);
+                    $hr_memo_access = in_array(1, $user_access); //HR Memorandum
+                ?>
+                
+                @if ($hr_memo_access)
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p> HR Memo/Approval</p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('hr_memo_exam') }}" class="nav-link">
+                                    <p> Examinations</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('hr_memo') }}" class="nav-link">
+                                    <p> Memo/Approval</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
 
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
@@ -84,10 +91,33 @@
                 </li>
 
                 <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-list-alt"></i>
-                        <p>Theoretical Exam </p>
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cogs"></i>
+                        <p>
+                            Theoretical Exam
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('questionnaire') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Questionnaire</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('examDashboard') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Examination</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Exam Result</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <li class="nav-item has-treeview">

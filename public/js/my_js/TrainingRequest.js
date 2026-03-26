@@ -178,10 +178,14 @@ $(document).ready(function() {
 
     $trainingRequestTable.on('click', '.btnConformTrainingRequest', function () {
         const requestId = $(this).data('id');
+        const ctrlNumber = $(this).data('ctrl');
+        const dept = $(this).data('dept');
+
+        // console.log(dept)
 
         Swal.fire({
             title: 'Are you sure?',
-            text: "You are about to conform this training request?",
+            html: "You are about to conform this training request " + '<b>' + ctrlNumber + '</b> for ' + '<b>' + dept + '</b>?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -229,10 +233,13 @@ $(document).ready(function() {
 
     $trainingRequestTable.on('click', '.btnReceiveTrainingRequest', function () {
         const requestId = $(this).data('id');
+        const ctrlNumber = $(this).data('ctrl');
+        const dept = $(this).data('dept');
 
         Swal.fire({
             title: 'Are you sure?',
-            text: "You are about to receive this training request?",
+            // text: "You are about to receive this training request?",
+            html: "You are about to receive this training request " + '<b>' + ctrlNumber + '</b> for ' + '<b>' + dept + '</b>?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -280,10 +287,13 @@ $(document).ready(function() {
 
     $trainingRequestTable.on('click', '.btnApproveTrainingRequest', function () {
         const requestId = $(this).data('id');
+        const ctrlNumber = $(this).data('ctrl');
+        const dept = $(this).data('dept');
 
         Swal.fire({
             title: 'Are you sure?',
-            text: "You are about to approve this training request?",
+            // text: "You are about to approve this training request?",
+            html: "You are about to approve this training request " + '<b>' + ctrlNumber + '</b> for ' + '<b>' + dept + '</b>?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
