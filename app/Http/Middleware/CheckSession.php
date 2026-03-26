@@ -19,6 +19,8 @@ class CheckSession
     public function handle(Request $request, Closure $next)
     {
         session_start();
+    
+        // dd($_SESSION);
         if(!isset($_SESSION['rapidx_user_id'])){
             return redirect('../');
         }
@@ -28,8 +30,11 @@ class CheckSession
         ->where('rapidx_emp_id', $_SESSION['rapidx_user_id'])
         ->first();
 
+        if ($user) {
+            $user->name = $_SESSION['rapidx_name'];
+        }
+
         // attach new data
-        $user->name = $_SESSION['rapidx_name'];
 
         session(['global_user' => $user]);
         View::share('globalUser', $user);

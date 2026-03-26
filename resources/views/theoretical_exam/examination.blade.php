@@ -1,4 +1,4 @@
-@php $layout = 'layouts.layout'; @endphp
+@php $layout = 'layouts.super_user_layout'; @endphp
 @extends($layout)
 @section('title', 'Start Exam')
 
