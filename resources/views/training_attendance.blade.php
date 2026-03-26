@@ -40,7 +40,7 @@
                                 <div class="card-header">
                                     <h3 class="card-title">Training Attendance Details</h3>
                                 </div>
-                                <div class="card-body bg-light">
+                               <div class="card-body bg-light">
                                     <div class="row align-items-center mb-4">
                                         <div class="col-sm-5 text-center">
                                             <div class="p-3 bg-white shadow-sm rounded">
@@ -51,12 +51,12 @@
                                         <div class="col-sm-7 text-center">
                                             <div class="p-3">
                                                 <h2 class="display-4 font-weight-bold">
-                                                    <span class="modelabel badge badge-primary px-4 py-2" name="modelabel" id="modelabel">Time In</span>
+                                                    <span class="modelabel badge badge-secondary px-4 py-2" name="modelabel" id="modelabel">---</span>
                                                 </h2>
                                             </div>
                                         </div>
                                     </div>
-                                
+
                                     <div class="row mb-5 justify-content-center">
                                         <div class="col-lg-10">
                                             <div class="card shadow-sm border-0">
@@ -64,17 +64,17 @@
                                                     <div class="row align-items-center">
                                                         <div class="col-md-4 text-center border-right">
                                                             <div class="position-relative d-inline-block">
-                                                                <img alt="User Pic" src=".\storage\pmi_pictures\not_found.jpg"
+                                                                {{-- <img alt="User Pic" src=".\storage\pmi_pictures\not_found.jpg"
                                                                     id="employee_image" class="rounded-circle img-thumbnail shadow"
-                                                                    style="width:200px; height:200px; object-fit: cover;">
-                                                                
+                                                                    style="width:200px; height:200px; object-fit: cover;"> --}}
+
                                                                 <div id="text" class="position-absolute w-100" style="bottom: 10px; left: 0;">
-                                                                    <span class="badge badge-danger p-2 shadow">DUPLICATE RECORD</span>
+                                                                    <span class="badge badge-danger p-2 shadow d-none">DUPLICATE RECORD</span>
                                                                 </div>
                                                             </div>
                                                             <input type="hidden" name="emplono" id="emplono">
                                                         </div>
-                                
+
                                                         <div class="col-md-8 pl-md-5">
                                                             <div class="mb-3">
                                                                 <small class="text-uppercase text-muted font-weight-bold">Employee Name</small>
@@ -83,7 +83,7 @@
                                                                     <span style="font-family: 'Arial', sans-serif; font-weight: 700;" name="emploname" id="emploname">---</span>
                                                                 </h2>
                                                             </div>
-                                
+
                                                             <div class="row mt-4">
                                                                 <div class="col-6">
                                                                     <small class="text-uppercase text-muted font-weight-bold">Date Logged</small>
@@ -106,7 +106,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                
+
                                     <div class="card shadow-sm mb-4">
                                         <div class="card-header bg-dark text-white">
                                             <h5 class="mb-0"><i class="fas fa-list mr-2"></i> Recent Attendance Logs</h5>
@@ -126,7 +126,7 @@
                                             </table>
                                         </div>
                                     </div>
-                                
+
                                     <div class="row justify-content-center">
                                         <form method="post" id="trainingAttendanceTimeInOut" class="form-horizontal w-50">
                                             @csrf
@@ -134,10 +134,10 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text bg-primary text-white"><i class="fas fa-barcode"></i></span>
                                                 </div>
-                                                <input type="text" id="txtScanner" name="txtScanner" 
-                                                       class="form-control form-control-lg border-primary" 
-                                                       onkeyup="this.value = this.value.toUpperCase();" 
-                                                       placeholder="Scan ID or Type ID Number..." autofocus>
+                                                <input type="text" id="txtScanner" name="txtScanner"
+                                                    class="form-control form-control-lg border-primary"
+                                                    onkeyup="this.value = this.value.toUpperCase();"
+                                                    placeholder="Scan ID or Type ID Number..." autofocus>
                                             </div>
                                         </form>
                                     </div>
@@ -239,7 +239,7 @@
         TrainingAttendanceSummary : '#tblTrainingAttendanceSummary',
         TrainingAttendanceRequest : '#tblTrainingAttendanceRequest'
     }
-    
+
     dtTrainingAttendanceSummary = $(tbl.TrainingAttendanceSummary).DataTable({
     "processing" : false,
         "serverSide" : true,
@@ -324,13 +324,13 @@
         // Submit attendance via AJAX
         function submitAttendance() {
             const employeeNo = $scanner.val().trim();
-            
+
             if (!employeeNo) {
                 console.warn('Employee number is empty');
                 return;
             }
-            alert('dasd')
-return ;
+
+
             let data = { employeeNo };
             let apiData = $.param(data);
             $.ajax({
@@ -342,14 +342,35 @@ return ;
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function (response) {
+                    let userCollection = response.userCollection
+                    let fullName = response.fullName;
+                    // let now = new Date();
+                    // // Format Date: e.g., Thursday, March 26, 2026
+                    // const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    // // Format Time: e.g., 02:30:05 PM
+                    // const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+                    // const dateString = now.toLocaleDateString('en-US',  response.date ?? dateOptions)
+                    // const timeString = now.toLocaleTimeString('en-US', response.time_out ?? response.time_out ?? timeOptions);
+
+                    $('#emploname').html(fullName);
+                    if(response.trainingAttendanceIsExists === 'true'){
+                        $('#modelabel').html(response.msg).removeClass('badge-success');
+                        $('#modelabel').html(response.msg).addClass('badge-danger');
+                    }else{
+                        $('#modelabel').html(response.timeOrTimeOut).removeClass('badge-danger');
+                        $('#modelabel').html(response.timeOrTimeOut).addClass('badge-success');
+                    }
+
                     dtTrainingAttendance.ajax.url('view_training_attendance?employeeNo='+employeeNo).draw();
                     console.log('Attendance saved:', response);
                     $scanner.val('').focus();
-                    
+
                 },error: function (result) {
                     let errorResponse = result.responseJSON;
                     let status = result.status;
-
+                    dtTrainingAttendance.ajax.url('view_training_attendance?employeeNo=').draw();
+                    $scanner.val('').focus();
+                    $('#modelabel').html(errorResponse.msg).addClass('badge-danger');
                     // console.log(errorResponse);
                     // console.log(errorResponse.msg);
                     // console.log(errorResponse.trainingAttendanceIsExists);
@@ -360,19 +381,51 @@ return ;
                     if( status === 500){
                         toastr.error(errorResponse.msg);
                     }
-                    return;
-                    if( response.status === 409 ){
-                        
-                    }
-                    
-                    if( response.status === 422 ){
-                    
-                    }
-
                 }
             });
+            // call_ajax_serialize(data, {}, 'save_attendance', function (response) {
+            //     console.log('Attendance saved:', response);
+            //     $scanner.val('').focus();
+            //     dtTrainingAttendance.ajax.url('view_training_attendance?employeeNo='+employeeNo).draw(); // uncomment if you need to redraw datatable
+            // });
         }
     });
+
+    // Start the clock immediately
+    runAttendanceClock();
+    // Refresh every 1000ms (1 second)
+    const clockInterval = setInterval(runAttendanceClock, 1000);
+    function runAttendanceClock() {
+        const now = new Date();
+
+        // 1. Full Date for the top card (e.g., Thursday, March 26, 2026)
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const fullDate = now.toLocaleDateString('en-US', dateOptions);
+
+        // 2. Short Date for the "Date Logged" section (YYYY-MM-DD)
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const shortDate = `${year}-${month}-${day}`;
+
+        // 3. Digital Time (12-hour format with AM/PM)
+        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+        const timeString = now.toLocaleTimeString('en-US', timeOptions);
+
+        // Update the DOM elements using your original IDs
+        if (document.getElementById('date')) {
+            // document.getElementById('date').innerText = fullDate;
+            $('#date').html( fullDate);
+        }
+        if (document.getElementById('tapdate')) {
+            $('#tapdate').html( fullDate);
+            // document.getElementById('tapdate').innerText = shortDate;
+        }
+        if (document.getElementById('taptime')) {
+            $('#taptime').html(timeString);
+            // document.getElementById('taptime').innerText = timeString;
+        }
+    }
     </script>
 @endsection
 

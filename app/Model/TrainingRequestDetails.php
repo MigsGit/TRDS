@@ -29,10 +29,10 @@ class TrainingRequestDetails extends Model
         'training_endorsement_date'
     ];
 
-    public function emp_no_system_one_hris_emp_info(){
+    public function rapidx_system_one_hris_emp_info(){
         return $this->hasOne(SystemOneHrisEmpInfo::class, 'EmpNo', 'emp_no');
     }
-    public function emp_no_system_one_subcon_emp_info(){
+    public function rapidx_system_one_subcon_emp_info(){
         return $this->hasOne(SystemOneSubconEmpInfo::class, 'EmpNo', 'emp_no');
     }
 }
