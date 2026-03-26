@@ -10,6 +10,7 @@ use App\Model\TrainingRequest;
 use App\Model\TrainingRequestDetails;
 use App\Model\User;
 use App\RapidXUser;
+use App\Model\RapidXDepartment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -56,6 +57,9 @@ class TrainingRequestController extends Controller
 
         return DataTables()->of($trainingRequests)
         ->addColumn('action', function($trainingRequest) use ($receiverUsers, $tuHeadApproverUser){
+            $trainingRequestDept = RapidXDepartment::where('department_id', $trainingRequest->department_id)->first();
+            $dept = $trainingRequestDept->department_group;
+            // return $dept;
             $result = '';
             $result .= '<center>';
 
@@ -63,15 +67,31 @@ class TrainingRequestController extends Controller
 
             if($trainingRequest->status == 0) {
                 if($trainingRequest->section_head_user && $trainingRequest->section_head_user->id == $_SESSION['rapidx_user_id']){
-                     $result .= '<button class="btn btn-sm btn-success btnConformTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
-                }
+                    $result .= '<button class="btn btn-sm btn-success btnConformTrainingRequest" 
+                        data-id="' . $trainingRequest->id . '" 
+                        data-ctrl="' . $trainingRequest->ctrl_number . '" 
+                        data-dept="' . $dept . '">
+                        <i class="fas fa-check"></i>
+                    </button>';                }
             }else if($trainingRequest->status == 1){
                 if($receiverUsers->contains('rapidx_emp_id', $_SESSION['rapidx_user_id'])){
-                    $result .= '<button class="btn btn-sm btn-success btnReceiveTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
-                }
+                    // $result .= '<button class="btn btn-sm btn-success btnReceiveTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
+                    $result .= '<button class="btn btn-sm btn-success btnReceiveTrainingRequest" 
+                        data-id="' . $trainingRequest->id . '" 
+                        data-ctrl="' . $trainingRequest->ctrl_number . '" 
+                        data-dept="' . $dept . '">
+                        <i class="fas fa-check"></i>
+                    </button>'; 
+                    }
             }else if($trainingRequest->status == 2){
                 if($tuHeadApproverUser){
-                    $result .= '<button class="btn btn-sm btn-success btnApproveTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
+                    // $result .= '<button class="btn btn-sm btn-success btnApproveTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
+                    $result .= '<button class="btn btn-sm btn-success btnApproveTrainingRequest" 
+                        data-id="' . $trainingRequest->id . '" 
+                        data-ctrl="' . $trainingRequest->ctrl_number . '" 
+                        data-dept="' . $dept . '">
+                        <i class="fas fa-check"></i>
+                    </button>'; 
                 }
             }
 
@@ -135,8 +155,13 @@ class TrainingRequestController extends Controller
                 $result .= "<br><small class='text-muted'>$date $time</small>";
             }
             else if ($trainingRequest->status == 1) {
-                $result .= '<span class="badge badge-secondary">Pending</span>';
-                $result .= "<br><small class='text-muted'>$date $time</small>";
+                // if(!$trainingRequest->section_head_date){
+                    $forReceiveDate = date('h:i:s A', strtotime($trainingRequest->section_head_date));
+                    $forReceiveTime = date('h:i:s A', strtotime($trainingRequest->section_head_date));
+                    //  $result .= '<span class="badge badge-secondary">Pending</span>';
+                    $result .= '<span class="badge badge-secondary">Pending</span>';
+                    $result .= "<br><small class='text-muted'>$forReceiveDate $forReceiveTime</small>";
+                // }
             }else if($trainingRequest->status == 2){
                 $receiverName = $trainingRequest->received_by ? RapidXUser::where('id', $trainingRequest->received_by)->first()->name : 'Unknown User';
                 $receivedDate = date('M d, Y', strtotime($trainingRequest->received_date));
@@ -172,8 +197,14 @@ class TrainingRequestController extends Controller
                 $result .= "<br><small class='text-muted'>$date $time</small>";
             }
             else if ($trainingRequest->status == 1) {
+                // $result .= '<span class="badge badge-secondary">Pending</span>';
+                // $result .= "<br><small class='text-muted'>$date $time</small>";
+                $forReceiveDate = date('h:i:s A', strtotime($trainingRequest->section_head_date));
+                $forReceiveTime = date('h:i:s A', strtotime($trainingRequest->section_head_date));
+                //  $result .= '<span class="badge badge-secondary">Pending</span>';
                 $result .= '<span class="badge badge-secondary">Pending</span>';
-                $result .= "<br><small class='text-muted'>$date $time</small>";
+                $result .= "<br><small class='text-muted'>$forReceiveDate $forReceiveTime</small>";
+
             }else if($trainingRequest->status == 2 || $trainingRequest->status == 3){
                 if(!$trainingRequest->tu_head_approver && $trainingRequest->received_by){
                     $receivedDate = date('M d, Y', strtotime($trainingRequest->received_date));
@@ -333,7 +364,7 @@ class TrainingRequestController extends Controller
     public function getUserConformance(Request $request){
         // return 'asd';
         $trainingRequest = User::whereHas('user_access_module', function ($query) {
-            $query->whereIn('user_modules_id', [5,6]); 
+            $query->whereIn('user_modules_id', [3,5,6]); 
         })
         ->with(['users'])
         ->get();

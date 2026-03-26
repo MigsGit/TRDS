@@ -28,16 +28,19 @@ class HrMemoController extends Controller
 
     public function viewHrMemoInfo(Request $request){
         $globalUser = session('global_user');
+        // return $globalUser;
         $user_access = explode(',', $globalUser->user_modules_id);
 
         $hr_memo_details = HrMemo::with(['prepared_by_info', 'noted_by_info', 'email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
 
         return DataTables::of($hr_memo_details)
-        ->addColumn('action', function($hr_memo_details) use ($user_access){
+        ->addColumn('action', function($hr_memo_details) use ($user_access, $globalUser){
             $result = "";
             $result .= "<center>";
 
-            $canApprove  = in_array(9, $user_access);
+            $canApproveHR  = $globalUser->rapidx_emp_id == $hr_memo_details->noted_by || $globalUser->user_level_id == 1; //Noted By Person & SuperAdmin Userlevel only is allowed
+            // $canApproveHR  = in_array(9, $user_access);
+            $canApproveTU  = in_array(2, $user_access) || $globalUser->user_level_id == 1;
 
             $id = $hr_memo_details->id;
 
@@ -61,14 +64,14 @@ class HrMemoController extends Controller
                 $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
                 $result .= $this->actionButton('btn-success btnEnable', 'fas fa-undo', $id);
             }else if($isForHRApproval){
-                if($canApprove){
+                if($canApproveHR){
                     $result .= $this->actionButton('btn-success btnView', 'fas fa-check-square', $id, 'mr-1', 'true');
                 }else{
                     $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
                 }
             }
             else if ($isForTUReceiving){
-                if($canApprove){
+                if($canApproveTU){
                     $result .= $this->actionButton('btn-success btnView', 'fas fa-check-square', $id, 'mr-1', 'true');
                 }else{
                     $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
