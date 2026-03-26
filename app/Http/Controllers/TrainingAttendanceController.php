@@ -15,8 +15,7 @@ use Illuminate\Support\Facades\DB;
 class TrainingAttendanceController extends Controller
 {
     public function save_attendance(TrainingAttendanceRequest $trainingAttendanceRequest){
-    //    $user =  User::with('rapidx_system_one_hris_emp_info','rapidx_system_one_subcon_emp_info')->where('rapidx_emp_no',$request->employeeNo)->first();
-       
+   
        try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
@@ -55,7 +54,7 @@ class TrainingAttendanceController extends Controller
                     $trainingAttendanceRequestValidated['status'] =  'PRESENT'; 
                     $trainingAttendanceRequestValidated['created_at'] = $dateNow; 
                     TrainingAttendance::insert($trainingAttendanceRequestValidated);
-                    
+                    $timeOrTimeOut = 'in';
                 }else{ //Update Time Out
                     // Find the open attendance record for the current user
                     $attendance = TrainingAttendance::where('rapidx_emp_no',$trainingAttendanceRequest->employeeNo)
@@ -68,12 +67,8 @@ class TrainingAttendanceController extends Controller
                     }
 
                     // Perform the 10-minute check
-                    $minTime = Carbon::parse($attendance->clock_in)->addMinutes(10);
-
+                    $minTime = Carbon::parse($attendance->time_in)->addMinutes(10);
                     if ($dateNow->lt($minTime)) {
-                        $secondsLeft = $dateNow->diffInSeconds($minTime);
-                        $minutesLeft = ceil($secondsLeft / 60);
-                        
                         return response()->json([
                             'isSuccess' => 'true',
                             'trainingAttendanceIsExists'=>'true',
@@ -83,6 +78,7 @@ class TrainingAttendanceController extends Controller
                         $trainingAttendanceRequestValidated['time_out'] =  $dateNow->format('H:i:s');
                         $trainingAttendance->where('id',$trainingAttendance->id)
                         ->update($trainingAttendanceRequestValidated);
+                        $timeOrTimeOut = 'out';
                 }
             }else{ //No Record of training request
                 return response()->json([
@@ -94,6 +90,7 @@ class TrainingAttendanceController extends Controller
             DB::commit();
             return response()->json([
                 'isSuccess' => 'true',
+                'timeOrTimeOut' => $timeOrTimeOut ?? '',
                 'trainingAttendanceIsExists'=>'false',
                 'msg' => 'Record Save!',
             ]);
@@ -104,28 +101,35 @@ class TrainingAttendanceController extends Controller
     }
     public function view_training_attendance(Request $request){
         try {
-        return $trainingRequests = TrainingRequest::
-            where('logdel', 0)
-            ->get();
-        return DataTables::of($trainingRequests)
-        ->addColumn('action', function($row){
-            $result = '';
-            $result .= '<center><div class="btn-group">
-                          <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
-                            <i class="fa fa-cog"></i>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-right">';
-                $result .= '<button class="dropdown-item aViewTrainingAttendance" type="button" user-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalViewTrainingAttendanceRequest" data-keyboard="false">View</button>';
-                // $result .= '<button class="dropdown-item aEditModuleAccess" type="button"  rapidx-emp-no= "'.$row->rapidx_emp_no .'"  user-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUserModuleAccess" data-keyboard="false">View</button>';
-                $result .= '</div>
-                        </div></center>';
-            return $result;
+      
+        $trainingRequestDetails =  TrainingAttendance::
+        where('rapidx_emp_no',$request->employeeNo)
+        ->with('rapidx_system_one_hris_emp_info','rapidx_system_one_subcon_emp_info')
+        ->limit(3)->get();
+        
+        return DataTables::of($trainingRequestDetails)
+        ->addColumn('fullname', function($user){
+            if(filled($user->rapidx_system_one_hris_emp_info)){
+                $userHris = $user->rapidx_system_one_hris_emp_info;
+            }
+            else{
+                $userHris = $user->rapidx_system_one_subcon_emp_info;
+            }
+            return $userHris->FirstName.' '.$userHris->LastName;
         })
-        ->addColumn('status', function($row){
-            $result = '';
-            return $result;
+        ->addColumn('position', function($user){
+            if(filled($user->rapidx_system_one_hris_emp_info)){
+                $userHris = $user->rapidx_system_one_hris_emp_info;
+            }
+            else{
+                $userHris = $user->rapidx_system_one_subcon_emp_info;
+            }
+            return $userHris->Position ?? '';
         })
-        ->rawColumns(['action','status'])
+        ->rawColumns([
+            'fullname',
+            'position',
+        ])
         ->make(true);
 
         } catch (Exception $e) {

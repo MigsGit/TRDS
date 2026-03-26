@@ -565,7 +565,7 @@
                 $('#txtAddLastName').val(response['empInfo'][0]['LastName']);
                 $('#txtAddUserPosition').val(response['empInfo'][0]['Position']);
                 $('#txtAddUserSection').val(response['empInfo'][0]['Section']);
-                $('#rapidxEmpId').val(response['rapidxUser']['id']);
+                $('#rapidxEmpId').val(response['rapidxUser']['id']??'');
                 $('#txtAddUserEmail').val(response['rapidxUser']['email']);
 
                 // $username = strtolower(substr($fname, 0, 1).substr($mname, 0,1).$lname);

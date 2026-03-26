@@ -40,104 +40,105 @@
                                 <div class="card-header">
                                     <h3 class="card-title">Training Attendance Details</h3>
                                 </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-sm-5">
-                                            <center>
-                                                <br>
-                                                <br>
-                                                <br>
-                                                <p id="date"></p>
-                                            </center>
+                                <div class="card-body bg-light">
+                                    <div class="row align-items-center mb-4">
+                                        <div class="col-sm-5 text-center">
+                                            <div class="p-3 bg-white shadow-sm rounded">
+                                                <h5 class="text-muted mb-0">Current Date</h5>
+                                                <h2 id="date" class="font-weight-bold text-primary"></h2>
+                                            </div>
                                         </div>
-                                        <div class="col-sm-7">
-                                            <center>
-                                                <p>
-                                                    <h3><label><span class="modelabel" name="modelabel" id="modelabel">Time In</span></label></h3>
-                                                </p>
-                                            </center>
-                                            <br>
-                                            <div class="row">
-                                                <div class="panel panel-default"
-                                                    style="width: 900px; height: 265px; margin: auto ; border: none; right">
-                                                    <div class="panel-body">
-                                                        <div class="col-sm-4" style="text-align: center;">
-                                                            <div class="box">
+                                        <div class="col-sm-7 text-center">
+                                            <div class="p-3">
+                                                <h2 class="display-4 font-weight-bold">
+                                                    <span class="modelabel badge badge-primary px-4 py-2" name="modelabel" id="modelabel">Time In</span>
+                                                </h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                    <div class="row mb-5 justify-content-center">
+                                        <div class="col-lg-10">
+                                            <div class="card shadow-sm border-0">
+                                                <div class="card-body p-4">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-md-4 text-center border-right">
+                                                            <div class="position-relative d-inline-block">
                                                                 <img alt="User Pic" src=".\storage\pmi_pictures\not_found.jpg"
-                                                                    id="employee_image" class="img-circle img-responsive"
-                                                                    style="width:275px;height:235px;">
-                                                                <div class="text" id="text">
-                                                                    <label>
-                                                                        DUPLICATE RECORD
-                                                                    </label>
+                                                                    id="employee_image" class="rounded-circle img-thumbnail shadow"
+                                                                    style="width:200px; height:200px; object-fit: cover;">
+                                                                
+                                                                <div id="text" class="position-absolute w-100" style="bottom: 10px; left: 0;">
+                                                                    <span class="badge badge-danger p-2 shadow">DUPLICATE RECORD</span>
                                                                 </div>
                                                             </div>
                                                             <input type="hidden" name="emplono" id="emplono">
                                                         </div>
-
-                                                        <div class="col-sm-8">
-                                                            <div class="container">
+                                
+                                                        <div class="col-md-8 pl-md-5">
+                                                            <div class="mb-3">
+                                                                <small class="text-uppercase text-muted font-weight-bold">Employee Name</small>
+                                                                <h2 class="mb-0">
+                                                                    <i class="fas fa-user text-primary mr-2"></i>
+                                                                    <span style="font-family: 'Arial', sans-serif; font-weight: 700;" name="emploname" id="emploname">---</span>
+                                                                </h2>
                                                             </div>
-                                                            <ul class="container details">
-                                                                <p>
-                                                                    <h3><span class="glyphicon glyphicon-user one"
-                                                                            style="width:550px;">&nbsp;<b><span
-                                                                                    style="font-family: Arial; font-size: 33px"
-                                                                                    name="emploname"
-                                                                                    id="emploname"></span></b></span></h3>
-                                                                </p>
-                                                                <br>
-                                                                <!-- <p><h3><label>Department&nbsp;&nbsp;<span class="glyphicon glyphicon-briefcase one" style="width:50px;"></span></label></h3><h2><span name="dept" id="dept"></span></h2></p>  -->
-
-                                                                <p>
-                                                                    <h3><span class="glyphicon glyphicon-calendar one"
-                                                                            style="width:550px;">&nbsp;<b><span
-                                                                                    style="font-family: Arial; font-size: 33px"
-                                                                                    name="tapdate" id="tapdate"></span></b></span>
-                                                                    </h3>
-                                                                </p>
-                                                                <br>
-                                                                <p>
-                                                                    <h3><span class="glyphicon glyphicon-time one"
-                                                                            style="width:550px;">&nbsp;<b><span
-                                                                                    style="font-family: Arial; font-size: 33px"
-                                                                                    name="taptime" id="taptime"></span></b></span>
-                                                                    </h3>
-                                                                </p>
-                                                            </ul>
+                                
+                                                            <div class="row mt-4">
+                                                                <div class="col-6">
+                                                                    <small class="text-uppercase text-muted font-weight-bold">Date Logged</small>
+                                                                    <h4>
+                                                                        <i class="fas fa-calendar-alt text-success mr-2"></i>
+                                                                        <span name="tapdate" id="tapdate">---</span>
+                                                                    </h4>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <small class="text-uppercase text-muted font-weight-bold">Time Logged</small>
+                                                                    <h4>
+                                                                        <i class="fas fa-clock text-warning mr-2"></i>
+                                                                        <span name="taptime" id="taptime">---</span>
+                                                                    </h4>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="table-responsive">
-                                        <table id="tblTrainingAttendance" class="table table-bordered table-striped table-hover" style="width: 100%;">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 15%;" class="text-center">Employee Number</th>
-                                                    <th style="width: 10%;" class="text-center">Name</th>
-                                                    <th style="width: 10%;" class="text-center">Position</th>
-                                                    <th style="width: 15%;"  class="text-center">Date</th>
-                                                    <th style="width: 15%;"  class="text-center">Time In</th>
-                                                    <th style="width: 15%;"  class="text-center">Time Out</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
+                                
+                                    <div class="card shadow-sm mb-4">
+                                        <div class="card-header bg-dark text-white">
+                                            <h5 class="mb-0"><i class="fas fa-list mr-2"></i> Recent Attendance Logs</h5>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table id="tblTrainingAttendance" class="table table-hover table-striped mb-0" style="width: 100%;">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th class="text-center">Employee Number</th>
+                                                        <th class="text-center">Name</th>
+                                                        <th class="text-center">Position</th>
+                                                        <th class="text-center">Date</th>
+                                                        <th class="text-center">Time In</th>
+                                                        <th class="text-center">Time Out</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
                                     </div>
-                                    <div class="row">
-                                        @csrf
-                                        <form method="post" id="trainingAttendanceTimeInOut" class="form-horizontal">
-                                            {{-- <meta name="csrf-token" content="{{ csrf_token() }}"> --}}
-                                            {{-- <input type="" name="walkin_id" id="walkin_id" placeholder="walkin_id"> --}}
-                                            <input type="text" id="txtScanner" name="txtScanner"
-                                                onkeyup="this.value = this.value.toUpperCase();" placeholder="txtScanner">
-                                            {{-- <input type="text" class="form-control" id="date" name="date" maxlength="50" required=""
-                                             readonly>
-                                            <input type="text" class="form-control" id="time" name="time" maxlength="50" required=""
-                                             readonly placeholder="time">
-                                            <input type="text" class="form-control" id="status" name="status" maxlength="50" required=""
-                                                value="1" readonly placeholder="status"> --}}
+                                
+                                    <div class="row justify-content-center">
+                                        <form method="post" id="trainingAttendanceTimeInOut" class="form-horizontal w-50">
+                                            @csrf
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text bg-primary text-white"><i class="fas fa-barcode"></i></span>
+                                                </div>
+                                                <input type="text" id="txtScanner" name="txtScanner" 
+                                                       class="form-control form-control-lg border-primary" 
+                                                       onkeyup="this.value = this.value.toUpperCase();" 
+                                                       placeholder="Scan ID or Type ID Number..." autofocus>
+                                            </div>
                                         </form>
                                     </div>
                                 </div>
@@ -238,20 +239,7 @@
         TrainingAttendanceSummary : '#tblTrainingAttendanceSummary',
         TrainingAttendanceRequest : '#tblTrainingAttendanceRequest'
     }
-    // dtTrainingAttendance = $(tbl.TrainingAttendance).DataTable({
-    // "processing" : false,
-    //     "serverSide" : true,
-    //     "ajax" : {
-    //         url: "view_training_attendance",
-    //     },
-    //     "columns":[
-    //         { "data" : "action", orderable:false, searchable:false },
-    //         { "data" : "ctrl_number" },
-    //         { "data" : "date_filed" },
-    //         { "data" : "received_date" },
-    //     ],
-    //     "order": [[ 1, "asc" ]],
-    // });
+    
     dtTrainingAttendanceSummary = $(tbl.TrainingAttendanceSummary).DataTable({
     "processing" : false,
         "serverSide" : true,
@@ -293,57 +281,23 @@
 
 
 
-    //Attendance
-    // $("#txtScanner").keyup(function (e) {
-    //     let employeeNo = $('#txtScanner').val();
-    //     if (e.keyCode == 13) {
-    //         let data = {
-    //             employeeNo : employeeNo
-    //         };
-    //         let serialized_data = {};
-    //         console.log(data);
-           
-          
-    //     }
-    // });
-    // $(document).keypress(function (e) {
-    //     $("#txtScanner").focus();
-    // });
-
-
-    // Replace the existing block with this
-    // Attendance
-    // $(function () {
-    //     // Always handle form submit via AJAX and prevent full page reload
-    //     $('#trainingAttendanceTimeInOut').on('submit', function (e) {
-    //         e.preventDefault();
-    //         let employeeNo = $('#txtScanner').val();
-    //         if (!employeeNo) return;
-    //         let data = { employeeNo: employeeNo };
-    //         let serialized_data = {};
-    //         console.log('Submitting attendance', data);
-    //         call_ajax_serialize(data, serialized_data, 'save_attendance', function (response) {
-    //             console.log(response);
-    //             // optional: clear input and refocus
-    //             $('#txtScanner').val('').focus();
-    //             // dt.draw(); // uncomment if you need to redraw a datatable
-    //         });
-    //     });
-
-    //     // When Enter is pressed in the scanner input, prevent default and trigger the AJAX submit
-    //     $('#txtScanner').on('keydown', function (e) {
-    //         if (e.key === 'Enter' || e.keyCode === 13) {
-    //             e.preventDefault();
-    //             $('#trainingAttendanceTimeInOut').submit();
-    //         }
-    //     });
-
-    //     // keep scanner focused
-    //     $(document).keypress(function () {
-    //         $('#txtScanner').focus();
-    //     });
-    // });
-
+    //========= Attendance
+    dtTrainingAttendance = $(tbl.TrainingAttendance).DataTable({
+    "processing" : false,
+        "serverSide" : true,
+        "ajax" : {
+            url: "view_training_attendance",
+        },
+        "columns":[
+            { "data" : "rapidx_emp_no" },
+            { "data" : "fullname" },
+            { "data" : "position" },
+            { "data" : "date" },
+            { "data" : "time_in" },
+            { "data" : "time_out" },
+        ],
+        "order": [[ 1, "asc" ]],
+    });
     $(function () {
         const $form = $('#trainingAttendanceTimeInOut');
         const $scanner = $('#txtScanner');
@@ -375,13 +329,47 @@
                 console.warn('Employee number is empty');
                 return;
             }
+            alert('dasd')
+return ;
+            let data = { employeeNo };
+            let apiData = $.param(data);
+            $.ajax({
+                type: "POST",
+                url: "save_attendance",
+                data: apiData,
+                dataType: "json",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    dtTrainingAttendance.ajax.url('view_training_attendance?employeeNo='+employeeNo).draw();
+                    console.log('Attendance saved:', response);
+                    $scanner.val('').focus();
+                    
+                },error: function (result) {
+                    let errorResponse = result.responseJSON;
+                    let status = result.status;
 
-            const data = { employeeNo };
-            
-            call_ajax_serialize(data, {}, 'save_attendance', function (response) {
-                console.log('Attendance saved:', response);
-                $scanner.val('').focus();
-                // dt.draw(); // uncomment if you need to redraw datatable
+                    // console.log(errorResponse);
+                    // console.log(errorResponse.msg);
+                    // console.log(errorResponse.trainingAttendanceIsExists);
+                    // console.log(errorResponse.isSuccess);
+                    // console.log(result.status);
+                    // console.log(result.statusText);
+                    // $('#modal-loading').modal('hide');
+                    if( status === 500){
+                        toastr.error(errorResponse.msg);
+                    }
+                    return;
+                    if( response.status === 409 ){
+                        
+                    }
+                    
+                    if( response.status === 422 ){
+                    
+                    }
+
+                }
             });
         }
     });
