@@ -98,8 +98,27 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
 
         },
         error: function (result) {
-            alert('error ajax');
-            $('#modal-loading').modal('hide');
+            let errorResponse = result.responseJSON;
+            let status = result.status;
+
+            // console.log(errorResponse);
+            // console.log(errorResponse.msg);
+            // console.log(errorResponse.trainingAttendanceIsExists);
+            // console.log(errorResponse.isSuccess);
+            // console.log(result.status);
+            // console.log(result.statusText);
+            // $('#modal-loading').modal('hide');
+            if( status === 500){
+                toastr.error(errorResponse.msg);
+            }
+            return;
+            if( response.status === 409 ){
+                
+            }
+            
+            if( response.status === 422 ){
+               
+            }
 
         }
     });

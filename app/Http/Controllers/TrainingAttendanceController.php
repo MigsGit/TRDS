@@ -6,6 +6,7 @@ use App\Model\TrainingAttendance;
 use App\Model\TrainingRequest;
 use App\Model\TrainingRequestDetails;
 use App\Model\User;
+use Carbon\Carbon;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,23 +21,82 @@ class TrainingAttendanceController extends Controller
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
             $trainingRequest =  TrainingRequestDetails::where('emp_no',$trainingAttendanceRequest->employeeNo)->first();
-           
+            
             if(filled($trainingRequest)){
-                $trainingAttendance =  TrainingAttendance::where('rapidx_emp_no',$trainingAttendanceRequest->employeeNo)->first();
-                
                 $dateNow = now();
-                $trainingAttendanceRequest['training_request_details_id'] = $trainingRequest->id;
-                $trainingAttendanceRequest['rapidx_emp_no'] =  $trainingRequest->emp_no;
-                $trainingAttendanceRequest['date'] = $dateNow;
-                $trainingAttendanceRequest['time_in'] =  $dateNow->format('H:i:s');
-                // $trainingAttendanceRequest['time_out'] =  $dateNow->format('H:i:s');
-                $trainingAttendanceRequest['status'] =  'PRESENT'; 
-                return $trainingAttendanceRequest;
-            }else{
 
+                $trainingAttendanceIsExists =  TrainingAttendance::where('rapidx_emp_no',$trainingAttendanceRequest->employeeNo)
+                ->where('date',$dateNow)
+                ->whereNotNull('time_in')
+                ->whereNotNull('time_out')
+                ->first();
+
+                if(filled($trainingAttendanceIsExists)){
+                    return response()->json([
+                        'isSuccess' => 'true',
+                        'trainingAttendanceIsExists'=>'true',
+                        'msg'=> 'Duplicate Record!'
+                    ]);
+                }
+
+                $trainingAttendance =  TrainingAttendance::where('rapidx_emp_no',$trainingAttendanceRequest->employeeNo)
+                ->where('date',$dateNow->format('Y-m-d'))
+                ->first();
+
+                $trainingAttendanceRequestValidated =[];
+                if(blank($trainingAttendance)){ //Save Time In If No Record of Attendance
+                    $trainingAttendance =  TrainingAttendance::where('rapidx_emp_no',$trainingAttendanceRequest->employeeNo)->first();
+                
+                    $dateNow = now();
+                    $trainingAttendanceRequestValidated['training_request_details_id'] = $trainingRequest->id;
+                    $trainingAttendanceRequestValidated['rapidx_emp_no'] =  $trainingRequest->emp_no;
+                    $trainingAttendanceRequestValidated['date'] = $dateNow;
+                    $trainingAttendanceRequestValidated['time_in'] =  $dateNow->format('H:i:s');
+                    $trainingAttendanceRequestValidated['status'] =  'PRESENT'; 
+                    $trainingAttendanceRequestValidated['created_at'] = $dateNow; 
+                    TrainingAttendance::insert($trainingAttendanceRequestValidated);
+                    
+                }else{ //Update Time Out
+                    // Find the open attendance record for the current user
+                    $attendance = TrainingAttendance::where('rapidx_emp_no',$trainingAttendanceRequest->employeeNo)
+                    ->whereNull('time_out')
+                    ->latest()
+                    ->first();
+
+                    if (!$attendance) {
+                        return back()->with('error', 'No active clock-in found.');
+                    }
+
+                    // Perform the 10-minute check
+                    $minTime = Carbon::parse($attendance->clock_in)->addMinutes(10);
+
+                    if ($dateNow->lt($minTime)) {
+                        $secondsLeft = $dateNow->diffInSeconds($minTime);
+                        $minutesLeft = ceil($secondsLeft / 60);
+                        
+                        return response()->json([
+                            'isSuccess' => 'true',
+                            'trainingAttendanceIsExists'=>'true',
+                            'msg'=> 'Duplicate Record!'
+                        ]);
+                    }
+                        $trainingAttendanceRequestValidated['time_out'] =  $dateNow->format('H:i:s');
+                        $trainingAttendance->where('id',$trainingAttendance->id)
+                        ->update($trainingAttendanceRequestValidated);
+                }
+            }else{ //No Record of training request
+                return response()->json([
+                    'isSuccess' => 'false',
+                    'trainingAttendanceIsExists'=>'false',
+                    'msg' => 'Error: Please register the user to the training request!',
+                ],500);
             }
             DB::commit();
-            return response()->json(['is_success' => 'true']);
+            return response()->json([
+                'isSuccess' => 'true',
+                'trainingAttendanceIsExists'=>'false',
+                'msg' => 'Record Save!',
+            ]);
         } catch (Exception $e) {
             DB::rollback();
             throw $e;
