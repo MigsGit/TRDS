@@ -8,7 +8,7 @@
             class="brand-image img-circle elevation-3"
             style="opacity: .8">
 
-        <span class="brand-text font-weight-light font-size"><h5>System Title</h5></span>
+        <span class="brand-text font-weight-light font-size"><h5>TRDSv2</h5></span>
     </a> <!-- System title and logo -->
 
     <!-- Sidebar -->
