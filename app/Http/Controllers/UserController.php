@@ -25,7 +25,6 @@ use QrCode;
 
 class UserController extends Controller
 {
-
     public function save_user_module_access(UserAccessModuleRequest $userAccessModuleRequest){
         try {
             date_default_timezone_set('Asia/Manila');
@@ -62,7 +61,7 @@ class UserController extends Controller
             ->addColumn('label1', function($user){
                 $result = "";
 
-                if(blank($user->deleted_at)){
+                if($user->status === 1){
                     $result .= '<span class="badge badge-pill badge-success">Active</span>';
                 }
                 else{
@@ -79,8 +78,6 @@ class UserController extends Controller
                 }
                 else{
                     $userHris = $user->rapidx_system_one_subcon_emp_info;
-
-                    $result .= '<span class="badge badge-pill badge-danger">Inactive</span>';
                 }
                 return $userHris->FirstName.' '.$userHris->LastName;
                 return $result;

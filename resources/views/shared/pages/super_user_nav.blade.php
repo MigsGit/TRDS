@@ -8,7 +8,7 @@
             class="brand-image img-circle elevation-3"
             style="opacity: .8">
 
-        <span class="brand-text font-weight-light font-size"><h5>TRDSv2 </h5></span>
+        <span class="brand-text font-weight-light font-size"><h5>TRDSv2</h5></span>
     </a> <!-- System title and logo -->
 
     <!-- Sidebar -->
@@ -74,26 +74,13 @@
                         <i class="nav-icon fas fa-users"></i>
                         <p> Training Request/Approval  </p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
                     </a>
-
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ route('training_request') }}" class="nav-link">
                                 <p> Training Request</p>
                             </a>
                         </li>
-                        {{-- <p>{{ $globalUser }}</p> --}}
-                        {{-- <li class="nav-item">
-                            <a href="{{ route('training_request_conformance') }}" class="nav-link">
-                                <p> Traning Conformance</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('training_request_approval') }}" class="nav-link">
-                                <p> Traning Approval</p>
-                            </a>
-                        </li> --}}
                     </ul>
-
                 </li>
 
                 <li class="nav-item has-treeview">

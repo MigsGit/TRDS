@@ -22,16 +22,21 @@ class CreateTrainingAttendancesTable extends Migration
             Scan Emp No - automatic date to/end
             Training Hours - automatic get from start & end
 
+            Read userid, rapidx emp  ,Save user id, 
             */
             $table->id();
             $table->foreignId('training_request_details_id')
                 ->nullable()
                 ->constrained('training_request_details')
                 ->cascadeOnDelete();
-            $table->string('status')->nullable()->comment='PRESENT/ABSENT/DONE';
-            $table->string('section')->comment = 'CN/TS/YF/PPS';
-            $table->int('training_hours')->nullable();
-            $table->int('remarks')->nullable();
+            $table->string('rapidx_emp_no');
+            $table->time('date')->nullable();
+            $table->time('time_in')->nullable();
+            $table->time('time_out')->nullable();
+            $table->string('status')->nullable()->comment='PRESENT/ABSENT';
+            // $table->string('section')->comment = 'CN/TS/YF/PPS';
+            // $table->int('training_hours')->nullable();
+            $table->string('remarks')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
