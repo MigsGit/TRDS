@@ -36,7 +36,7 @@
                             </li>
                         </ul>
                         <div class="tab-content mt-4" id="myTabContent">
-                            <div class="tab-pane fade show active" id="menu1" role="tabpanel" aria-labelledby="menu1-tab">
+                            <div class="tab-pane fade" id="menu1" role="tabpanel" aria-labelledby="menu1-tab">
                                 <div class="card-header">
                                     <h3 class="card-title">Training Attendance Details</h3>
                                 </div>
@@ -143,7 +143,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="menu2" role="tabpanel" aria-labelledby="menu2-tab">
+                            <div class="tab-pane fade show active" id="menu2" role="tabpanel" aria-labelledby="menu2-tab">
                                 <div class="card card-dark">
                                     <div class="card-header">
                                         <h3 class="card-title">Training Attendance Summary</h3>
@@ -192,28 +192,111 @@
                             <input type="text" class="form-control" name="trainingAttendanceCtrlNo" id="trainingAttendanceCtrlNo" readonly>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                          <label>From</label>
-                            <input type="date" class="form-control" name="trainingAttendanceCtrlNo" id="trainingAttendanceCtrlNo">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                              <label>From</label>
+                                <input type="date" class="form-control" name="fromDate" id="fromDate">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                              <label>To</label>
+                                <input type="date" class="form-control" name="toDate" id="toDate">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                              <label>Present Count</label>
+                                <input type="number" class="form-control" id="presentCount">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label>Absent Count</label>
+                                <input type="number" class="form-control" id="absentCount">
+                              </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                          <label>To</label>
-                            <input type="date" class="form-control" name="trainingAttendanceCtrlNo" id="trainingAttendanceCtrlNo">
-                        </div>
-                    </div>
+                  
                     <table class="table table-sm table-bordered" id="tblTrainingAttendanceRequest" style="width: 100%;">
                         <thead>
                             <tr>
-                                <th>Action</th>
+                                <th>Status</th>
                                 <th>Employee No</th>
                                 <th>Name</th>
-                                <th>Date From</th>
-                                <th>Date To</th>
+                                <th>Date</th>
                                 <th>Training Hours</th>
                                 <th>Reason/Remarks of Absence</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" id="btnSubmitTrainingAttendance" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="modalViewTrainingAttendanceRequest" data-backdrop="static">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> Training Attendance Details</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                          <label>Ctrl No</label>
+                            <input type="text" class="form-control" name="trainingAttendanceCtrlNo" id="trainingAttendanceCtrlNo" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                              <label>From</label>
+                                <input type="date" class="form-control" name="fromDate" id="fromDate">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                              <label>To</label>
+                                <input type="date" class="form-control" name="toDate" id="toDate">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                              <label>Present Count</label>
+                                <input type="number" class="form-control" id="presentCount">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label>Absent Count</label>
+                                <input type="number" class="form-control" id="absentCount">
+                              </div>
+                        </div>
+                    </div>
+                  
+                    <table class="table table-sm table-bordered" id="tblTrainingAttendanceRequest" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Employee No</th>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Training Hours</th>
+                                <th>Reason/Remarks of Absence</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -259,26 +342,44 @@
     "processing" : false,
         "serverSide" : true,
         "ajax" : {
-            url: "view_training_attendance_request",
+            url: "view_training_attendance_request_details",
             // data: function (param){
             //     param.trainingRequestsId = '';
             // },
         },
         "columns":[
-            { "data" : "action", orderable:false, searchable:false },
-            { "data" : "emp_no" },
-            { "data" : "name" },
-            { "data" : "training_endorsement_date" },//date from
-            { "data" : "training_endorsement_date" },//date to
-            { "data" : "training_endorsement_date" }, //hours time in out
-            { "data" : "training_endorsement_date" }, //remarks
+            { "data" : "status"},
+            { "data" : "rapidx_emp_no" },
+            { "data" : "fullname" },
+            { "data" : "date","defaultContent": "NO RECORD!"},//date to
+            { "data" : "training_hours","defaultContent": "" }, //hours time in out
+            { "data" : "remarks" ,"defaultContent": ""}, //remarks
+            { "data" : "action"}, //remarks
         ],
+        "drawCallback": function(settings) {
+            var api = this.api();
+            
+            var totalPresent = api.rows().data().filter(function(row) {
+                return row.status === "PRESENT";
+            }).length;
+
+            $('#presentCount').val(totalPresent);
+        },
         "order": [[ 1, "asc" ]],
     });
-    $(tbl.TrainingAttendanceSummary).on('click','#checkBulkUserModule','tr', function () {
-
+    $(tbl.TrainingAttendanceSummary).on('click','.aViewTrainingAttendance','tr', function () {
+        trainingAttendanceRequest = $(this).attr('training-requests-id');
     });
-
+    $('#fromDate').change(function (e) { 
+        e.preventDefault();
+        fromDate = $(this).val();
+        dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingAttendanceRequest} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
+    });
+    $('#toDate').change(function (e) { 
+        e.preventDefault();
+        toDate = $(this).val();
+        dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingAttendanceRequest} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
+    });
 
 
     //========= Attendance

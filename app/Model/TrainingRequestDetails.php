@@ -4,6 +4,7 @@ namespace App\Model;
 
 use App\Model\SystemOneHrisEmpInfo;
 use App\Model\SystemOneSubconEmpInfo;
+use App\Model\TrainingAttendance;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -34,5 +35,8 @@ class TrainingRequestDetails extends Model
     }
     public function rapidx_system_one_subcon_emp_info(){
         return $this->hasOne(SystemOneSubconEmpInfo::class, 'EmpNo', 'emp_no');
+    }
+    public function training_attendance(){
+        return $this->hasMany(TrainingAttendance::class, 'training_request_details_id', 'id');
     }
 }
