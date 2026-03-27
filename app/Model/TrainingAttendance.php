@@ -26,4 +26,7 @@ class TrainingAttendance extends Model
     public function rapidx_system_one_subcon_emp_info(){
         return $this->hasOne(SystemOneSubconEmpInfo::class, 'EmpNo', 'rapidx_emp_no');
     }
+    public function training_request_details(){
+        return $this->hasMany(TrainingRequestDetails::class, 'id', 'training_request_details_id');
+    }
 }

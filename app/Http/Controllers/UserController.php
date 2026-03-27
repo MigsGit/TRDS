@@ -58,6 +58,7 @@ class UserController extends Controller
                 ->get();
 
         return DataTables::of($users)
+            
             ->addColumn('label1', function($user){
                 $result = "";
 

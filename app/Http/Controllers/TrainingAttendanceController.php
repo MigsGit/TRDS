@@ -7,6 +7,7 @@ use App\Model\TrainingRequest;
 use App\Model\TrainingRequestDetails;
 use App\Model\User;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -114,37 +115,36 @@ class TrainingAttendanceController extends Controller
     }
     public function view_training_attendance(Request $request){
         try {
+            
+            $trainingRequestDetails =  TrainingAttendance::
+            where('rapidx_emp_no',$request->employeeNo)
+            ->with('rapidx_system_one_hris_emp_info','rapidx_system_one_subcon_emp_info')
+            ->limit(3)->get();
 
-        $trainingRequestDetails =  TrainingAttendance::
-        where('rapidx_emp_no',$request->employeeNo)
-        ->with('rapidx_system_one_hris_emp_info','rapidx_system_one_subcon_emp_info')
-        ->limit(3)->get();
-
-        return DataTables::of($trainingRequestDetails)
-        ->addColumn('fullname', function($user){
-            if(filled($user->rapidx_system_one_hris_emp_info)){
-                $userHris = $user->rapidx_system_one_hris_emp_info;
-            }
-            else{
-                $userHris = $user->rapidx_system_one_subcon_emp_info;
-            }
-            return $userHris->FirstName.' '.$userHris->LastName;
-        })
-        ->addColumn('position', function($user){
-            if(filled($user->rapidx_system_one_hris_emp_info)){
-                $userHris = $user->rapidx_system_one_hris_emp_info;
-            }
-            else{
-                $userHris = $user->rapidx_system_one_subcon_emp_info;
-            }
-            return $userHris->Position ?? '';
-        })
-        ->rawColumns([
-            'fullname',
-            'position',
-        ])
-        ->make(true);
-
+            return DataTables::of($trainingRequestDetails)
+            ->addColumn('fullname', function($user){
+                if(filled($user->rapidx_system_one_hris_emp_info)){
+                    $userHris = $user->rapidx_system_one_hris_emp_info;
+                }
+                else{
+                    $userHris = $user->rapidx_system_one_subcon_emp_info;
+                }
+                return $userHris->FirstName.' '.$userHris->LastName;
+            })
+            ->addColumn('position', function($user){
+                if(filled($user->rapidx_system_one_hris_emp_info)){
+                    $userHris = $user->rapidx_system_one_hris_emp_info;
+                }
+                else{
+                    $userHris = $user->rapidx_system_one_subcon_emp_info;
+                }
+                return $userHris->Position ?? '';
+            })
+            ->rawColumns([
+                'fullname',
+                'position',
+            ])
+            ->make(true);
         } catch (Exception $e) {
             throw $e;
         }
@@ -162,7 +162,7 @@ class TrainingAttendanceController extends Controller
                             <i class="fa fa-cog"></i>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">';
-                $result .= '<button class="dropdown-item aViewTrainingAttendance" type="button" user-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalViewTrainingAttendanceRequest" data-keyboard="false">View</button>';
+                $result .= '<button class="dropdown-item aViewTrainingAttendance" type="button" training-requests-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalViewTrainingAttendanceRequest" data-keyboard="false">View</button>';
                 // $result .= '<button class="dropdown-item aEditModuleAccess" type="button"  rapidx-emp-no= "'.$row->rapidx_emp_no .'"  user-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUserModuleAccess" data-keyboard="false">View</button>';
                 $result .= '</div>
                         </div></center>';
@@ -179,39 +179,82 @@ class TrainingAttendanceController extends Controller
             throw $e;
         }
     }
-    public function view_training_attendance_request(Request $request){
+    public function view_training_attendance_request_details(Request $request){
         try {
-        /*
-            emp_no
-            id
-            training_request_id
-         */
-        $trainingRequests = TrainingRequestDetails::with('rapidx_system_one_hris_emp_info',
-        'rapidx_system_one_subcon_emp_info')
-        // where('training_request_id',$request->trainingRequestsId)
+        $trainingRequests = TrainingAttendance::
+        where('training_request_details_id',$request->trainingAttendanceRequest)
+       ->whereBetween('date',[$request->fromDate,$request->toDate])
+        ->with(
+            'rapidx_system_one_hris_emp_info',
+            'rapidx_system_one_subcon_emp_info',
+            'training_request_details',
+        )
         ->get();
         return DataTables::of($trainingRequests)
+        ->addColumn('fullname', function($row){
+            if(filled($row->rapidx_system_one_hris_emp_info)){
+                $userHris = $row->rapidx_system_one_hris_emp_info;
+            }
+            else{
+                $userHris = $row->rapidx_system_one_subcon_emp_info;
+            }
+            return $userHris->FirstName.' '.$userHris->LastName;
+        })
+        ->addColumn('training_hours', function($row){
+            if(blank($row->time_out)){
+                return 'NO TIME OUT RECORD!';
+            }
+            $in = Carbon::parse($row->time_in);
+            $out = Carbon::parse($row->time_out);
+
+            // 1. Get Total Minutes (Best for precise payroll)
+            $totalMinutes = $out->diffInMinutes($in);
+
+            // 2. Get Hours as a Decimal (e.g., 8.5 hours)
+            $decimalHours = number_format($totalMinutes / 60, 2);
+
+            // 3. Get Human Readable (e.g., "8 hours 30 minutes")
+            return $duration = $in->diff($out)->format('%H hours %I minutes');
+        })
+        ->addColumn('training_hours', function($row){
+            if(blank($row->time_out)){
+                return'<span class="badge badge-pill badge-danger">NO TIME OUT RECORD!</span>';
+            }
+            $in = Carbon::parse($row->time_in);
+            $out = Carbon::parse($row->time_out);
+
+            // 1. Get Total Minutes (Best for precise payroll)
+            $totalMinutes = $out->diffInMinutes($in);
+
+            // 2. Get Hours as a Decimal (e.g., 8.5 hours)
+            $decimalHours = number_format($totalMinutes / 60, 2);
+
+            // 3. Get Human Readable (e.g., "8 hours 30 minutes")
+            return $duration = $in->diff($out)->format('%H hours %I minutes');
+        })
         ->addColumn('action', function($row){
-            return $result = '';
-            $result .= '<center><div class="btn-group">
-                          <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
-                            <i class="fa fa-cog"></i>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-right">';
-                $result .= '<button class="dropdown-item aViewTrainingAttendanceRequest" type="button" training-request-details-id="' . $row->id . '"  training-request-id="' . $row->training_request_id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#" data-keyboard="false">View</button>';
-                $result .= '</div>
-                        </div></center>';
+            $result = '<center><div class="btn-group">
+                      <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
+                        <i class="fa fa-cog"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-right">';
+            $result .= '<button class="dropdown-item aEditAttendance" type="button" attendance-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalTrainingAttendance" data-keyboard="false">Edit</button>';
+            // $result .= '<button class="dropdown-item aEditModuleAccess" type="button"  rapidx-emp-no= "'.$user->rapidx_emp_no .'"  user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUserModuleAccess" data-keyboard="false">Edit Module</button>';
+            $result .= '</div>
+                    </div></center>';
             return $result;
         })
-        ->addColumn('status', function($row){
-            $result = '';
-            return $result;
-        })
-        ->rawColumns(['action','status'])
+        ->rawColumns([
+            'status',
+            'training_hours',
+            'fullname',
+            'action',
+        ])
         ->make(true);
 
         } catch (Exception $e) {
             throw $e;
         }
     }
+    
 }
