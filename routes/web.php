@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('checkSession')->group(function(){
 
     Route::get('/', function () {
-        return view('blank');
-    })->name('blank');
+        return view('index');
+    })->name('index');
 
     Route::get('/training_attendance', function () {
         return view('training_attendance');
@@ -273,13 +273,14 @@ Route::middleware('checkSession')->group(function(){
     // Route::post('/import_user', 'import_user');
 
     Route::controller(TrainingAttendanceController::class)->group(function () {
-        Route::post('/save_attendance', 'save_attendance');
 
         Route::get('/view_training_attendance_summary', 'view_training_attendance_summary');
         Route::get('/view_training_attendance', 'view_training_attendance');
         Route::get('/view_training_attendance_request_details', 'view_training_attendance_request_details');
+    });
 
-
+    Route::get('/refresh-session', function () {
+        return response()->json(['status' => 'refreshed', 'token' => csrf_token()]);
     });
 
 });
