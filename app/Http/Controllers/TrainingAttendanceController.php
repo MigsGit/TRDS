@@ -162,7 +162,7 @@ class TrainingAttendanceController extends Controller
                             <i class="fa fa-cog"></i>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">';
-                $result .= '<button class="dropdown-item aViewTrainingAttendance" type="button" training-requests-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalViewTrainingAttendanceRequest" data-keyboard="false">View</button>';
+                $result .= '<button class="dropdown-item aViewTrainingAttendance" type="button" training-requests-id="' . $row->id . '"  ctrl-no="'.$row->ctrl_number.'"  style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalViewTrainingAttendanceRequest" data-keyboard="false">View</button>';
                 // $result .= '<button class="dropdown-item aEditModuleAccess" type="button"  rapidx-emp-no= "'.$row->rapidx_emp_no .'"  user-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUserModuleAccess" data-keyboard="false">View</button>';
                 $result .= '</div>
                         </div></center>';
@@ -250,8 +250,7 @@ class TrainingAttendanceController extends Controller
                     ];
                 });
             })->sortBy([
-                ['date', 'asc'],
-                ['name', 'asc'],
+                ['date', 'desc'],
             ]);
             // Calculate the total absent count from the generated rows
             $absentCount = $allRows->where('status', 'ABSENT')->count();

@@ -27,143 +27,25 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12">
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active .menuTab" id="Pending-tab" data-toggle="tab" href="#menu1" role="tab" aria-controls="menu1" aria-selected="true">Attendance</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link .menuTab" id="Completed-tab" data-toggle="tab" href="#menu2" role="tab" aria-controls="menu2" aria-selected="false">Summary</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content mt-4" id="myTabContent">
-                            <div class="tab-pane fade" id="menu1" role="tabpanel" aria-labelledby="menu1-tab">
-                                <div class="card-header">
-                                    <h3 class="card-title">Training Attendance Details</h3>
-                                </div>
-                               <div class="card-body bg-light">
-                                    <div class="row align-items-center mb-4">
-                                        <div class="col-sm-5 text-center">
-                                            <div class="p-3 bg-white shadow-sm rounded">
-                                                <h5 class="text-muted mb-0">Current Date</h5>
-                                                <h2 id="date" class="font-weight-bold text-primary"></h2>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-7 text-center">
-                                            <div class="p-3">
-                                                <h2 class="display-4 font-weight-bold">
-                                                    <span class="modelabel badge badge-secondary px-4 py-2" name="modelabel" id="modelabel">---</span>
-                                                </h2>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row mb-5 justify-content-center">
-                                        <div class="col-lg-10">
-                                            <div class="card shadow-sm border-0">
-                                                <div class="card-body p-4">
-                                                    <div class="row align-items-center">
-                                                        <div class="col-md-4 text-center border-right">
-                                                            <div class="position-relative d-inline-block">
-                                                                {{-- <img alt="User Pic" src=".\storage\pmi_pictures\not_found.jpg"
-                                                                    id="employee_image" class="rounded-circle img-thumbnail shadow"
-                                                                    style="width:200px; height:200px; object-fit: cover;"> --}}
-
-                                                                <div id="text" class="position-absolute w-100" style="bottom: 10px; left: 0;">
-                                                                    <span class="badge badge-danger p-2 shadow d-none">DUPLICATE RECORD</span>
-                                                                </div>
-                                                            </div>
-                                                            <input type="hidden" name="emplono" id="emplono">
-                                                        </div>
-
-                                                        <div class="col-md-8 pl-md-5">
-                                                            <div class="mb-3">
-                                                                <small class="text-uppercase text-muted font-weight-bold">Employee Name</small>
-                                                                <h2 class="mb-0">
-                                                                    <i class="fas fa-user text-primary mr-2"></i>
-                                                                    <span style="font-family: 'Arial', sans-serif; font-weight: 700;" name="emploname" id="emploname">---</span>
-                                                                </h2>
-                                                            </div>
-
-                                                            <div class="row mt-4">
-                                                                <div class="col-6">
-                                                                    <small class="text-uppercase text-muted font-weight-bold">Date Logged</small>
-                                                                    <h4>
-                                                                        <i class="fas fa-calendar-alt text-success mr-2"></i>
-                                                                        <span name="tapdate" id="tapdate">---</span>
-                                                                    </h4>
-                                                                </div>
-                                                                <div class="col-6">
-                                                                    <small class="text-uppercase text-muted font-weight-bold">Time Logged</small>
-                                                                    <h4>
-                                                                        <i class="fas fa-clock text-warning mr-2"></i>
-                                                                        <span name="taptime" id="taptime">---</span>
-                                                                    </h4>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="card shadow-sm mb-4">
-                                        <div class="card-header bg-dark text-white">
-                                            <h5 class="mb-0"><i class="fas fa-list mr-2"></i> Recent Attendance Logs</h5>
-                                        </div>
-                                        <div class="table-responsive">
-                                            <table id="tblTrainingAttendance" class="table table-hover table-striped mb-0" style="width: 100%;">
-                                                <thead class="thead-light">
-                                                    <tr>
-                                                        <th class="text-center">Employee Number</th>
-                                                        <th class="text-center">Name</th>
-                                                        <th class="text-center">Position</th>
-                                                        <th class="text-center">Date</th>
-                                                        <th class="text-center">Time In</th>
-                                                        <th class="text-center">Time Out</th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <div class="row justify-content-center">
-                                        <form method="post" id="trainingAttendanceTimeInOut" class="form-horizontal w-50">
-                                            @csrf
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text bg-primary text-white"><i class="fas fa-barcode"></i></span>
-                                                </div>
-                                                <input type="text" id="txtScanner" name="txtScanner"
-                                                    class="form-control form-control-lg border-primary"
-                                                    onkeyup="this.value = this.value.toUpperCase();"
-                                                    placeholder="Scan ID or Type ID Number..." autofocus>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+                           
+                        <div class="card card-dark">
+                            <div class="card-header">
+                                <h3 class="card-title">Training Attendance Summary</h3>
                             </div>
-                            <div class="tab-pane fade show active" id="menu2" role="tabpanel" aria-labelledby="menu2-tab">
-                                <div class="card card-dark">
-                                    <div class="card-header">
-                                        <h3 class="card-title">Training Attendance Summary</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="float-sm-right  mb-3">
-                                        </div>
-                                        <div class="table-responsive">
-                                            <table id="tblTrainingAttendanceSummary" class="table table-bordered table-striped table-hover" style="width: 100%;">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="width: 10%;">Action</th>
-                                                        <th style="width: 15%;" class="text-center">Ctrl No. / Doc No.</th>
-                                                        <th style="width: 10%;" class="text-center">Date From</th>
-                                                        <th style="width: 15%;"  class="text-center">Date To</th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                        </div>
-                                    </div>
+                            <div class="card-body">
+                                <div class="float-sm-right  mb-3">
+                                </div>
+                                <div class="table-responsive">
+                                    <table id="tblTrainingAttendanceSummary" class="table table-bordered table-striped table-hover" style="width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 10%;">Action</th>
+                                                <th style="width: 15%;" class="text-center">Ctrl No. / Doc No.</th>
+                                                <th style="width: 10%;" class="text-center">Date From</th>
+                                                <th style="width: 15%;"  class="text-center">Date To</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -208,13 +90,13 @@
                         <div class="col-sm-3">
                             <div class="form-group">
                               <label>Present Count</label>
-                                <input type="number" class="form-control" id="presentCount">
+                                <input type="number" class="form-control" id="presentCount" readonly>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label>Absent Count</label>
-                                <input type="number" class="form-control" id="absentCount">
+                                <input type="number" class="form-control" id="absentCount" readonly>
                               </div>
                         </div>
                     </div>
@@ -234,10 +116,6 @@
                         <tbody>
                         </tbody>
                     </table>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" id="btnSubmitTrainingAttendance" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -313,6 +191,8 @@
     
     $(tbl.TrainingAttendanceSummary).on('click','.aViewTrainingAttendance','tr', function () {
         trainingAttendanceRequest = $(this).attr('training-requests-id');
+        let ctrlNo = $(this).attr('ctrl-no');
+        $('#trainingAttendanceCtrlNo').val(ctrlNo);
     });
 
     $('#fromDate, #toDate').on('change', function() {
