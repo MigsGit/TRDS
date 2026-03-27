@@ -271,7 +271,7 @@
     });
 
     dtViewTrainingAttendanceRequest = $(tbl.TrainingAttendanceRequest).DataTable({
-    "processing" : false,
+        "processing" : false,
         "serverSide" : true,
         "ajax" : {
             url: "view_training_attendance_request_details",
@@ -279,38 +279,49 @@
             //     param.trainingRequestsId = '';
             // },
         },
-        "columns":[
-            { "data" : "status"},
-            { "data" : "rapidx_emp_no" },
-            { "data" : "fullname" },
-            { "data" : "date","defaultContent": "NO RECORD!"},//date to
-            { "data" : "training_hours","defaultContent": "" }, //hours time in out
-            { "data" : "remarks" ,"defaultContent": ""}, //remarks
-            { "data" : "action"}, //remarks
+        columns: [
+             { 
+                data: "status",
+                render: function(data) {
+                    let badge = data === 'PRESENT' ? 'badge-success' : 'badge-danger';
+                    return `<span class="badge badge-pill ${badge}">${data}</span>`;
+                }
+            },
+            { data: "emp_no" },
+            { data: "name" },
+            { data: "date" },
+            { data: "training_hours",
+                render: function(data) {
+                    let badge = data === 'NO RECORD' ? 'badge-danger' : 'badge-success';
+                    return `<span class="badge badge-pill ${badge}">${data}</span>`;
+                }
+            },
+            { data: "remarks" },
+            { data: "action" },
+           
         ],
+        // Update your input fields whenever the table is drawn
         "drawCallback": function(settings) {
-            var api = this.api();
-            
-            var totalPresent = api.rows().data().filter(function(row) {
-                return row.status === "PRESENT";
-            }).length;
-
-            $('#presentCount').val(totalPresent);
+            var json = settings.json; // This contains the 'with' data from Laravel
+            if (json) {
+                $('#presentCount').val(json.totalPresent);
+                $('#absentCount').val(json.totalAbsent);
+            }
         },
         "order": [[ 1, "asc" ]],
     });
+    
     $(tbl.TrainingAttendanceSummary).on('click','.aViewTrainingAttendance','tr', function () {
         trainingAttendanceRequest = $(this).attr('training-requests-id');
     });
-    $('#fromDate').change(function (e) { 
-        e.preventDefault();
-        fromDate = $(this).val();
-        dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingAttendanceRequest} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
-    });
-    $('#toDate').change(function (e) { 
-        e.preventDefault();
-        toDate = $(this).val();
-        dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingAttendanceRequest} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
+
+    $('#fromDate, #toDate').on('change', function() {
+        // Only draw if all three fields have values to avoid empty loops
+        if($('#fromDate').val() && $('#toDate').val()) {
+            let fromDate = $('#fromDate').val(); 
+            let toDate = $('#toDate').val()
+            dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingAttendanceRequest} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
+        }
     });
 
 

@@ -181,77 +181,87 @@ class TrainingAttendanceController extends Controller
     }
     public function view_training_attendance_request_details(Request $request){
         try {
-        $trainingRequests = TrainingAttendance::
-        where('training_request_details_id',$request->trainingAttendanceRequest)
-       ->whereBetween('date',[$request->fromDate,$request->toDate])
-        ->with(
-            'rapidx_system_one_hris_emp_info',
-            'rapidx_system_one_subcon_emp_info',
-            'training_request_details',
-        )
-        ->get();
-        return DataTables::of($trainingRequests)
-        ->addColumn('fullname', function($row){
-            if(filled($row->rapidx_system_one_hris_emp_info)){
-                $userHris = $row->rapidx_system_one_hris_emp_info;
+            $fromDate = $request->fromDate;
+            $toDate = $request->toDate;
+            $trainingId = $request->trainingAttendanceRequest;
+            if ( blank($fromDate) || blank($toDate) || blank($trainingId) ) {
+                return datatables()->of(collect([]))
+                    ->with([
+                        'totalAbsent' => 0,
+                        'totalPresent' => 0
+                    ])
+                    ->make(true);
             }
-            else{
-                $userHris = $row->rapidx_system_one_subcon_emp_info;
-            }
-            return $userHris->FirstName.' '.$userHris->LastName;
-        })
-        ->addColumn('training_hours', function($row){
-            if(blank($row->time_out)){
-                return 'NO TIME OUT RECORD!';
-            }
-            $in = Carbon::parse($row->time_in);
-            $out = Carbon::parse($row->time_out);
+                // Get the "Expected" list of employees
+            $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
+                ->with(['training_attendance']) 
+                ->get();
 
-            // 1. Get Total Minutes (Best for precise payroll)
-            $totalMinutes = $out->diffInMinutes($in);
+            //Create the date range
+            $period = CarbonPeriod::create($fromDate, $toDate);
 
-            // 2. Get Hours as a Decimal (e.g., 8.5 hours)
-            $decimalHours = number_format($totalMinutes / 60, 2);
+            //Generate all rows (Employees x Days)
+            $allRows = collect($period)->flatMap(function ($date) use ($employees) {
+                $currentDate = $date->toDateString();
 
-            // 3. Get Human Readable (e.g., "8 hours 30 minutes")
-            return $duration = $in->diff($out)->format('%H hours %I minutes');
-        })
-        ->addColumn('training_hours', function($row){
-            if(blank($row->time_out)){
-                return'<span class="badge badge-pill badge-danger">NO TIME OUT RECORD!</span>';
-            }
-            $in = Carbon::parse($row->time_in);
-            $out = Carbon::parse($row->time_out);
+                return $employees->map(function ($emp) use ($currentDate) {
+                    // Find specific attendance for this employee on this day
+                    // We use optional() or collect() to prevent "contains on null" errors
+                    $attendance = collect($emp->training_attendance)->first(function ($item) use ($currentDate) {
+                        return Carbon::parse($item->date)->toDateString() == $currentDate;
+                    });
+                
+                    $time_in =$attendance->time_in ?? '';
+                    $time_out =$attendance->time_out ?? '';
+                    $attendanceId =$attendance->id ?? '';
+                    $duration = 'NO RECORD';
+                    if($time_in !='' && $time_out !=''){
+                        $in = Carbon::parse($attendance->time_in);
+                        $out = Carbon::parse($attendance->time_out);
+                    
+        
+                        //Get Total Minutes (Best for precise payroll)
+                        $totalMinutes = $out->diffInMinutes($in);
+            
+                        //Get Hours as a Decimal (e.g., 8.5 hours)
+                        $decimalHours = number_format($totalMinutes / 60, 2);
+            
+                        //Get Human Readable (e.g., "8 hours 30 minutes")
+                        $duration = $in->diff($out)->format('%H hours %I minutes');
+                    }
 
-            // 1. Get Total Minutes (Best for precise payroll)
-            $totalMinutes = $out->diffInMinutes($in);
 
-            // 2. Get Hours as a Decimal (e.g., 8.5 hours)
-            $decimalHours = number_format($totalMinutes / 60, 2);
-
-            // 3. Get Human Readable (e.g., "8 hours 30 minutes")
-            return $duration = $in->diff($out)->format('%H hours %I minutes');
-        })
-        ->addColumn('action', function($row){
-            $result = '<center><div class="btn-group">
-                      <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
-                        <i class="fa fa-cog"></i>
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-right">';
-            $result .= '<button class="dropdown-item aEditAttendance" type="button" attendance-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalTrainingAttendance" data-keyboard="false">Edit</button>';
-            // $result .= '<button class="dropdown-item aEditModuleAccess" type="button"  rapidx-emp-no= "'.$user->rapidx_emp_no .'"  user-id="' . $user->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUserModuleAccess" data-keyboard="false">Edit Module</button>';
-            $result .= '</div>
-                    </div></center>';
-            return $result;
-        })
-        ->rawColumns([
-            'status',
-            'training_hours',
-            'fullname',
-            'action',
-        ])
-        ->make(true);
-
+                    $button = '<center><div class="btn-group">
+                                <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
+                                <i class="fa fa-cog"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">';
+                    $button .= '<button class="dropdown-item aEditAttendance" type="button" attendance-id="' . $attendanceId . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalTrainingAttendance" data-keyboard="false">Edit</button>';
+                    $button .= '</div>
+                            </div></center>';
+                    return [
+                        'emp_no'   => $emp->emp_no,
+                        'name'     => $emp->name,
+                        'date'     => $currentDate,
+                        'training_hours'     => $duration,
+                        'status'   => $attendance ? 'PRESENT' : 'ABSENT',
+                        'action'   => $button,
+                        'remarks'   => $attendance->remarks ?? '',
+                    ];
+                });
+            })->sortBy([
+                ['date', 'asc'],
+                ['name', 'asc'],
+            ]);
+            // Calculate the total absent count from the generated rows
+            $absentCount = $allRows->where('status', 'ABSENT')->count();
+            $presentCount = $allRows->where('status', 'PRESENT')->count();
+            return datatables()->of($allRows)
+            ->with([
+                'totalAbsent' => $absentCount,
+                'totalPresent' => $presentCount
+            ])
+            ->make(true);
         } catch (Exception $e) {
             throw $e;
         }
