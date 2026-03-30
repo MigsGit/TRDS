@@ -115,7 +115,7 @@ class TrainingAttendanceController extends Controller
     }
     public function view_training_attendance(Request $request){
         try {
-            
+
             $trainingRequestDetails =  TrainingAttendance::
             where('rapidx_emp_no',$request->employeeNo)
             ->with('rapidx_system_one_hris_emp_info','rapidx_system_one_subcon_emp_info')
@@ -194,7 +194,7 @@ class TrainingAttendanceController extends Controller
             }
                 // Get the "Expected" list of employees
             $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
-                ->with(['training_attendance']) 
+                ->with(['training_attendance'])
                 ->get();
 
             //Create the date range
@@ -210,7 +210,7 @@ class TrainingAttendanceController extends Controller
                     $attendance = collect($emp->training_attendance)->first(function ($item) use ($currentDate) {
                         return Carbon::parse($item->date)->toDateString() == $currentDate;
                     });
-                
+
                     $time_in =$attendance->time_in ?? '';
                     $time_out =$attendance->time_out ?? '';
                     $attendanceId =$attendance->id ?? '';
@@ -218,19 +218,17 @@ class TrainingAttendanceController extends Controller
                     if($time_in !='' && $time_out !=''){
                         $in = Carbon::parse($attendance->time_in);
                         $out = Carbon::parse($attendance->time_out);
-                    
-        
+
+
                         //Get Total Minutes (Best for precise payroll)
                         $totalMinutes = $out->diffInMinutes($in);
-            
+
                         //Get Hours as a Decimal (e.g., 8.5 hours)
                         $decimalHours = number_format($totalMinutes / 60, 2);
-            
+
                         //Get Human Readable (e.g., "8 hours 30 minutes")
                         $duration = $in->diff($out)->format('%H hours %I minutes');
                     }
-
-
                     $button = '<center><div class="btn-group">
                                 <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
                                 <i class="fa fa-cog"></i>
@@ -244,6 +242,8 @@ class TrainingAttendanceController extends Controller
                         'name'     => $emp->name,
                         'date'     => $currentDate,
                         'training_hours'     => $duration,
+                        'time_in'     => $attendance->time_in ?? NULL,
+                        'time_out'     => $attendance->time_out ?? NULL,
                         'status'   => $attendance ? 'PRESENT' : 'ABSENT',
                         'action'   => $button,
                         'remarks'   => $attendance->remarks ?? '',
@@ -265,5 +265,17 @@ class TrainingAttendanceController extends Controller
             throw $e;
         }
     }
-    
+
+    public function get_training_attendance_by_id(Request $request){
+        try {
+           $trainingAttendance = TrainingAttendance::where('id',$request->getTrainingAttendanceById)->first();
+            return response()->json([
+                'isSuccess' => 'true',
+                'trainingAttendance' => $trainingAttendance,
+        ]);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
 }

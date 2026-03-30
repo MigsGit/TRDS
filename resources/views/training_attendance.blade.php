@@ -27,7 +27,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12">
-                           
+
                         <div class="card card-dark">
                             <div class="card-header">
                                 <h3 class="card-title">Training Attendance Summary</h3>
@@ -58,6 +58,7 @@
     <!-- /.content-wrapper -->
 
     <!-- MODALS -->
+
     <div class="modal fade" id="modalViewTrainingAttendanceRequest" data-backdrop="static">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -70,26 +71,26 @@
                 <div class="modal-body">
                     <div class="col-sm-12">
                         <div class="form-group">
-                          <label>Ctrl No</label>
+                            <label>Ctrl No</label>
                             <input type="text" class="form-control" name="trainingAttendanceCtrlNo" id="trainingAttendanceCtrlNo" readonly>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-3">
                             <div class="form-group">
-                              <label>From</label>
-                                <input type="date" class="form-control" name="fromDate" id="fromDate">
+                                <label>From</label>
+                                <input type="date" class="form-control" name="fromDate" id="fromDate" value="<?php echo date('Y-m-d'); ?>">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                              <label>To</label>
-                                <input type="date" class="form-control" name="toDate" id="toDate">
+                                <label>To</label>
+                                <input type="date" class="form-control" name="toDate" id="toDate" value="<?php echo date('Y-m-d'); ?>">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                              <label>Present Count</label>
+                                <label>Present Count</label>
                                 <input type="number" class="form-control" id="presentCount" readonly>
                             </div>
                         </div>
@@ -97,10 +98,10 @@
                             <div class="form-group">
                                 <label>Absent Count</label>
                                 <input type="number" class="form-control" id="absentCount" readonly>
-                              </div>
+                                </div>
                         </div>
                     </div>
-                  
+
                     <table class="table table-sm table-bordered" id="tblTrainingAttendanceRequest" style="width: 100%;">
                         <thead>
                             <tr>
@@ -108,6 +109,8 @@
                                 <th>Employee No</th>
                                 <th>Name</th>
                                 <th>Date</th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
                                 <th>Training Hours</th>
                                 <th>Reason/Remarks of Absence</th>
                                 <th>Action</th>
@@ -122,7 +125,63 @@
         </div>
         <!-- /.modal-dialog -->
     </div>
-    <!-- /.modal -->
+
+    <div class="modal fade" id="modalEditTrainingAttendance">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa fa-user-plus"></i> Edit Training Attendance</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" id="formEditTrainingAttendance">
+                @csrf
+                <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <input type="number" class="form-control" name="training_request_details_id" id="trainingRequestDetailsId" readonly>
+                            <input type="text" class="form-control" name="rapidx_emp_no" id="rapidxEmpNo" readonly>
+                            <input type="number" class="form-control" name="training_attendances_id" id="trainingAttendancesId" readonly>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Date</label>
+                                    <input type="text" class="form-control" name="date" id="date" readonly>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Time In</label>
+                                    <input type="time" class="form-control" name="time_in" id="timeIn">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Timeout</label>
+                                    <input type="time" class="form-control" name="time_out" id="timeOut">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Remarks</label>
+                            <input type="text read-only" class="form-control" name="remarks" id="remarks">
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" id="btnAddUser" class="btn btn-dark"><i id="iBtnAddUserIcon" class="fa fa-check"></i> Save</button>
+                </div>
+            </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    </div>
+
 @endsection
 
 @section('js_content')
@@ -132,6 +191,9 @@
         TrainingAttendanceSummary : '#tblTrainingAttendanceSummary',
         TrainingAttendanceRequest : '#tblTrainingAttendanceRequest'
     }
+  
+
+    
 
     dtTrainingAttendanceSummary = $(tbl.TrainingAttendanceSummary).DataTable({
     "processing" : false,
@@ -158,7 +220,7 @@
             // },
         },
         columns: [
-             { 
+             {
                 data: "status",
                 render: function(data) {
                     let badge = data === 'PRESENT' ? 'badge-success' : 'badge-danger';
@@ -168,6 +230,8 @@
             { data: "emp_no" },
             { data: "name" },
             { data: "date" },
+            { data: "time_in", defaultContent: `<span class="badge badge-pill bg-danger">NO TIME IN</span>` },
+            { data: "time_out", defaultContent: `<span class="badge badge-pill bg-danger">NO TIME OUT</span>` },
             { data: "training_hours",
                 render: function(data) {
                     let badge = data === 'NO RECORD' ? 'badge-danger' : 'badge-success';
@@ -176,7 +240,7 @@
             },
             { data: "remarks" },
             { data: "action" },
-           
+
         ],
         // Update your input fields whenever the table is drawn
         "drawCallback": function(settings) {
@@ -188,22 +252,56 @@
         },
         "order": [[ 1, "asc" ]],
     });
-    
+
     $(tbl.TrainingAttendanceSummary).on('click','.aViewTrainingAttendance','tr', function () {
-        trainingAttendanceRequest = $(this).attr('training-requests-id');
+        trainingRequestDetailsId = $(this).attr('training-requests-id');
         let ctrlNo = $(this).attr('ctrl-no');
         $('#trainingAttendanceCtrlNo').val(ctrlNo);
+        let fromDate = $('#fromDate').val();
+        let toDate = $('#toDate').val()
+        dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
+    });
+    $(tbl.TrainingAttendanceRequest).on('click','.aEditAttendance','tr', function () {
+        let trainingAttendancesId = $(this).attr('attendance-id');
+        let row = $(this).closest('tr'); // Get the parent row
+        let employeeNo = row.find('td:eq(1)').text()
+        let date = row.find('td:eq(3)').text();
+
+     
+        $('#trainingRequestDetailsId').val(trainingRequestDetailsId);
+        $('#date').val(date);
+        $('#rapidxEmpNo').val(employeeNo);
+        $('#trainingAttendancesId').val(trainingAttendancesId);
+      
+
+        let data = {
+            'getTrainingAttendanceById' : trainingAttendancesId
+        }
+        call_ajax(data,'get_training_attendance_by_id',function(response){
+            let data = response.trainingAttendance;
+            if( data === null ){
+                $('#timeIn').val( '');
+                $('#timeOut').val('');
+                $('#timeOut').val('');
+                return;
+            }
+            $('#timeIn').val(data.time_in);
+            $('#timeOut').val(data.time_out);
+            $('#remarks').val(data.remarks);
+        })
+
+        $('#modalEditTrainingAttendance').modal();
     });
 
     $('#fromDate, #toDate').on('change', function() {
         // Only draw if all three fields have values to avoid empty loops
         if($('#fromDate').val() && $('#toDate').val()) {
-            let fromDate = $('#fromDate').val(); 
+            let fromDate = $('#fromDate').val();
             let toDate = $('#toDate').val()
-            dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingAttendanceRequest} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
+            dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
         }
     });
-
+   
 
     //========= Attendance
     dtTrainingAttendance = $(tbl.TrainingAttendance).DataTable({

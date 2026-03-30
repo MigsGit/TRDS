@@ -278,8 +278,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/view_training_attendance_summary', 'view_training_attendance_summary');
         Route::get('/view_training_attendance', 'view_training_attendance');
         Route::get('/view_training_attendance_request_details', 'view_training_attendance_request_details');
-
-
+        Route::get('/get_training_attendance_by_id', 'get_training_attendance_by_id');
     });
 
 });
