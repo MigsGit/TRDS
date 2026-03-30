@@ -140,7 +140,7 @@
                 <div class="modal-body">
                 <div class="row">
                     <div class="col-sm-12">
-                        <div class="form-group">
+                        <div class="form-group d-none">
                             <input type="number" class="form-control" name="training_request_details_id" id="trainingRequestDetailsId" readonly>
                             <input type="text" class="form-control" name="rapidx_emp_no" id="rapidxEmpNo" readonly>
                             <input type="number" class="form-control" name="training_attendances_id" id="trainingAttendancesId" readonly>
@@ -155,13 +155,13 @@
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>Time In</label>
-                                    <input type="time" class="form-control" name="time_in" id="timeIn">
+                                    <input type="time" class="form-control" name="time_in" id="timeIn" step="any">
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>Timeout</label>
-                                    <input type="time" class="form-control" name="time_out" id="timeOut">
+                                    <input type="time" class="form-control" name="time_out" id="timeOut" step="any">
                                 </div>
                             </div>
                         </div>
@@ -174,7 +174,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" id="btnAddUser" class="btn btn-dark"><i id="iBtnAddUserIcon" class="fa fa-check"></i> Save</button>
+                <button type="submit" id="btnAddUser" class="btn btn-dark"><i id="iBtnAddUserIcon" class="fa fa-check"></i> Save</button>
                 </div>
             </form>
             </div>
@@ -192,8 +192,6 @@
         TrainingAttendanceRequest : '#tblTrainingAttendanceRequest'
     }
   
-
-    
 
     dtTrainingAttendanceSummary = $(tbl.TrainingAttendanceSummary).DataTable({
     "processing" : false,
@@ -296,12 +294,24 @@
     $('#fromDate, #toDate').on('change', function() {
         // Only draw if all three fields have values to avoid empty loops
         if($('#fromDate').val() && $('#toDate').val()) {
-            let fromDate = $('#fromDate').val();
-            let toDate = $('#toDate').val()
+            let  fromDate = $('#fromDate').val();
+            let toDate = $('#toDate').val();
             dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
         }
     });
-   
+
+    $('#formEditTrainingAttendance').submit(function (e) { 
+        e.preventDefault();
+        let data = {
+        }
+        let serialized_data = $(this).serialize()
+        call_ajax_serialize(data,serialized_data,'save_training_attendance',function(response){
+            let fromDate = $('#fromDate').val();
+            let toDate = $('#toDate').val()
+            $('#modalEditTrainingAttendance').modal('hide');
+            dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
+        })
+    });
 
     //========= Attendance
     dtTrainingAttendance = $(tbl.TrainingAttendance).DataTable({

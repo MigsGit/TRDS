@@ -37,6 +37,6 @@ class TrainingRequestDetails extends Model
         return $this->hasOne(SystemOneSubconEmpInfo::class, 'EmpNo', 'emp_no');
     }
     public function training_attendance(){
-        return $this->hasMany(TrainingAttendance::class, 'training_request_details_id', 'id');
+        return $this->hasMany(TrainingAttendance::class, 'rapidx_emp_no', 'emp_no');
     }
 }

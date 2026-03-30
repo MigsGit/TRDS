@@ -101,7 +101,7 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
             let errorResponse = result.responseJSON;
             let status = result.status;
 
-            // console.log(errorResponse);
+            console.log('errorResponse',errorResponse);
             // console.log(errorResponse.msg);
             // console.log(errorResponse.trainingAttendanceIsExists);
             // console.log(errorResponse.isSuccess);
@@ -109,15 +109,15 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
             // console.log(result.statusText);
             // $('#modal-loading').modal('hide');
             if( status === 500){
-                toastr.error(errorResponse.msg);
+                toastr.error(errorResponse.msg ?? '');
+                toastr.error(errorResponse.message ?? '');
             }
-            return;
-            if( response.status === 409 ){
+            if( result.status === 409 ){
                 
             }
             
-            if( response.status === 422 ){
-               
+            if( result.status === 422 ){
+                toastr.error(errorResponse.message);
             }
 
         }
