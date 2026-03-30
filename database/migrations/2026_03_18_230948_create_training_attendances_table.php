@@ -24,8 +24,6 @@ class CreateTrainingAttendancesTable extends Migration
             $table->time('time_in');
             $table->time('time_out')->nullable();
             $table->string('status')->nullable()->default('PRESENT')->comment='PRESENT/ABSENT';
-            // $table->string('section')->comment = 'CN/TS/YF/PPS';
-            // $table->int('training_hours')->nullable();
             $table->string('remarks')->nullable();
             $table->softDeletes();
             $table->timestamps();
