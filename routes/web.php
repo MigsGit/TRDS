@@ -274,6 +274,7 @@ Route::middleware('checkSession')->group(function(){
 
     Route::controller(TrainingAttendanceController::class)->group(function () {
         Route::post('/save_attendance', 'save_attendance');
+        Route::post('/save_training_attendance', 'save_training_attendance');
 
         Route::get('/view_training_attendance_summary', 'view_training_attendance_summary');
         Route::get('/view_training_attendance', 'view_training_attendance');

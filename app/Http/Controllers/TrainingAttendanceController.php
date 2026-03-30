@@ -277,5 +277,32 @@ class TrainingAttendanceController extends Controller
             throw $e;
         }
     }
+    public function save_training_attendance(TrainingAttendanceRequest $trainingAttendanceRequest){
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $trainingAttendanceRequestValidated =[];
+            $trainingAttendanceRequestValidated['time_in'] =  $trainingAttendanceRequest->time_in;
+            $trainingAttendanceRequestValidated['time_out'] =  $trainingAttendanceRequest->time_out;
+            $trainingAttendanceRequestValidated['remarks'] =  $trainingAttendanceRequest->remarks;
+            // return $trainingAttendanceRequestValidated;
+            if( filled($trainingAttendanceRequest['training_attendances_id']) ){
+                TrainingAttendance::where('id',$trainingAttendanceRequest->training_attendances_id)
+                ->update($trainingAttendanceRequestValidated);
+            }else{
+                $trainingAttendanceRequestValidated['date'] =  $trainingAttendanceRequest->date;
+                $trainingAttendanceRequestValidated['rapidx_emp_no'] =  $trainingAttendanceRequest->rapidx_emp_no;
+                $trainingAttendanceRequestValidated['training_request_details_id'] =  $trainingAttendanceRequest->training_request_details_id;
+                $trainingAttendanceRequestValidated['status'] =  'PRESENT';
+                // return $trainingAttendanceRequestValidated;
+                TrainingAttendance::insert($trainingAttendanceRequestValidated);
+            }
+            DB::commit();
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
 
 }

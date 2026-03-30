@@ -24,7 +24,16 @@ class TrainingAttendanceRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'rapidx_emp_no'  => 'required',
+            'training_request_details_id'  => 'required',
+            'time_in'  => 'required',
+            'time_out' => 'nullable|after:time_in',
+        ];
+    }
+    public function messages()
+    {
+        return [
+            'time_out.after' => 'The Time Out must be later than the Time In.',
         ];
     }
 }
