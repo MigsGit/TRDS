@@ -15,8 +15,8 @@ class CreateExamResultDetailsTable extends Migration
     {
         Schema::create('exam_result_details', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('exam_result_id')->comment ='exam_results ID';
-            $table->unsignedBigInteger('questionnaire_id')->nullable()->comment ='questionnaires ID';
+            $table->unsignedBigInteger('exam_result_id')->comment = 'exam_results ID';
+            $table->unsignedBigInteger('questionnaire_id')->comment = 'questionnaires ID';
             $table->unsignedBigInteger('questionnaire_revision_no')->nullable()->comment ='questionnaires revision no';
             $table->json('questionnaire')->nullable();
             $table->json('questionnaire_details')->nullable();
@@ -30,6 +30,9 @@ class CreateExamResultDetailsTable extends Migration
             $table->unsignedTinyInteger('status')->default(0)->comment = '0-active, 1-deactivate';
             $table->unsignedTinyInteger('logdel')->default(0)->comment = '0-Show, 1-Hide';
             $table->timestamps();
+
+            $table->foreign('exam_result_id')->references('id')->on('exam_results');
+            $table->foreign('questionnaire_id')->references('id')->on('questionnaires');
         });
     }
 
