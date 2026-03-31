@@ -350,7 +350,8 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
 
                         $(this).find("input[name='choices[]']").val(choiceValue);
 
-                        if(choiceValue === answer){
+                        let answerArr = typeof answer === 'string' ? answer.split(',') : [];
+                        if(answerArr.includes(choiceValue)){
                             $(this)
                                 .find('.chkAnswer')
                                 .prop('checked', true)
