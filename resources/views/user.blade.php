@@ -291,6 +291,7 @@
       <!-- /.modal-content -->
     </div>
   </div>
+
   <div class="modal fade" id="modalAddUserModuleAccess">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -738,6 +739,8 @@
             dtUserModuleAccess.ajax.url('view_user_module_access?users_id='+'').draw();
         });
     });
+
+    
   </script>
   @endsection
 {{-- @endauth --}}
