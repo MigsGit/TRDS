@@ -122,10 +122,10 @@
                                     <div class="form-group">
                                         <label class="font-weight-bold">Category: </label>
                                         <select class="form-control" name="questionnaire_category" id="slctQuestionnaireCategory" required>
-                                            <option value="" selected disabled>-- Select Category --</option>
-                                            <option value="0">Newly Hired</option>
-                                            <option value="1">Certification</option>
-                                            <option value="2">Re-Certification</option>
+                                            {{-- <option value="" selected disabled>-- Select Category --</option> --}}
+                                            <option selected value="0">Newly Hired</option>
+                                            {{-- <option value="1">Certification</option>
+                                            <option value="2">Re-Certification</option> --}}
                                         </select>
                                     </div>
 
@@ -580,10 +580,15 @@
                     }              
                 }
             });
-    
+
             $('#slctQuestionnaireCategoryType').change(function (e) { 
                 e.preventDefault();
                 let typeOfQuestion = $(this).val()
+
+                $('#singleMultipleAnswer').empty();
+                $('#identificationEssay').empty();
+                $('#multipleGrid').empty();
+
                 html = ''
                 switch (typeOfQuestion) {
                     case '0':

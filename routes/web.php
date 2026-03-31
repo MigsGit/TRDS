@@ -5,6 +5,7 @@ use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
 use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\ExaminationController;
+use App\Http\Controllers\ExaminationResultController;
 use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
@@ -61,6 +62,10 @@ Route::middleware('checkSession')->group(function(){
         return view('theoretical_exam/questionnaire');
     })->name('questionnaire');
 
+    Route::get('/examination_result', function () {
+        return view('theoretical_exam/examination_result');
+    })->name('examination_result');
+
 
     // QUESTIONNAIRES CONTROLLER
     // Route::get('/view_questionnaire', 'QuestionnairesController@viewQuestionnaire');
@@ -89,13 +94,26 @@ Route::middleware('checkSession')->group(function(){
         Route::post('create_update_questionnaire_details', 'createUpdateQuestionnaireDetails');
         Route::get('get_questionnaire_details_by_id', 'getQuestionnaireDetailsById');
     });
-
+    
     Route::controller(ExaminationController::class)->group(function () {
         Route::get('exam', 'examDashboard')->name('examDashboard');
         Route::get('exam/startExam/{id}/{revision}', 'startExam')->name('startExam');
-
+        
         Route::get('get_exam_training_request_control_no', 'getExamTrainingRequestControlNo')->name('get_exam_training_request_control_no');
         Route::get('get_exam_training_request_employee_no', 'getExamTrainingRequestEmployeeNo')->name('get_exam_training_request_employee_no');
+        Route::get('count_exam_training_request_examination_take', 'countExamTrainingRequestExaminationTake')->name('count_exam_training_request_examination_take');
+
+        Route::post('exam_submission', 'examSubmission');
+        Route::get('get_exam_training_request_details_by_id_revision', 'getExamTrainingRequestDetailsByIdRevision');
+    });
+    
+    Route::controller(ExaminationResultController::class)->group(function () {
+        Route::get('view_exam_result', 'viewExamResult');
+        Route::get('view_exam_result_details', 'viewExamResultDetails');
+        Route::get('get_employee_exam_result_by_id', 'getEmployeeExamResultById');
+        Route::post('update_exam_score_for_employee', 'updateExamScoreForEmployee');
+
+        Route::get('/view_pdf/{id}', 'viewPdf');
     });
 
     // Route::get('/training_request', function () {
