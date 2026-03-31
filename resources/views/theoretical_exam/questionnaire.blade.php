@@ -273,7 +273,7 @@
                 <form method="post" id="formCreateUpdateQuestionnaireDetails" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
-                        <input type="hidden" name="questionnaire_details_pkid" id="txtCreateUpdateQuestionnaireDetailsPkid">
+                        <input type="text" name="questionnaire_details_pkid" id="txtCreateUpdateQuestionnaireDetailsPkid">
                         <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsFkid">
                         <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsRevision">
                         <div class="container-fluid">
@@ -647,7 +647,7 @@
                         html += '    </select>'
                         html += '</div>'
                         html += '<div class="col-md-12 mb-3">'
-                        html += '   <input type="text" class="form-control d-none" name="identification[]" id="txtIdentification" placeholder="Answer for identification" disabled>'
+                        html += '   <input type="text" class="form-control d-none" name="identification[]" id="txtIdentification" placeholder="Answer for identification" style="text-transform: uppercase;" disabled>'
                         html += '</div>'
     
                         $('#identificationEssay').append(html);
@@ -828,7 +828,7 @@
     
                 $('#txtCreateUpdateQuestionnaireDetailsPkid').val(questionnaireDetailsId);
                 $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireDetailRevision);
-    
+
                 GetQuestionnaireDetailsById(questionnaireDetailsId,questionnaireDetailRevision)
             });
     
