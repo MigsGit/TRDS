@@ -117,7 +117,7 @@
                                         <strong>
                                             {{ $question->exam_no }}.
                                             @if($question->category_type == 2)
-                                                {{ $question->question_text ?? 'Grid Question' }}
+                                                {{ $question['description'] ?? '' }}
                                             @else
                                                 {{ $items[0]['question'] ?? '' }}
                                             @endif

@@ -40,7 +40,7 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
 
             questions.forEach(q => {
                 const items = Array.isArray(q.answer_choices_question) ? q.answer_choices_question : [];
-                let questionText = q.category_type === 2 ? (q.question_text || 'Grid Question') : (items[0]?.question || 'No question text');
+                let questionText = q.category_type === 2 ? (q.description || 'No description text') : (items[0]?.question || 'No question text');
 
                 let html = `<div class="card mb-3"><div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start">

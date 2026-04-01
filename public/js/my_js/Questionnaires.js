@@ -231,7 +231,7 @@ const CreateUpdateQuestionnaireDetails = () => {
         successCallback: function(response){
 
             if(response['result'] == 1){
-                alert('Questionnaire Details already exists!');
+                alert('File name is already exists!');
             }else if(response['hasError'] == 1){
                 alert('Saving failed!');
             }else{

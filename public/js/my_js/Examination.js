@@ -182,8 +182,9 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo) => {
 
         successCallback: function(response){
             console.log('qwe:', response);
-            if(response.length > 0){
-                $('#txtExamTrainingRequestExaminationTake').val(response);
+            let count = response;
+            if(count > 0){
+                $('#txtExamTrainingRequestExaminationTake').val(count);
             }
         },
 
@@ -475,17 +476,37 @@ const ExamSubmission = () => {
                     alert('Saving failed!');
                 }else{
                     $('#btnSubmitExam').prop('disabled', true).text('Submitted');
-                    console.log('Exam Result Submitted:', response);
-                    toastr.success('Saved!');
+                    let tist = employeeExamResult.summary
+                    console.log('Exam Result Submitted:', tist);
 
-                    const protocol = window.location.protocol;
-                    const hostname = window.location.hostname; 
-                    const pathname = window.location.pathname;
-                    const firstSegment = pathname.split('/').filter(Boolean)[0];
-                    const secondSegment = pathname.split('/').filter(Boolean)[1];
-                    const newUrl = `${protocol}//${hostname}/${firstSegment}/${secondSegment}/`;
+                   // SweetAlert popup
+                    Swal.fire({
+                        title: '📝 Employee Exam Result',
+                        confirmButtonColor: '#172838',
+                        html: `
+                            <p><strong>Total Score:</strong> ${tist.total_score}</p>
+                            <p><strong>Total Points:</strong> ${tist.total_points}</p>
+                            <p><strong>Percentage:</strong> ${tist.percentage}%</p>
+                            <p><strong>Passing Score:</strong> ${tist.passing_score}</p>
+                            <p><strong>Result:</strong> ${tist.result}</p>
+                        `,
+                        icon: tist.result === 'Passed' ? 'success' : 'error',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Build the redirect URL
+                            const protocol = window.location.protocol;
+                            const hostname = window.location.hostname; 
+                            const pathname = window.location.pathname;
+                            const segments = pathname.split('/').filter(Boolean);
+                            const firstSegment = segments[0] || '';
+                            const secondSegment = segments[1] || '';
+                            const newUrl = `${protocol}//${hostname}/${firstSegment}/${secondSegment}/`;
 
-                    window.location.href = newUrl;
+                            // Redirect after OK click
+                            window.location.href = newUrl;
+                        }
+                    });
                 }
             },
 
