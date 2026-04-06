@@ -47,7 +47,7 @@
                     $user_access = explode(',', $globalUser->user_modules_id);
                     $hr_memo_access = in_array(1, $user_access); //HR Memorandum
                 ?>
-                
+
                 @if ($hr_memo_access)
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
@@ -82,14 +82,14 @@
                         </li>
                     </ul>
                 </li>
-
-                <li class="nav-item has-treeview">
-                    <a href="{{ route('training_attendance') }}"  class="nav-link">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>Training Attendance </p>
-                    </a>
-                </li>
-
+                @if ( in_array(7,explode(',', $globalUser->user_modules_id)) )
+                    <li class="nav-item has-treeview">
+                        <a href="{{ route('training_attendance') }}"  class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p> @php echo $globalUser->user_modules_id @endphp Training Attendance  </p>
+                        </a>
+                    </li>
+                @endif
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
                         <i class="fas fa-cogs"></i>
