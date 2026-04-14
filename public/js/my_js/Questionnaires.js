@@ -231,7 +231,7 @@ const CreateUpdateQuestionnaireDetails = () => {
         successCallback: function(response){
 
             if(response['result'] == 1){
-                alert('Questionnaire Details already exists!');
+                alert('File name is already exists!');
             }else if(response['hasError'] == 1){
                 alert('Saving failed!');
             }else{
@@ -350,7 +350,8 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
 
                         $(this).find("input[name='choices[]']").val(choiceValue);
 
-                        if(choiceValue === answer){
+                        let answerArr = typeof answer === 'string' ? answer.split(',') : [];
+                        if(answerArr.includes(choiceValue)){
                             $(this)
                                 .find('.chkAnswer')
                                 .prop('checked', true)

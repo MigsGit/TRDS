@@ -390,57 +390,53 @@ class QuestionnairesController extends Controller
         }else{
             // DB::beginTransaction();
             // try{
-                // $count_production_data = QuestionnaireDetails::where('questionnaire_id', $request->questionnaire_details_fkid)->where('logdel', 0)->exists();
-                // if($count_production_data == 0){
-                //     $exists = QuestionnaireDetails::where([
-                //         'id'   => $request->questionnaire_details_fkid,
-                //         'logdel' => 0,
-                //     ])->exists();
+                $exists = QuestionnaireDetails::where('image', $filename)
+                    ->where('logdel', 0)
+                    ->exists();
 
-                //     if($exists){
-                //         return response()->json(['result' => 1]);
-                //     }
-                
-                
-                    $test = 
-                        QuestionnaireDetails::
-                            where('questionnaire_id', $request->questionnaire_details_fkid)
-                            ->where('revision', $request->questionnaire_details_revision)
-                            ->where('status', 0)
-                            ->where('logdel', 0)
-                            ->orderBy('exam_no', 'DESC')
-                            ->first('exam_no');
+                if ($exists && $request->upload_image != '') {
+                    return response()->json(['result' => 1]);
+                }
 
-                    if(!$test){
-                        $numbering = '1';
-                    }else{
-                        $numbering = intval($test->exam_no)+1;
-                    }
+                if($request->questionnaire_details_pkid == ''){
 
-                    $questionnaires_record['exam_no']  = $numbering;
-                    $questionnaires_record['questionnaire_id']  = $request->questionnaire_details_fkid;
-                    $questionnaires_record['image']             = $filename;
-                    $questionnaires_record['created_by']        = '';
-                    $questionnaires_record['created_at']        = date('Y-m-d H:i:s');
+                    $test = QuestionnaireDetails::where('questionnaire_id', $request->questionnaire_details_fkid)
+                        ->where('revision', $request->questionnaire_details_revision)
+                        ->where('status', 0)
+                        ->where('logdel', 0)
+                        ->orderBy('exam_no', 'DESC')
+                        ->first();
+
+                    $numbering = $test ? intval($test->exam_no) + 1 : 1;
+
+                    $questionnaires_record['exam_no'] = $numbering; 
+                    $questionnaires_record['questionnaire_id'] = $request->questionnaire_details_fkid; 
+                    $questionnaires_record['image'] = $filename; 
+                    $questionnaires_record['created_by'] = ''; 
+                    $questionnaires_record['created_at'] = date('Y-m-d H:i:s'); 
 
                     QuestionnaireDetails::insert($questionnaires_record);
-                // }else{
-                //     $data_checking = array_merge($questionnaires_record, [
-                //         'id'     => $request->questionnaire_details_fkid,
-                //         'logdel' => 0,
-                //     ]);
+                }else{
+                    $record = QuestionnaireDetails::where('id', $request->questionnaire_details_pkid)
+                        ->where('status', 0)
+                        ->where('logdel', 0)
+                        ->first();
 
-                //     $exists = QuestionnaireDetails::where($data_checking)->exists();
-
-                //     if($exists){
-                //         return response()->json(['result' => 1]);
-                //     }else{
-                //         $questionnaires_record['updated_by']    = '';
-                //         $questionnaires_record['updated_at']    = date('Y-m-d H:i:s');
-
-                //         QuestionnaireDetails::where('id', $request->questionnaire_details_fkid)->where('logdel', 0)->update($questionnaires_record);
-                //     }
-                // }
+                    $questionnaires_record['image']             = $request->upload_image; 
+                    $questionnaires_record['updated_by']        = ''; 
+                    $questionnaires_record['updated_at']        = date('Y-m-d H:i:s'); 
+                    // return $questionnaires_record;
+                    if($record->image == $request->upload_image){
+                        QuestionnaireDetails::where('id', $request->questionnaire_details_pkid)->where('status', 0)->where('logdel', 0)->update($questionnaires_record);
+                        // $record->update($questionnaires_record);
+                    }else{
+                        if($exists){
+                            return response()->json(['result' => 1]);
+                        }
+                        QuestionnaireDetails::where('id', $request->questionnaire_details_pkid)->where('status', 0)->where('logdel', 0)->update($questionnaires_record);
+                        // $record->update($questionnaires_record);
+                    }
+                }
 
                 // DB::commit();
                 return response()->json(['hasError' => 0]);

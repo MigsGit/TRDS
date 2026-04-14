@@ -283,12 +283,15 @@ class TrainingAttendanceController extends Controller
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
             $trainingAttendanceRequestValidated =[];
-            $trainingAttendanceRequestValidated['time_in'] =  $trainingAttendanceRequest->time_in;
-            $trainingAttendanceRequestValidated['time_out'] =  $trainingAttendanceRequest->time_out;
             $trainingAttendanceRequestValidated['status'] =  $trainingAttendanceRequest->status;
             if($trainingAttendanceRequest->status === 'ABSENT'){
+                $trainingAttendanceRequestValidated['time_in'] =  NULL;
+                $trainingAttendanceRequestValidated['time_out'] = NULL;
                 $trainingAttendanceRequestValidated['remarks'] =  $trainingAttendanceRequest->remarks;
             }else{
+                $trainingAttendanceRequestValidated['time_in'] =  $trainingAttendanceRequest->time_in;
+                $trainingAttendanceRequestValidated['time_out'] =  $trainingAttendanceRequest->time_out;
+
                 $trainingAttendanceRequestValidated['remarks'] =  '';
             }
             // return $trainingAttendanceRequestValidated;

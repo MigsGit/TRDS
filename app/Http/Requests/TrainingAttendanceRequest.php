@@ -29,7 +29,7 @@ class TrainingAttendanceRequest extends FormRequest
             'rapidx_emp_no'  => 'required',
             'status'  => 'required',
             'training_request_details_id'  => 'required',
-            // 'time_in'  => 'nullable|after:status',
+            'time_in'  => 'required_without:status,PRESENT|nullable',
             'time_out' => 'nullable|after:time_in',
             'remarks' => 'required_without:status,ABSENT|string|nullable',
         ];
@@ -37,8 +37,9 @@ class TrainingAttendanceRequest extends FormRequest
     public function messages()
     {
         return [
+            'time_in.required_without' => 'The Time In field is required when status.',
             'time_out.after' => 'The Time Out must be later than the Time In.',
-            'remarks.required_without' => 'The remarks field is required when status',
+            'remarks.required_without' => 'The Remarks field is required when status',
         ];
     }
     protected function failedValidation(Validator $validator)

@@ -44,11 +44,13 @@
                     </a>
                 </li> --}}
                 <?php
-                    $user_access = explode(',', $globalUser->user_modules_id);
-                    $hr_memo_access = in_array(1, $user_access); //HR Memorandum
+                    // if($globalUser != null){
+                    //     $user_access = explode(',', $globalUser->user_modules_id);
+                    //     $hr_memo_access = in_array(1, $user_access); //HR Memorandum
+                    // }
                 ?>
 
-                @if ($hr_memo_access)
+
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-users"></i>
@@ -67,7 +69,6 @@
                             </li>
                         </ul>
                     </li>
-                @endif
 
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
@@ -112,7 +113,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
+                            <a href="{{ route('examination_result') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Exam Result</p>
                             </a>
