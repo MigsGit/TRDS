@@ -100,6 +100,12 @@
                                 <input type="number" class="form-control" id="absentCount" readonly>
                                 </div>
                         </div>
+                        {{-- <div class="col-sm-2">
+                            <div class="form-group">
+                                <label>Total Manhours</label>
+                                <input type="number" class="form-control" id="totalManHours" readonly>
+                                </div>
+                        </div> --}}
                     </div>
 
                     <table class="table table-sm table-bordered" id="tblTrainingAttendanceRequest" style="width: 100%;">
@@ -118,6 +124,12 @@
                         </thead>
                         <tbody>
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="6">Training Hours Total</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -146,28 +158,46 @@
                             <input type="number" class="form-control" name="training_attendances_id" id="trainingAttendancesId" readonly>
                         </div>
                         <div class="row">
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Remarks</label>
+                                    <select class="form-control" style="width: 100%" name="status" id="status">
+                                        <option value="" disabled selected></option>
+                                        <option value="PRESENT">PRESENT</option>
+                                        <option value="ABSENT">ABSENT</option>
+                                        {{-- <option value="AWOL">AWOL</option> --}}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
                                 <div class="form-group">
                                     <label>Date</label>
                                     <input type="text" class="form-control" name="date" id="date" readonly>
                                 </div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
                                 <div class="form-group">
                                     <label>Time In</label>
                                     <input type="time" class="form-control" name="time_in" id="timeIn" step="any">
                                 </div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
                                 <div class="form-group">
                                     <label>Timeout</label>
                                     <input type="time" class="form-control" name="time_out" id="timeOut" step="any">
                                 </div>
                             </div>
                         </div>
+
                         <div class="form-group">
                             <label>Remarks</label>
-                            <input type="text read-only" class="form-control" name="remarks" id="remarks">
+                            <select class="form-control" style="width: 100%" name="remarks" id="remarks">
+                                <option value="" selected>N/A</option>
+                                <option value="AWOL">AWOL</option>
+                                <option value="SL">SL</option>
+                                <option value="VL">VL</option>
+                            </select>
+                            {{-- <input type="text read-only" class="form-control" name="remarks" id="remarks"> --}}
                         </div>
                     </div>
                 </div>
@@ -186,12 +216,16 @@
 
 @section('js_content')
     <script type="text/javascript">
+    $('.select2bs4').select2({
+        theme: 'bootstrap4'
+    });
+
     tbl = {
         TrainingAttendance : '#tblTrainingAttendance',
         TrainingAttendanceSummary : '#tblTrainingAttendanceSummary',
         TrainingAttendanceRequest : '#tblTrainingAttendanceRequest'
     }
-  
+
 
     dtTrainingAttendanceSummary = $(tbl.TrainingAttendanceSummary).DataTable({
     "processing" : false,
@@ -211,6 +245,7 @@
     dtViewTrainingAttendanceRequest = $(tbl.TrainingAttendanceRequest).DataTable({
         "processing" : false,
         "serverSide" : true,
+        "paging" : false,
         "ajax" : {
             url: "view_training_attendance_request_details",
             // data: function (param){
@@ -221,7 +256,7 @@
              {
                 data: "status",
                 render: function(data) {
-                    let badge = data === 'PRESENT' ? 'badge-success' : 'badge-danger';
+                    let badge = data === 'PRESENT' ? 'badge-success' :   data === 'AWOL' ? 'badge-secondary'  : 'badge-danger';
                     return `<span class="badge badge-pill ${badge}">${data}</span>`;
                 }
             },
@@ -248,6 +283,20 @@
                 $('#absentCount').val(json.totalAbsent);
             }
         },
+        "footerCallback": function(row, data, start, end, display) {
+            let api = this.api();
+            total = 0;
+
+            api.column(6).data().each(function(value) {
+                if (value && value !== 'NO RECORD') {
+                    let hours = parseInt(value.split(' ')[0]) || 0;
+                    total += hours;
+                }
+            });
+
+            $(api.column(6).footer()).html('Total: ' + total + ' hours');
+            // $('#totalManHours').val(`${total} hours`);
+        },
         "order": [[ 1, "asc" ]],
     });
 
@@ -265,12 +314,12 @@
         let employeeNo = row.find('td:eq(1)').text()
         let date = row.find('td:eq(3)').text();
 
-     
+
         $('#trainingRequestDetailsId').val(trainingRequestDetailsId);
         $('#date').val(date);
         $('#rapidxEmpNo').val(employeeNo);
         $('#trainingAttendancesId').val(trainingAttendancesId);
-      
+
 
         let data = {
             'getTrainingAttendanceById' : trainingAttendancesId
@@ -283,6 +332,7 @@
                 $('#timeOut').val('');
                 return;
             }
+            $('#status').val(data.status);
             $('#timeIn').val(data.time_in);
             $('#timeOut').val(data.time_out);
             $('#remarks').val(data.remarks);
@@ -300,7 +350,7 @@
         }
     });
 
-    $('#formEditTrainingAttendance').submit(function (e) { 
+    $('#formEditTrainingAttendance').submit(function (e) {
         e.preventDefault();
         let data = {
         }

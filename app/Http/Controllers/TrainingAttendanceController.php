@@ -193,8 +193,9 @@ class TrainingAttendanceController extends Controller
                     ->make(true);
             }
                 // Get the "Expected" list of employees
-            $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
+          $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
                 ->with(['training_attendance'])
+                //whereHas
                 ->get();
 
             //Create the date range
@@ -227,7 +228,7 @@ class TrainingAttendanceController extends Controller
                         $decimalHours = number_format($totalMinutes / 60, 2);
 
                         //Get Human Readable (e.g., "8 hours 30 minutes")
-                        $duration = $in->diff($out)->format('%H hours %I minutes');
+                        $duration = $in->diff($out)->format('%H hours');
                     }
                     $button = '<center><div class="btn-group">
                                 <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
@@ -244,7 +245,7 @@ class TrainingAttendanceController extends Controller
                         'training_hours'     => $duration,
                         'time_in'     => $attendance->time_in ?? NULL,
                         'time_out'     => $attendance->time_out ?? NULL,
-                        'status'   => $attendance ? 'PRESENT' : 'ABSENT',
+                        'status'   => $attendance->status ?? 'ABSENT',
                         'action'   => $button,
                         'remarks'   => $attendance->remarks ?? '',
                     ];
@@ -268,11 +269,11 @@ class TrainingAttendanceController extends Controller
 
     public function get_training_attendance_by_id(Request $request){
         try {
-           $trainingAttendance = TrainingAttendance::where('id',$request->getTrainingAttendanceById)->first();
+            $trainingAttendance = TrainingAttendance::where('id',$request->getTrainingAttendanceById)->first();
             return response()->json([
                 'isSuccess' => 'true',
                 'trainingAttendance' => $trainingAttendance,
-        ]);
+            ]);
         } catch (Exception $e) {
             throw $e;
         }
@@ -284,7 +285,12 @@ class TrainingAttendanceController extends Controller
             $trainingAttendanceRequestValidated =[];
             $trainingAttendanceRequestValidated['time_in'] =  $trainingAttendanceRequest->time_in;
             $trainingAttendanceRequestValidated['time_out'] =  $trainingAttendanceRequest->time_out;
-            $trainingAttendanceRequestValidated['remarks'] =  $trainingAttendanceRequest->remarks;
+            $trainingAttendanceRequestValidated['status'] =  $trainingAttendanceRequest->status;
+            if($trainingAttendanceRequest->status === 'ABSENT'){
+                $trainingAttendanceRequestValidated['remarks'] =  $trainingAttendanceRequest->remarks;
+            }else{
+                $trainingAttendanceRequestValidated['remarks'] =  '';
+            }
             // return $trainingAttendanceRequestValidated;
             if( filled($trainingAttendanceRequest['training_attendances_id']) ){
                 TrainingAttendance::where('id',$trainingAttendanceRequest->training_attendances_id)
@@ -293,7 +299,6 @@ class TrainingAttendanceController extends Controller
                 $trainingAttendanceRequestValidated['date'] =  $trainingAttendanceRequest->date;
                 $trainingAttendanceRequestValidated['rapidx_emp_no'] =  $trainingAttendanceRequest->rapidx_emp_no;
                 $trainingAttendanceRequestValidated['training_request_details_id'] =  $trainingAttendanceRequest->training_request_details_id;
-                $trainingAttendanceRequestValidated['status'] =  'PRESENT';
                 // return $trainingAttendanceRequestValidated;
                 TrainingAttendance::insert($trainingAttendanceRequestValidated);
             }

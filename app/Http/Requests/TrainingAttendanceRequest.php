@@ -25,9 +25,11 @@ class TrainingAttendanceRequest extends FormRequest
     {
         return [
             'rapidx_emp_no'  => 'required',
+            'status'  => 'required',
             'training_request_details_id'  => 'required',
-            'time_in'  => 'required',
+            // 'time_in'  => 'nullable|after:status',
             'time_out' => 'nullable|after:time_in',
+            'remarks' => 'required_without:status,ABSENT|string|nullable',
         ];
     }
     public function messages()
