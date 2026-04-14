@@ -113,9 +113,9 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
                 toastr.error(errorResponse.message ?? '');
             }
             if( result.status === 409 ){
-                
+
             }
-            
+
             if( result.status === 422 ){
                 toastr.error(errorResponse.message);
             }
@@ -127,7 +127,7 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
 const resetFormValues = (params) => {
     // Reset values
     params.frmId[0].reset();
-    
+
     // params.frmId[0].reset();
 
     // Reset hidden input fields
@@ -139,3 +139,4 @@ const resetFormValues = (params) => {
     $('div').find('select').removeClass('is-invalid');
     $("div").find('select').attr('title', '');
 }
+
