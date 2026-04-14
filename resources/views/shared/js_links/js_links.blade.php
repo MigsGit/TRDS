@@ -64,6 +64,7 @@
 <script src="{{ asset('public/js/my_js/Common.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/Questionnaires.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/Examination.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/ExamResult.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/User.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/CustomerClaim.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/RapidXUser.js') }}?<?=time()?>"></script>
