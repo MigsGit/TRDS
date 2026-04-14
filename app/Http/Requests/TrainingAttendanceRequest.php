@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class TrainingAttendanceRequest extends FormRequest
 {
@@ -36,6 +38,17 @@ class TrainingAttendanceRequest extends FormRequest
     {
         return [
             'time_out.after' => 'The Time Out must be later than the Time In.',
+            'remarks.required_without' => 'The remarks field is required when status',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        // Get the first error message from the collection
+        $firstError = $validator->errors()->first();
+
+        throw new HttpResponseException(response()->json([
+            'message' => $firstError, // This puts the specific remark error here
+            'errors'  => $validator->errors()
+        ], 422));
     }
 }

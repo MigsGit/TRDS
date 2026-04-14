@@ -118,6 +118,8 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
 
             if( result.status === 422 ){
                 toastr.error(errorResponse.message);
+
+                // errorHandler( errors.first_molding_device_id,formModal.firstMolding.find('#first_molding_device_id') );  
             }
 
         }
@@ -128,15 +130,23 @@ const resetFormValues = (params) => {
     // Reset values
     params.frmId[0].reset();
 
-    // params.frmId[0].reset();
-
-    // Reset hidden input fields
-    // $("select[name='user_level']", $('#formAddUser')).val(0).trigger('change');
-
     // Remove invalid & title validation
     $('div').find('input').removeClass('is-invalid');
     $("div").find('input').attr('title', '');
     $('div').find('select').removeClass('is-invalid');
     $("div").find('select').attr('title', '');
+}
+
+
+const errorHandler = function (errors,formInput){
+    if(errors === undefined){
+        formInput.removeClass('is-invalid')
+        formInput.addClass('is-valid')
+        formInput.attr('title', '')
+    }else {
+        formInput.removeClass('is-valid')
+        formInput.addClass('is-invalid');
+        formInput.attr('title', errors[0])
+    }
 }
 

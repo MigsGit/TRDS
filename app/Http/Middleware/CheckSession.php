@@ -39,7 +39,7 @@ class CheckSession
             AND users.user_stat = 1
             AND user_accesses.module_id = 54'
         );
-       
+
         if($userAccess == null){
             return redirect('../');
         }
