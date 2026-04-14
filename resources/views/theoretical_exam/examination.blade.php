@@ -43,6 +43,7 @@
     <section class="content">
         <div class="container-fluid">
             <div id="stepOne">
+                <input type="hidden" name="get_questionnaire_id" id="getQuestionnaireId">
                 <div class="container-fluid">
                     <div class="card">
                         <div class="card-body">
@@ -55,7 +56,7 @@
 
                                     <div class="form-group">
                                         <label class="font-weight-bold">Employee No.: </label>
-                                        <select class="form-control select2bs5 get-training_request-employee_no" name="exam_training_request_employee_no" id="slctExamTrainingRequestEmployeeNo" required disabled></select>
+                                        <select class="form-control select2bs5 get-training_request-employee_no" name="exam_training_request_employee_no" id="slctExamTrainingRequestEmployeeNo" required></select>
                                     </div>
 
                                     <div class="form-group">
@@ -76,7 +77,7 @@
                                     <div class="form-group">
                                         <label class="font-weight-bold">Date Examination: </label>
                                         <div class="input-group">
-                                            <input type="date" class="form-control" name="exam_training_request_date_examination" id="nmbrExamTrainingRequestDateExamination" required readonly>
+                                            <input type="date" class="form-control" name="exam_training_request_date_examination" id="examTrainingRequestDateExamination" value="{{ date('Y-m-d') }}"  required readonly>
                                         </div>
                                     </div>
         
@@ -94,11 +95,15 @@
                 </div>
             </div>
 
-
             <div class="d-none" id="stepTwo"> 
-                <form action="" method="POST">
+                <form method="POST" id="formExamSubmission">
                     @csrf
                     <div class="exam-scroll-container">
+                        <input type="hidden" class="w-100" name="examination_user_info" id="txtExaminationUserInfo" readonly>
+                        <input type="hidden" class="w-100" name="employee_examination_result" id="txtEmployeeExaminationResult" placeholder="EXAM RESULT PER EMPLOYEE" readonly> <!-- this is for exam result -->
+                        <input type="hidden" class="w-100" name="examination_questionnaire" id="txtExaminationQuestionnaire">
+                        <input type="hidden" class="w-100" name="examination_questionnaire_details" id="txtExaminationQuestionnaireDetails">
+
                         @forelse($questions as $question)
                             @php
                                 $items = json_decode($question->answer_choices_question, true);
@@ -107,18 +112,24 @@
                             <div class="card mb-3">
                                 <div class="card-body">
 
-                                    <p>
-                                        <strong>{{ $loop->iteration }}. 
-                                        @if($question->category_type == 2)
-                                            {{ $question->question_text ?? 'Grid Question' }}
-                                        @else
-                                            {{ $items[0]['question'] ?? '' }}
-                                        @endif
+                                    <!-- QUESTION HEADER -->
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <strong>
+                                            {{ $question->exam_no }}.
+                                            @if($question->category_type == 2)
+                                                {{ $question['description'] ?? '' }}
+                                            @else
+                                                {{ $items[0]['question'] ?? '' }}
+                                            @endif
                                         </strong>
-                                    </p>
 
+                                        <span class="text-muted">
+                                            {{ $question->points }} {{ $question->points == 1 ? 'pt' : 'pts' }}
+                                        </span>
+                                    </div>
+
+                                    <!-- IMAGE -->
                                     @if($question->image)
-                                        <!-- Image Preview -->
                                         <div class="text-center mb-2">
                                             <img 
                                                 src="{{ asset('storage/app/public/questionnaire_attachment/' . $question->image) }}" 
@@ -130,21 +141,29 @@
                                         </div>
                                     @endif
 
+                                    <!-- QUESTION TYPES -->
                                     @switch($question->category_type)
                                         @case(0)
                                             <!-- MULTIPLE CHOICE -->
                                             @foreach($items as $item)
                                                 @foreach($item['choices'] as $choice)
                                                     <div class="form-check">
-                                                        <input class="form-check-input"
-                                                            type="radio"
-                                                            name="answers[{{ $question->id }}]"
-                                                            value="{{ $choice }}">
+                                                        @if($question->points > 1)
+                                                            <input class="form-check-input"
+                                                                type="checkbox"
+                                                                name="answers[{{ $question->id }}][]"
+                                                                value="{{ $choice }}">
+                                                        @else
+                                                            <input class="form-check-input"
+                                                                type="radio"
+                                                                name="answers[{{ $question->id }}]"
+                                                                value="{{ $choice }}">
+                                                        @endif
                                                         <label class="form-check-label">{{ $choice }}</label>
                                                     </div>
                                                 @endforeach
                                             @endforeach
-                                            @break
+                                        @break
 
                                         @case(1)
                                             <!-- IDENTIFICATION / ESSAY -->
@@ -155,14 +174,15 @@
                                                         class="form-control"
                                                         placeholder="Enter your answer">
                                                 @endif
+
                                                 @if($question->type == 'Essay')
                                                     <textarea name="answers[{{ $question->id }}]"
-                                                            class="form-control"
-                                                            rows="4"
-                                                            placeholder="Write your answer here..."></textarea>
+                                                        class="form-control"
+                                                        rows="4"
+                                                        placeholder="Write your answer here..."></textarea>
                                                 @endif
                                             @endforeach
-                                            @break
+                                        @break
 
                                         @case(2)
                                             <!-- GRID / TABLE TYPE -->
@@ -192,11 +212,13 @@
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            @break
+                                        @break
+
                                     @endswitch
 
                                 </div>
                             </div>
+
                         @empty
                             <div class="alert alert-warning">No questions available.</div>
                         @endforelse
@@ -204,7 +226,7 @@
 
                     <div class="mt-3 d-flex justify-content-between">
                         <button type="button" id="btnPrev" class="btn btn-secondary">Previous</button>
-                        <button type="submit" class="btn btn-success">Submit Exam</button>
+                        <button type="submit" id="btnSubmitExam" class="btn btn-success">Submit Exam</button>
                     </div>
                 </form>
             </div>
@@ -227,7 +249,13 @@
 
 @section('js_content')
     <script type="text/javascript">
+        const path = window.location.pathname;
+        const parts = path.split('/').filter(Boolean); 
+        const linkIdRevision = parts.slice(-2); 
+
         $(document).ready(function () {
+            console.log('linkIdRevision', linkIdRevision);
+            $('#getQuestionnaireId').val(linkIdRevision[0]);
             $('.select2bs5').select2({ theme: 'bootstrap-5' });
 
             GetExamTrainingRequestControlNo($('.get-training_request-ctrl_no'));
@@ -235,16 +263,57 @@
             $('#slctExamTrainingRequestCtrlNo').change(function (e) { 
                 e.preventDefault();
                 const selectedControlNo = $(this).val();
-                console.log('Selected Control No:', selectedControlNo);
 
                 $('#slctExamTrainingRequestEmployeeNo').prop('disabled', false);
                 GetExamTrainingRequestEmployeeNo($('.get-training_request-employee_no'), selectedControlNo);
             });
 
+            $('#slctExamTrainingRequestEmployeeNo').change(function (e) { 
+                e.preventDefault();
+                let getData = $(this).val()
+                let getControlNo = $('#slctExamTrainingRequestCtrlNo').val()
+
+                GetExamTrainingRequestEmployeeInfo(getData, getControlNo);
+                CountExamTrainingRequestExaminationTake(getData, getControlNo);
+            });
+
             $('#btnNext').click(function (e) { 
                 e.preventDefault();
-                $('#stepOne').addClass('d-none');
-                $('#stepTwo').removeClass('d-none');
+                console.log('Ctrl. No.: ', $('#slctExamTrainingRequestCtrlNo').val());
+                console.log('Employee No.: ', $('#slctExamTrainingRequestEmployeeNo').val());
+                console.log('Name: ', $('#txtExamTrainingRequestName').val());
+                console.log('Date Hired: ', $('#txtExamTrainingRequestDateHired').val());
+                console.log('Date Examination: ', $('#examTrainingRequestDateExamination').val());
+                console.log('Examination Taken: ', $('#txtExamTrainingRequestExaminationTake').val());
+
+                if($('#slctExamTrainingRequestCtrlNo').val() == null){
+                    alert('Please select a Control No.');
+                }else if($('#slctExamTrainingRequestEmployeeNo').val() == null){
+                    alert('Please select an Employee No.');
+                }else if($('#txtExamTrainingRequestName').val() == ''){
+                    alert('Please enter a Name.');
+                }else if($('#txtExamTrainingRequestDateHired').val() == ''){
+                    alert('Please enter a Date Hired.');
+                }else if($('#examTrainingRequestDateExamination').val() == ''){
+                    alert('Please enter a Date Examination.');
+                }else{
+                    let $examinationEmployeeInfo = {
+                        training_request_ctrl_no: $('#slctExamTrainingRequestCtrlNo').val(),
+                        employee_no: $('#slctExamTrainingRequestEmployeeNo').val(),
+                        employee_name: $('#txtExamTrainingRequestName').val(),
+                        date_hired: $('#txtExamTrainingRequestDateHired').val(),
+                        date_examination: $('#examTrainingRequestDateExamination').val(),
+                    };
+
+                    console.log($examinationEmployeeInfo);
+                    $('#txtExaminationUserInfo').val(JSON.stringify($examinationEmployeeInfo));
+                    $('#stepOne').addClass('d-none');
+                    $('#stepTwo').removeClass('d-none');
+
+                    console.log('linkIdRevision: ', linkIdRevision); 
+
+                    LinkForIdAndRevision(linkIdRevision);
+                }
             });
 
             $('#btnPrev').click(function (e) { 
@@ -255,6 +324,11 @@
 
             $(document).on('click', '.previewImage', function() {
                 $('#modalImage').attr('src', $(this).attr('src'));
+            });
+
+            $('#formExamSubmission').submit(function (e) { 
+                e.preventDefault();
+                ExamSubmission()
             });
         });
     </script>
