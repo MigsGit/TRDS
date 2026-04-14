@@ -193,10 +193,11 @@ class TrainingAttendanceController extends Controller
                     ->make(true);
             }
                 // Get the "Expected" list of employees
-          $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
-                ->with(['training_attendance'])
-                //whereHas
-                ->get();
+            $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
+            ->with(['training_attendance'])
+            ->get()->sortBy(function($detail) {
+                return $detail->training_attendance['date'] ?? '0000-00-00';
+            });
 
             //Create the date range
             $period = CarbonPeriod::create($fromDate, $toDate);
@@ -283,15 +284,16 @@ class TrainingAttendanceController extends Controller
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
             $trainingAttendanceRequestValidated =[];
-            $trainingAttendanceRequestValidated['time_in'] =  $trainingAttendanceRequest->time_in;
-            $trainingAttendanceRequestValidated['time_out'] =  $trainingAttendanceRequest->time_out;
             $trainingAttendanceRequestValidated['status'] =  $trainingAttendanceRequest->status;
             if($trainingAttendanceRequest->status === 'ABSENT'){
+                $trainingAttendanceRequestValidated['time_in'] =  NULL;
+                $trainingAttendanceRequestValidated['time_out'] = NULL;
                 $trainingAttendanceRequestValidated['remarks'] =  $trainingAttendanceRequest->remarks;
             }else{
+                $trainingAttendanceRequestValidated['time_in'] =  $trainingAttendanceRequest->time_in;
+                $trainingAttendanceRequestValidated['time_out'] =  $trainingAttendanceRequest->time_out;
                 $trainingAttendanceRequestValidated['remarks'] =  '';
             }
-            // return $trainingAttendanceRequestValidated;
             if( filled($trainingAttendanceRequest['training_attendances_id']) ){
                 TrainingAttendance::where('id',$trainingAttendanceRequest->training_attendances_id)
                 ->update($trainingAttendanceRequestValidated);
@@ -299,7 +301,6 @@ class TrainingAttendanceController extends Controller
                 $trainingAttendanceRequestValidated['date'] =  $trainingAttendanceRequest->date;
                 $trainingAttendanceRequestValidated['rapidx_emp_no'] =  $trainingAttendanceRequest->rapidx_emp_no;
                 $trainingAttendanceRequestValidated['training_request_details_id'] =  $trainingAttendanceRequest->training_request_details_id;
-                // return $trainingAttendanceRequestValidated;
                 TrainingAttendance::insert($trainingAttendanceRequestValidated);
             }
             DB::commit();
