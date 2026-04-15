@@ -394,21 +394,21 @@ class HrMemoController extends Controller
                 if ($td->employment_type == 1) {
                     // HRIS employee
                     $td->load(['hris_emp_info' => function ($q) {
-                        $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
-                        ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                        ->select(
+                        // $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                        // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                        $q->select(
                             'vw_employeeinfo.*',
-                            'tbl_Training.Venue as Venue'
+                            // 'tbl_Training.Venue as Venue'
                         );
                     }]);
                 } else {
                     // Subcon employee
                     $td->load(['subcon_emp_info' => function ($q) {
-                        $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
-                        ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                        ->select(
+                        // $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                        // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                        $q->select(
                             'vw_employeeinfo.*',
-                            'tbl_Training.Venue as Venue'
+                            // 'tbl_Training.Venue as Venue'
                         );
                     }]);
                 }
