@@ -423,8 +423,8 @@ class HrMemoController extends Controller
 
         try {
             $memo = HrMemo::findOrFail($request->id);
-
             $memo->status = $request->new_status;
+            // $memo->approval_remarks = $request->remarks;
             $memo->save();
 
             DB::commit(); // ✅ commit here

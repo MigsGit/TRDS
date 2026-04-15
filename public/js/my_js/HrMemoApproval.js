@@ -138,7 +138,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         traineeIdCounter = 1; //set counter to 1 every new memo
 
         $addButtonTD.data('counter', traineeIdCounter)
-        // console.log('btn counter', $addButtonTD.data('counter'));
+        // $addButtonTD.data('counter', null);
 
         selectEmailRecipients($('.selectToRecipients'));
         selectEmailRecipients($('.selectCcRecipients'));
@@ -148,10 +148,11 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
     // add trainee details button
     $addButtonTD.on('click', function (){
-        // console.log('btn counter', $addButtonTD.data('counter'));
-
         $formTD[0].reset();
         $formTD.find('input[type="hidden"]').val('');
+        // $addButtonTD.data('counter', traineeIdCounter)
+        $addButtonTD.data('counter', null);
+        console.log('counterNow', $addButtonTD.data('counter'));
 
         // Remove all rows except template row
         $($tableExam).find('tbody tr:not(.data-row)').remove();
@@ -159,8 +160,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         // Clear template row inputs
         $($tableExam).find('.data-row input').val('');
 
-        // <select class="form-control form-control-sm select2bs5 selectTitle" name="title[]" required></select>
-        // <select class="form-control form-control-sm select2bs5 selectResult" name="result[]" required></select>
         // Remove any additional rows except the default one
         const defaultExamRow = `
             <tr class="data-row" data-checkbox-id=''>
@@ -195,53 +194,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         selectEmpNo($('.selectEmpNo'));
         $modalTD.modal('show');
     });
-    // $addButtonTD.on('click', function (){ // KINOMENT KO NAGE-ERROR
-
-    //     $formTD[0].reset();
-    //     $formTD.find('input[type="hidden"]').val('');
-
-    //     // Remove all rows except template row
-    //     $($tableExam).find('tbody tr:not(.data-row)').remove();
-
-    //     // Clear template row inputs
-    //     $($tableExam).find('.data-row input').val('');
-
-    //     // <select class="form-control form-control-sm select2bs5 selectTitle" name="title[]" required></select>
-    //     // <select class="form-control form-control-sm select2bs5 selectResult" name="result[]" required></select>
-    //     // Remove any additional rows except the default one
-    //     const defaultExamRow = `
-    //         <tr class="data-row" data-checkbox-id=''>
-    //             <td>
-    //                 <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" required></select>
-    //             </td>
-    //             <td>
-    //                 <select class="form-control form-control-md" name="result[]" id="result" required>
-    //                     <option value="" disabled selected>Select Result</option>
-    //                     <option value="1">Passed</option>
-    //                     <option value="2">Failed</option>
-    //                     <option value="3">Complied</option>
-    //                 </select>
-    //             </td>
-    //             <td>
-    //                 <input type="text" class="form-control form-control-md" name="remarks[]" id="remarks" required></input>
-    //             </td>
-    //             <td id="removeRow">
-    //                 <center>
-    //                     <button class="btn btn-md btn-danger removeRow" title="Remove Row" type="button" disabled>
-    //                         <i class="fa fa-times"></i>
-    //                     </button>
-    //                 </center>
-    //             </td>
-    //         </tr>
-    //     `;
-
-    //     const $tbody = $($tableExam).find('tbody');
-    //     $tbody.html(defaultExamRow);
-
-    //     getExaminations($('#tblExamination tr:last').find('.selectExamTitle'));
-    //     selectEmployeeDetails($('.selectEmpNo'));
-    //     $modalTD.modal('show');
-    // });
 
     // Handle employee number input
     $('#employeeNumber').on('change', function(){
@@ -253,8 +205,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             dataType: "json",
             success: function (response) {
                 emp_details = response[0];
-                console.log('emp_details', emp_details);
-
                 $formTD.find('#employeeName').val(emp_details.EmpName);
                 $formTD.find('#dateHired').val(emp_details.DateHired);
                 $formTD.find('#position').val(emp_details.Position);
@@ -279,7 +229,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         newRow.find('.select2-container').remove();
 
         let $newSelectExamTitle = newRow.find('.selectExamTitle');
-        // let $newSelectResult = newRow.find('.selectResult');
 
         // 🔥 Clean select2 plugin traces from cloned select
         $newSelectExamTitle
@@ -290,15 +239,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             .empty()        // ← THIS clears options
             .val(null);
 
-        // 🔥 Clean select2 plugin traces from cloned select
-        // $newSelectResult
-        //     .removeClass('select2-hidden-accessible')
-        //     .removeAttr('data-select2-id')
-        //     .removeAttr('tabindex')
-        //     .removeAttr('aria-hidden')
-        //     .empty()        // ← THIS clears options
-        //     .val(null);
-
         // Append new row first
         $tableExam.find('tbody').append(newRow);
 
@@ -306,10 +246,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         $newSelectExamTitle.select2({
             theme: 'bootstrap-5',
         });
-
-        // $newSelectResult.select2({
-        //     theme: 'bootstrap-5',
-        // });
 
         // Update button states
         updateRemoveButtons($tableExam, 'Table', '.removeExamRow');
@@ -374,7 +310,37 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         });
     });
 
-    // Approve button
+    // HR Disapprove button
+    // $form.on('click', '#btnHRDisapprove', function () {
+    //     const id = $form.find('#txtHrMemoId').val();
+    //     let updateStatusTo = 4; // disapproved
+
+    //     Swal.fire({
+    //         title: 'Disapprove HR Memo',
+    //         input: 'textarea',
+    //         inputLabel: 'Remarks',
+    //         inputPlaceholder: 'Enter reason for disapproval...',
+    //         inputAttributes: {
+    //             'aria-label': 'Enter remarks'
+    //         },
+    //         showCancelButton: true,
+    //         confirmButtonText: 'Submit',
+    //         cancelButtonText: 'Cancel',
+    //         inputValidator: (value) => {
+    //             if (!value) {
+    //                 return 'Remarks is required!';
+    //             }
+    //         }
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             let remarks = result.value;
+
+    //             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
+    //         }
+    //     });
+    // });
+
+    // HR Approve button
     $form.on('click', '#btnHRApprove', function () {
         const id = $form.find('#txtHrMemoId').val();
         let updateStatusTo = 5; //approved
@@ -384,7 +350,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         });
     });
 
-    // Approve button
+    // TU Approve button
     $form.on('click', '#btnTUApprove', function () {
         const id = $form.find('#txtHrMemoId').val();
         let updateStatusTo = 6; //approved
@@ -403,6 +369,36 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
         });
     });
+
+    // TU Disapprove button
+    // $form.on('click', '#btnTUDisapprove', function () {
+    //     const id = $form.find('#txtHrMemoId').val();
+    //     let updateStatusTo = 7; // disapproved
+
+    //     Swal.fire({
+    //         title: 'Disapprove HR Memo',
+    //         input: 'textarea',
+    //         inputLabel: 'Remarks',
+    //         inputPlaceholder: 'Enter reason for disapproval...',
+    //         inputAttributes: {
+    //             'aria-label': 'Enter remarks'
+    //         },
+    //         showCancelButton: true,
+    //         confirmButtonText: 'Submit',
+    //         cancelButtonText: 'Cancel',
+    //         inputValidator: (value) => {
+    //             if (!value) {
+    //                 return 'Remarks is required!';
+    //             }
+    //         }
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             let remarks = result.value;
+
+    //             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
+    //         }
+    //     });
+    // });
 
     // --------------------
     // REMOVE ROW
@@ -423,20 +419,17 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
     $tableTD.on('click', '.editTDRow', function(e) {
         e.preventDefault();
-        let id = $(this).data("id");
-        let trainee = traineeDetailsArray.find(item => item.action.id == id);
-        console.log('trainees', trainee);
-        console.log('edit traineeDetailsArray', traineeDetailsArray);
+        let editId = $(this).data("id");
+        let trainee = traineeDetailsArray.find(item => item.action.id == editId);
+
+        $addButtonTD.data('counter', editId);
+        console.log('counterNow', $addButtonTD.data('counter'));
 
         selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
         $formTD.find('#endorsementDate').val(trainee.endorsement_date);
 
         $tableExam.find('tbody').empty();
         trainee.exam_details.forEach(function (exam){
-            // getExaminations($('#tblExamination tr:last').find('.selectExamTitle'), exam.exam_title);
-            // $('#tblExamination tr:last').find('#result').val(exam.result);
-            // $('#tblExamination tr:last').find('#remarks').val(exam.remarks);
-
             let rowExams = `
                 <tr class="data-row" data-checkbox-id=''>
                     <td>
@@ -529,7 +522,9 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         e.preventDefault();
         let empId = $formTD.find('#employeeNumber').val();
         let endorsementDate = $formTD.find('#endorsementDate').val();
-        let counterNow = $form.find('#btnAddTrainee').data('counter');
+        // let counterNow = $form.find('#btnAddTrainee').data('counter');
+        let counterNow = $form.find('#btnAddTrainee').data('counter') || null;
+        console.log('counterNow', counterNow);
 
         if(empId == null){
             showError('Please select an employee.');
@@ -566,20 +561,30 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             return; // stop the rest of the function
         }
 
+        // let traineeDetailsList = {
+        //     action: {id: counterNow, emp_id: empId, emp_type: empType, status: 1}, //status 1 means "added/edited but not yet saved to database"
+
+        let isEdit = counterNow !== null;
         let traineeDetailsList = {
-            action: {id: counterNow, emp_id: empId, emp_type: empType},
+            action: {
+                id: isEdit ? counterNow : getNextId(traineeDetailsArray),
+                emp_id: empId,
+                emp_type: empType,
+                status: 1
+            },
             emp_no: empNumber,
             emp_name : empName,
             traning_venue: trainingVenue,
             endorsement_date: endorsementDate,
             exam_details: exam_list
         }
+        console.log('traineeDetailsArray', traineeDetailsArray);
 
-        let index = traineeDetailsArray.findIndex(function(item) {
+        let index = traineeDetailsArray.findIndex(function(item){
             return item.action.id == counterNow;
         });
 
-        if (index !== -1) {
+        if (isEdit && index !== -1) {
             // EDIT existing
             traineeDetailsArray[index] = traineeDetailsList;
         } else {
@@ -588,14 +593,18 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         }
 
         // traineeDetailsArray.push(traineeDetailsList);
-        $addButtonTD.data('counter', traineeIdCounter);
-        // console.log('btn counter', $addButtonTD.data('counter'));
+        // $addButtonTD.data('counter', traineeIdCounter);
 
         dtTraineeDetails.clear().draw();
         dtTraineeDetails.rows.add(traineeDetailsArray).draw();
         showSuccess('Trainee details added to the list.');
         $modalTD.modal('hide');
     });
+}
+
+function getNextId(traineeDetailsArray) {
+    if (traineeDetailsArray.length === 0) return 1;
+    return Math.max(...traineeDetailsArray.map(x => x.action.id || 0)) + 1;
 }
 
 function updateRemoveButtons($table, measure_type, array = null, cboElement){
@@ -626,11 +635,9 @@ function selectEmailRecipients(cboElement, rapidxId = null, hr_only = false){
             result = '<option value="" disabled selected>--Loading--</option>';
         },
         success: function (response) {
-            console.log(response);
-
             if(response.length > 0){
-                    result = '<option value="" disabled selected> Select Name/s </option>';
-
+                    // result = '<option value="" disabled selected> Select Name/s </option>';
+                    result = '';
                 for (let i = 0; i < response.length; i++) {
                     result += '<option value="' + response[i]['id'] + '" data-email="' + response[i]['email'] + '">' + response[i]['name'] + '</option>';
                 }
@@ -666,8 +673,6 @@ function selectEmpNo(cboElement, empId = null, mode = null){
             result = '<option value="" disabled selected>--Loading--</option>';
         },
         success: function (response) {
-            console.log(response);
-
             if(response.length > 0){
                     result = '<option value="" disabled selected> Select Employee No </option>';
 
@@ -915,6 +920,7 @@ function disableForm($form, status = null){
 /**
  * Disable or update hr_memo_approval status
  */
+// function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null, remarks = '') {
 function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null) {
     $.ajax({
         type: 'POST',
@@ -922,6 +928,7 @@ function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null) {
         data: {
             id: id,
             new_status: updateToStatus
+            // remarks: remarks
         },
         dataType: 'json',
         success: function (response) {
