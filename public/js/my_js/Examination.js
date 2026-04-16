@@ -460,7 +460,7 @@ const ExamSubmission = () => {
             employee_examination_result: JSON.stringify(employeeExamResult)
         };
 
-        const ajaxExamSSubmission = {
+        const ajaxExamSubmission = {
             url: link,
             method: "POST",
             data: formData,
@@ -479,7 +479,6 @@ const ExamSubmission = () => {
                     let tist = employeeExamResult.summary
                     console.log('Exam Result Submitted:', tist);
 
-                   // SweetAlert popup
                     Swal.fire({
                         title: '📝 Employee Exam Result',
                         confirmButtonColor: '#172838',
@@ -494,7 +493,6 @@ const ExamSubmission = () => {
                         confirmButtonText: 'OK'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // Build the redirect URL
                             const protocol = window.location.protocol;
                             const hostname = window.location.hostname; 
                             const pathname = window.location.pathname;
@@ -503,7 +501,6 @@ const ExamSubmission = () => {
                             const secondSegment = segments[1] || '';
                             const newUrl = `${protocol}//${hostname}/${firstSegment}/${secondSegment}/`;
 
-                            // Redirect after OK click
                             window.location.href = newUrl;
                         }
                     });
@@ -516,7 +513,7 @@ const ExamSubmission = () => {
             }
         };
 
-        ajaxRequest(ajaxExamSSubmission);
+        ajaxRequest(ajaxExamSubmission);
 
     } catch (err) {
         console.error('Unexpected error:', err);
