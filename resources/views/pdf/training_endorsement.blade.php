@@ -221,7 +221,7 @@
     @endphp
 
     <br><br><br>
-    <table style="width:100%; border:none; margin-top:40px;">
+    <table style="width:100%; border:none; margin-top:20px;">
         <tr>
             <td style="width:33%; text-align:center; vertical-align:top;">
                 <strong>Prepared by:</strong><br><br>
@@ -243,6 +243,16 @@
             </td>
         </tr>
     </table>
+    
+    @foreach($employees as $employee)
+        @if(!empty($employee['attachment']))
+            <div style="page-break-before: always;">
+                <p style="font-weight: bold; font-size: 12px; margin-bottom: 10px;">{{ $employee['name'] ?? '' }} - Hands-On Attachment:</p>
+                <img src="{{ $employee['attachment'] }}" alt="" style="width:100%; max-height:700px; object-fit:contain; display:block; border:1px solid #ccc;">
+            </div>
+        @endif
+    @endforeach
+
 
 
 </body>
