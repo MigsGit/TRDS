@@ -122,10 +122,10 @@
                                     <div class="form-group">
                                         <label class="font-weight-bold">Category: </label>
                                         <select class="form-control" name="questionnaire_category" id="slctQuestionnaireCategory" required>
-                                            <option value="" selected disabled>-- Select Category --</option>
-                                            <option value="0">Newly Hired</option>
-                                            <option value="1">Certification</option>
-                                            <option value="2">Re-Certification</option>
+                                            {{-- <option value="" selected disabled>-- Select Category --</option> --}}
+                                            <option selected value="0">Newly Hired</option>
+                                            {{-- <option value="1">Certification</option>
+                                            <option value="2">Re-Certification</option> --}}
                                         </select>
                                     </div>
 
@@ -237,7 +237,7 @@
                         </button>
                     </div>
                     <div class="table-responsive">
-                        <table id="tableQuestionnaireDetails" class="table table-bordered table-hover nowrap w-100">
+                        <table id="tableQuestionnaireDetails" class="table table-bordered table-hover w-100">
                             <thead>
                                 <tr>
                                     <th>Action</th>
@@ -273,7 +273,7 @@
                 <form method="post" id="formCreateUpdateQuestionnaireDetails" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
-                        <input type="hidden" name="questionnaire_details_pkid" id="txtCreateUpdateQuestionnaireDetailsPkid">
+                        <input type="text" name="questionnaire_details_pkid" id="txtCreateUpdateQuestionnaireDetailsPkid">
                         <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsFkid">
                         <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsRevision">
                         <div class="container-fluid">
@@ -580,10 +580,15 @@
                     }              
                 }
             });
-    
+
             $('#slctQuestionnaireCategoryType').change(function (e) { 
                 e.preventDefault();
                 let typeOfQuestion = $(this).val()
+
+                $('#singleMultipleAnswer').empty();
+                $('#identificationEssay').empty();
+                $('#multipleGrid').empty();
+
                 html = ''
                 switch (typeOfQuestion) {
                     case '0':
@@ -642,7 +647,7 @@
                         html += '    </select>'
                         html += '</div>'
                         html += '<div class="col-md-12 mb-3">'
-                        html += '   <input type="text" class="form-control d-none" name="identification[]" id="txtIdentification" placeholder="Answer for identification" disabled>'
+                        html += '   <input type="text" class="form-control d-none" name="identification[]" id="txtIdentification" placeholder="Answer for identification" style="text-transform: uppercase;" disabled>'
                         html += '</div>'
     
                         $('#identificationEssay').append(html);
@@ -823,7 +828,7 @@
     
                 $('#txtCreateUpdateQuestionnaireDetailsPkid').val(questionnaireDetailsId);
                 $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireDetailRevision);
-    
+
                 GetQuestionnaireDetailsById(questionnaireDetailsId,questionnaireDetailRevision)
             });
     
