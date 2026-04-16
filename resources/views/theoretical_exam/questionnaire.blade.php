@@ -237,7 +237,7 @@
                         </button>
                     </div>
                     <div class="table-responsive">
-                        <table id="tableQuestionnaireDetails" class="table table-bordered table-hover nowrap w-100">
+                        <table id="tableQuestionnaireDetails" class="table table-bordered table-hover w-100">
                             <thead>
                                 <tr>
                                     <th>Action</th>
