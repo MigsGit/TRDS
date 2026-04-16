@@ -2,6 +2,7 @@
 
 namespace App\Model;
 
+use App\Model\Hr\HrMemo;
 use App\Model\SystemOneHrisEmpInfo;
 use App\Model\SystemOneSubconEmpInfo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -34,5 +35,13 @@ class TrainingRequestDetails extends Model
     }
     public function emp_no_system_one_subcon_emp_info(){
         return $this->hasOne(SystemOneSubconEmpInfo::class, 'EmpNo', 'emp_no');
+    }
+
+    public function hr_memo_details(){
+        return $this->hasOne(HrMemo::class, 'id', 'training_memo_doc_id');
+    }
+
+    public function employee_exam_details(){
+        return $this->hasMany(ExamResult::class, 'employee_no','emp_no');
     }
 }
