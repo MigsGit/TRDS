@@ -2,6 +2,7 @@
 
 namespace App\Model;
 
+use App\Model\Hr\HrMemo;
 use App\Model\SystemOneHrisEmpInfo;
 use App\Model\SystemOneSubconEmpInfo;
 use App\Model\TrainingAttendance;
