@@ -105,6 +105,7 @@ $(document).on('click', '.btnViewEndorsement', function () {
                     var questionnaire = '';
                     var examTitles = '';
                     var examRemarks = '';
+                    var handsOnImage = '';
                     var statusHtml = '<span class="badge badge-success">Endorsed</span>';
 
                     if (Array.isArray(emp.training_request_details_info.employee_exam_details) && emp.training_request_details_info.employee_exam_details.length > 0) {
@@ -154,18 +155,28 @@ $(document).on('click', '.btnViewEndorsement', function () {
                     if(emp.will_endorse == 1){
                         statusHtml = '<span class="badge badge-danger">Not Endorsed</span>';
                     }
+                    if(emp.hands_on_filename != null){
+                        // Dynamically get the base path after the host (e.g., /TRDS_chris)
+                        var basePath = window.location.pathname.split('/')[1];
+                        handsOnImage = `${window.location.protocol}//${window.location.host}/${basePath}/public/storage/hands_on_attachments/${emp.id}.${emp.hands_on_filename_ext}`;
+                        console.log(handsOnImage);
+                    } else {
+                        handsOnImage = null;
+                    }
+                   
                     return Object.assign({
-                        action: '--',
-                        status: statusHtml,
-                        date_hired: emp.training_request_details_info.date_hired || '',
-                        emp_no: emp.training_request_details_info.emp_no || '',
-                        name: emp.training_request_details_info.name || '',
-                        id: emp.training_request_details_info.id || '',
-                        // will_not_endorse: false,
-                        // remarks: '',
-                        rating: ratings,
-                        questionnaire: examTitles,
-                        exam_remarks: examRemarks,
+                        action             : '--',
+                        status             : statusHtml,
+                        date_hired         : emp.training_request_details_info.date_hired || '',
+                        emp_no             : emp.training_request_details_info.emp_no || '',
+                        name               : emp.training_request_details_info.name || '',
+                        id                 : emp.training_request_details_info.id || '',
+                        rating             : ratings,
+                        questionnaire      : examTitles,
+                        exam_remarks       : examRemarks,
+                        hands_on_image     : handsOnImage || null,
+                        hands_on_file_name : emp.hands_on_filename,
+                        hands_on_attachment: handsOnImage ? `<button type="button" class="btn btn-primary btn-sm btnViewHandsOnAttachment" title="View Hands-On"><i class="fa fa-eye"></i></button>` : ''
                         // rowClass: rowClass,
                         // hasExam: hasExam,
                         // hasPassed: hasPassed
@@ -650,6 +661,7 @@ $(document).on('click', '.btnViewHandsOnAttachment', function () {
     var row = $(this).closest('tr');
     var rowIdx = endorsementEmployeeTable.row(row).index();
     var rowData = endorsementEmployeeTable.row(row).data();
+
     if (rowData && rowData.hands_on_image) {
         var win = window.open('', '_blank');
         win.document.write('<title>Hands-On Attachment</title><body style="margin:0;background:#000;"><img src="' + rowData.hands_on_image + '" style="max-width:100%;max-height:100vh;display:block;margin:auto;" /></body>');
