@@ -1,0 +1,548 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\TrainingEndorsementRequest;
+use App\Model\RapidXUser;
+use App\Model\TrainingEndorsement;
+use App\Model\TrainingEndorsementApprovals;
+use App\Model\TrainingEndorsementEmployee;
+use App\Model\TrainingRequest;
+use App\Model\TrainingRequestDetails;
+use App\Model\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use DataTables;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
+
+class TrainingEndorsementController extends Controller
+{
+     /**
+     * Insert approval record for endorsement
+     *
+     * @param int $training_endorsement_id
+     * @param int $rapidx_id
+     * @param string $approval_type ('approved_by' or 'checked_by')
+     * @return void
+     */
+    protected function insertApproval($training_endorsement_id, $rapidx_id, $approval_type)
+    {
+        TrainingEndorsementApprovals::insert([
+            'training_endorsement_id' => $training_endorsement_id,
+            'rapidx_id' => $rapidx_id,
+            'approval_type' => $approval_type,
+            'created_by' => $_SESSION['rapidx_user_id'] ?? 'system',
+            'created_at' => now(),
+        ]);
+    }
+
+    public function getTrainingEndorsements(Request $request)
+    {
+        $data = TrainingEndorsement::with([
+            'training_request_details',
+            'hr_memo_details'
+        ])
+        ->whereNull('deleted_at')
+        ->get();
+
+        return DataTables::of($data)
+            ->addColumn('action', function ($row) {
+                $result = "";
+                $result .= '<center>';
+                $result .= '<button class="btn btn-sm btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>';
+                $result .= '<button class="btn btn-sm btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>';
+                $result .= '<button class="btn btn-sm btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>';
+                $result .= '</center>';
+                
+                return '
+                <center>
+                    <button class="btn btn-sm btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>
+                    <button class="btn btn-sm btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>
+                    <button class="btn btn-sm btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>
+                </center>
+                ';
+            })
+            // ->addColumn('endorsement_ctrl', function ($row) {
+            //     return $row->endorsement_ctrl ?? '';
+            // })
+            // ->addColumn('hr_memo', function ($row) {
+            //     return $row->hr_memo_ctrl ?? '';
+            // })
+            // ->addColumn('tu_ctrl', function ($row) {
+            //     return $row->training_req_ctrl ?? '';
+            // })
+            ->addColumn('date_created', function ($row) {
+                return $row->created_at ?? '';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+    }
+
+    public function getTrainingEndorsementById(Request $request)
+    {
+        $tr_ctrl_no = $request->tr_ctrl_no;
+
+        $data = TrainingEndorsement::with([
+            'created_by_user_details',
+            'te_approval_details',
+            'training_request_details',
+            'hr_memo_details',
+            'training_endorsement_employees' => function($query) {
+                $query->whereNull('deleted_at');
+            },
+            'training_endorsement_employees.training_request_details_info',
+            'training_endorsement_employees.training_request_details_info.employee_exam_details' => function($query) use ($tr_ctrl_no) {
+                $query->where('training_request_ctrl_no', $tr_ctrl_no);
+            },
+            'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info'
+        ])
+        ->where('id', $request->id)
+        ->first();
+
+        // Group te_approval_details by approval_type for frontend assignment
+        $checked_by = [];
+        $approved_by = [];
+        if ($data && $data->te_approval_details) {
+            foreach ($data->te_approval_details as $approval) {
+                if ($approval->approval_type === 'checked_by') {
+                    $checked_by[] = $approval->rapidx_id;
+                } elseif ($approval->approval_type === 'approved_by') {
+                    $approved_by[] = $approval->rapidx_id;
+                }
+            }
+        }
+
+        $data->checked_by = $checked_by;
+        $data->approved_by = $approved_by;
+
+        return response()->json(['result' => true, 'data' => $data]);
+    }
+
+    public function saveTrainingEndorsement(TrainingEndorsementRequest $request)
+    {
+        $data = $request->validated();
+        DB::beginTransaction();
+        try{
+            
+            if(isset($data['endorsement_id'])){ // Update
+
+            }
+            else{ // Create
+
+                $list_of_employee = json_decode($data['employees'], true);
+                // Validate that there are employees in the list
+                if(count($list_of_employee) == 0){
+                    return response()->json([
+                        'result' => false,
+                        'message' => 'No employees added for endorsement.'
+                    ]);
+                }
+                // Check if any employee has not passed the exam or has no exam result
+                if (
+                    collect($list_of_employee)->contains(function ($employee) {
+                        return (empty($employee['hasExam']) || empty($employee['hasPassed'])) && !$employee['will_not_endorse'];
+                    })
+                ) {
+                    return response()->json([
+                        'result' => false,
+                        'message' => 'All employees must have passed the exam.'
+                    ]);
+                }
+
+                $ctrl_no = $this->generateControlNumber();
+                $endorsementData = [
+                    'training_request_id' => $data['training_req_id'],
+                    'hr_memo_id'          => $data['hr_memo_id'],
+                    'date'                => $data['endorsement_date'],
+                    'ctrl_no'             => $ctrl_no,
+                    'mail_cc'             => implode(',', $data['attn']),
+                    'created_by'          => $_SESSION['rapidx_user_id'] ?? 'system',
+                    'created_at'          => now(),
+                ];
+                $inserted_te_id = TrainingEndorsement::insertGetId($endorsementData);
+
+                foreach($list_of_employee as $employee){
+                    $filename = "";
+                    $array_endorsement_employee = [
+                        'training_endorsement_id'    => $inserted_te_id,
+                        'training_request_detail_id' => $employee['tr_details_id'],
+                        'emp_no'                     => $employee['emp_no'],
+                        'will_endorse'               => $employee['will_not_endorse'],
+                        'will_not_endorse_remarks'   => $employee['remarks'],
+                        'created_by'                 => $_SESSION['rapidx_user_id'] ?? 'system',
+                        'created_at'                 => now(),
+                    ];
+                    
+                    // TrainingEndorsementEmployee::insert([
+                    //     'training_endorsement_id'    => $inserted_te_id,
+                    //     'training_request_detail_id' => $employee['tr_details_id'],
+                    //     'emp_no'                     => $employee['emp_no'],
+                    //     'will_endorse'               => $employee['will_not_endorse'],
+                    //     'will_not_endorse_remarks'   => $employee['remarks'],
+                    //     'hands_on_filename'          => $hands_on_filename,
+                    //     'created_by'                 => $_SESSION['rapidx_user_id'] ?? 'system',
+                    //     'created_at'                 => now(),
+                    // ]);
+                    $te_emp_id = TrainingEndorsementEmployee::insertGetId($array_endorsement_employee);
+
+                    if (isset($employee['hands_on_image']) && !empty($employee['hands_on_image'])) {
+                        $filename = $employee['hands_on_file_name'] ?? '';
+                        // Get extension from filename or default to png
+                        $extension = 'png';
+                        if (!empty($filename) && str_contains($filename, '.')) {
+                            $extension = pathinfo($filename, PATHINFO_EXTENSION);
+                        }
+                        $storageFilename = $te_emp_id . '.' . $extension;
+
+                        // Decode base64 image if needed
+                        $imageData = $employee['hands_on_image'];
+                        if (preg_match('/^data:image\/(png|jpg|jpeg);base64,/', $imageData)) {
+                            $imageData = preg_replace('/^data:image\/(png|jpg|jpeg);base64,/', '', $imageData);
+                            $imageData = base64_decode($imageData);
+                        }
+                        Storage::put('public/hands_on_attachments/' . $storageFilename, $imageData);
+
+                        TrainingEndorsementEmployee::where('id', $te_emp_id)
+                        ->update([
+                            'hands_on_filename' => $filename
+                        ]);
+                    }
+                }
+
+                // Insert checked_by approvals
+                if (!empty($data['checked_by']) && is_array($data['checked_by'])) {
+                    foreach ($data['checked_by'] as $rapidx_id) {
+                        $this->insertApproval($inserted_te_id, $rapidx_id, 'checked_by');
+                    }
+                }
+                // Insert approved_by approvals
+                if (!empty($data['approved_by']) && is_array($data['approved_by'])) {
+                    foreach ($data['approved_by'] as $rapidx_id) {
+                        $this->insertApproval($inserted_te_id, $rapidx_id, 'approved_by');
+                    }
+                }
+            }
+            DB::commit();
+            return response()->json([
+                'result' => true,
+                'message' => 'Training endorsement saved successfully.',
+                'endorsement_ctrl_no' => $ctrl_no ?? null
+            ]);
+        }catch(Throwable $e){
+            DB::rollback();
+            return $e->getMessage();
+        }
+        
+        return $data;
+    }
+
+    public function deleteTrainingEndorsement(Request $request)
+    {
+        // TODO: Replace with actual model delete logic
+        return response()->json(['result' => 0, 'message' => 'Not yet implemented.']);
+    }
+
+    public function getEndorsementUsers(Request $request)
+    {
+
+        $users = User::with(['users'])->whereNull('deleted_at')->get()->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->users->name,
+                'email' => $user->users->email,
+                'rapidx_id' => $user->rapidx_emp_id
+            ];
+        });
+
+        return response()->json($users);
+    }
+
+    public function getCurrentUser(Request $request)
+    {
+        $user = session('global_user');
+        $name = '';
+        if ($user) {
+            $name = $user->name;
+        }
+
+        return response()->json(['name' => trim($name)]);
+    }
+
+    public function getAllEmail(Request $request){
+        $users = RapidXUser::where('user_stat', 1)->get();
+
+        return response()->json($users);
+    }
+
+    public function getTrainingRequestControls(Request $request){
+        $trainingReqCtrls = TrainingRequest::select('ctrl_number')
+        ->where('logdel', 0)
+        ->where('ctrl_number', 'like', '%' . $request->training_req_ctrl . '%')
+        ->distinct()
+        ->get();
+        return response()->json($trainingReqCtrls);
+    }
+
+    public function getTrainingRequestDetails(Request $request){
+        $ctrl_number = $request->training_req_ctrl;
+
+        // // Get training_request_detail_ids already in training_endorsement_employees
+       
+            // 'training_request_details' => function($query) {
+            //     $query->whereNotIn('id', function($sub) {
+            //         $sub->select('training_request_detail_id')
+            //             ->from('training_endorsement_employees')
+            //             ->whereNull('deleted_at');
+            //     });
+            // },
+
+        $trainingRequest = TrainingRequest::with([
+            'training_request_details',
+            'training_request_details.hr_memo_details',
+            'training_request_details.employee_exam_details' => function($query) use ($ctrl_number) {
+                $query->where('training_request_ctrl_no', $ctrl_number);
+            },
+            'training_request_details.employee_exam_details.exam_result_details_info' => function($query) {
+                $query->where('exam_result_status', 1);
+            }
+        ])
+        ->where('ctrl_number', $request->training_req_ctrl)->first();
+
+        $endorsement = TrainingEndorsement::with([
+            'training_endorsement_employees:id,training_endorsement_id,training_request_detail_id'
+        ])
+        ->whereNull('deleted_at')
+        ->where('training_request_id', $trainingRequest->id)
+        ->get();
+
+        // Flatten all training_endorsement_employee IDs into a single array
+        // Get all training_request_detail_id from endorsement employees
+        $endorsement_employee_detail_ids = [];
+        foreach ($endorsement as $endorse) {
+            foreach ($endorse->training_endorsement_employees as $emp) {
+                $endorsement_employee_detail_ids[] = $emp->training_request_detail_id;
+            }
+        }
+        // Remove training_request_details whose id is in endorsement_employee_detail_ids
+        $filtered_details = collect($trainingRequest->training_request_details)->reject(function($detail) use ($endorsement_employee_detail_ids) {
+            return in_array($detail->id, $endorsement_employee_detail_ids);
+        })->values();
+
+        // Properly replace the original details with the filtered collection using setRelation
+        $trainingRequest->setRelation('training_request_details', $filtered_details);
+
+        
+        if(!$trainingRequest){
+            return response()->json([
+                'result' => false,
+                'message' => 'Training Request Control Number not found.'
+            ]);
+        }
+
+        // Get only the first hr_memo_details.document_no from training_request_details
+        $hr_memo_document_no = null;
+        $hr_memo_id = null;
+        foreach ($trainingRequest->training_request_details as $detail) {
+            $hr_memo_id = $detail->training_memo_doc_id;
+
+            if ($detail->hr_memo_details && isset($detail->hr_memo_details->document_no)) {
+                $hr_memo_document_no = $detail->hr_memo_details->document_no;
+                break;
+            }
+        }
+
+        return response()->json([
+            'result'              => true,
+            'training_request'    => $trainingRequest,
+            'hr_memo_document_no' => $hr_memo_document_no,
+            'hr_memo_id'     => $hr_memo_id
+        ]);
+    }
+
+    public function generateControlNumber()
+    {
+        $prefix = 'TUE';
+        $year = date('y'); // last two digits of year
+        $month = date('m');  // month, two digits
+
+        // Count existing endorsements for today
+        $count = TrainingEndorsement::count() + 1;
+        $countPadded = str_pad($count, 4, '0', STR_PAD_LEFT);
+
+        $controlNumber = "{$prefix}-{$year}{$month}-{$countPadded}";
+        return $controlNumber;
+    }
+
+    public function getEmployeesForNotEndorsed(Request $request)
+    {
+        $te_emp_details = TrainingEndorsementEmployee::where('training_endorsement_id', $request->training_endorsement_id)->get('emp_no')->pluck('emp_no')->toArray();
+
+        $tr_details = TrainingRequestDetails::where('training_request_id', $request->trId)->whereNotIn('emp_no', $te_emp_details)->get();
+
+        return DataTables::of($tr_details)
+        ->addColumn('action', function ($row) use ($request) {
+            $result = '';            
+            $result .= '<center>';            
+            $result .= '<button class="btn btn-sm btn-danger btnAddEmployeeForNotEndorsed" 
+                        data-emp-no="' . $row->emp_no . '"  
+                        data-te-id="' . $request->training_endorsement_id . '"  
+                        data-tr-id="' . $row->id . '"  
+                        title="Add Employee for Not Endorsed"><i class="fa fa-plus"></i></button>';
+            $result .= '</center>';
+            return $result;
+        })
+        ->rawColumns(['action'])
+        ->make(true);
+    }
+    
+    public function addNotEndorsedEmp(Request $request){
+        DB::beginTransaction();
+        try{
+            TrainingEndorsementEmployee::insert([
+                'training_endorsement_id'    => $request->training_endorsement_id,
+                'training_request_detail_id' => $request->training_request_id,
+                'emp_no'                     => $request->emp_no,
+                'will_endorse'               => 1,
+                'will_not_endorse_remarks'   => $request->remarks,
+                'created_by'                 => $_SESSION['rapidx_user_id'] ?? 'system',
+                'updated_by'                 => $_SESSION['rapidx_user_id'] ?? 'system',
+                'created_at'                 => now(),
+            ]);
+            DB::commit();
+
+            return response()->json([
+                'result' => true,
+                'message' => 'Employee added successfully for not endorsed.'
+            ]);
+        }catch(\Throwable $e){
+            DB::rollback();
+            return response()->json([
+                'result' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function exportEndorsementPdf(Request $request)
+    {
+        $tr_ctrl_no = $request->tr_ctrl_no;
+
+        $data = TrainingEndorsement::with([
+            'created_by_user_details',
+            'training_request_details',
+            'hr_memo_details',
+            'te_approval_details',
+            'te_approval_details.approver_details',
+            'training_endorsement_employees' => function($query) {
+                $query->whereNull('deleted_at');
+            },
+            'training_endorsement_employees.training_request_details_info',
+            'training_endorsement_employees.training_request_details_info.employee_exam_details' => function($query) use ($tr_ctrl_no) {
+                $query->where('training_request_ctrl_no', $tr_ctrl_no);
+            },
+            'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info'
+        ])
+        ->where('id', $request->id)
+        ->first();
+
+        if (!$data) {
+            abort(404, 'Endorsement not found.');
+        }
+
+        // return $data;
+        // Build employees array for the PDF
+        $employees = [];
+        $employees_will_not_endorse = [];
+        foreach ($data->training_endorsement_employees as $emp) {
+            $detail = $emp->training_request_details_info;
+            if (!$detail) continue;
+
+            $exams = [];
+            if ($detail->employee_exam_details && $detail->employee_exam_details->count() > 0) {
+                foreach ($detail->employee_exam_details as $examResult) {
+                    $examDetail = $examResult->exam_result_details_info;
+                    $examTitle = '';
+                    $score = '';
+                    $rating = '';
+                    $remark = '';
+
+                    if ($examDetail) {
+                        // Parse questionnaire JSON for exam_title
+                        if ($examDetail->questionnaire) {
+                            $questionnaire = is_string($examDetail->questionnaire)
+                                ? json_decode($examDetail->questionnaire, true)
+                                : $examDetail->questionnaire;
+                            $examTitle = $questionnaire['exam_title'] ?? '';
+                        }
+
+                        $totalScore = ($examDetail->score ?? 0) + ($examDetail->identification_essay_score ?? 0);
+                        $totalItems = $questionnaire['total_items'] ?? $questionnaire['total_points'] ?? '';
+                        $score = $totalItems ? $totalScore . '/' . $totalItems : $totalScore;
+                        $rating = $examDetail->rating ?? '';
+                        $remark = $examDetail->remark ?? '';
+                    }
+
+                    $exams[] = [
+                        'title'  => $examTitle,
+                        'score'  => $score,
+                        'rating' => $rating,
+                        'remark' => $remark,
+                    ];
+                }
+            }
+
+            $posDeptSec = implode(' / ', array_filter([
+                $detail->position ?? '',
+                $detail->department ?? '',
+                $detail->section ?? '',
+            ]));
+            
+            if($emp->will_endorse == 1){
+                $employees_will_not_endorse[] = [
+                    'date_hired'          => $detail->date_hired ?? '',
+                    'emp_no'              => $detail->emp_no ?? '',
+                    'name'                => $detail->name ?? '',
+                    'position'            => $posDeptSec,
+                    'exams'               => $exams,
+                    'immediate_superior'  => $data->training_request_details->section_head_user->name ?? '',
+                    'remarks'             => $emp->will_not_endorse_remarks ?? '',
+                ];
+            }
+            else{
+                $employees[] = [
+                    'date_hired'          => $detail->date_hired ?? '',
+                    'emp_no'              => $detail->emp_no ?? '',
+                    'name'                => $detail->name ?? '',
+                    'position'            => $posDeptSec,
+                    'exams'               => $exams,
+                    'immediate_superior'  => $data->training_request_details->section_head_user->name ?? '',
+                ];
+            }
+           
+        }
+
+        $attnEmails = $data->mail_cc ?? '';
+        $endorsementDate = $data->date ? Carbon::parse($data->date)->format('F j, Y') : '';
+
+        $pdf = Pdf::loadView('pdf.training_endorsement', [
+            'endorsement'                   => $data,
+            'to'                            => $attnEmails,
+            'attn'                          => $attnEmails,
+            'hr_memo_no'                    => $data->hr_memo_details->document_no ?? '',
+            'training_request_ctrl'         => $data->training_request_details->ctrl_number ?? '',
+            'endorsement_date'              => $endorsementDate,
+            'hr_endorsement_date'           => '',
+            'training_date'                 => '',
+            'endorsement_to_requestor_date' => $endorsementDate,
+            'employees'                     => $employees,
+            'employees_will_not_endorse'    => $employees_will_not_endorse,
+        ]);
+
+        $pdf->setPaper('A4', 'landscape');
+
+        return $pdf->stream('endorsement_' . ($data->ctrl_no ?? 'unknown') . '.pdf');
+    }
+}
