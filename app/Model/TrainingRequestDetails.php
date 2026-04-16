@@ -40,4 +40,12 @@ class TrainingRequestDetails extends Model
     public function training_attendance(){
         return $this->hasMany(TrainingAttendance::class, 'rapidx_emp_no', 'emp_no');
     }
+    
+    public function hr_memo_details(){
+        return $this->hasOne(HrMemo::class, 'id', 'training_memo_doc_id');
+    }
+
+    public function employee_exam_details(){
+        return $this->hasMany(ExamResult::class, 'employee_no','emp_no');
+    }
 }
