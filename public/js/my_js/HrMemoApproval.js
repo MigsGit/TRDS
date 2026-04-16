@@ -301,45 +301,45 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     });
 
     // Disapprove button
-    // $form.on('click', '#btnHRDisapprove', function () {
-    //     const id = $form.find('#txtHrMemoId').val();
-    //     let updateStatusTo = 4; //disapproved
-    //     // let forApproval = true;
-    //     confirmAction('Disapprove HR Memo Document?', function () {
-    //         updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
-    //     });
-    // });
-
-    // HR Disapprove button
     $form.on('click', '#btnHRDisapprove', function () {
         const id = $form.find('#txtHrMemoId').val();
-        let updateStatusTo = 4; // disapproved
-
-        Swal.fire({
-            title: 'Disapprove HR Memo',
-            input: 'textarea',
-            id: 'hrDisapproveRemarks',
-            inputLabel: 'Remarks',
-            inputPlaceholder: 'Enter reason for disapproval...',
-            inputAttributes: {
-                'aria-label': 'Enter remarks'
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Submit',
-            cancelButtonText: 'Cancel',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Remarks is required!';
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let remarks = result.value;
-
-                updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
-            }
+        let updateStatusTo = 4; //disapproved
+        // let forApproval = true;
+        confirmAction('Disapprove HR Memo Document?', function () {
+            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
         });
     });
+
+    // HR Disapprove button
+    // $form.on('click', '#btnHRDisapprove', function () {
+    //     const id = $form.find('#txtHrMemoId').val();
+    //     let updateStatusTo = 4; // disapproved
+
+    //     Swal.fire({
+    //         title: 'Disapprove HR Memo',
+    //         input: 'textarea',
+    //         id: 'hrDisapproveRemarks',
+    //         inputLabel: 'Remarks',
+    //         inputPlaceholder: 'Enter reason for disapproval...',
+    //         inputAttributes: {
+    //             'aria-label': 'Enter remarks'
+    //         },
+    //         showCancelButton: true,
+    //         confirmButtonText: 'Submit',
+    //         cancelButtonText: 'Cancel',
+    //         inputValidator: (value) => {
+    //             if (!value) {
+    //                 return 'Remarks is required!';
+    //             }
+    //         }
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             let remarks = result.value;
+
+    //             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
+    //         }
+    //     });
+    // });
 
     // HR Approve button
     $form.on('click', '#btnHRApprove', function () {
@@ -362,45 +362,45 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     });
 
     // Disapprove button
-    // $form.on('click', '#btnTUDisapprove', function () {
-    //     const id = $form.find('#txtHrMemoId').val();
-    //     let updateStatusTo = 7; //disapproved
-    //     // let forApproval = true;
-    //     confirmAction('Disapprove HR Memo Document?', function () {
-    //         updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
-    //     });
-    // });
-
-    // TU Disapprove button
     $form.on('click', '#btnTUDisapprove', function () {
         const id = $form.find('#txtHrMemoId').val();
-        let updateStatusTo = 7; // disapproved
-
-        Swal.fire({
-            title: 'Disapprove HR Memo',
-            input: 'textarea',
-            id: 'tuDisapproveRemarks',
-            inputLabel: 'Remarks',
-            inputPlaceholder: 'Enter reason for disapproval...',
-            inputAttributes: {
-                'aria-label': 'Enter remarks'
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Submit',
-            cancelButtonText: 'Cancel',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Remarks is required!';
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let remarks = result.value;
-
-                updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
-            }
+        let updateStatusTo = 7; //disapproved
+        // let forApproval = true;
+        confirmAction('Disapprove HR Memo Document?', function () {
+            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
         });
     });
+
+    // TU Disapprove button
+    // $form.on('click', '#btnTUDisapprove', function () {
+    //     const id = $form.find('#txtHrMemoId').val();
+    //     let updateStatusTo = 7; // disapproved
+
+    //     Swal.fire({
+    //         title: 'Disapprove HR Memo',
+    //         input: 'textarea',
+    //         id: 'tuDisapproveRemarks',
+    //         inputLabel: 'Remarks',
+    //         inputPlaceholder: 'Enter reason for disapproval...',
+    //         inputAttributes: {
+    //             'aria-label': 'Enter remarks'
+    //         },
+    //         showCancelButton: true,
+    //         confirmButtonText: 'Submit',
+    //         cancelButtonText: 'Cancel',
+    //         inputValidator: (value) => {
+    //             if (!value) {
+    //                 return 'Remarks is required!';
+    //             }
+    //         }
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             let remarks = result.value;
+
+    //             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
+    //         }
+    //     });
+    // });
 
     // --------------------
     // REMOVE ROW
