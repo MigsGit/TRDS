@@ -154,6 +154,8 @@ $(document).on('click', '.btnViewEndorsement', function () {
                     if(emp.will_endorse == 1){
                         statusHtml = '<span class="badge badge-danger">Not Endorsed</span>';
                     }
+
+                   
                     return Object.assign({
                         action: '--',
                         status: statusHtml,
@@ -161,14 +163,12 @@ $(document).on('click', '.btnViewEndorsement', function () {
                         emp_no: emp.training_request_details_info.emp_no || '',
                         name: emp.training_request_details_info.name || '',
                         id: emp.training_request_details_info.id || '',
-                        // will_not_endorse: false,
-                        // remarks: '',
                         rating: ratings,
                         questionnaire: examTitles,
                         exam_remarks: examRemarks,
-                        // rowClass: rowClass,
-                        // hasExam: hasExam,
-                        // hasPassed: hasPassed
+                        hands_on_attachment: emp.hands_on_filename ? `<button type="button" class="btn btn-primary btn-sm btnViewHandsOnAttachment" title="View Hands-On"><i class="fa fa-eye"></i></button>` : 'N/A',
+                        hands_on_filename: emp.hands_on_filename || '',
+                        training_endorsement_employee_id: emp.id || ''
                     });
                 });
                 
@@ -650,13 +650,39 @@ $(document).on('click', '.btnViewHandsOnAttachment', function () {
     var row = $(this).closest('tr');
     var rowIdx = endorsementEmployeeTable.row(row).index();
     var rowData = endorsementEmployeeTable.row(row).data();
-    if (rowData && rowData.hands_on_image) {
+
+    // Prefer inline/base64 image if present
+    if (!rowData) {
+        toastr.error('No employee data available.');
+        return;
+    }
+
+    if (rowData.hands_on_image) {
         var win = window.open('', '_blank');
+        if (!win) {
+            toastr.error('Please allow popups to view the image.');
+            return;
+        }
         win.document.write('<title>Hands-On Attachment</title><body style="margin:0;background:#000;"><img src="' + rowData.hands_on_image + '" style="max-width:100%;max-height:100vh;display:block;margin:auto;" /></body>');
         win.document.close();
-    } else {
-        toastr.error('No hands-on image attached.');
+        return;
     }
+
+    // Try to build URL from storage: saved under storage/hands_on/{empId}/{filename}
+    var filename = rowData.hands_on_filename;
+    var empId = rowData.training_endorsement_employee_id;
+     console.log('empId', empId, 'filename', filename, 'rowData', rowData);
+    // return false;
+    if (filename && empId) {
+        var fileExtension = filename.split('.').pop();
+        var url = './public/storage/hands_on_attachments/' + encodeURIComponent(empId + '.' + fileExtension);
+        var win2 = window.open(url, '_blank');
+        if (!win2) {
+            toastr.error('Please allow popups to view the image.');
+        }
+        return;
+    }
+    toastr.error('No hands-on image attached.');
 });
 
 $('#btnExportEndorsement').on('click', function(){

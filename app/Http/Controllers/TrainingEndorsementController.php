@@ -176,16 +176,6 @@ class TrainingEndorsementController extends Controller
                         'created_at'                 => now(),
                     ];
                     
-                    // TrainingEndorsementEmployee::insert([
-                    //     'training_endorsement_id'    => $inserted_te_id,
-                    //     'training_request_detail_id' => $employee['tr_details_id'],
-                    //     'emp_no'                     => $employee['emp_no'],
-                    //     'will_endorse'               => $employee['will_not_endorse'],
-                    //     'will_not_endorse_remarks'   => $employee['remarks'],
-                    //     'hands_on_filename'          => $hands_on_filename,
-                    //     'created_by'                 => $_SESSION['rapidx_user_id'] ?? 'system',
-                    //     'created_at'                 => now(),
-                    // ]);
                     $te_emp_id = TrainingEndorsementEmployee::insertGetId($array_endorsement_employee);
 
                     if (isset($employee['hands_on_image']) && !empty($employee['hands_on_image'])) {
@@ -309,7 +299,16 @@ class TrainingEndorsementController extends Controller
                 $query->where('exam_result_status', 1);
             }
         ])
-        ->where('ctrl_number', $request->training_req_ctrl)->first();
+        ->where('ctrl_number', $request->training_req_ctrl)
+        ->where('status', 3) // Training Request Approved
+        ->first();
+
+        if(!$trainingRequest){
+            return response()->json([
+                'result' => false,
+                'message' => 'Training Request Control Number not found or not approved.'
+            ]);
+        }
 
         $endorsement = TrainingEndorsement::with([
             'training_endorsement_employees:id,training_endorsement_id,training_request_detail_id'
