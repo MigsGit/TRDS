@@ -52,18 +52,23 @@ class TrainingEndorsementController extends Controller
             ->addColumn('action', function ($row) {
                 $result = "";
                 $result .= '<center>';
-                $result .= '<button class="btn btn-sm btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>';
-                $result .= '<button class="btn btn-sm btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>';
-                $result .= '<button class="btn btn-sm btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>';
-                $result .= '</center>';
+                    $result .= '<button class="btn btn-sm mr-1 btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>';
+                    $result .= '<button class="btn btn-sm mr-1 btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>';
+                    $result .= '<button class="btn btn-sm mr-1 btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>';
                 
-                return '
-                <center>
-                    <button class="btn btn-sm btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>
-                    <button class="btn btn-sm btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>
-                    <button class="btn btn-sm btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>
-                </center>
-                ';
+                if($row->status == 0){
+                    $result .= '<button class="btn btn-sm mr-1 btn-success btnProceedApprovalEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Proceed Approval"><i class="fa fa-check"></i></button>';
+                }
+                $result .= '</center>';
+
+                // return '
+                // <center>
+                //     <button class="btn btn-sm btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>
+                //     <button class="btn btn-sm btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>
+                //     <button class="btn btn-sm btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>
+                // </center>
+                // ';
+                return $result;
             })
             // ->addColumn('endorsement_ctrl', function ($row) {
             //     return $row->endorsement_ctrl ?? '';
@@ -175,7 +180,7 @@ class TrainingEndorsementController extends Controller
                         'created_by'                 => $_SESSION['rapidx_user_id'] ?? 'system',
                         'created_at'                 => now(),
                     ];
-                    
+
                     $te_emp_id = TrainingEndorsementEmployee::insertGetId($array_endorsement_employee);
 
                     if (isset($employee['hands_on_image']) && !empty($employee['hands_on_image'])) {
@@ -513,6 +518,7 @@ class TrainingEndorsementController extends Controller
                 ];
             }
             else{
+                $ext = $emp->hands_on_filename_ext ?? '';
                 $employees[] = [
                     'date_hired'          => $detail->date_hired ?? '',
                     'emp_no'              => $detail->emp_no ?? '',
@@ -530,7 +536,6 @@ class TrainingEndorsementController extends Controller
         $endorsementDate = $data->date ? Carbon::parse($data->date)->format('F j, Y') : '';
 
 
-        // return $employees;
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,
@@ -548,5 +553,29 @@ class TrainingEndorsementController extends Controller
         $pdf->setPaper('A4', 'landscape');
 
         return $pdf->stream('endorsement_' . ($data->ctrl_no ?? 'unknown') . '.pdf');
+    }
+
+    public function proceedEndorsementApproval(Request $request){
+        DB::beginTransaction();
+        try{
+            trainingEndorsement::where('id', $request->id)
+            ->update([
+                'status' => 1,
+                'updated_by' => $_SESSION['rapidx_user_id'],
+                'updated_at' => now(),
+            ]);
+            DB::commit();
+
+            return response()->json([
+                'result' => true,
+                'message' => 'Endorsement approval proceeded successfully.'
+            ]);
+        }catch(\Throwable $e){
+            DB::rollback();
+            return response()->json([
+                'result' => false,
+                'message' => 'An error occurred while processing your request.'
+            ]);
+        }
     }
 }

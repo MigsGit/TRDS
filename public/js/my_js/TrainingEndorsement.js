@@ -697,6 +697,26 @@ $('#btnExportEndorsement').on('click', function(){
 
 });
 
+$(document).on('click', '.btnProceedApprovalEndorsement', function(){
+    const id = $(this).data('id');
+    if (!id) {
+        toastr.error('Something went wrong. Please try again.');
+        return;
+    }
+    Swal.fire({
+        title: 'Proceed to Approval?',
+        text: 'Are you sure you want to proceed this endorsement for approval? Please ensure all details are correct before proceeding.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, proceed',
+        cancelButtonText: 'No, cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            proceedApprovalEndorsement(id);
+        }
+    });
+});
+
 
 // ==================== Dropdown Loaders ====================
 function getCheckedByUsers(selectedVal) {
@@ -834,6 +854,34 @@ function addNotEndorsedEmployee(empNo, teId, trId, remarks){
             console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
         }
     });
+}
 
-    
+function proceedApprovalEndorsement(id){
+    $.ajax({
+        type: "POST",
+        url: "proceed_endorsement_approval",
+        data: {
+            id: id,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        dataType: "json",
+        beforeSend: function(){
+            showSwalLoading();
+        },
+        success: function (response) {
+            if(!response.result){
+                toastr.error(response.message);
+                Swal.close();
+                return;
+            }
+            toastr.success(response.message);
+            trainingEndorsementTable.ajax.reload();
+            Swal.close();
+        },
+        error: function(xhr, status, error){
+            Swal.close();
+            toastr.error('An error occurred while processing your request.');
+            console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
+        }
+    });
 }
