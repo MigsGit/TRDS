@@ -13657,5 +13657,39 @@
 
 @section('js_content')
     <script type="text/javascript">
+        $(function () {
+            var $positionSelect = $('#text_select_position');
+            var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper');
+
+            function togglePositionSection(position) {
+                $positionSections.addClass('d-none');
+
+                switch (position) {
+                    case 'MH':
+                        $('#divMH').removeClass('d-none');
+                        break;
+                    case 'Technician':
+                        $('#divTechnian').removeClass('d-none');
+                        break;
+                    case 'Supervisor':
+                    case 'Engineer':
+                    case 'Planner':
+                        $('#divSEP').removeClass('d-none');
+                        break;
+                    case 'Inspector':
+                        $('#divInspector').removeClass('d-none');
+                        break;
+                    case 'Operator':
+                        $('#div_Oper').removeClass('d-none');
+                        break;
+                }
+            }
+
+            $positionSelect.on('change', function () {
+                togglePositionSection($(this).val());
+            });
+
+            togglePositionSection($positionSelect.val());
+        });
     </script>
 @endsection
