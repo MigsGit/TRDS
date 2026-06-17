@@ -39,6 +39,9 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/hr_memo', function () {
         return view('hr_memo_approval');
     })->name('hr_memo');
+    Route::get('/certification_classification', function () {
+        return view('certification_classification');
+    })->name('certification_classification');
 
     // Route::get('/training_request', function () {
     //     return view('training_request');
@@ -94,11 +97,11 @@ Route::middleware('checkSession')->group(function(){
         Route::post('create_update_questionnaire_details', 'createUpdateQuestionnaireDetails');
         Route::get('get_questionnaire_details_by_id', 'getQuestionnaireDetailsById');
     });
-    
+
     Route::controller(ExaminationController::class)->group(function () {
         Route::get('exam', 'examDashboard')->name('examDashboard');
         Route::get('exam/startExam/{id}/{revision}', 'startExam')->name('startExam');
-        
+
         Route::get('get_exam_training_request_control_no', 'getExamTrainingRequestControlNo')->name('get_exam_training_request_control_no');
         Route::get('get_exam_training_request_employee_no', 'getExamTrainingRequestEmployeeNo')->name('get_exam_training_request_employee_no');
         Route::get('count_exam_training_request_examination_take', 'countExamTrainingRequestExaminationTake')->name('count_exam_training_request_examination_take');
@@ -106,7 +109,7 @@ Route::middleware('checkSession')->group(function(){
         Route::post('exam_submission', 'examSubmission');
         Route::get('get_exam_training_request_details_by_id_revision', 'getExamTrainingRequestDetailsByIdRevision');
     });
-    
+
     Route::controller(ExaminationResultController::class)->group(function () {
         Route::get('view_exam_result', 'viewExamResult');
         Route::get('view_exam_result_details', 'viewExamResultDetails');
