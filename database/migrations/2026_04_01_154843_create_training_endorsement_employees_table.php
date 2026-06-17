@@ -23,6 +23,7 @@ class CreateTrainingEndorsementEmployeesTable extends Migration
             $table->longText('will_not_endorse_remarks')->nullable();
             // $table->string('hands_on_image')->nullable();
             $table->string('hands_on_filename')->nullable();
+            $table->string('hands_on_filename_ext')->nullable();
             $table->string('created_by');
             $table->string('updated_by')->nullable();
             $table->softDeletes();

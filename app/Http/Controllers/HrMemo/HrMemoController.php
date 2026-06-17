@@ -86,23 +86,23 @@ class HrMemoController extends Controller
             $result .= "</center>";
             return $result;
         })
-        ->addColumn('status_label', function($pth_details){
+        ->addColumn('status_label', function($hr_memo_details){
             $result = "";
             $result .= "<center>";
 
-            if($pth_details->status == 1){
+            if($hr_memo_details->status == 1){
                 $result .= "<span class='badge rounded-pill bg-info'>Pending</gspan>";
-            }else if($pth_details->status == 2){
+            }else if($hr_memo_details->status == 2){
                 $result .= "<span class='badge rounded-pill bg-secondary'>Cancelled</span>";
-            }else if($pth_details->status == 3){
+            }else if($hr_memo_details->status == 3){
                 $result .= "<span class='badge rounded-pill bg-primary'>For HR Approval</span>";
-            }else if($pth_details->status == 4){
+            }else if($hr_memo_details->status == 4){
                 $result .= "<span class='badge rounded-pill bg-danger'>HR Disapproved</span>";
-            }else if($pth_details->status == 5){
+            }else if($hr_memo_details->status == 5){
                 $result .= "<span class='badge rounded-pill bg-primary'>For TU Receiving</span>";
-            }else if($pth_details->status == 6){
+            }else if($hr_memo_details->status == 6){
                 $result .= "<span class='badge rounded-pill bg-success'>TU Received</span>";
-            }else if($pth_details->status == 7){
+            }else if($hr_memo_details->status == 7){
                 $result .= "<span class='badge rounded-pill bg-danger'>TU Disapproved</span>";
             }else{
                 $result .= "<span class='badge rounded-pill bg-info'>N/A</span>";
@@ -111,23 +111,23 @@ class HrMemoController extends Controller
 
             return $result;
         })
-        ->addColumn('reason_label', function($pth_details){
+        ->addColumn('reason_label', function($hr_memo_details){
             $result = "";
             $result .= "<center>";
 
-            if($pth_details->status == 1){
+            if($hr_memo_details->reason == 1){
                 $result .= "<span'>Newly Hired</span>";
-            }else if($pth_details->status == 2){
+            }else if($hr_memo_details->reason == 2){
                 $result .= "<span'>Maternity Leave</span>";
-            }else if($pth_details->status == 3){
+            }else if($hr_memo_details->reason == 3){
                 $result .= "<span'>Sick Leave</span>";
-            }else if($pth_details->status == 4){
+            }else if($hr_memo_details->reason == 4){
                 $result .= "<span'>Vacation Leave</span>";
-            }else if($pth_details->status == 5){
+            }else if($hr_memo_details->reason == 5){
                 $result .= "<span'>Promoted</span>";
-            }else if($pth_details->status == 6){
+            }else if($hr_memo_details->reason == 6){
                 $result .= "<span'>Transferred</span>";
-            }else if($pth_details->status == 7){
+            }else if($hr_memo_details->reason == 7){
                 $result .= "<span'>Regularization</span>";
             }else{
                 $result .= "<span'>N/A</span>";
@@ -394,21 +394,21 @@ class HrMemoController extends Controller
                 if ($td->employment_type == 1) {
                     // HRIS employee
                     $td->load(['hris_emp_info' => function ($q) {
-                        $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
-                        ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                        ->select(
+                        // $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                        // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                        $q->select(
                             'vw_employeeinfo.*',
-                            'tbl_Training.Venue as Venue'
+                            // 'tbl_Training.Venue as Venue'
                         );
                     }]);
                 } else {
                     // Subcon employee
                     $td->load(['subcon_emp_info' => function ($q) {
-                        $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
-                        ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                        ->select(
+                        // $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                        // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                        $q->select(
                             'vw_employeeinfo.*',
-                            'tbl_Training.Venue as Venue'
+                            // 'tbl_Training.Venue as Venue'
                         );
                     }]);
                 }
@@ -423,8 +423,8 @@ class HrMemoController extends Controller
 
         try {
             $memo = HrMemo::findOrFail($request->id);
-
             $memo->status = $request->new_status;
+            // $memo->approval_remarks = $request->remarks;
             $memo->save();
 
             DB::commit(); // ✅ commit here

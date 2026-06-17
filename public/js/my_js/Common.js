@@ -98,8 +98,29 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
 
         },
         error: function (result) {
-            alert('error ajax');
-            $('#modal-loading').modal('hide');
+            let errorResponse = result.responseJSON;
+            let status = result.status;
+
+            console.log('errorResponse',errorResponse);
+            // console.log(errorResponse.msg);
+            // console.log(errorResponse.trainingAttendanceIsExists);
+            // console.log(errorResponse.isSuccess);
+            // console.log(result.status);
+            // console.log(result.statusText);
+            // $('#modal-loading').modal('hide');
+            if( status === 500){
+                toastr.error(errorResponse.msg ?? '');
+                toastr.error(errorResponse.message ?? '');
+            }
+            if( result.status === 409 ){
+
+            }
+
+            if( result.status === 422 ){
+                toastr.error(errorResponse.message);
+
+                // errorHandler( errors.first_molding_device_id,formModal.firstMolding.find('#first_molding_device_id') );  
+            }
 
         }
     });
@@ -108,11 +129,6 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
 const resetFormValues = (params) => {
     // Reset values
     params.frmId[0].reset();
-    
-    // params.frmId[0].reset();
-
-    // Reset hidden input fields
-    // $("select[name='user_level']", $('#formAddUser')).val(0).trigger('change');
 
     // Remove invalid & title validation
     $('div').find('input').removeClass('is-invalid');

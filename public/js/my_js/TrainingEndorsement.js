@@ -105,6 +105,7 @@ $(document).on('click', '.btnViewEndorsement', function () {
                     var questionnaire = '';
                     var examTitles = '';
                     var examRemarks = '';
+                    var handsOnImage = '';
                     var statusHtml = '<span class="badge badge-success">Endorsed</span>';
 
                     if (Array.isArray(emp.training_request_details_info.employee_exam_details) && emp.training_request_details_info.employee_exam_details.length > 0) {

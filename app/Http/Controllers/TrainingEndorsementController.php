@@ -197,7 +197,8 @@ class TrainingEndorsementController extends Controller
 
                         TrainingEndorsementEmployee::where('id', $te_emp_id)
                         ->update([
-                            'hands_on_filename' => $filename
+                            'hands_on_filename'     => $filename,
+                            'hands_on_filename_ext' => $extension
                         ]);
                     }
                 }
@@ -455,6 +456,7 @@ class TrainingEndorsementController extends Controller
         // Build employees array for the PDF
         $employees = [];
         $employees_will_not_endorse = [];
+
         foreach ($data->training_endorsement_employees as $emp) {
             $detail = $emp->training_request_details_info;
             if (!$detail) continue;
@@ -518,6 +520,7 @@ class TrainingEndorsementController extends Controller
                     'position'            => $posDeptSec,
                     'exams'               => $exams,
                     'immediate_superior'  => $data->training_request_details->section_head_user->name ?? '',
+                    'attachment'          => $emp->hands_on_filename ? asset('public/storage/hands_on_attachments/' . $emp->id . '.' . $emp->hands_on_filename_ext) : '',
                 ];
             }
            
@@ -526,6 +529,8 @@ class TrainingEndorsementController extends Controller
         $attnEmails = $data->mail_cc ?? '';
         $endorsementDate = $data->date ? Carbon::parse($data->date)->format('F j, Y') : '';
 
+
+        // return $employees;
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,
