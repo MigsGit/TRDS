@@ -15,10 +15,14 @@ const trainingEndorsementTable = $('#tblTrainingEndorsement').DataTable({
     serverSide: true,
     ajax: {
         url: 'get_training_endorsements',
-        type: 'GET'
+        type: 'GET',
+        data: function(d) {
+            d.status = $('#endorsementStatus').val();
+        }
     },
     columns: [
         { data: 'action', orderable: false, searchable: false },
+        { data: 'raw_status' },
         { data: 'ctrl_no'},
         { data: 'hr_memo_details.document_no'  },
         { data: 'training_request_details.ctrl_number'  },
@@ -176,10 +180,13 @@ $(document).on('click', '.btnViewEndorsement', function () {
                 // Load employees into modal table
                 endorsementEmployeeTable.clear().rows.add(rows).draw();
 
+                // Validation for approval
+                if(data.status == 1){
+
+                }
+
                 // Set select2 values after modal opens
                 modalAddEndorsement.modal('show');
-                // getCheckedByUsers(data.checked_by);
-                // getApprovedByUsers(data.approved_by);
             } else {
                 toastr.error(response.message);
             }
@@ -717,6 +724,33 @@ $(document).on('click', '.btnProceedApprovalEndorsement', function(){
     });
 });
 
+$('#endorsementStatus').on('change', function(){
+    var status = $(this).val();
+    trainingEndorsementTable.ajax.reload();
+})
+
+
+$(document).on('click', '.btnApproveEndorsement', function(){
+    var id = $(this).data('id');
+    var approvalType = $(this).data('approval-type');
+
+    if (!id || !approvalType) {
+        toastr.error('Something went wrong. Please try again.');
+        return;
+    }
+    Swal.fire({
+        title: 'Approve Endorsement?',
+        text: 'Are you sure you want to approve this endorsement? Please ensure all details are correct before proceeding.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, approve',
+        cancelButtonText: 'No, cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            approveEndorsement(id, approvalType);
+        }
+    });
+});
 
 // ==================== Dropdown Loaders ====================
 function getCheckedByUsers(selectedVal) {
@@ -862,6 +896,37 @@ function proceedApprovalEndorsement(id){
         url: "proceed_endorsement_approval",
         data: {
             id: id,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        dataType: "json",
+        beforeSend: function(){
+            showSwalLoading();
+        },
+        success: function (response) {
+            if(!response.result){
+                toastr.error(response.message);
+                Swal.close();
+                return;
+            }
+            toastr.success(response.message);
+            trainingEndorsementTable.ajax.reload();
+            Swal.close();
+        },
+        error: function(xhr, status, error){
+            Swal.close();
+            toastr.error('An error occurred while processing your request.');
+            console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
+        }
+    });
+}
+
+function approveEndorsement(id, approvalType){
+    $.ajax({
+        type: "POST",
+        url: "approve_endorsement",
+        data: {
+            id: id,
+            approval_type: approvalType,
             _token: $('meta[name="csrf-token"]').attr('content')
         },
         dataType: "json",
