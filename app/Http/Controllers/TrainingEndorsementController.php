@@ -75,14 +75,18 @@ class TrainingEndorsementController extends Controller
                     $result .= '<button class="btn btn-sm mr-1 btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>';
                 }
 
-                if($row->status == 0){
-                    $result .= '<button class="btn btn-sm mr-1 btn-success btnProceedApprovalEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Proceed Approval"><i class="fa fa-check"></i></button>';
+                if($row->status == 0 && $row->created_by == $_SESSION['rapidx_user_id']){
+                    $result .= '<button class="btn btn-sm mr-1 btn-secondary btnEditEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-edit"></i></button>';
+                
+                    $result .= '<button class="btn btn-sm mr-1 btn-success btnProceedApprovalEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Proceed Approval"><i class="fa fa-paper-plane"></i></button>';
                 }
                 else if ($row->status == 1 && in_array(17, $exploded_u_access) && in_array($_SESSION['rapidx_user_id'], $checker_array)) {
                     $result .= '<button class="btn btn-sm mr-1 btn-success btnApproveEndorsement" data-approval-type="checker" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Approve Endorsement"><i class="fa fa-check"></i></button>';
+                    $result .= '<button class="btn btn-sm mr-1 btn-danger btnRejectEndorsement" data-approval-type="checker" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Reject Endorsement"><i class="fa fa-times"></i></button>';
                 }
-                 else if ($row->status == 2 && in_array(17, $exploded_u_access) && in_array($_SESSION['rapidx_user_id'], $approver_array)) {
+                else if ($row->status == 2 && in_array(17, $exploded_u_access) && in_array($_SESSION['rapidx_user_id'], $approver_array)) {
                     $result .= '<button class="btn btn-sm mr-1 btn-success btnApproveEndorsement" data-approval-type="approver" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Approve Endorsement"><i class="fa fa-check"></i></button>';
+                    $result .= '<button class="btn btn-sm mr-1 btn-danger btnRejectEndorsement" data-approval-type="approver" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Reject Endorsement"><i class="fa fa-times"></i></button>';
                 }
                 $result .= '</center>';
 
@@ -99,7 +103,13 @@ class TrainingEndorsementController extends Controller
                 $result = "";
                 $result .= '<center>';
                 if($row->status == 0){
-                    $result .= '<span class="badge badge-warning">Pending</span>';
+                    if(!is_null($row->disapprove_remarks) && !is_null($row->disapprove_by)){
+                        $result .= '<span class="badge badge-danger mt-1">Disapproved</span>';
+                        $result .= '<br><span class="mt-1"><strong>Remarks:</strong> '.$row->disapprove_remarks.'</span>';
+                    }
+                    else{
+                        $result .= '<span class="badge badge-warning">Pending</span>';
+                    }
                 } elseif($row->status == 1){
                     $result .= '<span class="badge badge-info">For Endorsement Checker</span>';
                 } elseif($row->status == 2){
@@ -161,32 +171,132 @@ class TrainingEndorsementController extends Controller
     {
         $data = $request->validated();
         DB::beginTransaction();
+        $inserted_te_id;
         try{
-            
-            if(isset($data['endorsement_id'])){ // Update
+            $list_of_employee = json_decode($data['employees'], true);
+            // Validate that there are employees in the list
+            if(count($list_of_employee) == 0){
+                return response()->json([
+                    'result' => false,
+                    'message' => 'No employees added for endorsement.'
+                ]);
+            }
+            // Check if any employee has not passed the exam or has no exam result
+            // return $list_of_employee;
+            if (
+                collect($list_of_employee)->contains(function ($employee) {
+                    return (empty($employee['hasExam']) || empty($employee['hasPassed'])) && !$employee['will_not_endorse'];
+                })
+            ) {
+                return response()->json([
+                    'result' => false,
+                    'message' => 'All employees must have passed the exam.'
+                ]);
+            }
 
+            if(isset($data['endorsement_id'])){ // Update
+               $inserted_te_id = $data['endorsement_id'];
+                TrainingEndorsement::where('id', $data['endorsement_id'])->update([
+                    'disapprove_remarks' => null,
+                    'disapprove_by'      => null,
+                    'mail_cc'            => implode(',', $data['attn']),
+                    'updated_by'         => $_SESSION['rapidx_user_id'] ?? 'system',
+                    'updated_at'         => now(),
+                ]);
+
+                // 1. Fetch the OLD IDs and image details BEFORE deleting the records
+                // This creates a nested array keyed by emp_no containing id, filename, and extension
+                $oldRecords = TrainingEndorsementEmployee::where('training_endorsement_id', $data['endorsement_id'])
+                    ->get()
+                    ->keyBy('emp_no')
+                    ->toArray();
+
+                // 2. Clear old data
+                TrainingEndorsementEmployee::where('training_endorsement_id', $data['endorsement_id'])->delete();
+                TrainingEndorsementApprovals::where('training_endorsement_id', $data['endorsement_id'])->delete();
+
+                foreach($list_of_employee as $employee){
+                    $empNo = $employee['emp_no'];
+                    $filename = "";
+                    
+                    $array_endorsement_employee = [
+                        'training_endorsement_id'    => $data['endorsement_id'],
+                        'training_request_detail_id' => $employee['tr_details_id'],
+                        'emp_no'                     => $empNo,
+                        'will_endorse'               => $employee['will_not_endorse'],
+                        'will_not_endorse_remarks'   => $employee['remarks'],
+                        'created_by'                 => $_SESSION['rapidx_user_id'] ?? 'system',
+                        'created_at'                 => now(),
+                    ];
+
+                    // This is your new ID (e.g., 12)
+                    $te_emp_id = TrainingEndorsementEmployee::insertGetId($array_endorsement_employee);
+
+                    // 3. Process new image
+                    if (isset($employee['hands_on_image']) && !empty($employee['hands_on_image'])) {
+                        $filename = $employee['hands_on_file_name'] ?? '';
+                        $extension = 'png';
+                        if (!empty($filename) && str_contains($filename, '.')) {
+                            $extension = pathinfo($filename, PATHINFO_EXTENSION);
+                        }
+                        $storageFilename = $te_emp_id . '.' . $extension;
+
+                        $imageData = $employee['hands_on_image'];
+                        if (preg_match('/^data:image\/(png|jpg|jpeg);base64,/', $imageData)) {
+                            $imageData = preg_replace('/^data:image\/(png|jpg|jpeg);base64,/', '', $imageData);
+                            $imageData = base64_decode($imageData);
+                        }
+                        Storage::put('public/hands_on_attachments/' . $storageFilename, $imageData);
+
+                        TrainingEndorsementEmployee::where('id', $te_emp_id)->update([
+                            'hands_on_filename'     => $filename,
+                            'hands_on_filename_ext' => $extension
+                        ]);
+                        
+                    // 4. Retain old image (e.g., renaming 10.png to 12.png)
+                    } elseif (isset($oldRecords[$empNo]) && !empty($oldRecords[$empNo]['hands_on_filename'])) {
+                        
+                        $oldId        = $oldRecords[$empNo]['id'];                 // This is 10
+                        $oldExtension = $oldRecords[$empNo]['hands_on_filename_ext'] ?? 'png';
+                        $oldFilename  = $oldRecords[$empNo]['hands_on_filename'];
+
+                        $oldStoragePath = 'public/hands_on_attachments/' . $oldId . '.' . $oldExtension;       // public/hands_on_attachments/10.png
+                        $newStoragePath = 'public/hands_on_attachments/' . $te_emp_id . '.' . $oldExtension;   // public/hands_on_attachments/12.png
+
+                        // Check if the physical file 10.png actually exists before trying to rename it
+                        if (Storage::exists($oldStoragePath)) {
+                            // Rename/move the file from 10.png to 12.png
+                            Storage::move($oldStoragePath, $newStoragePath);
+                        }
+
+                        // Save the original filename metadata into your new row (ID 12)
+                        TrainingEndorsementEmployee::where('id', $te_emp_id)->update([
+                            'hands_on_filename'     => $oldFilename,
+                            'hands_on_filename_ext' => $oldExtension
+                        ]);
+                    }
+                }
             }
             else{ // Create
-
-                $list_of_employee = json_decode($data['employees'], true);
-                // Validate that there are employees in the list
-                if(count($list_of_employee) == 0){
-                    return response()->json([
-                        'result' => false,
-                        'message' => 'No employees added for endorsement.'
-                    ]);
-                }
-                // Check if any employee has not passed the exam or has no exam result
-                if (
-                    collect($list_of_employee)->contains(function ($employee) {
-                        return (empty($employee['hasExam']) || empty($employee['hasPassed'])) && !$employee['will_not_endorse'];
-                    })
-                ) {
-                    return response()->json([
-                        'result' => false,
-                        'message' => 'All employees must have passed the exam.'
-                    ]);
-                }
+                // $list_of_employee = json_decode($data['employees'], true);
+                // // Validate that there are employees in the list
+                // if(count($list_of_employee) == 0){
+                //     return response()->json([
+                //         'result' => false,
+                //         'message' => 'No employees added for endorsement.'
+                //     ]);
+                // }
+                // // Check if any employee has not passed the exam or has no exam result
+                // if (
+                //     collect($list_of_employee)->contains(function ($employee) {
+                //         return (empty($employee['hasExam']) || empty($employee['hasPassed'])) && !$employee['will_not_endorse'];
+                //     })
+                // ) {
+                //     return response()->json([
+                //         'result' => false,
+                //         'message' => 'All employees must have passed the exam.'
+                //     ]);
+                // }
 
                 $ctrl_no = $this->generateControlNumber();
                 $endorsementData = [
@@ -239,17 +349,29 @@ class TrainingEndorsementController extends Controller
                     }
                 }
 
-                // Insert checked_by approvals
-                if (!empty($data['checked_by']) && is_array($data['checked_by'])) {
-                    foreach ($data['checked_by'] as $rapidx_id) {
-                        $this->insertApproval($inserted_te_id, $rapidx_id, 'checked_by');
-                    }
+                // // Insert checked_by approvals
+                // if (!empty($data['checked_by']) && is_array($data['checked_by'])) {
+                //     foreach ($data['checked_by'] as $rapidx_id) {
+                //         $this->insertApproval($inserted_te_id, $rapidx_id, 'checked_by');
+                //     }
+                // }
+                // // Insert approved_by approvals
+                // if (!empty($data['approved_by']) && is_array($data['approved_by'])) {
+                //     foreach ($data['approved_by'] as $rapidx_id) {
+                //         $this->insertApproval($inserted_te_id, $rapidx_id, 'approved_by');
+                //     }
+                // }
+            }
+            // Insert checked_by approvals
+            if (!empty($data['checked_by']) && is_array($data['checked_by'])) {
+                foreach ($data['checked_by'] as $rapidx_id) {
+                    $this->insertApproval($inserted_te_id, $rapidx_id, 'checked_by');
                 }
-                // Insert approved_by approvals
-                if (!empty($data['approved_by']) && is_array($data['approved_by'])) {
-                    foreach ($data['approved_by'] as $rapidx_id) {
-                        $this->insertApproval($inserted_te_id, $rapidx_id, 'approved_by');
-                    }
+            }
+            // Insert approved_by approvals
+            if (!empty($data['approved_by']) && is_array($data['approved_by'])) {
+                foreach ($data['approved_by'] as $rapidx_id) {
+                    $this->insertApproval($inserted_te_id, $rapidx_id, 'approved_by');
                 }
             }
             DB::commit();
@@ -633,6 +755,40 @@ class TrainingEndorsementController extends Controller
             return response()->json([
                 'result' => true,
                 'message' => 'Endorsement approved successfully.'
+            ]);
+        }catch(\Throwable $e){
+            DB::rollback();
+            return response()->json([
+                'result' => false,
+                'message' => 'An error occurred while processing your request.'
+            ]);
+        }
+    }
+
+    public function disapproveEndorsement(Request $request){
+        DB::beginTransaction();
+        try{
+            
+            $approval_type = $request->approval_type; // 'checker' or 'approver'
+            TrainingEndorsement::where('id', $request->id)
+            ->update([
+                'status' => 0,
+                'disapprove_remarks' => $request->dis_remarks ?? '',
+                'disapprove_by' => $_SESSION['rapidx_user_id'],
+                'updated_by' => $_SESSION['rapidx_user_id'],
+                'updated_at' => now(),
+            ]);
+            TrainingEndorsementApprovals::where('training_endorsement_id', $request->id)
+            ->where('rapidx_id', $_SESSION['rapidx_user_id'])
+            ->where('approval_type', $approval_type === 'checker' ? 'checked_by' : 'approved_by')
+            ->update([
+                'updated_by' => $_SESSION['rapidx_user_id'],
+                'updated_at' => now(),
+            ]);
+            DB::commit();
+            return response()->json([
+                'result' => true,
+                'message' => 'Endorsement disapproved successfully.'
             ]);
         }catch(\Throwable $e){
             DB::rollback();

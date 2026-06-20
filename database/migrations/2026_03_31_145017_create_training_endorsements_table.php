@@ -20,6 +20,8 @@ class CreateTrainingEndorsementsTable extends Migration
             $table->unsignedBigInteger('hr_memo_id');
             $table->string('ctrl_no')->nullable();
             $table->string('date')->nullable();
+            $table->longText('disapprove_remarks')->nullable();
+            $table->string('disapprove_by')->nullable();
             $table->string('mail_cc')->nullable();
             $table->string('created_by');
             $table->string('updated_by')->nullable();

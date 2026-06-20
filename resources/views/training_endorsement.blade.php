@@ -212,8 +212,11 @@
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" id="btnSubmitEndorsement" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
-                        <button type="button" id="btnExportEndorsement" class="btn btn-info" hidden><i class="fa fa-file-export"></i> Export</button>
+                        
+                        <div>
+                            <button type="button" id="btnExportEndorsement" class="btn btn-info" hidden><i class="fa fa-file-export"></i> Export</button>
+                            <button type="button" id="btnSubmitEndorsement" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
+                        </div>
                     </div>
                 </form>
             </div>

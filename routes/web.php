@@ -87,6 +87,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/export_endorsement_pdf', 'exportEndorsementPdf')->name('export_endorsement_pdf');
         Route::post('/proceed_endorsement_approval', 'proceedEndorsementApproval')->name('proceed_endorsement_approval');
         Route::post('/approve_endorsement', 'approveEndorsement')->name('approve_endorsement');
+        Route::post('/disapprove_endorsement', 'disapproveEndorsement')->name('disapprove_endorsement');
     });
 
     // QUESTIONNAIRES CONTROLLER
