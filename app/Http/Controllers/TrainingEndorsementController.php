@@ -701,7 +701,7 @@ class TrainingEndorsementController extends Controller
         $attnEmails = $data->mail_cc ?? '';
         $endorsementDate = $data->date ? Carbon::parse($data->date)->format('F j, Y') : '';
 
-
+        // return $data;
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,

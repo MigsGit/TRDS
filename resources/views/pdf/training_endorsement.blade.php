@@ -221,7 +221,7 @@
     @endphp
 
     <br><br><br>
-    <table style="width:100%; border:none; margin-top:20px;">
+    {{-- <table style="width:100%; border:none; margin-top:20px;">
         <tr>
             <td style="width:33%; text-align:center; vertical-align:top;">
                 <strong>Prepared by:</strong><br><br>
@@ -230,15 +230,67 @@
             <td style="width:33%; text-align:center; vertical-align:top;">
                 <strong>Checked by:</strong><br><br>
                 @foreach($checkedBy as $checker)
-                    {{-- {{ getUserDetails($checker->rapidx_id) }}<br> --}}
+                    <img src="http://rapidx/RapidX_E-Signature/{{ $checker->approver_details->employee_number.'.png' }}" alt="Signature" style="width:100px; height:auto;"><br>
                     {{ $checker->approver_details->name ?? '' }}<br>
                 @endforeach
             </td>
             <td style="width:33%; text-align:center; vertical-align:top;">
                 <strong>Approved by:</strong><br><br>
                 @foreach($approvedBy as $approver)
-                    {{-- {{ getUserDetails($approver->rapidx_id) }}<br> --}}
+                    <img src="http://rapidx/RapidX_E-Signature/{{ $approver->approver_details->employee_number.'.png' }}" style="width:100px; height:auto;"><br>
                     {{ $approver->approver_details->name ?? '' }}<br>
+                @endforeach
+            </td>
+        </tr>
+    </table> --}}
+
+    <table style="width:100%; border:none; margin-top:10px; border-collapse: collapse;">
+        <tr>
+            <td style="width:33%; text-align:center; padding-bottom: 10px; font-weight: bold;">
+                Prepared by:
+            </td>
+            <td style="width:33%; text-align:center; padding-bottom: 10px; font-weight: bold;">
+                Checked by:
+            </td>
+            <td style="width:33%; text-align:center; padding-bottom: 10px; font-weight: bold;">
+                Approved by:
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="width:33%; text-align:center; vertical-align: bottom; padding: 0 10px;">
+                <span style="display:block; font-weight: bold;">
+                    {{ $endorsement->created_by_user_details->name ?? '' }}
+                </span>
+            </td>
+            
+            <td style="width:33%; text-align:center; vertical-align: bottom; padding: 0 10px;">
+                @foreach($checkedBy as $checker)
+                    <div style="display: block; text-align: center;">
+                        @if ($endorsement->status == 2)
+                            <img src="http://rapidx/RapidX_E-Signature/{{ $checker->approver_details->employee_number.'.png' }}" 
+                                alt="Signature" 
+                                style="width:100px; height:auto; display:block; margin: 0 auto -20px auto;">
+                        @endif
+                        <span style="display:block; font-weight: bold;">
+                            {{ $checker->approver_details->name ?? '' }}
+                        </span>
+                    </div>
+                @endforeach
+            </td>
+            
+            <td style="width:33%; text-align:center; vertical-align: bottom; padding: 0 10px;">
+                @foreach($approvedBy as $approver)
+                    <div style="display: block; text-align: center;">
+                        @if ($endorsement->status == 2)
+                            <img src="http://rapidx/RapidX_E-Signature/{{ $approver->approver_details->employee_number.'.png' }}" 
+                                alt="Signature" 
+                                style="width:100px; height:auto; display:block; margin: 0 auto -20px auto;">
+                        @endif
+                        <span style="display:block; font-weight: bold;">
+                            {{ $approver->approver_details->name ?? '' }}
+                        </span>
+                    </div>
                 @endforeach
             </td>
         </tr>
