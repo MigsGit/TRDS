@@ -171,7 +171,7 @@ class TrainingEndorsementController extends Controller
     {
         $data = $request->validated();
         DB::beginTransaction();
-        $inserted_te_id;
+        $inserted_te_id = null;
         try{
             $list_of_employee = json_decode($data['employees'], true);
             // Validate that there are employees in the list
@@ -214,7 +214,6 @@ class TrainingEndorsementController extends Controller
                 // 2. Clear old data
                 TrainingEndorsementEmployee::where('training_endorsement_id', $data['endorsement_id'])->delete();
                 TrainingEndorsementApprovals::where('training_endorsement_id', $data['endorsement_id'])->delete();
-
                 foreach($list_of_employee as $employee){
                     $empNo = $employee['emp_no'];
                     $filename = "";
@@ -380,18 +379,32 @@ class TrainingEndorsementController extends Controller
                 'message' => 'Training endorsement saved successfully.',
                 'endorsement_ctrl_no' => $ctrl_no ?? null
             ]);
-        }catch(Throwable $e){
+        }catch(\Throwable $e){
             DB::rollback();
             return $e->getMessage();
         }
         
-        return $data;
     }
 
     public function deleteTrainingEndorsement(Request $request)
     {
-        // TODO: Replace with actual model delete logic
-        return response()->json(['result' => 0, 'message' => 'Not yet implemented.']);
+        DB::beginTransaction();
+        try{
+            TrainingEndorsement::where('id', $request->id)
+            ->update([
+                'deleted_at' => now(),
+                'updated_by' => $_SESSION['rapidx_user_id'] ?? 'system',
+                'updated_at' => now()
+            ]);
+            DB::commit();
+            return response()->json([
+                'result' => true,
+                'message' => 'Training endorsement deleted successfully.'
+            ]);
+        }catch(\Throwable $e){
+            DB::rollback();
+            return $e->getMessage();
+        }
     }
 
     public function getEndorsementUsers(Request $request)

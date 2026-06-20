@@ -820,6 +820,7 @@ $(document).on('click', '.btnEditEndorsement', function(){
         success: function (response) {
             if (response.result) {
                 let data = response.data;
+                console.log('Endorsement data for editing:', data);
                 $('#endorsementId').val(data.id);
                 $('#documentNo').val(data.ctrl_no);
                 $('#trainingReqCtrl').val(data.training_request_details.ctrl_number);
@@ -829,7 +830,6 @@ $(document).on('click', '.btnEditEndorsement', function(){
 
                 let attn = data.mail_cc.split(',').map(email => email.trim());
                 $('#attn').val(attn).trigger('change');
-                console.log(data.approved_by);
                 $('#selectApprovedBy').val(data.approved_by).trigger('change');
                 $('#selectCheckedBy').val(data.checked_by).trigger('change');
                 
@@ -837,7 +837,7 @@ $(document).on('click', '.btnEditEndorsement', function(){
                 $('#trainingReqCtrl').prop('readonly', true);
                 $('#btnSubmitEndorsement').show();
                 $('#selectApprovedBy').prop('readonly', false);
-                $('#selectCheckedBy').prop('readonly', false);
+                $('#selectCheckedBy').prop('readv conly', false);
                 
                 // Get job function from dynamic training request details block
                 let trJobFunctions = data.training_request_details ? data.training_request_details.job_function : null;
@@ -854,8 +854,10 @@ $(document).on('click', '.btnEditEndorsement', function(){
                     var hasPassed = false;
                     var requiresHandsOn = false;
                     var will_not_endorse = false;
+                    var will_not_endorse_remarks = "";
                     if(emp.will_endorse) {
                         will_not_endorse = true;
+                        will_not_endorse_remarks = emp.will_not_endorse_remarks;
                     }
 
                     // Compute exam indicators matching your creation logic context
@@ -961,6 +963,7 @@ $(document).on('click', '.btnEditEndorsement', function(){
                         hasExam: hasExam,
                         hasPassed: hasPassed,
                         will_not_endorse: will_not_endorse,
+                        remarks: will_not_endorse_remarks,
                         requiresHandsOn: requiresHandsOn || false,
                         hands_on_attachment: emp.hands_on_filename ? `<button type="button" class="btn btn-primary btn-sm btnViewHandsOnAttachment" title="View Hands-On"><i class="fa fa-eye"></i></button>` : 'N/A',
                         hands_on_filename: emp.hands_on_filename || '',
