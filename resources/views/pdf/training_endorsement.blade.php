@@ -258,7 +258,7 @@
         </tr>
         
         <tr>
-            <td style="width:33%; text-align:center; vertical-align: bottom; padding: 0 10px;">
+            <td style="width:33%; text-align:center; vertical-align: top; padding: 0 10px;">
                 <span style="display:block; font-weight: bold;">
                     {{ $endorsement->created_by_user_details->name ?? '' }}
                 </span>
@@ -267,10 +267,10 @@
             <td style="width:33%; text-align:center; vertical-align: bottom; padding: 0 10px;">
                 @foreach($checkedBy as $checker)
                     <div style="display: block; text-align: center;">
-                        @if ($endorsement->status == 2)
+                        @if ($endorsement->status > 2)
                             <img src="http://rapidx/RapidX_E-Signature/{{ $checker->approver_details->employee_number.'.png' }}" 
                                 alt="Signature" 
-                                style="width:100px; height:auto; display:block; margin: 0 auto -20px auto;">
+                                style="width:80px; height:auto; display:block; margin: 0 auto -20px auto;">
                         @endif
                         <span style="display:block; font-weight: bold;">
                             {{ $checker->approver_details->name ?? '' }}
@@ -282,10 +282,10 @@
             <td style="width:33%; text-align:center; vertical-align: bottom; padding: 0 10px;">
                 @foreach($approvedBy as $approver)
                     <div style="display: block; text-align: center;">
-                        @if ($endorsement->status == 2)
+                        @if ($endorsement->status == 3)
                             <img src="http://rapidx/RapidX_E-Signature/{{ $approver->approver_details->employee_number.'.png' }}" 
                                 alt="Signature" 
-                                style="width:100px; height:auto; display:block; margin: 0 auto -20px auto;">
+                                style="width:80px; height:auto; display:block; margin: 0 auto -20px auto;">
                         @endif
                         <span style="display:block; font-weight: bold;">
                             {{ $approver->approver_details->name ?? '' }}
