@@ -64,8 +64,8 @@ class TrainingEndorsementController extends Controller
         return DataTables::of($data)
             ->addColumn('action', function ($row) use($exploded_u_access) {
 
-                $approver_array = $row->te_approval_details->where('approval_type', 'approved_by')->pluck('rapidx_id')->toArray();
-                $checker_array = $row->te_approval_details->where('approval_type', 'checked_by')->pluck('rapidx_id')->toArray();
+                $approver_array = $row->te_approval_details->where('approval_type', 'approved_by')->whereNull('updated_at')->pluck('rapidx_id')->toArray();
+                $checker_array = $row->te_approval_details->where('approval_type', 'checked_by')->whereNull('updated_at')->pluck('rapidx_id')->toArray();
                 $result = "";
                 $result .= '<center>';
                 $result .= '<button class="btn btn-sm mr-1 btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>';
@@ -77,10 +77,9 @@ class TrainingEndorsementController extends Controller
 
                 if($row->status == 0 && $row->created_by == $_SESSION['rapidx_user_id']){
                     $result .= '<button class="btn btn-sm mr-1 btn-secondary btnEditEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-edit"></i></button>';
-                
                     $result .= '<button class="btn btn-sm mr-1 btn-success btnProceedApprovalEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Proceed Approval"><i class="fa fa-paper-plane"></i></button>';
                 }
-                else if ($row->status == 1 && in_array(17, $exploded_u_access) && in_array($_SESSION['rapidx_user_id'], $checker_array)) {
+                else if ($row->status == 1 && in_array(17, $exploded_u_access) && in_array($_SESSION['rapidx_user_id'], $checker_array) ) {
                     $result .= '<button class="btn btn-sm mr-1 btn-success btnApproveEndorsement" data-approval-type="checker" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Approve Endorsement"><i class="fa fa-check"></i></button>';
                     $result .= '<button class="btn btn-sm mr-1 btn-danger btnRejectEndorsement" data-approval-type="checker" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Reject Endorsement"><i class="fa fa-times"></i></button>';
                 }
@@ -749,14 +748,14 @@ class TrainingEndorsementController extends Controller
         DB::beginTransaction();
         try{
             $approval_type = $request->approval_type; // 'checker' or 'approver'
-            $status = ($approval_type === 'checker') ? 2 : 3;
+            // $status = ($approval_type === 'checker') ? 2 : 3;
 
-            TrainingEndorsement::where('id', $request->id)
-            ->update([
-                'status' => $status,
-                'updated_by' => $_SESSION['rapidx_user_id'],
-                'updated_at' => now(),
-            ]);
+            // TrainingEndorsement::where('id', $request->id)
+            // ->update([
+            //     // 'status' => $status,
+            //     'updated_by' => $_SESSION['rapidx_user_id'],
+            //     'updated_at' => now(),
+            // ]);
             TrainingEndorsementApprovals::where('training_endorsement_id', $request->id)
             ->where('rapidx_id', $_SESSION['rapidx_user_id'])
             ->where('approval_type', $approval_type === 'checker' ? 'checked_by' : 'approved_by')
@@ -764,6 +763,23 @@ class TrainingEndorsementController extends Controller
                 'updated_by' => $_SESSION['rapidx_user_id'],
                 'updated_at' => now(),
             ]);
+
+            $approver_left = TrainingEndorsementApprovals::where('training_endorsement_id', $request->id)
+            ->where('approval_type', $approval_type === 'checker' ? 'checked_by' : 'approved_by')
+            ->whereNull('updated_at')
+            ->get();
+
+            if($approver_left->count() == 0){
+                $new_status = ($approval_type === 'checker') ? 2 : 3;
+                TrainingEndorsement::where('id', $request->id)
+                ->update([
+                    'status' => $new_status,
+                    'updated_by' => $_SESSION['rapidx_user_id'],
+                    'updated_at' => now(),
+                ]);
+            }
+
+
             DB::commit();
             return response()->json([
                 'result' => true,
