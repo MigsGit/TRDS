@@ -34,7 +34,7 @@
                                 <div class="card-header m-3">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h5 class="card-title fw-bold fs-4 text-secondary">Certification / Qualification List</h5>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateCQForm"><i class="fa fa-plus fa-md me-2"></i>Certify Employee</button>
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCreateCQForm"><i class="fa fa-plus fa-md me-2"></i>Certify Employee</button>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -286,9 +286,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title mb-0" id="createCQFormLabel">Qualification / Certification Form</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> 
+                            </button>
                     </div>
 
                     <div class="modal-body">
@@ -358,7 +357,7 @@
 
                                 <div class="row mt-2 mb-5">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-primary" style="width: 100%;" id="" data-bs-target="#select_Employee" data-bs-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                        <button type="button" class="btn btn-primary" style="width: 100%;" id="" data-target="#select_Employee" data-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
                                     </div>
                                 </div>
 
@@ -382,7 +381,7 @@
                                 <div class="row mb-5">
                                     <div class="col-md-12">
                                         <label for="">Reason for Certification:</label>
-                                        <select class="form-select" name="text_mh_certification" id="text_mh_certification">
+                                        <select class="form-control select2bs4" name="text_mh_certification" id="text_mh_certification">
                                             <option value="" selected disabled>Select Reason</option>
                                             <option value="Newly hired employees">1 Newly hired employees</option>
                                             <option value="Newly promoted employees">2 Newly promoted employees</option>
@@ -403,11 +402,11 @@
                                 <div class="accordion" id="accordionExampleMH">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneMH" aria-expanded="true" aria-controls="collapseOneMH">
+                                        <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneMH" aria-expanded="true" aria-controls="collapseOneMH">
                                             <h5>PRODUCTION / WAREHOUSE SUPERVISOR (Training/Orientation)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseOneMH" class="accordion-collapse collapse show" data-bs-parent="#accordionExampleMH">
+                                        <div id="collapseOneMH" class="accordion-collapse collapse show" data-parent="#accordionExampleMH">
                                             <div class="accordion-body">
 
                                                 <!-- ------------------------------------------------ -->
@@ -692,7 +691,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label class="ms-3" for="">First Take:</label>
-                                                        <select class="form-select" name="text_mh_first_result" id="text_mh_first_result">
+                                                        <select class="form-control select2bs4" name="text_mh_first_result" id="text_mh_first_result">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -701,7 +700,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="ms-3" for="">Second Take:</label>
-                                                        <select class="form-select" name="text_mh_second_result" id="text_mh_second_result">
+                                                        <select class="form-control select2bs4" name="text_mh_second_result" id="text_mh_second_result">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -714,7 +713,7 @@
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <label class="ms-3" for="">Trained by:</label>
-                                                                <input class="form-select" type="text" id="text_mh_first_trained_by" name="text_mh_first_trained_by" list="list_display_empno" placeholder="Select Trained by">
+                                                                <input class="form-control" type="text" id="text_mh_first_trained_by" name="text_mh_first_trained_by" list="list_display_empno" placeholder="Select Trained by">
                                                                 <datalist id="list_display_empno"></datalist>
 
                                                                 <input type="hidden" id="text_mh_first_trained_by_username" name="text_mh_first_trained_by_username">
@@ -722,7 +721,7 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label class="ms-3" for="">Mentored by:</label>
-                                                                <input class="form-select" type="text" id="text_mh_first_mentored_by" name="text_mh_first_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                                                <input class="form-control" type="text" id="text_mh_first_mentored_by" name="text_mh_first_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
                                                                 <datalist id="list_display_empno"></datalist>
                                                             </div>
                                                         </div>
@@ -733,7 +732,7 @@
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <label class="ms-3" for="">Trained by:</label>
-                                                                <input class="form-select" type="text" id="text_mh_second_trained_by" name="text_mh_second_trained_by" list="list_display_empno" placeholder="Select Trained by">
+                                                                <input class="form-control" type="text" id="text_mh_second_trained_by" name="text_mh_second_trained_by" list="list_display_empno" placeholder="Select Trained by">
                                                                 <datalist id="list_display_empno"></datalist>
 
                                                                 <input type="hidden" id="text_mh_second_trained_by_username" name="text_mh_second_trained_by_username">
@@ -741,7 +740,7 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label class="ms-3" for="">Mentored by:</label>
-                                                                <input class="form-select" type="text" id="text_mh_second_mentored_by" name="text_mh_second_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                                                <input class="form-control" type="text" id="text_mh_second_mentored_by" name="text_mh_second_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
                                                                 <datalist id="list_display_empno"></datalist>
                                                             </div>
                                                         </div>
@@ -775,7 +774,7 @@
                                                     <div class="col-md-6"></div>
                                                     <div class="col-md-3">
                                                         <label class="" for="">Send Email Alert to:</label>
-                                                        <input class="form-select" type="text" id="text_alert_pw_sec_mh" name="text_alert_pw_sec_mh" list="list_display_empno" placeholder="Send email to">
+                                                        <input class="form-control" type="text" id="text_alert_pw_sec_mh" name="text_alert_pw_sec_mh" list="list_display_empno" placeholder="Send email to">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_alert_pw_sec_mh_username" name="text_alert_pw_sec_mh_username">
                                                         <input type="hidden" id="text_alert_pw_sec_mh_email" name="text_alert_pw_sec_mh_email">
@@ -783,7 +782,7 @@
 
                                                     <div class="col-md-3">
                                                         <label class="" for="">Add cc:</label>
-                                                        <input class="form-select" type="text" id="text_alert_pw_cc_sec_mh" name="text_alert_pw_cc_sec_mh" list="list_display_empno" placeholder="Cc">
+                                                        <input class="form-control" type="text" id="text_alert_pw_cc_sec_mh" name="text_alert_pw_cc_sec_mh" list="list_display_empno" placeholder="Cc">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_alert_pw_cc_sec_mh_username" name="text_alert_pw_cc_sec_mh_username">
                                                         <input type="hidden" id="text_alert_pw_cc_sec_mh_email" name="text_alert_pw_cc_sec_mh_email">
@@ -797,7 +796,7 @@
                                                     <div class="col-md-3">
                                                         <label for="text_alert_pw_sec_mh">Send Email Alert to:</label>
                                                         <div id="selectedPwAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                        <input class="form-select" type="text"
+                                                        <input class="form-control" type="text"
                                                             id="text_alert_pw_sec_mh"
                                                             name="text_alert_pw_sec_mh"
                                                             list="list_display_empno"
@@ -811,7 +810,7 @@
                                                     <div class="col-md-3">
                                                         <label for="text_alert_pw_cc_sec_mh">Add cc:</label>
                                                         <div id="selectedPwAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                        <input class="form-select" type="text"
+                                                        <input class="form-control" type="text"
                                                             id="text_alert_pw_cc_sec_mh"
                                                             name="text_alert_pw_cc_sec_mh"
                                                             list="list_display_empno"
@@ -829,11 +828,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwoMH" aria-expanded="false" aria-controls="collapseTwoMH">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoMH" aria-expanded="false" aria-controls="collapseTwoMH">
                                             <h5>LINE QUALITY CONTROL SECTION (Certification)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseTwoMH" class="accordion-collapse collapse" data-bs-parent="#accordionExampleMH">
+                                        <div id="collapseTwoMH" class="accordion-collapse collapse" data-parent="#accordionExampleMH">
                                             <div class="accordion-body">
 
                                                 <!-- ------------------------------------------------ -->
@@ -861,7 +860,7 @@
                                                 <div class="row mb-4">
                                                     <div class="col-md-6">
                                                         <p class="" for="">1.1 Observation / Interview Result</p>
-                                                        <select class="form-select" name="text_mh_obs_first_result" id="text_mh_obs_first_result">
+                                                        <select class="form-control select2bs4" name="text_mh_obs_first_result" id="text_mh_obs_first_result">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -870,7 +869,7 @@
 
                                                     <div class="col-md-6">
                                                         <p class="" for="">1.1 Observation / Interview Result</p>
-                                                        <select class="form-select" name="text_mh_obs_second_result" id="text_mh_obs_second_result">
+                                                        <select class="form-control select2bs4" name="text_mh_obs_second_result" id="text_mh_obs_second_result">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -963,7 +962,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label class="" for="">3. Overall Assessment:</label>
-                                                        <select class="form-select" name="text_mh_oa_1st_result" id="text_mh_oa_1st_result">
+                                                        <select class="form-control select2bs4" name="text_mh_oa_1st_result" id="text_mh_oa_1st_result">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -972,7 +971,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="" for="">3. Overall Assessment:</label>
-                                                        <select class="form-select" name="text_mh_oa_2nd_result" id="text_mh_oa_2nd_result">
+                                                        <select class="form-control select2bs4" name="text_mh_oa_2nd_result" id="text_mh_oa_2nd_result">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -995,7 +994,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label class="" for="">Certified by:</label>
-                                                        <input class="form-select" type="text" id="text_mh_1st_certified" name="text_mh_1st_certified" list="list_display_empno" placeholder="Select Certified by">
+                                                        <input class="form-control" type="text" id="text_mh_1st_certified" name="text_mh_1st_certified" list="list_display_empno" placeholder="Select Certified by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_mh_1st_certified_username" name="text_mh_1st_certified_username">
@@ -1004,7 +1003,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="" for="">Certified by:</label>
-                                                        <input class="form-select" type="text" id="text_mh_2nd_certified" name="text_mh_2nd_certified" list="list_display_empno" placeholder="Select Certified by">
+                                                        <input class="form-control" type="text" id="text_mh_2nd_certified" name="text_mh_2nd_certified" list="list_display_empno" placeholder="Select Certified by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_mh_2nd_certified_username" name="text_mh_2nd_certified_username">
@@ -1079,7 +1078,7 @@
 
                                 <div class="col-md-6">
                                     <label for="">Approved / Confirmed by:</label>
-                                    <input class="form-select" type="text" id="text_mh_approved_confirmed_by" name="text_mh_approved_confirmed_by" list="list_display_empno" placeholder="Select Certified by">
+                                    <input class="form-control" type="text" id="text_mh_approved_confirmed_by" name="text_mh_approved_confirmed_by" list="list_display_empno" placeholder="Select Certified by">
                                     <datalist id="list_display_empno"></datalist>
 
                                     <label for="" class="mt-1">Prodn / PPC-WHSE Sec. Head</label>
@@ -1089,7 +1088,7 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                     <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
                                 </div>
 
@@ -1112,7 +1111,7 @@
 
                                     <div class="col-md-3">
                                         <label for="">Production Section:</label>
-                                        <input class="form-select" type="text" name="text_tech_section" id="text_tech_section" list="list_section" placeholder="Select Section">
+                                        <input class="form-control" type="text" name="text_tech_section" id="text_tech_section" list="list_section" placeholder="Select Section">
                                         <datalist id="list_section">
 
                                         </datalist>
@@ -1120,7 +1119,7 @@
 
                                     <div class="col-md-3">
                                         <label for="">Station:</label>
-                                        <select class="form-select" name="text_tech_station" id="text_tech_station">
+                                        <select class="form-control select2bs4" name="text_tech_station" id="text_tech_station">
                                             <option value="" selected disabled>Select station</option>
                                             <option value="Process">Process</option>
                                             <option value="Maintenance">Maintenance</option>
@@ -1131,14 +1130,14 @@
 
                                     <div class="col-md-3">
                                         <label for="">Product Line:</label>
-                                        <input class="form-select" type="text" id="text_tech_product_line" name="text_tech_product_line" placeholder="Enter product line here" list="list_prod_line">
+                                        <input class="form-control" type="text" id="text_tech_product_line" name="text_tech_product_line" placeholder="Enter product line here" list="list_prod_line">
                                         <datalist id="list_prod_line"></datalist>
                                     </div>
                                 </div>
 
                                 <div class="row mt-2 mb-5">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-primary" style="width: 100%;" data-bs-target="#select_Employee_technician" data-bs-toggle="modal"><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                        <button type="button" class="btn btn-primary" style="width: 100%;" data-target="#select_Employee_technician" data-toggle="modal"><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
                                     </div>
                                 </div>
 
@@ -1162,7 +1161,7 @@
                                 <div class="row mb-5">
                                     <div class="col-md-12">
                                         <label for="">Reason for Certification:</label>
-                                        <select class="form-select" name=text_tech_certification id="text_tech_certification">
+                                        <select class="form-control select2bs4" name=text_tech_certification id="text_tech_certification">
                                             <option value="" selected disabled>Select Reason</option>
                                             <option value="Lateral transfer">1 Lateral transfer</option>
                                             <option value="Flexibility">2 Flexibility</option>
@@ -1183,11 +1182,11 @@
                                 <div class="accordion" id="accordionExampleTech">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneTech" aria-expanded="true" aria-controls="collapseOneTech">
+                                        <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneTech" aria-expanded="true" aria-controls="collapseOneTech">
                                             <h5>ENGINEERING SECTION (Training and Qualification)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseOneTech" class="accordion-collapse collapse show" data-bs-parent="#accordionExampleTech">
+                                        <div id="collapseOneTech" class="accordion-collapse collapse show" data-parent="#accordionExampleTech">
                                             <div class="accordion-body">
 
                                                 <!-- ------------------------------------------------ -->
@@ -1629,7 +1628,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label for="">Trained and Qualified by:</label>
-                                                        <input class="form-select" type="text" id="text_tech_trained_qualified_by" name="text_tech_trained_qualified_by" list="list_display_empno" placeholder="Select Trained and Qualified by">
+                                                        <input class="form-control" type="text" id="text_tech_trained_qualified_by" name="text_tech_trained_qualified_by" list="list_display_empno" placeholder="Select Trained and Qualified by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_tech_trained_qualified_by_username" name="text_tech_trained_qualified_by_username">
@@ -1638,7 +1637,7 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label for="">Mentored by:</label>
-                                                        <input class="form-select" type="text" id="text_tech_mentored_by" name="text_tech_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                                        <input class="form-control" type="text" id="text_tech_mentored_by" name="text_tech_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
                                                         <datalist id="list_display_empno"></datalist>
                                                     </div>
                                                 </div>
@@ -1659,7 +1658,7 @@
                                                     <div class="col-md-6"></div>
                                                     <div class="col-md-3">
                                                         <label class="" for="">Send Email Alert to:</label>
-                                                        <input class="form-select" type="text" id="text_edit_alert_estq_sec_tech" name="text_edit_alert_estq_sec_tech" list="list_display_empno" placeholder="Send email to">
+                                                        <input class="form-control" type="text" id="text_edit_alert_estq_sec_tech" name="text_edit_alert_estq_sec_tech" list="list_display_empno" placeholder="Send email to">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_edit_alert_estq_sec_tech_username" name="text_edit_alert_estq_sec_tech_username">
                                                         <input type="hidden" id="text_edit_alert_estq_sec_tech_email" name="text_edit_alert_estq_sec_tech_email">
@@ -1667,7 +1666,7 @@
 
                                                     <div class="col-md-3">
                                                         <label class="" for="">Add cc:</label>
-                                                        <input class="form-select" type="text" id="text_edit_alert_estq_cc_sec_tech" name="text_edit_alert_estq_cc_sec_tech" list="list_display_empno" placeholder="Cc">
+                                                        <input class="form-control" type="text" id="text_edit_alert_estq_cc_sec_tech" name="text_edit_alert_estq_cc_sec_tech" list="list_display_empno" placeholder="Cc">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_edit_alert_estq_cc_sec_tech_username" name="text_edit_alert_estq_cc_sec_tech_username">
                                                         <input type="hidden" id="text_edit_alert_estq_cc_sec_tech_email" name="text_edit_alert_estq_cc_sec_tech_email">
@@ -1681,7 +1680,7 @@
                                                     <div class="col-md-3">
                                                         <label for="text_edit_alert_estq_sec_tech">Send Email Alert to:</label>
                                                         <div id="selectedEstqAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                        <input class="form-select" type="text"
+                                                        <input class="form-control" type="text"
                                                             id="text_edit_alert_estq_sec_tech"
                                                             name="text_edit_alert_estq_sec_tech"
                                                             list="list_display_empno"
@@ -1695,7 +1694,7 @@
                                                     <div class="col-md-3">
                                                         <label for="text_edit_alert_estq_cc_sec_tech">Add cc:</label>
                                                         <div id="selectedEstqAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                        <input class="form-select" type="text"
+                                                        <input class="form-control" type="text"
                                                             id="text_edit_alert_estq_cc_sec_tech"
                                                             name="text_edit_alert_estq_cc_sec_tech"
                                                             list="list_display_empno"
@@ -1713,11 +1712,11 @@
 
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwoTech" aria-expanded="false" aria-controls="collapseTwoTech">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoTech" aria-expanded="false" aria-controls="collapseTwoTech">
                                             <h5>ENGINEERING SECTION (Certification)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseTwoTech" class="accordion-collapse collapse" data-bs-parent="#accordionExampleTech">
+                                        <div id="collapseTwoTech" class="accordion-collapse collapse" data-parent="#accordionExampleTech">
                                             <div class="accordion-body">
 
                                                 <!-- ------------------------------------------------ -->
@@ -1729,7 +1728,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label class="ms-3" for="">First Take:</label>
-                                                        <select class="form-select" name="text_tech_es_1st_take_result" id="text_tech_es_1st_take_result">
+                                                        <select class="form-control select2bs4" name="text_tech_es_1st_take_result" id="text_tech_es_1st_take_result">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -1738,7 +1737,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="ms-3" for="">Second Take:</label>
-                                                        <select class="form-select" name="text_tech_es_2nd_take_result" id="text_tech_es_2nd_take_result">
+                                                        <select class="form-control select2bs4" name="text_tech_es_2nd_take_result" id="text_tech_es_2nd_take_result">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -1749,7 +1748,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label class="ms-3" for="">Certified by:</label>
-                                                        <input class="form-select" type="text" id="text_tech_es_1st_certified_by" name="text_tech_es_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                        <input class="form-control" type="text" id="text_tech_es_1st_certified_by" name="text_tech_es_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_tech_es_1st_certified_by_username" name="text_tech_es_1st_certified_by_username">
@@ -1759,7 +1758,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="ms-3" for="">Certified by:</label>
-                                                        <input class="form-select" type="text" id="text_tech_es_2nd_certified_by" name="text_tech_es_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                        <input class="form-control" type="text" id="text_tech_es_2nd_certified_by" name="text_tech_es_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_tech_es_2nd_certified_by_username" name="text_tech_es_2nd_certified_by_username">
@@ -1798,11 +1797,11 @@
 
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThreeTech" aria-expanded="false" aria-controls="collapseThreeTech">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeTech" aria-expanded="false" aria-controls="collapseThreeTech">
                                             <h5>QUALITY CONTROL SECTION (CERTIFICATION)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseThreeTech" class="accordion-collapse collapse" data-bs-parent="#accordionExampleTech">
+                                        <div id="collapseThreeTech" class="accordion-collapse collapse" data-parent="#accordionExampleTech">
                                             <div class="accordion-body">
 
                                                 <!-- ------------------------------------------------ -->
@@ -1816,7 +1815,7 @@
                                                     <div class="row mb-3">
                                                         <div class="col-md-6">
                                                             <label class="ms-3" for="">First Take:</label>
-                                                            <select class="form-select" name="text_tech_qcs_1st_take_result" id="text_tech_qcs_1st_take_result">
+                                                            <select class="form-control select2bs4" name="text_tech_qcs_1st_take_result" id="text_tech_qcs_1st_take_result">
                                                                 <option value="" selected disabled>Select Result</option>
                                                                 <option value="PASSED">PASSED</option>
                                                                 <option value="FAILED">FAILED</option>
@@ -1825,7 +1824,7 @@
 
                                                         <div class="col-md-6">
                                                             <label class="ms-3" for="">Second Take:</label>
-                                                            <select class="form-select" name="text_tech_qcs_2nd_take_result" id="text_tech_qcs_2nd_take_result">
+                                                            <select class="form-control select2bs4" name="text_tech_qcs_2nd_take_result" id="text_tech_qcs_2nd_take_result">
                                                                 <option value="" selected disabled>Select Result</option>
                                                                 <option value="PASSED">PASSED</option>
                                                                 <option value="FAILED">FAILED</option>
@@ -1836,7 +1835,7 @@
                                                     <div class="row mb-3">
                                                         <div class="col-md-6">
                                                             <label class="ms-3" for="">Certified by:</label>
-                                                            <input class="form-select" type="text" id="text_tech_qcs_1st_certified_by" name="text_tech_qcs_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                            <input class="form-control" type="text" id="text_tech_qcs_1st_certified_by" name="text_tech_qcs_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
                                                             <datalist id="list_display_empno"></datalist>
 
                                                             <input type="hidden" id="text_tech_qcs_1st_certified_by_username" name="text_tech_qcs_1st_certified_by_username">
@@ -1845,7 +1844,7 @@
 
                                                         <div class="col-md-6">
                                                             <label class="ms-3" for="">Certified by:</label>
-                                                            <input class="form-select" type="text" id="text_tech_qcs_2nd_certified_by" name="text_tech_qcs_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                            <input class="form-control" type="text" id="text_tech_qcs_2nd_certified_by" name="text_tech_qcs_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
                                                             <datalist id="list_display_empno"></datalist>
 
                                                             <input type="hidden" id="text_tech_qcs_2nd_certified_by_username" name="text_tech_qcs_2nd_certified_by_username">
@@ -1887,7 +1886,7 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label for="">Approved by:</label>
-                                        <input class="form-select" type="text" id="text_tech_approved_by" name="text_tech_approved_by" list="list_display_empno" placeholder="Select Approved by">
+                                        <input class="form-control" type="text" id="text_tech_approved_by" name="text_tech_approved_by" list="list_display_empno" placeholder="Select Approved by">
                                         <datalist id="list_display_empno"></datalist>
 
                                         <input type="hidden" id="text_tech_approved_by_username" name="text_tech_approved_by_username">
@@ -1899,7 +1898,7 @@
                                 <!-- <hr style="height: 1px; background-color: grey; border: none;"> -->
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                     <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
                                 </div>
 
@@ -1922,7 +1921,7 @@
 
                                     <div class="col-md-3">
                                         <label for="">Production Section:</label>
-                                        <input class="form-select" type="text" name="text_sep_section" id="text_sep_section" list="list_section" placeholder="Select Section">
+                                        <input class="form-control" type="text" name="text_sep_section" id="text_sep_section" list="list_section" placeholder="Select Section">
                                         <datalist id="list_section">
 
                                         </datalist>
@@ -1930,7 +1929,7 @@
 
                                     <div class="col-md-3">
                                         <label for="">Designation:</label>
-                                        <Select class="form-control select2" name="text_sep_station" id="text_sep_station">
+                                        <select class="form-control select2bs4" style="100%" name="text_sep_station" id="text_sep_station">
                                             <option value="" selected disabled>Select designation</option>
                                             <option value="Jr. Production Supervisor">Jr. Production Supervisor</option>
                                             <option value="Sr. Production Supervisor">Sr. Production Supervisor</option>
@@ -1940,19 +1939,19 @@
                                             <option value="LQC Sr. Supervisor">LQC Sr. Supervisor</option>
                                             <option value="Jr. & Sr. Maintenance Engineer">Jr. & Sr. Maintenance Engineer</option>
                                             <option value="Jr. Equipment Engineer">Jr. Equipment Engineer</option>
-                                        </Select>
+                                        </select>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="">Product Line:</label>
-                                        <input class="form-select" type="text" id="text_sep_product_line" name="text_sep_product_line" placeholder="Enter product line here" list="list_prod_line">
+                                        <input class="form-control" type="text" id="text_sep_product_line" name="text_sep_product_line" placeholder="Enter product line here" list="list_prod_line">
                                         <datalist id="list_prod_line"></datalist>
                                     </div>
                                 </div>
 
                                 <div class="row mt-2 mb-5">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-primary" style="width: 100%;" data-bs-target="#select_Employee_sep" data-bs-toggle="modal"><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                        <button type="button" class="btn btn-primary" style="width: 100%;" data-target="#select_Employee_sep" data-toggle="modal"><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
                                     </div>
                                 </div>
 
@@ -1976,7 +1975,7 @@
                                 <div class="row mb-5">
                                     <div class="col-md-9">
                                         <label for="">Reason for Certification:</label>
-                                        <select class="form-select" name="text_sep_certification" id="text_sep_certification">
+                                        <select class="form-control select2bs4" name="text_sep_certification" id="text_sep_certification">
                                             <option value="" selected disabled>Select Reason</option>
                                             <option value="Lateral transfer">1 Lateral transfer</option>
                                             <option value="Flexibility">2 Flexibility</option>
@@ -2349,7 +2348,7 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="ms-3" for="">Theoretical Examination</label>
-                                        <select class="form-select" name="text_sep_theoretical_result" id="text_sep_theoretical_result">
+                                        <select class="form-control select2bs4" name="text_sep_theoretical_result" id="text_sep_theoretical_result">
                                             <option value="" selected disabled>Select Result</option>
                                             <option value="PASSED">PASSED</option>
                                             <option value="FAILED">FAILED</option>
@@ -2358,7 +2357,7 @@
 
                                     <div class="col-md-6">
                                         <label class="ms-3" for="">Hands-on</label>
-                                        <select class="form-select" name="text_sep_handson_result" id="text_sep_handson_result">
+                                        <select class="form-control select2bs4" name="text_sep_handson_result" id="text_sep_handson_result">
                                             <option value="" selected disabled>Select Result</option>
                                             <option value="PASSED">PASSED</option>
                                             <option value="FAILED">FAILED</option>
@@ -2369,7 +2368,7 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="ms-3" for="">Trained / Certified by:</label>
-                                        <input class="form-select" type="text" id="text_sep_trained_certified_by" name="text_sep_trained_certified_by" list="list_display_empno" placeholder="Select Trained / Certified by">
+                                        <input class="form-control" type="text" id="text_sep_trained_certified_by" name="text_sep_trained_certified_by" list="list_display_empno" placeholder="Select Trained / Certified by">
                                         <datalist id="list_display_empno"></datalist>
 
                                         <input type="hidden" id="text_sep_trained_certified_by_username" name="text_sep_trained_certified_by_username">
@@ -2377,7 +2376,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label class="ms-3" for="">Mentored by:</label>
-                                        <input class="form-select" type="text" id="text_sep_mentored_by" name="text_sep_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                        <input class="form-control" type="text" id="text_sep_mentored_by" name="text_sep_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
                                         <datalist id="list_display_empno"></datalist>
                                     </div>
                                 </div>
@@ -2396,7 +2395,7 @@
                                 <div class="row mb-5">
                                     <div class="col-md-6">
                                         <label for="">Approved by:</label>
-                                        <input class="form-select" type="text" id="text_sep_approved_by" name="text_sep_approved_by" list="list_display_empno" placeholder="Select Approved by">
+                                        <input class="form-control" type="text" id="text_sep_approved_by" name="text_sep_approved_by" list="list_display_empno" placeholder="Select Approved by">
                                         <datalist id="list_display_empno"></datalist>
 
                                         <input type="hidden" id="text_sep_approved_by_username" name="text_sep_approved_by_username">
@@ -2413,7 +2412,7 @@
                                 <!-- <hr style="height: 1px; background-color: grey; border: none;"> -->
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                     <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
                                 </div>
 
@@ -2436,7 +2435,7 @@
 
                                     <div class="col-md-3">
                                         <label for="">Production Section:</label>
-                                        <input class="form-select" type="text" name="text_section_inspector" id="text_section_inspector" list="list_section" placeholder="Select Section">
+                                        <input class="form-control" type="text" name="text_section_inspector" id="text_section_inspector" list="list_section" placeholder="Select Section">
                                         <datalist id="list_section">
 
                                         </datalist>
@@ -2444,7 +2443,7 @@
 
                                     <div class="col-md-3">
                                         <label for="">Station:</label>
-                                        <Select class="form-select" name="text_series_inspector" id="text_series_inspector">
+                                        <select class="form-control select2bs4" name="text_series_inspector" id="text_series_inspector">
                                             <option value="" selected disabled>Select station</option>
                                             <option value="IQC">IQC</option>
                                             <option value="IPQC">IPQC</option>
@@ -2455,14 +2454,14 @@
 
                                     <div class="col-md-3">
                                         <label for="">Product Line:</label>
-                                        <input class="form-select" type="text" id="text_insp_product_line" name="text_insp_product_line" placeholder="Enter product line here" list="list_prod_line">
+                                        <input class="form-control" type="text" id="text_insp_product_line" name="text_insp_product_line" placeholder="Enter product line here" list="list_prod_line">
                                         <datalist id="list_prod_line"></datalist>
                                     </div>
                                 </div>
 
                                 <div class="row mt-2 mb-5">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-primary" style="width: 100%;" data-bs-target="#select_Employee_inspector" data-bs-toggle="modal"><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                        <button type="button" class="btn btn-primary" style="width: 100%;" data-target="#select_Employee_inspector" data-toggle="modal"><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
                                     </div>
                                 </div>
 
@@ -2486,7 +2485,7 @@
                                 <div class="row mb-3">
                                     <div class="col-md-12">
                                         <label for="text_certification_inspector">Reason for Certification:</label>
-                                        <select class="form-select" name="text_certification_inspector" id="text_certification_inspector">
+                                        <select class="form-control select2bs4" name="text_certification_inspector" id="text_certification_inspector">
                                             <option value="" selected disabled>Select Reason</option>
                                             <option value="Lateral transfer">1 Lateral transfer</option>
                                             <option value="Flexibility">2 Flexibility</option>
@@ -2505,11 +2504,11 @@
                                 <div class="accordion" id="accordionExampleInsp">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneInsp" aria-expanded="true" aria-controls="collapseOneInsp">
+                                        <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneInsp" aria-expanded="true" aria-controls="collapseOneInsp">
                                             <h5>LINE QUALITY CONTROL SECTION (Training and Qualification)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseOneInsp" class="accordion-collapse collapse show" data-bs-parent="#accordionExampleInsp">
+                                        <div id="collapseOneInsp" class="accordion-collapse collapse show" data-parent="#accordionExampleInsp">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -3086,7 +3085,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Trained and Qualified by:</label>
-                                                    <input class="form-select" type="text" id="text_certified_inspector" name="text_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
+                                                    <input class="form-control" type="text" id="text_certified_inspector" name="text_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_certified_inspector_username" name="text_certified_inspector_username">
@@ -3094,7 +3093,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Mentored by:</label>
-                                                    <input class="form-select" type="text" id="text_mentored" name="text_mentored" list="list_display_empno" placeholder="Select Mentored by">
+                                                    <input class="form-control" type="text" id="text_mentored" name="text_mentored" list="list_display_empno" placeholder="Select Mentored by">
                                                     <datalist id="list_display_empno"></datalist>
                                                 </div>
                                             </div>
@@ -3115,7 +3114,7 @@
                                                 <div class="col-md-6"></div>
                                                 <div class="col-md-3">
                                                     <label class="" for="">Send Email Alert to:</label>
-                                                    <input class="form-select" type="text" id="text_alert_qctq_sec_insp" name="text_alert_qctq_sec_insp" list="list_display_empno" placeholder="Send email to">
+                                                    <input class="form-control" type="text" id="text_alert_qctq_sec_insp" name="text_alert_qctq_sec_insp" list="list_display_empno" placeholder="Send email to">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_qctq_sec_insp_username" name="text_alert_qctq_sec_insp_username">
                                                     <input type="hidden" id="text_alert_qctq_sec_insp_email" name="text_alert_qctq_sec_insp_email">
@@ -3123,7 +3122,7 @@
 
                                                 <div class="col-md-3">
                                                     <label class="" for="">Add cc:</label>
-                                                    <input class="form-select" type="text" id="text_alert_qctq_cc_sec_insp" name="text_alert_qctq_cc_sec_insp" list="list_display_empno" placeholder="Cc">
+                                                    <input class="form-control" type="text" id="text_alert_qctq_cc_sec_insp" name="text_alert_qctq_cc_sec_insp" list="list_display_empno" placeholder="Cc">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_qctq_cc_sec_insp_username" name="text_alert_qctq_cc_sec_insp_username">
                                                     <input type="hidden" id="text_alert_qctq_cc_sec_insp_email" name="text_alert_qctq_cc_sec_insp_email">
@@ -3136,7 +3135,7 @@
                                                 <div class="col-md-3">
                                                     <label for="text_alert_qctq_sec_insp">Send Email Alert to:</label>
                                                     <div id="selectedQctqAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                    <input class="form-select" type="text"
+                                                    <input class="form-control" type="text"
                                                             id="text_alert_qctq_sec_insp"
                                                             name="text_alert_qctq_sec_insp"
                                                             list="list_display_empno"
@@ -3150,7 +3149,7 @@
                                                 <div class="col-md-3">
                                                     <label for="text_alert_qctq_cc_sec_insp">Add cc:</label>
                                                     <div id="selectedQctqAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                    <input class="form-select" type="text"
+                                                    <input class="form-control" type="text"
                                                             id="text_alert_qctq_cc_sec_insp"
                                                             name="text_alert_qctq_cc_sec_insp"
                                                             list="list_display_empno"
@@ -3168,11 +3167,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwoInsp" aria-expanded="false" aria-controls="collapseTwoInsp">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoInsp" aria-expanded="false" aria-controls="collapseTwoInsp">
                                             <h5>LINE QUALITY CONTROL SECTION (Certification)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseTwoInsp" class="accordion-collapse collapse" data-bs-parent="#accordionExampleInsp">
+                                        <div id="collapseTwoInsp" class="accordion-collapse collapse" data-parent="#accordionExampleInsp">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -3199,7 +3198,7 @@
                                                     </div>
 
                                                     <div class="col-md-3">
-                                                        <select class="form-select" name="text_sel_result1_inspector" id="text_sel_result1_inspector">
+                                                        <select class="form-control select2bs4" name="text_sel_result1_inspector" id="text_sel_result1_inspector">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -3215,7 +3214,7 @@
                                                     </div>
 
                                                     <div class="col-md-3">
-                                                        <select class="form-select" name="text_sel_result2_inspector" id="text_sel_result2_inspector">
+                                                        <select class="form-control select2bs4" name="text_sel_result2_inspector" id="text_sel_result2_inspector">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -3351,7 +3350,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-12">
                                                         <label for="">Result:</label>
-                                                        <select class="form-select" name="text_sec2_result_inspector" id="text_sec2_result_inspector">
+                                                        <select class="form-control select2bs4" name="text_sec2_result_inspector" id="text_sec2_result_inspector">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="RE-TRAIN">RE-TRAIN</option>
@@ -3363,7 +3362,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-12">
                                                         <label for="">Certified by:</label>
-                                                        <input class="form-select" type="text" id="text_sec2_certified_inspector" name="text_sec2_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
+                                                        <input class="form-control" type="text" id="text_sec2_certified_inspector" name="text_sec2_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_sec2_certified_inspector_username" name="text_sec2_certified_inspector_username">
@@ -3396,11 +3395,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThreeInsp" aria-expanded="false" aria-controls="collapseThreeInsp">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeInsp" aria-expanded="false" aria-controls="collapseThreeInsp">
                                             <h5>VALIDATION PROCESS: QUALITY CONTROL SECTION <> OQC only</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseThreeInsp" class="accordion-collapse collapse" data-bs-parent="#accordionExampleInsp">
+                                        <div id="collapseThreeInsp" class="accordion-collapse collapse" data-parent="#accordionExampleInsp">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -3453,7 +3452,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">First Take:</label>
-                                                    <select class="form-select" name="text_vpqcs_result1_inspector" id="text_vpqcs_result1_inspector">
+                                                    <select class="form-control select2bs4" name="text_vpqcs_result1_inspector" id="text_vpqcs_result1_inspector">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -3462,7 +3461,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Second Take:</label>
-                                                    <select class="form-select" name="text_vpqcs_result2_inspector" id="text_vpqcs_result2_inspector">
+                                                    <select class="form-control select2bs4" name="text_vpqcs_result2_inspector" id="text_vpqcs_result2_inspector">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -3473,7 +3472,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Validated by:</label>
-                                                    <input class="form-select" type="text" id="text_vpqcs_validated1_inspector" name="text_vpqcs_validated1_inspector" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_vpqcs_validated1_inspector" name="text_vpqcs_validated1_inspector" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_vpqcs_validated1_inspector_username" name="text_vpqcs_validated1_inspector_username">
@@ -3482,7 +3481,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Validated by: <span style="font-size: 0.9em;">(after re-orientation)</span></label>
-                                                    <input class="form-select" type="text" id="text_vpqcs_validated2_inspector" name="text_vpqcs_validated2_inspector" list="list_display_empno" placeholder="Select Certified by">
+                                                    <input class="form-control" type="text" id="text_vpqcs_validated2_inspector" name="text_vpqcs_validated2_inspector" list="list_display_empno" placeholder="Select Certified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_vpqcs_validated2_inspector_username" name="text_vpqcs_validated2_inspector_username">
@@ -3532,7 +3531,7 @@
                                 <div class="row mb-5">
                                     <div class="col-md-6">
                                         <label for="">Approved by:</label>
-                                        <input class="form-select" type="text" id="text_sec3_approved_inspector" name="text_sec3_approved_inspector" list="list_display_empno" placeholder="Select Approved by">
+                                        <input class="form-control" type="text" id="text_sec3_approved_inspector" name="text_sec3_approved_inspector" list="list_display_empno" placeholder="Select Approved by">
                                         <datalist id="list_display_empno"></datalist>
 
                                         <input type="hidden" id="text_sec3_approved_inspector_userame" name="text_sec3_approved_inspector_userame">
@@ -3582,7 +3581,7 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                     <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
                                 </div>
 
@@ -3605,7 +3604,7 @@
 
                                     <div class="col-md-3">
                                         <label for="">Production Section:</label>
-                                        <input class="form-select" type="text" name="text_section_operator" id="text_section_operator" list="list_section" placeholder="Select Section">
+                                        <input class="form-control" type="text" name="text_section_operator" id="text_section_operator" list="list_section" placeholder="Select Section">
                                         <datalist id="list_section">
 
                                         </datalist>
@@ -3618,14 +3617,14 @@
 
                                     <div class="col-md-3">
                                         <label for="">Product Line:</label>
-                                        <input class="form-select" type="text" id="text_operator_product_line" name="text_operator_product_line" placeholder="Enter product line here" list="list_prod_line">
+                                        <input class="form-control" type="text" id="text_operator_product_line" name="text_operator_product_line" placeholder="Enter product line here" list="list_prod_line">
                                         <datalist id="list_prod_line"></datalist>
                                     </div>
                                 </div>
 
                                 <div class="row mt-2 mb-5">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-primary" style="width: 100%;" id="" data-bs-target="#select_Employee_operator" data-bs-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                        <button type="button" class="btn btn-primary" style="width: 100%;" id="" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
                                     </div>
                                 </div>
 
@@ -3649,7 +3648,7 @@
                                 <div class="row mb-5">
                                     <div class="col-md-12">
                                         <label for="">Reason for Certification:</label>
-                                        <select class="form-select" name="text_certification_operator" id="text_certification_operator">
+                                        <select class="form-control select2bs4" name="text_certification_operator" id="text_certification_operator">
                                             <option value="" selected disabled>Select Reason</option>
                                             <option value="Newly hired employees">1 Newly hired employees</option>
                                             <option value="Newly promoted employees">2 Newly promoted employees</option>
@@ -3672,11 +3671,11 @@
                                 <div class="accordion" id="accordionExampleOper">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneOper" aria-expanded="true" aria-controls="collapseOneOper">
+                                        <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneOper" aria-expanded="true" aria-controls="collapseOneOper">
                                             <h5>PRODUCTION SECTION (Training and Orientation)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseOneOper" class="accordion-collapse collapse show" data-bs-parent="#accordionExampleOper">
+                                        <div id="collapseOneOper" class="accordion-collapse collapse show" data-parent="#accordionExampleOper">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -3943,7 +3942,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take:</label>
-                                                    <select class="form-select" name="text_first_result_oper" id="text_first_result_oper">
+                                                    <select class="form-control select2bs4" name="text_first_result_oper" id="text_first_result_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -3952,7 +3951,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take:</label>
-                                                    <select class="form-select" name="text_second_result_oper" id="text_second_result_oper">
+                                                    <select class="form-control select2bs4" name="text_second_result_oper" id="text_second_result_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -3965,7 +3964,7 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <label class="" for="">Trained by:</label>
-                                                            <input class="form-select" type="text" id="text_first_trainedby_oper" name="text_first_trainedby_oper" list="list_display_empno" placeholder="Select Trained by">
+                                                            <input class="form-control" type="text" id="text_first_trainedby_oper" name="text_first_trainedby_oper" list="list_display_empno" placeholder="Select Trained by">
                                                             <datalist id="list_display_empno"></datalist>
 
                                                             <input type="hidden" id="text_first_trainedby_oper_username" name="text_first_trainedby_oper_username">
@@ -3973,7 +3972,7 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <label class="" for="">Mentored by:</label>
-                                                            <input class="form-select" type="text" id="text_first_mentoredby_oper" name="text_first_mentoredby_oper" list="list_display_empno" placeholder="Select Mentored by">
+                                                            <input class="form-control" type="text" id="text_first_mentoredby_oper" name="text_first_mentoredby_oper" list="list_display_empno" placeholder="Select Mentored by">
                                                             <datalist id="list_display_empno"></datalist>
                                                         </div>
                                                     </div>
@@ -3984,7 +3983,7 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <label class="" for="">Trained by:</label>
-                                                            <input class="form-select" type="text" id="text_second_trainedby_oper" name="text_second_trainedby_oper" list="list_display_empno" placeholder="Select Trained by">
+                                                            <input class="form-control" type="text" id="text_second_trainedby_oper" name="text_second_trainedby_oper" list="list_display_empno" placeholder="Select Trained by">
                                                             <datalist id="list_display_empno"></datalist>
 
                                                             <input type="hidden" id="text_second_trainedby_oper_username" name="text_second_trainedby_oper_username">
@@ -3992,7 +3991,7 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                              <label class="" for="">Mentored by:</label>
-                                                            <input class="form-select" type="text" id="text_second_mentoredby_oper" name="text_second_mentoredby_oper" list="list_display_empno" placeholder="Select Mentored by">
+                                                            <input class="form-control" type="text" id="text_second_mentoredby_oper" name="text_second_mentoredby_oper" list="list_display_empno" placeholder="Select Mentored by">
                                                             <datalist id="list_display_empno"></datalist>
                                                         </div>
                                                     </div>
@@ -4027,7 +4026,7 @@
                                                 <div class="col-md-3">
                                                     <label class="" for="">Send Email Alert to:</label>
                                                     <div id="selectedAlertRecipients" class="fs-5 mb-1"></div>
-                                                    <input class="form-select" type="text" id="text_alert_prod_sec" name="text_alert_prod_sec" list="list_display_empno" placeholder="Send email to">
+                                                    <input class="form-control" type="text" id="text_alert_prod_sec" name="text_alert_prod_sec" list="list_display_empno" placeholder="Send email to">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_prod_sec_username" name="text_alert_prod_sec_username">
                                                     <input type="hidden" id="text_alert_prod_sec_email" name="text_alert_prod_sec_email">
@@ -4036,7 +4035,7 @@
                                                 <div class="col-md-3">
                                                     <label class="" for="">Add cc:</label>
                                                     <div id="selectedAlertCcRecipients" class="fs-5 mb-1"></div>
-                                                    <input class="form-select" type="text" id="text_alert_prod_cc_sec" name="text_alert_prod_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                    <input class="form-control" type="text" id="text_alert_prod_cc_sec" name="text_alert_prod_cc_sec" list="list_display_empno" placeholder="Cc">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_prod_cc_sec_username" name="text_alert_prod_cc_sec_username">
                                                     <input type="hidden" id="text_alert_prod_cc_sec_email" name="text_alert_prod_cc_sec_email">
@@ -4050,11 +4049,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwoOper" aria-expanded="false" aria-controls="collapseTwoOper">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoOper" aria-expanded="false" aria-controls="collapseTwoOper">
                                             <h5>ENGINEERING SECTION (Training and Qualification)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseTwoOper" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOper">
+                                        <div id="collapseTwoOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -4291,7 +4290,7 @@
                                             <div class="row mb-4">
                                                 <div class="col-md-6">
                                                     <label class="" for="">1. Observation / Interview Result</label>
-                                                    <select class="form-select" name="text_obs_first_result_es_oper" id="text_obs_first_result_es_oper">
+                                                    <select class="form-control select2bs4" name="text_obs_first_result_es_oper" id="text_obs_first_result_es_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4300,7 +4299,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">1. Observation / Interview Result</label>
-                                                    <select class="form-select" name="text_obs_second_result_es_oper" id="text_obs_second_result_es_oper">
+                                                    <select class="form-control select2bs4" name="text_obs_second_result_es_oper" id="text_obs_second_result_es_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4345,7 +4344,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
-                                                    <select class="form-select" name="text_oa_1st_result_es_oper" id="text_oa_1st_result_es_oper">
+                                                    <select class="form-control select2bs4" name="text_oa_1st_result_es_oper" id="text_oa_1st_result_es_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4354,7 +4353,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
-                                                    <select class="form-select" name="text_oa_2nd_result_es_oper" id="text_oa_2nd_result_es_oper">
+                                                    <select class="form-control select2bs4" name="text_oa_2nd_result_es_oper" id="text_oa_2nd_result_es_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4377,7 +4376,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Qualified by:</label>
-                                                    <input class="form-select" type="text" id="text_1st_qualifiedby_es_oper" name="text_1st_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
+                                                    <input class="form-control" type="text" id="text_1st_qualifiedby_es_oper" name="text_1st_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_1st_qualifiedby_es_oper_username" name="text_1st_qualifiedby_es_oper_username">
@@ -4386,7 +4385,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Qualified by:</label>
-                                                    <input class="form-select" type="text" id="text_2nd_qualifiedby_es_oper" name="text_2nd_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
+                                                    <input class="form-control" type="text" id="text_2nd_qualifiedby_es_oper" name="text_2nd_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_2nd_qualifiedby_es_oper_username" name="text_2nd_qualifiedby_es_oper_username">
@@ -4423,11 +4422,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
                                             <h5>QUALITY CONTROL SECTION (CERTIFICATTION)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseThreeOper" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOper">
+                                        <div id="collapseThreeOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -4449,7 +4448,7 @@
                                             <div class="row mb-4">
                                                 <div class="col-md-6">
                                                     <label class="" for="">1.1 Observation / Interview Result</label>
-                                                    <select class="form-select" name="text_obs_first_result_qcs_oper" id="text_obs_first_result_qcs_oper">
+                                                    <select class="form-control select2bs4" name="text_obs_first_result_qcs_oper" id="text_obs_first_result_qcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4458,7 +4457,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">1.1 Observation / Interview Result</label>
-                                                    <select class="form-select" name="text_obs_second_result_qcs_oper" id="text_obs_second_result_qcs_oper">
+                                                    <select class="form-control select2bs4" name="text_obs_second_result_qcs_oper" id="text_obs_second_result_qcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4622,7 +4621,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
-                                                    <select class="form-select" name="text_oa_1st_result_qcs_oper" id="text_oa_1st_result_qcs_oper">
+                                                    <select class="form-control select2bs4" name="text_oa_1st_result_qcs_oper" id="text_oa_1st_result_qcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4631,7 +4630,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
-                                                    <select class="form-select" name="text_oa_2nd_result_qcs_oper" id="text_oa_2nd_result_qcs_oper">
+                                                    <select class="form-control select2bs4" name="text_oa_2nd_result_qcs_oper" id="text_oa_2nd_result_qcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4654,7 +4653,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Certified by:</label>
-                                                    <input class="form-select" type="text" id="text_1st_certifiedby_qcs_oper" name="text_1st_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
+                                                    <input class="form-control" type="text" id="text_1st_certifiedby_qcs_oper" name="text_1st_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_1st_certifiedby_qcs_oper_username" name="text_1st_certifiedby_qcs_oper_username">
@@ -4663,7 +4662,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Certified by:</label>
-                                                    <input class="form-select" type="text" id="text_2nd_certifiedby_qcs_oper" name="text_2nd_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
+                                                    <input class="form-control" type="text" id="text_2nd_certifiedby_qcs_oper" name="text_2nd_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_2nd_certifiedby_qcs_oper_username" name="text_2nd_certifiedby_qcs_oper_username">
@@ -4711,11 +4710,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFourOper" aria-expanded="false" aria-controls="collapseFourOper">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFourOper" aria-expanded="false" aria-controls="collapseFourOper">
                                             <h5>PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseFourOper" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOper">
+                                        <div id="collapseFourOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -4769,7 +4768,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">2. Overall Assessment:</label>
-                                                    <select class="form-select" name="text_oa_1st_result_peqcs_oper" id="text_oa_1st_result_peqcs_oper">
+                                                    <select class="form-control select2bs4" name="text_oa_1st_result_peqcs_oper" id="text_oa_1st_result_peqcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4778,7 +4777,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">2. Overall Assessment:</label>
-                                                    <select class="form-select" name="text_oa_2nd_result_peqcs_oper" id="text_oa_2nd_result_peqcs_oper">
+                                                    <select class="form-control select2bs4" name="text_oa_2nd_result_peqcs_oper" id="text_oa_2nd_result_peqcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4917,11 +4916,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
                                             <h5>VALIDATION PROCESS: ENGINEERING SECTION</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseFiveOper" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOper">
+                                        <div id="collapseFiveOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -4934,7 +4933,7 @@
                                                 <div class="col-md-5"></div>
 
                                                 <div class="col-md-4">
-                                                    <select class="form-select" name="text_application_vpes_oper" id="text_application_vpes_oper">
+                                                    <select class="form-control select2bs4" name="text_application_vpes_oper" id="text_application_vpes_oper">
                                                         <option value="" selected disabled>Select</option>
                                                         <option value="Applicable">Applicable</option>
                                                         <option value="Not Applicable">Not Applicable</option>
@@ -4958,7 +4957,7 @@
                                             <div class="row mb-4">
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take</label>
-                                                    <select class="form-select" name="text_first_result_vpes_oper" id="text_first_result_vpes_oper">
+                                                    <select class="form-control select2bs4" name="text_first_result_vpes_oper" id="text_first_result_vpes_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4967,7 +4966,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take</label>
-                                                    <select class="form-select" name="text_second_result_vpes_oper" id="text_second_result_vpes_oper">
+                                                    <select class="form-control select2bs4" name="text_second_result_vpes_oper" id="text_second_result_vpes_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -4978,7 +4977,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after 2nd day):</label>
-                                                    <input class="form-select" type="text" id="text_1st_validatedby_vpes_oper" name="text_1st_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_1st_validatedby_vpes_oper" name="text_1st_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_1st_validatedby_vpes_oper_username" name="text_1st_validatedby_vpes_oper_username">
@@ -4987,7 +4986,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after re-orientation):</label>
-                                                    <input class="form-select" type="text" id="text_2nd_validatedby_vpes_oper" name="text_2nd_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_2nd_validatedby_vpes_oper" name="text_2nd_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_2nd_validatedby_vpes_oper_username" name="text_2nd_validatedby_vpes_oper_username">
@@ -5021,11 +5020,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSixOper" aria-expanded="false" aria-controls="collapseSixOper">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSixOper" aria-expanded="false" aria-controls="collapseSixOper">
                                             <h5>VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseSixOper" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOper">
+                                        <div id="collapseSixOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -5059,7 +5058,7 @@
                                             <div class="row mb-4">
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take</label>
-                                                    <select class="form-select" name="text_first_result_vpqcs_oper" id="text_first_result_vpqcs_oper">
+                                                    <select class="form-control select2bs4" name="text_first_result_vpqcs_oper" id="text_first_result_vpqcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -5068,7 +5067,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take</label>
-                                                    <select class="form-select" name="text_second_result_vpqcs_oper" id="text_second_result_vpqcs_oper">
+                                                    <select class="form-control select2bs4" name="text_second_result_vpqcs_oper" id="text_second_result_vpqcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -5079,7 +5078,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after 2nd day):</label>
-                                                    <input class="form-select" type="text" id="text_1st_validatedby_vpqcs_oper" name="text_1st_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_1st_validatedby_vpqcs_oper" name="text_1st_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_1st_validatedby_vpqcs_oper_username" name="text_1st_validatedby_vpqcs_oper_username">
@@ -5088,7 +5087,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after re-orientation):</label>
-                                                    <input class="form-select" type="text" id="text_2nd_validatedby_vpqcs_oper" name="text_2nd_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_2nd_validatedby_vpqcs_oper" name="text_2nd_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_2nd_validatedby_vpqcs_oper_username" name="text_2nd_validatedby_vpqcs_oper_username">
@@ -5130,7 +5129,7 @@
                                                 <div class="col-md-4"></div>
 
                                                 <div class="col-md-4">
-                                                    <select class="form-select" name="text_application_vpqcs_oper" id="text_application_vpqcs_oper">
+                                                    <select class="form-control select2bs4" name="text_application_vpqcs_oper" id="text_application_vpqcs_oper">
                                                         <option value="" selected disabled>Select</option>
                                                         <option value="Applicable">Applicable</option>
                                                         <option value="Not Applicable">Not Applicable</option>
@@ -5143,7 +5142,7 @@
                                             <div class="row mb-4">
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take</label>
-                                                    <select class="form-select" name="text_first_result_vpes_oper_2" id="text_first_result_vpes_oper_2">
+                                                    <select class="form-control select2bs4" name="text_first_result_vpes_oper_2" id="text_first_result_vpes_oper_2">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -5152,7 +5151,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take</label>
-                                                    <select class="form-select" name="text_second_result_vpes_oper_2" id="text_second_result_vpes_oper_2">
+                                                    <select class="form-control select2bs4" name="text_second_result_vpes_oper_2" id="text_second_result_vpes_oper_2">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -5163,7 +5162,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after 3rd day):</label>
-                                                    <input class="form-select" type="text" id="text_1st_validatedby_vpes_oper_2" name="text_1st_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_1st_validatedby_vpes_oper_2" name="text_1st_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_1st_validatedby_vpes_oper_2_username" name="text_1st_validatedby_vpes_oper_2_username">
@@ -5172,7 +5171,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after re-orientation):</label>
-                                                    <input class="form-select" type="text" id="text_2nd_validatedby_vpes_oper_2" name="text_2nd_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_2nd_validatedby_vpes_oper_2" name="text_2nd_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_2nd_validatedby_vpes_oper_2_username" name="text_2nd_validatedby_vpes_oper_2_username">
@@ -5206,11 +5205,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSevenOper" aria-expanded="false" aria-controls="collapseSevenOper">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSevenOper" aria-expanded="false" aria-controls="collapseSevenOper">
                                             <h5>QC Validation for Visual Operator</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseSevenOper" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOper">
+                                        <div id="collapseSevenOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -5259,7 +5258,7 @@
                                             <div class="row mb-5">
                                                 <div class="col-md-4">
                                                     <label class="ms-3" for="">First Take:</label>
-                                                    <select class="form-select" name="text_result1__qcvvo_oper" id="text_result1__qcvvo_oper">
+                                                    <select class="form-control select2bs4" name="text_result1__qcvvo_oper" id="text_result1__qcvvo_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -5268,7 +5267,7 @@
 
                                                 <div class="col-md-4">
                                                     <label class="ms-3" for="">Validated by:</label>
-                                                    <input class="form-select" type="text" id="text_validated1_qcvvo_oper" name="text_validated1_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_validated1_qcvvo_oper" name="text_validated1_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_validated1_qcvvo_oper_username" name="text_validated1_qcvvo_oper_username">
@@ -5325,7 +5324,7 @@
                                             <div class="row mb-4">
                                                 <div class="col-md-4">
                                                     <label class="ms-3" for="">Second Take:</label>
-                                                    <select class="form-select" name="text_result2__qcvvo_oper" id="text_result2__qcvvo_oper">
+                                                    <select class="form-control select2bs4" name="text_result2__qcvvo_oper" id="text_result2__qcvvo_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -5334,7 +5333,7 @@
 
                                                 <div class="col-md-4">
                                                     <label class="ms-3" for="">Validated by:</label>
-                                                    <input class="form-select" type="text" id="text_validated2_qcvvo_oper" name="text_validated2_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_validated2_qcvvo_oper" name="text_validated2_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_validated2_qcvvo_oper_username" name="text_validated2_qcvvo_oper_username">
@@ -5420,7 +5419,7 @@
 
                                 <div class="col-md-6">
                                     <label for="">Approved / Confirmed by:</label>
-                                    <input class="form-select" type="text" id="text_oper_approved_confirmed_by" name="text_oper_approved_confirmed_by" list="list_display_empno" placeholder="Select Approved / Confirmed by">
+                                    <input class="form-control" type="text" id="text_oper_approved_confirmed_by" name="text_oper_approved_confirmed_by" list="list_display_empno" placeholder="Select Approved / Confirmed by">
                                     <datalist id="list_display_empno"></datalist>
 
                                     <label for="" class="mt-1">QC Supervisor</label>
@@ -5430,7 +5429,7 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                     <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
                                 </div>
 
@@ -5443,12 +5442,14 @@
         </div>
 
         <!-- Modal Select Employee for MH -->
-        <div class="modal" id="select_Employee" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="select_Employee" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">Qualification / Certification Form</h5>
-                        <button type="button" class="btn-close" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -5479,7 +5480,7 @@
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-primary btnAddMHEmp" style="width: 100%;" id="btnAddMHEmp" data-bs-target="#select_Employee" data-bs-toggle="modal"><i class="fa-solid fa-plus"></i> Add to Table</button>
+                        <button type="button" class="btn btn-primary btnAddMHEmp" style="width: 100%;" id="btnAddMHEmp" data-target="#select_Employee" data-toggle="modal"><i class="fa-solid fa-plus"></i> Add to Table</button>
 
                         <hr style="border: 1px solid black;">
 
@@ -5502,19 +5503,21 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary btnAddSelectedMHEmp" id="btnAddSelectedMHEmp"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add</button>
-                        <button type="button" class="btn btn-secondary" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-target="#modalCreateCQForm" data-toggle="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Modal Select Employee for Supervisor, Engineer, Planner -->
-        <div class="modal" tabindex="-1" id="select_Employee3" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" tabindex="-1" id="select_Employee3" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">Qualification / Certification Form</h5>
-                        <button type="button" class="btn-close" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                     <div class="modal-body">
 
@@ -5577,7 +5580,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-target="#modalCreateCQForm" data-toggle="modal">Close</button>
                         <button type="button" class="btn btn-primary">Save changes</button>
                     </div>
                 </div>
@@ -5585,12 +5588,14 @@
         </div>
 
         <!-- Modal Select Employee for SEP -->
-        <div class="modal" id="select_Employee_sep" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="select_Employee_sep" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">Qualification / Certification Form</h5>
-                        <button type="button" class="btn-close" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -5644,19 +5649,21 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary btnAddSelectedSEPEmp" id="btnAddSelectedSEPEmp"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add</button>
-                        <button type="button" class="btn btn-secondary" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-target="#modalCreateCQForm" data-toggle="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Modal Select Employee for Technician -->
-        <div class="modal" id="select_Employee_technician" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="select_Employee_technician" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">Qualification / Certification Form</h5>
-                        <button type="button" class="btn-close" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -5710,19 +5717,21 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary btnAddSelectedTechEmp" id="btnAddSelectedTechEmp"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add</button>
-                        <button type="button" class="btn btn-secondary" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-target="#modalCreateCQForm" data-toggle="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Modal Select Employee for Inspector -->
-        <div class="modal" id="select_Employee_inspector" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="select_Employee_inspector" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">Qualification / Certification Form</h5>
-                        <button type="button" class="btn-close" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -5776,19 +5785,21 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary btnAddSelectedInspEmp" id="btnAddSelectedInspEmp"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add</button>
-                        <button type="button" class="btn btn-secondary" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-target="#modalCreateCQForm" data-toggle="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Modal Select Employee for Operator -->
-        <div class="modal" id="select_Employee_operator" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="select_Employee_operator" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">Qualification / Certification Form</h5>
-                        <button type="button" class="btn-close" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -5854,19 +5865,21 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary btnAddSelectedOPEREmp" id="btnAddSelectedOPEREmp"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add</button>
-                        <button type="button" class="btn btn-secondary" data-bs-target="#modalCreateCQForm" data-bs-toggle="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-target="#modalCreateCQForm" data-toggle="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- VIEW MODAL FOR MH -->
-        <div class="modal" id="modalViewMH" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="modalViewMH" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -6152,7 +6165,7 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                 </div>
 
                             </form>
@@ -6163,12 +6176,14 @@
         </div>
 
         <!-- VIEW MODAL FOR TECHNICIAN -->
-        <div class="modal" id="modalViewTech" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="modalViewTech" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                             <div class="modal-body">
                         <form id="formSubmit_Tech">
@@ -6349,7 +6364,7 @@
                                     </div>
                             </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                 </div>
                         </form>
                     </div>
@@ -6358,12 +6373,14 @@
         </div>
 
         <!-- VIEW MODAL FOR SEP -->
-        <div class="modal" id="modalViewSEP" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="modalViewSEP" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -6487,7 +6504,7 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                 </div>
 
                             </form>
@@ -6498,12 +6515,14 @@
         </div>
 
         <!-- VIEW MODAL FOR INSPECTOR -->
-        <div class="modal" id="modalViewInsp" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="modalViewInsp" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -6819,7 +6838,7 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                 </div>
 
                             </form>
@@ -6830,12 +6849,14 @@
         </div>
 
         <!-- VIEW MODAL FOR OPERATOR -->
-        <div class="modal" id="modalViewOper" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="modalViewOper" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -7778,7 +7799,7 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                 </div>
 
                             </form>
@@ -7789,12 +7810,14 @@
         </div>
 
 
-        <div class="modal" id="modalEditMh" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="modalEditMh" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -7812,7 +7835,7 @@
 
                                 <div class="col-md-3">
                                     <label for="">Production Section:</label>
-                                    <input class="form-select" type="text" name="text_edit_mh_section" id="text_edit_mh_section" list="list_section" placeholder="Select Section" disabled>
+                                    <input class="form-control" type="text" name="text_edit_mh_section" id="text_edit_mh_section" list="list_section" placeholder="Select Section" disabled>
                                     <datalist id="list_section">
 
                                     </datalist>
@@ -7825,14 +7848,14 @@
 
                                 <div class="col-md-3">
                                     <label for="">Product Line:</label>
-                                    <input class="form-select" type="text" id="text_edit_mh_product_line" name="text_edit_mh_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
+                                    <input class="form-control" type="text" id="text_edit_mh_product_line" name="text_edit_mh_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
                                     <datalist id="list_prod_line"></datalist>
                                 </div>
                             </div>
 
                             <!-- <div class="row mt-2 mb-5">
                                 <div class="col-md-12">
-                                    <button type="button" class="btn btn-primary" style="width: 100%;" id="" data-bs-target="#select_Employee" data-bs-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                    <button type="button" class="btn btn-primary" style="width: 100%;" id="" data-target="#select_Employee" data-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
                                 </div>
                             </div> -->
 
@@ -7855,7 +7878,7 @@
                             <div class="row mb-5">
                                 <div class="col-md-12">
                                     <label for="">Reason for Certification:</label>
-                                    <select class="form-select" name="text_edit_mh_certification" id="text_edit_mh_certification" disabled>
+                                    <select class="form-control select2bs4" name="text_edit_mh_certification" id="text_edit_mh_certification" disabled>
                                         <option value="" selected disabled>Select Reason</option>
                                         <option value="Newly hired employees">1 Newly hired employees</option>
                                         <option value="Newly promoted employees">2 Newly promoted employees</option>
@@ -7876,11 +7899,11 @@
                             <div class="accordion" id="accordionExampleMHEdit">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneMHEdit" aria-expanded="true" aria-controls="collapseOneMHEdit">
+                                    <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneMHEdit" aria-expanded="true" aria-controls="collapseOneMHEdit">
                                         <h5>PRODUCTION / WAREHOUSE SUPERVISOR (Training/Orientation)</h5>
                                     </button>
                                     </h2>
-                                    <div id="collapseOneMHEdit" class="accordion-collapse collapse show" data-bs-parent="#accordionExampleMHEdit">
+                                    <div id="collapseOneMHEdit" class="accordion-collapse collapse show" data-parent="#accordionExampleMHEdit">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -8165,7 +8188,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">First Take:</label>
-                                                    <select class="form-select" name="text_edit_mh_first_result" id="text_edit_mh_first_result">
+                                                    <select class="form-control select2bs4" name="text_edit_mh_first_result" id="text_edit_mh_first_result">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -8174,7 +8197,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Second Take:</label>
-                                                    <select class="form-select" name="text_edit_mh_second_result" id="text_edit_mh_second_result">
+                                                    <select class="form-control select2bs4" name="text_edit_mh_second_result" id="text_edit_mh_second_result">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -8187,7 +8210,7 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <label class="ms-3" for="">Trained by:</label>
-                                                            <input class="form-select" type="text" id="text_edit_mh_first_trained_by" name="text_edit_mh_first_trained_by" list="list_display_empno" placeholder="Select Trained by">
+                                                            <input class="form-control" type="text" id="text_edit_mh_first_trained_by" name="text_edit_mh_first_trained_by" list="list_display_empno" placeholder="Select Trained by">
                                                             <datalist id="list_display_empno"></datalist>
 
                                                             <input type="hidden" id="text_edit_mh_first_trained_by_username" name="text_edit_mh_first_trained_by_username">
@@ -8195,7 +8218,7 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <label class="ms-3" for="">Mentored by:</label>
-                                                            <input class="form-select" type="text" id="text_edit_mh_first_mentored_by" name="text_edit_mh_first_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                                            <input class="form-control" type="text" id="text_edit_mh_first_mentored_by" name="text_edit_mh_first_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
                                                             <datalist id="list_display_empno"></datalist>
                                                         </div>
                                                     </div>
@@ -8206,7 +8229,7 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <label class="ms-3" for="">Trained by:</label>
-                                                            <input class="form-select" type="text" id="text_edit_mh_second_trained_by" name="text_edit_mh_second_trained_by" list="list_display_empno" placeholder="Select Trained by">
+                                                            <input class="form-control" type="text" id="text_edit_mh_second_trained_by" name="text_edit_mh_second_trained_by" list="list_display_empno" placeholder="Select Trained by">
                                                             <datalist id="list_display_empno"></datalist>
 
                                                             <input type="hidden" id="text_edit_mh_second_trained_by_username" name="text_edit_mh_second_trained_by_username">
@@ -8214,7 +8237,7 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                              <label class="ms-3" for="">Mentored by:</label>
-                                                            <input class="form-select" type="text" id="text_edit_mh_second_mentored_by" name="text_edit_mh_second_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                                            <input class="form-control" type="text" id="text_edit_mh_second_mentored_by" name="text_edit_mh_second_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
                                                             <datalist id="list_display_empno"></datalist>
                                                         </div>
                                                     </div>
@@ -8248,7 +8271,7 @@
                                                 <div class="col-md-6"></div>
                                                 <div class="col-md-3">
                                                     <label class="" for="" id="label_edit_alert_pw_sec_mh">Send Email Alert to:</label>
-                                                    <input class="form-select" type="text" id="text_edit_alert_pw_sec_mh" name="text_edit_alert_pw_sec_mh" list="list_display_empno" placeholder="Send email to" disabled>
+                                                    <input class="form-control" type="text" id="text_edit_alert_pw_sec_mh" name="text_edit_alert_pw_sec_mh" list="list_display_empno" placeholder="Send email to" disabled>
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_edit_alert_pw_sec_mh_username" name="text_edit_alert_pw_sec_mh_username">
                                                     <input type="hidden" id="text_edit_alert_pw_sec_mh_email" name="text_edit_alert_pw_sec_mh_email">
@@ -8256,7 +8279,7 @@
 
                                                 <div class="col-md-3">
                                                     <label class="" for="" id="label_edit_alert_pw_cc_sec_mh">Add cc:</label>
-                                                    <input class="form-select" type="text" id="text_edit_alert_pw_cc_sec_mh" name="text_edit_alert_pw_cc_sec_mh" list="list_display_empno" placeholder="Cc" disabled>
+                                                    <input class="form-control" type="text" id="text_edit_alert_pw_cc_sec_mh" name="text_edit_alert_pw_cc_sec_mh" list="list_display_empno" placeholder="Cc" disabled>
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_edit_alert_pw_cc_sec_mh_username" name="text_edit_alert_pw_cc_sec_mh_username">
                                                     <input type="hidden" id="text_edit_alert_pw_cc_sec_mh_email" name="text_edit_alert_pw_cc_sec_mh_email">
@@ -8270,11 +8293,11 @@
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwoMHEdit" aria-expanded="false" aria-controls="collapseTwoMHEdit">
+                                    <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoMHEdit" aria-expanded="false" aria-controls="collapseTwoMHEdit">
                                         <h5>LINE QUALITY CONTROL SECTION (Certification)</h5>
                                     </button>
                                     </h2>
-                                    <div id="collapseTwoMHEdit" class="accordion-collapse collapse" data-bs-parent="#accordionExampleMHEdit">
+                                    <div id="collapseTwoMHEdit" class="accordion-collapse collapse" data-parent="#accordionExampleMHEdit">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -8302,7 +8325,7 @@
                                             <div class="row mb-4">
                                                 <div class="col-md-6">
                                                     <p class="" for="">1.1 Observation / Interview Result</p>
-                                                    <select class="form-select" name="text_edit_mh_obs_first_result" id="text_edit_mh_obs_first_result">
+                                                    <select class="form-control select2bs4" name="text_edit_mh_obs_first_result" id="text_edit_mh_obs_first_result">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -8311,7 +8334,7 @@
 
                                                 <div class="col-md-6">
                                                     <p class="" for="">1.1 Observation / Interview Result</p>
-                                                    <select class="form-select" name="text_edit_mh_obs_second_result" id="text_edit_mh_obs_second_result">
+                                                    <select class="form-control select2bs4" name="text_edit_mh_obs_second_result" id="text_edit_mh_obs_second_result">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -8404,7 +8427,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
-                                                    <select class="form-select" name="text_edit_mh_oa_1st_result" id="text_edit_mh_oa_1st_result">
+                                                    <select class="form-control select2bs4" name="text_edit_mh_oa_1st_result" id="text_edit_mh_oa_1st_result">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -8413,7 +8436,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
-                                                    <select class="form-select" name="text_edit_mh_oa_2nd_result" id="text_edit_mh_oa_2nd_result">
+                                                    <select class="form-control select2bs4" name="text_edit_mh_oa_2nd_result" id="text_edit_mh_oa_2nd_result">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -8436,7 +8459,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Certified by:</label>
-                                                    <input class="form-select" type="text" id="text_edit_mh_1st_certified" name="text_edit_mh_1st_certified" list="list_display_empno" placeholder="Select Certified by">
+                                                    <input class="form-control" type="text" id="text_edit_mh_1st_certified" name="text_edit_mh_1st_certified" list="list_display_empno" placeholder="Select Certified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_mh_1st_certified_username" name="text_edit_mh_1st_certified_username">
@@ -8445,7 +8468,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Certified by:</label>
-                                                    <input class="form-select" type="text" id="text_edit_mh_2nd_certified" name="text_edit_mh_2nd_certified" list="list_display_empno" placeholder="Select Certified by">
+                                                    <input class="form-control" type="text" id="text_edit_mh_2nd_certified" name="text_edit_mh_2nd_certified" list="list_display_empno" placeholder="Select Certified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_mh_2nd_certified_username" name="text_edit_mh_2nd_certified_username">
@@ -8522,7 +8545,7 @@
 
                             <div class="col-md-6">
                                 <label for="">Approved / Confirmed by:</label>
-                                <input class="form-select" type="text" id="text_edit_mh_approved_confirmed_by" name="text_edit_mh_approved_confirmed_by" list="list_display_empno" placeholder="Select Certified by">
+                                <input class="form-control" type="text" id="text_edit_mh_approved_confirmed_by" name="text_edit_mh_approved_confirmed_by" list="list_display_empno" placeholder="Select Certified by">
                                 <datalist id="list_display_empno"></datalist>
 
                                 <label for="" class="mt-1">Prodn / PPC-WHSE Sec. Head</label>
@@ -8532,7 +8555,7 @@
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                 <button type="submit" class="btn btn-success" id="btnSubmitMHEdit"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
                             </div>
                         </form>
@@ -8541,12 +8564,14 @@
             </div>
         </div>
 
-        <div class="modal" id="modalEditTech" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="modalEditTech" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -8563,7 +8588,7 @@
 
                                 <div class="col-md-3">
                                     <label for="">Production Section:</label>
-                                    <input class="form-select" type="text" name="text_edit_tech_section" id="text_edit_tech_section" list="list_section" placeholder="Select Section" disabled>
+                                    <input class="form-control" type="text" name="text_edit_tech_section" id="text_edit_tech_section" list="list_section" placeholder="Select Section" disabled>
                                     <datalist id="list_section">
 
                                     </datalist>
@@ -8571,7 +8596,7 @@
 
                                 <div class="col-md-3">
                                     <label for="">Station:</label>
-                                    <select class="form-select" name="text_edit_tech_station" id="text_edit_tech_station" disabled>
+                                    <select class="form-control select2bs4" name="text_edit_tech_station" id="text_edit_tech_station" disabled>
                                         <option value="" selected disabled>Select station</option>
                                         <option value="Process">Process</option>
                                         <option value="Maintenance">Maintenance</option>
@@ -8582,7 +8607,7 @@
 
                                 <div class="col-md-3">
                                     <label for="">Product Line:</label>
-                                    <input class="form-select" type="text" id="text_edit_tech_product_line" name="text_edit_tech_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
+                                    <input class="form-control" type="text" id="text_edit_tech_product_line" name="text_edit_tech_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
                                     <datalist id="list_prod_line"></datalist>
                                 </div>
                             </div>
@@ -8606,7 +8631,7 @@
                             <div class="row mb-5">
                                 <div class="col-md-12">
                                     <label for="">Reason for Certification:</label>
-                                    <select class="form-select" name=text_edit_tech_certification id="text_edit_tech_certification" disabled>
+                                    <select class="form-control select2bs4" name=text_edit_tech_certification id="text_edit_tech_certification" disabled>
                                         <option value="" selected disabled>Select Reason</option>
                                         <option value="Lateral transfer">1 Lateral transfer</option>
                                         <option value="Flexibility">2 Flexibility</option>
@@ -8627,11 +8652,11 @@
                             <div class="accordion" id="accordionExampleTechEdit">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneTechEdit" aria-expanded="true" aria-controls="collapseOneTechEdit">
+                                    <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneTechEdit" aria-expanded="true" aria-controls="collapseOneTechEdit">
                                         <h5>ENGINEERING SECTION (Training and Qualification)</h5>
                                     </button>
                                     </h2>
-                                    <div id="collapseOneTechEdit" class="accordion-collapse collapse show" data-bs-parent="#accordionExampleTechEdit">
+                                    <div id="collapseOneTechEdit" class="accordion-collapse collapse show" data-parent="#accordionExampleTechEdit">
                                     <div class="accordion-body">
                                         <!-- ------------------------------------------------ -->
 
@@ -9070,7 +9095,7 @@
                                         <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <label for="">Trained and Qualified by:</label>
-                                                <input class="form-select" type="text" id="text_edit_tech_trained_qualified_by" name="text_edit_tech_trained_qualified_by" list="list_display_empno" placeholder="Select Trained and Qualified by">
+                                                <input class="form-control" type="text" id="text_edit_tech_trained_qualified_by" name="text_edit_tech_trained_qualified_by" list="list_display_empno" placeholder="Select Trained and Qualified by">
                                                 <datalist id="list_display_empno"></datalist>
 
                                                 <input type="hidden" id="text_edit_tech_trained_qualified_by_username" name="text_edit_tech_trained_qualified_by_username">
@@ -9078,7 +9103,7 @@
                                             </div>
                                              <div class="col-md-6">
                                                 <label for="">Mentored by:</label>
-                                                <input class="form-select" type="text" id="text_edit_tech_mentored_by" name="text_edit_tech_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                                <input class="form-control" type="text" id="text_edit_tech_mentored_by" name="text_edit_tech_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
                                                 <datalist id="list_display_empno"></datalist>
                                             </div>
                                         </div>
@@ -9099,7 +9124,7 @@
                                             <div class="col-md-6"></div>
                                             <div class="col-md-3">
                                                 <label class="" for="" id="label_alert_estq_sec_tech">Send Email Alert to:</label>
-                                                <input class="form-select" type="text" id="text_alert_estq_sec_tech" name="text_alert_estq_sec_tech" list="list_display_empno" placeholder="Send email to" disabled>
+                                                <input class="form-control" type="text" id="text_alert_estq_sec_tech" name="text_alert_estq_sec_tech" list="list_display_empno" placeholder="Send email to" disabled>
                                                 <datalist id="list_display_empno"></datalist>
                                                 <input type="hidden" id="text_alert_estq_sec_tech_username" name="text_alert_estq_sec_tech_username">
                                                 <input type="hidden" id="text_alert_estq_sec_tech_email" name="text_alert_estq_sec_tech_email">
@@ -9107,7 +9132,7 @@
 
                                             <div class="col-md-3">
                                                 <label class="" for="" id="label_alert_estq_cc_sec_tech">Add cc:</label>
-                                                <input class="form-select" type="text" id="text_alert_estq_cc_sec_tech" name="text_alert_estq_cc_sec_tech" list="list_display_empno" placeholder="Cc" disabled>
+                                                <input class="form-control" type="text" id="text_alert_estq_cc_sec_tech" name="text_alert_estq_cc_sec_tech" list="list_display_empno" placeholder="Cc" disabled>
                                                 <datalist id="list_display_empno"></datalist>
                                                 <input type="hidden" id="text_alert_estq_cc_sec_tech_username" name="text_alert_estq_cc_sec_tech_username">
                                                 <input type="hidden" id="text_alert_estq_cc_sec_tech_email" name="text_alert_estq_cc_sec_tech_email">
@@ -9120,11 +9145,11 @@
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwoTechEdit" aria-expanded="false" aria-controls="collapseTwoTechEdit">
+                                    <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoTechEdit" aria-expanded="false" aria-controls="collapseTwoTechEdit">
                                         <h5>ENGINEERING SECTION (Certification)</h5>
                                     </button>
                                     </h2>
-                                    <div id="collapseTwoTechEdit" class="accordion-collapse collapse" data-bs-parent="#accordionExampleTechEdit">
+                                    <div id="collapseTwoTechEdit" class="accordion-collapse collapse" data-parent="#accordionExampleTechEdit">
                                     <div class="accordion-body">
                                         <!-- ------------------------------------------------ -->
 
@@ -9135,7 +9160,7 @@
                                         <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <label class="ms-3" for="">First Take:</label>
-                                                <select class="form-select" name="text_edit_tech_es_1st_take_result" id="text_edit_tech_es_1st_take_result">
+                                                <select class="form-control select2bs4" name="text_edit_tech_es_1st_take_result" id="text_edit_tech_es_1st_take_result">
                                                     <option value="" selected disabled>Select Result</option>
                                                     <option value="PASSED">PASSED</option>
                                                     <option value="FAILED">FAILED</option>
@@ -9144,7 +9169,7 @@
 
                                             <div class="col-md-6">
                                                 <label class="ms-3" for="">Second Take:</label>
-                                                <select class="form-select" name="text_edit_tech_es_2nd_take_result" id="text_edit_tech_es_2nd_take_result">
+                                                <select class="form-control select2bs4" name="text_edit_tech_es_2nd_take_result" id="text_edit_tech_es_2nd_take_result">
                                                     <option value="" selected disabled>Select Result</option>
                                                     <option value="PASSED">PASSED</option>
                                                     <option value="FAILED">FAILED</option>
@@ -9155,7 +9180,7 @@
                                         <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <label class="ms-3" for="">Certified by:</label>
-                                                <input class="form-select" type="text" id="text_edit_tech_es_1st_certified_by" name="text_edit_tech_es_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                <input class="form-control" type="text" id="text_edit_tech_es_1st_certified_by" name="text_edit_tech_es_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
                                                 <datalist id="list_display_empno"></datalist>
 
                                                 <input type="hidden" id="text_edit_tech_es_1st_certified_by_username" name="text_edit_tech_es_1st_certified_by_username">
@@ -9165,7 +9190,7 @@
 
                                             <div class="col-md-6">
                                                 <label class="ms-3" for="">Certified by:</label>
-                                                <input class="form-select" type="text" id="text_edit_tech_es_2nd_certified_by" name="text_edit_tech_es_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                <input class="form-control" type="text" id="text_edit_tech_es_2nd_certified_by" name="text_edit_tech_es_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
                                                 <datalist id="list_display_empno"></datalist>
 
                                                 <input type="hidden" id="text_edit_tech_es_2nd_certified_by_username" name="text_edit_tech_es_2nd_certified_by_username">
@@ -9200,7 +9225,7 @@
                                             <div class="col-md-6"></div>
                                             <div class="col-md-3">
                                                 <label class="" for="">Send Email Alert to:</label>
-                                                <input class="form-select" type="text" id="text_edit_alert_esc_sec_tech" name="text_edit_alert_esc_sec_tech" list="list_display_empno" placeholder="Send email to">
+                                                <input class="form-control" type="text" id="text_edit_alert_esc_sec_tech" name="text_edit_alert_esc_sec_tech" list="list_display_empno" placeholder="Send email to">
                                                 <datalist id="list_display_empno"></datalist>
                                                 <input type="hidden" id="text_edit_alert_esc_sec_tech_username" name="text_edit_alert_esc_sec_tech_username">
                                                 <input type="hidden" id="text_edit_alert_esc_sec_tech_email" name="text_edit_alert_esc_sec_tech_email">
@@ -9208,7 +9233,7 @@
 
                                             <div class="col-md-3">
                                                 <label class="" for="">Add cc:</label>
-                                                <input class="form-select" type="text" id="text_edit_alert_esc_cc_sec_tech" name="text_edit_alert_esc_cc_sec_tech" list="list_display_empno" placeholder="Cc">
+                                                <input class="form-control" type="text" id="text_edit_alert_esc_cc_sec_tech" name="text_edit_alert_esc_cc_sec_tech" list="list_display_empno" placeholder="Cc">
                                                 <datalist id="list_display_empno"></datalist>
                                                 <input type="hidden" id="text_edit_alert_esc_cc_sec_tech_username" name="text_edit_alert_esc_cc_sec_tech_username">
                                                 <input type="hidden" id="text_edit_alert_esc_cc_sec_tech_email" name="text_edit_alert_esc_cc_sec_tech_email">
@@ -9222,7 +9247,7 @@
                                             <div class="col-md-3">
                                                 <label for="text_edit_alert_esc_sec_tech" id="label_edit_alert_esc_sec_tech">Send Email Alert to:</label>
                                                 <div id="selectedEscAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                <input class="form-select" type="text"
+                                                <input class="form-control" type="text"
                                                     id="text_edit_alert_esc_sec_tech"
                                                     name="text_edit_alert_esc_sec_tech"
                                                     list="list_display_empno"
@@ -9236,7 +9261,7 @@
                                             <div class="col-md-3">
                                                 <label for="text_edit_alert_esc_cc_sec_tech" id="label_edit_alert_esc_cc_sec_tech">Add cc:</label>
                                                 <div id="selectedEscAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                <input class="form-select" type="text"
+                                                <input class="form-control" type="text"
                                                     id="text_edit_alert_esc_cc_sec_tech"
                                                     name="text_edit_alert_esc_cc_sec_tech"
                                                     list="list_display_empno"
@@ -9253,11 +9278,11 @@
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThreeTechEdit" aria-expanded="false" aria-controls="collapseThreeTechEdit">
+                                    <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeTechEdit" aria-expanded="false" aria-controls="collapseThreeTechEdit">
                                         <h5>QUALITY CONTROL SECTION (CERTIFICATION)</h5>
                                     </button>
                                     </h2>
-                                    <div id="collapseThreeTechEdit" class="accordion-collapse collapse" data-bs-parent="#accordionExampleTechEdit">
+                                    <div id="collapseThreeTechEdit" class="accordion-collapse collapse" data-parent="#accordionExampleTechEdit">
                                     <div class="accordion-body">
                                         <!-- ------------------------------------------------ -->
 
@@ -9270,7 +9295,7 @@
                                         <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <label class="ms-3" for="">First Take:</label>
-                                                <select class="form-select" name="text_edit_tech_qcs_1st_take_result" id="text_edit_tech_qcs_1st_take_result">
+                                                <select class="form-control select2bs4" name="text_edit_tech_qcs_1st_take_result" id="text_edit_tech_qcs_1st_take_result">
                                                     <option value="" selected disabled>Select Result</option>
                                                     <option value="PASSED">PASSED</option>
                                                     <option value="FAILED">FAILED</option>
@@ -9279,7 +9304,7 @@
 
                                             <div class="col-md-6">
                                                 <label class="ms-3" for="">Second Take:</label>
-                                                <select class="form-select" name="text_edit_tech_qcs_2nd_take_result" id="text_edit_tech_qcs_2nd_take_result">
+                                                <select class="form-control select2bs4" name="text_edit_tech_qcs_2nd_take_result" id="text_edit_tech_qcs_2nd_take_result">
                                                     <option value="" selected disabled>Select Result</option>
                                                     <option value="PASSED">PASSED</option>
                                                     <option value="FAILED">FAILED</option>
@@ -9290,7 +9315,7 @@
                                         <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <label class="ms-3" for="">Certified by:</label>
-                                                <input class="form-select" type="text" id="text_edit_tech_qcs_1st_certified_by" name="text_edit_tech_qcs_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                <input class="form-control" type="text" id="text_edit_tech_qcs_1st_certified_by" name="text_edit_tech_qcs_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
                                                 <datalist id="list_display_empno"></datalist>
 
                                                 <input type="hidden" id="text_edit_tech_qcs_1st_certified_by_username" name="text_edit_tech_qcs_1st_certified_by_username">
@@ -9299,7 +9324,7 @@
 
                                             <div class="col-md-6">
                                                 <label class="ms-3" for="">Certified by:</label>
-                                                <input class="form-select" type="text" id="text_edit_tech_qcs_2nd_certified_by" name="text_edit_tech_qcs_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                <input class="form-control" type="text" id="text_edit_tech_qcs_2nd_certified_by" name="text_edit_tech_qcs_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
                                                 <datalist id="list_display_empno"></datalist>
 
                                                 <input type="hidden" id="text_edit_tech_qcs_2nd_certified_by_username" name="text_edit_tech_qcs_2nd_certified_by_username">
@@ -9343,7 +9368,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="">Approved by:</label>
-                                    <input class="form-select" type="text" id="text_edit_tech_approved_by" name="text_edit_tech_approved_by" list="list_display_empno" placeholder="Select Approved by">
+                                    <input class="form-control" type="text" id="text_edit_tech_approved_by" name="text_edit_tech_approved_by" list="list_display_empno" placeholder="Select Approved by">
                                     <datalist id="list_display_empno"></datalist>
 
                                     <input type="hidden" id="text_edit_tech_approved_by_username" name="text_edit_tech_approved_by_username">
@@ -9355,7 +9380,7 @@
                             <!-- <hr style="height: 1px; background-color: grey; border: none;"> -->
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                 <button type="submit" class="btn btn-success" id="btnSubmitTechEdit"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
                             </div>
 
@@ -9366,12 +9391,14 @@
         </div>
 
 
-        <div class="modal" id="modalEditSep" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="modalEditSep" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -9389,7 +9416,7 @@
 
                                 <div class="col-md-3">
                                     <label for="">Production Section:</label>
-                                    <input class="form-select" type="text" name="text_edit_sep_section" id="text_edit_sep_section" list="list_section" placeholder="Select Section" disabled>
+                                    <input class="form-control" type="text" name="text_edit_sep_section" id="text_edit_sep_section" list="list_section" placeholder="Select Section" disabled>
                                     <datalist id="list_section">
 
                                     </datalist>
@@ -9397,7 +9424,7 @@
 
                                 <div class="col-md-3">
                                     <label for="">Designation:</label>
-                                    <Select class="form-select" name="text_edit_sep_station" id="text_edit_sep_station" disabled>
+                                    <select class="form-control select2bs4" style=" width:100%" name="text_edit_sep_station" id="text_edit_sep_station" disabled>
                                         <option value="" selected disabled>Select designation</option>
                                         <option value="Jr. Production Supervisor">Jr. Production Supervisor</option>
                                         <option value="Sr. Production Supervisor">Sr. Production Supervisor</option>
@@ -9412,7 +9439,7 @@
 
                                 <div class="col-md-3">
                                     <label for="">Product Line:</label>
-                                    <input class="form-select" type="text" id="text_edit_sep_product_line" name="text_edit_sep_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
+                                    <input class="form-control" type="text" id="text_edit_sep_product_line" name="text_edit_sep_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
                                     <datalist id="list_prod_line"></datalist>
                                 </div>
                             </div>
@@ -9436,7 +9463,7 @@
                             <div class="row mb-5">
                                 <div class="col-md-9">
                                     <label for="">Reason for Certification:</label>
-                                    <select class="form-select" name="text_edit_sep_certification" id="text_edit_sep_certification" disabled>
+                                    <select class="form-control select2bs4" name="text_edit_sep_certification" id="text_edit_sep_certification" disabled>
                                         <option value="" selected disabled>Select Reason</option>
                                         <option value="Lateral transfer">1 Lateral transfer</option>
                                         <option value="Flexibility">2 Flexibility</option>
@@ -9809,7 +9836,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="ms-3" for="">Theoretical Examination</label>
-                                    <select class="form-select" name="text_edit_sep_theoretical_result" id="text_edit_sep_theoretical_result">
+                                    <select class="form-control select2bs4" name="text_edit_sep_theoretical_result" id="text_edit_sep_theoretical_result">
                                         <option value="" selected disabled>Select Result</option>
                                         <option value="PASSED">PASSED</option>
                                         <option value="FAILED">FAILED</option>
@@ -9818,7 +9845,7 @@
 
                                 <div class="col-md-6">
                                     <label class="ms-3" for="">Hands-on</label>
-                                    <select class="form-select" name="text_edit_sep_handson_result" id="text_edit_sep_handson_result">
+                                    <select class="form-control select2bs4" name="text_edit_sep_handson_result" id="text_edit_sep_handson_result">
                                         <option value="" selected disabled>Select Result</option>
                                         <option value="PASSED">PASSED</option>
                                         <option value="FAILED">FAILED</option>
@@ -9829,7 +9856,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="ms-3" for="">Trained / Certified by:</label>
-                                    <input class="form-select" type="text" id="text_edit_sep_trained_certified_by" name="text_edit_sep_trained_certified_by" list="list_display_empno" placeholder="Select Trained / Certified by">
+                                    <input class="form-control" type="text" id="text_edit_sep_trained_certified_by" name="text_edit_sep_trained_certified_by" list="list_display_empno" placeholder="Select Trained / Certified by">
                                     <datalist id="list_display_empno"></datalist>
 
                                     <input type="hidden" id="text_edit_sep_trained_certified_by_username" name="text_edit_sep_trained_certified_by_username">
@@ -9837,7 +9864,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="ms-3" for="">Mentored by:</label>
-                                    <input class="form-select" type="text" id="text_edit_sep_mentored_by" name="text_edit_sep_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                    <input class="form-control" type="text" id="text_edit_sep_mentored_by" name="text_edit_sep_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
                                     <datalist id="list_display_empno"></datalist>
 
                                 </div>
@@ -9857,7 +9884,7 @@
                             <div class="row mb-5">
                                 <div class="col-md-6">
                                     <label for="">Approved by:</label>
-                                    <input class="form-select" type="text" id="text_edit_sep_approved_by" name="text_edit_sep_approved_by" list="list_display_empno" placeholder="Select Approved by">
+                                    <input class="form-control" type="text" id="text_edit_sep_approved_by" name="text_edit_sep_approved_by" list="list_display_empno" placeholder="Select Approved by">
                                     <datalist id="list_display_empno"></datalist>
 
                                     <input type="hidden" id="text_edit_sep_approved_by_username" name="text_edit_sep_approved_by_username">
@@ -9874,7 +9901,7 @@
                             <!-- <hr style="height: 1px; background-color: grey; border: none;"> -->
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                 <button type="submit" class="btn btn-success" id="btnSubmitSEPEdit"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
                             </div>
 
@@ -9884,12 +9911,14 @@
             </div>
         </div>
 
-        <div class="modal" id="modalEditInsp" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="modalEditInsp" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -9907,7 +9936,7 @@
 
                                 <div class="col-md-3">
                                     <label for="">Production Section:</label>
-                                    <input class="form-select" type="text" name="text_edit_section_inspector" id="text_edit_section_inspector" list="list_section" placeholder="Select Section" disabled>
+                                    <input class="form-control" type="text" name="text_edit_section_inspector" id="text_edit_section_inspector" list="list_section" placeholder="Select Section" disabled>
                                     <datalist id="list_section">
 
                                     </datalist>
@@ -9915,7 +9944,7 @@
 
                                 <div class="col-md-3">
                                     <label for="">Station:</label>
-                                    <Select class="form-select" name="text_edit_series_inspector" id="text_edit_series_inspector" disabled>
+                                    <select class="form-control select2bs4" name="text_edit_series_inspector" id="text_edit_series_inspector" disabled>
                                         <option value="" selected disabled>Select station</option>
                                         <option value="IQC">IQC</option>
                                         <option value="IPQC">IPQC</option>
@@ -9926,7 +9955,7 @@
 
                                 <div class="col-md-3">
                                     <label for="">Product Line:</label>
-                                    <input class="form-select" type="text" id="text_edit_insp_product_line" name="text_edit_insp_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
+                                    <input class="form-control" type="text" id="text_edit_insp_product_line" name="text_edit_insp_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
                                     <datalist id="list_prod_line"></datalist>
                                 </div>
                             </div>
@@ -9950,7 +9979,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="text_edit_certification_inspector">Reason for Certification:</label>
-                                    <select class="form-select" name="text_edit_certification_inspector" id="text_edit_certification_inspector" disabled>
+                                    <select class="form-control select2bs4" name="text_edit_certification_inspector" id="text_edit_certification_inspector" disabled>
                                         <option value="" selected disabled>Select Reason</option>
                                         <option value="Lateral transfer">1 Lateral transfer</option>
                                         <option value="Flexibility">2 Flexibility</option>
@@ -9982,11 +10011,11 @@
                                 <div class="accordion" id="accordionExampleInspEdit">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneInspEdit" aria-expanded="true" aria-controls="collapseOneInspEdit">
+                                        <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneInspEdit" aria-expanded="true" aria-controls="collapseOneInspEdit">
                                             <h5>LINE QUALITY CONTROL SECTION (Training and Qualification)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseOneInspEdit" class="accordion-collapse collapse show" data-bs-parent="#accordionExampleInspEdit">
+                                        <div id="collapseOneInspEdit" class="accordion-collapse collapse show" data-parent="#accordionExampleInspEdit">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -10563,7 +10592,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Trained and Qualified by:</label>
-                                                    <input class="form-select" type="text" id="text_edit_certified_inspector" name="text_edit_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
+                                                    <input class="form-control" type="text" id="text_edit_certified_inspector" name="text_edit_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_certified_inspector_username" name="text_edit_certified_inspector_username">
@@ -10571,7 +10600,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Mentored by:</label>
-                                                    <input class="form-select" type="text" id="text_edit_mentored_by" name="text_edit_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                                    <input class="form-control" type="text" id="text_edit_mentored_by" name="text_edit_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
                                                     <datalist id="list_display_empno"></datalist>
                                                 </div>
                                             </div>
@@ -10614,11 +10643,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwoInspEdit" aria-expanded="false" aria-controls="collapseTwoInspEdit">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoInspEdit" aria-expanded="false" aria-controls="collapseTwoInspEdit">
                                             <h5>LINE QUALITY CONTROL SECTION (Certification)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseTwoInspEdit" class="accordion-collapse collapse" data-bs-parent="#accordionExampleInspEdit">
+                                        <div id="collapseTwoInspEdit" class="accordion-collapse collapse" data-parent="#accordionExampleInspEdit">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -10645,7 +10674,7 @@
                                                 </div>
 
                                                 <div class="col-md-3">
-                                                    <select class="form-select" name="text_edit_sel_result1_inspector" id="text_edit_sel_result1_inspector">
+                                                    <select class="form-control select2bs4" name="text_edit_sel_result1_inspector" id="text_edit_sel_result1_inspector">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -10661,7 +10690,7 @@
                                                 </div>
 
                                                 <div class="col-md-3">
-                                                    <select class="form-select" name="text_edit_sel_result2_inspector" id="text_edit_sel_result2_inspector">
+                                                    <select class="form-control select2bs4" name="text_edit_sel_result2_inspector" id="text_edit_sel_result2_inspector">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -10797,7 +10826,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-12">
                                                     <label for="">Result:</label>
-                                                    <select class="form-select" name="text_edit_sec2_result_inspector" id="text_edit_sec2_result_inspector">
+                                                    <select class="form-control select2bs4" name="text_edit_sec2_result_inspector" id="text_edit_sec2_result_inspector">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="RE-TRAIN">RE-TRAIN</option>
@@ -10809,7 +10838,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-12">
                                                     <label for="">Certified by:</label>
-                                                    <input class="form-select" type="text" id="text_edit_sec2_certified_inspector" name="text_edit_sec2_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
+                                                    <input class="form-control" type="text" id="text_edit_sec2_certified_inspector" name="text_edit_sec2_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_sec2_certified_inspector_username" name="text_edit_sec2_certified_inspector_username">
@@ -10833,7 +10862,7 @@
                                                 <div class="col-md-6"></div>
                                                 <div class="col-md-3">
                                                     <label class="" for="">Send Email Alert to:</label>
-                                                    <input class="form-select" type="text" id="text_edit_alert_qcc_sec_insp" name="text_edit_alert_qcc_sec_insp" list="list_display_empno" placeholder="Send email to">
+                                                    <input class="form-control" type="text" id="text_edit_alert_qcc_sec_insp" name="text_edit_alert_qcc_sec_insp" list="list_display_empno" placeholder="Send email to">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_edit_alert_qcc_sec_insp_username" name="text_edit_alert_qcc_sec_insp_username">
                                                     <input type="hidden" id="text_edit_alert_qcc_sec_insp_email" name="text_edit_alert_qcc_sec_insp_email">
@@ -10841,7 +10870,7 @@
 
                                                 <div class="col-md-3">
                                                     <label class="" for="">Add cc:</label>
-                                                    <input class="form-select" type="text" id="text_edit_alert_qcc_cc_sec_insp" name="text_edit_alert_qcc_cc_sec_insp" list="list_display_empno" placeholder="Cc">
+                                                    <input class="form-control" type="text" id="text_edit_alert_qcc_cc_sec_insp" name="text_edit_alert_qcc_cc_sec_insp" list="list_display_empno" placeholder="Cc">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_edit_alert_qcc_cc_sec_insp_username" name="text_edit_alert_qcc_cc_sec_insp_username">
                                                     <input type="hidden" id="text_edit_alert_qcc_cc_sec_insp_email" name="text_edit_alert_qcc_cc_sec_insp_email">
@@ -10855,7 +10884,7 @@
                                                 <div class="col-md-3">
                                                     <label for="text_edit_alert_qcc_sec_insp" id="label_edit_alert_qcc_sec_insp">Send Email Alert to:</label>
                                                     <div id="selectedQccAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                    <input class="form-select" type="text"
+                                                    <input class="form-control" type="text"
                                                         id="text_edit_alert_qcc_sec_insp"
                                                         name="text_edit_alert_qcc_sec_insp"
                                                         list="list_display_empno"
@@ -10869,7 +10898,7 @@
                                                 <div class="col-md-3">
                                                     <label for="text_edit_alert_qcc_cc_sec_insp" id="label_edit_alert_qcc_cc_sec_insp">Add cc:</label>
                                                     <div id="selectedQccAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                    <input class="form-select" type="text"
+                                                    <input class="form-control" type="text"
                                                         id="text_edit_alert_qcc_cc_sec_insp"
                                                         name="text_edit_alert_qcc_cc_sec_insp"
                                                         list="list_display_empno"
@@ -10889,11 +10918,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThreeInspEdit" aria-expanded="false" aria-controls="collapseThreeInspEdit">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeInspEdit" aria-expanded="false" aria-controls="collapseThreeInspEdit">
                                             <h5>VALIDATION PROCESS: QUALITY CONTROL SECTION <> OQC only</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseThreeInspEdit" class="accordion-collapse collapse" data-bs-parent="#accordionExampleInspEdit">
+                                        <div id="collapseThreeInspEdit" class="accordion-collapse collapse" data-parent="#accordionExampleInspEdit">
                                         <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -10944,7 +10973,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">First Take:</label>
-                                                    <select class="form-select" name="text_edit_vpqcs_result1_inspector" id="text_edit_vpqcs_result1_inspector">
+                                                    <select class="form-control select2bs4" name="text_edit_vpqcs_result1_inspector" id="text_edit_vpqcs_result1_inspector">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -10953,7 +10982,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Second Take:</label>
-                                                    <select class="form-select" name="text_edit_vpqcs_result2_inspector" id="text_edit_vpqcs_result2_inspector">
+                                                    <select class="form-control select2bs4" name="text_edit_vpqcs_result2_inspector" id="text_edit_vpqcs_result2_inspector">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -10964,7 +10993,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Validated by:</label>
-                                                    <input class="form-select" type="text" id="text_edit_vpqcs_validated1_inspector" name="text_edit_vpqcs_validated1_inspector" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_edit_vpqcs_validated1_inspector" name="text_edit_vpqcs_validated1_inspector" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_vpqcs_validated1_inspector_username" name="text_edit_vpqcs_validated1_inspector_username">
@@ -10973,7 +11002,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Validated by: <span style="font-size: 0.9em;">(after re-orientation)</span></label>
-                                                    <input class="form-select" type="text" id="text_edit_vpqcs_validated2_inspector" name="text_edit_vpqcs_validated2_inspector" list="list_display_empno" placeholder="Select Certified by">
+                                                    <input class="form-control" type="text" id="text_edit_vpqcs_validated2_inspector" name="text_edit_vpqcs_validated2_inspector" list="list_display_empno" placeholder="Select Certified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_vpqcs_validated2_inspector_username" name="text_edit_vpqcs_validated2_inspector_username">
@@ -11014,7 +11043,7 @@
                             <div class="row mb-5">
                                 <div class="col-md-6">
                                     <label for="">Approved by:</label>
-                                    <input class="form-select" type="text" id="text_edit_sec3_approved_inspector" name="text_edit_sec3_approved_inspector" list="list_display_empno" placeholder="Select Approved by">
+                                    <input class="form-control" type="text" id="text_edit_sec3_approved_inspector" name="text_edit_sec3_approved_inspector" list="list_display_empno" placeholder="Select Approved by">
                                     <datalist id="list_display_empno"></datalist>
 
                                     <input type="hidden" id="text_edit_sec3_approved_inspector_userame" name="text_edit_sec3_approved_inspector_userame">
@@ -11119,7 +11148,7 @@
                             </div> -->
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                 <button type="submit" class="btn btn-success" id="btnSubmitInspEdit"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
                             </div>
 
@@ -11130,12 +11159,14 @@
         </div>
 
 
-        <div class="modal" id="modalEditOper" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="modalEditOper" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -11153,7 +11184,7 @@
 
                                 <div class="col-md-3">
                                     <label for="">Production Section:</label>
-                                    <input class="form-select" type="text" name="text_edit_section_operator" id="text_edit_section_operator" list="list_section" placeholder="Select Section" disabled>
+                                    <input class="form-control" type="text" name="text_edit_section_operator" id="text_edit_section_operator" list="list_section" placeholder="Select Section" disabled>
                                     <datalist id="list_section">
 
                                     </datalist>
@@ -11166,14 +11197,14 @@
 
                                 <div class="col-md-3">
                                     <label for="">Product Line:</label>
-                                    <input class="form-select" type="text" id="text_edit_operator_product_line" name="text_edit_operator_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
+                                    <input class="form-control" type="text" id="text_edit_operator_product_line" name="text_edit_operator_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
                                     <datalist id="list_prod_line"></datalist>
                                 </div>
                             </div>
 
                             <!-- <div class="row mt-2 mb-5">
                                 <div class="col-md-12">
-                                    <button type="button" class="btn btn-primary" style="width: 100%;" id="" data-bs-target="#select_Employee_operator" data-bs-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                    <button type="button" class="btn btn-primary" style="width: 100%;" id="" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
                                 </div>
                             </div> -->
 
@@ -11196,7 +11227,7 @@
                             <div class="row mb-5">
                                 <div class="col-md-12">
                                     <label for="">Reason for Certification:</label>
-                                    <select class="form-select" name="text_edit_certification_operator" id="text_edit_certification_operator" disabled>
+                                    <select class="form-control select2bs4" name="text_edit_certification_operator" id="text_edit_certification_operator" disabled>
                                         <option value="" selected disabled>Select Reason</option>
                                         <option value="Newly hired employees">1 Newly hired employees</option>
                                         <option value="Newly promoted employees">2 Newly promoted employees</option>
@@ -11230,11 +11261,11 @@
                                 <div class="accordion" id="accordionExampleOperEdit">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneOperEdit" aria-expanded="true" aria-controls="collapseOneOperEdit">
+                                        <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneOperEdit" aria-expanded="true" aria-controls="collapseOneOperEdit">
                                             <h5>PRODUCTION SECTION (Training and Orientation)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseOneOperEdit" class="accordion-collapse collapse show" data-bs-parent="#accordionExampleOperEdit">
+                                        <div id="collapseOneOperEdit" class="accordion-collapse collapse show" data-parent="#accordionExampleOperEdit">
                                             <div class="accordion-body">
 
                                                 <!-- ------------------------------------------------ -->
@@ -11501,7 +11532,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label class="" for="">First Take:</label>
-                                                        <select class="form-select" name="text_edit_first_result_oper" id="text_edit_first_result_oper">
+                                                        <select class="form-control select2bs4" name="text_edit_first_result_oper" id="text_edit_first_result_oper">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -11510,7 +11541,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="" for="">Second Take:</label>
-                                                        <select class="form-select" name="text_edit_second_result_oper" id="text_edit_second_result_oper">
+                                                        <select class="form-control select2bs4" name="text_edit_second_result_oper" id="text_edit_second_result_oper">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -11523,7 +11554,7 @@
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <label class="" for="">Trained by:</label>
-                                                                <input class="form-select" type="text" id="text_edit_first_trainedby_oper" name="text_edit_first_trainedby_oper" list="list_display_empno" placeholder="Select Trained by">
+                                                                <input class="form-control" type="text" id="text_edit_first_trainedby_oper" name="text_edit_first_trainedby_oper" list="list_display_empno" placeholder="Select Trained by">
                                                                 <datalist id="list_display_empno"></datalist>
 
                                                                 <input type="hidden" id="text_edit_first_trainedby_oper_username" name="text_edit_first_trainedby_oper_username">
@@ -11531,7 +11562,7 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                  <label class="" for="">Mentored by:</label>
-                                                                <input class="form-select" type="text" id="text_edit_first_mentoredby_oper" name="text_edit_first_mentoredby_oper" list="list_display_empno" placeholder="Select Mentored by">
+                                                                <input class="form-control" type="text" id="text_edit_first_mentoredby_oper" name="text_edit_first_mentoredby_oper" list="list_display_empno" placeholder="Select Mentored by">
                                                                 <datalist id="list_display_empno"></datalist>
                                                             </div>
                                                         </div>
@@ -11542,7 +11573,7 @@
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <label class="" for="">Trained by:</label>
-                                                                <input class="form-select" type="text" id="text_edit_second_trainedby_oper" name="text_edit_second_trainedby_oper" list="list_display_empno" placeholder="Select Trained by">
+                                                                <input class="form-control" type="text" id="text_edit_second_trainedby_oper" name="text_edit_second_trainedby_oper" list="list_display_empno" placeholder="Select Trained by">
                                                                 <datalist id="list_display_empno"></datalist>
 
                                                                 <input type="hidden" id="text_edit_second_trainedby_oper_username" name="text_edit_second_trainedby_oper_username">
@@ -11550,7 +11581,7 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label class="" for="">Mentored by:</label>
-                                                                <input class="form-select" type="text" id="text_edit_second_mentoredby_oper" name="text_edit_second_mentoredby_oper" list="list_display_empno" placeholder="Select Mentored by">
+                                                                <input class="form-control" type="text" id="text_edit_second_mentoredby_oper" name="text_edit_second_mentoredby_oper" list="list_display_empno" placeholder="Select Mentored by">
                                                                 <datalist id="list_display_empno"></datalist>
                                                             </div>
                                                         </div>
@@ -11587,11 +11618,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwoOperEdit" aria-expanded="false" aria-controls="collapseTwoOperEdit">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoOperEdit" aria-expanded="false" aria-controls="collapseTwoOperEdit">
                                             <h5>ENGINEERING SECTION (Training and Qualification)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseTwoOperEdit" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOperEdit">
+                                        <div id="collapseTwoOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
                                             <div class="accordion-body">
 
                                                 <!-- ------------------------------------------------ -->
@@ -11828,7 +11859,7 @@
                                                 <div class="row mb-4">
                                                     <div class="col-md-6">
                                                         <label class="" for="">1. Observation / Interview Result</label>
-                                                        <select class="form-select" name="text_edit_obs_first_result_es_oper" id="text_edit_obs_first_result_es_oper">
+                                                        <select class="form-control select2bs4" name="text_edit_obs_first_result_es_oper" id="text_edit_obs_first_result_es_oper">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -11837,7 +11868,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="" for="">1. Observation / Interview Result</label>
-                                                        <select class="form-select" name="text_edit_obs_second_result_es_oper" id="text_edit_obs_second_result_es_oper">
+                                                        <select class="form-control select2bs4" name="text_edit_obs_second_result_es_oper" id="text_edit_obs_second_result_es_oper">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -11882,7 +11913,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label class="" for="">3. Overall Assessment:</label>
-                                                        <select class="form-select" name="text_edit_oa_1st_result_es_oper" id="text_edit_oa_1st_result_es_oper">
+                                                        <select class="form-control select2bs4" name="text_edit_oa_1st_result_es_oper" id="text_edit_oa_1st_result_es_oper">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -11891,7 +11922,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="" for="">3. Overall Assessment:</label>
-                                                        <select class="form-select" name="text_edit_oa_2nd_result_es_oper" id="text_edit_oa_2nd_result_es_oper">
+                                                        <select class="form-control select2bs4" name="text_edit_oa_2nd_result_es_oper" id="text_edit_oa_2nd_result_es_oper">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -11914,7 +11945,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label class="" for="">Qualified by:</label>
-                                                        <input class="form-select" type="text" id="text_edit_1st_qualifiedby_es_oper" name="text_edit_1st_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
+                                                        <input class="form-control" type="text" id="text_edit_1st_qualifiedby_es_oper" name="text_edit_1st_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_edit_1st_qualifiedby_es_oper_username" name="text_edit_1st_qualifiedby_es_oper_username">
@@ -11923,7 +11954,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="" for="">Qualified by:</label>
-                                                        <input class="form-select" type="text" id="text_edit_2nd_qualifiedby_es_oper" name="text_edit_2nd_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
+                                                        <input class="form-control" type="text" id="text_edit_2nd_qualifiedby_es_oper" name="text_edit_2nd_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_edit_2nd_qualifiedby_es_oper_username" name="text_edit_2nd_qualifiedby_es_oper_username">
@@ -11957,7 +11988,7 @@
                                                     <div class="col-md-6"></div>
                                                     <div class="col-md-3">
                                                         <label class="" for="">Send Email Alert to:</label>
-                                                        <input class="form-select" type="text" id="text_alert_eng_sec" name="text_alert_eng_sec" list="list_display_empno" placeholder="Send email to">
+                                                        <input class="form-control" type="text" id="text_alert_eng_sec" name="text_alert_eng_sec" list="list_display_empno" placeholder="Send email to">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_alert_eng_sec_username" name="text_alert_eng_sec_username">
                                                         <input type="hidden" id="text_alert_eng_sec_email" name="text_alert_eng_sec_email">
@@ -11965,7 +11996,7 @@
 
                                                     <div class="col-md-3">
                                                         <label class="" for="">Add cc:</label>
-                                                        <input class="form-select" type="text" id="text_alert_eng_cc_sec" name="text_alert_eng_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                        <input class="form-control" type="text" id="text_alert_eng_cc_sec" name="text_alert_eng_cc_sec" list="list_display_empno" placeholder="Cc">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_alert_eng_cc_sec_username" name="text_alert_eng_cc_sec_username">
                                                         <input type="hidden" id="text_alert_eng_cc_sec_email" name="text_alert_eng_cc_sec_email">
@@ -11978,7 +12009,7 @@
                                                     <div class="col-md-3">
                                                         <label for="text_alert_eng_sec" id="label_alert_eng_sec">Send Email Alert to:</label>
                                                         <div id="selectedEngAlertRecipients" class="fs-5 mb-1"></div>
-                                                        <input class="form-select" type="text"
+                                                        <input class="form-control" type="text"
                                                             id="text_alert_eng_sec"
                                                             name="text_alert_eng_sec"
                                                             list="list_display_empno"
@@ -11991,7 +12022,7 @@
                                                     <div class="col-md-3">
                                                         <label for="text_alert_eng_cc_sec" id="label_alert_eng_cc_sec">Add cc:</label>
                                                         <div id="selectedEngAlertCcRecipients" class="fs-5 mb-1"></div>
-                                                        <input class="form-select" type="text"
+                                                        <input class="form-control" type="text"
                                                             id="text_alert_eng_cc_sec"
                                                             name="text_alert_eng_cc_sec"
                                                             list="list_display_empno"
@@ -12009,11 +12040,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThreeOperEdit" aria-expanded="false" aria-controls="collapseThreeOperEdit">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeOperEdit" aria-expanded="false" aria-controls="collapseThreeOperEdit">
                                             <h5>QUALITY CONTROL SECTION (CERTIFICATTION)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseThreeOperEdit" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOperEdit">
+                                        <div id="collapseThreeOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
                                             <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -12035,7 +12066,7 @@
                                             <div class="row mb-4">
                                                 <div class="col-md-6">
                                                     <label class="" for="">1.1 Observation / Interview Result</label>
-                                                    <select class="form-select" name="text_edit_obs_first_result_qcs_oper" id="text_edit_obs_first_result_qcs_oper">
+                                                    <select class="form-control select2bs4" name="text_edit_obs_first_result_qcs_oper" id="text_edit_obs_first_result_qcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -12044,7 +12075,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">1.1 Observation / Interview Result</label>
-                                                    <select class="form-select" name="text_edit_obs_second_result_qcs_oper" id="text_edit_obs_second_result_qcs_oper">
+                                                    <select class="form-control select2bs4" name="text_edit_obs_second_result_qcs_oper" id="text_edit_obs_second_result_qcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -12208,7 +12239,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
-                                                    <select class="form-select" name="text_edit_oa_1st_result_qcs_oper" id="text_edit_oa_1st_result_qcs_oper">
+                                                    <select class="form-control select2bs4" name="text_edit_oa_1st_result_qcs_oper" id="text_edit_oa_1st_result_qcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -12217,7 +12248,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
-                                                    <select class="form-select" name="text_edit_oa_2nd_result_qcs_oper" id="text_edit_oa_2nd_result_qcs_oper">
+                                                    <select class="form-control select2bs4" name="text_edit_oa_2nd_result_qcs_oper" id="text_edit_oa_2nd_result_qcs_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -12240,7 +12271,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Certified by:</label>
-                                                    <input class="form-select" type="text" id="text_edit_1st_certifiedby_qcs_oper" name="text_edit_1st_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
+                                                    <input class="form-control" type="text" id="text_edit_1st_certifiedby_qcs_oper" name="text_edit_1st_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_1st_certifiedby_qcs_oper_username" name="text_edit_1st_certifiedby_qcs_oper_username">
@@ -12249,7 +12280,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Certified by:</label>
-                                                    <input class="form-select" type="text" id="text_edit_2nd_certifiedby_qcs_oper" name="text_edit_2nd_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
+                                                    <input class="form-control" type="text" id="text_edit_2nd_certifiedby_qcs_oper" name="text_edit_2nd_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_2nd_certifiedby_qcs_oper_username" name="text_edit_2nd_certifiedby_qcs_oper_username">
@@ -12319,7 +12350,7 @@
                                                 <div class="col-md-6"></div>
                                                 <div class="col-md-3">
                                                     <label class="" for="">Send Email Alert to:</label>
-                                                    <input class="form-select" type="text" id="text_alert_qc_sec" name="text_alert_qc_sec" list="list_display_empno" placeholder="Send email to">
+                                                    <input class="form-control" type="text" id="text_alert_qc_sec" name="text_alert_qc_sec" list="list_display_empno" placeholder="Send email to">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_qc_sec_username" name="text_alert_qc_sec_username">
                                                     <input type="hidden" id="text_alert_qc_sec_email" name="text_alert_qc_sec_email">
@@ -12327,7 +12358,7 @@
 
                                                 <div class="col-md-3">
                                                     <label class="" for="">Add cc:</label>
-                                                    <input class="form-select" type="text" id="text_alert_qc_cc_sec" name="text_alert_qc_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                    <input class="form-control" type="text" id="text_alert_qc_cc_sec" name="text_alert_qc_cc_sec" list="list_display_empno" placeholder="Cc">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_qc_cc_sec_username" name="text_alert_qc_cc_sec_username">
                                                     <input type="hidden" id="text_alert_qc_cc_sec_email" name="text_alert_qc_cc_sec_email">
@@ -12341,7 +12372,7 @@
                                                 <div class="col-md-3">
                                                     <label class="" for="" id="label_alert_qc_sec">Send Email Alert to:</label>
                                                     <div id="selectedQcAlertRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
-                                                    <input class="form-select" type="text" id="text_alert_qc_sec" name="text_alert_qc_sec" list="list_display_empno" placeholder="Send email to">
+                                                    <input class="form-control" type="text" id="text_alert_qc_sec" name="text_alert_qc_sec" list="list_display_empno" placeholder="Send email to">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_qc_sec_username" name="text_alert_qc_sec_username">
                                                     <input type="hidden" id="text_alert_qc_sec_email" name="text_alert_qc_sec_email">
@@ -12351,7 +12382,7 @@
                                                 <div class="col-md-3">
                                                     <label class="" for="" id="label_alert_qc_cc_sec">Add cc:</label>
                                                     <div id="selectedQcAlertCcRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
-                                                    <input class="form-select" type="text" id="text_alert_qc_cc_sec" name="text_alert_qc_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                    <input class="form-control" type="text" id="text_alert_qc_cc_sec" name="text_alert_qc_cc_sec" list="list_display_empno" placeholder="Cc">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_qc_cc_sec_username" name="text_alert_qc_cc_sec_username">
                                                     <input type="hidden" id="text_alert_qc_cc_sec_email" name="text_alert_qc_cc_sec_email">
@@ -12365,11 +12396,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFourOperEdit" aria-expanded="false" aria-controls="collapseFourOperEdit">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFourOperEdit" aria-expanded="false" aria-controls="collapseFourOperEdit">
                                             <h5>PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseFourOperEdit" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOperEdit">
+                                        <div id="collapseFourOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
                                             <div class="accordion-body">
 
                                                 <!-- ------------------------------------------------ -->
@@ -12424,7 +12455,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label class="" for="">2. Overall Assessment:</label>
-                                                        <select class="form-select" name="text_edit_oa_1st_result_peqcs_oper" id="text_edit_oa_1st_result_peqcs_oper">
+                                                        <select class="form-control select2bs4" name="text_edit_oa_1st_result_peqcs_oper" id="text_edit_oa_1st_result_peqcs_oper">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -12433,7 +12464,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="" for="">2. Overall Assessment:</label>
-                                                        <select class="form-select" name="text_edit_oa_2nd_result_peqcs_oper" id="text_edit_oa_2nd_result_peqcs_oper">
+                                                        <select class="form-control select2bs4" name="text_edit_oa_2nd_result_peqcs_oper" id="text_edit_oa_2nd_result_peqcs_oper">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -12569,7 +12600,7 @@
                                                     <div class="col-md-6"></div>
                                                     <div class="col-md-3">
                                                         <label class="" for="">Send Email Alert to:</label>
-                                                        <input class="form-select" type="text" id="text_alert_pps_sec" name="text_alert_pps_sec" list="list_display_empno" placeholder="Send email to">
+                                                        <input class="form-control" type="text" id="text_alert_pps_sec" name="text_alert_pps_sec" list="list_display_empno" placeholder="Send email to">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_alert_pps_sec_username" name="text_alert_pps_sec_username">
                                                         <input type="hidden" id="text_alert_pps_sec_email" name="text_alert_pps_sec_email">
@@ -12577,7 +12608,7 @@
 
                                                     <div class="col-md-3">
                                                         <label class="" for="">Add cc:</label>
-                                                        <input class="form-select" type="text" id="text_alert_pps_cc_sec" name="text_alert_pps_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                        <input class="form-control" type="text" id="text_alert_pps_cc_sec" name="text_alert_pps_cc_sec" list="list_display_empno" placeholder="Cc">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_alert_pps_cc_sec_username" name="text_alert_pps_cc_sec_username">
                                                         <input type="hidden" id="text_alert_pps_cc_sec_email" name="text_alert_pps_cc_sec_email">
@@ -12591,7 +12622,7 @@
                                                     <div class="col-md-3">
                                                         <label class="" for="" id="label_alert_pps_sec">Send Email Alert to:</label>
                                                         <div id="selectedPpsAlertRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
-                                                        <input class="form-select" type="text" id="text_alert_pps_sec" name="text_alert_pps_sec" list="list_display_empno" placeholder="Send email to">
+                                                        <input class="form-control" type="text" id="text_alert_pps_sec" name="text_alert_pps_sec" list="list_display_empno" placeholder="Send email to">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_alert_pps_sec_username" name="text_alert_pps_sec_username">
                                                         <input type="hidden" id="text_alert_pps_sec_email" name="text_alert_pps_sec_email">
@@ -12601,7 +12632,7 @@
                                                     <div class="col-md-3">
                                                         <label class="" for="" id="label_alert_pps_cc_sec">Add cc:</label>
                                                         <div id="selectedPpsAlertCcRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
-                                                        <input class="form-select" type="text" id="text_alert_pps_cc_sec" name="text_alert_pps_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                        <input class="form-control" type="text" id="text_alert_pps_cc_sec" name="text_alert_pps_cc_sec" list="list_display_empno" placeholder="Cc">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_alert_pps_cc_sec_username" name="text_alert_pps_cc_sec_username">
                                                         <input type="hidden" id="text_alert_pps_cc_sec_email" name="text_alert_pps_cc_sec_email">
@@ -12615,11 +12646,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFiveOperEdit" aria-expanded="false" aria-controls="collapseFiveOperEdit">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFiveOperEdit" aria-expanded="false" aria-controls="collapseFiveOperEdit">
                                             <h5>VALIDATION PROCESS: ENGINEERING SECTION</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseFiveOperEdit" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOperEdit">
+                                        <div id="collapseFiveOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
                                             <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -12632,7 +12663,7 @@
                                                 <div class="col-md-5"></div>
 
                                                 <div class="col-md-4">
-                                                    <select class="form-select" name="text_edit_application_vpes_oper" id="text_edit_application_vpes_oper">
+                                                    <select class="form-control select2bs4" name="text_edit_application_vpes_oper" id="text_edit_application_vpes_oper">
                                                         <option value="" selected disabled>Select</option>
                                                         <option value="Applicable">Applicable</option>
                                                         <option value="Not Applicable">Not Applicable</option>
@@ -12656,7 +12687,7 @@
                                             <div class="row mb-4">
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take</label>
-                                                    <select class="form-select" name="text_edit_first_result_vpes_oper" id="text_edit_first_result_vpes_oper">
+                                                    <select class="form-control select2bs4" name="text_edit_first_result_vpes_oper" id="text_edit_first_result_vpes_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -12665,7 +12696,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take</label>
-                                                    <select class="form-select" name="text_edit_second_result_vpes_oper" id="text_edit_second_result_vpes_oper">
+                                                    <select class="form-control select2bs4" name="text_edit_second_result_vpes_oper" id="text_edit_second_result_vpes_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -12676,7 +12707,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after 2nd day):</label>
-                                                    <input class="form-select" type="text" id="text_edit_1st_validatedby_vpes_oper" name="text_edit_1st_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_edit_1st_validatedby_vpes_oper" name="text_edit_1st_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_1st_validatedby_vpes_oper_username" name="text_edit_1st_validatedby_vpes_oper_username">
@@ -12685,7 +12716,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after re-orientation):</label>
-                                                    <input class="form-select" type="text" id="text_edit_2nd_validatedby_vpes_oper" name="text_edit_2nd_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_edit_2nd_validatedby_vpes_oper" name="text_edit_2nd_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_2nd_validatedby_vpes_oper_username" name="text_edit_2nd_validatedby_vpes_oper_username">
@@ -12716,7 +12747,7 @@
                                                 <div class="col-md-6"></div>
                                                 <div class="col-md-3">
                                                     <label class="" for="">Send Email Alert to:</label>
-                                                    <input class="form-select" type="text" id="text_alert_ev_sec" name="text_alert_ev_sec" list="list_display_empno" placeholder="Send email to">
+                                                    <input class="form-control" type="text" id="text_alert_ev_sec" name="text_alert_ev_sec" list="list_display_empno" placeholder="Send email to">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_ev_sec_username" name="text_alert_ev_sec_username">
                                                     <input type="hidden" id="text_alert_ev_sec_email" name="text_alert_ev_sec_email">
@@ -12724,7 +12755,7 @@
 
                                                 <div class="col-md-3">
                                                     <label class="" for="">Add cc:</label>
-                                                    <input class="form-select" type="text" id="text_alert_ev_cc_sec" name="text_alert_ev_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                    <input class="form-control" type="text" id="text_alert_ev_cc_sec" name="text_alert_ev_cc_sec" list="list_display_empno" placeholder="Cc">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_ev_cc_sec_username" name="text_alert_ev_cc_sec_username">
                                                     <input type="hidden" id="text_alert_ev_cc_sec_email" name="text_alert_ev_cc_sec_email">
@@ -12738,7 +12769,7 @@
                                                 <div class="col-md-3">
                                                     <label class="" for="" id="label_alert_ev_sec">Send Email Alert to:</label>
                                                     <div id="selectedEvAlertRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
-                                                    <input class="form-select" type="text" id="text_alert_ev_sec" name="text_alert_ev_sec" list="list_display_empno" placeholder="Send email to">
+                                                    <input class="form-control" type="text" id="text_alert_ev_sec" name="text_alert_ev_sec" list="list_display_empno" placeholder="Send email to">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_ev_sec_username" name="text_alert_ev_sec_username">
                                                     <input type="hidden" id="text_alert_ev_sec_email" name="text_alert_ev_sec_email">
@@ -12748,7 +12779,7 @@
                                                 <div class="col-md-3">
                                                     <label class="" for="" id="label_alert_ev_cc_sec">Add cc:</label>
                                                     <div id="selectedEvAlertCcRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
-                                                    <input class="form-select" type="text" id="text_alert_ev_cc_sec" name="text_alert_ev_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                    <input class="form-control" type="text" id="text_alert_ev_cc_sec" name="text_alert_ev_cc_sec" list="list_display_empno" placeholder="Cc">
                                                     <datalist id="list_display_empno"></datalist>
                                                     <input type="hidden" id="text_alert_ev_cc_sec_username" name="text_alert_ev_cc_sec_username">
                                                     <input type="hidden" id="text_alert_ev_cc_sec_email" name="text_alert_ev_cc_sec_email">
@@ -12762,11 +12793,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSixOperEdit" aria-expanded="false" aria-controls="collapseSixOperEdit">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSixOperEdit" aria-expanded="false" aria-controls="collapseSixOperEdit">
                                             <h5>VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseSixOperEdit" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOperEdit">
+                                        <div id="collapseSixOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
                                             <div class="accordion-body">
 
                                                 <!-- ------------------------------------------------ -->
@@ -12800,7 +12831,7 @@
                                                 <div class="row mb-4">
                                                     <div class="col-md-6">
                                                         <label class="" for="">First Take</label>
-                                                        <select class="form-select" name="text_edit_first_result_vpqcs_oper" id="text_edit_first_result_vpqcs_oper">
+                                                        <select class="form-control select2bs4" name="text_edit_first_result_vpqcs_oper" id="text_edit_first_result_vpqcs_oper">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -12809,7 +12840,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="" for="">Second Take</label>
-                                                        <select class="form-select" name="text_edit_second_result_vpqcs_oper" id="text_edit_second_result_vpqcs_oper">
+                                                        <select class="form-control select2bs4" name="text_edit_second_result_vpqcs_oper" id="text_edit_second_result_vpqcs_oper">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -12820,7 +12851,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label class="" for="">Validated by (after 2nd day):</label>
-                                                        <input class="form-select" type="text" id="text_edit_1st_validatedby_vpqcs_oper" name="text_edit_1st_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                        <input class="form-control" type="text" id="text_edit_1st_validatedby_vpqcs_oper" name="text_edit_1st_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_edit_1st_validatedby_vpqcs_oper_username" name="text_edit_1st_validatedby_vpqcs_oper_username">
@@ -12829,7 +12860,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="" for="">Validated by (after re-orientation):</label>
-                                                        <input class="form-select" type="text" id="text_edit_2nd_validatedby_vpqcs_oper" name="text_edit_2nd_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                        <input class="form-control" type="text" id="text_edit_2nd_validatedby_vpqcs_oper" name="text_edit_2nd_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_edit_2nd_validatedby_vpqcs_oper_username" name="text_edit_2nd_validatedby_vpqcs_oper_username">
@@ -12871,7 +12902,7 @@
                                                     <div class="col-md-4"></div>
 
                                                     <div class="col-md-4">
-                                                        <select class="form-select" name="text_edit_application_vpqcs_oper" id="text_edit_application_vpqcs_oper">
+                                                        <select class="form-control select2bs4" name="text_edit_application_vpqcs_oper" id="text_edit_application_vpqcs_oper">
                                                             <option value="" selected disabled>Select</option>
                                                             <option value="Applicable">Applicable</option>
                                                             <option value="Not Applicable">Not Applicable</option>
@@ -12884,7 +12915,7 @@
                                                 <div class="row mb-4">
                                                     <div class="col-md-6">
                                                         <label class="" for="">First Take</label>
-                                                        <select class="form-select" name="text_edit_first_result_vpes_oper_2" id="text_edit_first_result_vpes_oper_2">
+                                                        <select class="form-control select2bs4" name="text_edit_first_result_vpes_oper_2" id="text_edit_first_result_vpes_oper_2">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -12893,7 +12924,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="" for="">Second Take</label>
-                                                        <select class="form-select" name="text_edit_second_result_vpes_oper_2" id="text_edit_second_result_vpes_oper_2">
+                                                        <select class="form-control select2bs4" name="text_edit_second_result_vpes_oper_2" id="text_edit_second_result_vpes_oper_2">
                                                             <option value="" selected disabled>Select Result</option>
                                                             <option value="PASSED">PASSED</option>
                                                             <option value="FAILED">FAILED</option>
@@ -12904,7 +12935,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label class="" for="">Validated by (after 3rd day):</label>
-                                                        <input class="form-select" type="text" id="text_edit_1st_validatedby_vpes_oper_2" name="text_edit_1st_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
+                                                        <input class="form-control" type="text" id="text_edit_1st_validatedby_vpes_oper_2" name="text_edit_1st_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_edit_1st_validatedby_vpes_oper_2_username" name="text_edit_1st_validatedby_vpes_oper_2_username">
@@ -12913,7 +12944,7 @@
 
                                                     <div class="col-md-6">
                                                         <label class="" for="">Validated by (after re-orientation):</label>
-                                                        <input class="form-select" type="text" id="text_edit_2nd_validatedby_vpes_oper_2" name="text_edit_2nd_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
+                                                        <input class="form-control" type="text" id="text_edit_2nd_validatedby_vpes_oper_2" name="text_edit_2nd_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
                                                         <datalist id="list_display_empno"></datalist>
 
                                                         <input type="hidden" id="text_edit_2nd_validatedby_vpes_oper_2_username" name="text_edit_2nd_validatedby_vpes_oper_2_username">
@@ -12944,7 +12975,7 @@
                                                     <div class="col-md-6"></div>
                                                     <div class="col-md-3">
                                                         <label class="" for="">Send Email Alert to:</label>
-                                                        <input class="form-select" type="text" id="text_alert_qcv_sec" name="text_alert_qcv_sec" list="list_display_empno" placeholder="Send email to">
+                                                        <input class="form-control" type="text" id="text_alert_qcv_sec" name="text_alert_qcv_sec" list="list_display_empno" placeholder="Send email to">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_alert_qcv_sec_username" name="text_alert_qcv_sec_username">
                                                         <input type="hidden" id="text_alert_qcv_sec_email" name="text_alert_qcv_sec_email">
@@ -12952,7 +12983,7 @@
 
                                                     <div class="col-md-3">
                                                         <label class="" for="">Add cc:</label>
-                                                        <input class="form-select" type="text" id="text_alert_qcv_cc_sec" name="text_alert_qcv_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                        <input class="form-control" type="text" id="text_alert_qcv_cc_sec" name="text_alert_qcv_cc_sec" list="list_display_empno" placeholder="Cc">
                                                         <datalist id="list_display_empno"></datalist>
                                                         <input type="hidden" id="text_alert_qcv_cc_sec_username" name="text_alert_qcv_cc_sec_username">
                                                         <input type="hidden" id="text_alert_qcv_cc_sec_email" name="text_alert_qcv_cc_sec_email">
@@ -12966,7 +12997,7 @@
                                                     <div class="col-md-3">
                                                         <label for="text_alert_qcv_sec" id="label_alert_qcv_sec">Send Email Alert to:</label>
                                                         <div id="selectedQcvAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                        <input class="form-select" type="text"
+                                                        <input class="form-control" type="text"
                                                             id="text_alert_qcv_sec"
                                                             name="text_alert_qcv_sec"
                                                             list="list_display_empno"
@@ -12980,7 +13011,7 @@
                                                     <div class="col-md-3">
                                                         <label for="text_alert_qcv_cc_sec" id="label_alert_qcv_cc_sec">Add cc:</label>
                                                         <div id="selectedQcvAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                                                        <input class="form-select" type="text"
+                                                        <input class="form-control" type="text"
                                                             id="text_alert_qcv_cc_sec"
                                                             name="text_alert_qcv_cc_sec"
                                                             list="list_display_empno"
@@ -12998,11 +13029,11 @@
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSevenOperEdit" aria-expanded="false" aria-controls="collapseSevenOperEdit">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSevenOperEdit" aria-expanded="false" aria-controls="collapseSevenOperEdit">
                                             <h5>QC Validation for Visual Operator</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseSevenOperEdit" class="accordion-collapse collapse" data-bs-parent="#accordionExampleOperEdit">
+                                        <div id="collapseSevenOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
                                             <div class="accordion-body">
 
                                             <!-- ------------------------------------------------ -->
@@ -13051,7 +13082,7 @@
                                             <div class="row mb-5">
                                                 <div class="col-md-4">
                                                     <label class="ms-3" for="">First Take:</label>
-                                                    <select class="form-select" name="text_edit_result1__qcvvo_oper" id="text_edit_result1__qcvvo_oper">
+                                                    <select class="form-control select2bs4" name="text_edit_result1__qcvvo_oper" id="text_edit_result1__qcvvo_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -13060,7 +13091,7 @@
 
                                                 <div class="col-md-4">
                                                     <label class="ms-3" for="">Validated by:</label>
-                                                    <input class="form-select" type="text" id="text_edit_validated1_qcvvo_oper" name="text_edit_validated1_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_edit_validated1_qcvvo_oper" name="text_edit_validated1_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_validated1_qcvvo_oper_username" name="text_edit_validated1_qcvvo_oper_username">
@@ -13117,7 +13148,7 @@
                                             <div class="row mb-4">
                                                 <div class="col-md-4">
                                                     <label class="ms-3" for="">Second Take:</label>
-                                                    <select class="form-select" name="text_edit_result2__qcvvo_oper" id="text_edit_result2__qcvvo_oper">
+                                                    <select class="form-control select2bs4" name="text_edit_result2__qcvvo_oper" id="text_edit_result2__qcvvo_oper">
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -13126,7 +13157,7 @@
 
                                                 <div class="col-md-4">
                                                     <label class="ms-3" for="">Validated by:</label>
-                                                    <input class="form-select" type="text" id="text_edit_validated2_qcvvo_oper" name="text_edit_validated2_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <input class="form-control" type="text" id="text_edit_validated2_qcvvo_oper" name="text_edit_validated2_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
                                                     <datalist id="list_display_empno"></datalist>
 
                                                     <input type="hidden" id="text_edit_validated2_qcvvo_oper_username" name="text_edit_validated2_qcvvo_oper_username">
@@ -13238,7 +13269,7 @@
 
                             <div class="col-md-6">
                                 <label for="">Approved / Confirmed by:</label>
-                                <input class="form-select" type="text" id="text_edit_oper_approved_confirmed_by" name="text_edit_oper_approved_confirmed_by" list="list_display_empno" placeholder="Select Approved / Confirmed by">
+                                <input class="form-control" type="text" id="text_edit_oper_approved_confirmed_by" name="text_edit_oper_approved_confirmed_by" list="list_display_empno" placeholder="Select Approved / Confirmed by">
                                 <datalist id="list_display_empno"></datalist>
 
                                 <label for="" class="mt-1">QC Supervisor</label>
@@ -13249,7 +13280,7 @@
 
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-success" id="btnSubmitOperEdit"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                             </div>
 
                         </form>
@@ -13259,12 +13290,14 @@
         </div>
 
          <!-- GENERATE REPORT FOR MH -->
-        <div class="modal" id="" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">GENERATE PDF</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -13315,12 +13348,14 @@
         </div>
 
         <!-- GENERATE REPORT FOR TECHNICIAN -->
-        <div class="modal" id="" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">GENERATE PDF</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -13392,12 +13427,14 @@
         </div>
 
         <!-- GENERATE REPORT FOR SEP -->
-        <div class="modal" id="" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">GENERATE PDF</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -13437,12 +13474,14 @@
         </div>
 
         <!-- GENERATE REPORT FOR INSPECTOR -->
-        <div class="modal" id="" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">GENERATE PDF</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -13523,12 +13562,14 @@
         </div>
 
         <!-- GENERATE REPORT FOR OPERATOR -->
-        <div class="modal" id="" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal" id="" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">GENERATE PDF</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -13658,6 +13699,7 @@
 @section('js_content')
     <script type="text/javascript">
         $(function () {
+            $('.select2bs4').select2();
             var $positionSelect = $('#text_select_position');
             var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper');
 
@@ -13691,5 +13733,6 @@
 
             togglePositionSection($positionSelect.val());
         });
+        //Initialize Select2 Elements
     </script>
 @endsection

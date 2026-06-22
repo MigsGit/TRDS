@@ -136,21 +136,9 @@
                 </li>
 
                 <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-list-alt"></i>
-                        <p>Qualification / Certification </p>
-                    </a>
-                </li>
-                <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-list-alt"></i>
-                        <p>Qualification / Certification </p>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="{{ route('certification_classification') }}" class="nav-link">
                         <i class="far fa-circle nav-icon"></i>
-                        <p>Exam Result</p>
+                        <p>Qualification / Certification</p>
                     </a>
                 </li>
 

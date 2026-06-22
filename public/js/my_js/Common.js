@@ -119,7 +119,7 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
             if( result.status === 422 ){
                 toastr.error(errorResponse.message);
 
-                // errorHandler( errors.first_molding_device_id,formModal.firstMolding.find('#first_molding_device_id') );  
+                // errorHandler( errors.first_molding_device_id,formModal.firstMolding.find('#first_molding_device_id') );
             }
 
         }
