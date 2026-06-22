@@ -277,7 +277,7 @@ Route::middleware('checkSession')->group(function(){
             // MEMO DOCS
             Route::get('/get_memo_docs', 'getMemoDocs')->name('get_memo_docs');
             Route::get('/get_memo_doc_details', 'getMemoDocsDetails')->name('get_memo_doc_details');
-            Route::get('/get_employee_list_by_memo_doc', 'getEmployeeListByMemoDoc')->name('get_employee_list_by_memo_doc');
+            // Route::get('/get_employee_list_by_memo_doc', 'getEmployeeListByMemoDoc')->name('get_employee_list_by_memo_doc');
             Route::post('/save_memo_doc_employees', 'saveMemoDocEmployees')->name('save_memo_doc_employees');
         });
     });

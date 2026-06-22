@@ -76,6 +76,8 @@ function initHrMemoApprovalTable($table, url = 'view_hr_memo') {
     return $table.DataTable({
         processing: true,
         serverSide: true,
+        scrollY: '380px',
+        scrollCollapse: true,
         ajax: { url: url },
         fixedHeader: true,
         columns: [
@@ -116,6 +118,9 @@ function initTraineeDetailsTable($table1) {
             },
             { data: "emp_no" },
             { data: "emp_name" },
+            { data: "position" },
+            { data: "department" },
+            { data: "section" },
             { data: "traning_venue" },
             { data: "endorsement_date" }
         ],
@@ -872,9 +877,15 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
 
                 if(item.employment_type == 1){ //HRIS
                     empName = item.hris_emp_info.EmpName;
+                    position = item.hris_emp_info.Position;
+                    department = item.hris_emp_info.Department;
+                    section = item.hris_emp_info.Section;
                     trainingVenue = item.hris_emp_info.Venue ?? "N/A";
                 }else if(item.employment_type == 2){ //SUBCON
                     empName = item.subcon_emp_info.EmpName;
+                    position = item.subcon_emp_info.Position;
+                    department = item.subcon_emp_info.Department;
+                    section = item.subcon_emp_info.Section;
                     trainingVenue = item.subcon_emp_info.Venue ?? "N/A";
                 }
 
@@ -890,6 +901,9 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
                     action: {id: counterNow, emp_id: item.hris_id, emp_type: item.employment_type, status: response.status},
                     emp_no: item.employee_no,
                     emp_name: empName,
+                    position: position,
+                    department: department,
+                    section: section,
                     traning_venue: trainingVenue,
                     endorsement_date: item.endorsement_date,
                     exam_details: exam_list
