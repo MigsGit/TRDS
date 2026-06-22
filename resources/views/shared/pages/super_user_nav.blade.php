@@ -69,7 +69,6 @@
                             </li>
                         </ul>
                     </li>
-                @endif
 
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
