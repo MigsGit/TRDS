@@ -69,6 +69,7 @@
                             </li>
                         </ul>
                     </li>
+                {{-- @endif --}}
 
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
@@ -83,14 +84,21 @@
                         </li>
                     </ul>
                 </li>
+                {{-- http://rapidx/TRDSv2_attendance/ --}}
                 @if ( in_array(7,explode(',', $globalUser->user_modules_id)) )
                     <li class="nav-item has-treeview">
+                         <i class="fas fa-users"></i>
                         <a href="{{ route('training_attendance') }}"  class="nav-link">
-                            <i class="nav-icon fas fa-users"></i>
                             <p>Training Attendance  </p>
                         </a>
                     </li>
                 @endif
+                <li class="nav-item has-treeview">
+                    <i class="fas fa-user"></i>
+                    <a href="http://rapidx/TRDSv2_attendance/"  class="nav-link">
+                        <p>Training Attendance  </p>
+                    </a>
+                </li>
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
                         <i class="fas fa-cogs"></i>
