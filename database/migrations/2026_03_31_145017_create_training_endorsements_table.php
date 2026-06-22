@@ -15,10 +15,13 @@ class CreateTrainingEndorsementsTable extends Migration
     {
         Schema::create('training_endorsements', function (Blueprint $table) {
             $table->id();
+            $table->integer('status')->default(0)->comment('0 - pending, 1 - for Approval, 2 - Approved, 3 - Disapproved');
             $table->unsignedBigInteger('training_request_id');
             $table->unsignedBigInteger('hr_memo_id');
             $table->string('ctrl_no')->nullable();
             $table->string('date')->nullable();
+            $table->longText('disapprove_remarks')->nullable();
+            $table->string('disapprove_by')->nullable();
             $table->string('mail_cc')->nullable();
             $table->string('created_by');
             $table->string('updated_by')->nullable();

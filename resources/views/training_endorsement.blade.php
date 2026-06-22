@@ -1,4 +1,9 @@
-@php $layout = 'layouts.super_user_layout'; @endphp
+@php 
+    $layout = 'layouts.super_user_layout';
+    $session = session('global_user');
+    $exploded_u_access = explode(',', $session->user_modules_id);
+
+@endphp
 @extends($layout)
 @section('title', 'Training Endorsement')
 
@@ -32,17 +37,34 @@
                             </div>
 
                             <div class="card-body">
-                                <div class="float-sm-right mb-3">
-                                    <button class="btn btn-primary btn-sm" id="btnShowModalAddEndorsement">
+                                {{-- <div class="d-flex justify-content-between align-items-center mb-3"> --}}
+                                <div class="d-flex {{ in_array('17', $exploded_u_access) ? 'justify-content-between' : 'justify-content-end' }} align-items-center mb-3">
+                                    @if (in_array('17', $exploded_u_access))
+                                        <select id="endorsementStatus" class="form-control form-control-sm" style="width: 200px;">
+                                            <option value="" selected disabled>-- SELECT --</option>
+                                            <option value="0">Pending</option>
+                                            <option value="1">Endorsement Checker</option>
+                                            <option value="2">Endorsement Approver</option>
+                                            <option value="3">Approved</option>
+                                        </select>
+                                    @endif
+                                    
+                                    <button class="btn btn-primary btn-sm ms-auto" id="btnShowModalAddEndorsement">
                                         <i class="fa fa-plus fa-md me-2"></i> Add Endorsement
                                     </button>
                                 </div>
+                                {{-- <div class="float-sm-right mb-3">
+                                    <button class="btn btn-primary btn-sm" id="btnShowModalAddEndorsement">
+                                        <i class="fa fa-plus fa-md me-2"></i> Add Endorsement
+                                    </button>
+                                </div> --}}
 
                                 <div class="table-responsive">
                                     <table id="tblTrainingEndorsement" class="table table-bordered table-striped table-hover table-sm" style="width: 100%;">
                                         <thead>
                                             <tr>
                                                 <th style="width: 10%;">Action</th>
+                                                <th style="width: 15%;" class="text-center">Status</th>
                                                 <th style="width: 20%;" class="text-center">Endorsement Ctrl #</th>
                                                 <th style="width: 20%;" class="text-center">HR Memo</th>
                                                 <th style="width: 20%;" class="text-center">Training Request Ctrl #</th>
@@ -65,7 +87,7 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-plus"></i> Training Endorsement Form</h4>
+                    <h4 class="modal-title"><i class="fa fa-info-circle"></i> Training Endorsement Form</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -190,8 +212,11 @@
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" id="btnSubmitEndorsement" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
-                        <button type="button" id="btnExportEndorsement" class="btn btn-info" hidden><i class="fa fa-file-export"></i> Export</button>
+                        
+                        <div>
+                            <button type="button" id="btnExportEndorsement" class="btn btn-info" hidden><i class="fa fa-file-export"></i> Export</button>
+                            <button type="button" id="btnSubmitEndorsement" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
+                        </div>
                     </div>
                 </form>
             </div>

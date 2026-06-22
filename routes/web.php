@@ -85,6 +85,9 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_employees_for_not_endorsed', 'getEmployeesForNotEndorsed')->name('get_employees_for_not_endorsed');
         Route::post('/add_not_endorsed_emp', 'addNotEndorsedEmp')->name('add_not_endorsed_emp');
         Route::get('/export_endorsement_pdf', 'exportEndorsementPdf')->name('export_endorsement_pdf');
+        Route::post('/proceed_endorsement_approval', 'proceedEndorsementApproval')->name('proceed_endorsement_approval');
+        Route::post('/approve_endorsement', 'approveEndorsement')->name('approve_endorsement');
+        Route::post('/disapprove_endorsement', 'disapproveEndorsement')->name('disapprove_endorsement');
     });
 
     // QUESTIONNAIRES CONTROLLER

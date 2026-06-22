@@ -44,13 +44,13 @@
                     </a>
                 </li> --}}
                 <?php
-                    if($globalUser != null){
-                        $user_access = explode(',', $globalUser->user_modules_id);
-                        $hr_memo_access = in_array(1, $user_access); //HR Memorandum
-                    }
+                    // if($globalUser != null){
+                    //     $user_access = explode(',', $globalUser->user_modules_id);
+                    //     $hr_memo_access = in_array(1, $user_access); //HR Memorandum
+                    // }
                 ?>
 
-                @if($hr_memo_access)
+
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-users"></i>

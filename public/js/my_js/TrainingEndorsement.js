@@ -15,10 +15,14 @@ const trainingEndorsementTable = $('#tblTrainingEndorsement').DataTable({
     serverSide: true,
     ajax: {
         url: 'get_training_endorsements',
-        type: 'GET'
+        type: 'GET',
+        data: function(d) {
+            d.status = $('#endorsementStatus').val();
+        }
     },
     columns: [
         { data: 'action', orderable: false, searchable: false },
+        { data: 'raw_status' },
         { data: 'ctrl_no'},
         { data: 'hr_memo_details.document_no'  },
         { data: 'training_request_details.ctrl_number'  },
@@ -155,41 +159,34 @@ $(document).on('click', '.btnViewEndorsement', function () {
                     if(emp.will_endorse == 1){
                         statusHtml = '<span class="badge badge-danger">Not Endorsed</span>';
                     }
-                    if(emp.hands_on_filename != null){
-                        // Dynamically get the base path after the host (e.g., /TRDS_chris)
-                        var basePath = window.location.pathname.split('/')[1];
-                        handsOnImage = `${window.location.protocol}//${window.location.host}/${basePath}/public/storage/hands_on_attachments/${emp.id}.${emp.hands_on_filename_ext}`;
-                        console.log(handsOnImage);
-                    } else {
-                        handsOnImage = null;
-                    }
+
                    
                     return Object.assign({
-                        action             : '--',
-                        status             : statusHtml,
-                        date_hired         : emp.training_request_details_info.date_hired || '',
-                        emp_no             : emp.training_request_details_info.emp_no || '',
-                        name               : emp.training_request_details_info.name || '',
-                        id                 : emp.training_request_details_info.id || '',
-                        rating             : ratings,
-                        questionnaire      : examTitles,
-                        exam_remarks       : examRemarks,
-                        hands_on_image     : handsOnImage || null,
-                        hands_on_file_name : emp.hands_on_filename,
-                        hands_on_attachment: handsOnImage ? `<button type="button" class="btn btn-primary btn-sm btnViewHandsOnAttachment" title="View Hands-On"><i class="fa fa-eye"></i></button>` : ''
-                        // rowClass: rowClass,
-                        // hasExam: hasExam,
-                        // hasPassed: hasPassed
+                        action: '--',
+                        status: statusHtml,
+                        date_hired: emp.training_request_details_info.date_hired || '',
+                        emp_no: emp.training_request_details_info.emp_no || '',
+                        name: emp.training_request_details_info.name || '',
+                        id: emp.training_request_details_info.id || '',
+                        rating: ratings,
+                        questionnaire: examTitles,
+                        exam_remarks: examRemarks,
+                        hands_on_attachment: emp.hands_on_filename ? `<button type="button" class="btn btn-primary btn-sm btnViewHandsOnAttachment" title="View Hands-On"><i class="fa fa-eye"></i></button>` : 'N/A',
+                        hands_on_filename: emp.hands_on_filename || '',
+                        training_endorsement_employee_id: emp.id || ''
                     });
                 });
                 
                 // Load employees into modal table
                 endorsementEmployeeTable.clear().rows.add(rows).draw();
 
+                // Validation for approval
+                if(data.status == 1){
+
+                }
+
                 // Set select2 values after modal opens
                 modalAddEndorsement.modal('show');
-                // getCheckedByUsers(data.checked_by);
-                // getApprovedByUsers(data.approved_by);
             } else {
                 toastr.error(response.message);
             }
@@ -285,15 +282,16 @@ formAddEndorsement.on('submit', function (e) {
     e.preventDefault();
     // Validate: require hands-on image for employees that need it
     var allRows = endorsementEmployeeTable.rows().data().toArray();
+    console.log('All rows on submit:', allRows);
     var missingHandsOn = allRows.filter(function(row) {
-        return row.requiresHandsOn && !row.hands_on_image && !row.will_not_endorse;
+        return row.requiresHandsOn && !row.hands_on_image && !row.will_not_endorse && !row.hands_on_filename;
     });
     if (missingHandsOn.length > 0) {
         var names = missingHandsOn.map(function(row) { return row.name || row.emp_no; }).join(', ');
         toastr.error('Hands-on image is required for: ' + names);
         return;
     }
-
+    
     // Collect employee data from the modal DataTable, including will_not_endorse and remarks
     var employees = endorsementEmployeeTable.rows().data().toArray().map(function (row) {
         return {
@@ -414,7 +412,16 @@ $('#trainingReqCtrl').on('keyup', function (e) {
                 training_req_ctrl: trainingReqCtrl
             },
             dataType: "json",
+            beforeSend: function(){
+                showSwalLoading();
+                endorsementEmployeeTable.clear().draw()
+                $('#hrMemoId').val('');
+                $('#hrMemoCtrl').val('');
+                $('#trainingReqId').val('');
+
+            },
             success: function (response) {
+                Swal.close();
                 if(!response.result){
                     toastr.error(response.message);
                     return;
@@ -662,13 +669,38 @@ $(document).on('click', '.btnViewHandsOnAttachment', function () {
     var rowIdx = endorsementEmployeeTable.row(row).index();
     var rowData = endorsementEmployeeTable.row(row).data();
 
-    if (rowData && rowData.hands_on_image) {
+    // Prefer inline/base64 image if present
+    if (!rowData) {
+        toastr.error('No employee data available.');
+        return;
+    }
+
+    if (rowData.hands_on_image) {
         var win = window.open('', '_blank');
+        if (!win) {
+            toastr.error('Please allow popups to view the image.');
+            return;
+        }
         win.document.write('<title>Hands-On Attachment</title><body style="margin:0;background:#000;"><img src="' + rowData.hands_on_image + '" style="max-width:100%;max-height:100vh;display:block;margin:auto;" /></body>');
         win.document.close();
-    } else {
-        toastr.error('No hands-on image attached.');
+        return;
     }
+
+    // Try to build URL from storage: saved under storage/hands_on/{empId}/{filename}
+    var filename = rowData.hands_on_filename;
+    var empId = rowData.training_endorsement_employee_id;
+     console.log('empId', empId, 'filename', filename, 'rowData', rowData);
+    // return false;
+    if (filename && empId) {
+        var fileExtension = filename.split('.').pop();
+        var url = './public/storage/hands_on_attachments/' + encodeURIComponent(empId + '.' + fileExtension);
+        var win2 = window.open(url, '_blank');
+        if (!win2) {
+            toastr.error('Please allow popups to view the image.');
+        }
+        return;
+    }
+    toastr.error('No hands-on image attached.');
 });
 
 $('#btnExportEndorsement').on('click', function(){
@@ -682,6 +714,285 @@ $('#btnExportEndorsement').on('click', function(){
 
 });
 
+$(document).on('click', '.btnProceedApprovalEndorsement', function(){
+    const id = $(this).data('id');
+    if (!id) {
+        toastr.error('Something went wrong. Please try again.');
+        return;
+    }
+    Swal.fire({
+        title: 'Proceed to Approval?',
+        text: 'Are you sure you want to proceed this endorsement for approval? Please ensure all details are correct before proceeding.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, proceed',
+        cancelButtonText: 'No, cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            proceedApprovalEndorsement(id);
+        }
+    });
+});
+
+$('#endorsementStatus').on('change', function(){
+    var status = $(this).val();
+    trainingEndorsementTable.ajax.reload();
+})
+
+
+$(document).on('click', '.btnApproveEndorsement', function(){
+    var id = $(this).data('id');
+    var approvalType = $(this).data('approval-type');
+
+    if (!id || !approvalType) {
+        toastr.error('Something went wrong. Please try again.');
+        return;
+    }
+    Swal.fire({
+        title: 'Approve Endorsement?',
+        text: 'Are you sure you want to approve this endorsement? Please ensure all details are correct before proceeding.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, approve',
+        cancelButtonText: 'No, cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            approveEndorsement(id, approvalType);
+        }
+    });
+});
+
+$(document).on('click', '.btnRejectEndorsement', function(){
+    var id = $(this).data('id');
+    var approvalType = $(this).data('approval-type');
+
+    if (!id) {
+        toastr.error('Something went wrong. Please try again.');
+        return;
+    }
+   if ($.fn.modal) {
+        $.fn.modal.Constructor.prototype._enforceFocus = function() {};
+    }
+
+    document.activeElement.blur();
+    Swal.fire({
+        title: 'Disapprove Endorsement?',
+        input: 'textarea',
+        inputPlaceholder: 'Enter remarks here...',
+        showCancelButton: true,
+        confirmButtonText: 'Disapprove',
+        cancelButtonText: 'Cancel',
+        allowOutsideClick: false,
+        allowEscapeKey: true,
+        target: document.body,
+        didOpen: function () {
+            const textarea = document.querySelector('.swal2-textarea');
+            if (textarea) textarea.focus();
+        },
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Remarks are required!';
+            }
+        }
+    }).then(function (result) {
+        if (result.isConfirmed) {
+            rejectEndorsement(id, approvalType, result.value);
+            console.log("Remarks:", result.value);
+        }
+    });
+});
+
+$(document).on('click', '.btnEditEndorsement', function(){
+    var id = $(this).data('id');
+    var trCtrlNo = $(this).data('tr-ctrl-no');
+    $.ajax({
+        url: 'get_training_endorsement_by_id',
+        method: 'GET',
+        data: { 
+            id: id,
+            tr_ctrl_no: trCtrlNo
+        },
+        beforeSend: function(){
+            $('#btnExportEndorsement').prop('hidden', false);
+            $('#selectApprovedBy').val('').trigger('change');
+            $('#selectCheckedBy').val('').trigger('change');
+        },  
+        success: function (response) {
+            if (response.result) {
+                let data = response.data;
+                console.log('Endorsement data for editing:', data);
+                $('#endorsementId').val(data.id);
+                $('#documentNo').val(data.ctrl_no);
+                $('#trainingReqCtrl').val(data.training_request_details.ctrl_number);
+                $('#hrMemoCtrl').val(data.hr_memo_details.document_no);
+                $('#endorsementDate').val(data.date);
+                $('#preparedBy').val(data.created_by_user_details.name);
+
+                let attn = data.mail_cc.split(',').map(email => email.trim());
+                $('#attn').val(attn).trigger('change');
+                $('#selectApprovedBy').val(data.approved_by).trigger('change');
+                $('#selectCheckedBy').val(data.checked_by).trigger('change');
+                
+                $('#attn').prop('readonly', false);
+                $('#trainingReqCtrl').prop('readonly', true);
+                $('#btnSubmitEndorsement').show();
+                $('#selectApprovedBy').prop('readonly', false);
+                $('#selectCheckedBy').prop('readv conly', false);
+                
+                // Get job function from dynamic training request details block
+                let trJobFunctions = data.training_request_details ? data.training_request_details.job_function : null;
+                endorsementEmpList = data.training_endorsement_employees || [];
+
+                var rows = endorsementEmpList.map(function(detail) {
+                    var emp = detail || {};
+                    var ratings = '';
+                    var remarks = '';
+                    var questionnaire = '';
+                    var examTitles = '';
+                    var examRemarks = '';
+                    var hasExam = false;
+                    var hasPassed = false;
+                    var requiresHandsOn = false;
+                    var will_not_endorse = false;
+                    var will_not_endorse_remarks = "";
+                    if(emp.will_endorse) {
+                        will_not_endorse = true;
+                        will_not_endorse_remarks = emp.will_not_endorse_remarks;
+                    }
+
+                    // Compute exam indicators matching your creation logic context
+                    if (Array.isArray(emp.training_request_details_info.employee_exam_details) && emp.training_request_details_info.employee_exam_details.length > 0) {
+                        ratings = emp.training_request_details_info.employee_exam_details.map(function(exam) {
+                            return exam.exam_result_details_info && exam.exam_result_details_info.rating !== undefined && exam.exam_result_details_info.rating !== null
+                                ? exam.exam_result_details_info.rating
+                                : '';
+                        }).join(' | ');
+
+                        remarks = emp.training_request_details_info.employee_exam_details.map(function(exam) {
+                            return exam.exam_result_details_info && exam.exam_result_details_info.remark !== undefined && exam.exam_result_details_info.remark !== null
+                                ? exam.exam_result_details_info.remark
+                                : '';
+                        }).join(' | ');
+                        examRemarks = remarks;
+
+                        // Check if any remarks contain 'Passed' (case-insensitive)
+                        hasPassed = /passed/i.test(remarks);
+
+                        var questionnaireArr = emp.training_request_details_info.employee_exam_details.map(function(exam) {
+                            return exam.exam_result_details_info && exam.exam_result_details_info.questionnaire !== undefined && exam.exam_result_details_info.questionnaire !== null
+                                ? exam.exam_result_details_info.questionnaire
+                                : null;
+                        }).filter(function(q) { return q !== null; });
+                        
+                        var parsedQuestionnaires = questionnaireArr.map(function(q) {
+                            if (typeof q === 'string') {
+                                try {
+                                    return JSON.parse(q);
+                                } catch (e) {
+                                    return null;
+                                }
+                            }
+                            return q;
+                        }).filter(function(q) { return q !== null; });
+                        questionnaire = JSON.stringify(parsedQuestionnaires);
+                        
+                        try {
+                            const qArr = JSON.parse(questionnaire);
+                            if (Array.isArray(qArr) && qArr.length > 0) {
+                                hasExam = true;
+                                examTitles = qArr.map(q => q && q.exam_title ? q.exam_title : '').filter(Boolean).join(' | ');
+                            }
+                        } catch (e) {
+                            examTitles = '';
+                        }
+                    }
+
+                    // Determine dynamic flags, classes, and actions matching structural conditions
+                    let statusHtml = '';
+                    let rowClass = '';
+                    let actionBtns = '';
+
+                    if (emp.will_endorse == 1) {
+                        statusHtml = '<span class="badge badge-danger">Not Endorsed</span>';
+                        rowClass = 'custom-failed-row';
+                        actionBtns += `
+                            <button type="button" class="btn btn-danger btn-sm btnRemoveEmployee"><i class="fa fa-trash"></i></button>
+                        `;
+                    } else if (hasExam && hasPassed) {
+                        statusHtml = '<span class="badge badge-success">Endorsed</span>';
+                        actionBtns += `
+                            <button type="button" class="btn btn-danger btn-sm btnRemoveEmployee"><i class="fa fa-trash"></i></button>
+                            <button type="button" class="btn btn-secondary btn-sm btnWillNotEndorse" title="Will Not Be Endorsed"><i class="fa fa-ban"></i></button>
+                        `;
+                        if ([3,4,5,6].includes(Number(trJobFunctions))) {
+                            requiresHandsOn = true;
+                            actionBtns += `
+                                <button type="button" class="btn btn-info btn-sm btnAddHandsOn" title="Add Hands-On"><i class="fa fa-plus"></i></button>
+                            `;
+                        }
+                        rowClass = '';
+                    } else if (hasExam && !hasPassed) {
+                        statusHtml = '<span class="badge badge-danger">Failed Exam</span>';
+                        actionBtns = `
+                            <button type="button" class="btn btn-danger btn-sm btnRemoveEmployee"><i class="fa fa-trash"></i></button>
+                            <button type="button" class="btn btn-secondary btn-sm btnWillNotEndorse" title="Will Not Be Endorsed"><i class="fa fa-ban"></i></button>
+                        `;
+                        rowClass = 'custom-failed-row';
+                    } else {
+                        statusHtml = '<span class="badge badge-danger">No Exam</span>';
+                        actionBtns = `
+                            <button type="button" class="btn btn-danger btn-sm btnRemoveEmployee"><i class="fa fa-trash"></i></button>
+                            <button type="button" class="btn btn-secondary btn-sm btnWillNotEndorse" title="Will Not Be Endorsed"><i class="fa fa-ban"></i></button>
+                        `;
+                        rowClass = 'custom-failed-row';
+                    }
+
+                    console.log('will_not_endorse', will_not_endorse);
+
+                    return Object.assign({
+                        action: actionBtns || '--',
+                        status: statusHtml,
+                        date_hired: emp.training_request_details_info.date_hired || '',
+                        emp_no: emp.training_request_details_info.emp_no || '',
+                        name: emp.training_request_details_info.name || '',
+                        id: emp.training_request_details_info.id || '',
+                        rating: ratings,
+                        questionnaire: examTitles,
+                        exam_remarks: examRemarks,
+                        rowClass: rowClass,
+                        hasExam: hasExam,
+                        hasPassed: hasPassed,
+                        will_not_endorse: will_not_endorse,
+                        remarks: will_not_endorse_remarks,
+                        requiresHandsOn: requiresHandsOn || false,
+                        hands_on_attachment: emp.hands_on_filename ? `<button type="button" class="btn btn-primary btn-sm btnViewHandsOnAttachment" title="View Hands-On"><i class="fa fa-eye"></i></button>` : 'N/A',
+                        hands_on_filename: emp.hands_on_filename || '',
+                        training_endorsement_employee_id: emp.id || ''
+                    });
+                });
+                
+                // Load employees into modal table
+                endorsementEmployeeTable.clear().rows.add(rows).draw();
+
+                // Fire custom background coloring rules post-render
+                applyCustomFailedRowBg();
+
+                // Validation for approval
+                if(data.status == 1){
+                    // Keep workflow validations here if any
+                }
+
+                // Set select2 values after modal opens
+                modalAddEndorsement.modal('show');
+            } else {
+                toastr.error(response.message);
+            }
+        },
+        error: function () {
+            toastr.error('Failed to fetch endorsement details.');
+        }
+    });
+});
 
 // ==================== Dropdown Loaders ====================
 function getCheckedByUsers(selectedVal) {
@@ -819,6 +1130,97 @@ function addNotEndorsedEmployee(empNo, teId, trId, remarks){
             console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
         }
     });
+}
 
-    
+function proceedApprovalEndorsement(id){
+    $.ajax({
+        type: "POST",
+        url: "proceed_endorsement_approval",
+        data: {
+            id: id,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        dataType: "json",
+        beforeSend: function(){
+            showSwalLoading();
+        },
+        success: function (response) {
+            if(!response.result){
+                toastr.error(response.message);
+                Swal.close();
+                return;
+            }
+            toastr.success(response.message);
+            trainingEndorsementTable.ajax.reload();
+            Swal.close();
+        },
+        error: function(xhr, status, error){
+            Swal.close();
+            toastr.error('An error occurred while processing your request.');
+            console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
+        }
+    });
+}
+
+function approveEndorsement(id, approvalType){
+    $.ajax({
+        type: "POST",
+        url: "approve_endorsement",
+        data: {
+            id: id,
+            approval_type: approvalType,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        dataType: "json",
+        beforeSend: function(){
+            showSwalLoading();
+        },
+        success: function (response) {
+            if(!response.result){
+                toastr.error(response.message);
+                Swal.close();
+                return;
+            }
+            toastr.success(response.message);
+            trainingEndorsementTable.ajax.reload();
+            Swal.close();
+        },
+        error: function(xhr, status, error){
+            Swal.close();
+            toastr.error('An error occurred while processing your request.');
+            console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
+        }
+    });
+}
+
+function rejectEndorsement(id, approvalType, remarks){
+    $.ajax({
+        type: "POST",
+        url: "disapprove_endorsement",
+        data: {
+            id: id,
+            approval_type: approvalType,
+            dis_remarks: remarks,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        dataType: "json",
+        beforeSend: function(){
+            showSwalLoading();
+        },
+        success: function (response) {
+            if(!response.result){
+                toastr.error(response.message);
+                Swal.close();
+                return;
+            }
+            toastr.success(response.message);
+            trainingEndorsementTable.ajax.reload();
+            Swal.close();
+        },
+        error: function(xhr, status, error){
+            Swal.close();
+            toastr.error('An error occurred while processing your request.');
+            console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
+        }
+    });
 }
