@@ -127,13 +127,15 @@
                         <p>Personal Skill Matrix </p>
                     </a>
                 </li>
-
-                <li class="nav-item has-treeview">
-                     <a href="{{ route('training_endorsement') }}"  class="nav-link">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>Training Endorsement </p>
-                    </a>
-                </li>
+                @if ( in_array(16,explode(',', $globalUser->user_modules_id)) )
+                    <li class="nav-item has-treeview">
+                        <a href="{{ route('training_endorsement') }}"  class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>Training Endorsement </p>
+                        </a>
+                    </li>
+                @endif
+              
 
                 <li class="nav-item has-treeview">
                     <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
