@@ -88,7 +88,13 @@
                     <li class="nav-item has-treeview">
                         <a href="{{ route('training_attendance') }}"  class="nav-link">
                             <i class="nav-icon fas fa-users"></i>
-                            <p>Training Attendance  </p>
+                            <p>Training Attendance Summary </p>
+                        </a>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="http://rapidx/TRDSv2_attendance/"  class="nav-link">
+        <a href="{{ route('training_attendance') }}"  class="nav-link">
+p>Training Attendance  </p>
                         </a>
                     </li>
                 @endif
@@ -139,10 +145,4 @@
                 <li class="nav-item has-treeview">
                     <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
                         <i class="nav-icon fas fa-list-alt"></i>
-                        <p>Qualification / Certification </p>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div><!-- Sidebar -->
-</aside>
+             
