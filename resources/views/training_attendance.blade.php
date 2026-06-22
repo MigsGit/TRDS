@@ -192,7 +192,7 @@
                         <div class="form-group">
                             <label>Remarks</label>
                             <select class="form-control" style="width: 100%" name="remarks" id="remarks">
-                                <option value="" selected>N/A</option>
+                                <option value="N/A" selected>N/A</option>
                                 <option value="AWOL">AWOL</option>
                                 <option value="SL">SL</option>
                                 <option value="VL">VL</option>
@@ -310,12 +310,13 @@
     });
     $(tbl.TrainingAttendanceRequest).on('click','.aEditAttendance','tr', function () {
         let trainingAttendancesId = $(this).attr('attendance-id');
+        let attendanceDetailsId = $(this).attr('attendance-details-id');
         let row = $(this).closest('tr'); // Get the parent row
         let employeeNo = row.find('td:eq(1)').text()
         let date = row.find('td:eq(3)').text();
 
 
-        $('#trainingRequestDetailsId').val(trainingRequestDetailsId);
+        $('#trainingRequestDetailsId').val(attendanceDetailsId);
         $('#date').val(date);
         $('#rapidxEmpNo').val(employeeNo);
         $('#trainingAttendancesId').val(trainingAttendancesId);
@@ -362,7 +363,7 @@
             dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
 
 
-           
+
         })
     });
 
