@@ -69,7 +69,10 @@
                             </li>
                         </ul>
                     </li>
+<<<<<<< HEAD
                 {{-- @endif --}}
+=======
+>>>>>>> 36df990b5b3b8b0eab4c032d4593ed06a14abe9a
 
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
