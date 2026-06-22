@@ -192,7 +192,7 @@
                         <div class="form-group">
                             <label>Remarks</label>
                             <select class="form-control" style="width: 100%" name="remarks" id="remarks">
-                                <option value="" selected>N/A</option>
+                                <option value="N/A" selected>N/A</option>
                                 <option value="AWOL">AWOL</option>
                                 <option value="SL">SL</option>
                                 <option value="VL">VL</option>
@@ -362,7 +362,7 @@
             dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
 
 
-           
+
         })
     });
 

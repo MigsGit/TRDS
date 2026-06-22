@@ -86,16 +86,16 @@
                 </li>
                 {{-- http://rapidx/TRDSv2_attendance/ --}}
                 @if ( in_array(7,explode(',', $globalUser->user_modules_id)) )
-                    <li class="nav-item has-treeview">
-                         <i class="fas fa-users"></i>
+                    <li class="nav-item">
                         <a href="{{ route('training_attendance') }}"  class="nav-link">
-                            <p>Training Attendance  </p>
+                            <i class="fas fa-users"></i>
+                            <p>Training Attendance Summary   </p>
                         </a>
                     </li>
                 @endif
-                <li class="nav-item has-treeview">
-                    <i class="fas fa-user"></i>
-                    <a href="http://rapidx/TRDSv2_attendance/"  class="nav-link">
+                 <li class="nav-item">
+                     <a href="http://rapidx/TRDSv2_attendance/"  class="nav-link">
+                        <i class="fas fa-user"></i>
                         <p>Training Attendance  </p>
                     </a>
                 </li>
