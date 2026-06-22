@@ -427,7 +427,7 @@ $(document).ready(function() {
     }
 
     function getHrisSection(selectedSectionId = null, isViewMode = false) {
-
+        // console.log('section_id',selectedSectionId)
         $.ajax({
             url: 'get_hris_sections',
             method: 'GET',
@@ -437,7 +437,16 @@ $(document).ready(function() {
                 $select.append('<option value="" disabled selected>Select Section</option>');
 
                 $.each(response, function(index, section) {
-                    $select.append('<option value="' + section.pkid + '">' + section.Section + ' - ' + section.department.Department + '</option>');
+
+                    let department = section.department && section.department.Department 
+                        ? section.department.Department 
+                        : '-';
+
+                    $select.append(
+                        '<option value="' + section.pkid + '">' 
+                        + section.Section + ' - ' + department + 
+                        '</option>'
+                    );
                 });
 
                 if (selectedSectionId) {
