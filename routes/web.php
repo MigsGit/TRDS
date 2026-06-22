@@ -7,6 +7,7 @@ use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\ExaminationResultController;
 use App\Http\Controllers\TrainingAttendanceController;
+use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -66,6 +67,25 @@ Route::middleware('checkSession')->group(function(){
         return view('theoretical_exam/examination_result');
     })->name('examination_result');
 
+     Route::get('/training_endorsement', function () {
+        return view('training_endorsement');
+    })->name('training_endorsement');
+
+    // TRAINING ENDORSEMENT CONTROLLER
+    Route::controller(TrainingEndorsementController::class)->group(function () {
+        Route::get('/get_training_endorsements', 'getTrainingEndorsements')->name('get_training_endorsements');
+        Route::get('/get_training_endorsement_by_id', 'getTrainingEndorsementById')->name('get_training_endorsement_by_id');
+        Route::post('/save_training_endorsement', 'saveTrainingEndorsement')->name('save_training_endorsement');
+        Route::post('/delete_training_endorsement', 'deleteTrainingEndorsement')->name('delete_training_endorsement');
+        Route::get('/get_endorsement_users', 'getEndorsementUsers')->name('get_endorsement_users');
+        Route::get('/get_current_user', 'getCurrentUser')->name('get_current_user');
+        Route::get('/get_all_email', 'getAllEmail')->name('get_all_email');
+        Route::get('/get_training_request_controls', 'getTrainingRequestControls')->name('get_training_request_controls');
+        Route::get('/get_training_request_ctrl_details', 'getTrainingRequestDetails')->name('get_training_request_ctrl_details');
+        Route::get('/get_employees_for_not_endorsed', 'getEmployeesForNotEndorsed')->name('get_employees_for_not_endorsed');
+        Route::post('/add_not_endorsed_emp', 'addNotEndorsedEmp')->name('add_not_endorsed_emp');
+        Route::get('/export_endorsement_pdf', 'exportEndorsementPdf')->name('export_endorsement_pdf');
+    });
 
     // QUESTIONNAIRES CONTROLLER
     // Route::get('/view_questionnaire', 'QuestionnairesController@viewQuestionnaire');
