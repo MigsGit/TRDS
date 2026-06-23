@@ -255,14 +255,14 @@ const CreateUpdateQuestionnaireDetails = () => {
     ajaxRequest(ajaxGetCreateUpdateQuestionnaireDetails);
 };
 
-function renderTable() {
+function RenderTable() {
     // Table header
     $('#questionTable thead tr').html('<th>Question</th>');
 
     getOptions.forEach((options, getIndex) => {
         $('#questionTable thead tr').append(`
             <th class="position-relative">
-                ${options} 
+                ${options}
                 <button type="button" class="btn btn-sm btn-secondary removeOption" data-index="${getIndex}" style="position:absolute; top:2px; right:2px;">&times;</button>
             </th>
         `);
@@ -281,8 +281,9 @@ function renderTable() {
             let radioId = `question${questionIndex}_option${optionIndex}`;
             let checked = getSelectedAnswers[questionIndex] == (optionIndex + 1) ? 'checked' : '';
 
+            // <input type="radio" id="${radioId}" data-row="${questionIndex}" data-column="${optionIndex + 1}" ${checked}>
             row += `<td class="text-center">
-                        <input type="radio" id="${radioId}" data-row="${questionIndex}" data-column="${optionIndex + 1}" ${checked}>
+                        <input type="radio" id="${radioId}" data-row="${questionIndex}" data-column="${options}" ${checked}>
                         <label for="${radioId}" class="sr-only"></label>
                     </td>`;
         });
@@ -315,7 +316,7 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
             if(getQuestionnaireDetials.length === 0){
                 return;
             }
-            
+
             $('#slctQuestionnaireCategoryType').val(getQuestionnaireDetials.category_type).trigger('change')
             $('#nmbrQuestionnairePoints').val(getQuestionnaireDetials.points)
 
@@ -369,35 +370,35 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
                 case 2:
                     $('#txtQuestionnaireDescription').val(getQuestionnaireDetials.description)
                     let rawData = getQuestionnaireDetials.answer_choices_question;
-                
+
                     if (!rawData) return;
-                
+
                     let getData = JSON.parse(rawData);
-                
+
                     getQuestions = [];
                     getOptions = [];
                     getSelectedAnswers = [];
-                
+
                     if (getData.length > 0) {
                         getOptions = getData[0].choices;
                     }
-                
+
                     getData.forEach((item, index) => {
                         getQuestions.push(item.question);
                         getSelectedAnswers[index] = item.answer;
                     });
-                
-                    renderTable();
-                
+
+                    RenderTable();
+
                     getSelectedAnswers.forEach((ans, rowIndex) => {
                         if (ans !== null) {
                             let radio = $(`input[data-row="${rowIndex}"][data-column="${ans}"]`);
                             radio.prop('checked', true);
                         }
                     });
-                
+
                     $('#gridAnswerHidden').val(JSON.stringify(getSelectedAnswers));
-                
+
                     break;
                 default:
                     console.log('IRRORMAN');
