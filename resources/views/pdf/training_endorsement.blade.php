@@ -259,6 +259,11 @@
         
         <tr>
             <td style="width:33%; text-align:center; vertical-align: top; padding: 0 10px;">
+                @if ($endorsement->status > 0)
+                    <img src="http://rapidx/RapidX_E-Signature/{{ $endorsement->created_by_user_details->employee_number.'.png' }}" 
+                        alt="Signature" 
+                        style="width:80px; height:auto; display:block; margin: 0 auto -20px auto;">
+                @endif
                 <span style="display:block; font-weight: bold;">
                     {{ $endorsement->created_by_user_details->name ?? '' }}
                 </span>

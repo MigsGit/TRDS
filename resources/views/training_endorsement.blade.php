@@ -63,12 +63,14 @@
                                     <table id="tblTrainingEndorsement" class="table table-bordered table-striped table-hover table-sm" style="width: 100%;">
                                         <thead>
                                             <tr>
-                                                <th style="width: 10%;">Action</th>
-                                                <th style="width: 15%;" class="text-center">Status</th>
-                                                <th style="width: 20%;" class="text-center">Endorsement Ctrl #</th>
-                                                <th style="width: 20%;" class="text-center">HR Memo</th>
-                                                <th style="width: 20%;" class="text-center">Training Request Ctrl #</th>
-                                                <th style="width: 15%;" class="text-center">Date Created</th>
+                                                <th>Action</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center">Endorsement Ctrl #</th>
+                                                <th class="text-center">HR Memo</th>
+                                                <th class="text-center">Training Request Ctrl #</th>
+                                                <th class="text-center">Prepared By</th>
+                                                <th class="text-center">Checker</th>
+                                                <th class="text-center">Approver</th>
                                             </tr>
                                         </thead>
                                     </table>
