@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\CommonController;
 use App\Http\Requests\TrainingEndorsementRequest;
+use App\Jobs\SendEmailTrainingEndorsementApprovalJob;
 use App\Model\RapidXUser;
 use App\Model\TrainingEndorsement;
 use App\Model\TrainingEndorsementApprovals;
@@ -18,8 +20,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 
+
 class TrainingEndorsementController extends Controller
 {
+    protected $CommonController;
+    
+    public function __construct( CommonController $CommonController) {
+        $this->CommonController = $CommonController;
+    }
+
      /**
      * Insert approval record for endorsement
      *
@@ -45,7 +54,9 @@ class TrainingEndorsementController extends Controller
         $data = TrainingEndorsement::with([
             'training_request_details',
             'hr_memo_details',
-            'te_approval_details'
+            'te_approval_details',
+            'te_approval_details.approver_details',
+            'created_by_user_details'
         ])
         ->whereNull('deleted_at')
         ->get();
@@ -122,7 +133,66 @@ class TrainingEndorsementController extends Controller
             ->addColumn('date_created', function ($row) {
                 return $row->created_at ?? '';
             })
-            ->rawColumns(['action', 'raw_status'])
+            ->addColumn('prepared_by', function ($row){
+                $result = "";
+                $result .= "<center>";
+                $result .= "<span class='badge badge-info mt-1'>{$row->created_by_user_details->name}</span><br>";
+                // $result .= $row->created_by_user_details->name ?? '';
+                $result .= "<em >{$row->created_at}</em>";
+                $result .= "</center>";
+                return $result;
+            })
+            ->addColumn('raw_checker', function($row){
+                $checker = $row->te_approval_details->where('approval_type', 'checked_by')->flatten(1)->toArray();
+
+                $result = "";
+                $result .= "<center>";
+                if($checker){
+                    foreach($checker as $checker){
+                        $format_updated_at = $checker['updated_at'] ? Carbon::parse($checker['updated_at'])->format('Y-m-d H:i:s') : null;
+                        if($checker['updated_at'] != null){
+                            $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
+                            $result .= "<em >{$format_updated_at}</em><br>";
+                        }
+                        else{
+                            $result .= "<span class='badge badge-warning mt-1'>{$checker['approver_details']['name']}</span><br>";
+                            $result .= "<em >N/A</em><br>";
+                        }
+                    }
+                }
+                else{
+                    $result .= "<span class='badge badge-warning mt-1'>Not Assigned</span>";
+                }
+                $result .= "</center>";
+
+                return $result;
+            })
+            ->addColumn('raw_approver', function($row){
+                $approver = $row->te_approval_details->where('approval_type', 'approved_by')->flatten(1)->toArray();
+
+                $result = "";
+                $result .= "<center>";
+                if($approver){
+                    foreach($approver as $approver){
+                        $format_updated_at = $approver['updated_at'] ? Carbon::parse($approver['updated_at'])->format('Y-m-d H:i:s') : null;
+                        if($approver['updated_at'] != null){
+                            $result .= "<span class='badge badge-success mt-1'>{$approver['approver_details']['name']}</span><br>";
+                            $result .= "<em >{$format_updated_at}</em><br>";
+                        }
+                        else{
+                            $result .= "<span class='badge badge-warning mt-1'>{$approver['approver_details']['name']}</span><br>";
+                            $result .= "<em >N/A</em><br>";
+                        }
+                    }
+                }
+                else{
+                    $result .= "<span class='badge badge-warning mt-1'>Not Assigned</span>";
+                }
+                $result .= "</center>";
+
+                return $result;
+            })
+            ->rawColumns(['action', 'raw_status', 'prepared_by', 'raw_checker', 'raw_approver'])
             ->make(true);
     }
 
@@ -276,25 +346,6 @@ class TrainingEndorsementController extends Controller
                 }
             }
             else{ // Create
-                // $list_of_employee = json_decode($data['employees'], true);
-                // // Validate that there are employees in the list
-                // if(count($list_of_employee) == 0){
-                //     return response()->json([
-                //         'result' => false,
-                //         'message' => 'No employees added for endorsement.'
-                //     ]);
-                // }
-                // // Check if any employee has not passed the exam or has no exam result
-                // if (
-                //     collect($list_of_employee)->contains(function ($employee) {
-                //         return (empty($employee['hasExam']) || empty($employee['hasPassed'])) && !$employee['will_not_endorse'];
-                //     })
-                // ) {
-                //     return response()->json([
-                //         'result' => false,
-                //         'message' => 'All employees must have passed the exam.'
-                //     ]);
-                // }
 
                 $ctrl_no = $this->generateControlNumber();
                 $endorsementData = [
@@ -346,19 +397,6 @@ class TrainingEndorsementController extends Controller
                         ]);
                     }
                 }
-
-                // // Insert checked_by approvals
-                // if (!empty($data['checked_by']) && is_array($data['checked_by'])) {
-                //     foreach ($data['checked_by'] as $rapidx_id) {
-                //         $this->insertApproval($inserted_te_id, $rapidx_id, 'checked_by');
-                //     }
-                // }
-                // // Insert approved_by approvals
-                // if (!empty($data['approved_by']) && is_array($data['approved_by'])) {
-                //     foreach ($data['approved_by'] as $rapidx_id) {
-                //         $this->insertApproval($inserted_te_id, $rapidx_id, 'approved_by');
-                //     }
-                // }
             }
             // Insert checked_by approvals
             if (!empty($data['checked_by']) && is_array($data['checked_by'])) {
@@ -373,6 +411,8 @@ class TrainingEndorsementController extends Controller
                 }
             }
             DB::commit();
+
+
             return response()->json([
                 'result' => true,
                 'message' => 'Training endorsement saved successfully.',
@@ -646,7 +686,7 @@ class TrainingEndorsementController extends Controller
                             $questionnaire = is_string($examDetail->questionnaire)
                                 ? json_decode($examDetail->questionnaire, true)
                                 : $examDetail->questionnaire;
-                            $examTitle = $questionnaire['exam_title'] ?? '';
+                        $examTitle = $questionnaire['exam_title'] ?? '';
                         }
 
                         $totalScore = ($examDetail->score ?? 0) + ($examDetail->identification_essay_score ?? 0);
@@ -723,14 +763,23 @@ class TrainingEndorsementController extends Controller
     public function proceedEndorsementApproval(Request $request){
         DB::beginTransaction();
         try{
-            trainingEndorsement::where('id', $request->id)
+            TrainingEndorsement::where('id', $request->id)
             ->update([
                 'status' => 1,
                 'updated_by' => $_SESSION['rapidx_user_id'],
                 'updated_at' => now(),
             ]);
-            DB::commit();
 
+            $details = TrainingEndorsement::with([
+                'te_approval_details',
+                'te_approval_details.approver_details',
+                'created_by_user_details'
+            ])->where('id', $request->id)->first();
+
+            $this->CommonController->sendEmailTrainingEndorsement($details, 1);
+            
+            DB::commit();
+            
             return response()->json([
                 'result' => true,
                 'message' => 'Endorsement approval proceeded successfully.'
@@ -748,14 +797,6 @@ class TrainingEndorsementController extends Controller
         DB::beginTransaction();
         try{
             $approval_type = $request->approval_type; // 'checker' or 'approver'
-            // $status = ($approval_type === 'checker') ? 2 : 3;
-
-            // TrainingEndorsement::where('id', $request->id)
-            // ->update([
-            //     // 'status' => $status,
-            //     'updated_by' => $_SESSION['rapidx_user_id'],
-            //     'updated_at' => now(),
-            // ]);
             TrainingEndorsementApprovals::where('training_endorsement_id', $request->id)
             ->where('rapidx_id', $_SESSION['rapidx_user_id'])
             ->where('approval_type', $approval_type === 'checker' ? 'checked_by' : 'approved_by')
@@ -769,6 +810,7 @@ class TrainingEndorsementController extends Controller
             ->whereNull('updated_at')
             ->get();
 
+            $new_status = 1;
             if($approver_left->count() == 0){
                 $new_status = ($approval_type === 'checker') ? 2 : 3;
                 TrainingEndorsement::where('id', $request->id)
@@ -779,13 +821,30 @@ class TrainingEndorsementController extends Controller
                 ]);
             }
 
+            $details = TrainingEndorsement::with([
+                'te_approval_details',
+                'te_approval_details.approver_details',
+                'created_by_user_details'
+            ])->where('id', $request->id)->first();
+            if($approval_type == 'checker' && $new_status == 1){
+                $this->CommonController->sendEmailTrainingEndorsement($details, 1);
 
+            }
+            else{
+                if($new_status == 3){
+                    $this->CommonController->sendEmailTrainingEndorsement($details, 3);
+                }
+                else{
+                    $this->CommonController->sendEmailTrainingEndorsement($details, 2);
+                }
+
+            }
             DB::commit();
             return response()->json([
                 'result' => true,
                 'message' => 'Endorsement approved successfully.'
             ]);
-        }catch(\Throwable $e){
+        }catch(Throwable $e){
             DB::rollback();
             return response()->json([
                 'result' => false,
@@ -819,7 +878,7 @@ class TrainingEndorsementController extends Controller
                 'result' => true,
                 'message' => 'Endorsement disapproved successfully.'
             ]);
-        }catch(\Throwable $e){
+        }catch(Throwable $e){
             DB::rollback();
             return response()->json([
                 'result' => false,

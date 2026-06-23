@@ -26,7 +26,9 @@ const trainingEndorsementTable = $('#tblTrainingEndorsement').DataTable({
         { data: 'ctrl_no'},
         { data: 'hr_memo_details.document_no'  },
         { data: 'training_request_details.ctrl_number'  },
-        { data: 'date_created' }
+        { data: 'prepared_by' },
+        { data: 'raw_checker' },
+        { data: 'raw_approver' }
     ]
 });
 
@@ -503,6 +505,12 @@ $('#trainingReqCtrl').on('keyup', function (e) {
                         `;
                         if ([3,4,5,6].includes(Number(trJobFunctions))) {
                             requiresHandsOn = true;
+                            actionBtns += `
+                                <button type="button" class="btn btn-info btn-sm btnAddHandsOn" title="Add Hands-On"><i class="fa fa-plus"></i></button>
+                            `;
+                        }
+                        if ([1].includes(Number(trJobFunctions))) {
+                            requiresHandsOn = false;
                             actionBtns += `
                                 <button type="button" class="btn btn-info btn-sm btnAddHandsOn" title="Add Hands-On"><i class="fa fa-plus"></i></button>
                             `;
