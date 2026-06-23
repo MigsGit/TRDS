@@ -26,11 +26,11 @@ class QuestionnairesController extends Controller
         return DataTables::of($questionnaires)
         ->addColumn('action', function($questionnaire){
             $result =   '<center>';
-            
+
             if($questionnaire->status == 0){
                 $result .=  '<div class="btn-group">';
                 $result .=  '   <button type="button" class="btn btn-dark dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">';
-                $result .=  '   <i class="fa fa-cog"></i>'; 
+                $result .=  '   <i class="fa fa-cog"></i>';
                 $result .=  '</button>';
                 $result .=  '<div class="dropdown-menu dropdown-menu-right">';
                 if($questionnaire->revision != 0){
@@ -40,11 +40,11 @@ class QuestionnairesController extends Controller
                 $result .=  '   <button type="button" class="btn text-center dropdown-item actionQuestionnaireDetails" questionnaire-id="' . $questionnaire->id . '" questionnaire-revision="' . $questionnaire->revision . '" questionnaire-exam_title="' . $questionnaire->exam_title . '" data-toggle="modal" data-target="#modalQuestionnaireDetails" title="Questionnaire Details"><i class="fa fa-list-ul"></i> Details</button>';
                 $result .=  '   <button type="button" class="btn text-center dropdown-item actionChangeQuestionnaireStatus" questionnaire-id="' . $questionnaire->id . '" status="1" data-toggle="modal" data-target="#modalChangeQuestionnaireStatus" title="Deactivate Questionnaire"><i class="fa fa-ban"></i> Inactive</button>';
                 $result .=  '</button>';
-                
+
             }else{
                 $result .= '<button type="button" class="btn btn-warning btn-sm text-center actionChangeQuestionnaireStatus" questionnaire-id="' . $questionnaire->id . '" status="0" data-toggle="modal" data-target="#modalChangeQuestionnaireStatus" title="Activate Questionnaire"><i class="fas fa-redo"></i></button>';
             }
-            
+
             $result .= '</center>';
             return $result;
         })
@@ -85,7 +85,7 @@ class QuestionnairesController extends Controller
     public function getSystemoneHrisSection(Request $request){
         date_default_timezone_set('Asia/Manila');
 
-        $hris_section = 
+        $hris_section =
             SystemOneHrisSection::where('Section', '!=', 'BOD')
                 ->where('isActive', '1')
                 ->select('Section')
@@ -172,7 +172,7 @@ class QuestionnairesController extends Controller
     public function getQuestionnaireById(Request $request){
         date_default_timezone_set('Asia/Manila');
 
-        $questionnaire_info = 
+        $questionnaire_info =
             Questionnaires::where('id', $request->questionnaireId)
                 ->where('status', '0')
                 ->where('logdel', '0')
@@ -200,18 +200,24 @@ class QuestionnairesController extends Controller
     // ===========================================================================================================================================================
 	public function viewQuestionnaireDetails(Request $request){
         $questionnaire_details = QuestionnaireDetails::where('questionnaire_id', $request->questionnaireId)->where('revision', $request->questionnaireRevision)->where('status', 0)->where('logdel', 0)->get();
+        $passingScore = Questionnaires::where('id', $request->questionnaireId)->where('status', 0)->where('logdel', 0)->value('passing_score');
+        $totalPoints = $questionnaire_details->sum('points');
 
         return DataTables::of($questionnaire_details)
+        ->with([
+            'totalPoints' => $totalPoints,
+            'passingScore' => $passingScore,
+        ])
         ->addColumn('action', function($questionnaire_detail){
             $result =   '<center>';
-            
+
             if($questionnaire_detail->status == 0){
                 $result .= '<button type="button" class="btn btn-dark btn-sm text-center actionUpdateQuestionnaireDetails mr-2" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" data-toggle="modal" data-target="#modalCreateUpdateQuestionnaireDetails" title="Update Questionnaire Details"><i class="fas fa-edit"></i></button>';
                 $result .= '<button type="button" class="btn btn-danger btn-sm text-center actionChangeQuestionnaireStatus" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" status="1" data-toggle="modal" data-target="#modalChangeQuestionnaireDetailsStatus" title="Deactive Questionnaire"><i class="fas fa-redo"></i></button>';
             }else{
                 $result .= '<button type="button" class="btn btn-warning btn-sm text-center actionChangeQuestionnaireStatus" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" status="0" data-toggle="modal" data-target="#modalChangeQuestionnaireDetailsStatus" title="Activate Questionnaire"><i class="fas fa-redo"></i></button>';
             }
-            
+
             $result .=  '</center>';
             return $result;
         })
@@ -231,7 +237,7 @@ class QuestionnairesController extends Controller
             $result =   '<center>';
             if($questionnaire_detail->image != '' || $questionnaire_detail->image != NULL){
                 $result .=  '<a style="" class="image" href="storage/app/public/questionnaire_attachment/'. $questionnaire_detail->image .'" target="_blank">
-                            <img src="storage/app/public/questionnaire_attachment/' . $questionnaire_detail->image . '" style="max-width: 140px; max-height: 115px; width: 130px; height: auto; border: 1px solid #000;"></a>';            
+                            <img src="storage/app/public/questionnaire_attachment/' . $questionnaire_detail->image . '" style="max-width: 140px; max-height: 115px; width: 130px; height: auto; border: 1px solid #000;"></a>';
             }
             $result .=  '</center>';
 
@@ -241,34 +247,34 @@ class QuestionnairesController extends Controller
         ->addColumn('question', function($questionnaire_detail) {
             $questions = json_decode($questionnaire_detail->answer_choices_question, true);
             if (!is_array($questions)) return '';
-        
+
             $uniqueQuestions = collect($questions)->pluck('question')->unique();
-        
+
             return $uniqueQuestions->implode('<br><br>');
         })
-        
+
         ->addColumn('choices', function($questionnaire_detail) {
             $questions = json_decode($questionnaire_detail->answer_choices_question, true);
             if (!is_array($questions)) return '';
-        
+
             $uniqueChoices = collect($questions)
                 ->pluck('choices')
                 ->flatten()
                 ->unique();
-        
+
             return $uniqueChoices->implode('<br>');
         })
 
         ->addColumn('answer', function($questionnaire_detail) {
             $questions = json_decode($questionnaire_detail->answer_choices_question, true);
             if (!is_array($questions)) return '';
-        
+
             $uniqueAnswers = collect($questions)
                 ->pluck('answer')
                 ->map(function ($answer) {
                     return str_replace(',', '<br>', $answer);
                 });
-        
+
             return $uniqueAnswers->implode('<br><br>');
         })
 
@@ -372,7 +378,7 @@ class QuestionnairesController extends Controller
             '1' => 'question_type',
             '2' => 'questionnaire_description',
         ];
-        
+
         if (isset($map[$type])) {
             $questionnaires_record[$type === '1' ? 'type' : 'description'] = $request->{$map[$type]};
         }
@@ -409,11 +415,11 @@ class QuestionnairesController extends Controller
 
                     $numbering = $test ? intval($test->exam_no) + 1 : 1;
 
-                    $questionnaires_record['exam_no'] = $numbering; 
-                    $questionnaires_record['questionnaire_id'] = $request->questionnaire_details_fkid; 
-                    $questionnaires_record['image'] = $filename; 
-                    $questionnaires_record['created_by'] = ''; 
-                    $questionnaires_record['created_at'] = date('Y-m-d H:i:s'); 
+                    $questionnaires_record['exam_no'] = $numbering;
+                    $questionnaires_record['questionnaire_id'] = $request->questionnaire_details_fkid;
+                    $questionnaires_record['image'] = $filename;
+                    $questionnaires_record['created_by'] = '';
+                    $questionnaires_record['created_at'] = date('Y-m-d H:i:s');
 
                     QuestionnaireDetails::insert($questionnaires_record);
                 }else{
@@ -422,9 +428,9 @@ class QuestionnairesController extends Controller
                         ->where('logdel', 0)
                         ->first();
 
-                    $questionnaires_record['image']             = $request->upload_image; 
-                    $questionnaires_record['updated_by']        = ''; 
-                    $questionnaires_record['updated_at']        = date('Y-m-d H:i:s'); 
+                    $questionnaires_record['image']             = $request->upload_image;
+                    $questionnaires_record['updated_by']        = '';
+                    $questionnaires_record['updated_at']        = date('Y-m-d H:i:s');
                     // return $questionnaires_record;
                     if($record->image == $request->upload_image){
                         QuestionnaireDetails::where('id', $request->questionnaire_details_pkid)->where('status', 0)->where('logdel', 0)->update($questionnaires_record);
@@ -450,7 +456,7 @@ class QuestionnairesController extends Controller
     public function getQuestionnaireDetailsById(Request $request){
         date_default_timezone_set('Asia/Manila');
 
-        $questionnaire_details = 
+        $questionnaire_details =
             QuestionnaireDetails::
                 where('id', $request->questionnaireDetailId)
                 ->where('revision', $request->questionnaireDetailRevision)

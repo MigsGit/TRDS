@@ -20,11 +20,31 @@ use App\Model\ExamAttempts;
 
 class ExaminationController extends Controller
 {
-    public function examDashboard(){
-        $examCategories = Questionnaires::where('status', 0)
+    // public function examDashboard(){
+    //     $examCategories = Questionnaires::where('status', 0)
+    //         ->where('logdel', 0)
+    //         ->get();
+    //     return view('theoretical_exam.examination_dashboard', compact('examCategories'));
+    // }
+
+    public function examDashboard(Request $request){
+        $allCategories = Questionnaires::where('status', 0)
             ->where('logdel', 0)
             ->get();
-        return view('theoretical_exam.examination_dashboard', compact('examCategories'));
+
+        $examCategories = Questionnaires::where('status', 0)
+            ->where('logdel', 0);
+
+        if ($request->department) {
+            $examCategories->where('department', $request->department);
+        } else {
+            // show nothing initially (optional)
+            $examCategories->whereRaw('1 = 0');
+        }
+
+        $examCategories = $examCategories->get();
+
+        return view('theoretical_exam.examination_dashboard', compact('examCategories', 'allCategories'));
     }
 
     public function startExam($id, $revision){
