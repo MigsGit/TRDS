@@ -281,7 +281,7 @@
                             {{ $checker->approver_details->name ?? '' }}
                             <br>
                             {{ $checker->approver_details->employee_info->Position ?? '' }}
-                            <br>
+                            <br><br>
                         </span>
                     </div>
                 @endforeach
@@ -299,7 +299,7 @@
                             {{ $approver->approver_details->name ?? '' }}
                             <br>
                             {{ $approver->approver_details->employee_info->Position ?? '' }}
-                            <br>
+                            <br><br>
                         </span>
                     </div>
                 @endforeach
