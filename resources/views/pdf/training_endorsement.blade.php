@@ -301,11 +301,21 @@
         </tr>
     </table>
     
-    @foreach($employees as $employee)
+    {{-- @foreach($employees as $employee)
         @if(!empty($employee['attachment']))
             <div style="page-break-before: always;">
                 <p style="font-weight: bold; font-size: 12px; margin-bottom: 10px;">{{ $employee['name'] ?? '' }} - Hands-On Attachment:</p>
                 <img src="{{ $employee['attachment'] }}" alt="" style="width:100%; max-height:700px; object-fit:contain; display:block; border:1px solid #ccc;">
+            </div>
+        @endif
+    @endforeach --}}
+    @foreach($employees as $employee)
+        @if(!empty($employee['attachment']))
+            <div style="page-break-inside: avoid; margin-top: 20px;">
+                <p style="font-weight: bold; font-size: 12px; margin-bottom: 10px;">
+                    {{ $employee['name'] ?? '' }} - Hands-On Attachment:
+                </p>
+                <img src="{{ $employee['attachment'] }}" alt="" style="max-width: 100%; max-height: 650px; object-fit: contain; display: block; border: 1px solid #ccc;">
             </div>
         @endif
     @endforeach

@@ -238,6 +238,20 @@
                 <div class="modal-body">
                     <input type="hidden" id="handsOnRowIndex" value="">
                     <div class="form-group">
+                        <label for="handsOnRating">Rating</label>
+                        <div class="d-flex align-items-center">
+                            <input type="number" class="form-control w-50" id="handsOnRating" name="hands_on_rating" min="0" value="30" placeholder="Score">
+                            
+                            <span class="mx-2 font-weight-bold">/</span>
+                            
+                            <input type="number" class="form-control w-50" id="handsOnTotalRating" name="hands_on_total_rating" min="0" value="30" placeholder="Total">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="handsOnRemarks">Remarks</label>
+                        <textarea class="form-control" id="handsOnRemarks" name="hands_on_remarks" rows="3" placeholder="Enter remarks..."></textarea>
+                    </div>
+                    <div class="form-group">
                         <label for="handsOnImage">Select Image <small class="text-muted">(jpg, jpeg, png only)</small></label>
                         <input type="file" class="form-control-file" id="handsOnImage" accept="image/jpeg,image/png,image/jpg">
                     </div>
