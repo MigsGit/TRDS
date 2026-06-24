@@ -293,20 +293,23 @@ formAddEndorsement.on('submit', function (e) {
         toastr.error('Hands-on image is required for: ' + names);
         return;
     }
-    
+
     // Collect employee data from the modal DataTable, including will_not_endorse and remarks
     var employees = endorsementEmployeeTable.rows().data().toArray().map(function (row) {
         return {
-            hasExam: row.hasExam,
-            hasPassed: row.hasPassed,
-            emp_no: row.emp_no,
-            name: row.name,
-            date_hired: row.date_hired,
-            tr_details_id: row.id,
-            will_not_endorse: row.will_not_endorse || false,
-            remarks: row.remarks || '',
-            hands_on_image: row.hands_on_image || null,
-            hands_on_file_name: row.hands_on_file_name || null
+            hasExam              : row.hasExam,
+            hasPassed            : row.hasPassed,
+            emp_no               : row.emp_no,
+            name                 : row.name,
+            date_hired           : row.date_hired,
+            tr_details_id        : row.id,
+            will_not_endorse     : row.will_not_endorse || false,
+            remarks              : row.remarks || '',
+            hands_on_image       : row.hands_on_image || null,
+            hands_on_file_name   : row.hands_on_file_name || null,
+            hands_on_rating      : row.hands_on_rating || null,
+            hands_on_total_rating: row.hands_on_total_rating || null,
+            hands_on_remarks     : row.hands_on_remarks || null
         };
     });
 
@@ -653,16 +656,23 @@ $('#handsOnImage').on('change', function () {
 
 $('#btnSaveHandsOn').on('click', function () {
     var file = $('#handsOnImage')[0].files[0];
+    var rating = $('#handsOnRating').val();
+    var totalRating = $('#handsOnTotalRating').val();
+    var remarks = $('#handsOnRemarks').val();
     if (!file) {
         toastr.error('Please select an image file.');
         return;
     }
     var rowIdx = parseInt($('#handsOnRowIndex').val());
     var rowData = endorsementEmployeeTable.row(rowIdx).data();
+    
     var reader = new FileReader();
     reader.onload = function (e) {
         rowData.hands_on_image = e.target.result;
         rowData.hands_on_file_name = file.name;
+        rowData.hands_on_rating = rating;
+        rowData.hands_on_total_rating = totalRating;
+        rowData.hands_on_remarks = remarks;
         rowData.hands_on_attachment = `<button type="button" class="btn btn-primary btn-sm btnViewHandsOnAttachment" title="View Hands-On"><i class="fa fa-eye"></i></button>`;
         endorsementEmployeeTable.row(rowIdx).data(rowData).invalidate().draw();
         toastr.success('Hands-on image attached for ' + (rowData.name || 'employee') + '.');

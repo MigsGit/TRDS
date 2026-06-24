@@ -24,6 +24,9 @@ class CreateTrainingEndorsementEmployeesTable extends Migration
             // $table->string('hands_on_image')->nullable();
             $table->string('hands_on_filename')->nullable();
             $table->string('hands_on_filename_ext')->nullable();
+            $table->string('hands_on_filename_ext')->nullable();
+            $table->string('hands_on_rating')->nullable();
+            $table->string('hands_on_remarks')->nullable();
             $table->string('created_by');
             $table->string('updated_by')->nullable();
             $table->softDeletes();

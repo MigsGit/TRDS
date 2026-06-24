@@ -358,7 +358,6 @@ class TrainingEndorsementController extends Controller
                     'created_at'          => now(),
                 ];
                 $inserted_te_id = TrainingEndorsement::insertGetId($endorsementData);
-
                 foreach($list_of_employee as $employee){
                     $filename = "";
                     $array_endorsement_employee = [
@@ -390,10 +389,13 @@ class TrainingEndorsementController extends Controller
                         }
                         Storage::put('public/hands_on_attachments/' . $storageFilename, $imageData);
 
+                        $total_rating = "{$employee['hands_on_rating']}/{$employee['hands_on_total_rating']}";
                         TrainingEndorsementEmployee::where('id', $te_emp_id)
                         ->update([
                             'hands_on_filename'     => $filename,
-                            'hands_on_filename_ext' => $extension
+                            'hands_on_filename_ext' => $extension,
+                            'hands_on_rating'       => $total_rating,
+                            'hands_on_remarks'      => $employee['hands_on_remarks'] ?? null
                         ]);
                     }
                 }
@@ -710,6 +712,27 @@ class TrainingEndorsementController extends Controller
                 $detail->department ?? '',
                 $detail->section ?? '',
             ]));
+
+            if(!is_null($emp->hands_on_filename)){
+                list($score, $total) = explode('/', $emp->hands_on_rating);
+
+                // 2. Prevent division by zero error just in case
+                if ($total > 0) {
+                    $percentage = ($score / $total) * 100;
+                } else {
+                    $percentage = 0;
+                }
+
+                // Output: 100%
+                $rating = round($percentage) . '%';
+
+                $exams[] = [
+                    'title'  => "Hands On Exam",
+                    'score'  => $emp->hands_on_rating ?? '',
+                    'rating' => $rating ?? '0%',
+                    'remark' => $emp->hands_on_remarks ?? '',
+                ];
+            }
             
             if($emp->will_endorse == 1){
                 $employees_will_not_endorse[] = [
@@ -740,7 +763,6 @@ class TrainingEndorsementController extends Controller
         $attnEmails = $data->mail_cc ?? '';
         $endorsementDate = $data->date ? Carbon::parse($data->date)->format('F j, Y') : '';
 
-        // return $data;
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,
