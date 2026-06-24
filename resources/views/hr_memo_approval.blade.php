@@ -268,7 +268,7 @@
                 <div class="modal-body">
                     <form method="post" id="formTraineeDetails" autocomplete="off">
                         @csrf
-                        <div class="input-group input-group-sm mb-3" hidden>
+                        <div class="input-group mb-3" hidden>
                             <div class="input-group-prepend w-50">
                                 <span class="input-group-text w-100">Trainee Details ID</span>
                             </div>
@@ -280,46 +280,47 @@
                             <div class="col-sm-6">
                                 <div class="row">
                                     <div class="col">
-                                        <div class="input-group input-group-sm mb-3">
+                                        <div class="input-group mb-3">
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Employee Number</span>
                                             </div>
-                                                {{-- <input type="text" class="form-control form-control-sm" name="employeen_umber" id="employeeNumber" required> --}}
-                                                <select class="form-control form-control-sm select2bs5 selectEmpNo" type="text" name="employeen_umber" id="employeeNumber" required></select>
+                                                <!-- {{-- <input type="text" class="form-control" name="employeen_umber" id="employeeNumber" required> --}} -->
+                                                <select class="form-control select2bs5 selectEmpNo" type="text" name="employeen_umber" id="employeeNumber" required></select>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col">
-                                        <div class="input-group input-group-sm mb-3">
+                                        <div class="input-group mb-3">
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Date Hired</span>
                                             </div>
-                                                <input type="date" class="form-control form-control-sm" name="date_hired" id="dateHired" readonly>
+                                                <input type="date" class="form-control" name="date_hired" id="dateHired" readonly>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col">
-                                        <div class="input-group input-group-sm mb-3">
+                                        <div class="input-group mb-3">
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Training Venue</span>
                                             </div>
-                                                <input type="text" class="form-control form-control-sm" name="training_venue" id="trainingVenue" readonly>
+                                                <!-- <input type="text" class="form-control" name="training_venue" id="trainingVenue" readonly> -->
+                                                <select class="form-control select2bs5" name="training_venue" id="trainingVenue" required></select>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col">
-                                        <div class="input-group input-group-sm mb-3">
+                                        <div class="input-group mb-3">
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Department</span>
                                             </div>
-                                                <input type="text" class="form-control form-control-sm" name="department" id="department" readonly>
-                                                {{-- <select class="form-control select2bs5" type="text" name="dept_section" id="deptSection"  required></select> --}}
+                                                <input type="text" class="form-control" name="department" id="department" readonly>
+                                                <!-- {{-- <select class="form-control select2bs5" type="text" name="dept_section" id="deptSection"  required></select> --}} -->
                                         </div>
                                     </div>
                                 </div>
@@ -329,44 +330,44 @@
                             <div class="col-sm-6">
                                 <div class="row">
                                     <div class="col">
-                                        <div class="input-group input-group-sm mb-3">
+                                        <div class="input-group mb-3">
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Employee Name</span>
                                             </div>
-                                                <input type="text" class="form-control form-control-sm" name="employee_name" id="employeeName" readonly>
+                                                <input type="text" class="form-control" name="employee_name" id="employeeName" readonly>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col">
-                                        <div class="input-group input-group-sm mb-3">
+                                        <div class="input-group mb-3">
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Position</span>
                                             </div>
-                                                <input type="text" class="form-control form-control-sm" name="position" id="position" readonly>
+                                                <input type="text" class="form-control" name="position" id="position" readonly>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col">
-                                        <div class="input-group input-group-sm mb-3">
+                                        <div class="input-group mb-3">
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Endorsement Date</span>
                                             </div>
-                                                <input type="date" class="form-control form-control-sm" name="endorsement_date" id="endorsementDate" required>
+                                                <input type="date" class="form-control" name="endorsement_date" id="endorsementDate" required>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col">
-                                        <div class="input-group input-group-sm mb-3">
+                                        <div class="input-group mb-3">
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Product Allocation (Section)</span>
                                             </div>
-                                                <input type="text" class="form-control form-control-sm" name="prod_allocation" id="prodAllocation" readonly>
+                                                <input type="text" class="form-control" name="prod_allocation" id="prodAllocation" readonly>
                                                 {{-- <select class="form-control select2bs5" type="text" name="prod_allocation" id="prodAllocation" required></select> --}}
                                         </div>
                                     </div>
@@ -408,8 +409,7 @@
 @endsection
 
 @section('js_content')
-    {{-- <script type="text/javascript"> --}}
+    <!-- {{-- <script type="text/javascript"> --}} -->
         <script src="{{ asset('public/js/my_js/HrMemoApproval.js') }}?<?=time()?>"></script>
-    {{-- </script> --}}
+    <!-- {{-- </script> --}} -->
 @endsection
-

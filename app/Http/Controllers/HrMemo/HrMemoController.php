@@ -228,21 +228,38 @@ class HrMemoController extends Controller
             INNER JOIN db_hris.tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
         ";
 
+        $trainingVenueQuery = "
+            SELECT
+                Venue
+            FROM tbl_training_venue
+            WHERE Venue != '' AND logdel = 0
+            ORDER BY Venue ASC
+        ";
+
         // CASE 1: Employee number exists
         // if (!empty($empNo)) {
+        
+            $training_venue = DB::connection('mysql_systemone')->select($trainingVenueQuery);
 
             $hris = DB::connection('mysql_systemone')
                 ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
+                
 
             if (!empty($hris)) {
-                return response()->json($hris);
+                return response()->json([
+                    'emp_details' => $hris,
+                    'training_venue' => $training_venue
+                ]);
             }
 
             // fallback to subcon
             $subcon = DB::connection('mysql_subcon')
                 ->select($subconQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
 
-            return response()->json($subcon);
+            return response()->json([
+                'emp_details' => $subcon,
+                'training_venue' => $training_venue
+            ]);
         // }
     }
 
@@ -424,7 +441,7 @@ class HrMemoController extends Controller
         try {
             $memo = HrMemo::findOrFail($request->id);
             $memo->status = $request->new_status;
-            // $memo->approval_remarks = $request->remarks;
+            $memo->remarks = $request->remarks;
             $memo->save();
 
             DB::commit(); // ✅ commit here
@@ -432,6 +449,7 @@ class HrMemoController extends Controller
             return response()->json([
                 'success' => true,
                 'new_status' => $memo->status,
+                // 'remarks' => $memo->remarks,
                 'message' => 'Hr Memo status updated successfully.'
             ]);
         } catch (\Throwable $e) { // ✅ catch everything including DB errors
