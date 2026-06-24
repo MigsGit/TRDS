@@ -648,10 +648,14 @@ class TrainingEndorsementController extends Controller
             'hr_memo_details',
             'te_approval_details',
             'te_approval_details.approver_details',
+            'te_approval_details.approver_details.employee_info',
             'training_endorsement_employees' => function($query) {
                 $query->whereNull('deleted_at');
             },
             'training_endorsement_employees.training_request_details_info',
+            'training_endorsement_employees.training_request_details_info.training_attendance' => function($query) use ($tr_ctrl_no) {
+                $query->whereNull('deleted_at');
+            },
             'training_endorsement_employees.training_request_details_info.employee_exam_details' => function($query) use ($tr_ctrl_no) {
                 $query->where('training_request_ctrl_no', $tr_ctrl_no);
             },
@@ -762,6 +766,35 @@ class TrainingEndorsementController extends Controller
 
         $attnEmails = $data->mail_cc ?? '';
         $endorsementDate = $data->date ? Carbon::parse($data->date)->format('F j, Y') : '';
+        $hr_memo_date_filed = $data->hr_memo_details->date_filed ? Carbon::parse($data->hr_memo_details->date_filed)->format('F j, Y') : '';
+
+        // Getting Training Dates
+        $collection = collect($data);
+
+        // 1. Get all 'training_attendance' arrays from all employees
+        $allAttendance = collect($collection->get('training_endorsement_employees'))
+            ->pluck('training_request_details_info.training_attendance')
+            ->collapse(); // Flattens the multidimensional array into a single list
+
+
+        // 2. Extract only the 'date' column and filter out empty/null values
+        $dates = $allAttendance->pluck('date')->filter();
+
+        // 3. Extract your lowest and highest dates
+        $lowestDate  = $dates->min();
+        $highestDate = $dates->max();
+
+        $trainingDateRange = '';
+        if ($lowestDate && $highestDate) {
+            $startDate = Carbon::parse($lowestDate)->format('F j, Y');
+            $endDate   = Carbon::parse($highestDate)->format('F j, Y');
+
+            if ($startDate === $endDate) {
+                $trainingDateRange = $startDate;
+            } else {
+                $trainingDateRange = "{$startDate} - {$endDate}";
+            }
+        }
 
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
@@ -770,8 +803,8 @@ class TrainingEndorsementController extends Controller
             'hr_memo_no'                    => $data->hr_memo_details->document_no ?? '',
             'training_request_ctrl'         => $data->training_request_details->ctrl_number ?? '',
             'endorsement_date'              => $endorsementDate,
-            'hr_endorsement_date'           => '',
-            'training_date'                 => '',
+            'hr_endorsement_date'           => $hr_memo_date_filed,
+            'training_date'                 => $trainingDateRange,
             'endorsement_to_requestor_date' => $endorsementDate,
             'employees'                     => $employees,
             'employees_will_not_endorse'    => $employees_will_not_endorse,
