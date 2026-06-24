@@ -14,7 +14,7 @@ class AddRemarksToHrMemos extends Migration
     public function up()
     {
         Schema::table('hr_memos', function (Blueprint $table) {
-            //
+            $table->string('remarks')->nullable()->after('date_filed');
         });
     }
 
@@ -26,7 +26,7 @@ class AddRemarksToHrMemos extends Migration
     public function down()
     {
         Schema::table('hr_memos', function (Blueprint $table) {
-            //
+            $table->dropColumn('remarks');
         });
     }
 }

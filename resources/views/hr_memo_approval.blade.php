@@ -189,9 +189,9 @@
                                                 {{-- <th style="width: 10%;">Number</th> --}}
                                                 <th style="width: 10%;">Employee No</th>
                                                 <th style="width: 10%;">Name</th>
-                                                <!-- <th style="width: 10%;">Position</th>
+                                                <th style="width: 10%;">Position</th>
                                                 <th style="width: 10%;">Department</th>
-                                                <th style="width: 10%;">Section</th> -->
+                                                <th style="width: 10%;">Section</th>
                                                 <th style="width: 10%;">Training Venue</th>
                                                 <th style="width: 10%;">Endorsement Date</th>
                                             </tr>
@@ -409,8 +409,7 @@
 @endsection
 
 @section('js_content')
-    {{-- <script type="text/javascript"> --}}
+    <!-- {{-- <script type="text/javascript"> --}} -->
         <script src="{{ asset('public/js/my_js/HrMemoApproval.js') }}?<?=time()?>"></script>
-    {{-- </script> --}}
+    <!-- {{-- </script> --}} -->
 @endsection
-

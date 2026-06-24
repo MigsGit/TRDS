@@ -118,10 +118,10 @@ function initTraineeDetailsTable($table1) {
             },
             { data: "emp_no" },
             { data: "emp_name" },
-            // { data: "position" },
-            // { data: "department" },
-            // { data: "section" },
-            { data: "traning_venue" },
+            { data: "position" },
+            { data: "department" },
+            { data: "section" },
+            { data: "training_venue" },
             { data: "endorsement_date" }
         ],
     });
@@ -455,7 +455,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         console.log('counterNow', $addButtonTD.data('counter'));
 
         selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
-        $formTD.find('#trainingVenue').val(trainee.traning_venue).trigger('change');
+        $formTD.find('#trainingVenue').val(trainee.training_venue).trigger('change');
         $formTD.find('#endorsementDate').val(trainee.endorsement_date);
 
         $tableExam.find('tbody').empty();
@@ -551,8 +551,11 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     $('#btnAddTraineeDetailsToList').on('click', function (e) {
         e.preventDefault();
         let empId = $formTD.find('#employeeNumber').val();
-        let endorsementDate = $formTD.find('#endorsementDate').val();
+        let position = $formTD.find('#position').val();
+        let department = $formTD.find('#department').val();
+        let section = $formTD.find('#prodAllocation').val();
         let trainingVenue = $formTD.find('#trainingVenue').val();
+        let endorsementDate = $formTD.find('#endorsementDate').val();
         // let counterNow = $form.find('#btnAddTrainee').data('counter');
         let counterNow = $form.find('#btnAddTrainee').data('counter') || null;
         console.log('counterNow', counterNow);
@@ -604,7 +607,10 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             },
             emp_no: empNumber,
             emp_name : empName,
-            traning_venue: trainingVenue,
+            position: position,
+            department: department,
+            section: section,
+            training_venue: trainingVenue,
             endorsement_date: endorsementDate,
             exam_details: exam_list
         }
@@ -927,7 +933,7 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
                     position: position,
                     department: department,
                     section: section,
-                    traning_venue: trainingVenue,
+                    training_venue: trainingVenue,
                     endorsement_date: item.endorsement_date,
                     exam_details: exam_list
                 }
@@ -968,8 +974,8 @@ function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null, rem
         url: 'update_hr_memo_status',
         data: {
             id: id,
-            new_status: updateToStatus
-            // remarks: remarks
+            new_status: updateToStatus,
+            remarks: remarks
         },
         dataType: 'json',
         success: function (response) {
@@ -979,9 +985,10 @@ function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null, rem
                     modal.modal('hide');
                 }
 
-                if(updateToStatus > 2){
-                    SendHrMemoMail(id, updateToStatus);
-                }
+                //temp comment due to testing
+                // if(updateToStatus > 2){
+                //     SendHrMemoMail(id, updateToStatus);
+                // }
                 dtHMA.draw();
             }
         },

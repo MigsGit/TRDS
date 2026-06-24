@@ -441,7 +441,7 @@ class HrMemoController extends Controller
         try {
             $memo = HrMemo::findOrFail($request->id);
             $memo->status = $request->new_status;
-            // $memo->approval_remarks = $request->remarks;
+            $memo->remarks = $request->remarks;
             $memo->save();
 
             DB::commit(); // ✅ commit here
@@ -449,6 +449,7 @@ class HrMemoController extends Controller
             return response()->json([
                 'success' => true,
                 'new_status' => $memo->status,
+                // 'remarks' => $memo->remarks,
                 'message' => 'Hr Memo status updated successfully.'
             ]);
         } catch (\Throwable $e) { // ✅ catch everything including DB errors
