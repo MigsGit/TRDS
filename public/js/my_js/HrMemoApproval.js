@@ -118,9 +118,9 @@ function initTraineeDetailsTable($table1) {
             },
             { data: "emp_no" },
             { data: "emp_name" },
-            { data: "position" },
-            { data: "department" },
-            { data: "section" },
+            // { data: "position" },
+            // { data: "department" },
+            // { data: "section" },
             { data: "traning_venue" },
             { data: "endorsement_date" }
         ],
@@ -209,13 +209,35 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             data: { employee_number: empNo },
             dataType: "json",
             success: function (response) {
-                emp_details = response[0];
+                emp_details = response['emp_details'][0];
+                training_venue = response['training_venue'];
+                console.log('emp_details',emp_details);
+                console.log('training_venue',training_venue);
+
                 $formTD.find('#employeeName').val(emp_details.EmpName);
                 $formTD.find('#dateHired').val(emp_details.DateHired);
                 $formTD.find('#position').val(emp_details.Position);
-                $formTD.find('#trainingVenue').val(emp_details.Venue);
+                // $formTD.find('#trainingVenue').val(training_venue);
                 $formTD.find('#department').val(emp_details.Department);
                 $formTD.find('#prodAllocation').val(emp_details.Section);
+
+                if(training_venue.length > 0){
+                    result = '<option value="" disabled selected> Select Training Venue </option>';
+
+                    for (let i = 0; i < training_venue.length; i++) {
+                        result += '<option value="' + training_venue[i].Venue + '">' + training_venue[i].Venue + '</option>';
+                    }
+                }else{
+                    result = '<option value="0" selected disabled> -- No record found -- </option>';
+                }
+
+                $formTD.find('#trainingVenue').html(result);
+                // if(empId != null){
+                    // $formTD.find('#trainingVenue').val(empId).trigger('change');
+                // }
+                // if(mode == 'view'){
+                //     $formTD.find('#trainingVenue').prop('disabled', true).trigger('change.select2');
+                // }
             }
         });
     });
@@ -367,45 +389,45 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     });
 
     // Disapprove button
-    $form.on('click', '#btnTUDisapprove', function () {
-        const id = $form.find('#txtHrMemoId').val();
-        let updateStatusTo = 7; //disapproved
-        // let forApproval = true;
-        confirmAction('Disapprove HR Memo Document?', function () {
-            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
-        });
-    });
-
-    // TU Disapprove button
     // $form.on('click', '#btnTUDisapprove', function () {
     //     const id = $form.find('#txtHrMemoId').val();
-    //     let updateStatusTo = 7; // disapproved
-
-    //     Swal.fire({
-    //         title: 'Disapprove HR Memo',
-    //         input: 'textarea',
-    //         id: 'tuDisapproveRemarks',
-    //         inputLabel: 'Remarks',
-    //         inputPlaceholder: 'Enter reason for disapproval...',
-    //         inputAttributes: {
-    //             'aria-label': 'Enter remarks'
-    //         },
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Submit',
-    //         cancelButtonText: 'Cancel',
-    //         inputValidator: (value) => {
-    //             if (!value) {
-    //                 return 'Remarks is required!';
-    //             }
-    //         }
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             let remarks = result.value;
-
-    //             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
-    //         }
+    //     let updateStatusTo = 7; //disapproved
+    //     // let forApproval = true;
+    //     confirmAction('Disapprove HR Memo Document?', function () {
+    //         updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
     //     });
     // });
+
+    // TU Disapprove button
+    $form.on('click', '#btnTUDisapprove', function () {
+        const id = $form.find('#txtHrMemoId').val();
+        let updateStatusTo = 7; // disapproved
+
+        Swal.fire({
+            title: 'Disapprove HR Memo',
+            input: 'textarea',
+            id: 'tuDisapproveRemarks',
+            inputLabel: 'Remarks',
+            inputPlaceholder: 'Enter reason for disapproval...',
+            inputAttributes: {
+                'aria-label': 'Enter remarks'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Remarks is required!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let remarks = result.value;
+
+                updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
+            }
+        });
+    });
 
     // --------------------
     // REMOVE ROW
@@ -433,6 +455,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         console.log('counterNow', $addButtonTD.data('counter'));
 
         selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
+        $formTD.find('#trainingVenue').val(trainee.traning_venue).trigger('change');
         $formTD.find('#endorsementDate').val(trainee.endorsement_date);
 
         $tableExam.find('tbody').empty();
@@ -529,6 +552,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         e.preventDefault();
         let empId = $formTD.find('#employeeNumber').val();
         let endorsementDate = $formTD.find('#endorsementDate').val();
+        let trainingVenue = $formTD.find('#trainingVenue').val();
         // let counterNow = $form.find('#btnAddTrainee').data('counter');
         let counterNow = $form.find('#btnAddTrainee').data('counter') || null;
         console.log('counterNow', counterNow);
@@ -538,15 +562,14 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             return;
         }
 
-        if(endorsementDate == ''){
-            showError('Please fill up the Endorsement date.');
+        if(endorsementDate == '' || trainingVenue == ''){
+            showError('Please fill up the required fields.');
             return;
         }
 
         let empType = $formTD.find('#employeeNumber').find('option:selected').data('emp_type');
         let empNumber = $formTD.find('#employeeNumber').find('option:selected').text();
         let empName = $formTD.find('#employeeName').val();
-        let trainingVenue = $formTD.find('#trainingVenue').val();
         let exam_list = [];
         let hasError = false;
 
