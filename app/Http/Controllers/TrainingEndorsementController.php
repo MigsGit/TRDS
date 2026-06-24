@@ -644,6 +644,7 @@ class TrainingEndorsementController extends Controller
 
         $data = TrainingEndorsement::with([
             'created_by_user_details',
+            'created_by_user_details.employee_info',
             'training_request_details',
             'hr_memo_details',
             'te_approval_details',
@@ -731,7 +732,7 @@ class TrainingEndorsementController extends Controller
                 $rating = round($percentage) . '%';
 
                 $exams[] = [
-                    'title'  => "Hands On Exam",
+                    'title'  => "Mag Plate Measurement",
                     'score'  => $emp->hands_on_rating ?? '',
                     'rating' => $rating ?? '0%',
                     'remark' => $emp->hands_on_remarks ?? '',
@@ -796,6 +797,7 @@ class TrainingEndorsementController extends Controller
             }
         }
 
+        // return $data;
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,

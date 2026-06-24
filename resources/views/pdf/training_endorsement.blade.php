@@ -266,6 +266,9 @@
                 @endif
                 <span style="display:block; font-weight: bold;">
                     {{ $endorsement->created_by_user_details->name ?? '' }}
+                    <br>
+                    {{ $endorsement->created_by_user_details->employee_info->Position ?? '' }}
+                    <br>
                 </span>
             </td>
             
