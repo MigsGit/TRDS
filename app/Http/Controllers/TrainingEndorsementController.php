@@ -713,7 +713,7 @@ class TrainingEndorsementController extends Controller
                 $detail->section ?? '',
             ]));
 
-            if(!is_null($emp->hands_on_filename)){
+            if(!is_null($emp->hands_on_filename) && !is_null($emp->hands_on_rating)){
                 list($score, $total) = explode('/', $emp->hands_on_rating);
 
                 // 2. Prevent division by zero error just in case
