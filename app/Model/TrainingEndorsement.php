@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use App\Model\Hr\HrMemo;
+use App\Model\RapidXUser;
 use App\Model\TrainingEndorsementApprovals;
 use App\Model\TrainingRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
