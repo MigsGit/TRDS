@@ -39,9 +39,9 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/hr_memo', function () {
         return view('hr_memo_approval');
     })->name('hr_memo');
-    Route::get('/certification_classification', function () {
-        return view('certification_classification');
-    })->name('certification_classification');
+    Route::get('/qualification_certification', function () {
+        return view('qualification_certification');
+    })->name('qualification_certification');
 
     // Route::get('/training_request', function () {
     //     return view('training_request');

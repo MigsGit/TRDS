@@ -6,10 +6,6 @@
 @php
     $classificationTabs = [
         ['key' => 'mh', 'label' => 'MH', 'active' => true],
-        ['key' => 'tech', 'label' => 'Technician'],
-        ['key' => 'sep', 'label' => 'Supervisor, Engineer & Planner'],
-        ['key' => 'inspector', 'label' => 'Inspector'],
-        ['key' => 'operator', 'label' => 'Operator'],
     ];
 @endphp
 
@@ -28,38 +24,6 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
-
-                            <!-- VIEW ALL -->
-                            <!-- <div class="card mb-3" id="tbl_view_all">
-                                <div class="card-header m-3">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h5 class="card-title fw-bold fs-4 text-secondary">Certification / Qualification List</h5>
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCreateCQForm"><i class="fa fa-plus fa-md me-2"></i>Certify Employee</button>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table id="tbl_certification_list" class="table table-bordered table-hover nowrap" style="width: 100%;">
-                                            <thead>
-                                                <tr>
-                                                    Edited 1-10-25
-                                                    <th>Action</th>
-                                                    <th>Ctrl No. / Doc No.</th>
-                                                    <th>Date Filed</th>
-                                                    <th>Approved By</th>
-                                                    <th>Trained By</th>
-                                                    <th>Certified By</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div> -->
-
                             <div class="card mb-3 border-0 shadow-sm">
                                 <div class="card-header bg-white py-3">
                                     <div class="d-flex justify-content-between align-items-center flex-wrap">
@@ -125,151 +89,7 @@
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <!-- For Technician Tab -->
-                                        <div class="tab-pane fade" id="tech" role="tabpanel" aria-labelledby="checked-tab">
-                                            <div class="card shadow-sm border-0">
-                                                <div class="card-body">
-                                                    <!-- Edited 4-24-25 -->
-                                                    <div class="row mt-2 mb-2">
-                                                        <div class="col-md-3">
-                                                            <x-section-select name="select_tech_sort_by_section" id="select_tech_sort_by_section" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <h6 class="text-secondary" id="exam_label_tech"></h6>
-                                                        <!-- Add Button (Optional) -->
-                                                        <!-- <button class="btn btn-primary"><i class="fa fa-plus me-2"></i> Add New</button> -->
-                                                    </div>
-                                                    <div class="table-responsive">
-                                                        <table id="tbl_tech" class="table table-striped table-hover table-bordered nowrap" style="width: 100%;">
-                                                            <thead class="table-primary">
-                                                                <tr>
-                                                                <th>Action</th>
-                                                                <th>Ctrl No. / Doc No.</th>
-                                                                <th>Date Filed</th>
-                                                                <th>Trained by & Qualified by</th>
-                                                                <!-- <th>Qualified by</th> -->
-                                                                <th>Certified by</th>
-                                                                <th>Approved by (Engineer Head)</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- For SEP Tab -->
-                                        <div class="tab-pane fade" id="sep" role="tabpanel" aria-labelledby="checked-tab">
-                                            <div class="card shadow-sm border-0">
-                                                <div class="card-body">
-                                                    <!-- Edited 4-24-25 -->
-                                                    <div class="row mt-2 mb-2">
-                                                        <div class="col-md-3">
-                                                            <x-section-select name="select_sep_sort_by_section" id="select_sep_sort_by_section" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <h6 class="text-secondary" id="exam_label_sep"></h6>
-                                                        <!-- Add Button (Optional) -->
-                                                        <!-- <button class="btn btn-primary"><i class="fa fa-plus me-2"></i> Add New</button> -->
-                                                    </div>
-                                                    <div class="table-responsive">
-                                                        <table id="tbl_sep" class="table table-striped table-hover table-bordered nowrap" style="width: 100%;">
-                                                            <thead class="table-primary">
-                                                                <tr>
-                                                                <th>Action</th>
-                                                                <th>Ctrl No. / Doc No.</th>
-                                                                <th>Date Filed</th>
-                                                                <th>Trained by / Certified by</th>
-                                                                <!-- <th>Qualified by</th> -->
-                                                                <!-- <th>Certified by</th> -->
-                                                                <th>Approved by</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- For Inspector Tab -->
-                                        <div class="tab-pane fade" id="inspector" role="tabpanel" aria-labelledby="checked-tab">
-                                            <div class="card shadow-sm border-0">
-                                                <div class="card-body">
-                                                    <!-- Edited 4-24-25 -->
-                                                    <div class="row mt-2 mb-2">
-                                                        <div class="col-md-3">
-                                                            <x-section-select name="select_insp_sort_by_section" id="select_insp_sort_by_section" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <h6 class="text-secondary" id="exam_label_inspector"></h6>
-                                                        <!-- Add Button (Optional) -->
-                                                        <!-- <button class="btn btn-primary"><i class="fa fa-plus me-2"></i> Add New</button> -->
-                                                    </div>
-                                                    <div class="table-responsive">
-                                                        <table id="tbl_inspector" class="table table-striped table-hover table-bordered nowrap" style="width: 100%;">
-                                                            <thead class="table-primary">
-                                                                <tr>
-                                                                <th>Action</th>
-                                                                <th>Ctrl No. / Doc No.</th>
-                                                                <th>Date Filed</th>
-                                                                <th>Trained by & Qualified by</th>
-                                                                <!-- <th>Qualified by</th> -->
-                                                                <th>Certified by</th>
-                                                                <th>Approved by</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- For Operator Tab -->
-                                        <div class="tab-pane fade" id="operator" role="tabpanel" aria-labelledby="checked-tab">
-                                            <div class="card shadow-sm border-0">
-                                                <div class="card-body">
-                                                    <!-- Edited 4-24-25 -->
-                                                    <div class="row mt-2 mb-2">
-                                                        <div class="col-md-3">
-                                                            <x-section-select name="select_operator_sort_by_section" id="select_operator_sort_by_section" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <h6 class="text-secondary" id="exam_label_operator"></h6>
-                                                        <!-- Add Button (Optional) -->
-                                                        <!-- <button class="btn btn-primary"><i class="fa fa-plus me-2"></i> Add New</button> -->
-                                                    </div>
-                                                    <div class="table-responsive">
-                                                        <table id="tbl_operator" class="table table-striped table-hover table-bordered nowrap" style="width: 100%;">
-                                                            <thead class="table-primary">
-                                                                <tr>
-                                                                <th>Action</th>
-                                                                <th>Ctrl No. / Doc No.</th>
-                                                                <th>Date Filed</th>
-                                                                <th>Trained by & Production</th>
-                                                                <th>Qualified by & Engineering</th>
-                                                                <th>Certified by & Quality Control</th>
-                                                                <th>Approved by (QC Supervisor)</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
+                                
                                     </div>
                                 </div>
                             </div>
@@ -286,7 +106,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title mb-0" id="createCQFormLabel">Qualification / Certification Form</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> 
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
                             </button>
                     </div>
 
