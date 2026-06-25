@@ -3423,8 +3423,10 @@
 
                                     <div class="col-md-3">
                                         <label for="">Production Section:</label>
-                                        <select class="form-control select2bs4" style="width: 100%;" name="text_section_operator" id="text_section_operator">
-                                        </select>
+                                        <input class="form-control" type="text" name="text_section_operator" id="text_section_operator" list="list_section" placeholder="Select Section">
+                                        <datalist id="list_section">
+
+                                        </datalist>
                                     </div>
 
                                     <div class="col-md-3">
@@ -7629,6 +7631,5758 @@
             </div>
         </div>
 
+
+        <div class="modal" id="modalEditMh" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <form id="formSubmit_edit_Mh">
+                            <h3 class="mt-5 mb-3 text-center">MATERIAL HANDLER'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
+
+                            <div class="row mb-5">
+                                <div class="col-md-3">
+                                    <label for="">Control No.:</label>
+                                    <input class="form-control" type="text" class="form-control" id="text_edit_mh_new_conno" name="text_edit_mh_new_conno" placeholder="Select section to generate Control No." readonly>
+                                    <!-- <input class="form-control" type="text" class="form-control" id="" name="text_edit_mh_new_conno" placeholder="Auto Generated" readonly> -->
+                                    <input class="form-control" type="hidden" class="form-control" id="text_edit_mh_conno" name="text_edit_mh_conno" readonly>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Production Section:</label>
+                                    <input class="form-control" type="text" name="text_edit_mh_section" id="text_edit_mh_section" list="list_section" placeholder="Select Section" disabled>
+                                    <datalist id="list_section">
+
+                                    </datalist>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Series Name:</label>
+                                    <input class="form-control" type="text" id="text_edit_mh_series" name="text_edit_mh_series" placeholder="Enter series name here" disabled>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Product Line:</label>
+                                    <input class="form-control" type="text" id="text_edit_mh_product_line" name="text_edit_mh_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
+                                    <datalist id="list_prod_line"></datalist>
+                                </div>
+                            </div>
+
+                            <!-- <div class="row mt-2 mb-5">
+                                <div class="col-md-12">
+                                    <button type="button" class="btn btn-primary" id="" data-target="#select_Employee" data-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                </div>
+                            </div> -->
+
+                            <div class="table-responsive mt-3 mb-5">
+                                <table id="tbl_edit_certified_list_MH" class="table table-bordered table-hover nowrap">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th>Employee No.</th>
+                                            <th>Employee Name</th>
+                                            <th>Station From (Series)</th>
+                                            <th>Station To</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="row mb-5">
+                                <div class="col-md-12">
+                                    <label for="">Reason for Certification:</label>
+                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_mh_certification" id="text_edit_mh_certification" disabled>
+                                        <option value="" selected disabled>Select Reason</option>
+                                        <option value="Newly hired employees">1 Newly hired employees</option>
+                                        <option value="Newly promoted employees">2 Newly promoted employees</option>
+                                        <option value="Lateral transfer">3 Lateral transfer</option>
+                                        <option value="Flexibility1">4 Flexibility</option>
+                                        <option value="Transfer to another station">5 Transfer to another station (E.g: final visual, insertion,IQC, IPQC, OQC, etc)</option>
+                                        <option value="Transfer to other production section">6 Transfer to other production section (E.g: TS,PPS,CN, YF)</option>
+                                        <option value="Transfer to other product line">7 Transfer to other product line (E.g: TS: BGA-FP, QFP; CN: FMS, PJS; YF: EOL, FOL; PPS: Molding CN, Molding TS, Grinding, Stamping; MH-WHS, MH-Prodn)</option>
+                                        <option value="New Product">8 New Product</option>
+                                        <option value="Re-certification from disqualification">9 Re-certification from disqualification</option>
+                                        <option value="Leave reached at least 1 month (ML/ VL/SL)">10 Leave reached at least 1 month (ML/ VL/SL)</option>
+                                        <option value="Company shutdown at least 1 month">11 Company shutdown at least 1 month</option>
+                                        <option value="Re-certification">12 Re-certification</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="accordion" id="accordionExampleMHEdit">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneMHEdit" aria-expanded="true" aria-controls="collapseOneMHEdit">
+                                        <h5>PRODUCTION / WAREHOUSE SUPERVISOR (Training/Orientation)</h5>
+                                    </button>
+                                    </h2>
+                                    <div id="collapseOneMHEdit" class="accordion-collapse collapse show" data-parent="#accordionExampleMHEdit">
+                                        <div class="accordion-body">
+
+                                            <!-- ------------------------------------------------ -->
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-1">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation1" name="text_edit_mh_training_orientation" value="SOP" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation1"  style="font-weight: normal;">1) SOP</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-5"></div>
+
+                                                <div class="col-md-5">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation6" name="text_edit_mh_training_orientation" value="Work Instruction and Point Panel"  style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation6" style="font-weight: normal;">6) Work Instruction and Point Panel</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation2" name="text_edit_mh_training_orientation" value="Process Flow" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation2" style="font-weight: normal;">2) Process Flow</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4"></div>
+
+                                                <div class="col-md-5">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation7" name="text_edit_mh_training_orientation" value="Production Abnormality Control (IMS-PMI-025)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5" for="text_edit_mh_training_orientation7" style="font-weight: normal;">7) Production Abnormality Control (IMS-PMI-025)</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation3" name="text_edit_mh_training_orientation" value="Product Drawing" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation3" style="font-weight: normal;">3) Product Drawing</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4"></div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation8" name="text_edit_mh_training_orientation" value="Rule when to escalate" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation8" style="font-weight: normal;">Rule when to escalate</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation9" name="text_edit_mh_training_orientation" value="Filling-up of forms" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation9" style="font-weight: normal;">Filling-up of forms</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-5">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation4" name="text_edit_mh_training_orientation" value="Past Trouble History (claim, lot-out, yield, etc)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation4" style="font-weight: normal;">4) Past Trouble History (claim, lot-out, yield, etc)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation10" name="text_edit_mh_training_orientation" value="Dropped on the floor" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation10" style="font-weight: normal;">7.1 Dropped on the floor</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation5" name="text_edit_mh_training_orientation" value="Defect escalation" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_mh_training_orientation5" style="font-weight: normal;">5) Defect escalation</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4"></div>
+
+                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation11" name="text_edit_mh_training_orientation" value="WI-CN-216" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation11" style="font-weight: normal;">WI-CN-216</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation5_1" name="text_edit_mh_training_orientation" value="Rule when to escalate_2" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation5_1" style="font-weight: normal;">Rule when to escalate</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation5_2" name="text_edit_mh_training_orientation" value="Filling-up of forms_2" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation5_2" style="font-weight: normal;">Filling-up of forms</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation12" name="text_edit_mh_training_orientation" value="CN PP-CN-407" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation12" style="font-weight: normal;">PP-CN-407</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <!-- <input class="form-check-input" type="checkbox" id="text_training_orientation5_1" name="text_training_orientation" value=""> -->
+                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation17" name="text_edit_mh_training_orientation" value="CN PP-CN-010" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation17" style="font-weight: normal;">PP-CN-010</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3"></div>
+
+                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; 5px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation13" name="text_edit_mh_training_orientation" value="CN PP-CN-066" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation13" style="font-weight: normal;">PP-CN-066</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; 5px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <label class="fs-5  " for="" style="font-weight: normal;">PPS</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; 5px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation18" name="text_edit_mh_training_orientation" value="PPS PP-MDGEN-135" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation18" style="font-weight: normal;">PP-MDGEN-135</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3"></div>
+
+                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <label class="fs-5  " for="" style="font-weight: normal;">PPS</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation14" name="text_edit_mh_training_orientation" value="PPS PP-MDGEN-136" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation14" style="font-weight: normal;">PP-MDGEN-136</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <label class="fs-5  " for="" style="font-weight: normal;">YF</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation19" name="text_edit_mh_training_orientation" value="YF PP-YFLEX-296" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation19" style="font-weight: normal;">PP-YFLEX-296</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3"></div>
+
+                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <label class="fs-5  " for="" style="font-weight: normal;">YF</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation15" name="text_edit_mh_training_orientation" value="YF PP-YFLEX-448" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation15" style="font-weight: normal;">PP-YFLEX-448</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <label class="fs-5  " for="" style="font-weight: normal;">TS</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation20" name="text_edit_mh_training_orientation" value="TS PP-TSDGEN-046" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation20" style="font-weight: normal;">PP-TSDGEN-046</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3"></div>
+
+                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <label class="fs-5  " for="" style="font-weight: normal;">TS</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_training_orientation16" name="text_edit_mh_training_orientation" value="TS PP-TSDGEN-039" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_mh_training_orientation16" style="font-weight: normal;">PP-TSDGEN-039</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h4 class="mt-3 mb-3">RESULT</h4>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">First Take:</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_mh_first_result" id="text_edit_mh_first_result">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">Second Take:</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_mh_second_result" id="text_edit_mh_second_result">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label class="ms-3" for="">Trained by:</label>
+                                                            <input class="form-control" type="text" id="text_edit_mh_first_trained_by" name="text_edit_mh_first_trained_by" list="list_display_empno" placeholder="Select Trained by">
+                                                            <datalist id="list_display_empno"></datalist>
+
+                                                            <input type="hidden" id="text_edit_mh_first_trained_by_username" name="text_edit_mh_first_trained_by_username">
+                                                            <input type="hidden" id="text_edit_mh_first_trained_by_email" name="text_edit_mh_first_trained_by_email">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="ms-3" for="">Mentored by:</label>
+                                                            <input class="form-control" type="text" id="text_edit_mh_first_mentored_by" name="text_edit_mh_first_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                                            <datalist id="list_display_empno"></datalist>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label class="ms-3" for="">Trained by:</label>
+                                                            <input class="form-control" type="text" id="text_edit_mh_second_trained_by" name="text_edit_mh_second_trained_by" list="list_display_empno" placeholder="Select Trained by">
+                                                            <datalist id="list_display_empno"></datalist>
+
+                                                            <input type="hidden" id="text_edit_mh_second_trained_by_username" name="text_edit_mh_second_trained_by_username">
+                                                            <input type="hidden" id="text_edit_mh_second_trained_by_email" name="text_edit_mh_second_trained_by_email">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                             <label class="ms-3" for="">Mentored by:</label>
+                                                            <input class="form-control" type="text" id="text_edit_mh_second_mentored_by" name="text_edit_mh_second_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                                            <datalist id="list_display_empno"></datalist>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-5">
+                                                <div class="col-md-3">
+                                                    <label class="ms-3" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_mh_first_date" name="text_edit_mh_first_date">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="ms-3" for="">Time:</label>
+                                                    <input class="form-control" type="time" id="text_edit_mh_first_time" name="text_edit_mh_first_time">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="ms-3" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_mh_second_date" name="text_edit_mh_second_date">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="ms-3" for="">Time:</label>
+                                                    <input class="form-control" type="time" id="text_edit_mh_second_time" name="text_edit_mh_second_time">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-6"></div>
+                                                <div class="col-md-3">
+                                                    <label class="" for="" id="label_edit_alert_pw_sec_mh">Send Email Alert to:</label>
+                                                    <input class="form-control" type="text" id="text_edit_alert_pw_sec_mh" name="text_edit_alert_pw_sec_mh" list="list_display_empno" placeholder="Send email to" disabled>
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_edit_alert_pw_sec_mh_username" name="text_edit_alert_pw_sec_mh_username">
+                                                    <input type="hidden" id="text_edit_alert_pw_sec_mh_email" name="text_edit_alert_pw_sec_mh_email">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="" id="label_edit_alert_pw_cc_sec_mh">Add cc:</label>
+                                                    <input class="form-control" type="text" id="text_edit_alert_pw_cc_sec_mh" name="text_edit_alert_pw_cc_sec_mh" list="list_display_empno" placeholder="Cc" disabled>
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_edit_alert_pw_cc_sec_mh_username" name="text_edit_alert_pw_cc_sec_mh_username">
+                                                    <input type="hidden" id="text_edit_alert_pw_cc_sec_mh_email" name="text_edit_alert_pw_cc_sec_mh_email">
+                                                </div>
+                                            </div>
+
+                                            <!-- ------------------------------------------------ -->
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoMHEdit" aria-expanded="false" aria-controls="collapseTwoMHEdit">
+                                        <h5>LINE QUALITY CONTROL SECTION (Certification)</h5>
+                                    </button>
+                                    </h2>
+                                    <div id="collapseTwoMHEdit" class="accordion-collapse collapse" data-parent="#accordionExampleMHEdit">
+                                        <div class="accordion-body">
+
+                                            <!-- ------------------------------------------------ -->
+
+                                            <h4 class="mt-5 mb-3">QUALITY CONTROL SECTION (CERTIFICATION)</h4>
+
+                                            <p class="mb-3">1. Let the operator discuss the details of training/orientation conducted by concerned Supervisor and Eng'r as per check items specified.</p>
+
+                                            <div class="row mb-3">
+                                                <label for="">Result:</label>
+                                                <input class="form-control" type="text" id="text_edit_mh_result_input" name="text_edit_mh_result_input">
+                                            </div>
+
+                                            <div class="row">
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">First Take:</label>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Second Take:</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <p class="" for="">1.1 Observation / Interview Result</p>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_mh_obs_first_result" id="text_edit_mh_obs_first_result">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <p class="" for="">1.1 Observation / Interview Result</p>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_mh_obs_second_result" id="text_edit_mh_obs_second_result">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <p class="" for="">2. Sample Checking:</p>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_mh_first_sample" id="text_edit_mh_first_sample">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <p class="" for="">2. Sample Checking:</p>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_mh_second_sample" id="text_edit_mh_second_sample">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-4">
+                                                <div class="col-md-3">
+                                                    <p class="" for="">OK:</p>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_mh_first_ok" id="text_edit_mh_first_ok">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <p class="" for="">NG:</p>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_mh_first_ng" id="text_edit_mh_first_ng">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <p class="" for="">OK:</p>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_mh_second_ok" id="text_edit_mh_second_ok">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <p class="" for="">NG:</p>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_mh_second_ng" id="text_edit_mh_second_ng">
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_pdi_1t" name="qc_edit_mh_chkbox" value="PRODUCT DRAWING INTERPRETATION" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5" for="text_edit_mh_pdi_1t" style="font-weight: normal;">2.1 PRODUCT DRAWING INTERPRETATION</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_pdi_2t" name="qc_edit_mh_chkbox_2t" value="PRODUCT DRAWING INTERPRETATION" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5" for="text_edit_mh_pdi_2t" style="font-weight: normal;">2.1 PRODUCT DRAWING INTERPRETATION</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_kma_1t" name="qc_edit_mh_chkbox" value="KITTING / MH ACTIVITY (e.g Receiving)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5" for="text_edit_mh_kma_1t" style="font-weight: normal;"> 2.2 KITTING / MH ACTIVITY (e.g Receiving)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_kma_2t" name="qc_edit_mh_chkbox_2t" value="KITTING / MH ACTIVITY (e.g Receiving)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5" for="text_edit_mh_kma_2t" style="font-weight: normal;"> 2.2 KITTING / MH ACTIVITY (e.g Receiving)</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_fifo_1t" name="qc_edit_mh_chkbox" value="FIFO system (WI)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5" for="text_edit_mh_fifo_1t" style="font-weight: normal;"> 2.3 FIFO system (WI)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_mh_fifo_2t" name="qc_edit_mh_chkbox_2t" value="FIFO system (WI)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5" for="text_edit_mh_fifo_2t" style="font-weight: normal;"> 2.3 FIFO system (WI)</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">3. Overall Assessment:</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_mh_oa_1st_result" id="text_edit_mh_oa_1st_result">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">3. Overall Assessment:</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_mh_oa_2nd_result" id="text_edit_mh_oa_2nd_result">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Reason for Disapproval:</label>
+                                                    <input class="form-control" type="text" id="text_edit_mh_1st_disapproval" name="text_edit_mh_1st_disapproval">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Reason for Disapproval:</label>
+                                                    <input class="form-control" type="text" id="text_edit_mh_2nd_disapproval" name="text_edit_mh_2nd_disapproval">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Certified by:</label>
+                                                    <input class="form-control" type="text" id="text_edit_mh_1st_certified" name="text_edit_mh_1st_certified" list="list_display_empno" placeholder="Select Certified by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_mh_1st_certified_username" name="text_edit_mh_1st_certified_username">
+                                                    <input type="hidden" id="text_edit_mh_1st_certified_email" name="text_edit_mh_1st_certified_email">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Certified by:</label>
+                                                    <input class="form-control" type="text" id="text_edit_mh_2nd_certified" name="text_edit_mh_2nd_certified" list="list_display_empno" placeholder="Select Certified by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_mh_2nd_certified_username" name="text_edit_mh_2nd_certified_username">
+                                                    <input type="hidden" id="text_edit_mh_2nd_certified_email" name="text_edit_mh_2nd_certified_email">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-5">
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_mh_qc_1st_date" name="text_edit_mh_qc_1st_date">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Time:</label>
+                                                    <input class="form-control" type="time" id="text_edit_mh_qc_1st_time" name="text_edit_mh_qc_1st_time">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_mh_qc_2nd_date" name="text_edit_mh_qc_2nd_date">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Time:</label>
+                                                    <input class="form-control" type="time" id="text_edit_mh_qc_2nd_time" name="text_edit_mh_qc_2nd_time">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <div class="table-responsive">
+                                                        <table id="" class="table table-bordered table-hover nowrap">
+                                                            <thead class="table table-warning">
+                                                                <tr class="text-center">
+                                                                    <th>Designation</th>
+                                                                    <th>Training Orientation</th>
+                                                                    <th>Qualifier</th>
+                                                                    <th>Certifier</th>
+                                                                    <th>Approver / Confirmation</th>
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td rowspan="2" class="text-center align-middle">Material Handler</td>
+                                                                    <td>Production / Warehouse</td>
+                                                                    <td rowspan="2" class="text-center align-middle">n/a</td>
+                                                                    <td></td>
+                                                                    <td>- Production Head</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td><> Supervisor</td>
+                                                                    <td>QC Inspector</td>
+                                                                    <td>- PPC-Whse Head</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- ------------------------------------------------ -->
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr style="height: 5px; background-color: black; border: none;">
+
+                            <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
+
+                            <div class="col-md-6">
+                                <label for="">Approved / Confirmed by:</label>
+                                <input class="form-control" type="text" id="text_edit_mh_approved_confirmed_by" name="text_edit_mh_approved_confirmed_by" list="list_display_empno" placeholder="Select Certified by">
+                                <datalist id="list_display_empno"></datalist>
+
+                                <label for="" class="mt-1">Prodn / PPC-WHSE Sec. Head</label>
+
+                                <input type="hidden" id="text_edit_mh_approved_confirmed_by_username" name="text_edit_mh_approved_confirmed_by_username">
+                                <input type="hidden" id="text_edit_mh_approved_confirmed_by_email" name="text_edit_mh_approved_confirmed_by_email">
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                <button type="submit" class="btn btn-success" id="btnSubmitMHEdit"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="modalEditTech" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form id="formSubmit_edit_Tech">
+                            <h3 class="mt-5 mb-3 text-center">TECHNICIAN TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
+
+                            <div class="row mb-5">
+                                <div class="col-md-3">
+                                    <label for="">Control No.:</label>
+                                    <input class="form-control" type="text" class="form-control" id="text_edit_tech_new_conno" name="text_edit_tech_new_conno" placeholder="Select section to generate Control No." readonly>
+                                    <!-- <input class="form-control" type="text" class="form-control" id="" name="text_edit_tech_new_conno" placeholder="Auto Generated" readonly> -->
+                                    <input class="form-control" type="hidden" class="form-control" id="text_edit_tech_conno" name="text_edit_tech_conno" readonly>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Production Section:</label>
+                                    <input class="form-control" type="text" name="text_edit_tech_section" id="text_edit_tech_section" list="list_section" placeholder="Select Section" disabled>
+                                    <datalist id="list_section">
+
+                                    </datalist>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Station:</label>
+                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_tech_station" id="text_edit_tech_station" disabled>
+                                        <option value="" selected disabled>Select station</option>
+                                        <option value="Process">Process</option>
+                                        <option value="Maintenance">Maintenance</option>
+                                        <option value="Equipment">Equipment</option>
+                                        <option value="Die-set">Die-set</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Product Line:</label>
+                                    <input class="form-control" type="text" id="text_edit_tech_product_line" name="text_edit_tech_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
+                                    <datalist id="list_prod_line"></datalist>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive mt-3 mb-5">
+                                <table id="tbl_edit_certified_list_Tech" class="table table-bordered table-hover nowrap">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th>Employee No.</th>
+                                            <th>Employee Name</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="row mb-5">
+                                <div class="col-md-12">
+                                    <label for="">Reason for Certification:</label>
+                                    <select class="form-control select2bs4" style="width: 100%;" name=text_edit_tech_certification id="text_edit_tech_certification" disabled>
+                                        <option value="" selected disabled>Select Reason</option>
+                                        <option value="Lateral transfer">1 Lateral transfer</option>
+                                        <option value="Flexibility">2 Flexibility</option>
+                                        <option value="Transfer to another station">3 Transfer to another station (E.g: final visual, insertion,IQC, IPQC, OQC, etc)</option>
+                                        <option value="Transfer to other production section">4 Transfer to other production section (E.g: TS,PPS,CN, YF)</option>
+                                        <option value="Transfer to other product line">5 Transfer to other product line (E.g: TS: BGA-FP, QFP; CN: FMS, PJS; YF: EOL, FOL; PPS: Molding CN, Molding TS, Grinding, Stamping; MH-WHS, MH-Prodn)</option>
+                                        <option value="New Product">6 New Product</option>
+                                        <option value="Re-certification from disqualification">7 Re-certification from disqualification</option>
+                                        <option value="Leave reached at least 1 month (ML/ VL/SL)">8 Leave reached at least 1 month (ML/ VL/SL)</option>
+                                        <option value="Company shutdown at least 1 month">9 Company shutdown at least 1 month</option>
+                                        <option value="Re-certification">10 Re-certification</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <hr style="height: 5px; background-color: black; border: none;">
+
+                            <div class="accordion" id="accordionExampleTechEdit">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneTechEdit" aria-expanded="true" aria-controls="collapseOneTechEdit">
+                                        <h5>ENGINEERING SECTION (Training and Qualification)</h5>
+                                    </button>
+                                    </h2>
+                                    <div id="collapseOneTechEdit" class="accordion-collapse collapse show" data-parent="#accordionExampleTechEdit">
+                                    <div class="accordion-body">
+                                        <!-- ------------------------------------------------ -->
+
+                                        <p class="ms-4">TRAINING ITEMS :</p>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_1" name="text_edit_es_tech_training_orientation" value="Systems and Procedure" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_1" style="font-weight: normal;">A. Systems and Procedure</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_6" name="text_edit_es_tech_training_orientation" value="Defect Classification" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_6" style="font-weight: normal;">F. Defect Classification</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_10" name="text_edit_es_tech_training_orientation" value="Machine" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_10" style="font-weight: normal;">J. Machine</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <input class="form-control ms-5" type="text" name="text_edit_es_tech_training_orientation_14" id="text_edit_es_tech_training_orientation_14" style="width: 250px" placeholder="Enter Work/Document number">
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_21" name="text_edit_es_tech_training_orientation" value="CN (PP-CN-432)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_21" style="font-weight: normal;">CN (PP-CN-432)</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_35" name="text_edit_es_tech_training_orientation" value="Pre-production checking" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_35" style="font-weight: normal;">Pre-production checking</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_22" name="text_edit_es_tech_training_orientation" value="PPS (PQS-E01-016)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_22" style="font-weight: normal;">PPS (PQS-E01-016)</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_36" name="text_edit_es_tech_training_orientation" value="Set-up" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_36" style="font-weight: normal;">Set-up</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_23" name="text_edit_es_tech_training_orientation" value="F. Defect Classification - YF (PP-YFLEX-296)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_23" style="font-weight: normal;">YF (PP-YFLEX-296)</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_37" name="text_edit_es_tech_training_orientation" value="Buy-off and Certification" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_37" style="font-weight: normal;">Buy-off and Certification</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_2" name="text_edit_es_tech_training_orientation" value="Work Instruction" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_2" style="font-weight: normal;">B. Work Instruction</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_24" name="text_edit_es_tech_training_orientation" value="TS (PQS-D01-036)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_24" style="font-weight: normal;">TS (PQS-D01-036)</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_38" name="text_edit_es_tech_training_orientation" value="Calibration" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_38" style="font-weight: normal;">Calibration</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-4">
+                                                <input class="form-control ms-5" type="text" name="text_edit_es_tech_training_orientation_15" id="text_edit_es_tech_training_orientation_15" style="width: 250px" placeholder="Enter Work/Document number">
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_39" name="text_edit_es_tech_training_orientation" value="Preventive Maintenance" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_39" style="font-weight: normal;">Preventive Maintenance</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ************************************************************ 2ND ROW ******************************************************************* -->
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_7" name="text_edit_es_tech_training_orientation" value="Defect Escalation Procedure" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_7" style="font-weight: normal;">G. Defect Escalation Procedure</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_25" name="text_edit_es_tech_training_orientation" value="CN (PP-CN-010)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_25" style="font-weight: normal;">CN (PP-CN-010)</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_3" name="text_edit_es_tech_training_orientation" value="Point Panel" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_3" style="font-weight: normal;">C. Point Panel</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_26" name="text_edit_es_tech_training_orientation" value="PPS (PP-MDGEN-135)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_26" style="font-weight: normal;">PPS (PP-MDGEN-135)</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 ms-2">
+                                                <div class="form-check ms-3">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_11" name="text_edit_es_tech_training_orientation" value="Die-set / Mold" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_11" style="font-weight: normal;">K. Die-set / Mold</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <input class="form-control ms-5" type="text" name="text_edit_es_tech_training_orientation_16" id="text_edit_es_tech_training_orientation_16" style="width: 250px" placeholder="Enter Work/Document number">
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_27" name="text_edit_es_tech_training_orientation" value="G. Defect Escalation Procedure - YF (PP-YFLEX-296)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_27" style="font-weight: normal;">YF (PP-YFLEX-296)</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_40" name="text_edit_es_tech_training_orientation" value="Cleaning" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_40" style="font-weight: normal;">Cleaning</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_28" name="text_edit_es_tech_training_orientation" value="TS (PP-TSDGEN-046)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_28" style="font-weight: normal;">TS (PP-TSDGEN-046)</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_41" name="text_edit_es_tech_training_orientation" value="Assembly" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_41" style="font-weight: normal;">Assembly</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_42" name="text_edit_es_tech_training_orientation" value="Dis-assembly" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_42" style="font-weight: normal;">Dis-assembly</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ************************************************************ 3RD ROW ******************************************************************* -->
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_4" name="text_edit_es_tech_training_orientation" value="Product Drawing" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_4" style="font-weight: normal;">D. Product Drawing</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_8" name="text_edit_es_tech_training_orientation" value="Material" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_8" style="font-weight: normal;">H. Material</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-2 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_43" name="text_edit_es_tech_training_orientation" value="Marking" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_43" style="font-weight: normal;">Marking</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4 ms-3">
+                                                <p class="ms-5">Interpretation and Familiarization</p>
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_29" name="text_edit_es_tech_training_orientation" value="Calculation" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_29" style="font-weight: normal;">Calculation</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 ms-3">
+                                                <div class="form-check ms-3">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_44" name="text_edit_es_tech_training_orientation" value="Overhauling" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_44" style="font-weight: normal;">Overhauling</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_17" name="text_edit_es_tech_training_orientation" value="Product Drawing - A / AA / KL" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_17" style="font-weight: normal;">A / AA / KL</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_30" name="text_edit_es_tech_training_orientation" value="Mixing" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_30" style="font-weight: normal;">Mixing</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_18" name="text_edit_es_tech_training_orientation" value="Product Drawing - G / AG / KS / YEU / L" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_18" style="font-weight: normal;">G / AG / KS / YEU / L</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_31" name="text_edit_es_tech_training_orientation" value="Drying" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_31" style="font-weight: normal;">Drying</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-check ms-2">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_12" name="text_edit_es_tech_training_orientation" value="Measurement Commands" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_12" style="font-weight: normal;">L. Measurement Commands</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ************************************************************ 4TH ROW ******************************************************************* -->
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+
+                                            </div>
+
+                                            <div class="col-md-4">
+                                            </div>
+
+                                            <div class="col-md-3 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_edit_es_tech_training_orientation_45" name="text_edit_es_tech_training_orientation" value="PP-OPNGEN-023" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_edit_es_tech_training_orientation_45" style="font-weight: normal;">PP-OPNGEN-023</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_5" name="text_edit_es_tech_training_orientation" value="Material Drawing" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_5" style="font-weight: normal;">E. Material Drawing</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_46" name="text_edit_es_tech_training_orientation" value="PP-PPDGEN-004" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_46" style="font-weight: normal;">PP-PPDGEN-004</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4 ms-3">
+                                                <p class="ms-5">Interpretation and Familiarization</p>
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-3">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_9" name="text_edit_es_tech_training_orientation" value="Product Measurement" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_9" style="font-weight: normal;">I. Product Measurement</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 ms-3">
+                                                <div class="form-check ms-3">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_47" name="text_edit_es_tech_training_orientation" value="PP-YFLEX-243" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_47" style="font-weight: normal;">PP-YFLEX-243</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_19" name="text_edit_es_tech_training_orientation" value="Material Drawing - B /AB / SL / SM" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_19" style="font-weight: normal;">B /AB / SL / SM</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_32" name="text_edit_es_tech_training_orientation" value="Specifications" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_32" style="font-weight: normal;">Specifications</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ************************************************************ 5TH ROW ******************************************************************* -->
+
+                                        <div class="row">
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_20" name="text_edit_es_tech_training_orientation" value="Material Drawing - G / AG / KS / YEU / L" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_20" style="font-weight: normal;">G / AG / KS / YEU / L</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_33" name="text_edit_es_tech_training_orientation" value="Command" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_33" style="font-weight: normal;">Command</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-check ms-2">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_13" name="text_edit_es_tech_training_orientation" value="Past Trouble History" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_13" style="font-weight: normal;">M. Past Trouble History <span class="fw-bold" style="font-size: 0.6em">(claim, lot-out, yield, etc)</span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4 ms-3">
+                                            </div>
+
+                                            <div class="col-md-4 ms-3">
+                                                <div class="form-check ms-5">
+                                                    <input class="form-check-input" type="checkbox" id="text_edit_es_tech_training_orientation_34" name="text_edit_es_tech_training_orientation" value="Loading Point" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                    <label class="fs-5  " for="text_edit_es_tech_training_orientation_34" style="font-weight: normal;">Loading Point</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="">Trained and Qualified by:</label>
+                                                <input class="form-control" type="text" id="text_edit_tech_trained_qualified_by" name="text_edit_tech_trained_qualified_by" list="list_display_empno" placeholder="Select Trained and Qualified by">
+                                                <datalist id="list_display_empno"></datalist>
+
+                                                <input type="hidden" id="text_edit_tech_trained_qualified_by_username" name="text_edit_tech_trained_qualified_by_username">
+                                                <input type="hidden" id="text_edit_tech_trained_qualified_by_email" name="text_edit_tech_trained_qualified_by_email">
+                                            </div>
+                                             <div class="col-md-6">
+                                                <label for="">Mentored by:</label>
+                                                <input class="form-control" type="text" id="text_edit_tech_mentored_by" name="text_edit_tech_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                                <datalist id="list_display_empno"></datalist>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-5">
+                                            <div class="col-md-6">
+                                                <label class="ms-3" for="">Date:</label>
+                                                <input class="form-control" type="date" id="text_edit_tech_date" name="text_edit_tech_date">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="ms-3" for="">Time:</label>
+                                                <input class="form-control" type="time" id="text_edit_tech_time" name="text_edit_tech_time">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-2">
+                                            <div class="col-md-6"></div>
+                                            <div class="col-md-3">
+                                                <label class="" for="" id="label_alert_estq_sec_tech">Send Email Alert to:</label>
+                                                <input class="form-control" type="text" id="text_alert_estq_sec_tech" name="text_alert_estq_sec_tech" list="list_display_empno" placeholder="Send email to" disabled>
+                                                <datalist id="list_display_empno"></datalist>
+                                                <input type="hidden" id="text_alert_estq_sec_tech_username" name="text_alert_estq_sec_tech_username">
+                                                <input type="hidden" id="text_alert_estq_sec_tech_email" name="text_alert_estq_sec_tech_email">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="" for="" id="label_alert_estq_cc_sec_tech">Add cc:</label>
+                                                <input class="form-control" type="text" id="text_alert_estq_cc_sec_tech" name="text_alert_estq_cc_sec_tech" list="list_display_empno" placeholder="Cc" disabled>
+                                                <datalist id="list_display_empno"></datalist>
+                                                <input type="hidden" id="text_alert_estq_cc_sec_tech_username" name="text_alert_estq_cc_sec_tech_username">
+                                                <input type="hidden" id="text_alert_estq_cc_sec_tech_email" name="text_alert_estq_cc_sec_tech_email">
+                                            </div>
+                                        </div>
+
+                                        <!-- ------------------------------------------------ -->
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoTechEdit" aria-expanded="false" aria-controls="collapseTwoTechEdit">
+                                        <h5>ENGINEERING SECTION (Certification)</h5>
+                                    </button>
+                                    </h2>
+                                    <div id="collapseTwoTechEdit" class="accordion-collapse collapse" data-parent="#accordionExampleTechEdit">
+                                    <div class="accordion-body">
+                                        <!-- ------------------------------------------------ -->
+
+                                        <p class="mb-3"><> Let the technician discuss the details of training/orientation conducted by concerned Eng'r as per check items specified (item A / B / C / H / J / K  and or as applicable)</p>
+
+                                        <h4 class="mt-3 mb-3">RESULT</h4>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="ms-3" for="">First Take:</label>
+                                                <select class="form-control select2bs4" style="width: 100%;" name="text_edit_tech_es_1st_take_result" id="text_edit_tech_es_1st_take_result">
+                                                    <option value="" selected disabled>Select Result</option>
+                                                    <option value="PASSED">PASSED</option>
+                                                    <option value="FAILED">FAILED</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="ms-3" for="">Second Take:</label>
+                                                <select class="form-control select2bs4" style="width: 100%;" name="text_edit_tech_es_2nd_take_result" id="text_edit_tech_es_2nd_take_result">
+                                                    <option value="" selected disabled>Select Result</option>
+                                                    <option value="PASSED">PASSED</option>
+                                                    <option value="FAILED">FAILED</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="ms-3" for="">Certified by:</label>
+                                                <input class="form-control" type="text" id="text_edit_tech_es_1st_certified_by" name="text_edit_tech_es_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                <datalist id="list_display_empno"></datalist>
+
+                                                <input type="hidden" id="text_edit_tech_es_1st_certified_by_username" name="text_edit_tech_es_1st_certified_by_username">
+                                                <input type="hidden" id="text_edit_tech_es_1st_certified_by_email" name="text_edit_tech_es_1st_certified_by_email">
+
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="ms-3" for="">Certified by:</label>
+                                                <input class="form-control" type="text" id="text_edit_tech_es_2nd_certified_by" name="text_edit_tech_es_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                <datalist id="list_display_empno"></datalist>
+
+                                                <input type="hidden" id="text_edit_tech_es_2nd_certified_by_username" name="text_edit_tech_es_2nd_certified_by_username">
+                                                <input type="hidden" id="text_edit_tech_es_2nd_certified_by_email" name="text_edit_tech_es_2nd_certified_by_email">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-5">
+                                            <div class="col-md-3">
+                                                <label class="ms-3" for="">Date:</label>
+                                                <input class="form-control" type="date" id="text_edit_tech_es_1st_date" name="text_edit_tech_es_1st_date">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="ms-3" for="">Time:</label>
+                                                <input class="form-control" type="time" id="text_edit_tech_es_1st_time" name="text_edit_tech_es_1st_time">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="ms-3" for="">Date:</label>
+                                                <input class="form-control" type="date" id="text_edit_tech_es_2nd_date" name="text_edit_tech_es_2nd_date">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="ms-3" for="">Time:</label>
+                                                <input class="form-control" type="time" id="text_edit_tech_es_2nd_time" name="text_edit_tech_es_2nd_time">
+                                            </div>
+                                        </div>
+
+                                        <!-- <div class="row mb-2">
+                                            <div class="col-md-6"></div>
+                                            <div class="col-md-3">
+                                                <label class="" for="">Send Email Alert to:</label>
+                                                <input class="form-control" type="text" id="text_edit_alert_esc_sec_tech" name="text_edit_alert_esc_sec_tech" list="list_display_empno" placeholder="Send email to">
+                                                <datalist id="list_display_empno"></datalist>
+                                                <input type="hidden" id="text_edit_alert_esc_sec_tech_username" name="text_edit_alert_esc_sec_tech_username">
+                                                <input type="hidden" id="text_edit_alert_esc_sec_tech_email" name="text_edit_alert_esc_sec_tech_email">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="" for="">Add cc:</label>
+                                                <input class="form-control" type="text" id="text_edit_alert_esc_cc_sec_tech" name="text_edit_alert_esc_cc_sec_tech" list="list_display_empno" placeholder="Cc">
+                                                <datalist id="list_display_empno"></datalist>
+                                                <input type="hidden" id="text_edit_alert_esc_cc_sec_tech_username" name="text_edit_alert_esc_cc_sec_tech_username">
+                                                <input type="hidden" id="text_edit_alert_esc_cc_sec_tech_email" name="text_edit_alert_esc_cc_sec_tech_email">
+                                            </div>
+                                        </div> -->
+
+                                        <div class="row mb-2">
+                                            <div class="col-md-6"></div>
+
+                                            <!-- ESC Section: To -->
+                                            <div class="col-md-3">
+                                                <label for="text_edit_alert_esc_sec_tech" id="label_edit_alert_esc_sec_tech">Send Email Alert to:</label>
+                                                <div id="selectedEscAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
+                                                <input class="form-control" type="text"
+                                                    id="text_edit_alert_esc_sec_tech"
+                                                    name="text_edit_alert_esc_sec_tech"
+                                                    list="list_display_empno"
+                                                    placeholder="Send email to">
+                                                <datalist id="list_display_empno"></datalist>
+                                                <input type="hidden" id="text_edit_alert_esc_sec_tech_username" name="text_edit_alert_esc_sec_tech_username">
+                                                <input type="hidden" id="text_edit_alert_esc_sec_tech_email" name="text_edit_alert_esc_sec_tech_email">
+                                            </div>
+
+                                            <!-- ESC Section: CC -->
+                                            <div class="col-md-3">
+                                                <label for="text_edit_alert_esc_cc_sec_tech" id="label_edit_alert_esc_cc_sec_tech">Add cc:</label>
+                                                <div id="selectedEscAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
+                                                <input class="form-control" type="text"
+                                                    id="text_edit_alert_esc_cc_sec_tech"
+                                                    name="text_edit_alert_esc_cc_sec_tech"
+                                                    list="list_display_empno"
+                                                    placeholder="Cc">
+                                                <datalist id="list_display_empno"></datalist>
+                                                <input type="hidden" id="text_edit_alert_esc_cc_sec_tech_username" name="text_edit_alert_esc_cc_sec_tech_username">
+                                                <input type="hidden" id="text_edit_alert_esc_cc_sec_tech_email" name="text_edit_alert_esc_cc_sec_tech_email">
+                                            </div>
+                                        </div>
+
+                                        <!-- ------------------------------------------------ -->
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeTechEdit" aria-expanded="false" aria-controls="collapseThreeTechEdit">
+                                        <h5>QUALITY CONTROL SECTION (CERTIFICATION)</h5>
+                                    </button>
+                                    </h2>
+                                    <div id="collapseThreeTechEdit" class="accordion-collapse collapse" data-parent="#accordionExampleTechEdit">
+                                    <div class="accordion-body">
+                                        <!-- ------------------------------------------------ -->
+
+                                        <p class="mb-3"><> Let the technician discuss the details of training/orientation conducted by concerned Eng'r as per check items specified (item A / B / C / H / J / K / L and or as applicable)</p>
+
+                                        <div class="row mb-3">
+                                            <label for="">Result:</label>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="ms-3" for="">First Take:</label>
+                                                <select class="form-control select2bs4" style="width: 100%;" name="text_edit_tech_qcs_1st_take_result" id="text_edit_tech_qcs_1st_take_result">
+                                                    <option value="" selected disabled>Select Result</option>
+                                                    <option value="PASSED">PASSED</option>
+                                                    <option value="FAILED">FAILED</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="ms-3" for="">Second Take:</label>
+                                                <select class="form-control select2bs4" style="width: 100%;" name="text_edit_tech_qcs_2nd_take_result" id="text_edit_tech_qcs_2nd_take_result">
+                                                    <option value="" selected disabled>Select Result</option>
+                                                    <option value="PASSED">PASSED</option>
+                                                    <option value="FAILED">FAILED</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="ms-3" for="">Certified by:</label>
+                                                <input class="form-control" type="text" id="text_edit_tech_qcs_1st_certified_by" name="text_edit_tech_qcs_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                <datalist id="list_display_empno"></datalist>
+
+                                                <input type="hidden" id="text_edit_tech_qcs_1st_certified_by_username" name="text_edit_tech_qcs_1st_certified_by_username">
+                                                <input type="hidden" id="text_edit_tech_qcs_1st_certified_by_email" name="text_edit_tech_qcs_1st_certified_by_email">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="ms-3" for="">Certified by:</label>
+                                                <input class="form-control" type="text" id="text_edit_tech_qcs_2nd_certified_by" name="text_edit_tech_qcs_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
+                                                <datalist id="list_display_empno"></datalist>
+
+                                                <input type="hidden" id="text_edit_tech_qcs_2nd_certified_by_username" name="text_edit_tech_qcs_2nd_certified_by_username">
+                                                <input type="hidden" id="text_edit_tech_qcs_2nd_certified_by_email" name="text_edit_tech_qcs_2nd_certified_by_email">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-5">
+                                            <div class="col-md-3">
+                                                <label class="ms-3" for="">Date:</label>
+                                                <input class="form-control" type="date" id="text_edit_tech_qcs_1st_date" name="text_edit_tech_qcs_1st_date">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="ms-3" for="">Time:</label>
+                                                <input class="form-control" type="time" id="text_edit_tech_qcs_1st_time" name="text_edit_tech_qcs_1st_time">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="ms-3" for="">Date:</label>
+                                                <input class="form-control" type="date" id="text_edit_tech_qcs_2nd_date" name="text_edit_tech_qcs_2nd_date">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="ms-3" for="">Time:</label>
+                                                <input class="form-control" type="time" id="text_edit_tech_qcs_2nd_time" name="text_edit_tech_qcs_2nd_time">
+                                            </div>
+                                        </div>
+
+                                        <!-- ------------------------------------------------ -->
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <hr style="height: 5px; background-color: black; border: none;">
+
+                            <!-- <h4 class="mt-5 mb-3">QUALITY CONTROL SECTION (CERTIFICATION)</h4> -->
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="">Approved by:</label>
+                                    <input class="form-control" type="text" id="text_edit_tech_approved_by" name="text_edit_tech_approved_by" list="list_display_empno" placeholder="Select Approved by">
+                                    <datalist id="list_display_empno"></datalist>
+
+                                    <input type="hidden" id="text_edit_tech_approved_by_username" name="text_edit_tech_approved_by_username">
+                                    <input type="hidden" id="text_edit_tech_approved_by_email" name="text_edit_tech_approved_by_email">
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+
+                            <!-- <hr style="height: 1px; background-color: grey; border: none;"> -->
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                <button type="submit" class="btn btn-success" id="btnSubmitTechEdit"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal" id="modalEditSep" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <form id="formSubmit_edit_SEP">
+                            <h3 class="mt-5 mb-3 text-center">SUPERVISOR/ENGINEER/PLANNER TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
+
+                            <div class="row mb-5">
+                                <div class="col-md-3">
+                                    <label for="">Control No.:</label>
+                                    <input class="form-control" type="text" class="form-control" id="text_edit_sep_new_conno" name="text_edit_sep_new_conno" placeholder="Select section to generate Control No." readonly>
+                                    <!-- <input class="form-control" type="text" class="form-control" id="" name="text_edit_sep_new_conno" placeholder="Auto Generated" readonly> -->
+                                    <input class="form-control" type="hidden" class="form-control" id="text_edit_sep_conno" name="text_edit_sep_conno" readonly>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Production Section:</label>
+                                    <input class="form-control" type="text" name="text_edit_sep_section" id="text_edit_sep_section" list="list_section" placeholder="Select Section" disabled>
+                                    <datalist id="list_section">
+
+                                    </datalist>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Designation:</label>
+                                    <select class="form-control select2bs4" style="width: 100%;" style=" width:100%" name="text_edit_sep_station" id="text_edit_sep_station" disabled>
+                                        <option value="" selected disabled>Select designation</option>
+                                        <option value="Jr. Production Supervisor">Jr. Production Supervisor</option>
+                                        <option value="Sr. Production Supervisor">Sr. Production Supervisor</option>
+                                        <option value="Jr. Process Engineer">Jr. Process Engineer</option>
+                                        <option value="Sr. Process Engineer">Sr. Process Engineer</option>
+                                        <option value="LQC Jr. Supervisor">LQC Jr. Supervisor</option>
+                                        <option value="LQC Sr. Supervisor">LQC Sr. Supervisor</option>
+                                        <option value="Jr. & Sr. Maintenance Engineer">Jr. & Sr. Maintenance Engineer</option>
+                                        <option value="Jr. Equipment Engineer">Jr. Equipment Engineer</option>
+                                    </Select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Product Line:</label>
+                                    <input class="form-control" type="text" id="text_edit_sep_product_line" name="text_edit_sep_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
+                                    <datalist id="list_prod_line"></datalist>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive mt-3 mb-5">
+                                <table id="tbl_edit_certified_list_SEP" class="table table-bordered table-hover nowrap">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th>Employee No.</th>
+                                            <th>Employee Name</th>
+                                            <th>PRODN SECTION/PRODUCT LINE (FROM)</th>
+                                            <th>PRODN SECTION/PRODUCT LINE (TO)</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="row mb-5">
+                                <div class="col-md-9">
+                                    <label for="">Reason for Certification:</label>
+                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_sep_certification" id="text_edit_sep_certification" disabled>
+                                        <option value="" selected disabled>Select Reason</option>
+                                        <option value="Lateral transfer">1 Lateral transfer</option>
+                                        <option value="Flexibility">2 Flexibility</option>
+                                        <option value="Transfer to other production division">3 Transfer to other production division (E.g: TS,PPS,CN, YF)</option>
+                                        <option value="Transfer to other product line/area">4 Transfer to other product line/area (Within production section)</option>
+                                        <option value="Transfer to other section">5 Transfer to other section (E.g: Production. Engineering, QC or PPC)</option>
+                                        <option value="New Product">6 New Product (Note: for additional staff only as required)</option>
+                                        <option value="Others">7 Others</option>
+                                        <option value="Re-certification">Re-certification</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="d-none" id="date_transfer">
+                                        <label for="">Date of Transfer:</label>
+                                        <input class="form-control" type="date" name="" id="">
+                                    </div>
+
+                                    <div class="d-none" id="others_div">
+                                        <label for="">Others:</label>
+                                        <input class="form-control" type="text" name="" id="" placeholder="Enter Others">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr style="height: 5px; background-color: black; border: none;">
+
+                            <h4 class="mt-5 mb-3">Training/Orientation/Certification details</h4>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="table-responsive">
+                                        <table id="" class="table table-bordered nowrap">
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <th>Designation</th>
+                                                    <th>Trainer</th>
+                                                    <th>Approver</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr>
+                                                    <td>Jr Supvr / Jr Engr/ Jr Planner</td>
+                                                    <td>Sr Supvr / Sr Engr / Sr Planner</td>
+                                                    <td>Section Head</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>Sr Supvr / Sr Engr / Sr Planner</td>
+                                                    <td>Section Head</td>
+                                                    <td>Vice President</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="ms-4">A. TRAINING / ORIENTATION:</label>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="ms-4">Duration: 1 week</label>
+                                </div>
+                            </div>
+
+                            <!-- ************************************************************ 1ST ROW ******************************************************************* -->
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check ms-5">
+                                        <label class="fs-5  " for="" style="font-weight: normal;">1. General Systems / Procedures</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-check ms-5">
+                                        <label class="fs-5  " for="text_training_orientation2_1" style="font-weight: normal;">2. Product Familiarization</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_1" name="text_edit_sep_training_orientation" value="Production Abnormality Control (IMS-PMI-025)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_1" style="font-weight: normal;">1) Production Abnormality Control (IMS-PMI-025)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 ms-1">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_17" name="text_edit_sep_training_orientation" value="Product Process Flow" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_17" style="font-weight: normal;">1) Product Process Flow</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_2" name="text_edit_sep_training_orientation" value="Flow of nonconforming products" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_2" style="font-weight: normal;">2) Flow of nonconforming products (PQS-J01-004)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 ms-1">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_18" name="text_edit_sep_training_orientation" value="Product Drawing interpretation" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_18" style="font-weight: normal;">2) Product Drawing interpretation</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_3" name="text_edit_sep_training_orientation" value="Defect escalation rule" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_3" style="font-weight: normal;">3) Defect escalation rule</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 ms-1">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_19" name="text_edit_sep_training_orientation" value="Defects criteria per product" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_19" style="font-weight: normal;">3) Defects criteria per product</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row ms-5">
+                                <div class="col-md-1 ms-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                    <div class="form-check ms-1">
+                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_13" name="text_edit_sep_training_orientation" value="CN PP-CN-010" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_13" style="font-weight: normal;">PP-CN-010</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-check ms-2">
+                                        <label class="fs-5  " for="" style="font-weight: normal;"></label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 ms-1">
+                                    <div class="form-check ms-4">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_20" name="text_edit_sep_training_orientation" value="Machine  (for QC Supvr & Engineer)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_20" style="font-weight: normal;">4) Machine  (for QC Supvr & Engineer)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row ms-5">
+                                <div class="col-md-1 ms-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                    <div class="form-check ms-1">
+                                        <label class="fs-5  " for="" style="font-weight: normal;">PPS</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_14" name="text_edit_sep_training_orientation" value="PPS PP-MDGEN-135" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_14" style="font-weight: normal;">PP-MDGEN-135</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-check ms-2">
+                                        <label class="fs-5  " for="" style="font-weight: normal;"></label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-5 ms-1">
+                                    <div class="form-check ms-4">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_21" name="text_edit_sep_training_orientation" value="Product measurement (QC Supvr & Engineer)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_21" style="font-weight: normal;">5) Product measurement (QC Supvr & Engineer)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row ms-5">
+                                <div class="col-md-1 ms-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                    <div class="form-check ms-1">
+                                        <label class="fs-5  " for="" style="font-weight: normal;">YF</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_15" name="text_edit_sep_training_orientation" value="YF PP-YFLEX-296" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_15" style="font-weight: normal;">PP-YFLEX-296</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-check ms-2">
+                                        <label class="fs-5  " for="" style="font-weight: normal;"></label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-5">
+                                    <div class="form-check ms-2">
+                                        <label class="fs-5  " for="text_training_orientation2_1" style="font-weight: normal;">Note: Item # 1 & 3, no need if tranfer is within section only</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row ms-5">
+                                <div class="col-md-1 ms-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                    <div class="form-check ms-1">
+                                        <label class="fs-5  " for="" style="font-weight: normal;">TS</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_16" name="text_edit_sep_training_orientation" value="TS PP-TSDGEN-046" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_16" style="font-weight: normal;">PP-TSDGEN-046</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_4" name="text_edit_sep_training_orientation" value="New Product Evaluation Report (PPS-I01-004)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_4" style="font-weight: normal;">4) New Product Evaluation Report (PPS-I01-004)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_5" name="text_edit_sep_training_orientation" value="Handling product with long period of no production (PQS-I01-029)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_5" style="font-weight: normal;">5) Handling product with long period of no production (PQS-I01-029)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_6" name="text_edit_sep_training_orientation" value="PMI change control procedure (PPS-I01-018)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_6" style="font-weight: normal;">6) PMI change control procedure (PPS-I01-018)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 ms-3">
+                                    <div class="form-check ms-2">
+                                        <label class="fs-5  " for="" style="font-weight: normal;">3. Specific system per Section</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_7" name="text_edit_sep_training_orientation" value="Pilot run system (TS/CN); Product Qualification (YF); Die set runcard/evaluation (PPS)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_7" style="font-weight: normal;">7) <span style="font-size: 0.85em">Pilot run system (TS/CN); Product Qualification (YF); Die set runcard/evaluation (PPS)</span></label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 ms-1">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_22" name="text_edit_sep_training_orientation" value="Production System" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_22" style="font-weight: normal;">Production System</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_8" name="text_edit_sep_training_orientation" value="Urgent Direction transaction flow (PP-OPNGEN-025)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_8" style="font-weight: normal;">8) Urgent Direction transaction flow (PP-OPNGEN-025)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 ms-1">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_23" name="text_edit_sep_training_orientation" value="Engineering System" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_23" style="font-weight: normal;">Engineering System</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_9" name="text_edit_sep_training_orientation" value="Product Traceability System" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_9" style="font-weight: normal;">9) Product Traceability System</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 ms-1">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_24" name="text_edit_sep_training_orientation" value="QC System" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_24" style="font-weight: normal;">QC System</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_10" name="text_edit_sep_training_orientation" value="Problem Solving Methodology (PQS-I01-020)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_10" style="font-weight: normal;">10) Problem Solving Methodology (PQS-I01-020)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 ms-1">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_25" name="text_edit_sep_training_orientation" value="PPC System" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_25" style="font-weight: normal;">PPC System</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_11" name="text_edit_sep_training_orientation" value="Production layout (if transfer is to other production section)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_11" style="font-weight: normal;">11) Production layout (if transfer is to other production section)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 ms-1">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_26" name="text_edit_sep_training_orientation" value="Warehouse System" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_26" style="font-weight: normal;">Warehouse System</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6 ms-4">
+                                    <div class="form-check ms-5">
+                                        <input class="form-check-input" type="checkbox" id="text_edit_sep_training_orientation_12" name="text_edit_sep_training_orientation" value="Past Trouble History (claim, lot-out, yield, etc)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                        <label class="fs-5  " for="text_edit_sep_training_orientation_12" style="font-weight: normal;">12) Past Trouble History (claim, lot-out, yield, etc)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-5 ms-4">
+                                    <div class="form-check">
+                                        <label class="fs-5  " for="" style="font-weight: normal;">Note: Check box depending on the section</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <label class="">B. CERTIFICATION:</label>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="">Duration: 2 weeks</label>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="ms-3" for="">Theoretical Examination</label>
+                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_sep_theoretical_result" id="text_edit_sep_theoretical_result">
+                                        <option value="" selected disabled>Select Result</option>
+                                        <option value="PASSED">PASSED</option>
+                                        <option value="FAILED">FAILED</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="ms-3" for="">Hands-on</label>
+                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_sep_handson_result" id="text_edit_sep_handson_result">
+                                        <option value="" selected disabled>Select Result</option>
+                                        <option value="PASSED">PASSED</option>
+                                        <option value="FAILED">FAILED</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="ms-3" for="">Trained / Certified by:</label>
+                                    <input class="form-control" type="text" id="text_edit_sep_trained_certified_by" name="text_edit_sep_trained_certified_by" list="list_display_empno" placeholder="Select Trained / Certified by">
+                                    <datalist id="list_display_empno"></datalist>
+
+                                    <input type="hidden" id="text_edit_sep_trained_certified_by_username" name="text_edit_sep_trained_certified_by_username">
+                                    <input type="hidden" id="text_edit_sep_trained_certified_by_email" name="text_edit_sep_trained_certified_by_email">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="ms-3" for="">Mentored by:</label>
+                                    <input class="form-control" type="text" id="text_edit_sep_mentored_by" name="text_edit_sep_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                    <datalist id="list_display_empno"></datalist>
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-5">
+                                <div class="col-md-12">
+                                    <label class="ms-3" for="">Date:</label>
+                                    <input class="form-control" type="date" id="text_edit_sep_date" name="text_edit_sep_date">
+                                </div>
+                            </div>
+
+                            <!-- **************************************************************      2ND SECTION          ************************************************************************************************* -->
+
+                            <hr style="height: 5px; background-color: black; border: none;">
+
+                            <div class="row mb-5">
+                                <div class="col-md-6">
+                                    <label for="">Approved by:</label>
+                                    <input class="form-control" type="text" id="text_edit_sep_approved_by" name="text_edit_sep_approved_by" list="list_display_empno" placeholder="Select Approved by">
+                                    <datalist id="list_display_empno"></datalist>
+
+                                    <input type="hidden" id="text_edit_sep_approved_by_username" name="text_edit_sep_approved_by_username">
+                                    <input type="hidden" id="text_edit_sep_approved_by_email" name="text_edit_sep_approved_by_email">
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+
+                            <label class="mb-2" for="">Important Notations:</label>
+                            <p>1. The transfer of Supervisor, Engineer & Planner shall be performed if he/she reached at least 1 year on the current job assignment.</p>
+                            <p>2. Duration of ceritification activity should be done within 1 month period. (Training and orientation, theoretical exam and hands-on)</p>
+                            <p>3. Certification slip shall be accomplished by Section Head and submitted to TU along with the theoretical exam at the end of training for updating of ETR.</p>
+
+                            <!-- <hr style="height: 1px; background-color: grey; border: none;"> -->
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                <button type="submit" class="btn btn-success" id="btnSubmitSEPEdit"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="modalEditInsp" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <form id="formSubmit_edit_Insp">
+                            <h3 class="mt-5 mb-3 text-center">INSPECTOR TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
+
+                            <div class="row mb-5">
+                                <div class="col-md-3">
+                                    <label for="">Control No.:</label>
+                                    <input class="form-control" type="text" class="form-control" id="text_edit_conno_new_Inspector" name="text_edit_conno_new_Inspector" placeholder="Select section to generate Control No." readonly>
+                                    <!-- <input class="form-control" type="text" class="form-control" id="" name="text_edit_conno_new_Inspector" placeholder="Auto Generated" readonly> -->
+                                    <input class="form-control" type="hidden" class="form-control" id="text_edit_conno_Inspector" name="text_edit_conno_Inspector" readonly>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Production Section:</label>
+                                    <input class="form-control" type="text" name="text_edit_section_inspector" id="text_edit_section_inspector" list="list_section" placeholder="Select Section" disabled>
+                                    <datalist id="list_section">
+
+                                    </datalist>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Station:</label>
+                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_series_inspector" id="text_edit_series_inspector" disabled>
+                                        <option value="" selected disabled>Select station</option>
+                                        <option value="IQC">IQC</option>
+                                        <option value="IPQC">IPQC</option>
+                                        <option value="OQC">OQC</option>
+                                        <option value="Packing">Packing</option>
+                                    </Select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Product Line:</label>
+                                    <input class="form-control" type="text" id="text_edit_insp_product_line" name="text_edit_insp_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
+                                    <datalist id="list_prod_line"></datalist>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive mt-3 mb-5">
+                                <table id="tbl_edit_certified_list_Inspector" class="table table-bordered table-hover nowrap">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th>Employee No.</th>
+                                            <th>Employee Name</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="text_edit_certification_inspector">Reason for Certification:</label>
+                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_certification_inspector" id="text_edit_certification_inspector" disabled>
+                                        <option value="" selected disabled>Select Reason</option>
+                                        <option value="Lateral transfer">1 Lateral transfer</option>
+                                        <option value="Flexibility">2 Flexibility</option>
+                                        <option value="Transfer to another station">3 Transfer to another station (E.g: final visual, insertion,IQC, IPQC, OQC, etc)</option>
+                                        <option value="Transfer to other production section">4 Transfer to other production section (E.g: TS,PPS,CN, YF)</option>
+                                        <option value="Transfer to other product line">5 Transfer to other product line (E.g: TS: BGA-FP, QFP; CN: FMS, PJS; YF: EOL, FOL; PPS: Molding CN, Molding TS, Grinding, Stamping; MH-WHS, MH-Prodn)</option>
+                                        <option value="New Product">6 New Product</option>
+                                        <option value="Re-certification from disqualification">7 Re-certification from disqualification</option>
+                                        <option value="Leave reached at least 1 month (ML/ VL/SL)">8 Leave reached at least 1 month (ML/ VL/SL)</option>
+                                        <option value="Company shutdown at least 1 month">9 Company shutdown at least 1 month</option>
+                                        <option value="Re-certification">10 Re-certification</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <hr style="height: 5px; background-color: black; border: none;">
+
+                            <!-- <h4 class="mt-3 mb-3">LINE QUALITY CONTROL SECTION (Training and Qualification)</h4> -->
+
+
+
+
+
+
+
+
+
+
+                                <div class="accordion" id="accordionExampleInspEdit">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneInspEdit" aria-expanded="true" aria-controls="collapseOneInspEdit">
+                                            <h5>LINE QUALITY CONTROL SECTION (Training and Qualification)</h5>
+                                        </button>
+                                        </h2>
+                                        <div id="collapseOneInspEdit" class="accordion-collapse collapse show" data-parent="#accordionExampleInspEdit">
+                                        <div class="accordion-body">
+
+                                            <!-- ------------------------------------------------ -->
+
+                                            <p class="ms-4">TRAINING ITEMS :</p>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_1" name="text_edit_training_orientation_inspector" value="Systems and Procedure" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_1" style="font-weight: normal;">A. Systems and Procedure</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_2" name="text_edit_training_orientation_inspector" value="Defect Classification" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_2" style="font-weight: normal;">G. Defect Classification</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_3" name="text_edit_training_orientation_inspector" value="Environment Checking" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_3" style="font-weight: normal;">K. Environment Checking</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <input class="form-control ms-5" type="text" name="text_edit_training_orientation_ins_4" id="text_edit_training_orientation_ins_4" style="width: 250px" placeholder="Enter document number">
+                                                </div>
+
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_5" name="text_edit_training_orientation_inspector" value="CN (PP-CN-432)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_5" style="font-weight: normal;">CN (PP-CN-432)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_6" name="text_edit_training_orientation_inspector" value="RH / RT Monitoring" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_6" style="font-weight: normal;">RH / RT Monitoring</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4"></div>
+
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_7" name="text_edit_training_orientation_inspector" value="PPS (PQS-E01-016)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_7" style="font-weight: normal;">PPS (PQS-E01-016)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_8" name="text_edit_training_orientation_inspector" value="Dust Count Monitoring" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_8" style="font-weight: normal;">Dust Count Monitoring</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4"></div>
+
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_9" name="text_edit_training_orientation_inspector" value="F. Defect Classification - YF (PP-YFLEX-296)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_9" style="font-weight: normal;">YF (PP-YFLEX-296)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_10" name="text_edit_training_orientation_inspector" value="Cleanroom Monitoring" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_10" style="font-weight: normal;">Cleanroom Monitoring</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_11" name="text_edit_training_orientation_inspector" value="Work Instruction" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_11" style="font-weight: normal;">B. Work Instruction</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_12" name="text_edit_training_orientation_inspector" value="TS (PQS-D01-036)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_12" style="font-weight: normal;">TS (PQS-D01-036)</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <input class="form-control ms-5" type="text" name="text_edit_training_orientation_ins_13" id="text_edit_training_orientation_ins_13" style="width: 250px" placeholder="Enter document number">
+                                                </div>
+
+                                                <div class="col-md-4"></div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_14" name="text_edit_training_orientation_inspector" value="Feedback System" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_14" style="font-weight: normal;">L. Feedback System</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4"></div>
+
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5"></div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_15" name="text_edit_training_orientation_inspector" value="RQCFR" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_15" style="font-weight: normal;">RQCFR</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5"></div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_16" name="text_edit_training_orientation_inspector" value="Defect Escalation Procedure" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_16" style="font-weight: normal;">H. Defect Escalation Procedure</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_17" name="text_edit_training_orientation_inspector" value="ITN" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_17" style="font-weight: normal;">ITN</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_18" name="text_edit_training_orientation_inspector" value="Point Panel / Inspection Guide" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_18" style="font-weight: normal;">C. Point Panel / Inspection Guide</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 ms-3">
+                                                        <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_19" name="text_edit_training_orientation_inspector" value="CN (PP-CN-010)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_19" style="font-weight: normal;">CN (PP-CN-010)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_20" name="text_edit_training_orientation_inspector" value="Attention Tag" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_20" style="font-weight: normal;">Attention Tag</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <input class="form-control ms-5" type="text" name="text_edit_training_orientation_ins_21" id="text_edit_training_orientation_ins_21" style="width: 250px" placeholder="Enter document number">
+                                                </div>
+
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_22" name="text_edit_training_orientation_inspector" value="PPS (PP-MDGEN-135)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_22" style="font-weight: normal;">PPS (PP-MDGEN-135)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_23" name="text_edit_training_orientation_inspector" value="Lot-out Notice" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_23" style="font-weight: normal;">Lot-out Notice</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4"></div>
+
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_24" name="text_edit_training_orientation_inspector" value="H. Defect Escalation Procedure - YF (PP-YFLEX-296)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_24" style="font-weight: normal;">YF (PP-YFLEX-296)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5"></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5"></div>
+                                                </div>
+
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_25" name="text_edit_training_orientation_inspector" value="TS (PP-TSDGEN-046)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_25" style="font-weight: normal;">TS (PP-TSDGEN-046)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3 ms-2">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_26" name="text_edit_training_orientation_inspector" value="Buy-off and Certification Report" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_26" style="font-weight: normal;"><span style="font-size: 0.9em;">M. Buy-off and Certification Report</span></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_27" name="text_edit_training_orientation_inspector" value="Product Drawing" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_27" style="font-weight: normal;">D. Product Drawing</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <label class="fs-5  " for="" style="font-weight: normal;">Interpretation and Familiarization</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5"></div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_28" name="text_edit_training_orientation_inspector" value="Flow of nonconforming products (PQS-J01-004)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_28" style="font-weight: normal;"><span style="font-size: 0.83em;">N. Flow of nonconforming products (PQS-J01-004)</span></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_29" name="text_edit_training_orientation_inspector" value="A / AA / KL" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_29" style="font-weight: normal;">A / AA / KL</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 ms-1">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_30" name="text_edit_training_orientation_inspector" value="Machine Pre-production checking" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_30" style="font-weight: normal;">I. Machine Pre-production checking</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5"> </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_31" name="text_edit_training_orientation_inspector" value="G / AG / KS / YEU / L" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_31" style="font-weight: normal;">G / AG / KS / YEU / L</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2 ms-4">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_32" name="text_edit_training_orientation_inspector" value="Load tester" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_32" style="font-weight: normal;">Load tester</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_33" name="text_edit_training_orientation_inspector" value="XYZ Meas" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_33" style="font-weight: normal;">XYZ Meas</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-2">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_34" name="text_edit_training_orientation_inspector" value="Production Abnormality  (IMS-PMI-025)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_34" style="font-weight: normal;"><span style="font-size: 0.75em;">O. Production Abnormality  (IMS-PMI-025)</span></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5"></div>
+                                                </div>
+
+                                                <div class="col-md-2 ms-4">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_35" name="text_edit_training_orientation_inspector" value="Chiller" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_35" style="font-weight: normal;">Chiller</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_36" name="text_edit_training_orientation_inspector" value="XY Meas" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_36" style="font-weight: normal;">XY Meas</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-4"></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_37" name="text_edit_training_orientation_inspector" value="Material Drawing" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_37" style="font-weight: normal;">E. Material Drawing</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_38" name="text_edit_training_orientation_inspector" value="Oven" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_38" style="font-weight: normal;">Oven</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2 ms-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_39" name="text_edit_training_orientation_inspector" value="Micrometer" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_39" style="font-weight: normal;">Micrometer</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-2">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_40" name="text_edit_training_orientation_inspector" value="Measurement Commands" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_40" style="font-weight: normal;">P. Measurement Commands</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <label class="fs-5" for="" style="font-weight: normal;">Interpretation and Familiarization</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_41" name="text_edit_training_orientation_inspector" value="Caliper" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_41" style="font-weight: normal;">Caliper</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2 ms-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_42" name="text_edit_training_orientation_inspector" value="Profiler" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_42" style="font-weight: normal;">Profiler</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3 ms-3">
+                                                    <div class="form-check ms-2">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_43" name="text_edit_training_orientation_inspector" value="PP-OPNGEN-023" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_43" style="font-weight: normal;">PP-OPNGEN-023</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_44" name="text_edit_training_orientation_inspector" value="B / AB / SL / SM" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_44" style="font-weight: normal;">B / AB / SL / SM</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_45" name="text_edit_training_orientation_inspector" value="Nexiv" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_45" style="font-weight: normal;">Nexiv</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2 ms-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_46" name="text_edit_training_orientation_inspector" value="XRF" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_46" style="font-weight: normal;">XRF</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3 ms-3">
+                                                    <div class="form-check ms-2">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_47" name="text_edit_training_orientation_inspector" value="PP-PPDGEN-004" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_47" style="font-weight: normal;">PP-PPDGEN-004</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_48" name="text_edit_training_orientation_inspector" value="G / AG / KS / YEU / L" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_48" style="font-weight: normal;">G / AG / KS / YEU / L</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check ms-5"></div>
+                                                </div>
+
+                                                <div class="col-md-2 ms-4">
+                                                    <div class="form-check"></div>
+                                                </div>
+
+                                                <div class="col-md-3 ms-3">
+                                                    <div class="form-check ms-2">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_49" name="text_edit_training_orientation_inspector" value="PP-YFLEX-243" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_49" style="font-weight: normal;">PP-YFLEX-243</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5"></div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check ms-5"></div>
+                                                </div>
+
+                                                <div class="col-md-2 ms-4">
+                                                    <div class="form-check"></div>
+                                                </div>
+
+                                                <div class="col-md-3 ms-3">
+                                                    <div class="form-check ms-2">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_50" name="text_edit_training_orientation_inspector" value="PPS-E01-047" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_50" style="font-weight: normal;">PPS-E01-047</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_51" name="text_edit_training_orientation_inspector" value="Other documents" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_51" style="font-weight: normal;">F. Other documents</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_52" name="text_edit_training_orientation_inspector" value="Product Measurement" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_52" style="font-weight: normal;">J. Product Measurement</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5"></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_53" name="text_edit_training_orientation_inspector" value="IG / SGC" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_53" style="font-weight: normal;">IG / SGC</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-1 ms-4">
+                                                    <div class="form-check ms-4">
+                                                        <label class="fs-5" for="" style="font-weight: bold;"><span style="font-size: 0.60em;">Series name:</span></label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check">
+                                                        <input class="form-control" type="text" name="text_edit_training_orientation_ins_54" id="text_edit_training_orientation_ins_54" style="width: 200px" placeholder="Enter series name">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-2">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_55" name="text_edit_training_orientation_inspector" value="Sampling Plan (PQS-I01-028)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_55" style="font-weight: normal;">Q. Sampling Plan (PQS-I01-028)</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_56" name="text_edit_training_orientation_inspector" value="VIG / OGM" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_56" style="font-weight: normal;">VIG / OGM</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 ms-4">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_57" name="text_edit_training_orientation_inspector" value="Specifications" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_57" style="font-weight: normal;">Specifications</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-2"></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_58" name="text_edit_training_orientation_inspector" value="UD / QCI / PQS" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_58" style="font-weight: normal;">UD / QCI / PQS</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 ms-4">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_59" name="text_edit_training_orientation_inspector" value="Command" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_59" style="font-weight: normal;">Command</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-2">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_60" name="text_edit_training_orientation_inspector" value="Past Trouble History (claim, lot-out, yield, etc)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_60" style="font-weight: normal;"><span style="font-size: 0.7em;">R. Past Trouble History (claim, lot-out, yield, etc)</span></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5"></div>
+                                                </div>
+
+                                                <div class="col-md-4 ms-4">
+                                                    <div class="form-check ms-4">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ins_61" name="text_edit_training_orientation_inspector" value="Loading Point" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_training_orientation_ins_61" style="font-weight: normal;">Loading Point</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-2"></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">Trained and Qualified by:</label>
+                                                    <input class="form-control" type="text" id="text_edit_certified_inspector" name="text_edit_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_certified_inspector_username" name="text_edit_certified_inspector_username">
+                                                    <input type="hidden" id="text_edit_certified_inspector_email" name="text_edit_certified_inspector_email">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">Mentored by:</label>
+                                                    <input class="form-control" type="text" id="text_edit_mentored_by" name="text_edit_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_date_inspector" name="text_edit_date_inspector">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">Time:</label>
+                                                    <input class="form-control" type="time" id="text_edit_time_inspector" name="text_edit_time_inspector">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-6"></div>
+                                                <div class="col-md-3">
+                                                    <label class="d-none" for="">Send Email Alert to:</label>
+                                                    <input class="form-select d-none" type="text" id="text_edit_alert_qctq_sec_insp" name="text_edit_alert_qctq_sec_insp" list="list_display_empno" placeholder="Send email to" disabled>
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_edit_alert_qctq_sec_insp_username" name="text_edit_alert_qctq_sec_insp_username">
+                                                    <input type="hidden" id="text_edit_alert_qctq_sec_insp_email" name="text_edit_alert_qctq_sec_insp_email">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="d-none" for="">Add cc:</label>
+                                                    <input class="form-select d-none" type="text" id="text_edit_alert_qctq_cc_sec_insp" name="text_edit_alert_qctq_cc_sec_insp" list="list_display_empno" placeholder="Cc" disabled>
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_edit_alert_qctq_cc_sec_insp_username" name="text_edit_alert_qctq_cc_sec_insp_username">
+                                                    <input type="hidden" id="text_edit_alert_qctq_cc_sec_insp_email" name="text_edit_alert_qctq_cc_sec_insp_email">
+                                                </div>
+                                            </div>
+
+                                            <!-- ------------------------------------------------ -->
+
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoInspEdit" aria-expanded="false" aria-controls="collapseTwoInspEdit">
+                                            <h5>LINE QUALITY CONTROL SECTION (Certification)</h5>
+                                        </button>
+                                        </h2>
+                                        <div id="collapseTwoInspEdit" class="accordion-collapse collapse" data-parent="#accordionExampleInspEdit">
+                                        <div class="accordion-body">
+
+                                            <!-- ------------------------------------------------ -->
+
+                                            <label class="mb-3">A. Theoretical Examination</label>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <p class="" for="">First Take:</p>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <p class="" for="">Second Take:</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-1">
+                                                    <p class="ms-5" for="">Result:</p>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <input class="form-control" type="text" name="text_edit_result_input1_inspector" id="text_edit_result_input1_inspector" placeholder="Enter result">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_sel_result1_inspector" id="text_edit_sel_result1_inspector">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-1">
+                                                    <p class="ms-5" for="">Result:</p>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <input class="form-control" type="text" name="text_edit_result_input2_inspector" id="text_edit_result_input2_inspector" placeholder="Enter result">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_sel_result2_inspector" id="text_edit_sel_result2_inspector">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <label class="mb-3">B. Hands-on (demonstration of actual activity)</label>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_1" name="text_edit_hands_on_inspector" value="Machine Pre-production checking" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_1" style="font-weight: normal;">A. Machine Pre-production checking</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_2" name="text_edit_hands_on_inspector" value="Product Measurement" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_2" style="font-weight: normal;">B. Product Measurement</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-control" type="text" id="text_edit_hands_on_ins_3" name="text_edit_hands_on_ins_3" placeholder="Enter series name">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-2 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_4" name="text_edit_hands_on_inspector" value="Load Tester" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_4" style="font-weight: normal;">Load Tester</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_5" name="text_edit_hands_on_inspector" value="XYZ Meas" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_5" style="font-weight: normal;">XYZ Meas</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_6" name="text_edit_hands_on_inspector" value="Specifications" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_6" style="font-weight: normal;">Specifications</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-2 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_7" name="text_edit_hands_on_inspector" value="Chiller" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_7" style="font-weight: normal;">Chiller</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_8" name="text_edit_hands_on_inspector" value="XY Meas" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_8" style="font-weight: normal;">XY Meas</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_9" name="text_edit_hands_on_inspector" value="Command" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_9" style="font-weight: normal;">Command</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-2 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_10" name="text_edit_hands_on_inspector" value="Oven" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_10" style="font-weight: normal;">Oven</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_11" name="text_edit_hands_on_inspector" value="Micrometer" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_11" style="font-weight: normal;">Micrometer</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_12" name="text_edit_hands_on_inspector" value="Loading Point" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_12" style="font-weight: normal;">Loading Point</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-2 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_13" name="text_edit_hands_on_inspector" value="Caliper" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_13" style="font-weight: normal;">Caliper</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_14" name="text_edit_hands_on_inspector" value="Profiler" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_14" style="font-weight: normal;">Profiler</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-2 ms-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_15" name="text_edit_hands_on_inspector" value="Nexiv" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_15" style="font-weight: normal;">Nexiv</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_hands_on_ins_16" name="text_edit_hands_on_inspector" value="XRF" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_hands_on_ins_16" style="font-weight: normal;">XRF</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-12">
+                                                    <label for="">Result:</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_sec2_result_inspector" id="text_edit_sec2_result_inspector">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="RE-TRAIN">RE-TRAIN</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-12">
+                                                    <label for="">Certified by:</label>
+                                                    <input class="form-control" type="text" id="text_edit_sec2_certified_inspector" name="text_edit_sec2_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_sec2_certified_inspector_username" name="text_edit_sec2_certified_inspector_username">
+                                                    <input type="hidden" id="text_edit_sec2_certified_inspector_email" name="text_edit_sec2_certified_inspector_email">
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6 mb-4">
+                                                    <label for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_sec2_date_inspector" name="text_edit_sec2_date_inspector">
+                                                </div>
+
+                                                <div class="col-md-6 mb-4">
+                                                    <label for="">Time:</label>
+                                                    <input class="form-control" type="time" id="text_edit_sec2_time_inspector" name="text_edit_sec2_time_inspector">
+                                                </div>
+                                            </div>
+
+                                            <!-- <div class="row mb-2">
+                                                <div class="col-md-6"></div>
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Send Email Alert to:</label>
+                                                    <input class="form-control" type="text" id="text_edit_alert_qcc_sec_insp" name="text_edit_alert_qcc_sec_insp" list="list_display_empno" placeholder="Send email to">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_edit_alert_qcc_sec_insp_username" name="text_edit_alert_qcc_sec_insp_username">
+                                                    <input type="hidden" id="text_edit_alert_qcc_sec_insp_email" name="text_edit_alert_qcc_sec_insp_email">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Add cc:</label>
+                                                    <input class="form-control" type="text" id="text_edit_alert_qcc_cc_sec_insp" name="text_edit_alert_qcc_cc_sec_insp" list="list_display_empno" placeholder="Cc">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_edit_alert_qcc_cc_sec_insp_username" name="text_edit_alert_qcc_cc_sec_insp_username">
+                                                    <input type="hidden" id="text_edit_alert_qcc_cc_sec_insp_email" name="text_edit_alert_qcc_cc_sec_insp_email">
+                                                </div>
+                                            </div> -->
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-6"></div>
+
+                                                <!-- QCC Section: To -->
+                                                <div class="col-md-3">
+                                                    <label for="text_edit_alert_qcc_sec_insp" id="label_edit_alert_qcc_sec_insp">Send Email Alert to:</label>
+                                                    <div id="selectedQccAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
+                                                    <input class="form-control" type="text"
+                                                        id="text_edit_alert_qcc_sec_insp"
+                                                        name="text_edit_alert_qcc_sec_insp"
+                                                        list="list_display_empno"
+                                                        placeholder="Send email to">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_edit_alert_qcc_sec_insp_username" name="text_edit_alert_qcc_sec_insp_username">
+                                                    <input type="hidden" id="text_edit_alert_qcc_sec_insp_email" name="text_edit_alert_qcc_sec_insp_email">
+                                                </div>
+
+                                                <!-- QCC Section: CC -->
+                                                <div class="col-md-3">
+                                                    <label for="text_edit_alert_qcc_cc_sec_insp" id="label_edit_alert_qcc_cc_sec_insp">Add cc:</label>
+                                                    <div id="selectedQccAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
+                                                    <input class="form-control" type="text"
+                                                        id="text_edit_alert_qcc_cc_sec_insp"
+                                                        name="text_edit_alert_qcc_cc_sec_insp"
+                                                        list="list_display_empno"
+                                                        placeholder="Cc">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_edit_alert_qcc_cc_sec_insp_username" name="text_edit_alert_qcc_cc_sec_insp_username">
+                                                    <input type="hidden" id="text_edit_alert_qcc_cc_sec_insp_email" name="text_edit_alert_qcc_cc_sec_insp_email">
+                                                </div>
+                                            </div>
+
+                                            <p class="mb-3">Note: For OQC inspectors, validation process shall be done by immediate superior on the next day of certification.</p>
+
+                                            <!-- ------------------------------------------------ -->
+
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeInspEdit" aria-expanded="false" aria-controls="collapseThreeInspEdit">
+                                            <h5>VALIDATION PROCESS: QUALITY CONTROL SECTION <> OQC only</h5>
+                                        </button>
+                                        </h2>
+                                        <div id="collapseThreeInspEdit" class="accordion-collapse collapse" data-parent="#accordionExampleInspEdit">
+                                        <div class="accordion-body">
+
+                                            <!-- ------------------------------------------------ -->
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label for="">1. Reference Document</label>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label for="">2. Discuss the inspection sequence in detail.</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_ref_docno_inspector" name="text_edit_ref_docno_inspector[]" value="Work Instruction Document" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_ref_docno_inspector" style="font-weight: normal;">1. Work Instruction Document</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-1">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_ins_seq_ins_yes" name="text_edit_ins_seq_inspector" value="Yes" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_ins_seq_ins_yes" style="font-weight: normal;">Yes</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_ins_seq_ins_no" name="text_edit_ins_seq_inspector" value="No" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_ins_seq_ins_no" style="font-weight: normal;">No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-3">
+                                                    <div class="form-check">
+                                                        <input class="form-control" type="text" id="text_edit_ref_docno_input_inspector" name="text_edit_ref_docno_input_inspector" placeholder="Enter the reference document number">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h6 class="mt-3 mb-3">RESULT:</h6>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">First Take:</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_vpqcs_result1_inspector" id="text_edit_vpqcs_result1_inspector">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">Second Take:</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_vpqcs_result2_inspector" id="text_edit_vpqcs_result2_inspector">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">Validated by:</label>
+                                                    <input class="form-control" type="text" id="text_edit_vpqcs_validated1_inspector" name="text_edit_vpqcs_validated1_inspector" list="list_display_empno" placeholder="Select Validated by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_vpqcs_validated1_inspector_username" name="text_edit_vpqcs_validated1_inspector_username">
+                                                    <input type="hidden" id="text_edit_vpqcs_validated1_inspector_email" name="text_edit_vpqcs_validated1_inspector_email">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">Validated by: <span style="font-size: 0.9em;">(after re-orientation)</span></label>
+                                                    <input class="form-control" type="text" id="text_edit_vpqcs_validated2_inspector" name="text_edit_vpqcs_validated2_inspector" list="list_display_empno" placeholder="Select Certified by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_vpqcs_validated2_inspector_username" name="text_edit_vpqcs_validated2_inspector_username">
+                                                    <input type="hidden" id="text_edit_vpqcs_validated2_inspector_email" name="text_edit_vpqcs_validated2_inspector_email">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-5">
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_vpqcs_date1_inspector" name="text_edit_vpqcs_date1_inspector">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="ms-3" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_vpqcs_date2_inspector" name="text_edit_vpqcs_date2_inspector">
+                                                </div>
+                                            </div>
+
+                                            <!-- ------------------------------------------------ -->
+
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            <!-- **************************************************************      2ND SECTION          ************************************************************************************************* -->
+
+                            <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
+
+                            <!-- <h4 class="mt-3 mb-3">LINE QUALITY CONTROL SECTION (Certification)</h4> -->
+
+                            <!-- **************************************************************      3RD SECTION          ************************************************************************************************* -->
+
+                            <hr style="height: 5px; background-color: black; border: none;">
+
+                            <div class="row mb-5">
+                                <div class="col-md-6">
+                                    <label for="">Approved by:</label>
+                                    <input class="form-control" type="text" id="text_edit_sec3_approved_inspector" name="text_edit_sec3_approved_inspector" list="list_display_empno" placeholder="Select Approved by">
+                                    <datalist id="list_display_empno"></datalist>
+
+                                    <input type="hidden" id="text_edit_sec3_approved_inspector_userame" name="text_edit_sec3_approved_inspector_userame">
+                                    <input type="hidden" id="text_edit_sec3_approved_inspector_email" name="text_edit_sec3_approved_inspector_email">
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="table-responsive">
+                                        <table id="" class="table table-bordered nowrap">
+                                            <thead class="table table-success">
+                                                <tr>
+                                                    <th colspan="3">Validation and Certification Criteria</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody class="text-center">
+                                                <tr>
+                                                    <td>No.</td>
+                                                    <td>Rating</td>
+                                                    <td>Remarks</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>3</td>
+                                                    <td>Passed</td>
+                                                    <td>Skilled, no supervision required, can lead and review work of others</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>Re-train</td>
+                                                    <td>Need to re-train by co-inspectors and re-certify by Supervisors</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>Failed</td>
+                                                    <td>Need to re-train by training unit re-certify by Supervisors</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- **************************************************************      4TH SECTION          ************************************************************************************************* -->
+
+
+                            <!-- <div id="edit_for_oqc_only_section">
+
+                                <hr style="height: 5px; background-color: black; border: none;">
+
+                                <h5 class="text-center mb-3"><> OQC only</h3>
+
+                                <hr>
+
+                                <h4 class="mb-3">VALIDATION PROCESS: QUALITY CONTROL SECTION</h4>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="table-responsive">
+                                            <table id="" class="table table-bordered nowrap">
+                                                <thead class="table table-success">
+                                                    <tr>
+                                                        <th colspan="3">Validation and Certification Criteria</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody class="text-center">
+                                                    <tr>
+                                                        <td>No.</td>
+                                                        <td>Rating</td>
+                                                        <td>Remarks</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>3</td>
+                                                        <td>Passed</td>
+                                                        <td>Skilled, no supervision required, can lead and review work of others</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>2</td>
+                                                        <td>Re-train</td>
+                                                        <td>Need to re-train by co-inspectors and re-certify by Supervisors</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>Failed</td>
+                                                        <td>Need to re-train by training unit re-certify by Supervisors</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div> -->
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                <button type="submit" class="btn btn-success" id="btnSubmitInspEdit"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal" id="modalEditOper" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <form  id="formSubmit_edit_Oper">
+                            <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
+
+                            <div class="row mb-5">
+                                <div class="col-md-3">
+                                    <label for="">Control No.:</label>
+                                    <input class="form-control" type="text" class="form-control" id="text_edit_conno_new_operator" name="text_edit_conno_new_operator" placeholder="Select section to generate Control No." readonly>
+                                    <!-- <input class="form-control" type="text" class="form-control" id="" name="text_edit_conno_new_operator" placeholder="Auto Generated" readonly> -->
+                                    <input class="form-control" type="hidden" class="form-control" id="text_edit_conno_operator" name="text_edit_conno_operator" readonly>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Production Section:</label>
+                                    <input class="form-control" type="text" name="text_edit_section_operator" id="text_edit_section_operator" list="list_section" placeholder="Select Section" disabled>
+                                    <datalist id="list_section">
+
+                                    </datalist>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Series Name:</label>
+                                    <input class="form-control" type="text" id="text_edit_series_operator" name="text_edit_series_operator" placeholder="Enter series name here" disabled>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="">Product Line:</label>
+                                    <input class="form-control" type="text" id="text_edit_operator_product_line" name="text_edit_operator_product_line" placeholder="Enter product line here" list="list_prod_line" disabled>
+                                    <datalist id="list_prod_line"></datalist>
+                                </div>
+                            </div>
+
+                            <!-- <div class="row mt-2 mb-5">
+                                <div class="col-md-12">
+                                    <button type="button" class="btn btn-primary" id="" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                </div>
+                            </div> -->
+
+                            <div class="table-responsive mt-3 mb-5">
+                                <table id="tbl_edit_certified_list_operator" class="table table-bordered table-hover nowrap">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th>Employee No.</th>
+                                            <th>Employee Name</th>
+                                            <th>Station From</th>
+                                            <th>Station To</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="row mb-5">
+                                <div class="col-md-12">
+                                    <label for="">Reason for Certification:</label>
+                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_certification_operator" id="text_edit_certification_operator" disabled>
+                                        <option value="" selected disabled>Select Reason</option>
+                                        <option value="Newly hired employees">1 Newly hired employees</option>
+                                        <option value="Newly promoted employees">2 Newly promoted employees</option>
+                                        <option value="Lateral transfer">3 Lateral transfer</option>
+                                        <option value="Flexibility1">4 Flexibility</option>
+                                        <option value="Transfer to another station">5 Transfer to another station (E.g: final visual, insertion,IQC, IPQC, OQC, etc)</option>
+                                        <option value="Transfer to other production section">6 Transfer to other production section (E.g: TS,PPS,CN, YF)</option>
+                                        <option value="Transfer to other product line">7 Transfer to other product line (E.g: TS: BGA-FP, QFP; CN: FMS, PJS; YF: EOL, FOL; PPS: Molding CN, Molding TS, Grinding, Stamping; MH-WHS, MH-Prodn)</option>
+                                        <option value="New Product">8 New Product</option>
+                                        <option value="Re-certification from disqualification">9 Re-certification from disqualification</option>
+                                        <option value="Leave reached at least 1 month (ML/ VL/SL)">10 Leave reached at least 1 month (ML/ VL/SL)</option>
+                                        <option value="Company shutdown at least 1 month">11 Company shutdown at least 1 month</option>
+                                        <option value="Re-certification">12 Re-certification</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- **************************************************************      1ST SECTION          ************************************************************************************************* -->
+
+
+
+
+
+
+
+
+
+
+
+
+                                <div class="accordion" id="accordionExampleOperEdit">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneOperEdit" aria-expanded="true" aria-controls="collapseOneOperEdit">
+                                            <h5>PRODUCTION SECTION (Training and Orientation)</h5>
+                                        </button>
+                                        </h2>
+                                        <div id="collapseOneOperEdit" class="accordion-collapse collapse show" data-parent="#accordionExampleOperEdit">
+                                            <div class="accordion-body">
+
+                                                <!-- ------------------------------------------------ -->
+
+                                                <p>TRAINING ITEMS:</p>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-1">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_1" name="text_edit_training_orientation_ps_oper" value="SOP" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_1"  style="font-weight: normal;">1) SOP</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-5"></div>
+
+                                                    <div class="col-md-5">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_5" name="text_edit_training_orientation_ps_oper" value="Production Abnormality Control (IMS-PMI-025)"  style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_5" style="font-weight: normal;">5) Production Abnormality Control (IMS-PMI-025)</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_2" name="text_edit_training_orientation_ps_oper" value="Product Drawing" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_2" style="font-weight: normal;">2) Product Drawing</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4"></div>
+
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_6" name="text_edit_training_orientation_ps_oper" value="Rule when to escalate" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_6" style="font-weight: normal;">Rule when to escalate</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_7" name="text_edit_training_orientation_ps_oper" value="Filling-up of forms" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_7" style="font-weight: normal;">Filling-up of forms</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-5">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_3" name="text_edit_training_orientation_ps_oper" value="Past Trouble History (claim, lot-out, yield, etc)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_3" style="font-weight: normal;">3) Past Trouble History (claim, lot-out, yield, etc)</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_8" name="text_edit_training_orientation_ps_oper" value="Dropped on the floor" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_8" style="font-weight: normal;">5.1 Dropped on the floor</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_4" name="text_edit_training_orientation_ps_oper" value="Defect escalation" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_4" style="font-weight: normal;">4) Defect escalation</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_9" name="text_edit_training_orientation_ps_oper" value="WI-CN-216" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_9" style="font-weight: normal;">WI-CN-216</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_4_1" name="text_edit_training_orientation_ps_oper" value="Rule when to escalate_2" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_4_1" style="font-weight: normal;">Rule when to escalate</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_4_2" name="text_edit_training_orientation_ps_oper" value="Filling-up of forms_2" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_4_2" style="font-weight: normal;">Filling-up of forms</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2"  style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_10" name="text_edit_training_orientation_ps_oper" value="CN PP-CN-407" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_10" style="font-weight: normal;">PP-CN-407</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-1"  style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <!-- <input class="form-check-input" type="checkbox" id="text_edit_training_orientation5_1" name="text_edit_training_orientation_ps_oper" value=""> -->
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2"  style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_11" name="text_edit_training_orientation_ps_oper" value="CN PP-CN-010" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_11" style="font-weight: normal;">PP-CN-010</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-3"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_12" name="text_edit_training_orientation_ps_oper" value="CN PP-CN-066" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_12" style="font-weight: normal;">PP-CN-066</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">PPS</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_13" name="text_edit_training_orientation_ps_oper" value="PPS PP-MDGEN-135" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_13" style="font-weight: normal;">PP-MDGEN-135</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-3"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">PPS</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_14" name="text_edit_training_orientation_ps_oper" value="PPS PP-MDGEN-136" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_14" style="font-weight: normal;">PP-MDGEN-136</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">YF</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_15" name="text_edit_training_orientation_ps_oper" value="YF PP-YFLEX-296" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_15" style="font-weight: normal;">PP-YFLEX-296</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-3"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">YF</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_16" name="text_edit_training_orientation_ps_oper" value="YF PP-YFLEX-448" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_16" style="font-weight: normal;">PP-YFLEX-448</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">TS</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_17" name="text_edit_training_orientation_ps_oper" value="TS WI-TSDGEN-044" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_17" style="font-weight: normal;">WI-TSDGEN-044</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-3"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">TS</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_ps_oper_18" name="text_edit_training_orientation_ps_oper" value="TS WI-IC-4743" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_ps_oper_18" style="font-weight: normal;">WI-IC-4743</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <h5 class="mt-3 mb-3">RESULT</h5>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">First Take:</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_first_result_oper" id="text_edit_first_result_oper">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Second Take:</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_second_result_oper" id="text_edit_second_result_oper">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label class="" for="">Trained by:</label>
+                                                                <input class="form-control" type="text" id="text_edit_first_trainedby_oper" name="text_edit_first_trainedby_oper" list="list_display_empno" placeholder="Select Trained by">
+                                                                <datalist id="list_display_empno"></datalist>
+
+                                                                <input type="hidden" id="text_edit_first_trainedby_oper_username" name="text_edit_first_trainedby_oper_username">
+                                                                <input type="hidden" id="text_edit_first_trainedby_oper_email" name="text_edit_first_trainedby_oper_email">
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                 <label class="" for="">Mentored by:</label>
+                                                                <input class="form-control" type="text" id="text_edit_first_mentoredby_oper" name="text_edit_first_mentoredby_oper" list="list_display_empno" placeholder="Select Mentored by">
+                                                                <datalist id="list_display_empno"></datalist>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label class="" for="">Trained by:</label>
+                                                                <input class="form-control" type="text" id="text_edit_second_trainedby_oper" name="text_edit_second_trainedby_oper" list="list_display_empno" placeholder="Select Trained by">
+                                                                <datalist id="list_display_empno"></datalist>
+
+                                                                <input type="hidden" id="text_edit_second_trainedby_oper_username" name="text_edit_second_trainedby_oper_username">
+                                                                <input type="hidden" id="text_edit_second_trainedby_oper_email" name="text_edit_second_trainedby_oper_email">
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="" for="">Mentored by:</label>
+                                                                <input class="form-control" type="text" id="text_edit_second_mentoredby_oper" name="text_edit_second_mentoredby_oper" list="list_display_empno" placeholder="Select Mentored by">
+                                                                <datalist id="list_display_empno"></datalist>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-5">
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_edit_first_date_oper" name="text_edit_first_date_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Time:</label>
+                                                        <input class="form-control" type="time" id="text_edit_first_time_oper" name="text_edit_first_time_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_edit_second_date_oper" name="text_edit_second_date_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Time:</label>
+                                                        <input class="form-control" type="time" id="text_edit_second_time_oper" name="text_edit_second_time_oper">
+                                                    </div>
+                                                </div>
+
+                                                <!-- ------------------------------------------------ -->
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoOperEdit" aria-expanded="false" aria-controls="collapseTwoOperEdit">
+                                            <h5>ENGINEERING SECTION (Training and Qualification)</h5>
+                                        </button>
+                                        </h2>
+                                        <div id="collapseTwoOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
+                                            <div class="accordion-body">
+
+                                                <!-- ------------------------------------------------ -->
+
+                                                <p class="mb-3">TRAINING ITEMS:</p>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_1" name="text_edit_training_orientation_es_oper" value="Work Instruction" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_1"  style="font-weight: normal;">1) Work Instruction</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-3"></div>
+
+                                                    <div class="col-md-5">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_10" name="text_edit_training_orientation_es_oper" value="Pre-production samples and check sheet checking"  style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_10" style="font-weight: normal;">10) Pre-production samples and check sheet checking</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_2" name="text_edit_training_orientation_es_oper" value="Point Panel" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_2" style="font-weight: normal;">2) Point Panel</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4"></div>
+
+                                                    <div class="col-md-5">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">(applicable to operator that uses machines/tools and jigs only)</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_3" name="text_edit_training_orientation_es_oper" value="Criteria / Specification" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_3" style="font-weight: normal;">3) Criteria / Specification</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4"></div>
+
+                                                    <div class="col-md-5">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_11" name="text_edit_training_orientation_es_oper" value="Machine Abnormality" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_11" style="font-weight: normal;">11) Machine Abnormality</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_4" name="text_edit_training_orientation_es_oper" value="Visual Inspection Guide (if required)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_4" style="font-weight: normal;">4) Visual Inspection Guide (if required)</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_12" name="text_edit_training_orientation_es_oper" value="CN PP-CN-367" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_12" style="font-weight: normal;">PP-CN-367</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_5" name="text_edit_training_orientation_es_oper" value="Process Flow" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_5" style="font-weight: normal;">5) Process Flow</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_13" name="text_edit_training_orientation_es_oper" value="CN PP-CN-336" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_13" style="font-weight: normal;">PP-CN-336</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_6" name="text_edit_training_orientation_es_oper" value="Tools Equipment" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_6" style="font-weight: normal;">6) Tools Equipment</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_14" name="text_edit_training_orientation_es_oper" value="CN PP-CN-086" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_14" style="font-weight: normal;">PP-CN-086</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_7" name="text_edit_training_orientation_es_oper" value="PTNR" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_7" style="font-weight: normal;">7) PTNR (if required)</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_15" name="text_edit_training_orientation_es_oper" value="CN PP-CN-063" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_15" style="font-weight: normal;">PP-CN-063</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_8" name="text_edit_training_orientation_es_oper" value="Machine Operations" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_8" style="font-weight: normal;">8) Machine Operations</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">PPS</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_16" name="text_edit_training_orientation_es_oper" value="PPS PP-MDGEN-138" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_16" style="font-weight: normal;">PP-MDGEN-138</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_9" name="text_edit_training_orientation_es_oper" value="Safety" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_9" style="font-weight: normal;">9) Safety</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4"></div>
+
+                                                    <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <label class="fs-5  " for="" style="font-weight: normal;">YF</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_training_orientation_es_oper_17" name="text_edit_training_orientation_es_oper" value="YF PP-OPNGEN-017" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_training_orientation_es_oper_17" style="font-weight: normal;">PP-OPNGEN-017</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <h5 class="mt-3 mb-3">RESULT</h5>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">First Take:</label>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Second Take:</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-4">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">1. Observation / Interview Result</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_obs_first_result_es_oper" id="text_edit_obs_first_result_es_oper">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">1. Observation / Interview Result</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_obs_second_result_es_oper" id="text_edit_obs_second_result_es_oper">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">2. Sample Checking:</label>
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_first_sample_es_oper" id="text_edit_first_sample_es_oper">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">2. Sample Checking:</label>
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_second_sample_es_oper" id="text_edit_second_sample_es_oper">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-4">
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">OK:</label>
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_first_ok_es_oper" id="text_edit_first_ok_es_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">NG:</label>
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_first_ng_es_oper" id="text_edit_first_ng_es_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">OK:</label>
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_second_ok_es_oper" id="text_edit_second_ok_es_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">NG:</label>
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_second_ng_es_oper" id="text_edit_second_ng_es_oper">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">3. Overall Assessment:</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_oa_1st_result_es_oper" id="text_edit_oa_1st_result_es_oper">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">3. Overall Assessment:</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_oa_2nd_result_es_oper" id="text_edit_oa_2nd_result_es_oper">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Reason for Disqualification:</label>
+                                                        <input class="form-control" type="text" id="text_edit_1st_disqualification_es_oper" name="text_edit_1st_disqualification_es_oper">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Reason for Disqualification:</label>
+                                                        <input class="form-control" type="text" id="text_edit_2nd_disqualification_es_oper" name="text_edit_2nd_disqualification_es_oper">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Qualified by:</label>
+                                                        <input class="form-control" type="text" id="text_edit_1st_qualifiedby_es_oper" name="text_edit_1st_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_1st_qualifiedby_es_oper_username" name="text_edit_1st_qualifiedby_es_oper_username">
+                                                        <input type="hidden" id="text_edit_1st_qualifiedby_es_oper_email" name="text_edit_1st_qualifiedby_es_oper_email">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Qualified by:</label>
+                                                        <input class="form-control" type="text" id="text_edit_2nd_qualifiedby_es_oper" name="text_edit_2nd_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_2nd_qualifiedby_es_oper_username" name="text_edit_2nd_qualifiedby_es_oper_username">
+                                                        <input type="hidden" id="text_edit_2nd_qualifiedby_es_oper_email" name="text_edit_2nd_qualifiedby_es_oper_email">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-5">
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_edit_qc_1st_date_es_oper" name="text_edit_qc_1st_date_es_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Time:</label>
+                                                        <input class="form-control" type="time" id="text_edit_qc_1st_time_es_oper" name="text_edit_qc_1st_time_es_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_edit_qc_2nd_date_es_oper" name="text_edit_qc_2nd_date_es_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Time:</label>
+                                                        <input class="form-control" type="time" id="text_edit_qc_2nd_time_es_oper" name="text_edit_qc_2nd_time_es_oper">
+                                                    </div>
+                                                </div>
+
+                                                <!-- <div class="row mb-2">
+                                                    <div class="col-md-6"></div>
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Send Email Alert to:</label>
+                                                        <input class="form-control" type="text" id="text_alert_eng_sec" name="text_alert_eng_sec" list="list_display_empno" placeholder="Send email to">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_eng_sec_username" name="text_alert_eng_sec_username">
+                                                        <input type="hidden" id="text_alert_eng_sec_email" name="text_alert_eng_sec_email">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Add cc:</label>
+                                                        <input class="form-control" type="text" id="text_alert_eng_cc_sec" name="text_alert_eng_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_eng_cc_sec_username" name="text_alert_eng_cc_sec_username">
+                                                        <input type="hidden" id="text_alert_eng_cc_sec_email" name="text_alert_eng_cc_sec_email">
+                                                    </div>
+                                                </div> -->
+
+                                                <div class="row mb-2">
+                                                    <div class="col-md-6"></div>
+                                                    <!-- Engineering Section: To -->
+                                                    <div class="col-md-3">
+                                                        <label for="text_alert_eng_sec" id="label_alert_eng_sec">Send Email Alert to:</label>
+                                                        <div id="selectedEngAlertRecipients" class="fs-5 mb-1"></div>
+                                                        <input class="form-control" type="text"
+                                                            id="text_alert_eng_sec"
+                                                            name="text_alert_eng_sec"
+                                                            list="list_display_empno"
+                                                            placeholder="Type and select a recipient">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_eng_sec_username" name="text_alert_eng_sec_username">
+                                                        <input type="hidden" id="text_alert_eng_sec_email" name="text_alert_eng_sec_email">
+                                                    </div>
+                                                    <!-- Engineering Section: CC -->
+                                                    <div class="col-md-3">
+                                                        <label for="text_alert_eng_cc_sec" id="label_alert_eng_cc_sec">Add cc:</label>
+                                                        <div id="selectedEngAlertCcRecipients" class="fs-5 mb-1"></div>
+                                                        <input class="form-control" type="text"
+                                                            id="text_alert_eng_cc_sec"
+                                                            name="text_alert_eng_cc_sec"
+                                                            list="list_display_empno"
+                                                            placeholder="Type and select a recipient">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_eng_cc_sec_username" name="text_alert_eng_cc_sec_username">
+                                                        <input type="hidden" id="text_alert_eng_cc_sec_email" name="text_alert_eng_cc_sec_email">
+                                                    </div>
+                                                </div>
+
+                                                <!-- ------------------------------------------------ -->
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeOperEdit" aria-expanded="false" aria-controls="collapseThreeOperEdit">
+                                            <h5>QUALITY CONTROL SECTION (CERTIFICATTION)</h5>
+                                        </button>
+                                        </h2>
+                                        <div id="collapseThreeOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
+                                            <div class="accordion-body">
+
+                                            <!-- ------------------------------------------------ -->
+
+                                            <p class="mb-3">1. Let the operator discuss the details of training/orientation conducted by concerned Supervisor nad Eng'r as per check items specified.</p>
+
+                                            <h5 class="mt-3 mb-3">RESULT</h5>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">First Take:</label>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Second Take:</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">1.1 Observation / Interview Result</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_obs_first_result_qcs_oper" id="text_edit_obs_first_result_qcs_oper">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">1.1 Observation / Interview Result</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_obs_second_result_qcs_oper" id="text_edit_obs_second_result_qcs_oper">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">2. Sample Checking:</label>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_first_sample_qcs_oper" id="text_edit_first_sample_qcs_oper">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">2. Sample Checking:</label>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_second_sample_qcs_oper" id="text_edit_second_sample_qcs_oper">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-4">
+                                                <div class="col-md-3">
+                                                    <label class="" for="">OK:</label>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_first_ok_qcs_oper" id="text_edit_first_ok_qcs_oper">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">NG:</label>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_first_ng_qcs_oper" id="text_edit_first_ng_qcs_oper">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">OK:</label>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_second_ok_qcs_oper" id="text_edit_second_ok_qcs_oper">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">NG:</label>
+                                                    <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_second_ng_qcs_oper" id="text_edit_second_ng_qcs_oper">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-1">
+                                                <div class="col-md-6">
+                                                    <div class="table-responsive">
+                                                        <table id="" class="table table-bordered table-hover nowrap">
+                                                            <thead class="table table-warning">
+                                                                <tr class="text-center">
+                                                                    <th></th>
+                                                                    <th>Station</th>
+                                                                    <th>Type of Exam</th>
+                                                                    <th>Method</th>
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td><input type="checkbox" id="text_edit_qcs_station_1st_oper_1" name="text_edit_qcs_station_1st_oper" value="Visual"></td>
+                                                                    <td>Visual</td>
+                                                                    <td>Judgement Confirmation</td>
+                                                                    <td>Using GRR sample (50pcs.)</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td><input type="checkbox" id="text_edit_qcs_station_1st_oper_2" name="text_edit_qcs_station_1st_oper" value="Assembly"></td>
+                                                                    <td>Assembly</td>
+                                                                    <td>Judgement Confirmation</td>
+                                                                    <td>50 samples drawn from their actual output</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td><input type="checkbox" id="text_edit_qcs_station_1st_oper_3" name="text_edit_qcs_station_1st_oper" value="Others"></td>
+                                                                    <td>Others (Parts Prep/Prov. Insertion/Packing/ etc)</td>
+                                                                    <td>Work Confirmation</td>
+                                                                    <td>50 samples drawn from their actual output</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td><input type="checkbox" id="text_edit_qcs_station_1st_oper_4" name="text_edit_qcs_station_1st_oper" value="Rework Station"></td>
+                                                                    <td>Rework Station (PPS only)</td>
+                                                                    <td>Work Confirmation</td>
+                                                                    <td>50 samples drawn from their actual output</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td><input type="checkbox" id="text_edit_qcs_station_1st_oper_5" name="text_edit_qcs_station_1st_oper" value="Segregation Station"></td>
+                                                                    <td>Segregation Station</td>
+                                                                    <td>Work Confirmation</td>
+                                                                    <td>50 samples drawn from their actual output</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="table-responsive">
+                                                        <table id="" class="table table-bordered table-hover nowrap">
+                                                            <thead class="table table-warning">
+                                                                <tr class="text-center">
+                                                                    <th></th>
+                                                                    <th>Station</th>
+                                                                    <th>Type of Exam</th>
+                                                                    <th>Method</th>
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td><input type="checkbox" id="text_edit_qcs_station_2nd_oper_1" name="text_edit_qcs_station_2nd_oper" value="Visual"></td>
+                                                                    <td>Visual</td>
+                                                                    <td>Judgement Confirmation</td>
+                                                                    <td>Using GRR sample (50pcs.)</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td><input type="checkbox" id="text_edit_qcs_station_2nd_oper_2" name="text_edit_qcs_station_2nd_oper" value="Assembly"></td>
+                                                                    <td>Assembly</td>
+                                                                    <td>Judgement Confirmation</td>
+                                                                    <td>50 samples drawn from their actual output</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td><input type="checkbox" id="text_edit_qcs_station_2nd_oper_3" name="text_edit_qcs_station_2nd_oper" value="Others"></td>
+                                                                    <td>Others (Parts Prep/Prov. Insertion/Packing/ etc)</td>
+                                                                    <td>Work Confirmation</td>
+                                                                    <td>50 samples drawn from their actual output</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td><input type="checkbox" id="text_edit_qcs_station_2nd_oper_4" name="text_edit_qcs_station_2nd_oper" value="Rework Station"></td>
+                                                                    <td>Rework Station (PPS only)</td>
+                                                                    <td>Work Confirmation</td>
+                                                                    <td>50 samples drawn from their actual output</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td><input type="checkbox" id="text_edit_qcs_station_2nd_oper_5" name="text_edit_qcs_station_2nd_oper" value="Segregation Station"></td>
+                                                                    <td>Segregation Station</td>
+                                                                    <td>Work Confirmation</td>
+                                                                    <td>50 samples drawn from their actual output</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <p for="">** Assembly operators are those who install parts</p>
+                                                    <p for="">** if sample size is equals or exceeds on the lot size, conduct 100% inspection</p>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <p for="">** Assembly operators are those who install parts</p>
+                                                    <p for="">** if sample size is equals or exceeds on the lot size, conduct 100% inspection</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">3. Overall Assessment:</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_oa_1st_result_qcs_oper" id="text_edit_oa_1st_result_qcs_oper">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">3. Overall Assessment:</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_oa_2nd_result_qcs_oper" id="text_edit_oa_2nd_result_qcs_oper">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Reason for Disapproval:</label>
+                                                    <input class="form-control" type="text" id="text_edit_1st_disapproval_qcs_oper" name="text_edit_1st_disapproval_qcs_oper">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Reason for Disapproval:</label>
+                                                    <input class="form-control" type="text" id="text_edit_2nd_disapproval_qcs_oper" name="text_edit_2nd_disapproval_qcs_oper">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Certified by:</label>
+                                                    <input class="form-control" type="text" id="text_edit_1st_certifiedby_qcs_oper" name="text_edit_1st_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_1st_certifiedby_qcs_oper_username" name="text_edit_1st_certifiedby_qcs_oper_username">
+                                                    <input type="hidden" id="text_edit_1st_certifiedby_qcs_oper_email" name="text_edit_1st_certifiedby_qcs_oper_email">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Certified by:</label>
+                                                    <input class="form-control" type="text" id="text_edit_2nd_certifiedby_qcs_oper" name="text_edit_2nd_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_2nd_certifiedby_qcs_oper_username" name="text_edit_2nd_certifiedby_qcs_oper_username">
+                                                    <input type="hidden" id="text_edit_2nd_certifiedby_qcs_oper_email" name="text_edit_2nd_certifiedby_qcs_oper_email">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-5">
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_1st_date_qcs_oper" name="text_edit_1st_date_qcs_oper">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Time:</label>
+                                                    <input class="form-control" type="time" id="text_edit_1st_time_qcs_oper" name="text_edit_1st_time_qcs_oper">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_2nd_date_qcs_oper" name="text_edit_2nd_date_qcs_oper">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Time:</label>
+                                                    <input class="form-control" type="time" id="text_edit_2nd_time_qcs_oper" name="text_edit_2nd_time_qcs_oper">
+                                                </div>
+                                            </div>
+
+                                            <!-- <div class="row">
+                                                <div class="col-md-1">
+                                                    <label for="">Note:</label>
+                                                </div>
+
+                                                <div class="col-md-10">
+                                                    <p for="">#1 For PPS Finishing and Visual, complete the certification/qualification at the back page</p>
+                                                    <p for="">#2 For Engineering and QC Validation result, please update the back page</p>
+                                                </div>
+                                            </div> -->
+
+                                            <div class="row">
+                                                <div class="col-md-1">
+                                                    <label for="">Note:</label>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <p><em>Tick the box for the form or section that the next person needs to complete.</em></p>
+                                                </div>
+
+                                                <div class="col-md-10 ml-5 mt-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="pps-finishing" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="form-check-label ml-3" for="pps-finishing">
+                                                            #1 For PPS Finishing and Visual, complete the certification/qualification at the back page
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="engineering-qc" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="form-check-label ml-3" for="engineering-qc">
+                                                            #2 For Engineering and QC Validation result, please update the back page
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- <div class="row mb-2">
+                                                <div class="col-md-6"></div>
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Send Email Alert to:</label>
+                                                    <input class="form-control" type="text" id="text_alert_qc_sec" name="text_alert_qc_sec" list="list_display_empno" placeholder="Send email to">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_alert_qc_sec_username" name="text_alert_qc_sec_username">
+                                                    <input type="hidden" id="text_alert_qc_sec_email" name="text_alert_qc_sec_email">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Add cc:</label>
+                                                    <input class="form-control" type="text" id="text_alert_qc_cc_sec" name="text_alert_qc_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_alert_qc_cc_sec_username" name="text_alert_qc_cc_sec_username">
+                                                    <input type="hidden" id="text_alert_qc_cc_sec_email" name="text_alert_qc_cc_sec_email">
+                                                </div>
+                                            </div> -->
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-6"></div>
+
+                                                <!-- QC Section: To -->
+                                                <div class="col-md-3">
+                                                    <label class="" for="" id="label_alert_qc_sec">Send Email Alert to:</label>
+                                                    <div id="selectedQcAlertRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
+                                                    <input class="form-control" type="text" id="text_alert_qc_sec" name="text_alert_qc_sec" list="list_display_empno" placeholder="Send email to">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_alert_qc_sec_username" name="text_alert_qc_sec_username">
+                                                    <input type="hidden" id="text_alert_qc_sec_email" name="text_alert_qc_sec_email">
+                                                </div>
+
+                                                <!-- QC Section: CC -->
+                                                <div class="col-md-3">
+                                                    <label class="" for="" id="label_alert_qc_cc_sec">Add cc:</label>
+                                                    <div id="selectedQcAlertCcRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
+                                                    <input class="form-control" type="text" id="text_alert_qc_cc_sec" name="text_alert_qc_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_alert_qc_cc_sec_username" name="text_alert_qc_cc_sec_username">
+                                                    <input type="hidden" id="text_alert_qc_cc_sec_email" name="text_alert_qc_cc_sec_email">
+                                                </div>
+                                            </div>
+
+                                            <!-- ------------------------------------------------ -->
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFourOperEdit" aria-expanded="false" aria-controls="collapseFourOperEdit">
+                                            <h5>PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h5>
+                                        </button>
+                                        </h2>
+                                        <div id="collapseFourOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
+                                            <div class="accordion-body">
+
+                                                <!-- ------------------------------------------------ -->
+
+                                                <p class="mb-3">FOR PPS Visual Operators only</p>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">First Take:</label>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Second Take:</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">1. Lot Qty (1st lot):</label>
+                                                        <!-- DITO 5-8-25 -->
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_lot_1st_sample_peqcs_oper" id="text_edit_lot_1st_sample_peqcs_oper">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">1. Lot Qty (1st lot):</label>
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_2nd_sample_peqcs_oper" id="text_edit_2nd_sample_peqcs_oper">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-4">
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Injected NG Qty:</label>
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_1st_injected_ng_peqcs_oper" id="text_edit_1st_injected_ng_peqcs_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Detected NG:</label>
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_1st_detected_ng_peqcs_oper" id="text_edit_1st_detected_ng_peqcs_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Injected NG Qty:</label>
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_2nd_injected_ng_peqcs_oper" id="text_edit_2nd_injected_ng_peqcs_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Detected NG:</label>
+                                                        <input class="form-control" type="number" placeholder="Enter sample count" min="0" name="text_edit_2nd_detected_ng_peqcs_oper" id="text_edit_2nd_detected_ng_peqcs_oper">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">2. Overall Assessment:</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_oa_1st_result_peqcs_oper" id="text_edit_oa_1st_result_peqcs_oper">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">2. Overall Assessment:</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_oa_2nd_result_peqcs_oper" id="text_edit_oa_2nd_result_peqcs_oper">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Reason for Disapproval:</label>
+                                                        <input class="form-control" type="text" id="text_edit_1st_disapproval_peqcs_oper" name="text_edit_1st_disapproval_peqcs_oper">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Reason for Disapproval:</label>
+                                                        <input class="form-control" type="text" id="text_edit_2nd_disapproval_peqcs_oper" name="text_edit_2nd_disapproval_peqcs_oper">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label for="">Certified by:</label>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label for="">Certified by:</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1">
+                                                        <p for="">Production:</p>
+                                                    </div>
+
+                                                    <div class="col-md-5">
+                                                        <input class="form-select mb-2" type="text" id="text_edit_1st_certified_prod_peqcs_oper" name="text_edit_1st_certified_prod_peqcs_oper" list="list_display_empno" placeholder="Select Prod'n Certified by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_1st_certified_prod_peqcs_oper_username" name="text_edit_1st_certified_prod_peqcs_oper_username">
+                                                        <input type="hidden" id="text_edit_1st_certified_prod_peqcs_oper_email" name="text_edit_1st_certified_prod_peqcs_oper_email">
+                                                    </div>
+
+                                                    <div class="col-md-1">
+                                                        <p for="">Production:</p>
+                                                    </div>
+
+                                                    <div class="col-md-5">
+                                                        <input class="form-select mb-2" type="text" id="text_edit_2nd_certified_prod_peqcs_oper" name="text_edit_2nd_certified_prod_peqcs_oper" list="list_display_empno" placeholder="Select Prod'n Certified by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_2nd_certified_prod_peqcs_oper_username" name="text_edit_2nd_certified_prod_peqcs_oper_username">
+                                                        <input type="hidden" id="text_edit_2nd_certified_prod_peqcs_oper_email" name="text_edit_2nd_certified_prod_peqcs_oper_email">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1">
+                                                        <p for="">Engineering:</p>
+                                                    </div>
+
+                                                    <div class="col-md-5">
+                                                        <input class="form-select mb-2" type="text" id="text_edit_1st_certified_eng_peqcs_oper" name="text_edit_1st_certified_eng_peqcs_oper" list="list_display_empno" placeholder="Select Eng'g Certified by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_1st_certified_eng_peqcs_oper_username" name="text_edit_1st_certified_eng_peqcs_oper_username">
+                                                        <input type="hidden" id="text_edit_1st_certified_eng_peqcs_oper_email" name="text_edit_1st_certified_eng_peqcs_oper_email">
+                                                    </div>
+
+                                                    <div class="col-md-1">
+                                                        <p for="">Engineering:</p>
+                                                    </div>
+
+                                                    <div class="col-md-5">
+                                                        <input class="form-select mb-2" type="text" id="text_edit_2nd_certified_eng_peqcs_oper" name="text_edit_2nd_certified_eng_peqcs_oper" list="list_display_empno" placeholder="Select Eng'g Certified by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_2nd_certified_eng_peqcs_oper_username" name="text_edit_2nd_certified_eng_peqcs_oper_username">
+                                                        <input type="hidden" id="text_edit_2nd_certified_eng_peqcs_oper_email" name="text_edit_2nd_certified_eng_peqcs_oper_email">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1">
+                                                        <p for="">Quality Control:</p>
+                                                    </div>
+
+                                                    <div class="col-md-5">
+                                                        <input class="form-select mb-2" type="text" id="text_edit_1st_certified_qc_peqcs_oper" name="text_edit_1st_certified_qc_peqcs_oper" list="list_display_empno" placeholder="Select QC Certified by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_1st_certified_qc_peqcs_oper_username" name="text_edit_1st_certified_qc_peqcs_oper_username">
+                                                        <input type="hidden" id="text_edit_1st_certified_qc_peqcs_oper_email" name="text_edit_1st_certified_qc_peqcs_oper_email">
+                                                    </div>
+
+                                                    <div class="col-md-1">
+                                                        <p for="">Quality Control:</p>
+                                                    </div>
+
+                                                    <div class="col-md-5">
+                                                        <input class="form-select mb-2" type="text" id="text_edit_2nd_certified_qc_peqcs_oper" name="text_edit_2nd_certified_qc_peqcs_oper" list="list_display_empno" placeholder="Select QC Certified by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_2nd_certified_qc_peqcs_oper_username" name="text_edit_2nd_certified_qc_peqcs_oper_username">
+                                                        <input type="hidden" id="text_edit_2nd_certified_qc_peqcs_oper_email" name="text_edit_2nd_certified_qc_peqcs_oper_email">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-5">
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_edit_1st_date_peqcs_oper" name="text_edit_1st_date_peqcs_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Time:</label>
+                                                        <input class="form-control" type="time" id="text_edit_1st_time_peqcs_oper" name="text_edit_1st_time_peqcs_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_edit_2nd_date_peqcs_oper" name="text_edit_2nd_date_peqcs_oper">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Time:</label>
+                                                        <input class="form-control" type="time" id="text_edit_2nd_time_peqcs_oper" name="text_edit_2nd_time_peqcs_oper">
+                                                    </div>
+                                                </div>
+
+                                                <label for="">Note: NG Injection process shall be taken from first lot output</label>
+
+                                                <!-- <div class="row mb-2">
+                                                    <div class="col-md-6"></div>
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Send Email Alert to:</label>
+                                                        <input class="form-control" type="text" id="text_alert_pps_sec" name="text_alert_pps_sec" list="list_display_empno" placeholder="Send email to">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_pps_sec_username" name="text_alert_pps_sec_username">
+                                                        <input type="hidden" id="text_alert_pps_sec_email" name="text_alert_pps_sec_email">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Add cc:</label>
+                                                        <input class="form-control" type="text" id="text_alert_pps_cc_sec" name="text_alert_pps_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_pps_cc_sec_username" name="text_alert_pps_cc_sec_username">
+                                                        <input type="hidden" id="text_alert_pps_cc_sec_email" name="text_alert_pps_cc_sec_email">
+                                                    </div>
+                                                </div> -->
+
+                                                <div class="row mb-2">
+                                                    <div class="col-md-6"></div>
+
+                                                    <!-- PPS Section: To -->
+                                                    <div class="col-md-3">
+                                                        <label class="" for="" id="label_alert_pps_sec">Send Email Alert to:</label>
+                                                        <div id="selectedPpsAlertRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
+                                                        <input class="form-control" type="text" id="text_alert_pps_sec" name="text_alert_pps_sec" list="list_display_empno" placeholder="Send email to">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_pps_sec_username" name="text_alert_pps_sec_username">
+                                                        <input type="hidden" id="text_alert_pps_sec_email" name="text_alert_pps_sec_email">
+                                                    </div>
+
+                                                    <!-- PPS Section: CC -->
+                                                    <div class="col-md-3">
+                                                        <label class="" for="" id="label_alert_pps_cc_sec">Add cc:</label>
+                                                        <div id="selectedPpsAlertCcRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
+                                                        <input class="form-control" type="text" id="text_alert_pps_cc_sec" name="text_alert_pps_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_pps_cc_sec_username" name="text_alert_pps_cc_sec_username">
+                                                        <input type="hidden" id="text_alert_pps_cc_sec_email" name="text_alert_pps_cc_sec_email">
+                                                    </div>
+                                                </div>
+
+                                                <!-- ------------------------------------------------ -->
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFiveOperEdit" aria-expanded="false" aria-controls="collapseFiveOperEdit">
+                                            <h5>VALIDATION PROCESS: ENGINEERING SECTION</h5>
+                                        </button>
+                                        </h2>
+                                        <div id="collapseFiveOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
+                                            <div class="accordion-body">
+
+                                            <!-- ------------------------------------------------ -->
+
+                                            <div class="row mb-1">
+                                                <div class="col-md-3">
+                                                    <label class="ms-5" for="">Engineering Validation Result:</label>
+                                                </div>
+
+                                                <div class="col-md-5"></div>
+
+                                                <div class="col-md-4">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_application_vpes_oper" id="text_edit_application_vpes_oper">
+                                                        <option value="" selected disabled>Select</option>
+                                                        <option value="Applicable">Applicable</option>
+                                                        <option value="Not Applicable">Not Applicable</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-1"></div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_vpes_oper_1" name="text_edit_vpes_oper" value="Pre-production samples and check sheet checking" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_vpes_oper_1" style="font-weight: normal;">Pre-production samples and check sheet checking</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h5 class="mt-3 mb-3">RESULT</h5>
+
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">First Take</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_first_result_vpes_oper" id="text_edit_first_result_vpes_oper">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Second Take</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_second_result_vpes_oper" id="text_edit_second_result_vpes_oper">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Validated by (after 2nd day):</label>
+                                                    <input class="form-control" type="text" id="text_edit_1st_validatedby_vpes_oper" name="text_edit_1st_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_1st_validatedby_vpes_oper_username" name="text_edit_1st_validatedby_vpes_oper_username">
+                                                    <input type="hidden" id="text_edit_1st_validatedby_vpes_oper_email" name="text_edit_1st_validatedby_vpes_oper_email">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Validated by (after re-orientation):</label>
+                                                    <input class="form-control" type="text" id="text_edit_2nd_validatedby_vpes_oper" name="text_edit_2nd_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_2nd_validatedby_vpes_oper_username" name="text_edit_2nd_validatedby_vpes_oper_username">
+                                                    <input type="hidden" id="text_edit_2nd_validatedby_vpes_oper_email" name="text_edit_2nd_validatedby_vpes_oper_email">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_1st_date_vpes_oper" name="text_edit_1st_date_vpes_oper">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_2nd_date_vpes_oper" name="text_edit_2nd_date_vpes_oper">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-5">
+                                                <div class="col-md-12">
+                                                    <label class="" for="">Remarks:</label>
+                                                    <input class="form-control" type="text" name="text_edit_remarks_vpes_oper" id="text_edit_remarks_vpes_oper" placeholder="Enter remarks">
+                                                </div>
+                                            </div>
+
+                                            <!-- <div class="row mb-2">
+                                                <div class="col-md-6"></div>
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Send Email Alert to:</label>
+                                                    <input class="form-control" type="text" id="text_alert_ev_sec" name="text_alert_ev_sec" list="list_display_empno" placeholder="Send email to">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_alert_ev_sec_username" name="text_alert_ev_sec_username">
+                                                    <input type="hidden" id="text_alert_ev_sec_email" name="text_alert_ev_sec_email">
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="" for="">Add cc:</label>
+                                                    <input class="form-control" type="text" id="text_alert_ev_cc_sec" name="text_alert_ev_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_alert_ev_cc_sec_username" name="text_alert_ev_cc_sec_username">
+                                                    <input type="hidden" id="text_alert_ev_cc_sec_email" name="text_alert_ev_cc_sec_email">
+                                                </div>
+                                            </div> -->
+
+                                            <div class="row mb-2">
+                                                <div class="col-md-6"></div>
+
+                                                <!-- EV Section: To -->
+                                                <div class="col-md-3">
+                                                    <label class="" for="" id="label_alert_ev_sec">Send Email Alert to:</label>
+                                                    <div id="selectedEvAlertRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
+                                                    <input class="form-control" type="text" id="text_alert_ev_sec" name="text_alert_ev_sec" list="list_display_empno" placeholder="Send email to">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_alert_ev_sec_username" name="text_alert_ev_sec_username">
+                                                    <input type="hidden" id="text_alert_ev_sec_email" name="text_alert_ev_sec_email">
+                                                </div>
+
+                                                <!-- EV Section: Cc -->
+                                                <div class="col-md-3">
+                                                    <label class="" for="" id="label_alert_ev_cc_sec">Add cc:</label>
+                                                    <div id="selectedEvAlertCcRecipients" class="fs-5 mb-1"></div> <!-- ADDED -->
+                                                    <input class="form-control" type="text" id="text_alert_ev_cc_sec" name="text_alert_ev_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                    <datalist id="list_display_empno"></datalist>
+                                                    <input type="hidden" id="text_alert_ev_cc_sec_username" name="text_alert_ev_cc_sec_username">
+                                                    <input type="hidden" id="text_alert_ev_cc_sec_email" name="text_alert_ev_cc_sec_email">
+                                                </div>
+                                            </div>
+
+                                            <!-- ------------------------------------------------ -->
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSixOperEdit" aria-expanded="false" aria-controls="collapseSixOperEdit">
+                                            <h5>VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
+                                        </button>
+                                        </h2>
+                                        <div id="collapseSixOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
+                                            <div class="accordion-body">
+
+                                                <!-- ------------------------------------------------ -->
+
+                                                <div class="row mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="ms-5" for="">QC Validation for other section</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_vpqcs_oper_1" name="text_edit_vpqcs_oper" value="Production Abnormality Control" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_vpqcs_oper_1" style="font-weight: normal;">Production Abnormality Control</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_vpqcs_oper_2" name="text_edit_vpqcs_oper" value="Defect Escalation Procedure" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_vpqcs_oper_2" style="font-weight: normal;">Defect Escalation Procedure</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <h5 class="mt-3 mb-3">RESULT</h5>
+
+                                                <div class="row mb-4">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">First Take</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_first_result_vpqcs_oper" id="text_edit_first_result_vpqcs_oper">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Second Take</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_second_result_vpqcs_oper" id="text_edit_second_result_vpqcs_oper">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Validated by (after 2nd day):</label>
+                                                        <input class="form-control" type="text" id="text_edit_1st_validatedby_vpqcs_oper" name="text_edit_1st_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_1st_validatedby_vpqcs_oper_username" name="text_edit_1st_validatedby_vpqcs_oper_username">
+                                                        <input type="hidden" id="text_edit_1st_validatedby_vpqcs_oper_email" name="text_edit_1st_validatedby_vpqcs_oper_email">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Validated by (after re-orientation):</label>
+                                                        <input class="form-control" type="text" id="text_edit_2nd_validatedby_vpqcs_oper" name="text_edit_2nd_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_2nd_validatedby_vpqcs_oper_username" name="text_edit_2nd_validatedby_vpqcs_oper_username">
+                                                        <input type="hidden" id="text_edit_2nd_validatedby_vpqcs_oper_email" name="text_edit_2nd_validatedby_vpqcs_oper_email">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_edit_1st_date_vpqcs_oper" name="text_edit_1st_date_vpqcs_oper">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_edit_2nd_date_vpqcs_oper" name="text_edit_2nd_date_vpqcs_oper">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <label class="" for="">Remarks:</label>
+                                                        <input class="form-control" type="text" name="text_edit_remarks_vpqcs_oper" id="text_edit_remarks_vpqcs_oper" placeholder="Enter remarks">
+                                                    </div>
+                                                </div>
+
+                                                <!-- ************************************************************ 2ND SECTION VPQCS ******************************************************************* -->
+
+                                                <hr style="height: 5px; background-color: black; border: none;">
+
+                                                <div class="row mt-3 mb-1">
+                                                    <div class="col-md-4">
+                                                        <div class="form-check ms-5">
+                                                            <input class="form-check-input" type="checkbox" id="text_edit_vpqcs_oper_1_1" name="text_edit_vpqcs_oper_1" value="Pre-production samples and check sheet checking" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_edit_vpqcs_oper_1_1" style="font-weight: normal;">Pre-production samples and check sheet checking</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4"></div>
+
+                                                    <div class="col-md-4">
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_application_vpqcs_oper" id="text_edit_application_vpqcs_oper">
+                                                            <option value="" selected disabled>Select</option>
+                                                            <option value="Applicable">Applicable</option>
+                                                            <option value="Not Applicable">Not Applicable</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <h5 class="mt-3 mb-3">RESULT</h5>
+
+                                                <div class="row mb-4">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">First Take</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_first_result_vpes_oper_2" id="text_edit_first_result_vpes_oper_2">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Second Take</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_edit_second_result_vpes_oper_2" id="text_edit_second_result_vpes_oper_2">
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Validated by (after 3rd day):</label>
+                                                        <input class="form-control" type="text" id="text_edit_1st_validatedby_vpes_oper_2" name="text_edit_1st_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_1st_validatedby_vpes_oper_2_username" name="text_edit_1st_validatedby_vpes_oper_2_username">
+                                                        <input type="hidden" id="text_edit_1st_validatedby_vpes_oper_2_email" name="text_edit_1st_validatedby_vpes_oper_2_email">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Validated by (after re-orientation):</label>
+                                                        <input class="form-control" type="text" id="text_edit_2nd_validatedby_vpes_oper_2" name="text_edit_2nd_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
+                                                        <datalist id="list_display_empno"></datalist>
+
+                                                        <input type="hidden" id="text_edit_2nd_validatedby_vpes_oper_2_username" name="text_edit_2nd_validatedby_vpes_oper_2_username">
+                                                        <input type="hidden" id="text_edit_2nd_validatedby_vpes_oper_2_email" name="text_edit_2nd_validatedby_vpes_oper_2_email">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_edit_1st_date_vpes_oper_2" name="text_edit_1st_date_vpes_oper_2">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_edit_2nd_date_vpes_oper_2" name="text_edit_2nd_date_vpes_oper_2">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-5">
+                                                    <div class="col-md-12">
+                                                        <label class="" for="">Remarks:</label>
+                                                        <input class="form-control" type="text" name="text_edit_remarks_vpes_oper_2" id="text_edit_remarks_vpes_oper_2" placeholder="Enter remarks">
+                                                    </div>
+                                                </div>
+
+                                                <!-- <div class="row mb-2">
+                                                    <div class="col-md-6"></div>
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Send Email Alert to:</label>
+                                                        <input class="form-control" type="text" id="text_alert_qcv_sec" name="text_alert_qcv_sec" list="list_display_empno" placeholder="Send email to">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_qcv_sec_username" name="text_alert_qcv_sec_username">
+                                                        <input type="hidden" id="text_alert_qcv_sec_email" name="text_alert_qcv_sec_email">
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="" for="">Add cc:</label>
+                                                        <input class="form-control" type="text" id="text_alert_qcv_cc_sec" name="text_alert_qcv_cc_sec" list="list_display_empno" placeholder="Cc">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_qcv_cc_sec_username" name="text_alert_qcv_cc_sec_username">
+                                                        <input type="hidden" id="text_alert_qcv_cc_sec_email" name="text_alert_qcv_cc_sec_email">
+                                                    </div>
+                                                </div> -->
+
+                                                <div class="row mb-2">
+                                                    <div class="col-md-6"></div>
+
+                                                    <!-- QCV Section: To -->
+                                                    <div class="col-md-3">
+                                                        <label for="text_alert_qcv_sec" id="label_alert_qcv_sec">Send Email Alert to:</label>
+                                                        <div id="selectedQcvAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
+                                                        <input class="form-control" type="text"
+                                                            id="text_alert_qcv_sec"
+                                                            name="text_alert_qcv_sec"
+                                                            list="list_display_empno"
+                                                            placeholder="Send email to">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_qcv_sec_username" name="text_alert_qcv_sec_username">
+                                                        <input type="hidden" id="text_alert_qcv_sec_email" name="text_alert_qcv_sec_email">
+                                                    </div>
+
+                                                    <!-- QCV Section: CC -->
+                                                    <div class="col-md-3">
+                                                        <label for="text_alert_qcv_cc_sec" id="label_alert_qcv_cc_sec">Add cc:</label>
+                                                        <div id="selectedQcvAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
+                                                        <input class="form-control" type="text"
+                                                            id="text_alert_qcv_cc_sec"
+                                                            name="text_alert_qcv_cc_sec"
+                                                            list="list_display_empno"
+                                                            placeholder="Cc">
+                                                        <datalist id="list_display_empno"></datalist>
+                                                        <input type="hidden" id="text_alert_qcv_cc_sec_username" name="text_alert_qcv_cc_sec_username">
+                                                        <input type="hidden" id="text_alert_qcv_cc_sec_email" name="text_alert_qcv_cc_sec_email">
+                                                    </div>
+                                                </div>
+
+                                                <!-- ------------------------------------------------ -->
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSevenOperEdit" aria-expanded="false" aria-controls="collapseSevenOperEdit">
+                                            <h5>QC Validation for Visual Operator</h5>
+                                        </button>
+                                        </h2>
+                                        <div id="collapseSevenOperEdit" class="accordion-collapse collapse" data-parent="#accordionExampleOperEdit">
+                                            <div class="accordion-body">
+
+                                            <!-- ------------------------------------------------ -->
+
+                                            <p><> Reference Document</p>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="ms-4" for="">Reference Document</label>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label for="">Discuss the inspection sequence in detail.</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_refdoc_qcvvo_oper" name="text_edit_refdoc_qcvvo_oper[]" value="Work Instruction Document" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_refdoc_qcvvo_oper" style="font-weight: normal;">1. Work Instruction Document</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <input class="form-control" type="text" id="text_edit_refdocno_input_qcvvo_oper" name="text_edit_refdocno_input_qcvvo_oper" placeholder="Enter the reference document number">
+                                                </div>
+
+                                                <div class="col-md-1">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_ins_seq_qcvvo_oper_yes" name="text_edit_ins_seq_qcvvo_oper" value="Yes" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_ins_seq_qcvvo_oper_yes" style="font-weight: normal;">Yes</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_ins_seq_qcvvo_oper_no" name="text_edit_ins_seq_qcvvo_oper" value="No" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_ins_seq_qcvvo_oper_no" style="font-weight: normal;">No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h6 class="mt-3 mb-3">RESULT:</h6>
+
+                                            <div class="row mb-5">
+                                                <div class="col-md-4">
+                                                    <label class="ms-3" for="">First Take:</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_result1__qcvvo_oper" id="text_edit_result1__qcvvo_oper">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="ms-3" for="">Validated by:</label>
+                                                    <input class="form-control" type="text" id="text_edit_validated1_qcvvo_oper" name="text_edit_validated1_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_validated1_qcvvo_oper_username" name="text_edit_validated1_qcvvo_oper_username">
+                                                    <input type="hidden" id="text_edit_validated1_qcvvo_oper_email" name="text_edit_validated1_qcvvo_oper_email">
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="ms-3" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_date1_qcvvo_oper" name="text_edit_date1_qcvvo_oper">
+                                                </div>
+                                            </div>
+
+                                            <p><> Reference Document</p>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="ms-4" for="">Reference Document</label>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label for="">Discuss the inspection sequence in detail.</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-3">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_refdoc_qcvvo_oper_2" name="text_edit_refdoc_qcvvo_oper_2[]" value="Work Instruction Document" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_refdoc_qcvvo_oper_2" style="font-weight: normal;">1. Work Instruction Document</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <input class="form-control" type="text" id="text_edit_refdocno_input_qcvvo_oper_2" name="text_edit_refdocno_input_qcvvo_oper_2" placeholder="Enter the reference document number">
+                                                </div>
+
+                                                <div class="col-md-1">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_ins_seq_qcvvo_oper_yes_2" name="text_edit_ins_seq_qcvvo_oper_2" value="Yes" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_ins_seq_qcvvo_oper_yes_2" style="font-weight: normal;">Yes</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check ms-5">
+                                                        <input class="form-check-input" type="checkbox" id="text_edit_ins_seq_qcvvo_oper_no_2" name="text_edit_ins_seq_qcvvo_oper_2" value="No" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                        <label class="fs-5  " for="text_edit_ins_seq_qcvvo_oper_no_2" style="font-weight: normal;">No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h6 class="mt-3 mb-3">RESULT:</h6>
+
+                                            <div class="row mb-4">
+                                                <div class="col-md-4">
+                                                    <label class="ms-3" for="">Second Take:</label>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_edit_result2__qcvvo_oper" id="text_edit_result2__qcvvo_oper">
+                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="ms-3" for="">Validated by:</label>
+                                                    <input class="form-control" type="text" id="text_edit_validated2_qcvvo_oper" name="text_edit_validated2_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
+                                                    <datalist id="list_display_empno"></datalist>
+
+                                                    <input type="hidden" id="text_edit_validated2_qcvvo_oper_username" name="text_edit_validated2_qcvvo_oper_username">
+                                                    <input type="hidden" id="text_edit_validated2_qcvvo_oper_email" name="text_edit_validated2_qcvvo_oper_email">
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="ms-3" for="">Date:</label>
+                                                    <input class="form-control" type="date" id="text_edit_date2_qcvvo_oper" name="text_edit_date2_qcvvo_oper">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-4">
+                                                <div class="col-md-12">
+                                                    <label for="">
+                                                    Note #3: Do not combine machine operator's orientation to other station or process in (one) 1 slip
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <div class="table-responsive">
+                                                        <table id="" class="table table-bordered table-hover nowrap">
+                                                            <thead class="table table-warning">
+                                                                <tr class="text-center">
+                                                                    <th>Designation</th>
+                                                                    <th>Training / Orientation</th>
+                                                                    <th>Qualifier</th>
+                                                                    <th>Certifier</th>
+                                                                    <th>Approver / Confirmation</th>
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>Operator</td>
+                                                                    <td>Supervisor and/or Material Handler</td>
+                                                                    <td>Process Engineer</td>
+                                                                    <td>QC Inspector</td>
+                                                                    <td>QC Supervisor</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- ------------------------------------------------ -->
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            <hr style="height: 5px; background-color: black; border: none;">
+
+                            <!-- <h4 class="mb-3">PRODUCTION SECTION (Training and Orientation)</h4> -->
+
+                            <!-- **************************************************************      2ND SECTION          ************************************************************************************************* -->
+
+                            <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
+
+                            <!-- <h4 class="mb-3">ENGINEERING SECTION (Training and Qualification)</h4> -->
+
+                            <!-- ************************************************************ 3RD SECTION ******************************************************************* -->
+
+                            <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
+
+                            <!-- <h4 class="mb-3">QUALITY CONTROL SECTION (CERTIFICATTION)</h4> -->
+
+                            <!-- ************************************************************ 4TH SECTION - BACK PAGE - ******************************************************************* -->
+
+                            <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
+
+                            <!-- <h4 class="mb-3">PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h4> -->
+
+                            <!-- ************************************************************ 5TH SECTION - BACK PAGE - ******************************************************************* -->
+
+                            <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
+
+                            <!-- <h4 class="mb-3">VALIDATION PROCESS: ENGINEERING SECTION</h4> -->
+
+                            <!-- ************************************************************ 6TH SECTION - BACK PAGE - ******************************************************************* -->
+
+                            <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
+
+                            <!-- <h4 class="mb-3">VALIDATION PROCESS: QUALITY CONTROL SECTION</h4> -->
+
+                            <!-- ************************************************************ 6TH SECTION - BACK PAGE - ******************************************************************* -->
+
+                            <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
+
+                            <!-- <h4 class="mb-3">QC Validation for Visual Operator</h4> -->
+
+                            <div class="col-md-6">
+                                <label for="">Approved / Confirmed by:</label>
+                                <input class="form-control" type="text" id="text_edit_oper_approved_confirmed_by" name="text_edit_oper_approved_confirmed_by" list="list_display_empno" placeholder="Select Approved / Confirmed by">
+                                <datalist id="list_display_empno"></datalist>
+
+                                <label for="" class="mt-1">QC Supervisor</label>
+
+                                <input type="hidden" id="text_edit_oper_approved_confirmed_by_username" name="text_edit_oper_approved_confirmed_by_username">
+                                <input type="hidden" id="text_edit_oper_approved_confirmed_by_email" name="text_edit_oper_approved_confirmed_by_email">
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success" id="btnSubmitOperEdit"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <!-- GENERATE REPORT FOR MH -->
+        <div class="modal" id="" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">GENERATE PDF</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <!-- <form method="POST" action="exportOperFormPDF.php" id="formGeneratePDF" target="_blank"> -->
+
+                            <input type="text" name="text_report_mh_conno" id="text_report_mh_conno">
+                            <input type="text" name="text_report_fk_cq_mh_conno" id="text_report_fk_cq_mh_conno">
+
+                            <input type="text" name="text_report_mh_section" id="text_report_mh_section">
+                            <input type="text" name="text_report_mh_series" id="text_report_mh_series">
+                            <input type="text" name="text_report_mh_certification" id="text_report_mh_certification">
+                            <input type="text" name="text_report_mh_training" id="text_report_mh_training">
+                            <input type="text" name="text_report_mh_approved_confirmed_by" id="text_report_mh_approved_confirmed_by">
+                            <input type="text" name="text_report_mh_first_result" id="text_report_mh_first_result">
+                            <input type="text" name="text_report_mh_product_line" id="text_report_mh_product_line">
+                            <input type="text" name="text_report_mh_first_trained_by" id="text_report_mh_first_trained_by">
+                            <input type="text" name="text_report_mh_first_date_time" id="text_report_mh_first_date_time">
+                            <input type="text" name="text_report_mh_second_result" id="text_report_mh_second_result">
+                            <input type="text" name="text_report_mh_second_trained_by" id="text_report_mh_second_trained_by">
+                            <input type="text" name="text_report_mh_second_date_time" id="text_report_mh_second_date_time">
+                            <input type="text" name="text_report_mh_result_input" id="text_report_mh_result_input">
+                            <input type="text" name="text_view_mh_obs_first_result" id="text_view_mh_obs_first_result">
+                            <input type="text" name="text_report_mh_first_sample" id="text_report_mh_first_sample">
+                            <input type="text" name="text_report_mh_first_ok" id="text_report_mh_first_ok">
+                            <input type="text" name="text_report_mh_first_ng" id="text_report_mh_first_ng">
+                            <input type="text" name="text_report_mh_qcc_training1" id="text_report_mh_qcc_training1">
+                            <input type="text" name="text_report_mh_oa_1st_result" id="text_report_mh_oa_1st_result">
+                            <input type="text" name="text_report_mh_1st_disapproval" id="text_report_mh_1st_disapproval">
+                            <input type="text" name="text_report_mh_1st_certified" id="text_report_mh_1st_certified">
+                            <input type="text" name="text_report_mh_qc_1st_date_time" id="text_report_mh_qc_1st_date_time">
+                            <input type="text" name="text_report_mh_obs_second_result" id="text_report_mh_obs_second_result">
+                            <input type="text" name="text_report_mh_second_sample" id="text_report_mh_second_sample">
+                            <input type="text" name="text_report_mh_second_ok" id="text_report_mh_second_ok">
+                            <input type="text" name="text_report_mh_second_ng" id="text_report_mh_second_ng">
+                            <input type="text" name="text_report_mh_qcc_training2" id="text_report_mh_qcc_training2">
+                            <input type="text" name="text_report_mh_oa_2nd_result" id="text_report_mh_oa_2nd_result">
+                            <input type="text" name="text_report_mh_2nd_disapproval" id="text_report_mh_2nd_disapproval">
+                            <input type="text" name="text_report_mh_2nd_certified" id="text_report_mh_2nd_certified">
+                            <input type="text" name="text_report_mh_qc_2nd_date_time" id="text_report_mh_qc_2nd_date_time">
+
+                            <!-- <input type="submit" class="btn btn-warning float-start pdf" id="pdf" name="pdf" value="Generate PDF"> -->
+                        <!-- </form> -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GENERATE REPORT FOR TECHNICIAN -->
+        <div class="modal" id="" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">GENERATE PDF</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <!-- <form method="POST" action="exportOperFormPDF.php" id="formGeneratePDF" target="_blank"> -->
+
+                            <input type="text" name="text_report_tech_conno" id="text_report_tech_conno">
+                            <input type="text" name="text_report_fk_cq_tech_conno" id="text_report_fk_cq_tech_conno">
+
+                            <input type="text" name="text_report_cq_overall_section" id="text_report_cq_overall_section">
+                            <input type="text" name="text_report_cq_position" id="text_report_cq_position">
+                            <input type="text" name="text_report_cq_createdby_name" id="text_report_cq_createdby_name">
+                            <input type="text" name="text_report_cq_createdby_username" id="text_report_cq_createdby_username">
+                            <input type="text" name="text_report_cq_createdby_email" id="text_report_cq_createdby_email">
+                            <input type="text" name="text_report_cq_new_conno" id="text_report_cq_new_conno">
+                            <input type="text" name="text_report_cq_section" id="text_report_cq_section">
+                            <input type="text" name="text_report_cq_station" id="text_report_cq_station">
+                            <input type="text" name="text_report_cq_product_line" id="text_report_cq_product_line">
+                            <input type="text" name="text_report_cq_certification_reason" id="text_report_cq_certification_reason">
+                            <input type="text" name="text_report_cq_training" id="text_report_cq_training">
+                            <input type="text" name="text_report_cq_docnum" id="text_report_cq_docnum">
+                            <input type="text" name="text_report_cq_eng_trainedby" id="text_report_cq_eng_trainedby">
+                            <input type="text" name="text_report_cq_eng_trainedby_empno" id="text_report_cq_eng_trainedby_empno">
+                            <input type="text" name="text_report_cq_eng_trainedby_username" id="text_report_cq_eng_trainedby_username">
+                            <input type="text" name="text_report_cq_eng_trainedby_email" id="text_report_cq_eng_trainedby_email">
+                            <input type="text" name="text_report_cq_eng_date" id="text_report_cq_eng_date">
+                            <input type="text" name="text_report_cq_eng_time" id="text_report_cq_eng_time">
+                            <input type="text" name="text_report_cq_qcc_approvedby" id="text_report_cq_qcc_approvedby">
+                            <input type="text" name="text_report_cq_qcc_approvedby_empno" id="text_report_cq_qcc_approvedby_empno">
+                            <input type="text" name="text_report_cq_qcc_approvedby_username" id="text_report_cq_qcc_approvedby_username">
+                            <input type="text" name="text_report_cq_qcc_approvedby_email" id="text_report_cq_qcc_approvedby_email">
+                            <input type="text" name="text_report_cq_qcc_isApproved" id="text_report_cq_qcc_isApproved">
+                            <input type="text" name="text_report_cq_approved_at" id="text_report_cq_approved_at">
+                            <input type="text" name="text_report_cq_p_t_result_1" id="text_report_cq_p_t_result_1">
+                            <input type="text" name="text_report_cq_p_t_trainedby_1" id="text_report_cq_p_t_trainedby_1">
+                            <input type="text" name="text_report_cq_p_t_trainedby_1_empno" id="text_report_cq_p_t_trainedby_1_empno">
+                            <input type="text" name="text_report_cq_p_t_trainedby_username1" id="text_report_cq_p_t_trainedby_username1">
+                            <input type="text" name="text_report_cq_p_t_trainedby_email1" id="text_report_cq_p_t_trainedby_email1">
+                            <input type="text" name="text_report_cq_p_t_date_1" id="text_report_cq_p_t_date_1">
+                            <input type="text" name="text_report_cq_p_t_time_1" id="text_report_cq_p_t_time_1">
+                            <input type="text" name="text_report_cq_p_t_result_2" id="text_report_cq_p_t_result_2">
+                            <input type="text" name="text_report_cq_p_t_trainedby_2" id="text_report_cq_p_t_trainedby_2">
+                            <input type="text" name="text_report_cq_p_t_trainedby_2_empno" id="text_report_cq_p_t_trainedby_2_empno">
+                            <input type="text" name="text_report_cq_p_t_trainedby_username2" id="text_report_cq_p_t_trainedby_username2">
+                            <input type="text" name="text_report_cq_p_t_trainedby_email2" id="text_report_cq_p_t_trainedby_email2">
+                            <input type="text" name="text_report_cq_p_t_date_2" id="text_report_cq_p_t_date_2">
+                            <input type="text" name="text_report_cq_p_t_time_2" id="text_report_cq_p_t_time_2">
+                            <input type="text" name="text_report_cq_qcc_obs_result_1" id="text_report_cq_qcc_obs_result_1">
+                            <input type="text" name="text_report_cq_qcc_certifiedby_1" id="text_report_cq_qcc_certifiedby_1">
+                            <input type="text" name="text_report_cq_qcc_certifiedby_1_empno" id="text_report_cq_qcc_certifiedby_1_empno">
+                            <input type="text" name="text_report_cq_qcc_certifiedby_username1" id="text_report_cq_qcc_certifiedby_username1">
+                            <input type="text" name="text_report_cq_qcc_certifiedby_email1" id="text_report_cq_qcc_certifiedby_email1">
+                            <input type="text" name="text_report_cq_qcc_date_1" id="text_report_cq_qcc_date_1">
+                            <input type="text" name="text_report_cq_qcc_time_1" id="text_report_cq_qcc_time_1">
+                            <input type="text" name="text_report_cq_qcc_obs_result_2" id="text_report_cq_qcc_obs_result_2">
+                            <input type="text" name="text_report_cq_qcc_certifiedby_2" id="text_report_cq_qcc_certifiedby_2">
+                            <input type="text" name="text_report_cq_qcc_certifiedby_2_empno" id="text_report_cq_qcc_certifiedby_2_empno">
+                            <input type="text" name="text_report_cq_qcc_certifiedby_username2" id="text_report_cq_qcc_certifiedby_username2">
+                            <input type="text" name="text_report_cq_qcc_certifiedby_email2" id="text_report_cq_qcc_certifiedby_email2">
+                            <input type="text" name="text_report_cq_qcc_date_2" id="text_report_cq_qcc_date_2">
+                            <input type="text" name="text_report_cq_qcc_time_2" id="text_report_cq_qcc_time_2">
+
+                            <!-- <input type="submit" class="btn btn-warning float-start pdf" id="pdf" name="pdf" value="Generate PDF"> -->
+                        <!-- </form> -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GENERATE REPORT FOR SEP -->
+        <div class="modal" id="" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">GENERATE PDF</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <!-- <form method="POST" action="exportOperFormPDF.php" id="formGeneratePDF" target="_blank"> -->
+                            <input type="text" name="text_report_sep_conno" id="text_report_sep_conno">
+                            <input type="text" name="text_report_fk_cq_sep_conno" id="text_report_fk_cq_sep_conno">
+                            <input type="text" name="text_report_cq_overall_section" id="text_report_cq_overall_section">
+                            <input type="text" name="text_report_cq_position" id="text_report_cq_position">
+                            <input type="text" name="text_report_cq_createdby_name" id="text_report_cq_createdby_name">
+                            <input type="text" name="text_report_cq_createdby_username" id="text_report_cq_createdby_username">
+                            <input type="text" name="text_report_cq_createdby_email" id="text_report_cq_createdby_email">
+                            <input type="text" name="text_report_cq_new_conno" id="text_report_cq_new_conno">
+                            <input type="text" name="text_report_cq_section" id="text_report_cq_section">
+                            <input type="text" name="text_report_cq_station" id="text_report_cq_station">
+                            <input type="text" name="text_report_cq_product_line" id="text_report_cq_product_line">
+                            <input type="text" name="text_report_cq_certification_reason" id="text_report_cq_certification_reason">
+                            <input type="text" name="text_report_cq_training" id="text_report_cq_training">
+                            <input type="text" name="text_report_cq_p_t_result_1" id="text_report_cq_p_t_result_1">
+                            <input type="text" name="text_report_cq_p_t_trainedby_1" id="text_report_cq_p_t_trainedby_1">
+                            <input type="text" name="text_report_cq_p_t_trainedby_1_empno" id="text_report_cq_p_t_trainedby_1_empno">
+                            <input type="text" name="text_report_cq_p_t_trainedby_username1" id="text_report_cq_p_t_trainedby_username1">
+                            <input type="text" name="text_report_cq_p_t_trainedby_email1" id="text_report_cq_p_t_trainedby_email1">
+                            <input type="text" name="text_report_cq_p_t_trainedby_isApproved1" id="text_report_cq_p_t_trainedby_isApproved1">
+                            <input type="text" name="text_report_cq_p_t_date_1" id="text_report_cq_p_t_date_1">
+                            <input type="text" name="text_report_cq_p_t_result_2" id="text_report_cq_p_t_result_2">
+                            <input type="text" name="text_report_cq_p_t_approvedby" id="text_report_cq_p_t_approvedby">
+                            <input type="text" name="text_report_cq_p_t_approvedby_empno" id="text_report_cq_p_t_approvedby_empno">
+                            <input type="text" name="text_report_cq_p_t_approvedby_username" id="text_report_cq_p_t_approvedby_username">
+                            <input type="text" name="text_report_cq_p_t_approvedby_email" id="text_report_cq_p_t_approvedby_email">
+                            <input type="text" name="text_report_cq_p_t_approvedby_isApproved" id="text_report_cq_p_t_approvedby_isApproved">
+                            <input type="text" name="text_report_cq_p_t_approvedby_approved_at" id="text_report_cq_p_t_approvedby_approved_at">
+                        <!-- </form> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GENERATE REPORT FOR INSPECTOR -->
+        <div class="modal" id="" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">GENERATE PDF</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <!-- <form method="POST" action="exportOperFormPDF.php" id="formGeneratePDF" target="_blank"> -->
+                            <input type="text" name="text_report_insp_conno" id="text_report_insp_conno">
+                            <input type="text" name="text_report_fk_cq_insp_conno" id="text_report_fk_cq_insp_conno">
+                            <input type="text" name="text_report_cq_overall_section" id="text_report_cq_overall_section">
+                            <input type="text" name="text_report_cq_position" id="text_report_cq_position">
+                            <input type="text" name="text_report_cq_createdby_name" id="text_report_cq_createdby_name">
+                            <input type="text" name="text_report_cq_createdby_username" id="text_report_cq_createdby_username">
+                            <input type="text" name="text_report_cq_createdby_email" id="text_report_cq_createdby_email">
+                            <input type="text" name="text_report_cq_new_conno" id="text_report_cq_new_conno">
+                            <input type="text" name="text_report_cq_section" id="text_report_cq_section">
+                            <input type="text" name="text_report_cq_station" id="text_report_cq_station">
+                            <input type="text" name="text_report_cq_product_line" id="text_report_cq_product_line">
+                            <input type="text" name="text_report_cq_certification_reason" id="text_report_cq_certification_reason">
+                            <input type="text" name="text_report_cq_training" id="text_report_cq_training">
+                            <input type="text" name="text_report_cq_docnum" id="text_report_cq_docnum">
+                            <input type="text" name="text_report_cq_result" id="text_report_cq_result">
+                            <input type="text" name="text_report_cq_eng_trainedby" id="text_report_cq_eng_trainedby">
+                                                        <input type="text" name="text_report_cq_eng_trainedby_empno" id="text_report_cq_eng_trainedby_empno">
+
+                            <input type="text" name="text_report_cq_eng_trainedby_position" id="text_report_cq_eng_trainedby_position">
+                            <input type="text" name="text_report_cq_eng_date" id="text_report_cq_eng_date">
+                            <input type="text" name="text_report_cq_eng_time" id="text_report_cq_eng_time">
+                            <input type="text" name="text_report_cq_qcc_approvedby" id="text_report_cq_qcc_approvedby">
+                                                        <input type="text" name="text_report_cq_qcc_approvedby_empno" id="text_report_cq_qcc_approvedby_empno">
+
+                            <input type="text" name="text_report_cq_qcc_approvedby_username" id="text_report_cq_qcc_approvedby_username">
+                            <input type="text" name="text_report_cq_qcc_approvedby_email" id="text_report_cq_qcc_approvedby_email">
+                            <input type="text" name="text_report_cq_qcc_approvedby_isApproved" id="text_report_cq_qcc_approvedby_isApproved">
+                            <input type="text" name="text_report_cq_approved_at" id="text_report_cq_approved_at">
+                            <input type="text" name="text_report_cq_lqc_certifiedby1" id="text_report_cq_lqc_certifiedby1">
+                                                        <input type="text" name="text_report_cq_lqc_certifiedby1_empno" id="text_report_cq_lqc_certifiedby1_empno">
+
+                            <input type="text" name="text_report_cq_lqc_certifiedby_username1" id="text_report_cq_lqc_certifiedby_username1">
+                            <input type="text" name="text_report_cq_lqc_certifiedby_email1" id="text_report_cq_lqc_certifiedby_email1">
+                            <input type="text" name="text_report_cq_lqc_date1" id="text_report_cq_lqc_date1">
+                            <input type="text" name="text_report_cq_lqc_time1" id="text_report_cq_lqc_time1">
+                            <input type="text" name="text_report_cq_lqc_remarks1" id="text_report_cq_lqc_remarks1">
+                            <input type="text" name="text_report_cq_lqc_result1" id="text_report_cq_lqc_result1">
+                            <input type="text" name="text_report_cq_lqc_remarks2" id="text_report_cq_lqc_remarks2">
+                            <input type="text" name="text_report_cq_lqc_result2" id="text_report_cq_lqc_result2">
+                            <input type="text" name="text_report_cq_lqc_handson" id="text_report_cq_lqc_handson">
+                            <input type="text" name="text_report_cq_lqc_handson_remarks" id="text_report_cq_lqc_handson_remarks">
+                            <input type="text" name="text_report_cq_lqc_result" id="text_report_cq_lqc_result">
+                            <input type="text" name="text_report_cq_lqc_certifiedby2" id="text_report_cq_lqc_certifiedby2">
+                                                        <input type="text" name="text_report_cq_lqc_certifiedby2_empno" id="text_report_cq_lqc_certifiedby2_empno">
+
+                            <input type="text" name="text_report_cq_lqc_certifiedby_position2" id="text_report_cq_lqc_certifiedby_position2">
+                            <input type="text" name="text_report_cq_lqc_certifiedby_username2" id="text_report_cq_lqc_certifiedby_username2">
+                            <input type="text" name="text_report_cq_lqc_certifiedby_email2" id="text_report_cq_lqc_certifiedby_email2">
+                            <input type="text" name="text_report_cq_lqc_date2" id="text_report_cq_lqc_date2">
+                            <input type="text" name="text_report_cq_lqc_time2" id="text_report_cq_lqc_time2">
+                            <input type="text" name="text_report_cq_vpqcs_ref_docno_input_inspector" id="text_report_cq_vpqcs_ref_docno_input_inspector">
+                            <input type="text" name="text_report_cq_vpqcs_sequence_details" id="text_report_cq_vpqcs_sequence_details">
+                            <input type="text" name="text_report_cq_vpqcs_result1_inspector" id="text_report_cq_vpqcs_result1_inspector">
+                            <input type="text" name="text_report_cq_vpqcs_result2_inspector" id="text_report_cq_vpqcs_result2_inspector">
+                            <input type="text" name="text_report_cq_vpqcs_validated1_inspector" id="text_report_cq_vpqcs_validated1_inspector">
+                                                        <input type="text" name="text_report_cq_vpqcs_validated1_inspector_empno" id="text_report_cq_vpqcs_validated1_inspector_empno">
+
+                            <input type="text" name="text_report_cq_vpqcs_validated1_inspector_username" id="text_report_cq_vpqcs_validated1_inspector_username">
+                            <input type="text" name="text_report_cq_vpqcs_validated1_inspector_email" id="text_report_cq_vpqcs_validated1_inspector_email">
+                            <input type="text" name="text_report_cq_vpqcs_validated2_inspector" id="text_report_cq_vpqcs_validated2_inspector">
+                                                        <input type="text" name="text_report_cq_vpqcs_validated2_inspector_empno" id="text_report_cq_vpqcs_validated2_inspector_empno">
+
+                            <input type="text" name="text_report_cq_vpqcs_validated2_inspector_username" id="text_report_cq_vpqcs_validated2_inspector_username">
+                            <input type="text" name="text_report_cq_vpqcs_validated2_inspector_email" id="text_report_cq_vpqcs_validated2_inspector_email">
+                            <input type="text" name="text_report_cq_vpqcs_validated2_inspector_isApproved" id="text_report_cq_vpqcs_validated2_inspector_isApproved">
+                            <input type="text" name="text_report_cq_vpqcs_validated2_inspector_approved_at" id="text_report_cq_vpqcs_validated2_inspector_approved_at">
+                            <input type="text" name="text_report_cq_vpqcs_date1_inspector" id="text_report_cq_vpqcs_date1_inspector">
+                            <input type="text" name="text_report_cq_vpqcs_date2_inspector" id="text_report_cq_vpqcs_date2_inspector">
+                        <!-- </form> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- GENERATE REPORT FOR OPERATOR -->
         <div class="modal" id="" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -7801,19 +13555,16 @@
 
             togglePositionSection($positionSelect.val());
         });
-
         function initDivDeptSecCombos(comboSelectors) {
-            comboSelectors.forEach(function(selector) {
-                    getDivDeptSec({ comboId: $(selector) });
-            });
-            // comboSelectors.forEach(function(selector) {
-            //         getDivDeptSec({ comboId: $(selector) });
-            // });
+                comboSelectors.forEach(function(selector) {
+                        getDivDeptSec({ comboId: $(selector) });
+                });
         }
 
         // Initialize select elements using one function call.
         initDivDeptSecCombos([
-                '#text_section_operator',
+                '#text_oper_station_from',
+                '#text_oper_station_to'
         ]);
     </script>
 @endsection

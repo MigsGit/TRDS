@@ -7,5 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class DropdownMaster extends Model
 {
-    use HasFactory;
+     /**
+     * Get DropdownMaster Details
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function dropdown_master_details()
+    {
+        return $this->hasMany(DropdownMasterDetail::class, 'dropdown_masters_id', 'id');
+    }
 }

@@ -19,9 +19,9 @@
     ];
 @endphp
 
-<div class="form-group mb-0">
+<div class="form-group">
     <label for="{{ $id }}">{{ $label }}</label>
-    <select class="form-control" name="{{ $name }}" id="{{ $id }}">
+    <select class="form-control select2bs4" style="width: 100%;" name="{{ $name }}" id="{{ $id }}">
         @foreach ($sectionOptions as $option)
             <option
                 value="{{ $option['value'] }}"

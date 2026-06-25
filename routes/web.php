@@ -1,14 +1,14 @@
 <?php
-use App\Model\Questionnaires;
-
-use App\Http\Controllers\HrMemo\HrMemoController;
-use App\Http\Controllers\HrMemo\HrMemoExaminationController;
-use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\ExaminationResultController;
+use App\Http\Controllers\HrMemo\HrMemoController;
+use App\Http\Controllers\HrMemo\HrMemoExaminationController;
+use App\Http\Controllers\QualificationCertificationController;
+use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
+use App\Model\Questionnaires;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -71,17 +71,12 @@ Route::middleware('checkSession')->group(function(){
 
 
     // QUESTIONNAIRES CONTROLLER
-    // Route::get('/view_questionnaire', 'QuestionnairesController@viewQuestionnaire');
-    // Route::get('/get_systemone_hris_department', 'QuestionnairesController@getSystemoneHrisDepartment');
-    // Route::get('/get_systemone_hris_position', 'QuestionnairesController@getSystemoneHrisPosition');
-    // Route::get('/get_systemone_hris_section', 'QuestionnairesController@getSystemoneHrisSection');
-    // Route::post('/create_update_questionnaire', 'QuestionnairesController@createUpdateQuestionnaire');
-    // Route::get('/get_questionnaire_by_id', 'QuestionnairesController@getQuestionnaireById');
-    // Route::post('/change_questionnaire_status', 'QuestionnairesController@changeQuestionnaireStatus');
-
-    // Route::get('/view_questionnaire_details', 'QuestionnairesController@viewQuestionnaireDetails');
-    // Route::post('/create_update_questionnaire_details', 'QuestionnairesController@createUpdateQuestionnaireDetails');
-
+   
+    Route::controller(QualificationCertificationController::class)->group(function () {
+        // Questionnaires main routes
+        Route::get('get_div_dept_sec', 'getDivDeptSec');
+    });
+   
     Route::controller(QuestionnairesController::class)->group(function () {
         // Questionnaires main routes
         Route::get('view_questionnaire', 'viewQuestionnaire');

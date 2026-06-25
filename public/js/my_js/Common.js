@@ -1,9 +1,16 @@
+/* Select 2 Attr */
+$('.select2bs4').each(function () {
+    $(this).select2({
+        theme: 'bootstrap-5',
+        dropdownParent: $(this).parent(),
+    });
+});
+
 /**
  * Reusable function for using Ajax Request
  *
  * @param {object} options
  */
-
 const ajaxRequest = (options) => {
     var defaults = {
         url: '',
