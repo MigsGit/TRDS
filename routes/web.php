@@ -71,12 +71,13 @@ Route::middleware('checkSession')->group(function(){
 
 
     // QUESTIONNAIRES CONTROLLER
-   
+
     Route::controller(QualificationCertificationController::class)->group(function () {
         // Questionnaires main routes
         Route::get('get_div_dept_sec', 'getDivDeptSec');
+        Route::get('get_dropdown_master_details_by_fkid', 'getDropdownMasterDetailsByFkid');
     });
-   
+
     Route::controller(QuestionnairesController::class)->group(function () {
         // Questionnaires main routes
         Route::get('view_questionnaire', 'viewQuestionnaire');
@@ -182,6 +183,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_user_list', 'get_user_list');
         Route::get('/get_user_by_id', 'get_user_by_id');
         Route::get('/get_user_module_access', 'get_user_module_access');
+        Route::get('/get_system_one_employee_details', 'getSystemOneEmployeeDetails');
 
     });
 
