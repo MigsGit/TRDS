@@ -177,11 +177,11 @@
                         {{-- Multiple Data for Trainee Details --}}
                         <div class="row mt-5">
                             <div class="col">
-                                <div class="table-responsive">
-                                    <div class="d-flex justify-content-between">
+                                <div class="d-flex justify-content-between">
                                         <button type="button" id="btnAddTrainee" data-counter="" class="btn btn-primary"><i class="fa fa-plus"></i> Add Trainee</button>
-                                    </div>
-                                    <br>
+                                </div>
+                                <br>
+                                <div class="table-responsive" style="max-height:400px; overflow-y:auto;">
                                     <table class="table table-sm table-bordered" id="tblTraineeDetails" style="width: 100%;">
                                         <thead>
                                             <tr>

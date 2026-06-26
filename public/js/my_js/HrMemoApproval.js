@@ -636,6 +636,12 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         showSuccess('Trainee details added to the list.');
         $modalTD.modal('hide');
     });
+
+    $modalTD.on('hidden.bs.modal', function () {
+        if ($('#modalHrMemoApproval').hasClass('show')) {
+            $('body').addClass('modal-open');
+        }
+    });
 }
 
 function getNextId(traineeDetailsArray) {
