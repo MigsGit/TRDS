@@ -26,6 +26,11 @@ class CreateQcSlipEmployeesTable extends Migration
             // Pivot context metrics matching your structural HTML table cells
             $table->string('station_from');
             $table->string('station_to');
+            $table->string('station_to');
+            $table->string('first_take_ins_sequence');
+            $table->string('first_take_ins_assessment_result');
+            $table->string('second_take_ins_sequence');
+            $table->string('second_take_ins_assessment_result');
             $table->softDeletes();
             $table->timestamps();
         });
