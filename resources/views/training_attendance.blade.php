@@ -360,9 +360,6 @@
             let toDate = $('#toDate').val()
             $('#modalEditTrainingAttendance').modal('hide');
             dtViewTrainingAttendanceRequest.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
-
-
-
         })
     });
 

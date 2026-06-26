@@ -144,7 +144,8 @@
 
                         <!-- FORMAT 5 Operator -->
                         <div class="d-none" id="div_Oper">
-                            <form  id="formSubmit_Oper">
+                        <form  id="formSubmit_Oper" >
+                            @csrf
                                 <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
 
                                 <div class="row mb-5">
@@ -168,7 +169,7 @@
 
                                     <div class="col-md-3">
                                         <label for="">Product Line:</label>
-                                       
+
                                          <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_line">
                                         </select>
                                     </div>
@@ -221,10 +222,10 @@
                                 <!-- **************************************************************      1ST SECTION          ************************************************************************************************* -->
 
                                 <div class="accordion" id="accordionExampleOper">
-                                    <div class="accordion-item">
+                                    {{-- <div class="accordion-item">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneOper" aria-expanded="true" aria-controls="collapseOneOper">
-                                            <h5>PRODUCTION SECTION (Training and Orientation)</h5>
+                                            <h5>A. PRODUCTION SECTION (Training and Orientation)</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseOneOper" class="accordion-collapse collapse show" data-parent="#accordionExampleOper">
@@ -590,8 +591,8 @@
 
                                         </div>
                                         </div>
-                                    </div>
-                                    <div class="accordion-item">
+                                    </div> --}}
+                                    {{-- <div class="accordion-item">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoOper" aria-expanded="false" aria-controls="collapseTwoOper">
                                             <h5>ENGINEERING SECTION (Training and Qualification)</h5>
@@ -1930,7 +1931,7 @@
 
                                         </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
 
                                 <hr style="height: 5px; background-color: black; border: none;">
@@ -1977,7 +1978,7 @@
                                     <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
                                 </div>
 
-                            </form>
+                        </form>
 
                         </div>
                     </div>
@@ -1998,7 +1999,7 @@
 
                     <div class="modal-body">
 
-                     
+
 
                         <div class="row mb-4">
                             <div class="col-md-6">
@@ -2065,7 +2066,7 @@
                 </div>
             </div>
         </div>
-    
+
         <!-- VIEW MODAL FOR OPERATOR -->
         <div class="modal" id="modalViewOper" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
@@ -2079,7 +2080,7 @@
 
                     <div class="modal-body">
 
-                            <form id="formSubmit_oper">
+                            {{-- <form id="formSubmit_oper"> --}}
                                 <h3 class="mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
 
                                 <div class="row mb-5">
@@ -3020,7 +3021,7 @@
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                 </div>
 
-                            </form>
+                            {{-- </form> --}}
 
                     </div>
                 </div>
@@ -3164,6 +3165,47 @@
 
 @section('js_content')
     <script type="text/javascript">
+         // In-memory array that holds employees staged in the modal
+        operEmpArray = [];
+        $(document).on('submit', '#formSubmit_oper, #formSubmit_Oper', function (e) {
+            e.preventDefault();
+
+            var $form = $(this);
+
+            // Serialize form into an object (handles multiple inputs with same name)
+            var formArray = $form.serializeArray();
+            var data = {};
+            console.log(operEmpArray);
+            // $.each(formArray, function(i, field) {
+            //     if (data[field.name] !== undefined) {
+            //         if (!Array.isArray(data[field.name])) {
+            //             data[field.name] = [data[field.name]];
+            //         }
+            //         data[field.name].push(field.value);
+            //     } else {
+            //         data[field.name] = field.value;
+            //     }
+            // });
+
+            // // Add the Operator Employees table data
+            // if (typeof getOperEmpTableData === 'function') {
+            //     data.operator_employees = getOperEmpTableData(); // [{empId,empName,stFrom,stTo}, ...]
+            // } else {
+            //     data.operator_employees = [];
+            // }
+            console.log(data);
+            return;
+            // Send to server - adjust handler name if your backend expects a different one
+            call_ajax_serialize(data, 'save_qualification_certification_oper', function(response){
+                if (response && response.success) {
+                    Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
+                    $('#modalViewOper').modal('hide');
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to save.' });
+                }
+            });
+        });
+
         $(function () {
             // $('.select2bs4').select2();
             var $positionSelect = $('#text_select_position');
@@ -3248,5 +3290,8 @@
                 '#text_alert_prod_sec',
                 '#text_alert_prod_cc_sec',
         ]);
+
+        // call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId =null);
+
     </script>
 @endsection

@@ -42,7 +42,6 @@ function fnGetSelect2Value(params){
     $.each(params.dataValue, function(key, value){
         arrValue.push(value)
     });
-    console.log('arrValue',arrValue);
 
     params.comboId.val(arrValue).trigger('change');
 }
@@ -52,7 +51,7 @@ function fnGetSelect2Value(params){
    ========================================================= */
 
 // In-memory array that holds employees staged in the modal
-let operEmpArray = [];
+operEmpArray = [];
 
 /**
  * Initialise the modal:
@@ -108,6 +107,7 @@ function addOperEmpToTable() {
     // Push to in-memory array
     const entry = { empId, empName, stFrom, stFromText, stTo, stToText };
     operEmpArray.push(entry);
+    console.log('operEmpArray',operEmpArray);
 
     // Append row to staging table
     const idx = operEmpArray.length - 1;

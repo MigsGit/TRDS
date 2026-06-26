@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOpQcSectionCertificationsTable extends Migration
+class CreateModelQcOpAProdTrainingOrientationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateOpQcSectionCertificationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('op_qc_section_certifications', function (Blueprint $table) {
+        Schema::create('model_qc_op_a_prod_training_orientations', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
         });
@@ -26,6 +26,6 @@ class CreateOpQcSectionCertificationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('op_qc_section_certifications');
+        Schema::dropIfExists('model_qc_op_a_prod_training_orientations');
     }
 }

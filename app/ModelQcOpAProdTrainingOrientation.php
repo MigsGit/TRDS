@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OpProdEnggQcSectionCertificationCompletion extends Model
+class ModelQcOpAProdTrainingOrientation extends Model
 {
     use HasFactory;
 }
