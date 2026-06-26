@@ -159,14 +159,14 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>To</label>
+                                    <label>To (Select Name/s)</label>
                                     <select class="form-control select2bs5 selectToRecipients" name="to[]" id="selectTo" multiple required>
                                         {{-- <option value="" disabled selected> Select To/s </option> --}}
                                     </select>
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Cc</label>
+                                    <label>Cc (Select Name/s)</label>
                                     <select class="form-control select2bs5 selectCcRecipients" name="cc[]" id="selectCc" multiple required>
                                         {{-- <option value="" disabled selected> Select Cc/s </option> --}}
                                     </select>
@@ -203,7 +203,7 @@
                             </div>
                         </div>
 
-                        <div class="row mt-5">
+                        <div class="row mt-2 mb-5">
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label>Prepared By</label>
@@ -214,7 +214,7 @@
 
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label>Noted By</label>
+                                    <label>Noted By (Select Name)</label>
                                     <select class="form-control select2bs5 selectNotedBy" name="noted_by" id="notedBy" required>
                                     </select>
                                 </div>
