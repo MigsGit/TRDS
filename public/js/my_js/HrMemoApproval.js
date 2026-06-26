@@ -991,10 +991,10 @@ function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null, rem
                     modal.modal('hide');
                 }
 
-                //temp comment due to testing
-                // if(updateToStatus > 2){
-                //     SendHrMemoMail(id, updateToStatus);
-                // }
+                //temp comment when testing
+                if(updateToStatus > 2){
+                    SendHrMemoMail(id, updateToStatus);
+                }
                 dtHMA.draw();
             }
         },
