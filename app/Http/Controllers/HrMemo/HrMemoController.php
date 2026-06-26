@@ -146,7 +146,8 @@ class HrMemoController extends Controller
                 ->whereNotNull('email')
                 ->where('user_stat', 1)
                 ->when($request->hr_only == 'true', function ($query) use ($request) {
-                    return $query->where('department_id', 29); //HRD
+                    // return $query->where('department_id', 29); //ALL HRD
+                    return $query->whereIn('employee_number', ['1810', 'T078']); //ESM & GAC only
                 })
                 ->get();
         return response()->json($emails);
@@ -470,38 +471,54 @@ class HrMemoController extends Controller
 
     public function sendHrMemoMail(Request $request){
         $hr_memo = HrMemo::with(['prepared_by_info', 'noted_by_info', 'email_recipients.rapidx_user'])->where('id', $request->hr_memo_id)->whereNull('deleted_at')->first();
-        // return $hr_memo;
+        // return $hr_memo->noted_by_info->email;
         // $data = ['application' => $hr_memo, 'approver_details' => $approver_details];
+        $send_hr_to = $hr_memo->noted_by_info->email;
+        $send_hr_cc = ['evalfelor@pricon.ph','cdcasuyon@pricon.ph'];
 
-        $send_to = [];
-        $send_cc = [];
+        $send_tu_to = [];
+        $send_tu_cc = [];
 
         foreach ($hr_memo->email_recipients as $recipient){
             if($recipient->type == 'to'){
-                $send_to[] = $recipient->rapidx_user->email;
+                $send_tu_to[] = $recipient->rapidx_user->email;
             }else if($recipient->type == 'cc'){
-                $send_cc[] = $recipient->rapidx_user->email;
+                $send_tu_cc[] = $recipient->rapidx_user->email;
             }
         }
 
         // if($hr_memo){
             switch ($request->status) {
                 case 3: { //FOR APPROVAL
-                        Mail::send('mail.hr_memo_mail', ['hr_memo' => $hr_memo], function ($message) use ($send_to, $send_cc, $hr_memo) {
-                            $message->to($send_to)->subject('TRDSv2 Memo: ' . $hr_memo->subject);
+                        Mail::send('mail.hr_memo_mail', ['hr_memo' => $hr_memo], function ($message) use ($send_hr_to, $send_hr_cc, $hr_memo) {
+                            $message->to($send_hr_to)->subject('TRDSv2 Memo: ' . $hr_memo->subject);
 
-                            if(!empty($send_cc)){
-                                $message->cc($send_cc);
+                            if(!empty($send_hr_cc)){
+                                $message->cc($send_hr_cc);
                             }
                         });
 
                         break;
                     }
-                case 4: { //APPROVED
+                case 4: { //HR DISAPPROVED
 
                         break;
                     }
-                case 5: { //DISAPPROVED
+                case 5: { //HR APPROVED, FOR TU RECEIVING
+                        Mail::send('mail.hr_memo_mail', ['hr_memo' => $hr_memo], function ($message) use ($send_tu_to, $send_tu_cc, $hr_memo) {
+                            $message->to($send_tu_to)->subject('TRDSv2 Memo: ' . $hr_memo->subject);
+
+                            if(!empty($send_tu_cc)){
+                                $message->cc($send_tu_cc);
+                            }
+                        });
+                        break;
+                    }
+                case 6: { //TU RECEIVED
+
+                        break;
+                    }
+                case 7: { //TU DISAPPROVED
 
                         break;
                     }

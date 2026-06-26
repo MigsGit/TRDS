@@ -37,7 +37,7 @@
 <script src="{{ asset('public/template/plugins/daterangepicker/moment.min.js') }}"></script>
 <script src="{{ asset('public/template/plugins/daterangepicker/daterangepicker.js') }}"></script> --}}
 
-<script type="text/javascript" src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1581152197/smartwizard/jquery.smartWizard.min.js"></script>
+<!-- <script type="text/javascript" src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1581152197/smartwizard/jquery.smartWizard.min.js"></script> -->
 
 <script>
     toastr.options = {
