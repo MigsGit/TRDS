@@ -10,6 +10,20 @@ use Illuminate\Http\Request;
 
 class QualificationCertificationController extends Controller
 {
+    public function saveQualificationCertificationOper(Request $request){
+        // return 'true' ;
+
+        return $request->all();
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            DB::commit();
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
     public function getDivDeptSec(Request $request){
 
         try {

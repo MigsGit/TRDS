@@ -190,6 +190,7 @@
                                                 <th>Employee Name</th>
                                                 <th>Station From</th>
                                                 <th>Station To</th>
+                                                <th>Remarks</th>
                                             </tr>
                                         </thead>
 
@@ -222,7 +223,7 @@
                                 <!-- **************************************************************      1ST SECTION          ************************************************************************************************* -->
 
                                 <div class="accordion" id="accordionExampleOper">
-                                    {{-- <div class="accordion-item">
+                                    <div class="accordion-item">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneOper" aria-expanded="true" aria-controls="collapseOneOper">
                                             <h5>A. PRODUCTION SECTION (Training and Orientation)</h5>
@@ -591,7 +592,7 @@
 
                                         </div>
                                         </div>
-                                    </div> --}}
+                                    </div>
                                     {{-- <div class="accordion-item">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoOper" aria-expanded="false" aria-controls="collapseTwoOper">
@@ -2022,8 +2023,8 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="">Operator Name:</label>
-                                <input type="text" class="form-control" id="text_oper_remarks" name="text_oper_remarks" placeholder="Enter Operator's Name" readonly>
+                                <label for="">Remarks:</label>
+                                <input type="text" class="form-control" id="text_oper_remarks" name="text_oper_remarks" placeholder="Enter Remarks">
                             </div>
                         </div>
                         <button type="button" class="btn btn-primary btnAddOPEREmp" id="btnAddOPEREmp"><i class="fa-solid fa-plus"></i> Add to Table</button>
@@ -2040,6 +2041,7 @@
                                     <th>Employee Name</th>
                                     <th>Station (From)</th>
                                     <th>Station (To)</th>
+                                    <th>Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -2114,6 +2116,7 @@
                                                 <th>Operator's Name</th>
                                                 <th>Station (From)</th>
                                                 <th>Station (To)</th>
+                                                <th>Remarks</th>
                                             </tr>
                                         </thead>
 
@@ -3175,31 +3178,30 @@
             // Serialize form into an object (handles multiple inputs with same name)
             var formArray = $form.serializeArray();
             var data = {};
-            console.log(operEmpArray);
-            // $.each(formArray, function(i, field) {
-            //     if (data[field.name] !== undefined) {
-            //         if (!Array.isArray(data[field.name])) {
-            //             data[field.name] = [data[field.name]];
-            //         }
-            //         data[field.name].push(field.value);
-            //     } else {
-            //         data[field.name] = field.value;
-            //     }
-            // });
+            $.each(formArray, function(i, field) {
+                if (data[field.name] !== undefined) {
+                    if (!Array.isArray(data[field.name])) {
+                        data[field.name] = [data[field.name]];
+                    }
+                    data[field.name].push(field.value);
+                } else {
+                    data[field.name] = field.value;
+                }
+            });
 
-            // // Add the Operator Employees table data
-            // if (typeof getOperEmpTableData === 'function') {
-            //     data.operator_employees = getOperEmpTableData(); // [{empId,empName,stFrom,stTo}, ...]
-            // } else {
-            //     data.operator_employees = [];
-            // }
-            console.log(data);
-            return;
-            // Send to server - adjust handler name if your backend expects a different one
-            call_ajax_serialize(data, 'save_qualification_certification_oper', function(response){
+            // Add the Operator Employees table data (empId, empName, stFrom, stTo)
+            data.operator_employees = (typeof getOperEmpTableData === 'function')
+                ? getOperEmpTableData()
+                : [];
+
+            console.log('formSubmit_Oper data', data);
+
+            // Send to server
+            let serialized_data = {}
+            call_ajax_serialize(data,serialized_data,'save_qualification_certification_oper', function(response){
                 if (response && response.success) {
                     Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
-                    $('#modalViewOper').modal('hide');
+                    $('#modalCreateCQForm').modal('hide');
                 } else {
                     Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to save.' });
                 }

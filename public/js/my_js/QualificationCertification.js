@@ -75,6 +75,7 @@ function addOperEmpToTable() {
     const $empSelect    = $('#text_oper_emp_number');
     const $stationFrom  = $('#text_oper_station_from');
     const $stationTo    = $('#text_oper_station_to');
+    const $optRemarks    = $('#text_oper_remarks');
 
     const empId   = $empSelect.val();
     const empName = $empSelect.find('option:selected').text().trim();
@@ -82,6 +83,7 @@ function addOperEmpToTable() {
     const stFromText = $stationFrom.find('option:selected').text().trim();
     const stTo    = $stationTo.val();
     const stToText = $stationTo.find('option:selected').text().trim();
+    const optRemarks = $optRemarks.val();
 
     // --- validation ---
     if (!empId) {
@@ -105,7 +107,7 @@ function addOperEmpToTable() {
     }
 
     // Push to in-memory array
-    const entry = { empId, empName, stFrom, stFromText, stTo, stToText };
+    const entry = { empId, empName, stFrom, stFromText, stTo, stToText, optRemarks };
     operEmpArray.push(entry);
     console.log('operEmpArray',operEmpArray);
 
@@ -122,6 +124,7 @@ function addOperEmpToTable() {
         <td>${empName}</td>
         <td>${stFromText}</td>
         <td>${stToText}</td>
+        <td>${optRemarks}</td>
     </tr>`;
 
     $('#tbl_oper_add_emp tbody').append(row);
@@ -162,6 +165,7 @@ function addSelectedOperEmpToMain() {
             <td>${entry.empName}</td>
             <td data-value="${entry.stFrom}">${entry.stFromText}</td>
             <td data-value="${entry.stTo}">${entry.stToText}</td>
+            <td>${entry.optRemarks}</td>
         </tr>`;
 
         $('#tbl_certified_list_operator tbody').append(row);
@@ -185,6 +189,7 @@ function getOperEmpTableData() {
             empName  : $(this).find('td:eq(2)').text().trim(),
             stFrom   : $(this).find('td:eq(3)').data('value'),
             stTo     : $(this).find('td:eq(4)').data('value'),
+            optRemarks     : $(this).find('td:eq(5)').text().trim(),
         });
     });
     return employees;
