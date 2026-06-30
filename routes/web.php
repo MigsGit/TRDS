@@ -65,6 +65,10 @@ Route::middleware('checkSession')->group(function(){
         return view('theoretical_exam/questionnaire');
     })->name('questionnaire');
 
+    Route::get('/test', function () {
+        return view('qualification_certification_test');
+    })->name('test');
+
     Route::get('/examination_result', function () {
         return view('theoretical_exam/examination_result');
     })->name('examination_result');

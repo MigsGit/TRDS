@@ -202,330 +202,206 @@
                                 <div class="row mb-5">
                                     <div class="col-md-12">
                                         <label for="">Reason for Certification:</label>
-                                        <select class="form-control select2bs4" style="width: 100%;" name="text_certification_operator" id="text_certification_operator">
-                                            <option value="" selected disabled>Select Reason</option>
-                                            <option value="Newly hired employees">1 Newly hired employees</option>
-                                            <option value="Newly promoted employees">2 Newly promoted employees</option>
-                                            <option value="Lateral transfer">3 Lateral transfer</option>
-                                            <option value="Flexibility1">4 Flexibility</option>
-                                            <option value="Transfer to another station">5 Transfer to another station (E.g: final visual, insertion,IQC, IPQC, OQC, etc)</option>
-                                            <option value="Transfer to other production section">6 Transfer to other production section (E.g: TS,PPS,CN, YF)</option>
-                                            <option value="Transfer to other product line">7 Transfer to other product line (E.g: TS: BGA-FP, QFP; CN: FMS, PJS; YF: EOL, FOL; PPS: Molding CN, Molding TS, Grinding, Stamping; MH-WHS, MH-Prodn)</option>
-                                            <option value="New Product">8 New Product</option>
-                                            <option value="Re-certification from disqualification">9 Re-certification from disqualification</option>
-                                            <option value="Leave reached at least 1 month (ML/ VL/SL)">10 Leave reached at least 1 month (ML/ VL/SL)</option>
-                                            <option value="Company shutdown at least 1 month">11 Company shutdown at least 1 month</option>
-                                            <option value="Re-certification">12 Re-certification</option>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="text_certification_operator[]" id="text_certification_operator" multiple>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-5 div-transfer-flexibility d-none">
+                                    <div class="col-md-12">
+                                        <label for="">Lateral Transfer Flexibility:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="transfer_flexibility[]" id="transfer_flexibility" multiple>
+                                             <option value="1">3.1 Transfer to another station (E.g: final visual, insertion,IQC, IPQC, OQC, etc)</option>
+                                            <option value="2">3.2 Transfer to other production section (E.g: TS,PPS,CN, YF)</option>
+                                            <option value="3">3.3 Transfer to other product line (E.g: TS: BGA-FP, QFP; CN: FMS, PJS; YF: EOL, FOL; PPS: Molding CN, Molding TS, Grinding, Stamping; MH-WHS, MH-Prodn)
                                         </select>
                                     </div>
                                 </div>
 
-                                <!-- **************************************************************      1ST SECTION          ************************************************************************************************* -->
+                                <!-- **************************************************************      APRODTO          ************************************************************************************************* -->
 
                                 <div class="accordion" id="accordionExampleOper">
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                        <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneOper" aria-expanded="true" aria-controls="collapseOneOper">
+                                    {{-- <div class="card APRODTO">
+                                        <h2 class="card-header">
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOneOper" aria-expanded="true" aria-controls="collapseOneOper">
                                             <h5>A. PRODUCTION SECTION (Training and Orientation)</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseOneOper" class="accordion-collapse collapse show" data-parent="#accordionExampleOper">
-                                        <div class="accordion-body">
+                                        <div class="card-body">
 
-                                            <!-- ------------------------------------------------ -->
-
-                                            <p>TRAINING ITEMS:</p>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-1">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_1" name="text_training_orientation_ps_oper" value="SOP" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_1"  style="font-weight: normal;">1) SOP</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-5"></div>
-
-                                                <div class="col-md-5">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_5" name="text_training_orientation_ps_oper" value="Production Abnormality Control (IMS-PMI-025)"  style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_5" style="font-weight: normal;">5) Production Abnormality Control (IMS-PMI-025)</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_2" name="text_training_orientation_ps_oper" value="Product Drawing" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_2" style="font-weight: normal;">2) Product Drawing</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4"></div>
-
+                                            <div class="row mb-3">
                                                 <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_6" name="text_training_orientation_ps_oper" value="Rule when to escalate" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_6" style="font-weight: normal;">Rule when to escalate</label>
-                                                    </div>
-                                                </div>
+                                                        <label class="" for="">TRAINING ITEMS:</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" id="text_training_orientation_ps_oper" name="text_training_orientation_ps_oper" multiple></select>
 
-                                                <div class="col-md-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_7" name="text_training_orientation_ps_oper" value="Filling-up of forms" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_7" style="font-weight: normal;">Filling-up of forms</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-5">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_3" name="text_training_orientation_ps_oper" value="Past Trouble History (claim, lot-out, yield, etc)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_3" style="font-weight: normal;">3) Past Trouble History (claim, lot-out, yield, etc)</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-1"></div>
-
+                                                 </div>
                                                 <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_8" name="text_training_orientation_ps_oper" value="Dropped on the floor" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_8" style="font-weight: normal;">5.1 Dropped on the floor</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_4" name="text_training_orientation_ps_oper" value="Defect escalation" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_4" style="font-weight: normal;">4) Defect escalation</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_9" name="text_training_orientation_ps_oper" value="WI-CN-216" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_9" style="font-weight: normal;">WI-CN-216</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
+                                                        <label class="" for="">Defect Escalation:</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" id="defect_escalation" name="defect_escalation" multiple>
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="1" >Rule when to escalate </option>
+                                                            <option value="2" >Filling-up of forms
+                                                            </option>
+                                                        </select>
+                                                 </div>
                                                 <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_4_1" name="text_training_orientation_ps_oper" value="Rule when to escalate_2" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_4_1" style="font-weight: normal;">Rule when to escalate</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_4_2" name="text_training_orientation_ps_oper" value="Filling-up of forms_2" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_4_2" style="font-weight: normal;">Filling-up of forms</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2"  style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_10" name="text_training_orientation_ps_oper" value="CN PP-CN-407" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_10" style="font-weight: normal;">PP-CN-407</label>
-                                                    </div>
-                                                </div>
+                                                        <label class="" for="">Production Abnormlity Control (IMS-PMI-025):</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" id="production_abnormality" name="production_abnormality" multiple>
+                                                            <option value="" selected disabled>Select Result</option>
+                                                            <option value="1" >Rule when to escalate </option>
+                                                            <option value="2" >Filling-up of forms
+                                                            </option>
+                                                        </select>
+                                                 </div>
                                             </div>
+                                            <div class="container my-4">
+                                                <div class="row g-4">
 
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
+                                                <div class="col-lg-6">
+                                                    <div class="card shadow-sm h-100">
+                                                        <div class="card-header bg-light border-bottom-0 pt-3">
 
-                                                <div class="col-md-1"  style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <!-- <input class="form-check-input" type="checkbox" id="text_training_orientation5_1" name="text_training_orientation_ps_oper" value=""> -->
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
+                                                        </div>
+                                                        <div class="table-responsive p-3">
+                                                            <table class="table table-bordered table-hover align-middle mb-0">
+                                                                <thead class="table-light">
+                                                                    <tr>
+                                                                        <th scope="col" style="width: 25%;">Category</th>
+                                                                        <th scope="col">Document / Code Reference</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">CN</span></td>
+                                                                        <td>
+                                                                            <div class="form-check m-0">
+                                                                                <input class="form-check-input" type="checkbox" name="engg_tq_orientation_docs[]" value="PP-CN-010" id="chk_pp_cn_010">
+                                                                                <label class="form-check-label fw-medium ms-1" for="chk_pp_cn_010">PP-CN-010</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">PPS</span></td>
+                                                                        <td>
+                                                                            <div class="form-check m-0">
+                                                                                <input class="form-check-input" type="checkbox" name="orientation_docs[]" value="PP-MDGEN-135" id="chk_pp_mdgen_135">
+                                                                                <label class="form-check-label fw-medium ms-1" for="chk_pp_mdgen_135">PP-MDGEN-135</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">YF</span></td>
+                                                                        <td>
+                                                                            <div class="form-check m-0">
+                                                                                <input class="form-check-input" type="checkbox" name="orientation_docs[]" value="PP-YFLEX-296" id="chk_pp_yflex_296">
+                                                                                <label class="form-check-label fw-medium ms-1" for="chk_pp_yflex_296">PP-YFLEX-296</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">TS</span></td>
+                                                                        <td>
+                                                                            <div class="form-check m-0">
+                                                                                <input class="form-check-input" type="checkbox" name="orientation_docs[]" value="WI-TSDGEN-044" id="chk_wi_tsdgen_044">
+                                                                                <label class="form-check-label fw-medium ms-1" for="chk_wi_tsdgen_044">WI-TSDGEN-044</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-2"  style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_11" name="text_training_orientation_ps_oper" value="CN PP-CN-010" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_11" style="font-weight: normal;">PP-CN-010</label>
+
+                                                <div class="col-lg-6">
+                                                    <div class="card shadow-sm h-100">
+                                                        <div class="card-header bg-light border-bottom-0 pt-3">
+                                                        </div>
+                                                        <div class="table-responsive p-3">
+                                                            <table class="table table-bordered table-hover align-middle mb-0">
+                                                                <thead class="table-light">
+                                                                    <tr>
+                                                                        <th scope="col" style="width: 25%;">Category</th>
+                                                                        <th scope="col">Document / Code Reference</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">CN</span></td>
+                                                                        <td>
+                                                                            <div class="form-check m-0">
+                                                                                <input class="form-check-input" type="checkbox" name="orientation_docs[]" value="WI-CN-216" id="chk_wi_cn_216">
+                                                                                <label class="form-check-label fw-medium ms-1" for="chk_wi_cn_216">WI-CN-216</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">CN</span></td>
+                                                                        <td>
+                                                                            <div class="form-check m-0">
+                                                                                <input class="form-check-input" type="checkbox" name="orientation_docs[]" value="PP-CN-407" id="chk_pp_cn_407">
+                                                                                <label class="form-check-label fw-medium ms-1" for="chk_pp_cn_407">PP-CN-407</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">CN</span></td>
+                                                                        <td>
+                                                                            <div class="form-check m-0">
+                                                                                <input class="form-check-input" type="checkbox" name="orientation_docs[]" value="PP-CN-066" id="chk_pp_cn_066">
+                                                                                <label class="form-check-label fw-medium ms-1" for="chk_pp_cn_066">PP-CN-066</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">PPS</span></td>
+                                                                        <td>
+                                                                            <div class="form-check m-0">
+                                                                                <input class="form-check-input" type="checkbox" name="orientation_docs[]" value="PP-MDGEN-136" id="chk_pp_mdgen_136">
+                                                                                <label class="form-check-label fw-medium ms-1" for="chk_pp_mdgen_136">PP-MDGEN-136</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">YF</span></td>
+                                                                        <td>
+                                                                            <div class="form-check m-0">
+                                                                                <input class="form-check-input" type="checkbox" name="orientation_docs[]" value="PP-YFLEX-448" id="chk_pp_yflex_448">
+                                                                                <label class="form-check-label fw-medium ms-1" for="chk_pp_yflex_448">PP-YFLEX-448</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">TS</span></td>
+                                                                        <td>
+                                                                            <div class="form-check m-0">
+                                                                                <input class="form-check-input" type="checkbox" name="orientation_docs[]" value="WI-IC-4743" id="chk_wi_ic_4743">
+                                                                                <label class="form-check-label fw-medium ms-1" for="chk_wi_ic_4743">WI-IC-4743</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-3"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_12" name="text_training_orientation_ps_oper" value="CN PP-CN-066" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_12" style="font-weight: normal;">PP-CN-066</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">PPS</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_13" name="text_training_orientation_ps_oper" value="PPS PP-MDGEN-135" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_13" style="font-weight: normal;">PP-MDGEN-135</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-3"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">PPS</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_14" name="text_training_orientation_ps_oper" value="PPS PP-MDGEN-136" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_14" style="font-weight: normal;">PP-MDGEN-136</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">YF</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_15" name="text_training_orientation_ps_oper" value="YF PP-YFLEX-296" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_15" style="font-weight: normal;">PP-YFLEX-296</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-3"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">YF</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_16" name="text_training_orientation_ps_oper" value="YF PP-YFLEX-448" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_16" style="font-weight: normal;">PP-YFLEX-448</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">TS</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_17" name="text_training_orientation_ps_oper" value="TS WI-TSDGEN-044" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_17" style="font-weight: normal;">WI-TSDGEN-044</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-3"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">TS</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_ps_oper_18" name="text_training_orientation_ps_oper" value="TS WI-IC-4743" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_ps_oper_18" style="font-weight: normal;">WI-IC-4743</label>
-                                                    </div>
                                                 </div>
                                             </div>
 
                                             <h5 class="mt-3 mb-3">RESULT</h5>
-
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label class="" for="">First Take:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_oper" id="text_first_result_oper">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
-                                                    </select>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label class="" for="">Second Take:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_oper" id="text_second_result_oper">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <label class="" for="">Trained by:</label>
-                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_first_trainedby_oper" name="text_first_trainedby_oper"></select>
+                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_first_trainedby_oper" name="text_first_trainedby_oper" multiple></select>
 
-                                                            <input type="hidden" id="text_first_trainedby_oper_username" name="text_first_trainedby_oper_username">
-                                                            <input type="hidden" id="text_first_trainedby_oper_email" name="text_first_trainedby_oper_email">
                                                         </div>
                                                         <div class="col-md-6">
                                                             <label class="" for="">Mentored by:</label>
-                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_first_mentoredby_oper" name="text_first_mentoredby_oper"></select>
+                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_first_mentoredby_oper" name="text_first_mentoredby_oper" multiple></select>
                                                         </div>
                                                     </div>
 
@@ -535,10 +411,10 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <label class="" for="">Trained by:</label>
-                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_second_trainedby_oper" name="text_second_trainedby_oper"></select>
+                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_second_trainedby_oper" name="text_second_trainedby_oper" multiple></select>
 
                                                             <input type="hidden" id="text_second_trainedby_oper_username" name="text_second_trainedby_oper_username">
-                                                            <input type="hidden" id="text_second_trainedby_oper_email" name="text_second_trainedby_oper_email">
+                                                            <input type="hidden" id="text_second_trainedby_oper_email" name="text_second_trainedby_oper_email" multiple>
                                                         </div>
                                                         <div class="col-md-6">
                                                              <label class="" for="">Mentored by:</label>
@@ -576,253 +452,111 @@
                                                 <div class="col-md-3">
                                                     <label class="" for="">Send Email Alert to:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" id="text_alert_prod_sec" name="text_alert_prod_sec"></select>
-                                                    <input type="hidden" id="text_alert_prod_sec_username" name="text_alert_prod_sec_username">
-                                                    <input type="hidden" id="text_alert_prod_sec_email" name="text_alert_prod_sec_email">
                                                 </div>
 
                                                 <div class="col-md-3">
                                                     <label class="" for="">Add cc:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" id="text_alert_prod_cc_sec" name="text_alert_prod_cc_sec"></select>
-                                                    <input type="hidden" id="text_alert_prod_cc_sec_username" name="text_alert_prod_cc_sec_username">
-                                                    <input type="hidden" id="text_alert_prod_cc_sec_email" name="text_alert_prod_cc_sec_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" id="text_alert_prod_cc_sec" name="text_alert_prod_cc_sec" multiple></select>
+
                                                 </div>
                                             </div>
-
                                             <!-- ------------------------------------------------ -->
 
                                         </div>
                                         </div>
-                                    </div>
-                                    {{-- <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoOper" aria-expanded="false" aria-controls="collapseTwoOper">
+                                    </div> 
+                                    <div class="card BENGGTQ">
+                                        <h2 class="card-header">
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoOper" aria-expanded="false" aria-controls="collapseTwoOper">
                                             <h5>ENGINEERING SECTION (Training and Qualification)</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseTwoOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
-                                        <div class="accordion-body">
-
-                                            <!-- ------------------------------------------------ -->
-
+                                        <div class="card-body">
                                             <p class="mb-3">TRAINING ITEMS:</p>
+                                            <div class="col-md-3">
+                                                <label class="" for="">TRAINING ITEMS:</label>
+                                                <select class="form-control select2bs4" style="width: 100%;" id="text_training_orientation_es_oper" name="text_training_orientation_es_oper" multiple></select>
+                                            </div>
+                                             <div class="container my-4 BENGGTQ">
+                                                <div class="row justify-content-center">
+                                                    <div class="col-xl-6 col-lg-8 col-md-10">
+                                                        <div class="card shadow-sm border-0">
+                                                            <div class="card-header bg-light py-3 border-bottom-0">
+                                                                <h6 class="card-title mb-0 text-muted text-uppercase fw-bold small tracking-wider">Orientation Checklist - Set C</h6>
+                                                            </div>
+                                                            <div class="table-responsive p-3">
+                                                                <table class="table table-bordered table-hover align-middle mb-0">
+                                                                    <thead class="table-light">
+                                                                        <tr>
+                                                                            <th scope="col" style="width: 25%;">Category</th>
+                                                                            <th scope="col">Document / Code Reference</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">CN</span></td>
+                                                                            <td>
+                                                                                <div class="form-check m-0">
+                                                                                    <input class="form-check-input" type="checkbox" name="engg_orientation_docs[]" value="PP-CN-367" id="chk_pp_cn_367">
+                                                                                    <label class="form-check-label fw-medium ms-1" for="chk_pp_cn_367">PP-CN-367</label>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">CN</span></td>
+                                                                            <td>
+                                                                                <div class="form-check m-0">
+                                                                                    <input class="form-check-input" type="checkbox" name="engg_orientation_docs[]" value="PP-CN-336" id="chk_pp_cn_336">
+                                                                                    <label class="form-check-label fw-medium ms-1" for="chk_pp_cn_336">PP-CN-336</label>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">CN</span></td>
+                                                                            <td>
+                                                                                <div class="form-check m-0">
+                                                                                    <input class="form-check-input" type="checkbox" name="engg_orientation_docs[]" value="PP-CN-086" id="chk_pp_cn_086">
+                                                                                    <label class="form-check-label fw-medium ms-1" for="chk_pp_cn_086">PP-CN-086</label>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">CN</span></td>
+                                                                            <td>
+                                                                                <div class="form-check m-0">
+                                                                                    <input class="form-check-input" type="checkbox" name="engg_orientation_docs[]" value="PP-CN-063" id="chk_pp_cn_063">
+                                                                                    <label class="form-check-label fw-medium ms-1" for="chk_pp_cn_063">PP-CN-063</label>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">PPS</span></td>
+                                                                            <td>
+                                                                                <div class="form-check m-0">
+                                                                                    <input class="form-check-input" type="checkbox" name="engg_orientation_docs[]" value="PP-MDGEN-138" id="chk_pp_mdgen_138">
+                                                                                    <label class="form-check-label fw-medium ms-1" for="chk_pp_mdgen_138">PP-MDGEN-138</label>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td><span class="badge bg-secondary text-uppercase px-2 py-1.5">YF</span></td>
+                                                                            <td>
+                                                                                <div class="form-check m-0">
+                                                                                    <input class="form-check-input" type="checkbox" name="engg_orientation_docs[]" value="PP-OPNGEN-017" id="chk_pp_opngen_017">
+                                                                                    <label class="form-check-label fw-medium ms-1" for="chk_pp_opngen_017">PP-OPNGEN-017</label>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
 
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_1" name="text_training_orientation_es_oper" value="Work Instruction" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_1"  style="font-weight: normal;">1) Work Instruction</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-3"></div>
-
-                                                <div class="col-md-5">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_10" name="text_training_orientation_es_oper" value="Pre-production samples and check sheet checking"  style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_10" style="font-weight: normal;">10) Pre-production samples and check sheet checking</label>
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_2" name="text_training_orientation_es_oper" value="Point Panel" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_2" style="font-weight: normal;">2) Point Panel</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4"></div>
-
-                                                <div class="col-md-5">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">(applicable to operator that uses machines/tools and jigs only)</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_3" name="text_training_orientation_es_oper" value="Criteria / Specification" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_3" style="font-weight: normal;">3) Criteria / Specification</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4"></div>
-
-                                                <div class="col-md-5">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_11" name="text_training_orientation_es_oper" value="Machine Abnormality" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_11" style="font-weight: normal;">11) Machine Abnormality</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-4">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_4" name="text_training_orientation_es_oper" value="Visual Inspection Guide (if required)" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_4" style="font-weight: normal;">4) Visual Inspection Guide (if required)</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_12" name="text_training_orientation_es_oper" value="CN PP-CN-367" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_12" style="font-weight: normal;">PP-CN-367</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_5" name="text_training_orientation_es_oper" value="Process Flow" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_5" style="font-weight: normal;">5) Process Flow</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_13" name="text_training_orientation_es_oper" value="CN PP-CN-336" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_13" style="font-weight: normal;">PP-CN-336</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_6" name="text_training_orientation_es_oper" value="Tools Equipment" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_6" style="font-weight: normal;">6) Tools Equipment</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_14" name="text_training_orientation_es_oper" value="CN PP-CN-086" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_14" style="font-weight: normal;">PP-CN-086</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_7" name="text_training_orientation_es_oper" value="PTNR" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_7" style="font-weight: normal;">7) PTNR (if required)</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">CN</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_15" name="text_training_orientation_es_oper" value="CN PP-CN-063" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_15" style="font-weight: normal;">PP-CN-063</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_8" name="text_training_orientation_es_oper" value="Machine Operations" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_8" style="font-weight: normal;">8) Machine Operations</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">PPS</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_16" name="text_training_orientation_es_oper" value="PPS PP-MDGEN-138" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_16" style="font-weight: normal;">PP-MDGEN-138</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_9" name="text_training_orientation_es_oper" value="Safety" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_9" style="font-weight: normal;">9) Safety</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4"></div>
-
-                                                <div class="col-md-1" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <label class="fs-5  " for="" style="font-weight: normal;">YF</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2" style="border: 2px solid black; padding: 8px; height: 48px;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_training_orientation_es_oper_17" name="text_training_orientation_es_oper" value="YF PP-OPNGEN-017" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_training_orientation_es_oper_17" style="font-weight: normal;">PP-OPNGEN-017</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
                                             <h5 class="mt-3 mb-3">RESULT</h5>
-
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take:</label>
@@ -832,14 +566,11 @@
                                                     <label class="" for="">Second Take:</label>
                                                 </div>
                                             </div>
-
                                             <div class="row mb-4">
                                                 <div class="col-md-6">
                                                     <label class="" for="">1. Observation / Interview Result</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_obs_first_result_es_oper" id="text_obs_first_result_es_oper">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
+                                                       
                                                     </select>
                                                 </div>
 
@@ -890,7 +621,7 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_es_oper" id="text_oa_1st_result_es_oper">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_es_oper" id="text_oa_1st_result_es_oper" multiple>
                                                         <option value="" selected disabled>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
@@ -900,9 +631,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_2nd_result_es_oper" id="text_oa_2nd_result_es_oper">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
+                                                      
                                                     </select>
                                                 </div>
                                             </div>
@@ -921,21 +650,16 @@
 
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
-                                                    <label class="" for="">Qualified by:</label>
-                                                    <input class="form-control" type="text" id="text_1st_qualifiedby_es_oper" name="text_1st_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_1st_qualifiedby_es_oper_username" name="text_1st_qualifiedby_es_oper_username">
-                                                    <input type="hidden" id="text_1st_qualifiedby_es_oper_email" name="text_1st_qualifiedby_es_oper_email">
+                                                    <label class="" for="">Qualified by NMODI:</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" id="text_1st_qualifiedby_es_oper" name="text_1st_qualifiedby_es_oper[]" placeholder="Enter Employee Number" multiple>
+                                                        </select>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Qualified by:</label>
-                                                    <input class="form-control" type="text" id="text_2nd_qualifiedby_es_oper" name="text_2nd_qualifiedby_es_oper" list="list_display_empno" placeholder="Select Qualified by">
-                                                    <datalist id="list_display_empno"></datalist>
 
-                                                    <input type="hidden" id="text_2nd_qualifiedby_es_oper_username" name="text_2nd_qualifiedby_es_oper_username">
-                                                    <input type="hidden" id="text_2nd_qualifiedby_es_oper_email" name="text_2nd_qualifiedby_es_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" id="text_2nd_qualifiedby_es_oper" name="text_2nd_qualifiedby_es_oper[]" placeholder="Enter Employee Number" multiple>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -965,18 +689,15 @@
 
                                         </div>
                                         </div>
-                                    </div>
-                                    <div class="accordion-item">
+                                    </div>--}}
+                                    <div class="card">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
                                             <h5>QUALITY CONTROL SECTION (CERTIFICATTION)</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseThreeOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
-                                        <div class="accordion-body">
-
-                                            <!-- ------------------------------------------------ -->
-
+                                        <div class="card-body">
                                             <p class="mb-3">1. Let the operator discuss the details of training/orientation conducted by concerned Supervisor nad Eng'r as per check items specified.</p>
 
                                             <h5 class="mt-3 mb-3">RESULT</h5>
@@ -1254,7 +975,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="accordion-item">
+                                    {{--  <div class="card">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFourOper" aria-expanded="false" aria-controls="collapseFourOper">
                                             <h5>PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h5>
@@ -1460,7 +1181,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="accordion-item">
+                                    <div class="card">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
                                             <h5>VALIDATION PROCESS: ENGINEERING SECTION</h5>
@@ -1564,7 +1285,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="accordion-item">
+                                    <div class="card">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSixOper" aria-expanded="false" aria-controls="collapseSixOper">
                                             <h5>VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
@@ -1749,7 +1470,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="accordion-item">
+                                    <div class="card">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSevenOper" aria-expanded="false" aria-controls="collapseSevenOper">
                                             <h5>QC Validation for Visual Operator</h5>
@@ -2167,7 +1888,7 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="" for="">Trained by:</label>
-                                        <input class="form-control" type="text" id="text_view_first_trainedby_oper" name="text_view_first_trainedby_oper" readonly>
+                                        <input class="form-control" type="text" id="text_view_first_trainedby_oper" name="text_view_first_trainedby_oper" multiple readonly>
                                     </div>
 
                                     <div class="col-md-6">
@@ -3168,13 +2889,45 @@
 
 @section('js_content')
     <script type="text/javascript">
+    $(function () {
          // In-memory array that holds employees staged in the modal
         operEmpArray = [];
+        $(document).on('change', '#text_certification_operator',function (e) {
+            e.preventDefault();
+            // 1. Grab the value (fallback to empty string if null/undefined)
+            let selectedValue = $(this).val() || '';
+
+            let valuesArray = Array.isArray(selectedValue)
+                ? selectedValue
+                : selectedValue.toString().split(',');
+
+            const targetIDs = ['213', '216'];
+
+            const hasValue = valuesArray.some(val => targetIDs.includes(val.trim()));
+
+            $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
+         });
+        $(document).on('change', '#text_training_orientation_ps_oper',function (e) {
+            e.preventDefault();
+            // 1. Grab the value (fallback to empty string if null/undefined)
+            let selectedValue = $(this).val() || '';
+
+            let valuesArray = Array.isArray(selectedValue)
+                ? selectedValue
+                : selectedValue.toString().split(',');
+
+            const targetIDs = ['213', '216'];
+
+            const hasValue = valuesArray.some(val => targetIDs.includes(val.trim()));
+
+            $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
+         });
         $(document).on('submit', '#formSubmit_oper, #formSubmit_Oper', function (e) {
             e.preventDefault();
 
             var $form = $(this);
-
+            $form.append('text_select_position', $('#text_select_position').val());
+            $form.append('text_select_section', $('#text_select_section').val());
             // Serialize form into an object (handles multiple inputs with same name)
             var formArray = $form.serializeArray();
             var data = {};
@@ -3194,10 +2947,11 @@
                 ? getOperEmpTableData()
                 : [];
 
-            console.log('formSubmit_Oper data', data);
-
+          
             // Send to server
-            let serialized_data = {}
+            let serialized_data = {
+
+            }
             call_ajax_serialize(data,serialized_data,'save_qualification_certification_oper', function(response){
                 if (response && response.success) {
                     Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
@@ -3208,41 +2962,40 @@
             });
         });
 
-        $(function () {
-            // $('.select2bs4').select2();
-            var $positionSelect = $('#text_select_position');
-            var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper');
 
-            function togglePositionSection(position) {
-                $positionSections.addClass('d-none');
+        var $positionSelect = $('#text_select_position');
+        var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper');
 
-                switch (position) {
-                    case 'MH':
-                        $('#divMH').removeClass('d-none');
-                        break;
-                    case 'Technician':
-                        $('#divTechnian').removeClass('d-none');
-                        break;
-                    case 'Supervisor':
-                    case 'Engineer':
-                    case 'Planner':
-                        $('#divSEP').removeClass('d-none');
-                        break;
-                    case 'Inspector':
-                        $('#divInspector').removeClass('d-none');
-                        break;
-                    case 'Operator':
-                        $('#div_Oper').removeClass('d-none');
-                        break;
-                }
+        function togglePositionSection(position) {
+            $positionSections.addClass('d-none');
+
+            switch (position) {
+                case 'MH':
+                    $('#divMH').removeClass('d-none');
+                    break;
+                case 'Technician':
+                    $('#divTechnian').removeClass('d-none');
+                    break;
+                case 'Supervisor':
+                case 'Engineer':
+                case 'Planner':
+                    $('#divSEP').removeClass('d-none');
+                    break;
+                case 'Inspector':
+                    $('#divInspector').removeClass('d-none');
+                    break;
+                case 'Operator':
+                    $('#div_Oper').removeClass('d-none');
+                    break;
             }
+        }
 
-            $positionSelect.on('change', function () {
-                togglePositionSection($(this).val());
-            });
-
-            togglePositionSection($positionSelect.val());
+        $positionSelect.on('change', function () {
+            togglePositionSection($(this).val());
         });
+
+        togglePositionSection($positionSelect.val());
+    });
 
         function initDivDeptSecCombos(comboSelectors) {
             comboSelectors.forEach(function(selector) {
@@ -3257,29 +3010,35 @@
                 '#text_section_operator',
         ]);
 
-        function initDropdownMasterDetailsByFkidCombos(comboSelectors,dropdownMastersId) {
 
-            comboSelectors.forEach(function(selector) {
-                    getDropdownMasterDetailsByFkid({
-                        comboId: $(selector),
-                        dropdownMastersId: dropdownMastersId
-                    });
-            });
-        }
 
         initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
         ],1);
 
+
         initDropdownMasterDetailsByFkidCombos([
-                '#text_operator_product_line',
+            '#text_operator_product_line',
         ],2);
 
-        function initGetSystemOneEmployeeDetailsCombos(comboSelectors) {
+        initDropdownMasterDetailsByFkidCombos([
+                '#text_certification_operator',
+        ],3);
+
+        initDropdownMasterDetailsByFkidCombos([
+                '#text_training_orientation_ps_oper',
+        ],4);
+        const initGetSystemOneEmployeeDetailsCombos = (comboSelectors) => {
 
             comboSelectors.forEach(function(selector) {
                     getSystemOneEmployeeDetails($(selector));
+            });
+        }
+        const initSelectPassFail = (comboSelectors) => {
+
+            comboSelectors.forEach(function(selector) {
+                    selectPassFail($(selector));
             });
         }
 
@@ -3291,8 +3050,14 @@
                 '#text_second_mentoredby_oper',
                 '#text_alert_prod_sec',
                 '#text_alert_prod_cc_sec',
-        ]);
+                '#text_1st_qualifiedby_es_oper',
+                '#text_2nd_qualifiedby_es_oper',
+                '#text_obs_first_result_es_oper',
 
+        ]);
+        initSelectPassFail([
+            '#text_oa_1st_result_es_oper',
+        ])
         // call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId =null);
 
     </script>

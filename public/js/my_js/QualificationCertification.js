@@ -3,7 +3,6 @@ const getDivDeptSec = (params) => {
     };
 
     call_ajax(data,'get_div_dept_sec',function(response){
-        console.log(response);
 
         let paramsGetSelect2Value = {
             comboId : params.comboId,
@@ -11,7 +10,51 @@ const getDivDeptSec = (params) => {
         }
         fnGetSelect2Value(paramsGetSelect2Value)
     });
+}
+const selectPassFail = (comboId) => {
+    let data = [
+            { id : 'PASSED', text : 'PASSED' },
+            { id : 'FAILED', text : 'FAILED' }  ,
+    ]
+    let paramsGetSelect2Value = {
+        comboId : comboId,
+        dataValue : data
+    }
 
+    fnGetSelect2Value(paramsGetSelect2Value)
+}
+// const initDropdownMasterDetailsByFkidCombos = (comboSelectors,dropdownMastersId) => {
+
+//     comboSelectors.forEach(function(selector) {
+//             getDropdownMasterDetailsByFkid({
+//                 comboId: $(selector),
+//                 dropdownMastersId: dropdownMastersId
+//             });
+//     });
+// }
+// const getDropdownMasterDetailsByFkid = (params) => {
+//     let data = {
+//         dropdown_masters_id : params.dropdownMastersId
+//     };
+
+//     call_ajax(data,'get_dropdown_master_details_by_fkid',function(response){
+
+//         let paramsGetSelect2Value = {
+//             comboId : params.comboId,
+//             dataValue : response['data']
+//         }
+//         fnGetSelect2Value(paramsGetSelect2Value)
+//     });
+
+// }
+const initDropdownMasterDetailsByFkidCombos = (comboSelectors,dropdownMastersId) => {
+
+    comboSelectors.forEach(function(selector) {
+            getDropdownMasterDetailsByFkid({
+                comboId: $(selector),
+                dropdownMastersId: dropdownMastersId
+            });
+    });
 }
 const getDropdownMasterDetailsByFkid = (params) => {
     let data = {
@@ -19,12 +62,12 @@ const getDropdownMasterDetailsByFkid = (params) => {
     };
 
     call_ajax(data,'get_dropdown_master_details_by_fkid',function(response){
-console.log('dsds',response['dropdown_masters_details']);
-
+        // return;
         let paramsGetSelect2Value = {
             comboId : params.comboId,
             dataValue : response['data']
         }
+
         fnGetSelect2Value(paramsGetSelect2Value)
     });
 
@@ -32,19 +75,37 @@ console.log('dsds',response['dropdown_masters_details']);
 
 
 function fnGetSelect2Value(params){
-    // $('#formEditSa select[name="select_checked_by_qc[]"]'.select2({
-
+    // 1. Initialize the Select2 dropdown with your AJAX data source
     params.comboId.select2({
         data : params.dataValue,
         theme: 'bootstrap-5',
     });
-    var arrValue = [];
-    $.each(params.dataValue, function(key, value){
-        arrValue.push(value)
+
+    // 2. Set up a listener for changes to cleanly pull the entire object data matrix
+    params.comboId.on('change', function() {
+        // .select2('data') returns an array of selected option objects [{id: "...", text: "...", ...}]
+        let selectedObjects = $(this).select2('data');
+
+        let extractedData = selectedObjects.map(function(item) {
+            return {
+                id: item.id,     // The underlying database primary key/value
+                text: item.text  // The string display description/label
+            };
+        });
+
+        // You can now store 'extractedData' to your global queue variables or use it directly!
     });
 
-    params.comboId.val(arrValue).trigger('change');
+    // If your backend payload contains pre-selected values, map their keys to set them:
+    var arrValue = [];
+    $.each(params.dataValue, function(key, value){
+        arrValue.push(value.id); // Push the ID to pre-select it
+    });
+
+    // Un-comment this line if you want the dropdown to auto-select items arriving from AJAX:
+    // params.comboId.val(arrValue).trigger('change');
 }
+
 
 /* =========================================================
    Operator Employee Modal — Add Multiple Employees to Table
@@ -109,7 +170,6 @@ function addOperEmpToTable() {
     // Push to in-memory array
     const entry = { empId, empName, stFrom, stFromText, stTo, stToText, optRemarks };
     operEmpArray.push(entry);
-    console.log('operEmpArray',operEmpArray);
 
     // Append row to staging table
     const idx = operEmpArray.length - 1;
@@ -131,8 +191,9 @@ function addOperEmpToTable() {
 
     // Reset combos for the next entry
     $empSelect.val(null).trigger('change');
-    $stationFrom.val(null).trigger('change');
-    $stationTo.val(null).trigger('change');
+    // $stationFrom.val(null).trigger('change');
+    // $stationFrom.val(null).trigger('change');
+    // $stationTo.val(null).trigger('change');
 }
 
 /**

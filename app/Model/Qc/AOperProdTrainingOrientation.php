@@ -1,11 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Model\Qc;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ModelQcOpAProdTrainingOrientation extends Model
+class AOperProdTrainingOrientation extends Model
 {
     use HasFactory;
 }
