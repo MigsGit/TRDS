@@ -375,8 +375,8 @@
                     @csrf
                     <div class="modal-body">
                     <label id="lblChangeQuestionnaireDetailsStatusLabel"></label>
-                    <input type="text" name="questionnaire_id" id="txtChangeQuestionnaireDetailsStatusId" placeholder="Questionnaire Id">
-                    <input type="text" name="status" id="txtChangeQuestionnaireDetailsStatus" placeholder="Status">
+                    <input type="hidden" name="questionnaire_id" id="txtChangeQuestionnaireDetailsStatusId" placeholder="Questionnaire Id">
+                    <input type="hidden" name="status" id="txtChangeQuestionnaireDetailsStatus" placeholder="Status">
                     </div>
                     <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
