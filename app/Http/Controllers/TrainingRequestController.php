@@ -22,6 +22,8 @@ class TrainingRequestController extends Controller
         ->where('logdel', 0)
         ->get();
 
+        // return $trainingRequests;
+
         $receiverUsers = User::with(['user_access_module'])
         ->whereHas('user_access_module', function ($query) {
             $query->whereRaw("FIND_IN_SET(?, user_modules_id)", [5]);
@@ -55,11 +57,14 @@ class TrainingRequestController extends Controller
             $trainingRequests = $trainingRequests->whereIn('status', [0, 1, 2,3]); // All
         }
 
+
         return DataTables()->of($trainingRequests)
         ->addColumn('action', function($trainingRequest) use ($receiverUsers, $tuHeadApproverUser){
-            $trainingRequestDept = RapidXDepartment::where('department_id', $trainingRequest->department_id)->first();
-            $dept = $trainingRequestDept->department_group;
+            $sectionHeadDeptId = $trainingRequest->section_head_user->department_id;
+            $trainingRequestDept = RapidXDepartment::where('department_id', $sectionHeadDeptId)->first();
+            $dept = $trainingRequestDept->department_name;
             // return $dept;
+            // return $trainingRequest->department_id;
             $result = '';
             $result .= '<center>';
 
@@ -67,31 +72,31 @@ class TrainingRequestController extends Controller
 
             if($trainingRequest->status == 0) {
                 if($trainingRequest->section_head_user && $trainingRequest->section_head_user->id == $_SESSION['rapidx_user_id']){
-                    $result .= '<button class="btn btn-sm btn-success btnConformTrainingRequest" 
-                        data-id="' . $trainingRequest->id . '" 
-                        data-ctrl="' . $trainingRequest->ctrl_number . '" 
+                    $result .= '<button class="btn btn-sm btn-success btnConformTrainingRequest"
+                        data-id="' . $trainingRequest->id . '"
+                        data-ctrl="' . $trainingRequest->ctrl_number . '"
                         data-dept="' . $dept . '">
                         <i class="fas fa-check"></i>
                     </button>';                }
             }else if($trainingRequest->status == 1){
                 if($receiverUsers->contains('rapidx_emp_id', $_SESSION['rapidx_user_id'])){
                     // $result .= '<button class="btn btn-sm btn-success btnReceiveTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
-                    $result .= '<button class="btn btn-sm btn-success btnReceiveTrainingRequest" 
-                        data-id="' . $trainingRequest->id . '" 
-                        data-ctrl="' . $trainingRequest->ctrl_number . '" 
+                    $result .= '<button class="btn btn-sm btn-success btnReceiveTrainingRequest"
+                        data-id="' . $trainingRequest->id . '"
+                        data-ctrl="' . $trainingRequest->ctrl_number . '"
                         data-dept="' . $dept . '">
                         <i class="fas fa-check"></i>
-                    </button>'; 
+                    </button>';
                     }
             }else if($trainingRequest->status == 2){
                 if($tuHeadApproverUser){
                     // $result .= '<button class="btn btn-sm btn-success btnApproveTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
-                    $result .= '<button class="btn btn-sm btn-success btnApproveTrainingRequest" 
-                        data-id="' . $trainingRequest->id . '" 
-                        data-ctrl="' . $trainingRequest->ctrl_number . '" 
+                    $result .= '<button class="btn btn-sm btn-success btnApproveTrainingRequest"
+                        data-id="' . $trainingRequest->id . '"
+                        data-ctrl="' . $trainingRequest->ctrl_number . '"
                         data-dept="' . $dept . '">
                         <i class="fas fa-check"></i>
-                    </button>'; 
+                    </button>';
                 }
             }
 
@@ -251,16 +256,22 @@ class TrainingRequestController extends Controller
 
     public function getHRISSections(Request $request){
         // return 'asd';
-        $systemOneSection = SystemOneHrisSection::with(['department'])
-        ->where('isActive', 0)
-        ->get();
+       $systemOneSection = SystemOneHrisSection::with(['department'])
+    ->where('isActive', 1)
+    // ->select('section', 'department_id')
+    ->distinct()
+    ->get();
+
+    // return $systemOneSection;
+        // $systemOneSection = SystemOneHrisSection::where('isActive', 1)
+        // ->get();
         return response()->json($systemOneSection);
     }
 
     public function getHRISSectionByDepartment(Request $request){
         $systemOneDepartment = SystemOneHrisDepartment::where('isActive', 1)
         ->get();
-        return $systemOneDepartment;
+        // return $systemOneDepartment;
         return response()->json($systemOneDepartment);
     }
 
@@ -326,7 +337,7 @@ class TrainingRequestController extends Controller
             TrainingRequestDetails::updateOrCreate(
                 [
 
-                    'training_request_id' => $trainingRequestId,   
+                    'training_request_id' => $trainingRequestId,
                     'training_memo_doc_id' => $memoDocId,
                     'hr_memo_trainee_details_id' => $hrmemoDocsId,
                     'emp_no' => $emp['emp_no']
@@ -351,7 +362,7 @@ class TrainingRequestController extends Controller
                 'training_result' => implode(',', $explodedResult),
             ];
         }
-        
+
 
         if($trainingRequest){
             return response()->json(['result' => 1, 'message' => 'Training request added successfully']);
@@ -363,12 +374,19 @@ class TrainingRequestController extends Controller
 
     public function getUserConformance(Request $request){
         // return 'asd';
-        $trainingRequest = User::whereHas('user_access_module', function ($query) {
-            $query->whereIn('user_modules_id', [3,5,6]); 
+       $modules = [3, 5, 6];
+
+        $trainingRequest = User::whereHas('user_access_module', function ($query) use ($modules) {
+            $query->where(function ($q) use ($modules) {
+                foreach ($modules as $module) {
+                    $q->orWhereRaw("FIND_IN_SET(?, user_modules_id)", [$module]);
+                }
+            });
         })
-        ->with(['users'])
+        ->with('users')
         ->get();
 
+        // return $trainingRequest;
         return response()->json($trainingRequest);
     }
 
@@ -389,7 +407,7 @@ class TrainingRequestController extends Controller
         return response()->json($trainingRequestDetails);
 
     }
-    
+
     public function getMemoDocs(Request $request){
         $selectedMemoId = $request->selectedMemoId;
 
@@ -441,6 +459,10 @@ class TrainingRequestController extends Controller
         ->where('status', 6)
         ->first();
 
+        // return $memo;
+
+        // return $memo;
+
 
 
         // $traineeDetails = $memo ? $memo->trainee_details : collect();
@@ -462,18 +484,21 @@ class TrainingRequestController extends Controller
 
             if ($td->employment_type == 1) {
                 $td->load(['hris_emp_info' => function ($q) {
-                    $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
-                    ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                    ->select('vw_employeeinfo.*', 'tbl_Training.Venue as Venue');
+                    // $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                    // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                    $q->select('vw_employeeinfo.*');
                 }]);
             } else {
                 $td->load(['subcon_emp_info' => function ($q) {
-                    $q->join('vw_Trainee', 'vw_subcon_employeeinfo.pkid', '=', 'vw_Trainee.fkSubconEmployee')
-                    ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                    ->select('vw_subcon_employeeinfo.*', 'tbl_Training.Venue as Venue');
+                    // $q->join('vw_Trainee', 'vw_subcon_employeeinfo.pkid', '=', 'vw_Trainee.fkSubconEmployee')
+                    // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                    // $q->select('vw_subcon_employeeinfo.*');
                 }]);
             }
         }
+
+        // return $td;
+
 
         return DataTables()->of($traineeDetails)
         ->addColumn('id', function($td){
@@ -510,7 +535,7 @@ class TrainingRequestController extends Controller
         ->addColumn('name', function($td){
             if($td->employment_type == 1){
                 return $td->hris_emp_info->EmpName ?? '';
-            }else{               
+            }else{
                 return $td->subcon_emp_info->EmpName ?? '';
             }
         })
@@ -533,10 +558,12 @@ class TrainingRequestController extends Controller
                 ($td->hris_emp_info->Department ?? '') . ' / ' .
                 ($td->hris_emp_info->Section ?? '');
             }else{
-                return $td->subcon_emp_info->Position ?? '';
+                return ($td->subcon_emp_info->Position ?? '') . ' / ' .
+                ($td->subcon_emp_info->Department ?? '') . ' / ' .
+                ($td->subcon_emp_info->Section ?? '');
 
             }
-            
+
         })
 
         ->addColumn('training_title', function($td){
@@ -577,7 +604,7 @@ class TrainingRequestController extends Controller
         $trainingRequest = TrainingRequest::find($request->id);
         if($trainingRequest){
             $trainingRequest->status = 1; // Update status to "Conformed"
-            $trainingRequest->section_head_date = date('Y-m-d H:i:s'); 
+            $trainingRequest->section_head_date = date('Y-m-d H:i:s');
             $trainingRequest->save();
             return response()->json(['result' => 1, 'message' => 'Training request conformed successfully']);
         } else {
@@ -591,8 +618,8 @@ class TrainingRequestController extends Controller
         $trainingRequest = TrainingRequest::find($request->id);
         if($trainingRequest){
             $trainingRequest->status = 2; // Update status to "Received"
-            $trainingRequest->received_by = $_SESSION['rapidx_user_id']; 
-            $trainingRequest->received_date = date('Y-m-d H:i:s'); 
+            $trainingRequest->received_by = $_SESSION['rapidx_user_id'];
+            $trainingRequest->received_date = date('Y-m-d H:i:s');
             $trainingRequest->save();
             return response()->json(['result' => 1, 'message' => 'Training request received successfully']);
         } else {
@@ -606,8 +633,8 @@ class TrainingRequestController extends Controller
         $trainingRequest = TrainingRequest::find($request->id);
         if($trainingRequest){
             $trainingRequest->status = 3; // Update status to "Approved"
-            $trainingRequest->tu_head_approver = $_SESSION['rapidx_user_id']; 
-            $trainingRequest->tu_head_approve_date = date('Y-m-d H:i:s'); 
+            $trainingRequest->tu_head_approver = $_SESSION['rapidx_user_id'];
+            $trainingRequest->tu_head_approve_date = date('Y-m-d H:i:s');
             $trainingRequest->save();
             return response()->json(['result' => 1, 'message' => 'Training request approved successfully']);
         } else {

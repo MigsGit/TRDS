@@ -37,7 +37,7 @@
 <script src="{{ asset('public/template/plugins/daterangepicker/moment.min.js') }}"></script>
 <script src="{{ asset('public/template/plugins/daterangepicker/daterangepicker.js') }}"></script> --}}
 
-<script type="text/javascript" src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1581152197/smartwizard/jquery.smartWizard.min.js"></script>
+<!-- <script type="text/javascript" src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1581152197/smartwizard/jquery.smartWizard.min.js"></script> -->
 
 <script>
     toastr.options = {
@@ -71,5 +71,6 @@
 <script src="{{ asset('public/js/my_js/EmailRecipient.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/ProductClassification.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/TrainingRequest.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/TrainingEndorsement.js') }}?<?=time()?>"></script>
 
 {{-- <script src="https://cdn.jsdelivr.net/npm/@coreui/coreui@4.0.2/dist/js/coreui.bundle.min.js"></script> --}}

@@ -284,7 +284,6 @@ class QuestionnairesController extends Controller
 
     public function createUpdateQuestionnaireDetails(Request $request){
         date_default_timezone_set('Asia/Manila');
-
         $data = $request->all();
         $type = '';
         switch($request->questionnaire_category_type){
