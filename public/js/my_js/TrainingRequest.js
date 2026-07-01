@@ -1,6 +1,6 @@
 
 
-$(document).ready(function() {    
+$(document).ready(function() {
     // Apply Select2 to all select elements inside any modal dynamically
     $('.modal').on('shown.bs.modal', function () {
         $(this).find('.select2bs5').each(function() {
@@ -11,7 +11,7 @@ $(document).ready(function() {
         });
     });
 
-    
+
 
     const $trainingRequestTable = $('#tblTrainingRequest');
     const AddTrainingform = $('#formAddTrainingRequest');
@@ -69,7 +69,7 @@ $(document).ready(function() {
         ]
     });
 
-    
+
 
 
     selectFilterId.change(function(){
@@ -155,9 +155,9 @@ $(document).ready(function() {
                             { data: 'date_hired', name: 'date_hired' },
                             { data: 'emp_no', name: 'emp_no' },
                             { data: 'name', name: 'name' },
-                            { 
-                                data: 'pos_dept_section', 
-                                name: 'pos_dept_section', 
+                            {
+                                data: 'pos_dept_section',
+                                name: 'pos_dept_section',
                                 render : function(data, type, row) {
                                     return `${row.position} / ${row.department} / ${row.section}`;
                                 }
@@ -171,7 +171,7 @@ $(document).ready(function() {
                     });
                 }
             }
-            
+
         });
 
     });
@@ -363,7 +363,7 @@ $(document).ready(function() {
             url: 'add_training_request',
             method: 'POST',
             data: {
-                ...formData,   
+                ...formData,
                 employees: employees,
                 memo_doc_id: $('#selectMemoDocNo').val(),
                 _token: $('meta[name="csrf-token"]').attr('content')
@@ -383,7 +383,7 @@ $(document).ready(function() {
             }
         });
 
-        
+
     });
 
     $('#selectMemoDocNo').on('change', function(){
@@ -438,13 +438,13 @@ $(document).ready(function() {
 
                 $.each(response, function(index, section) {
 
-                    let department = section.department && section.department.Department 
-                        ? section.department.Department 
+                    let department = section.department && section.department.Department
+                        ? section.department.Department
                         : '-';
 
                     $select.append(
-                        '<option value="' + section.pkid + '">' 
-                        + section.Section + ' - ' + department + 
+                        '<option value="' + section.pkid + '">'
+                        + section.Section + ' - ' + department +
                         '</option>'
                     );
                 });
@@ -466,7 +466,7 @@ $(document).ready(function() {
             // data: { id: id },
             success: function(response) {
                 // Handle the response as needed
-                // console.log(response);
+                console.log(response);
                 const $select = $('#selectSectionHead');
                 $select.empty();
                 $select.append('<option value="" disabled selected>Select Conformance User</option>');

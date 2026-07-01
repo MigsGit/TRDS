@@ -345,7 +345,7 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
                     for(let i = 1; i < choices.length; i++){
                         $('#btnAddChoice').click();
                     }
-
+// question1_option3 answer_choices_question
                     $('.divChoices .input-group').each(function(index){
                         let choiceValue = choices[index];
 
@@ -387,10 +387,13 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
                         getQuestions.push(item.question);
                         getSelectedAnswers[index] = item.answer;
                     });
+                    console.log('getData',getData);
 
                     RenderTable();
 
                     getSelectedAnswers.forEach((ans, rowIndex) => {
+                    console.log('getData',ans);
+
                         if (ans !== null) {
                             let radio = $(`input[data-row="${rowIndex}"][data-column="${ans}"]`);
                             radio.prop('checked', true);

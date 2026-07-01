@@ -284,7 +284,6 @@ class QuestionnairesController extends Controller
 
     public function createUpdateQuestionnaireDetails(Request $request){
         date_default_timezone_set('Asia/Manila');
-
         $data = $request->all();
         $type = '';
         switch ($request->questionnaire_category_type) {
@@ -394,8 +393,8 @@ class QuestionnairesController extends Controller
         if($validator->fails()){
             return response()->json(['validationHasError' => 1, 'error' => $validator->errors()]);
         }else{
-            // DB::beginTransaction();
-            // try{
+            DB::beginTransaction();
+            try{
                 $exists = QuestionnaireDetails::where('image', $filename)
                     ->where('logdel', 0)
                     ->exists();
@@ -444,12 +443,12 @@ class QuestionnairesController extends Controller
                     }
                 }
 
-                // DB::commit();
+                DB::commit();
                 return response()->json(['hasError' => 0]);
-            // }catch (\Exception $e){
-            //     DB::rollback();
-            //     return response()->json(['hasError' => 1, 'exceptionError' => $e]);
-            // }
+            }catch (\Exception $e){
+                DB::rollback();
+                return response()->json(['hasError' => 1, 'exceptionError' => $e]);
+            }
         }
     }
 
