@@ -17,12 +17,12 @@ class CreateQcSlipsTable extends Migration
 
             $table->id();
             $table->string('control_no')->unique()->index();
-            // Relational Parent Links (Many-to-One Setup)
-            // $table->foreignId('section_id')->constrained('section_id')->onDelete('restrict')->onUpdate('cascade');
-            // $table->foreignId('product_line_id')->constrained()->onDelete('restrict')->onUpdate('cascade');
+            $table->string('status')->comment('1 PB-Preparedby | ');
+            $table->string('approval_status')->comment('1 PB-Preparedby | ');
+            $table->string('section_category');
+            $table->string('position_category');
             $table->string('section')->comment('systemone HRIS');
             $table->string('product_line')->comment('dropdown_maintenance_details');
-            $table->string('series_name');
             $table->string('series_name');
             $table->string('created_by')->comment('systemone HRIS');
             $table->softDeletes();

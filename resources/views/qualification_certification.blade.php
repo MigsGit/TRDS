@@ -464,7 +464,7 @@
 
                                         </div>
                                         </div>
-                                    </div> 
+                                    </div>
                                     <div class="card BENGGTQ">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoOper" aria-expanded="false" aria-controls="collapseTwoOper">
@@ -570,7 +570,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">1. Observation / Interview Result</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_obs_first_result_es_oper" id="text_obs_first_result_es_oper">
-                                                       
+
                                                     </select>
                                                 </div>
 
@@ -631,7 +631,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_2nd_result_es_oper" id="text_oa_2nd_result_es_oper">
-                                                      
+
                                                     </select>
                                                 </div>
                                             </div>
@@ -689,7 +689,7 @@
 
                                         </div>
                                         </div>
-                                    </div>--}}
+                                    </div>
                                     <div class="card">
                                         <h2 class="accordion-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
@@ -975,14 +975,14 @@
                                         </div>
                                         </div>
                                     </div>
-                                    {{--  <div class="card">
-                                        <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFourOper" aria-expanded="false" aria-controls="collapseFourOper">
+                                    <div class="card">
+                                        <h2 class="card-header">
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFourOper" aria-expanded="false" aria-controls="collapseFourOper">
                                             <h5>PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseFourOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
-                                        <div class="accordion-body">
+                                        <div class="card-body">
 
                                             <!-- ------------------------------------------------ -->
 
@@ -1078,13 +1078,10 @@
                                                 <div class="col-md-1">
                                                     <p for="">Production:</p>
                                                 </div>
-
                                                 <div class="col-md-5">
-                                                    <input class="form-select mb-2" type="text" id="text_1st_certified_prod_peqcs_oper" name="text_1st_certified_prod_peqcs_oper" list="list_display_empno" placeholder="Select Prod'n Certified by">
-                                                    <datalist id="list_display_empno"></datalist>
 
-                                                    <input type="hidden" id="text_1st_certified_prod_peqcs_oper_username" name="text_1st_certified_prod_peqcs_oper_username">
-                                                    <input type="hidden" id="text_1st_certified_prod_peqcs_oper_email" name="text_1st_certified_prod_peqcs_oper_email">
+                                                  <select class="form-control select2bs4" style="width: 100%;" name="text_1st_certified_prod_peqcs_oper" id="text_1st_certified_prod_peqcs_oper" multiple>
+                                                  </select>
                                                 </div>
 
                                                 <div class="col-md-1">
@@ -1092,11 +1089,8 @@
                                                 </div>
 
                                                 <div class="col-md-5">
-                                                    <input class="form-select mb-2" type="text" id="text_2nd_certified_prod_peqcs_oper" name="text_2nd_certified_prod_peqcs_oper" list="list_display_empno" placeholder="Select Prod'n Certified by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_2nd_certified_prod_peqcs_oper_username" name="text_2nd_certified_prod_peqcs_oper_username">
-                                                    <input type="hidden" id="text_2nd_certified_prod_peqcs_oper_email" name="text_2nd_certified_prod_peqcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_certified_prod_peqcs_oper" id="text_2nd_certified_prod_peqcs_oper" multiple>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -1106,11 +1100,8 @@
                                                 </div>
 
                                                 <div class="col-md-5">
-                                                    <input class="form-select mb-2" type="text" id="text_1st_certified_eng_peqcs_oper" name="text_1st_certified_eng_peqcs_oper" list="list_display_empno" placeholder="Select Eng'g Certified by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_1st_certified_eng_peqcs_oper_username" name="text_1st_certified_eng_peqcs_oper_username">
-                                                    <input type="hidden" id="text_1st_certified_eng_peqcs_oper_email" name="text_1st_certified_eng_peqcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_1st_certified_eng_peqcs_oper" id="text_1st_certified_eng_peqcs_oper" multiple>
+                                                    </select>
                                                 </div>
 
                                                 <div class="col-md-1">
@@ -1118,11 +1109,8 @@
                                                 </div>
 
                                                 <div class="col-md-5">
-                                                    <input class="form-select mb-2" type="text" id="text_2nd_certified_eng_peqcs_oper" name="text_2nd_certified_eng_peqcs_oper" list="list_display_empno" placeholder="Select Eng'g Certified by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_2nd_certified_eng_peqcs_oper_username" name="text_2nd_certified_eng_peqcs_oper_username">
-                                                    <input type="hidden" id="text_2nd_certified_eng_peqcs_oper_email" name="text_2nd_certified_eng_peqcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_certified_eng_peqcs_oper" id="text_2nd_certified_eng_peqcs_oper" multiple>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -1132,11 +1120,8 @@
                                                 </div>
 
                                                 <div class="col-md-5">
-                                                    <input class="form-select mb-2" type="text" id="text_1st_certified_qc_peqcs_oper" name="text_1st_certified_qc_peqcs_oper" list="list_display_empno" placeholder="Select QC Certified by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_1st_certified_qc_peqcs_oper_username" name="text_1st_certified_qc_peqcs_oper_username">
-                                                    <input type="hidden" id="text_1st_certified_qc_peqcs_oper_email" name="text_1st_certified_qc_peqcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_1st_certified_qc_peqcs_oper" id="text_1st_certified_qc_peqcs_oper" multiple>
+                                                    </select>
                                                 </div>
 
                                                 <div class="col-md-1">
@@ -1144,11 +1129,8 @@
                                                 </div>
 
                                                 <div class="col-md-5">
-                                                    <input class="form-select mb-2" type="text" id="text_2nd_certified_qc_peqcs_oper" name="text_2nd_certified_qc_peqcs_oper" list="list_display_empno" placeholder="Select QC Certified by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_2nd_certified_qc_peqcs_oper_username" name="text_2nd_certified_qc_peqcs_oper_username">
-                                                    <input type="hidden" id="text_2nd_certified_qc_peqcs_oper_email" name="text_2nd_certified_qc_peqcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_certified_qc_peqcs_oper" id="text_2nd_certified_qc_peqcs_oper" multiple>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -1181,7 +1163,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="card">
+                                   <div class="card">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
                                             <h5>VALIDATION PROCESS: ENGINEERING SECTION</h5>
@@ -1284,18 +1266,15 @@
 
                                         </div>
                                         </div>
-                                    </div>
+                                    </div>--}}
                                     <div class="card">
                                         <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSixOper" aria-expanded="false" aria-controls="collapseSixOper">
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseSixOper" aria-expanded="false" aria-controls="collapseSixOper">
                                             <h5>VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseSixOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
-                                        <div class="accordion-body">
-
-                                            <!-- ------------------------------------------------ -->
-
+                                        <div class="card-body">
                                             <div class="row mb-1">
                                                 <div class="col-md-3">
                                                     <label class="ms-5" for="">QC Validation for other section</label>
@@ -1426,23 +1405,17 @@
                                                 </div>
                                             </div>
 
-                                            <div class="row mb-3">
+                                            <div class="row mb-3 nmodify">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after 3rd day):</label>
-                                                    <input class="form-control" type="text" id="text_1st_validatedby_vpes_oper_2" name="text_1st_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_1st_validatedby_vpes_oper_2_username" name="text_1st_validatedby_vpes_oper_2_username">
-                                                    <input type="hidden" id="text_1st_validatedby_vpes_oper_2_email" name="text_1st_validatedby_vpes_oper_2_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_1st_validatedby_vpes_oper_2" id="text_1st_validatedby_vpes_oper_2" multiple>
+                                                    </select>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after re-orientation):</label>
-                                                    <input class="form-control" type="text" id="text_2nd_validatedby_vpes_oper_2" name="text_2nd_validatedby_vpes_oper_2" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_2nd_validatedby_vpes_oper_2_username" name="text_2nd_validatedby_vpes_oper_2_username">
-                                                    <input type="hidden" id="text_2nd_validatedby_vpes_oper_2_email" name="text_2nd_validatedby_vpes_oper_2_email">
+                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_validatedby_vpes_oper_2" id="text_2nd_validatedby_vpes_oper_2" multiple>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -1470,7 +1443,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="card">
+                                     {{--<div class="card">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSevenOper" aria-expanded="false" aria-controls="collapseSevenOper">
                                             <h5>QC Validation for Visual Operator</h5>
@@ -2947,7 +2920,7 @@
                 ? getOperEmpTableData()
                 : [];
 
-          
+
             // Send to server
             let serialized_data = {
 
@@ -3053,6 +3026,16 @@
                 '#text_1st_qualifiedby_es_oper',
                 '#text_2nd_qualifiedby_es_oper',
                 '#text_obs_first_result_es_oper',
+                //D PPD
+                '#text_1st_certified_prod_peqcs_oper',
+                '#text_1st_certified_eng_peqcs_oper',
+                '#text_1st_certified_qc_peqcs_oper',
+                '#text_2nd_certified_prod_peqcs_oper',
+                '#text_2nd_certified_eng_peqcs_oper',
+                '#text_2nd_certified_qc_peqcs_oper',
+                //EQcValidationProcess
+                '#text_1st_validatedby_vpes_oper_2',
+                '#text_2nd_validatedby_vpes_oper_2',
 
         ]);
         initSelectPassFail([

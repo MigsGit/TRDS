@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\QcSlipEmployeeRequest;
 use App\Model\DropdownMaster;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\QcSlipEmployee;
+use App\Model\QcSlip;
 use App\Model\SystemHrisViewDivDeptSec;
-use App\Http\Requests\QcSlipEmployeeRequest;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,12 +16,17 @@ class QualificationCertificationController extends Controller
 {
     public function saveQualificationCertificationOper(Request $request,QcSlipEmployeeRequest $qcSlipEmployeeRequest){
         try {
-          return $request->all();
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
             $qcSlipId = 1;
-            
-            $qcSlip =  [
+            $section = 'QC' ;
+            $params = [
+                'section' => $section,
+                'selectSection' => $request->select_section,
+                'qcSlipId' => $qcSlipId
+            ];
+            return $this->generateControlNumber($params);
+            return $qcSlip =  [
                 // 'control_no' =>  $request->control_no,//TODO
                 'section_category' =>  $request->select_section,
                 'position_category' =>  $request->text_select_position,
@@ -113,14 +119,13 @@ class QualificationCertificationController extends Controller
                 "second_date"  =>  $request->text_qc_2nd_date_es_oper,//date
                 "second_time"  =>  $request->text_qc_2nd_time_es_oper,//time
                 "second_status"=> $request->text_oa_2nd_result_es_oper,//PASSED
-                'second_remarks'=> $request->remarks,
-                 'second_remarks'=> "",
+                'second_remarks'=> "",
                 "approval_status" => 'BENGGTQ'
             ];
-            
+
             // BEnggTrainingQualification::insert($bEnggTqApprovers);
             // OpApprover::insert($bEnggTrainingQualificationApprover);
-            //Change status into C 
+            //Change status into C
 
         $cQcCertification = [
              "text_obs_first_result_qcs_oper" =>  $request->text_obs_first_result_qcs_oper, //PASSED
@@ -134,7 +139,7 @@ class QualificationCertificationController extends Controller
             "text_qcs_station_1st_oper"  =>  implode(' | ', $request->text_qcs_station_1st_oper),//MULTIPLE
             "text_qcs_station_2nd_oper"  =>  implode(' | ', $request->text_qcs_station_2nd_oper),//MULTIPLE
         ];
-           
+
          $cQcCertificationApprover = [
             "first_approver"  =>  implode(' | ', $request->text_1st_certifiedby_qcs_oper),//R152 - 2trainedby
             "first_date" =>  $request->text_1st_date_qcs_oper,
@@ -146,13 +151,66 @@ class QualificationCertificationController extends Controller
             "second_time" =>  $request->text_2nd_time_qcs_oper,
             "second_status" =>  $request->text_oa_2nd_result_qcs_oper,
             "second_remarks" =>  $request->text_2nd_disapproval_qcs_oper,
-         v];
+         ];
 
         //Change status into D if the SECTION IS PPS ELSE go to E VALIDATION PROCESS
+        //STATUS DPRDPPDONLY DENGGPPDONLY DQCPPDONLY
+        $cQcCertificationApprover = [
+            "1st_certified_prod_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_prod_peqcs_oper),//R152 - 2trainedby
+            "1st_certified_eng_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_eng_peqcs_oper),//R152 - 2trainedby
+            "1st_certified_qc_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_qc_peqcs_oper),//R152 - 2trainedby
+            "first_date" =>  $request->text_1st_date_peqcs_oper,
+            "first_time" =>  $request->text_1st_time_peqcs_oper,
+            "first_status" =>  $request->text_oa_1st_result_peqcs_oper,
+            "first_remarks" =>  $request->text_1st_disapproval_peqcs_oper,
 
+            "2nd_certified_prod_peqcs_oper"  =>  implode(' | ', $request->text_2nd_certified_prod_peqcs_oper),//R152 - 2trainedby
+            "2nd_certified_eng_peqcs_oper"  =>  implode(' | ', $request->text_2nd_certified_eng_peqcs_oper),//R152 - 2trainedby
+            "2nd_certified_qc_peqcs_oper"  =>  implode(' | ', $request->text_2nd_certified_qc_peqcs_oper),//R152 - 2trainedby
+            "second_date" =>  $request->text_2nd_date_peqcs_oper,
+            "second_time" =>  $request->text_2nd_time_peqcs_oper,
+            "second_status" =>  $request->text_oa_2nd_result_peqcs_oper,
+            "second_remarks" =>  $request->text_2nd_disapproval_peqcs_oper,
+            'd_alert_prod_sec'=> $request->d_text_alert_prod_sec,
+            'd_alert_prod_cc_sec'=> $request->d_text_alert_prod_cc_sec,
 
-            
-            DB::commit();
+        ];
+        return $dPpdCertificationCompletion =  [
+           "lot_1st_sample_peqcs_oper"=>  $request->text_lot_1st_sample_peqcs_oper, //INT
+           "1st_injected_ng_peqcs_oper"=>  $request->text_1st_injected_ng_peqcs_oper, //INT
+           "1st_detected_ng_peqcs_oper"=>  $request->text_1st_detected_ng_peqcs_oper, //INT
+           "2nd_sample_peqcs_oper"=>  $request->text_2nd_sample_peqcs_oper, //INT
+           "2nd_injected_ng_peqcs_oper"=>  $request->text_2nd_injected_ng_peqcs_oper, //INT
+           "2nd_detected_ng_peqcs_oper"=>  $request->text_2nd_detected_ng_peqcs_oper, //INT
+        ];
+        // EQCVP- EQcValidationProcess
+        // Change status into Go to PROCESS E
+        // BUKOD Database
+        return $dPpdCertificationCompletion =  [
+            //2nd day
+            "vpqcs_oper" => $request->text_vpqcs_oper,
+            "first_status" =>  $request->text_first_result_vpqcs_oper,//PASSED
+            "first_approver"=> implode(' | ', $request->text_1st_validatedby_vpqcs_oper),//R152 - 2trainedby
+            "first_date" =>  $request->text_1st_date_vpqcs_oper,
+
+            "second_status" =>  $request->text_second_result_vpqcs_oper,
+            "text_2nd_validatedby_vpqcs_oper"=> implode(' | ', $request->text_2nd_validatedby_vpqcs_oper),//R152 - 2trainedby
+            "second_date" =>  $request->text_2nd_date_vpqcs_oper,
+            "first_remarks" =>  $request->text_remarks_vpqcs_oper,
+
+            //3rd day
+            "text_vpqcs_oper_1_1" =>  $request->text_vpqcs_oper_1_1, //CHECKBOX
+            "first_status_2" =>  $request->text_first_result_vpes_oper_2, //PASSED
+            "first_approver_2"=> implode(' | ', $request->text_1st_validatedby_vpes_oper_2),//R152 - 2trainedby
+            "first_date_2" =>  $request->text_1st_date_vpes_oper_2,
+            "text_application_vpqcs_oper" =>  $request->text_application_vpqcs_oper, //DROPDOWN
+            "second_status_2" =>  $request->text_second_result_vpes_oper_2, //PASSED
+            "second_approver_2"=> implode(' | ', $request->text_2nd_validatedby_vpes_oper_2),//R152 - 2trainedby
+            "second_date_2" =>  $request->text_2nd_date_vpes_oper_2,
+            "text_remarks_vpes_oper_2" =>  $request->text_remarks_vpes_oper_2,
+        ];
+
+            // DB::commit();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -199,5 +257,62 @@ class QualificationCertificationController extends Controller
         } catch (Exception $e) {
             throw $e;
         }
+    }
+    public function generateControlNumber($params){
+        date_default_timezone_set('Asia/Manila');
+        //Systemon HRIS / Subcon
+
+       $qcSlip = QcSlip::where('id',$params['qcSlipId'])->get(['ecr_no']);
+        if(count( $qcSlip ) != 0){
+            $currentCtrlNo = explode('-',$qcSlip[0]->ecr_no);
+            $arrCtrNo		 	= end($currentCtrlNo);
+            $series 	 	= str_pad(($arrCtrNo+1),3,"0",STR_PAD_LEFT);
+            $currentCtrlNo = $params['section']."-".$params['selectSection']."-".date('m').date('y').'-'.$series;
+
+        }else{
+            $currentCtrlNo = $params['section']."-".$params['selectSection']."-".date('m').date('y').'-001';
+        }
+        return [
+            'currentCtrlNo' => $currentCtrlNo
+        ];
+        $rapidx_user = DB::connection('mysql_rapidx')
+        ->select(" SELECT department_group
+            FROM departments
+            WHERE department_id = '".session('rapidx_department_id')."'
+        ");
+        $hris_data = DB::connection('mysql_systemone_hris')
+        ->select("SELECT Department,Division,Section FROM vw_employeeinfo WHERE EmpNo = '".session('rapidx_employee_number')."'");
+        $subcon_data = DB::connection('mysql_systemone_subcon')
+        ->select("SELECT Department,Division,Section FROM vw_employeeinfo WHERE EmpNo = '".session('rapidx_employee_number')."'");
+        if(count($hris_data) > 0 && count($rapidx_user)> 0){
+            $vwEmployeeinfo =  $hris_data;
+            $filteredSection = str_replace("'", "", $this->getFilteredSection($vwEmployeeinfo[0]->Department));
+            $division =($rapidx_user[0]->department_group == "PPS" || $rapidx_user[0]->department_group == "PPD") ? "PPD" : (($rapidx_user[0]->department_group == "LOG" || $rapidx_user[0]->department_group == "ISS" || $rapidx_user[0]->department_group == "FIN" ) ? "ADMIN" :
+            $rapidx_user[0]->department_group);
+        }
+        if(count($subcon_data) > 0 && count($rapidx_user) > 0){
+            $vwEmployeeinfo =  $subcon_data;
+            $filteredSection = str_replace("'", "", $this->getFilteredSection($vwEmployeeinfo[0]->Department));
+            $division = ($rapidx_user[0]->department_group == "PPS" || $rapidx_user[0]->department_group == "PPD") ? "PPD" : (($rapidx_user[0]->department_group == "LOG" || $rapidx_user[0]->department_group == "ISS" || $rapidx_user[0]->department_group == "FIN")  ? "ADMIN" :
+            $rapidx_user[0]->department_group);
+        }
+        // Check if the Created At & App No / Division / Material Category is exisiting
+        // Example:TS-ADMIN-LOG-PCH-25-01-001
+        $ecr = Ecr::orderBy('id','desc')->whereYear('created_at',now())
+            ->whereNull('deleted_at')
+            ->limit(1)->get(['ecr_no']);
+        //If not exist reset the ecr to 1 ???
+        if(count( $ecr ) != 0){
+            $currentCtrlNo = explode('-',$ecr[0]->ecr_no);
+            $arrCtrNo		 	= end($currentCtrlNo);
+            $series 	 	= str_pad(($arrCtrNo+1),3,"0",STR_PAD_LEFT);
+            $currentCtrlNo = $division."-".$filteredSection."-".date('m').date('y').'-'.$series;
+
+        }else{
+            $currentCtrlNo = $division."-".$filteredSection."-".date('m').date('y').'-001';
+        }
+        return [
+            'currentCtrlNo' => $currentCtrlNo
+        ];
     }
 }
