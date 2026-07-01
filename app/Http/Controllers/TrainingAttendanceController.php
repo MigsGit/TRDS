@@ -151,9 +151,11 @@ class TrainingAttendanceController extends Controller
     }
     public function view_training_attendance_summary(Request $request){
         try {
-           $trainingRequests = TrainingRequest::
+        $trainingRequests = TrainingRequest::
             where('logdel', 0)
+            ->with('training_request_details')
             ->get();
+            // training-requests-id="' . $row->id . '"
         return DataTables::of($trainingRequests)
         ->addColumn('action', function($row){
             $result = '';
@@ -162,7 +164,7 @@ class TrainingAttendanceController extends Controller
                             <i class="fa fa-cog"></i>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">';
-                $result .= '<button class="dropdown-item aViewTrainingAttendance" type="button" training-requests-id="' . $row->id . '"  ctrl-no="'.$row->ctrl_number.'"  style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalViewTrainingAttendanceRequest" data-keyboard="false">View</button>';
+                $result .= '<button class="dropdown-item aViewTrainingAttendance" type="button" training-requests-id="' . $row->id . '"   training-requests-id="' . $row['training_request_details']. '"  ctrl-no="'.$row->ctrl_number.'"  style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalViewTrainingAttendanceRequest" data-keyboard="false">View</button>';
                 // $result .= '<button class="dropdown-item aEditModuleAccess" type="button"  rapidx-emp-no= "'.$row->rapidx_emp_no .'"  user-id="' . $row->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalAddUserModuleAccess" data-keyboard="false">View</button>';
                 $result .= '</div>
                         </div></center>';
@@ -194,8 +196,10 @@ class TrainingAttendanceController extends Controller
             }
                 // Get the "Expected" list of employees
             $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
-                ->with(['training_attendance'])
-                ->get();
+            ->with(['training_attendance'])
+            ->get()->sortBy(function($detail) {
+                return $detail->training_attendance['date'] ?? '0000-00-00';
+            });
 
             //Create the date range
             $period = CarbonPeriod::create($fromDate, $toDate);
@@ -227,14 +231,14 @@ class TrainingAttendanceController extends Controller
                         $decimalHours = number_format($totalMinutes / 60, 2);
 
                         //Get Human Readable (e.g., "8 hours 30 minutes")
-                        $duration = $in->diff($out)->format('%H hours %I minutes');
+                        $duration = $in->diff($out)->format('%H hours');
                     }
                     $button = '<center><div class="btn-group">
                                 <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
                                 <i class="fa fa-cog"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right">';
-                    $button .= '<button class="dropdown-item aEditAttendance" type="button" attendance-id="' . $attendanceId . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalTrainingAttendance" data-keyboard="false">Edit</button>';
+                    $button .= '<button class="dropdown-item aEditAttendance" type="button" attendance-id="' . $attendanceId . '" attendance-details-id="' . $emp->id. '"style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalTrainingAttendance" data-keyboard="false">Edit</button>';
                     $button .= '</div>
                             </div></center>';
                     return [
@@ -244,7 +248,7 @@ class TrainingAttendanceController extends Controller
                         'training_hours'     => $duration,
                         'time_in'     => $attendance->time_in ?? NULL,
                         'time_out'     => $attendance->time_out ?? NULL,
-                        'status'   => $attendance ? 'PRESENT' : 'ABSENT',
+                        'status'   => $attendance->status ?? 'ABSENT',
                         'action'   => $button,
                         'remarks'   => $attendance->remarks ?? '',
                     ];
@@ -268,11 +272,11 @@ class TrainingAttendanceController extends Controller
 
     public function get_training_attendance_by_id(Request $request){
         try {
-           $trainingAttendance = TrainingAttendance::where('id',$request->getTrainingAttendanceById)->first();
+            $trainingAttendance = TrainingAttendance::where('id',$request->getTrainingAttendanceById)->first();
             return response()->json([
                 'isSuccess' => 'true',
                 'trainingAttendance' => $trainingAttendance,
-        ]);
+            ]);
         } catch (Exception $e) {
             throw $e;
         }
@@ -282,18 +286,25 @@ class TrainingAttendanceController extends Controller
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
             $trainingAttendanceRequestValidated =[];
-            $trainingAttendanceRequestValidated['time_in'] =  $trainingAttendanceRequest->time_in;
-            $trainingAttendanceRequestValidated['time_out'] =  $trainingAttendanceRequest->time_out;
-            $trainingAttendanceRequestValidated['remarks'] =  $trainingAttendanceRequest->remarks;
-            // return $trainingAttendanceRequestValidated;
+            $trainingAttendanceRequestValidated['status'] =  $trainingAttendanceRequest->status;
+            if($trainingAttendanceRequest->status === 'ABSENT'){
+                $trainingAttendanceRequestValidated['time_in'] =  NULL;
+                $trainingAttendanceRequestValidated['time_out'] = NULL;
+                $trainingAttendanceRequestValidated['remarks'] =  $trainingAttendanceRequest->remarks;
+            }else{
+                $trainingAttendanceRequestValidated['time_in'] =  $trainingAttendanceRequest->time_in;
+                $trainingAttendanceRequestValidated['time_out'] =  $trainingAttendanceRequest->time_out;
+                $trainingAttendanceRequestValidated['remarks'] =  '';
+            }
             if( filled($trainingAttendanceRequest['training_attendances_id']) ){
+                // return 'true';
                 TrainingAttendance::where('id',$trainingAttendanceRequest->training_attendances_id)
                 ->update($trainingAttendanceRequestValidated);
             }else{
+                // return 'false';
                 $trainingAttendanceRequestValidated['date'] =  $trainingAttendanceRequest->date;
                 $trainingAttendanceRequestValidated['rapidx_emp_no'] =  $trainingAttendanceRequest->rapidx_emp_no;
                 $trainingAttendanceRequestValidated['training_request_details_id'] =  $trainingAttendanceRequest->training_request_details_id;
-                $trainingAttendanceRequestValidated['status'] =  'PRESENT';
                 // return $trainingAttendanceRequestValidated;
                 TrainingAttendance::insert($trainingAttendanceRequestValidated);
             }
@@ -304,5 +315,4 @@ class TrainingAttendanceController extends Controller
             throw $e;
         }
     }
-
 }

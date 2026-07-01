@@ -113,11 +113,13 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
                 toastr.error(errorResponse.message ?? '');
             }
             if( result.status === 409 ){
-                
+
             }
-            
+
             if( result.status === 422 ){
                 toastr.error(errorResponse.message);
+
+                // errorHandler( errors.first_molding_device_id,formModal.firstMolding.find('#first_molding_device_id') );  
             }
 
         }
@@ -127,15 +129,55 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
 const resetFormValues = (params) => {
     // Reset values
     params.frmId[0].reset();
-    
-    // params.frmId[0].reset();
-
-    // Reset hidden input fields
-    // $("select[name='user_level']", $('#formAddUser')).val(0).trigger('change');
 
     // Remove invalid & title validation
     $('div').find('input').removeClass('is-invalid');
     $("div").find('input').attr('title', '');
     $('div').find('select').removeClass('is-invalid');
     $("div").find('select').attr('title', '');
+}
+
+
+
+const handleValidatorErrors = (errors) => {
+    
+    document.querySelectorAll('div input').forEach(function(input) {
+        input.classList.remove('is-invalid');
+    });
+    document.querySelectorAll('div select').forEach(function(input) {
+        input.classList.remove('is-invalid');
+    });
+    document.querySelectorAll('div textarea').forEach(function(input) {
+        input.classList.remove('is-invalid');
+    });
+    // Loop through each field in the errors object
+    for (let field in errors) {
+        if (errors.hasOwnProperty(field)) {
+            // Extract the error messages for the field
+            let fieldErrorMessage = errors[field];
+
+            // Add invalid class & title validation
+            if(field){
+                // document.querySelector(`[name="${field}"]`).classList.add('is-invalid');
+                document.querySelectorAll(`[name="${field}"], [name="${field}[]"]`).forEach(function(el) {
+                    el.classList.add('is-invalid');
+                });
+                // document.querySelector(`[name="${field}"]`).classList.add('is-invalid');
+                // document.querySelector(`[name="${field}"]`).classList.add('is-invalid');
+
+            }
+        }
+    }
+}
+
+const showSwalLoading = (params) => {
+    Swal.fire({
+        width: '20rem',
+        html: '<em>Loading..</em>',
+        allowOutsideClick: false,
+        onRender: function () {
+            $('.swal2-content').prepend('<div class="spinner-border text-dark" role="status" style="width: 3rem; height: 3rem;"><span class="sr-only">Loading...</span></div>');
+        },
+        showConfirmButton: false,
+    });
 }
