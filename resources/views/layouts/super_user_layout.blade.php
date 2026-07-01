@@ -1,5 +1,5 @@
 @php
-    session_start();
+    // session_start();
     $isLogin = false;
     if(isset($_SESSION['rapidx_user_id'])){
         $isLogin = true;
@@ -12,7 +12,7 @@
 @if($isLogin)
     <!--
         *These are the sessions in RapidX System(for reference only)
-        
+
         $_SESSION["rapidx_user_id"] = Auth::user()->id;
         $_SESSION["rapidx_user_level_id"] = Auth::user()->user_level_id;
         $_SESSION["rapidx_username"] = Auth::user()->username;
@@ -44,8 +44,8 @@
                     you are free to change below module_id equals to your module_id
                 -->
                 @if($_SESSION['rapidx_user_accesses'][$index]['module_id'] == 11) <!-- 11-Customer Claim Database System Module -->
-                    @php 
-                        $isAuthorized = true; 
+                    @php
+                        $isAuthorized = true;
                         $user_level = $_SESSION['rapidx_user_accesses'][$index]['user_level_id']; // Collect the user_level_id
                     @endphp
                     @break
@@ -69,8 +69,9 @@
         <head>
             <meta charset="utf-8">
             <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <title>System Title | @yield('title')</title>
+            <title>TRDSv2 | @yield('title')</title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="csrf-token" content="{{ csrf_token() }}">
             <link rel="shortcut icon" type="image/png" href="{{ asset('public/images/favicon.ico') }}">
 
             <!-- CSS LINKS -->
@@ -96,7 +97,7 @@
                             <p>This is an On-Going Feature</p>
                         </div>
                         <div class="modal-footer">
-                            
+
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>

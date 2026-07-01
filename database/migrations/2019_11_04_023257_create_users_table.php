@@ -15,18 +15,20 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('systemone_user_id');
-            $table->unsignedBigInteger('rapidx_emp_no');
+            $table->unsignedBigInteger('systemone_emp_id');
+            $table->unsignedBigInteger('rapidx_emp_id');
+            $table->string('rapidx_emp_no');
             $table->unsignedTinyInteger('status')->default(1)->comment = '1-active,2-inactive';
-            $table->foreignId('user_level_id')->references('id')->on('user_levels')->comment ='User Levels Id';
+            $table->unsignedBigInteger('user_level_id')->comment ='User Levels Id';
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
+            $table->softDeletes();
             $table->timestamps();
 
             // Foreign Key
-            // $table->foreign('user_level_id')->references('id')->on('user_levels');
-            // $table->foreign('created_by')->references('id')->on('users');
-            // $table->foreign('last_updated_by')->references('id')->on('users');
+            $table->foreign('user_level_id')->references('id')->on('user_levels');
+            $table->foreign('created_by')->references('id')->on('users');
+            $table->foreign('updated_by')->references('id')->on('users');
         });
     }
 

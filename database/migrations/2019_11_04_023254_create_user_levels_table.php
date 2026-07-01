@@ -17,6 +17,8 @@ class CreateUserLevelsTable extends Migration
             $table->bigIncrements('id');
             $table->string('user_level');
             $table->integer('status');
+            $table->softDeletes();
+
             $table->timestamps();
         });
     }

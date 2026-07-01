@@ -17,6 +17,7 @@ class CreateUserModulesTable extends Migration
             $table->bigIncrements('id');
             $table->string('module_name')->index();
             $table->unsignedBigInteger('updated_by')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
