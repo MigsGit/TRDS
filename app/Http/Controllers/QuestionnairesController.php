@@ -213,9 +213,9 @@ class QuestionnairesController extends Controller
 
             if($questionnaire_detail->status == 0){
                 $result .= '<button type="button" class="btn btn-dark btn-sm text-center actionUpdateQuestionnaireDetails mr-2" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" data-toggle="modal" data-target="#modalCreateUpdateQuestionnaireDetails" title="Update Questionnaire Details"><i class="fas fa-edit"></i></button>';
-                $result .= '<button type="button" class="btn btn-danger btn-sm text-center actionChangeQuestionnaireStatus" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" status="1" data-toggle="modal" data-target="#modalChangeQuestionnaireDetailsStatus" title="Deactive Questionnaire"><i class="fas fa-redo"></i></button>';
+                $result .= '<button type="button" class="btn btn-danger btn-sm text-center actionChangeQuestionnaireDetailsStatus" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" status="1" data-toggle="modal" data-target="#modalChangeQuestionnaireDetailsStatus" title="Deactive Questionnaire"><i class="fas fa-redo"></i></button>';
             }else{
-                $result .= '<button type="button" class="btn btn-warning btn-sm text-center actionChangeQuestionnaireStatus" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" status="0" data-toggle="modal" data-target="#modalChangeQuestionnaireDetailsStatus" title="Activate Questionnaire"><i class="fas fa-redo"></i></button>';
+                $result .= '<button type="button" class="btn btn-warning btn-sm text-center actionChangeQuestionnaireDetailsStatus" questionnaire_detail-id="' . $questionnaire_detail->id . '" questionnaire_detail-revision="' . $questionnaire_detail->revision . '" status="0" data-toggle="modal" data-target="#modalChangeQuestionnaireDetailsStatus" title="Activate Questionnaire"><i class="fas fa-redo"></i></button>';
             }
 
             $result .=  '</center>';
@@ -286,7 +286,7 @@ class QuestionnairesController extends Controller
         date_default_timezone_set('Asia/Manila');
         $data = $request->all();
         $type = '';
-        switch ($request->questionnaire_category_type) {
+        switch($request->questionnaire_category_type){
             case '0':
                 $questions = $request->input('questionnaire_question', '[]');
                 $choices   = $request->input('choices', '[]');
@@ -360,8 +360,8 @@ class QuestionnairesController extends Controller
 
             default:
                 return response()->json(['result' => 1]);
-                break;
         }
+
         $validator = Validator::make($data, [
             'questionnaire_category_type' => 'required',
             'questionnaire_points'        => 'required',
@@ -378,16 +378,21 @@ class QuestionnairesController extends Controller
             '2' => 'questionnaire_description',
         ];
 
-        if (isset($map[$type])) {
+        if(isset($map[$type])){
             $questionnaires_record[$type === '1' ? 'type' : 'description'] = $request->{$map[$type]};
         }
 
-        if ($request->hasFile('upload_image')) {
+        if($request->hasFile('upload_image')){
             $original_filename = $request->file('upload_image')->getClientOriginalName();
             $filename = preg_replace('/[^A-Za-z0-9\.\-]/', '_', $original_filename);
-            Storage::putFileAs('public/questionnaire_attachment', $request->file('upload_image'), $filename);
+
+            Storage::putFileAs(
+                'public/questionnaire_attachment',
+                $request->file('upload_image'),
+                $filename
+            );
         }else{
-            $filename = preg_replace('/[^A-Za-z0-9\.\-]/', '_', $request->upload_image);
+            $filename = !empty($request->upload_image) ? preg_replace('/[^A-Za-z0-9\.\-]/', '_', $request->upload_image) : null;
         }
 
         if($validator->fails()){
@@ -395,30 +400,60 @@ class QuestionnairesController extends Controller
         }else{
             DB::beginTransaction();
             try{
-                $exists = QuestionnaireDetails::where('image', $filename)
-                    ->where('logdel', 0)
-                    ->exists();
+                if(!empty($filename)){
+                    $duplicate = QuestionnaireDetails::where('image', $filename)
+                        ->where('logdel', 0);
 
-                if ($exists && $request->upload_image != '') {
-                    return response()->json(['result' => 1]);
+                    if(!empty($request->questionnaire_details_pkid)){
+                        $duplicate->where('id', '!=', $request->questionnaire_details_pkid);
+                    }
+
+                    if($duplicate->exists()){
+                        return response()->json(['result' => 1]);
+                    }
                 }
 
-                if($request->questionnaire_details_pkid == ''){
-
-                    $test = QuestionnaireDetails::where('questionnaire_id', $request->questionnaire_details_fkid)
+                $test =
+                    QuestionnaireDetails::with('questionare_title_info')
+                        ->where('questionnaire_id', $request->questionnaire_details_fkid)
                         ->where('revision', $request->questionnaire_details_revision)
                         ->where('status', 0)
                         ->where('logdel', 0)
-                        ->orderBy('exam_no', 'DESC')
-                        ->first();
+                        ->get();
 
-                    $numbering = $test ? intval($test->exam_no) + 1 : 1;
+                $total_points = $test->sum('points');
+                $new_total_points = $total_points + $request->questionnaire_points;
+                $passing_score = optional($test->first()->questionare_title_info)->passing_score ?? 0;
 
-                    $questionnaires_record['exam_no'] = $numbering;
+                if($request->questionnaire_details_pkid == ''){
+                    if ($new_total_points > $passing_score) {
+                        return response()->json([
+                            'result'  => 0,
+                            'message' => 'Cannot insert. Total questionnaire points exceed the passing score.'
+                        ]);
+                    }
+
+                    $existing_no = $test->pluck('exam_no')
+                        ->sort()
+                        ->values()
+                        ->toArray();
+
+                    $next_package_count = 1;
+
+                    foreach ($existing_no as $count) {
+                        if ($count == $next_package_count) {
+                            $next_package_count++;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    $questionnaires_record['exam_no'] = $next_package_count;
                     $questionnaires_record['questionnaire_id'] = $request->questionnaire_details_fkid;
+                    $questionnaires_record['points'] = $request->questionnaire_points;
                     $questionnaires_record['image'] = $filename;
                     $questionnaires_record['created_by'] = '';
-                    $questionnaires_record['created_at'] = date('Y-m-d H:i:s');
+                    $questionnaires_record['created_at'] = now();
 
                     QuestionnaireDetails::insert($questionnaires_record);
                 }else{
@@ -427,22 +462,30 @@ class QuestionnairesController extends Controller
                         ->where('logdel', 0)
                         ->first();
 
-                    $questionnaires_record['image']             = $request->upload_image;
-                    $questionnaires_record['updated_by']        = '';
-                    $questionnaires_record['updated_at']        = date('Y-m-d H:i:s');
-                    // return $questionnaires_record;
-                    if($record->image == $request->upload_image){
-                        QuestionnaireDetails::where('id', $request->questionnaire_details_pkid)->where('status', 0)->where('logdel', 0)->update($questionnaires_record);
-                        // $record->update($questionnaires_record);
-                    }else{
-                        if($exists){
-                            return response()->json(['result' => 1]);
-                        }
-                        QuestionnaireDetails::where('id', $request->questionnaire_details_pkid)->where('status', 0)->where('logdel', 0)->update($questionnaires_record);
-                        // $record->update($questionnaires_record);
+                        $for_update_total_points = $total_points - $record->points + $request->questionnaire_points;
+                    if ($for_update_total_points > $passing_score) {
+                        return response()->json([
+                            'result'  => 0,
+                            'message' => 'Cannot update. Total questionnaire points exceed the passing score.'
+                        ]);
                     }
-                }
 
+                    if(!$record){
+                        return response()->json(['hasError' => 1, 'message' => 'Record not found.']);
+                    }
+
+                    if(!empty($filename)){
+                        $questionnaires_record['image'] = $filename;
+                    }
+
+                    $questionnaires_record['updated_by'] = '';
+                    $questionnaires_record['updated_at'] = date('Y-m-d H:i:s');
+
+                    QuestionnaireDetails::where('id', $request->questionnaire_details_pkid)
+                        ->where('status', 0)
+                        ->where('logdel', 0)
+                        ->update($questionnaires_record);
+                }
                 DB::commit();
                 return response()->json(['hasError' => 0]);
             }catch (\Exception $e){
@@ -464,5 +507,19 @@ class QuestionnairesController extends Controller
                 ->get();
 
         return response()->json($questionnaire_details);
+    }
+
+    public function changeQuestionnaireDetailsStatus(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
+        DB::beginTransaction();
+        try{
+            QuestionnaireDetails::where('id', $request->questionnaire_id)->where('logdel', 0)->update(['status' => $request->status]);
+            DB::commit();
+            return response()->json(['hasError' => 0]);
+        }catch (\Exception $e){
+            DB::rollback();
+            return response()->json(['hasError' => 1, 'exceptionError' => $e]);
+        }
     }
 }

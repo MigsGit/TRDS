@@ -11,7 +11,7 @@ class QuestionnaireDetails extends Model
     protected $table = 'questionnaire_details';
     protected $connection = 'mysql';
 
-    // public function questionare_title_info(){
-    //     return $this->hasOne(Questionnaires::class, 'id', 'questionnaire_id')->where('status', 0)->where('logdel', 0);
-    // }
+    public function questionare_title_info(){
+        return $this->hasOne(Questionnaires::class, 'id', 'questionnaire_id')->where('status', 0)->where('logdel', 0);
+    }
 }

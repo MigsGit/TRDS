@@ -232,6 +232,8 @@ const CreateUpdateQuestionnaireDetails = () => {
 
             if(response['result'] == 1){
                 alert('File name is already exists!');
+            }else if(response['result'] == 0){
+                alert('Points exceed the passing score!');
             }else if(response['hasError'] == 1){
                 alert('Saving failed!');
             }else{
@@ -320,7 +322,7 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
             $('#slctQuestionnaireCategoryType').val(getQuestionnaireDetials.category_type).trigger('change')
             $('#nmbrQuestionnairePoints').val(getQuestionnaireDetials.points)
 
-            let getData  = JSON.parse(getQuestionnaireDetials.answer_choices_question)
+            let getData     = JSON.parse(getQuestionnaireDetials.answer_choices_question)
             let question    = getData[0].question
             let choices     = getData[0].choices
             let answer      = getData[0].answer
@@ -415,4 +417,55 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
     };
 
     ajaxRequest(ajaxGetQuestionnaireDetailsById);
+};
+
+const ChangeQuestionnaireDetailsStatus = (questionnaireId) => {
+    let formData = $('#formChangeQuestionnaireDetailsStatus').serialize() + '&questionnaireId' + questionnaireId;
+
+    const ajaxChangeQuestionnaireDetailsStatus = {
+        url: "change_questionnaire_details_status",
+        method: "POST",
+        data: formData,
+        dataType: "json",
+
+        beforeSendCallback: function(){
+            $("#iBtnChangeQuestionnaireDetailsStatusIcon").addClass('fa fa-spinner fa-pulse');
+            $("#btnChangeQuestionnaireDetailsStatus").prop('disabled', 'disabled');
+        },
+
+        successCallback: function(response){
+            let getQuestionnaireData = response;
+            console.log('getQuestionnaireData:', getQuestionnaireData);
+
+            if(response['hasError'] == '1'){
+                toastr.error('Questionnaire activation failed!');
+            }else{
+                if($("#txtChangeQuestionnaireDetailsStatus").val() == 0){
+                    toastr.success('Questionnaire activation success!');
+                    $("#txtChangeQuestionnaireDetailsStatus").val() == 1;
+                }
+                else{
+                    toastr.success('Questionnaire deactivation success!');
+                    $("#txtChangeQuestionnaireDetailsStatus").val() == 0;
+                }
+                $("#modalChangeQuestionnaireDetailsStatus").modal('hide');
+                $("#formChangeQuestionnaireDetailsStatus")[0].reset();
+                dataQuestionnaireDetails.draw();
+            }
+
+            $("#iBtnChangeQuestionnaireDetailsStatusIcon").removeClass('fa fa-spinner fa-pulse');
+            $("#btnChangeQuestionnaireDetailsStatus").removeAttr('disabled');
+            $("#iBtnChangeQuestionnaireDetailsStatusIcon").addClass('fa fa-check');
+        },
+
+        errorCallback: function(xhr, status, error){
+            console.log('Ajax Error:', xhr.responseText);
+            toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+            $("#iBtnChangeQuestionnaireDetailsStatusIcon").removeClass('fa fa-spinner fa-pulse');
+            $("#btnChangeQuestionnaireDetailsStatus").removeAttr('disabled');
+            $("#iBtnChangeQuestionnaireDetailsStatusIcon").addClass('fa fa-check');
+        }
+    };
+
+    ajaxRequest(ajaxChangeQuestionnaireDetailsStatus);
 };
