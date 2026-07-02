@@ -72,7 +72,7 @@
 <script src="{{ asset('public/js/my_js/ProductClassification.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/TrainingRequest.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/QualificationCertification.js') }}?<?=time()?>"></script>
-<script src="{{ asset('public/js/my_js/PersonalSkillMatrix.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/PersonnelSkillMatrix.js') }}?<?=time()?>"></script>
 
 
 {{-- <script src="https://cdn.jsdelivr.net/npm/@coreui/coreui@4.0.2/dist/js/coreui.bundle.min.js"></script> --}}

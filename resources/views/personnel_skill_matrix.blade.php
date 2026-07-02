@@ -62,9 +62,7 @@
                                     <!-- Direct Employees -->
                                     <div class="tab-pane fade show active" id="directEmployees" role="tabpanel">
                                         <div class="table-responsive">
-                                            <table id="tblDirectEmployees"
-                                                class="table table-bordered table-striped table-hover"
-                                                style="width:100%;">
+                                            <table id="tblDirectEmployees" class="table table-bordered table-striped table-hover" style="width:100%;">
                                                 <thead>
                                                     <tr>
                                                         <th width="10%" class="text-center">Action</th>
@@ -83,9 +81,7 @@
                                     <!-- Indirect Employees -->
                                     <div class="tab-pane fade" id="subconEmployees" role="tabpanel">
                                         <div class="table-responsive">
-                                            <table id="tblSubconEmployees"
-                                                class="table table-bordered table-striped table-hover"
-                                                style="width:100%;">
+                                            <table id="tblSubconEmployees" class="table table-bordered table-striped table-hover" style="width:100%;">
                                                 <thead>
                                                     <tr>
                                                         <th width="10%" class="text-center">Action</th>
@@ -113,6 +109,341 @@
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
+
+    <!-- MODAL -->
+
+    <!-- Update Employee Modal -->
+    <div class="modal fade" id="updateEmpInfoModalId" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title font-weight-bold">
+                        Update Employee Details
+                    </h4>
+
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body p-0">
+
+                    <div id="employeeAccordion">
+
+                        <!-- Personal Information -->
+                        <div class="card">
+
+                               <div class="card-header accordion-header bg-primary text-white">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link text-white font-weight-bold" data-toggle="collapse" data-target="#collapseOne">
+                                            Personal Information
+                                        </button>
+                                    </h5>
+                                </div>
+
+                            <div id="collapseOne" class="collapse show" data-parent="#employeeAccordion">
+
+                                <div class="card-body">
+                                    <div class="text-center mb-3">
+                                        {{-- <img src="images/default-user.png"
+                                            class="img-thumbnail rounded"
+                                            style="width:150px;height:180px;object-fit:cover;"> --}}
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label text-right">E.N.</label>
+                                        <div class="col-md-7">
+                                            <input type="text" class="form-control" readonly id="empNo">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label text-right">Name</label>
+                                        <div class="col-md-7">
+                                            <input type="text" class="form-control" readonly id="empName">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label text-right">Position</label>
+                                        <div class="col-md-7">
+                                            <input type="text" class="form-control" readonly id="position">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label text-right">Section</label>
+                                        <div class="col-md-7">
+                                            <input type="text" class="form-control" readonly id="section">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label text-right">Date Hired</label>
+                                        <div class="col-md-7">
+                                            <input type="text" class="form-control" readonly id="dateHired">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label text-right">Date Certified</label>
+                                        <div class="col-md-7">
+                                            <input type="date" class="form-control" id="dateCertified">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label text-right">Validity Period</label>
+                                        <div class="col-md-7">
+                                            <input type="date" class="form-control" id="validity">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-12 text-center">
+                                            <div class="form-check">
+                                                <input class="form-check-input"type="checkbox"id="visualExam">
+                                                <label class="form-check-label">With Visual Exam
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Qualification -->
+                        <div class="card">
+                                <div class="card-header accordion-header bg-light">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link text-dark font-weight-bold" data-toggle="collapse" data-target="#collapseTwo">
+                                            Qualification / Certification (Tech., Eng'g, Supv.)
+                                        </button>
+                                    </h5>
+                                </div>
+
+
+                            <div id="collapseTwo" class="collapse" data-parent="#employeeAccordion">
+                                <div class="card-body">
+                                    <!-- Your Qualification Table -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Skill Card -->
+                        <div class="card">
+                            <div class="card-header accordion-header bg-light">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link text-dark font-weight-bold" data-toggle="collapse" data-target="#collapseThree">
+                                        Skill Card Rating
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseThree" class="collapse" data-parent="#employeeAccordion">
+                                <div class="card-body">
+                                    <!-- Skill Card Table -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-success">Save Changes</button>
+                    <button class="btn btn-secondary"data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- View Employee Modal -->
+    <div class="modal fade" id="viewEmpInfoModalId" tabindex="-1" role="dialog">
+        {{-- <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document"> --}}
+        <div class="modal-dialog modal-dialog-scrollable modal-semi-full">
+            <div class="modal-content">
+
+                <!-- Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title font-weight-bold">
+                        View Employee Details
+                    </h4>
+
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body">
+
+                    <div class="row">
+
+                        <!-- Employee Information -->
+                        <div class="col-md-5">
+
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label font-weight-bold text-right">E.N.</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="viewEmpNo" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label font-weight-bold text-right">Name</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="viewEmpName" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label font-weight-bold text-right">Position</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="viewPosition" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label font-weight-bold text-right">Section</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="viewSection" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label font-weight-bold text-right">Department</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="viewDepartment" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label font-weight-bold text-right">Division</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="viewDivision" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label font-weight-bold text-right">Date Hired</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="viewDateHired" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label font-weight-bold text-right">Employment Status</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="viewEmploymentStatus" readonly>
+                                </div>
+                            </div>
+
+                            {{-- <div class="form-group row mb-0">
+                                <label class="col-md-3 col-form-label font-weight-bold text-right">Hiring Status</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="viewHiringStatus" readonly>
+                                </div>
+                            </div> --}}
+
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="col-md-7">
+
+                            <table class="table table-borderless mt-4">
+                                <tr>
+                                    <th class="text-success text-right">Passed:</th>
+                                    <td id="lblPassed">0</td>
+                                </tr>
+
+                                <tr>
+                                    <th class="text-warning text-right">Complied:</th>
+                                    <td id="lblComplied">0</td>
+                                </tr>
+
+                                <tr>
+                                    <th class="text-danger text-right">Failed:</th>
+                                    <td id="lblFailed">0</td>
+                                </tr>
+
+                                <tr>
+                                    <th class="text-info text-right">Hands-on:</th>
+                                    <td id="lblHandsOn">0</td>
+                                </tr>
+
+                                <tr>
+                                    <th class="text-right" style="font-size:35px;">
+                                        Total:
+                                    </th>
+
+                                    <td style="font-size:35px;font-weight:bold;" id="lblTotal">
+                                        0
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <!-- Accordion -->
+                    <div id="viewAccordion">
+                        <div class="card">
+                            <div class="card-header p-0">
+                                <button class="btn btn-block text-left font-weight-bold" data-toggle="collapse" data-target="#trainingCollapse">
+                                    TRAININGS
+                                    <i class="fas fa-chevron-down float-right mt-1"></i>
+                                </button>
+                            </div>
+
+                            <div id="trainingCollapse" class="collapse" data-parent="#viewAccordion">
+
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="tblEmployeeTrainings" class="table table-bordered table-striped table-hover" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">Date</th>
+                                                    <th class="text-center">Title</th>
+                                                    <th class="text-center">Objective</th>
+                                                    <th class="text-center">Trainer</th>
+                                                    <th class="text-center">Results</th>
+                                                    <th class="text-center">Venue</th>
+                                                    <th class="text-center">Mechanics</th>
+                                                    <th class="text-center">Type of Training</th>
+                                                    <th class="text-center">Remarks</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="btnGenerateSkillCard"><i class="fas fa-file-alt"></i>
+                        Generate Skill Card
+                    </button>
+                    <button class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i>
+                        Close
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
 @endsection
 
 @section('js_content')
