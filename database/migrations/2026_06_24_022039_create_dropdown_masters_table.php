@@ -15,8 +15,8 @@ class CreateDropdownMastersTable extends Migration
     {
         Schema::create('dropdown_masters', function (Blueprint $table) {
              $table->id();
-            $table->tinyInteger('status')->nullable();
-            $table->string('dropdown_masters')->nullable();
+            $table->tinyInteger('status')->default(1)->comment('1-Active | 2 -Deactivate');
+            $table->string('dropdown_masters');
             $table->string('remarks')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();

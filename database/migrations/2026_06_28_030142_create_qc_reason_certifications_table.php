@@ -21,7 +21,7 @@ class CreateQcReasonCertificationsTable extends Migration
             ->cascadeOnDelete()->comment('reference from qc_slips_id');
             $table->longText('reason_of_certification')
             ->comment('reference from dropdown_master_details_id');
-            $table->longText('transfer_flexibility')->nullable();
+            $table->longText('transfer_flexibility')->comment('reference from dropdown_master_details_id');
             $table->longText('others')->nullable();
             $table->softDeletes();
             $table->timestamps();

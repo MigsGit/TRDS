@@ -144,7 +144,7 @@
 
                         <!-- FORMAT 5 Operator -->
                         <div class="d-none" id="div_Oper">
-                        <form  id="formSubmit_Oper" >
+                            <form  id="formSubmit_Oper" >
                             @csrf
                                 <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
 
@@ -210,9 +210,7 @@
                                     <div class="col-md-12">
                                         <label for="">Lateral Transfer Flexibility:</label>
                                         <select class="form-control select2bs4" style="width: 100%;" name="transfer_flexibility[]" id="transfer_flexibility" multiple>
-                                             <option value="1">3.1 Transfer to another station (E.g: final visual, insertion,IQC, IPQC, OQC, etc)</option>
-                                            <option value="2">3.2 Transfer to other production section (E.g: TS,PPS,CN, YF)</option>
-                                            <option value="3">3.3 Transfer to other product line (E.g: TS: BGA-FP, QFP; CN: FMS, PJS; YF: EOL, FOL; PPS: Molding CN, Molding TS, Grinding, Stamping; MH-WHS, MH-Prodn)
+
                                         </select>
                                     </div>
                                 </div>
@@ -2855,14 +2853,15 @@
                 </div>
             </div>
         </div>
-
+        @include('components.operator_prodn_training_orientation')
     </div>
 </div>
 @endsection
 
 @section('js_content')
     <script type="text/javascript">
-    $(function () {
+
+    $(document).ready(function () {
          // In-memory array that holds employees staged in the modal
         operEmpArray = [];
         $(document).on('change', '#text_certification_operator',function (e) {
@@ -2895,14 +2894,25 @@
 
             $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
          });
-        $(document).on('submit', '#formSubmit_oper, #formSubmit_Oper', function (e) {
-            e.preventDefault();
 
-            var $form = $(this);
-            $form.append('text_select_position', $('#text_select_position').val());
-            $form.append('text_select_section', $('#text_select_section').val());
+        // $(selector).click(function (e) {
+        //     e.preventDefault();
+
+        // });
+        $('#formSendEmail').click(function (e) {
+            e.preventDefault();
+            var $form = $('#formSubmit_oper');
+            var formArray = $form.serializeArray();
+
+
             // Serialize form into an object (handles multiple inputs with same name)
             var formArray = $form.serializeArray();
+            formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
+            formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
+            formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
+            formArray.push({ name: 'text_select_section', value: $('#text_select_section').val() });
+
+
             var data = {};
             $.each(formArray, function(i, field) {
                 if (data[field.name] !== undefined) {
@@ -2920,11 +2930,13 @@
                 ? getOperEmpTableData()
                 : [];
 
-
             // Send to server
             let serialized_data = {
 
             }
+            console.log('Form Array:', formArray); // Debugging line to check the serialized form data
+            console.log('data:', data); // Debugging line to check the serialized form data
+            return;
             call_ajax_serialize(data,serialized_data,'save_qualification_certification_oper', function(response){
                 if (response && response.success) {
                     Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
@@ -2933,6 +2945,20 @@
                     Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to save.' });
                 }
             });
+            return;
+            call_ajax_serialize(formArray, {}, 'save_form_send_email', function (response) {
+                if (response && response.success) {
+                    Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Approval saved.' });
+                    $('#modalSendEmail').modal('hide');
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to save.' });
+                }
+            });
+        });
+         $(document).on('submit', '#formSubmit_oper, #formSubmit_Oper', function (e) {
+            e.preventDefault();
+            $('#modalSendEmail').modal();
+            
         });
 
 
@@ -2970,78 +2996,69 @@
         togglePositionSection($positionSelect.val());
     });
 
-        function initDivDeptSecCombos(comboSelectors) {
-            comboSelectors.forEach(function(selector) {
-                    getDivDeptSec({ comboId: $(selector) });
-            });
-            // comboSelectors.forEach(function(selector) {
-            //         getDivDeptSec({ comboId: $(selector) });
-            // });
-        }
+    function initDivDeptSecCombos(comboSelectors) {
+        comboSelectors.forEach(function(selector) {
+                getDivDeptSec({ comboId: $(selector) });
+        });
+    }
+    initDivDeptSecCombos([
+            '#text_section_operator',
+    ]);
 
-        initDivDeptSecCombos([
-                '#text_section_operator',
-        ]);
+    initDropdownMasterDetailsByFkidCombos([
+            '#text_oper_station_to',
+            '#text_oper_station_from',
+    ],1);
 
+    initDropdownMasterDetailsByFkidCombos([
+        '#text_operator_product_line',
+    ],2);
+    initDropdownMasterDetailsByFkidCombos([
+            '#text_certification_operator',
+    ],3);
+    initDropdownMasterDetailsByFkidCombos([
+            '#text_training_orientation_ps_oper',
+    ],4);
+    initDropdownMasterDetailsByFkidCombos([
+            '#transfer_flexibility',
+    ],5);
+    const initGetSystemOneEmployeeDetailsCombos = (comboSelectors) => {
 
+        comboSelectors.forEach(function(selector) {
+                getSystemOneEmployeeDetails($(selector));
+        });
+    }
+    const initSelectPassFail = (comboSelectors) => {
 
-        initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-        ],1);
+        comboSelectors.forEach(function(selector) {
+                selectPassFail($(selector));
+        });
+    }
+    initGetSystemOneEmployeeDetailsCombos([
+        '#text_oper_emp_number',
+        '#text_first_trainedby_oper',
+        '#text_first_mentoredby_oper',
+        '#text_second_trainedby_oper',
+        '#text_second_mentoredby_oper',
+        '#text_alert_prod_sec',
+        '#text_alert_prod_cc_sec',
+        '#text_1st_qualifiedby_es_oper',
+        '#text_2nd_qualifiedby_es_oper',
+        '#text_obs_first_result_es_oper',
+        //D PPD
+        '#text_1st_certified_prod_peqcs_oper',
+        '#text_1st_certified_eng_peqcs_oper',
+        '#text_1st_certified_qc_peqcs_oper',
+        '#text_2nd_certified_prod_peqcs_oper',
+        '#text_2nd_certified_eng_peqcs_oper',
+        '#text_2nd_certified_qc_peqcs_oper',
+        //EQcValidationProcess
+        '#text_1st_validatedby_vpes_oper_2',
+        '#text_2nd_validatedby_vpes_oper_2',
 
-
-        initDropdownMasterDetailsByFkidCombos([
-            '#text_operator_product_line',
-        ],2);
-
-        initDropdownMasterDetailsByFkidCombos([
-                '#text_certification_operator',
-        ],3);
-
-        initDropdownMasterDetailsByFkidCombos([
-                '#text_training_orientation_ps_oper',
-        ],4);
-        const initGetSystemOneEmployeeDetailsCombos = (comboSelectors) => {
-
-            comboSelectors.forEach(function(selector) {
-                    getSystemOneEmployeeDetails($(selector));
-            });
-        }
-        const initSelectPassFail = (comboSelectors) => {
-
-            comboSelectors.forEach(function(selector) {
-                    selectPassFail($(selector));
-            });
-        }
-
-        initGetSystemOneEmployeeDetailsCombos([
-                '#text_oper_emp_number',
-                '#text_first_trainedby_oper',
-                '#text_first_mentoredby_oper',
-                '#text_second_trainedby_oper',
-                '#text_second_mentoredby_oper',
-                '#text_alert_prod_sec',
-                '#text_alert_prod_cc_sec',
-                '#text_1st_qualifiedby_es_oper',
-                '#text_2nd_qualifiedby_es_oper',
-                '#text_obs_first_result_es_oper',
-                //D PPD
-                '#text_1st_certified_prod_peqcs_oper',
-                '#text_1st_certified_eng_peqcs_oper',
-                '#text_1st_certified_qc_peqcs_oper',
-                '#text_2nd_certified_prod_peqcs_oper',
-                '#text_2nd_certified_eng_peqcs_oper',
-                '#text_2nd_certified_qc_peqcs_oper',
-                //EQcValidationProcess
-                '#text_1st_validatedby_vpes_oper_2',
-                '#text_2nd_validatedby_vpes_oper_2',
-
-        ]);
-        initSelectPassFail([
-            '#text_oa_1st_result_es_oper',
-        ])
-        // call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId =null);
-
+    ]);
+    initSelectPassFail([
+        '#text_oa_1st_result_es_oper',
+    ])
     </script>
 @endsection

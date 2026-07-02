@@ -79,6 +79,7 @@ Route::middleware('checkSession')->group(function(){
     Route::controller(QualificationCertificationController::class)->group(function () {
         // Questionnaires main routes
         Route::post('save_qualification_certification_oper', 'saveQualificationCertificationOper');
+        Route::post('save_form_send_email', 'saveFormSendEmail');
 
         Route::get('get_div_dept_sec', 'getDivDeptSec');
         Route::get('get_dropdown_master_details_by_fkid', 'getDropdownMasterDetailsByFkid');
