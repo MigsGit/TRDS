@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\QcSlipEmployeeRequest;
+use App\Http\Requests\QcSlipRequest;
 use App\Model\DropdownMaster;
 use App\Model\DropdownMasterDetail;
+use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\Model\QcSlip;
 use App\Model\SystemHrisViewDivDeptSec;
@@ -14,66 +16,79 @@ use Illuminate\Support\Facades\DB;
 
 class QualificationCertificationController extends Controller
 {
-    public function saveQualificationCertificationOper(Request $request,QcSlipEmployeeRequest $qcSlipEmployeeRequest){
+    public function saveQualificationCertificationOper(Request $request,QcSlipRequest $qcSlipRequest){
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            $qcSlipId = 1;
-            $section = 'QC' ;
+            $qcSlipId = 2;
+            $section = 'QC';
+            // $select_section = $request->select_section;
+            // $select_position = $request->text_select_position;
+            $select_position = 'Operator';
+            $select_section = 'TSF1';
             $params = [
                 'section' => $section,
-                'selectSection' => $request->select_section,
-                'qcSlipId' => $qcSlipId
+                'selectSection' => $select_section,
             ];
-            return $this->generateControlNumber($params);
-            return $qcSlip =  [
-                // 'control_no' =>  $request->control_no,//TODO
-                'section_category' =>  $request->select_section,
-                'position_category' =>  $request->text_select_position,
+            $generateControlNumber = $this->generateControlNumber($params);
+            $rapidxEmpNo =  session('global_user');
+            $saveQcSlip =  [
+                'control_no' =>  $generateControlNumber['currentCtrlNo'],
+                'section_category' =>  $select_section,//TODO
+                'position_category' =>  $select_position,//TODO
                 'section' =>  $request->text_section_operator,
-                'series_operator' =>  $request->text_series_operator,
+                'series_name' =>  $request->text_series_operator,
                 'product_line' =>  $request->text_operator_product_line,
-                // 'created_by' =>  $session(''),//TODO
+                'created_by' =>  $rapidxEmpNo->rapidx_emp_no,
+                'created_at' =>  now(),
             ];
+            // $qcSlipId = QcSlip::insertGetId($qcSlip);
 
-             return  $reasonOfCertification =  [
-                'qc_slip_id' => $qcSlipId,
+           $reasonOfCertification =  [
+                'qc_slips_id' => $qcSlipId,
                 'reason_of_certification' => implode(' | ',$request->text_certification_operator),
                 'transfer_flexibility' => implode(' | ',$request->transfer_flexibility),
                 'others' => $request->others,
+                'created_at' =>  now(),
             ];
+            // $saveQcReasonCertification = QcReasonCertification::insert($reasonOfCertification);
 
-            $collectOperatorEmployees = collect($request->operator_employees)->map(function($rowOperatorEmployees)use ($qcSlipId){
+
+          $collectOperatorEmployees = collect($request->operator_employees)->map(function($rowOperatorEmployees)use ($qcSlipId){
                 return [
-                        'qc_slip_id' => $qcSlipId,
+                        'qc_slips_id' => $qcSlipId,
                         'employee_no' => $rowOperatorEmployees['empId'],
                         'station_from' => $rowOperatorEmployees['stFrom'],
                         'station_to' => $rowOperatorEmployees['stTo'],
                         'remarks' => $rowOperatorEmployees['optRemarks'],
+                        'created_at' =>  now(),
                 ];
             })
             ->values()
             ->all();
-            //STATUS PB
-            $aOperProdTrainingOrientations =  [
+            // QcSlipEmployee::insert($collectOperatorEmployees);
+    return;
+            return $aOperProdTrainingOrientations =  [
                 'qc_slip_id' => $qcSlipId,
                 'traning_items' => implode(' | ',$request->text_certification_operator),
                 'production_abnormality' =>  $request->production_abnormality,
                 'orientation_docs' =>  implode(' | ',$request->orientation_docs),
                 'defect_escalation' =>  $request->defect_escalation,
             ];
-            //STATUS PB,APRODTO
+
+            //STATUS PB
+            //STATUS PB TO APRODTO
             $aOperToApprovers =  [
                 "approval_status" => 'BENGGTQ',
                 'first_approver'  =>  implode(' | ', $request->text_first_trainedby_oper),
-                'first_mentoredby_approver'  =>  implode(' | ', $request->text_first_mentoredby_oper),
+                'first_approver_2'  =>  implode(' | ', $request->text_first_mentoredby_oper),
                 'first_date'=> $request->text_first_date_oper,
                 'first_time'=> $request->text_first_time_oper,
                 'first_status'=> $request->first_status,
                 'first_remarks'=> "",
 
                 'second_approver' =>  implode(' | ', $request->text_second_trainedby_oper),
-                'second_mentoredby_approver' =>  implode(' | ', $request->text_second_mentoredby_oper),
+                'second_approver_2' =>  implode(' | ', $request->text_second_mentoredby_oper),
                 'second_date'=> $request->text_second_date_oper,
                 'second_time'=> $request->text_second_time_oper,
                 'second_status'=> $request->first_status,
@@ -81,11 +96,8 @@ class QualificationCertificationController extends Controller
 
                 'alert_prod_sec'=> $request->text_alert_prod_sec,
                 'alert_prod_cc_sec'=> $request->text_alert_prod_cc_sec,
-
-
             ];
 
-            // QcSlipEmployee::insert($collectOperatorEmployees);
             // AOperProdTrainingOrientation::insert($aOperProdTrainingOrientations);
             // OpApprover::insert($aOperToApprovers);
             //Change status into B
@@ -210,7 +222,6 @@ class QualificationCertificationController extends Controller
             "text_remarks_vpes_oper_2" =>  $request->text_remarks_vpes_oper_2,
         ];
 
-            // DB::commit();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -262,9 +273,12 @@ class QualificationCertificationController extends Controller
         date_default_timezone_set('Asia/Manila');
         //Systemon HRIS / Subcon
 
-       $qcSlip = QcSlip::where('id',$params['qcSlipId'])->get(['ecr_no']);
+        $qcSlip = QcSlip::orderBy('id','desc')->whereYear('created_at',now())
+        ->whereNull('deleted_at')
+        ->limit(1)->get(['control_no']);
+       
         if(count( $qcSlip ) != 0){
-            $currentCtrlNo = explode('-',$qcSlip[0]->ecr_no);
+            $currentCtrlNo = explode('-',$qcSlip[0]->control_no);
             $arrCtrNo		 	= end($currentCtrlNo);
             $series 	 	= str_pad(($arrCtrNo+1),3,"0",STR_PAD_LEFT);
             $currentCtrlNo = $params['section']."-".$params['selectSection']."-".date('m').date('y').'-'.$series;

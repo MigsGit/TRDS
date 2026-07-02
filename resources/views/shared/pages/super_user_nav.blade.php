@@ -122,9 +122,9 @@
                 </li>
 
                 <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>Personal Skill Matrix </p>
+                    <a href="{{ route('personnel_skill_matrix') }}"  class="nav-link">
+                        <i class="fas fa-blind"></i>
+                        <p>Personnel Skill Matrix</p>
                     </a>
                 </li>
 

@@ -8,6 +8,7 @@ use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PersonnelSkillMatrixController;
 use App\Model\Questionnaires;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -43,11 +44,6 @@ Route::middleware('checkSession')->group(function(){
         return view('qualification_certification');
     })->name('qualification_certification');
 
-    // Route::get('/training_request', function () {
-    //     return view('training_request');
-    // })->name('training_request');
-
-
     Route::get('/training_request_conformance', function () {
         return view('training_request_conformance');
     })->name('training_request_conformance');
@@ -72,6 +68,10 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/examination_result', function () {
         return view('theoretical_exam/examination_result');
     })->name('examination_result');
+
+    Route::get('/personnel_skill_matrix', function () {
+        return view('personnel_skill_matrix');
+    })->name('personnel_skill_matrix');
 
 
     // QUESTIONNAIRES CONTROLLER
@@ -121,38 +121,6 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/view_pdf/{id}', 'viewPdf');
     });
 
-    // Route::get('/training_request', function () {
-    //     return view('training_request');
-    // })->name('training_request');
-
-    // Route::get('/training_request_approval', function () {
-    //     return view('training_request_approval');
-    // })->name('training_request_approval');
-
-    // Route::get('/dashboard', function () {
-    //     return view('blank');
-    // })->name('dashboard');
-
-    // Route::get('/questionnaire', function () {
-    //     return view('theoretical_exam/questionnaire');
-    // })->name('questionnaire');
-
-    // Route::controller(QuestionnairesController::class)->group(function () {
-    //     // Questionnaires main routes
-    //     Route::get('view_questionnaire', 'viewQuestionnaire');
-    //     Route::get('get_systemone_hris_department', 'getSystemoneHrisDepartment');
-    //     Route::get('get_systemone_hris_position', 'getSystemoneHrisPosition');
-    //     Route::get('get_systemone_hris_section', 'getSystemoneHrisSection');
-    //     Route::post('create_update_questionnaire', 'createUpdateQuestionnaire');
-    //     Route::get('get_questionnaire_by_id', 'getQuestionnaireById');
-    //     Route::post('change_questionnaire_status', 'changeQuestionnaireStatus');
-
-    //     // Questionnaires details routes
-    //     Route::get('view_questionnaire_details', 'viewQuestionnaireDetails');
-    //     Route::post('create_update_questionnaire_details', 'createUpdateQuestionnaireDetails');
-    //     Route::get('get_questionnaire_details_by_id', 'getQuestionnaireDetailsById');
-    // });
-
     // =======================================================================================================
     Route::controller(HrMemoExaminationController::class)->group(function () {
         // HrMemoExaminationController
@@ -180,8 +148,6 @@ Route::middleware('checkSession')->group(function(){
     Route::controller(UserController::class)->group(function () {
         Route::post('/add_user', 'add_user');
         Route::post('/save_user_module_access', 'save_user_module_access');
-
-
         Route::get('/view_users', 'view_users')->name('user.view_users');
         Route::get('/view_user_module_access', 'view_user_module_access')->name('user.get_emp_details_by_id');
         Route::get('/get_user_levels', 'get_user_levels')->name('user.get_user_levels');
@@ -190,9 +156,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_user_by_id', 'get_user_by_id');
         Route::get('/get_user_module_access', 'get_user_module_access');
         Route::get('/get_system_one_employee_details', 'getSystemOneEmployeeDetails');
-
     });
-
 
     Route::controller(TrainingRequestController::class)->group(function () {
 
@@ -251,11 +215,9 @@ Route::middleware('checkSession')->group(function(){
             Route::post('/add_user', 'add_user');
             Route::post('/save_user_module_access', 'save_user_module_access');
 
-
             Route::get('/view_users', 'view_users')->name('user.view_users');
             Route::get('/view_user_module_access', 'view_user_module_access')->name('user.get_emp_details_by_id');
             Route::get('/get_user_levels', 'get_user_levels')->name('user.get_user_levels');
-            // Route::get('/get_emp_details_by_id', 'get_emp_details_by_id')->name('user.get_emp_details_by_id');
             Route::get('/get_user_list', 'get_user_list');
 
         });
@@ -270,7 +232,6 @@ Route::middleware('checkSession')->group(function(){
             Route::post('/confirm_training_request', 'confirmTrainingRequest')->name('confirm_training_request');
             Route::post('/receive_training_request', 'receiveTrainingRequest')->name('receive_training_request');
             Route::post('/approve_training_request', 'approveTrainingRequest')->name('approve_training_request');
-
 
             // FOR DROPDOWNS
             Route::get('/get_hris_department', 'getHRISSectionByDepartment')->name('get_hris_department');
@@ -290,20 +251,25 @@ Route::middleware('checkSession')->group(function(){
 
     Route::controller(TrainingAttendanceController::class)->group(function () {
         Route::get('/view_training_attendance', 'view_training_attendance');
-
-        // view_training_attendance
     });
-
-    // Route::post('/import_user', 'import_user');
 
     Route::controller(TrainingAttendanceController::class)->group(function () {
         Route::post('/save_attendance', 'save_attendance');
         Route::post('/save_training_attendance', 'save_training_attendance');
-
         Route::get('/view_training_attendance_summary', 'view_training_attendance_summary');
         Route::get('/view_training_attendance', 'view_training_attendance');
         Route::get('/view_training_attendance_request_details', 'view_training_attendance_request_details');
         Route::get('/get_training_attendance_by_id', 'get_training_attendance_by_id');
     });
+
+    Route::controller(PersonnelSkillMatrixController::class)->group(function () {
+
+        //TRAINING REQUEST
+        Route::get('/get_direct_employees', 'getDirectEmployees')->name('get_direct_employees');
+        Route::get('/get_subcon_employees', 'getSubconEmployees')->name('get_subcon_employees');
+
+    });
+
+
 
 });
