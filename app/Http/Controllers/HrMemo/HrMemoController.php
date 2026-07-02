@@ -20,8 +20,9 @@ use Illuminate\Support\Facades\Cache;
 
 class HrMemoController extends Controller
 {
-    private function actionButton($class, $icon, $id, $extraClass = '', $approval = false){
-        return "<button class='btn {$class} btn-sm {$extraClass}' data-id='{$id}' data-approval='{$approval}'>
+    private function actionButton($class, $icon, $id, $extraClass = '', $approval = false, $remarks = ''){
+        $remarksSafe = htmlspecialchars($remarks, ENT_QUOTES, 'UTF-8');
+        return "<button class='btn {$class} btn-sm {$extraClass}' data-id='{$id}' data-approval='{$approval}' data-remarks=\"{$remarksSafe}\">
                     <i class='fa-solid {$icon}'></i>
                 </button>";
     }
@@ -69,8 +70,7 @@ class HrMemoController extends Controller
                 }else{
                     $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
                 }
-            }
-            else if ($isForTUReceiving){
+            }else if ($isForTUReceiving){
                 if($canApproveTU){
                     $result .= $this->actionButton('btn-success btnView', 'fas fa-check-square', $id, 'mr-1', 'true');
                 }else{
@@ -78,6 +78,8 @@ class HrMemoController extends Controller
                 }
             }else if ($isHRDisapproved || $isTUDisapproved){
                 $result .= $this->actionButton('btn-secondary btnEdit', 'fas fa-edit', $id, 'mr-1');
+                // $remarksSafe = json_encode($hr_memo_details->remarks);
+                $result .= $this->actionButton('btn-danger btnViewRemarks', 'fas fa-comment-dots', $id, 'mr-1', 'false', $hr_memo_details->remarks); //CLARK TESTING
                 $result .= $this->actionButton('btn-success btnFinalSubmit', 'fas fa-check-square', $id, 'mr-1');
             }else{
                 $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
@@ -474,7 +476,8 @@ class HrMemoController extends Controller
         // return $hr_memo->noted_by_info->email;
         // $data = ['application' => $hr_memo, 'approver_details' => $approver_details];
         $send_hr_to = $hr_memo->noted_by_info->email;
-        $send_hr_cc = ['evalfelor@pricon.ph','cdcasuyon@pricon.ph'];
+        // $send_hr_cc = $hr_memo->prepared_by_info->email;
+        $send_hr_cc = [$hr_memo->prepared_by_info->email, 'cdcasuyon@pricon.ph'];
 
         $send_tu_to = [];
         $send_tu_cc = [];
