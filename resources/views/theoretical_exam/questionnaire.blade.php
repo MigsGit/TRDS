@@ -269,6 +269,10 @@
                     <h5 class="modal-title">
                         <strong><center class="questionnaireTitle"></center></strong>
                     </h5>
+
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
 
                 <form method="post" id="formCreateUpdateQuestionnaireDetails" enctype="multipart/form-data">
@@ -424,6 +428,11 @@
                 $('#singleMultipleAnswer').empty();
                 $('#identificationEssay').empty();
                 $('#multipleGrid').empty();
+
+
+                getQuestions = [];
+                getOptions = [];
+                getSelectedAnswers = [];
             });
 
             // ===============================================================================================================================================

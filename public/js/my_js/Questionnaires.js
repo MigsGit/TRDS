@@ -265,7 +265,7 @@ function RenderTable() {
         $('#questionTable thead tr').append(`
             <th class="position-relative">
                 ${options}
-                <button type="button" class="btn btn-sm btn-secondary removeOption" data-index="${getIndex}" style="position:absolute; top:2px; right:2px;">&times;</button>
+                <button type="button" class="btn btn-sm btn-secondary multipleRemove removeOption" data-index="${getIndex}" style="position:absolute; top:2px; right:2px;">&times;</button>
             </th>
         `);
     });
@@ -275,7 +275,7 @@ function RenderTable() {
     getQuestions.forEach((question, questionIndex) => {
         let row = `<tr>
             <td class="position-relative" style="padding-left:1rem;">
-                <button class="btn btn-sm btn-secondary removeQuestion" data-index="${questionIndex}" style="margin-right:5px;">&times;</button>&nbsp;
+                <button class="btn btn-sm btn-secondary multipleRemove removeQuestion" data-index="${questionIndex}" style="margin-right:5px;">&times;</button>&nbsp;
                 ${question}
             </td>`;
 
