@@ -138,6 +138,7 @@ Route::middleware('checkSession')->group(function(){
         Route::post('update_exam_score_for_employee', 'updateExamScoreForEmployee');
 
         Route::get('/view_pdf/{id}', 'viewPdf');
+        Route::post('update_examination_date', 'updateExaminationDate');
     });
 
     // Route::get('/training_request', function () {

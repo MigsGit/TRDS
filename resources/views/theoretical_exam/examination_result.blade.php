@@ -197,7 +197,7 @@
                             </div>
                         </div>
 
-                        <div class="d-none" id="stepTwo"> 
+                        <div class="d-none" id="stepTwo">
                             <div class="exam-scroll-container">
                                 <input type="text" class="w-100" name="exam_result_details_id" id="examResultDetailsId" readonly>
                             </div>
@@ -224,12 +224,66 @@
             </div>
         </div>
     </div>
+
+    <!-- Change Examination Date Modal -->
+    <div class="modal fade"id="modalChangeExaminationDate" tabindex="-1" role="dialog" aria-labelledby="changeExaminationDateLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+            <div class="modal-content shadow">
+
+                <!-- Modal Header -->
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="changeExaminationDateLabel">
+                        <i class="fa fa-calendar-alt mr-2"></i>
+                        Change Examination Date
+                    </h5>
+
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form method="post" id="formChangeExaminationDate" enctype="multipart/form-data">
+                    @csrf
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <input type="hidden" name="examination_result_detail_id" id="txtExaminationResultDetailId">
+
+                        <div class="form-group">
+                            <label for="lblExaminationDate" class="font-weight-bold">
+                                Examination Date
+                            </label>
+
+                            <input type="date"
+                                class="form-control"
+                                id="examinationDate"
+                                name="examination_date"
+                                placeholder="Enter Examination Date"
+                                autocomplete="off"
+                                required>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer bg-light justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" id="btnExaminationDate" class="btn btn-dark px-4">
+                            <i id="iBtnExaminationDateIcon" class="fa fa-check mr-1"></i>
+                            Save Date
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 
 @section('js_content')
     <script type="text/javascript">
-        let examResultTable; 
+        let examResultTable;
         let examResultTableDetails;
         let examResultId;
         let examResultDetailsId;
@@ -336,14 +390,14 @@
                 GetEmployeeExamResultById(examResultDetailsId);
             });
 
-            $('#btnNext').click(function (e) { 
+            $('#btnNext').click(function (e) {
                 e.preventDefault();
                 $('#stepOne').addClass('d-none');
                 $('#stepTwo').removeClass('d-none');
 
             });
 
-            $('#btnPrev').click(function (e) { 
+            $('#btnPrev').click(function (e) {
                 e.preventDefault();
                 $('#stepTwo').addClass('d-none');
                 $('#stepOne').removeClass('d-none');
@@ -358,6 +412,19 @@
                 UpdateExamScoreForEmployee();
             });
 
+            $(document).on('click', '.actionChangeExaminationDate',function(e){
+                e.preventDefault();
+
+                examinationResultDetailsId = $(this).attr('examinationResultDetails-id');
+                examinationDate = $(this).attr('examinationResultDetails-examination_date');
+                $("#txtExaminationResultDetailId").val(examinationResultDetailsId);
+                $("#examinationDate").val(examinationDate);
+            });
+
+            $("#formChangeExaminationDate").submit(function(event){
+                event.preventDefault();
+                UpdateExaminationDate();
+            });
         });
     </script>
 @endsection

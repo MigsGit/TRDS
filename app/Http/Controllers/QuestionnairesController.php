@@ -414,16 +414,22 @@ class QuestionnairesController extends Controller
                 }
 
                 $test =
-                    QuestionnaireDetails::with('questionare_title_info')
-                        ->where('questionnaire_id', $request->questionnaire_details_fkid)
+                    QuestionnaireDetails::where('questionnaire_id', $request->questionnaire_details_fkid)
                         ->where('revision', $request->questionnaire_details_revision)
                         ->where('status', 0)
                         ->where('logdel', 0)
                         ->get();
 
+
+                $tist = Questionnaires::where('id', $request->questionnaire_details_fkid)
+                    ->where('status', 0)
+                    ->where('logdel', 0)
+                    ->first();
+
                 $total_points = $test->sum('points');
                 $new_total_points = $total_points + $request->questionnaire_points;
-                $passing_score = optional($test->first()->questionare_title_info)->passing_score ?? 0;
+                $passing_score = optional($tist)->passing_score ?? 0;
+                // $passing_score = optional($test->first()->questionare_title_info)->passing_score ?? 0;
 
                 if($request->questionnaire_details_pkid == ''){
                     if ($new_total_points > $passing_score) {

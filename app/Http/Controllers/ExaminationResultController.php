@@ -34,7 +34,7 @@ class ExaminationResultController extends Controller
             if($exam_result->status == 0){
                 $result .=  '<div class="btn-group">';
                 $result .=  '   <button type="button" class="btn btn-dark dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">';
-                $result .=  '   <i class="fa fa-cog"></i>'; 
+                $result .=  '   <i class="fa fa-cog"></i>';
                 $result .=  '</button>';
                 $result .=  '<div class="dropdown-menu dropdown-menu-right">';
                 $result .=  '   <button type="button" class="btn text-center dropdown-item actionQuestionnaireDetailsForExamResult" questionnaire-id="' . $exam_result->id . '" questionnaire-revision="' . $exam_result->revision . '" questionnaire-exam_title="' . $exam_result->exam_title . '" data-toggle="modal" data-target="#modalExamResult" title="Exam Results"><i class="fa fa-list-ul"></i> Details</button>';
@@ -63,6 +63,8 @@ class ExaminationResultController extends Controller
     }
 
     public function viewExamResultDetails(Request $request){
+        $rapidx_user_id = $_SESSION['rapidx_user_id'];
+
         $exam_result_details = ExamResultDetails::with(['exam_result_info', 'exam_attempts_info'])->where('exam_result_status', $request->examStatus)
             ->where('questionnaire_id', $request->questionnaireId)
             ->where('questionnaire_revision_no', $request->questionnaireRevision)
@@ -70,17 +72,32 @@ class ExaminationResultController extends Controller
             ->get();
 
         return DataTables::of($exam_result_details)
-        ->addColumn('action', function($exam_result_detail){
+        ->addColumn('action', function($exam_result_detail) use($rapidx_user_id){
             $result =   '<center>';
             if($exam_result_detail->exam_result_status == 0){
                 $result .= '<button type="button" class="btn btn-warning btn-sm text-center actionEmployeeExamResult" exam_result_details-id="' . $exam_result_detail->id . '" data-toggle="modal" data-target="#modalEmployeeExamResult" title="Exam Results"><i class="fa fa-list-ul"></i> Details</button>';
             }else{
                 $result .= '<a  href="view_pdf/' . $exam_result_detail->id . '" target="_blank"
-                                class="btn btn-dark btn-sm" 
-                                target="_blank" 
+                                class="btn btn-dark btn-sm"
+                                target="_blank"
                                 title="View Exam Results">
                                 <i class="fa fa-eye"></i> View Exam
                             </a>';
+            }
+
+            if($rapidx_user_id == '211'){
+                $result .= '<br>
+                    <button
+                        type="button"
+                        class="btn btn-info btn-sm text-center mt-2 actionChangeExaminationDate"
+                        examinationResultDetails-id="' . $exam_result_detail->id . '"
+                        examinationResultDetails-examination_date="' . $exam_result_detail->date_examination . '"
+                        status="0"
+                        data-toggle="modal"
+                        data-target="#modalChangeExaminationDate"
+                        title="Activate Questionnaire">
+                        <i class="fas fa-calendar"></i>
+                    </button>';
             }
 
             $result .= '</center>';
@@ -169,5 +186,23 @@ class ExaminationResultController extends Controller
         ]);
 
         return $pdf->stream('exam_result_' . $exam_result_detail[0]->id . '.pdf');
+    }
+
+    public function updateExaminationDate(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
+        DB::beginTransaction();
+        try{
+            ExamResultDetails::where('id', $request->examination_result_detail_id)
+                ->update([
+                    'date_examination' => $request->examination_date,
+                    'updated_at' => now(),
+                ]);
+            DB::commit();
+            return response()->json(['hasError' => 0]);
+        }catch (\Exception $e){
+            DB::rollback();
+            return response()->json(['hasError' => 1, 'exceptionError' => $e]);
+        }
     }
 }
