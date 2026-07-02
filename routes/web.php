@@ -81,8 +81,10 @@ Route::middleware('checkSession')->group(function(){
         Route::post('save_qualification_certification_oper', 'saveQualificationCertificationOper');
         Route::post('save_form_send_email', 'saveFormSendEmail');
 
+        Route::get('load_qc_slip', 'loadQcSlip');
         Route::get('get_div_dept_sec', 'getDivDeptSec');
         Route::get('get_dropdown_master_details_by_fkid', 'getDropdownMasterDetailsByFkid');
+        Route::get('get_qc_slips_by_id', 'getQcSlipsById');
     });
 
     Route::controller(QuestionnairesController::class)->group(function () {

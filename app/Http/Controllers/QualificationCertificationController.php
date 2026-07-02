@@ -23,8 +23,86 @@ class QualificationCertificationController extends Controller
     public function __construct(CommonController $commonController){
         $this->commonController = $commonController;
     }
-    
 
+    public function getQcSlipsById(Request $request){
+      
+        try {
+            return $qcSlip = QcSlip::with('product_line','op_approvers')
+            ->where('id',$request->qcSlipsId)
+            ->whereNull('deleted_at')
+            ->get();    
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function loadQcSlip(Request $request){
+       $qcSlip = QcSlip::with('product_line','op_approvers')
+        ->whereNull('deleted_at')
+        ->get();
+        try {
+            return DataTables($qcSlip)
+            ->addColumn('rawAction',function ($row) use ($request){
+                $result = '';
+                $result .= '<center>';
+                $result .= '<button class="btn btn-sm btn-outline-primary" type="button" qc-slips-id="'.$row->id.'" id="btnGetQcSlipsId"><i class="fa-solid fa fa-edit"></i></button>';
+                $result .= '</center>';
+                return $result;
+            })
+            ->addColumn('rawStatus',function ($row) use ($request){
+                 $result = '';
+                $currentApprover = $row->created_by ?? '';
+                // $approvalStatusEnvironment = $row->environment->approval_status;
+                $approvalStatus = $row->approval_status;
+                // $getStatus = $this->commonInterface->getStatus4m($statusEnvironment);
+                $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
+                $result .= '<center>';
+                // $result .= '<span class="'.$getStatus['bgStatus'].'"> '.$getStatus['status'].' </span>';
+                $result .= '<br>';
+                $result .= '<span class="badge rounded-pill bg-danger"> '.$getApprovalStatus['approvalStatus'].' '.$currentApprover.' </span>';
+                $result .= '</center>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->addColumn('trained_by',function ($row){
+                // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
+                // $personInCharge = $row;
+                return $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$personInCharge.' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->addColumn('certified_by',function ($row){
+                // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
+                // $personInCharge = $row;
+                return $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$personInCharge.' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->addColumn('approvers',function ($row){
+                // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
+                // $personInCharge = $row;
+                return $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$personInCharge.' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->rawColumns(['rawAction','rawStatus','approvers'])
+            ->make(true);
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    
     public function saveOperApprovers($params){
         try {
             OpApprover::insert($params);
@@ -95,6 +173,7 @@ class QualificationCertificationController extends Controller
             $dateTime = now();
             $date = now()->toDateString();
             $time = now()->format('H:i:s');
+            $qcSlipId = $request->qc_slips_id;
             $qcSlipId = 2;
             $section = 'QC';
             // $select_section = $request->select_section;

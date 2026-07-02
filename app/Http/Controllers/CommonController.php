@@ -8,6 +8,38 @@ use Illuminate\Http\Request;
 class CommonController extends Controller
 {
 
+    public function getApprovalStatus($approvalStatus){
+        try {
+             switch ($approvalStatus) {
+                 case 'PB':
+                     $approvalStatus = 'Prepared by:';
+                     break;
+                //  case 'CB':
+                //      $approvalStatus = 'Checked by:';
+                //      break;
+                //  case 'AB':
+                //      $approvalStatus = 'Approved by:';
+                //      break;
+                //  case 'EXQC':
+                //      $approvalStatus = 'QC Head:';
+                //      break;
+                //  case 'EXOH':
+                //      $approvalStatus = 'Operation Head:';
+                //      break;
+                //  case 'EXQA':
+                //      $approvalStatus = 'QA Head:';
+                //      break;
+                 default:
+                     $approvalStatus = '---';
+                     break;
+             }
+             return [
+                 'approvalStatus' => $approvalStatus,
+             ];
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
     public function sendEmail($data){
         try {
             date_default_timezone_set('Asia/Manila');
@@ -20,7 +52,7 @@ class CommonController extends Controller
         }
     }
     public function emailMsg($params){
-       $qcSlip = QcSlip::with('product_line')->where('id',$params['qc_slips_id'])
+        $qcSlip = QcSlip::with('product_line')->where('id',$params['qc_slips_id'])
         ->whereNull('deleted_at')
         ->first();
         // if($getEcrStatus['status'] == 'DISAPPROVED'){

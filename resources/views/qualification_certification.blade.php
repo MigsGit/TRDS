@@ -70,16 +70,18 @@
                                                         <!-- <button class="btn btn-primary"><i class="fa fa-plus me-2"></i> Add New</button> -->
                                                     </div>
                                                     <div class="table-responsive">
-                                                        <table id="tbl_mh" class="table table-striped table-hover table-bordered nowrap">
+                                                        <table id="tbl_operator" class="table table-striped table-hover table-bordered nowrap">
                                                             <thead class="table-primary">
                                                                 <tr>
                                                                 <th>Action</th>
+                                                                <th>Status</th>
                                                                 <th>Ctrl No. / Doc No.</th>
+                                                                <th>Series Name</th>
+                                                                <th>Approvers</th>
                                                                 <th>Date Filed</th>
-                                                                <th>Trained by</th>
                                                                 <!-- <th>Qualified by</th> -->
-                                                                <th>Certified by</th>
-                                                                <th>Approved / Conformed by</th>
+                                                                {{-- <th>Certified by</th> --}}
+                                                                {{-- <th>Approved / Conformed by</th> --}}
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -144,16 +146,20 @@
 
                         <!-- FORMAT 5 Operator -->
                         <div class="d-none" id="div_Oper">
-                            <form  id="formSubmit_Oper" >
+                            <form  id="formSubmitOper" >
                             @csrf
                                 <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
 
+                                <div class="col-md-3">
+                                    <label for="">QC Slip Id:</label>
+                                    <input class="form-control" type="text" class="form-control" id="qc_slips_id" name="qc_slips_id" placeholder="Auto Generated" readonly>
+                                </div>
                                 <div class="row mb-5">
                                     <div class="col-md-3">
                                         <label for="">Control No.:</label>
-                                        <input class="form-control" type="hidden" class="form-control d-none" id="textconno_new_operator" name="textconno_new_operator" placeholder="Select section to generate Control No." readonly>
-                                        <input class="form-control" type="text" class="form-control" id="" name="textconno_new_operator" placeholder="Auto Generated" readonly>
-                                        <input class="form-control" type="hidden" class="form-control" id="textconno_operator" name="textconno_operator" readonly>
+                                        {{-- <input class="form-control" type="hidden" class="form-control d-none" id="textconno_new_operator" name="textconno_new_operator" placeholder="Select section to generate Control No." readonly> --}}
+                                        <input class="form-control" type="text" class="form-control" id="textconno_new_operator" name="textconno_new_operator" placeholder="Auto Generated" readonly>
+                                       {{--  <input class="form-control" type="hidden" class="form-control" id="textconno_operator" name="textconno_operator" readonly> --}}
                                     </div>
 
                                     <div class="col-md-3">
@@ -174,13 +180,11 @@
                                         </select>
                                     </div>
                                 </div>
-
                                 <div class="row mt-2 mb-5">
                                     <div class="col-md-12">
                                         <button type="button" class="btn btn-primary" id="" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
                                     </div>
                                 </div>
-
                                 <div class="table-responsive mt-3 mb-5">
                                     <table id="tbl_certified_list_operator" class="table table-bordered table-hover nowrap">
                                         <thead class="table-primary">
@@ -198,7 +202,6 @@
                                         </tbody>
                                     </table>
                                 </div>
-
                                 <div class="row mb-5">
                                     <div class="col-md-12">
                                         <label for="">Reason for Certification:</label>
@@ -1679,7 +1682,7 @@
             </div>
         </div>
 
-       
+
         @include('components.operator_prodn_training_orientation')
     </div>
 </div>
@@ -1689,7 +1692,68 @@
     <script type="text/javascript">
 
     $(document).ready(function () {
-         // In-memory array that holds employees staged in the modal
+        form = {
+            formSubmitOper: $('#formSubmitOper'),
+        };
+        dataTable = {
+            operator: '',
+        };
+        table = {
+           operator: '#tbl_operator',
+        };
+        dataTable.operator = $(table.operator).DataTable({
+            "processing" : true,
+            "serverSide" : true,
+            "ajax" : {
+                url: "load_qc_slip", //Rapid Ts Warehouse Packaging
+                data: function (param){
+                    // param.categoryMaterial = globalVar.categoryMaterialPackaging;
+                },
+            },
+            fixedHeader: true,
+            "columns":[
+                // { "data" : "rawBulkCheckBox", orderable:false, searchable:false },
+                { "data" : "rawAction", orderable:false, searchable:false },
+                { "data" : "rawStatus", orderable:false, searchable:false },
+                { "data" : "control_no" },
+                { "data" : "series_name" },
+                { "data" : "approvers" },
+                // { "data" : "certified_by" },
+                // { "data" : "approved_conformed_by" },
+                { "data" : "created_at" },
+            ],
+        });
+
+        const getQcSlipsById  = (params) => {
+            let data = {
+                qcSlipsId :  params.qcSlipsId
+            }
+            call_ajax(data, 'get_qc_slips_by_id', function(response){
+                let data = response[0];
+                console.log(data);
+                console.log(form.formSubmitOper);
+                
+                form.formSubmitOper.find('#qc_slips_id').val(data.id);
+                form.formSubmitOper.find('#textconno_new_operator').val(data.control_no);
+                form.formSubmitOper.find('#select_section').val(data.section_category);
+                form.formSubmitOper.find('#text_select_position').val(data.position_category);
+                form.formSubmitOper.find('#text_section_operator').val(data.section);
+                form.formSubmitOper.find('#text_series_operator').val(data.series_name);
+                form.formSubmitOper.find('#text_operator_product_line').val(data.product_line);
+                $('#modalCreateCQForm').modal();
+
+            })
+        }
+        $(table.operator).on('click', '#btnGetQcSlipsId','tr',function (e) {
+            e.preventDefault();
+            let qcSlipsId = $(this).attr('qc-slips-id');
+            let params = {
+                qcSlipsId: qcSlipsId,
+            };
+            getQcSlipsById(params);
+            console.log('btnGetQcSlipsId clicked');
+
+        });
         operEmpArray = [];
         $(document).on('change', '#text_certification_operator',function (e) {
             e.preventDefault();
@@ -1728,7 +1792,7 @@
         // });
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
-           var $form = $('#formSubmit_oper,#formSubmit_Oper');
+           var $form = $('#formSubmitOper,#formSubmitOper');
 
             // 1. Serialize standard form inputs into an array
             var formArray = $form.serializeArray();
@@ -1774,7 +1838,7 @@
             //     }
             // });
         });
-         $(document).on('submit', '#formSubmit_oper, #formSubmit_Oper', function (e) {
+         $(document).on('submit', '#formSubmitOper, #formSubmitOper', function (e) {
             e.preventDefault();
             $('#modalSendEmail').modal();
         });
@@ -1812,71 +1876,68 @@
         });
 
         togglePositionSection($positionSelect.val());
+// tbl_operator
+
+
+
+        initDivDeptSecCombos([
+                '#text_section_operator',
+        ]);
+
+        initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+        ],1);
+        initDropdownMasterDetailsByFkidCombos([
+            '#text_operator_product_line',
+        ],2);
+        initDropdownMasterDetailsByFkidCombos([
+                '#text_certification_operator',
+        ],3);
+        initDropdownMasterDetailsByFkidCombos([
+                '#text_training_orientation_ps_oper',
+        ],4);
+        initDropdownMasterDetailsByFkidCombos([
+                '#transfer_flexibility',
+        ],4);
+        const initGetSystemOneEmployeeDetailsCombos = (comboSelectors) => {
+            comboSelectors.forEach(function(selector) {
+                    getSystemOneEmployeeDetails($(selector));
+            });
+        }
+        const initSelectPassFail = (comboSelectors) => {
+
+            comboSelectors.forEach(function(selector) {
+                    selectPassFail($(selector));
+            });
+        }
+        initGetSystemOneEmployeeDetailsCombos([
+            '#text_oper_emp_number',
+            '#text_first_trainedby_oper',
+            '#text_first_mentoredby_oper',
+            '#text_second_trainedby_oper',
+            '#text_second_mentoredby_oper',
+            '#text_alert_prod_sec',
+            '#text_alert_prod_cc_sec',
+            '#text_1st_qualifiedby_es_oper',
+            '#text_2nd_qualifiedby_es_oper',
+            '#text_obs_first_result_es_oper',
+            //D PPD
+            '#text_1st_certified_prod_peqcs_oper',
+            '#text_1st_certified_eng_peqcs_oper',
+            '#text_1st_certified_qc_peqcs_oper',
+            '#text_2nd_certified_prod_peqcs_oper',
+            '#text_2nd_certified_eng_peqcs_oper',
+            '#text_2nd_certified_qc_peqcs_oper',
+            //EQcValidationProcess
+            '#text_1st_validatedby_vpes_oper_2',
+            '#text_2nd_validatedby_vpes_oper_2',
+
+        ]);
+        initSelectPassFail([
+            '#text_oa_1st_result_es_oper',
+        ])
     });
 
-    function initDivDeptSecCombos(comboSelectors) {
-        comboSelectors.forEach(function(selector) {
-                getDivDeptSec({ comboId: $(selector) });
-        });
-    }
-    initDivDeptSecCombos([
-            '#text_section_operator',
-    ]);
-
-    initDropdownMasterDetailsByFkidCombos([
-            '#text_oper_station_to',
-            '#text_oper_station_from',
-    ],1);
-
-    initDropdownMasterDetailsByFkidCombos([
-        '#text_operator_product_line',
-    ],2);
-    initDropdownMasterDetailsByFkidCombos([
-            '#text_certification_operator',
-    ],3);
-    initDropdownMasterDetailsByFkidCombos([
-            '#text_training_orientation_ps_oper',
-    ],4);
-    initDropdownMasterDetailsByFkidCombos([
-            '#transfer_flexibility',
-    ],5);
-    const initGetSystemOneEmployeeDetailsCombos = (comboSelectors) => {
-
-        comboSelectors.forEach(function(selector) {
-                getSystemOneEmployeeDetails($(selector));
-        });
-    }
-    const initSelectPassFail = (comboSelectors) => {
-
-        comboSelectors.forEach(function(selector) {
-                selectPassFail($(selector));
-        });
-    }
-    initGetSystemOneEmployeeDetailsCombos([
-        '#text_oper_emp_number',
-        '#text_first_trainedby_oper',
-        '#text_first_mentoredby_oper',
-        '#text_second_trainedby_oper',
-        '#text_second_mentoredby_oper',
-        '#text_alert_prod_sec',
-        '#text_alert_prod_cc_sec',
-        '#text_1st_qualifiedby_es_oper',
-        '#text_2nd_qualifiedby_es_oper',
-        '#text_obs_first_result_es_oper',
-        //D PPD
-        '#text_1st_certified_prod_peqcs_oper',
-        '#text_1st_certified_eng_peqcs_oper',
-        '#text_1st_certified_qc_peqcs_oper',
-        '#text_2nd_certified_prod_peqcs_oper',
-        '#text_2nd_certified_eng_peqcs_oper',
-        '#text_2nd_certified_qc_peqcs_oper',
-        //EQcValidationProcess
-        '#text_1st_validatedby_vpes_oper_2',
-        '#text_2nd_validatedby_vpes_oper_2',
-
-    ]);
-    initSelectPassFail([
-        '#text_oa_1st_result_es_oper',
-    ])
     </script>
 @endsection

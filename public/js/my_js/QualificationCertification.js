@@ -74,7 +74,7 @@ const getDropdownMasterDetailsByFkid = (params) => {
 }
 
 
-function fnGetSelect2Value(params){
+const fnGetSelect2Value = (params) =>  {
     // 1. Initialize the Select2 dropdown with your AJAX data source
     params.comboId.select2({
         data : params.dataValue,
@@ -119,7 +119,7 @@ operEmpArray = [];
  *  - (re-)attach select2 to the employee combo
  *  - clear the staging table & array
  */
-function initOperEmpModal() {
+const initOperEmpModal = () => {
     getSystemOneEmployeeDetails($('#text_oper_emp_number'));
     operEmpArray = [];
     $('#tbl_oper_add_emp tbody').empty();
@@ -127,12 +127,17 @@ function initOperEmpModal() {
     $('#text_oper_station_from').val(null).trigger('change');
     $('#text_oper_station_to').val(null).trigger('change');
 }
+const initDivDeptSecCombos = (comboSelectors) => {
+    comboSelectors.forEach(function(selector) {
+            getDivDeptSec({ comboId: $(selector) });
+    });
+}
 
 /**
  * Add the currently selected employee + stations as one row
  * in the staging table.
  */
-function addOperEmpToTable() {
+const addOperEmpToTable = () => {
     const $empSelect    = $('#text_oper_emp_number');
     const $stationFrom  = $('#text_oper_station_from');
     const $stationTo    = $('#text_oper_station_to');
@@ -200,7 +205,7 @@ function addOperEmpToTable() {
  * Move all staged employees into the main certification table
  * (tbl_certified_list_operator) and close the modal.
  */
-function addSelectedOperEmpToMain() {
+const addSelectedOperEmpToMain = () => {
     if (operEmpArray.length === 0) {
         Swal.fire({ icon: 'warning', title: 'No Employees', text: 'Please add at least one employee first.' });
         return;
@@ -242,7 +247,7 @@ function addSelectedOperEmpToMain() {
  * Collect the main certification table rows into a plain array
  * (useful when building the payload for form submission).
  */
-function getOperEmpTableData() {
+const getOperEmpTableData = () => {
     const employees = [];
     $('#tbl_certified_list_operator tbody tr').each(function() {
         employees.push({
@@ -256,21 +261,22 @@ function getOperEmpTableData() {
     return employees;
 }
 
+
 /* ---- Event bindings ---- */
 
 // Open modal → reinitialise
-$(document).on('show.bs.modal', '#select_Employee_operator', function () {
+$(document).on('show.bs.modal', '#select_Employee_operator', () => {
     initOperEmpModal();
 });
 
 // "Add to Table" button inside the modal
-$(document).on('click', '#btnAddOPEREmp', function () {
+$(document).on('click', '#btnAddOPEREmp', () => {
     addOperEmpToTable();
 });
 
 // Remove row from staging table
-$(document).on('click', '.btnRemoveOperEmpRow', function () {
-    const idx = $(this).data('index');
+$(document).on('click', '.btnRemoveOperEmpRow', () => {
+    idx = $(this).data('index');
     operEmpArray.splice(idx, 1);
     $(this).closest('tr').remove();
     // Re-index remaining rows
@@ -281,12 +287,12 @@ $(document).on('click', '.btnRemoveOperEmpRow', function () {
 });
 
 // "Add" button in modal footer → move to main table
-$(document).on('click', '#btnAddSelectedOPEREmp', function () {
+$(document).on('click', '#btnAddSelectedOPEREmp', ()=> {
     addSelectedOperEmpToMain();
 });
 
 // Remove row from the main certification table
-$(document).on('click', '.btnRemoveOperEmpMain', function () {
+$(document).on('click', '.btnRemoveOperEmpMain', () => {
     $(this).closest('tr').remove();
 });
 
