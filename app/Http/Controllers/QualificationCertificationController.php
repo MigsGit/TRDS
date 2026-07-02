@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\CommonController;
 use App\Http\Requests\QcSlipEmployeeRequest;
 use App\Http\Requests\QcSlipRequest;
 use App\Model\DropdownMaster;
@@ -18,6 +19,12 @@ use Illuminate\Support\Facades\DB;
 class QualificationCertificationController extends Controller
 {
 
+    protected $commonController;
+    public function __construct(CommonController $commonController){
+        $this->commonController = $commonController;
+    }
+    
+
     public function saveOperApprovers($params){
         try {
             OpApprover::insert($params);
@@ -29,19 +36,46 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-    // public function saveFormSendEmail(Request $request){
-    //     return 'true' ;
-    //     try {
-    //         date_default_timezone_set('Asia/Manila');
-    //         DB::beginTransaction();
-    //         OpApprover::insert($params);
-    //         DB::commit();
-    //         return response()->json(['is_success' => 'true']);
-    //     } catch (Exception $e) {
-    //         DB::rollback();
-    //         throw $e;
-    //     }
-    // }
+    public function saveFormSendEmail($params){
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $opApprover =  OpApprover::where('qc_slips_id',$params['qc_slips_id'])
+            ->where('approval_status',$params['approval_status'])
+            ->get();
+            // $opApprover->update($params['update_data']);
+            $emailParams = [
+                'qc_slips_id' => $params['qc_slips_id']
+            ];
+            $message = $this->commonController->emailMsg($emailParams);
+            $from = 'issinfoservice@pricon.ph';
+            $from_name = 'issinfoservice@pricon.ph';
+            $emailData = [
+                // "to" =>$to,
+                "to" =>"mrronquez@pricon.ph",
+                "cc" =>"",
+                "bcc" =>"mclegaspi@pricon.ph",
+                "from" => $from,
+                "from_name" => $from_name ?? "TRDS Auto Email",
+                // "subject" =>$subject,
+                "message" =>  $message,
+                "attachment_filename" => "",
+                "attachment" => "",
+                "send_date_time" => now(),
+                "date_time_sent" => "",
+                "date_created" => now(),
+                "created_by" => session('rapidx_username'),
+                "system_name" => "rapidx_TRDS",
+            ];
+            //TODO: SEND email
+
+            // DB::commit();
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
     public function updateOperApprovers($params){
         try {
             DB::commit();
@@ -57,7 +91,7 @@ class QualificationCertificationController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            return $rapidxEmpNo =  session('global_user');
+            $rapidxEmpNo =  session('global_user');
             $dateTime = now();
             $date = now()->toDateString();
             $time = now()->format('H:i:s');
@@ -72,6 +106,18 @@ class QualificationCertificationController extends Controller
                 'selectSection' => $select_section,
             ];
             $generateControlNumber = $this->generateControlNumber($params);
+                // $qcSlipId = QcSlip::insertGetId($saveQcSlip);
+            $emailParams = [
+                'qc_slips_id' => $qcSlipId,
+                'update_data'=> [
+                    'alert_prod_sec' => implode(' | ',$request->text_alert_prod_sec),
+                    'alert_prod_cc_sec' => implode(' | ',$request->text_alert_prod_cc_sec),
+                ],
+                'approval_status'=> 'PB',
+            ];
+            // DB::commit();
+            // return $this->saveFormSendEmail($emailParams); //put in the end of else
+
             $saveQcSlip =  [
                 'control_no' =>  $generateControlNumber['currentCtrlNo'],
                 'section_category' =>  $select_section,//TODO
@@ -82,7 +128,7 @@ class QualificationCertificationController extends Controller
                 'created_by' =>  $rapidxEmpNo->rapidx_emp_no,
                 'created_at' =>  now(),
             ];
-            // $qcSlipId = QcSlip::insertGetId($saveQcSlip);
+        
 
             $reasonOfCertification =  [
                 'qc_slips_id' => $qcSlipId,
@@ -141,7 +187,7 @@ class QualificationCertificationController extends Controller
             ];
             // 'alert_prod_sec'=> $request->text_alert_prod_sec,
             // 'alert_prod_cc_sec'=> $request->text_alert_prod_cc_sec,
-            DB::commit();
+            // DB::commit();
             OpApprover::insert($aOperToApprovers);
 
             // AOperProdTrainingOrientation::insert($aOperProdTrainingOrientations);
