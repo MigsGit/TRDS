@@ -16,16 +16,13 @@ class CreateAOperProdTrainingOrientationsTable extends Migration
         Schema::create('a_oper_prod_training_orientations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('qc_slips_id')
-            ->nullable()
             ->constrained('qc_slips')
             ->cascadeOnDelete()->comment('reference from qc_slips_id');
-            $table->foreignId('traning_items')
-            ->nullable()
-            ->constrained('dropdown_master_details')
-            ->cascadeOnDelete()->comment('reference from dropdown_master_details_id');
+            $table->longText('traning_items')->comment('reference from dropdown_master_details_id');
             $table->string('defect_escalation')->nullable()->comment('1-Rule when to escalate | 2-Filling-up of forms');
             $table->string('production_abnormality')->nullable()->comment('1-Rule when to escalate | 2-Filling-up of forms');
-            $table->string('orientation_docs')->nullable();
+            $table->longText('engg_tq_orientation_docs')->nullable();
+            $table->longText('orientation_docs')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

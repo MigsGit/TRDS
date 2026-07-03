@@ -221,7 +221,7 @@
                                 <!-- **************************************************************      APRODTO          ************************************************************************************************* -->
 
                                 <div class="accordion" id="accordionExampleOper">
-                                    {{-- <div class="card APRODTO">
+                                     <div class="card APRODTO">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOneOper" aria-expanded="true" aria-controls="collapseOneOper">
                                             <h5>A. PRODUCTION SECTION (Training and Orientation)</h5>
@@ -448,7 +448,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="row mb-2">
+                                            {{-- <div class="row mb-2">
                                                 <div class="col-md-6"></div>
                                                 <div class="col-md-3">
                                                     <label class="" for="">Send Email Alert to:</label>
@@ -460,13 +460,13 @@
                                                     <select class="form-control select2bs4" style="width: 100%;" id="text_alert_prod_cc_sec" name="text_alert_prod_cc_sec" multiple></select>
 
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                             <!-- ------------------------------------------------ -->
 
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="card BENGGTQ">
+                                   {{-- <div class="card BENGGTQ">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoOper" aria-expanded="false" aria-controls="collapseTwoOper">
                                             <h5>ENGINEERING SECTION (Training and Qualification)</h5>
@@ -1268,7 +1268,7 @@
                                         </div>
                                         </div>
                                     </div>--}}
-                                    <div class="card">
+                                   {{-- <div class="card">
                                         <h2 class="accordion-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseSixOper" aria-expanded="false" aria-controls="collapseSixOper">
                                             <h5>VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
@@ -1444,7 +1444,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                     {{--<div class="card">
+                                     <div class="card">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSevenOper" aria-expanded="false" aria-controls="collapseSevenOper">
                                             <h5>QC Validation for Visual Operator</h5>
