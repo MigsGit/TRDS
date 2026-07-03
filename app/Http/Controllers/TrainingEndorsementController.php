@@ -211,8 +211,14 @@ class TrainingEndorsementController extends Controller
             'training_endorsement_employees.training_request_details_info',
             'training_endorsement_employees.training_request_details_info.employee_exam_details' => function($query) use ($tr_ctrl_no) {
                 $query->where('training_request_ctrl_no', $tr_ctrl_no);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
             },
-            'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info'
+            'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info'  => function($query) {
+                $query->where('exam_result_status', 1);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
+            }
         ])
         ->where('id', $request->id)
         ->first();
@@ -659,8 +665,14 @@ class TrainingEndorsementController extends Controller
             },
             'training_endorsement_employees.training_request_details_info.employee_exam_details' => function($query) use ($tr_ctrl_no) {
                 $query->where('training_request_ctrl_no', $tr_ctrl_no);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
             },
-            'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info'
+            'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info' => function($query) {
+                $query->where('exam_result_status', 1);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
+            }
         ])
         ->where('id', $request->id)
         ->first();
