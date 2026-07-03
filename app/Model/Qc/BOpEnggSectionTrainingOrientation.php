@@ -5,7 +5,7 @@ namespace App\Model\Qc;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OpEnggSectionTrainingOrientation extends Model
+class BOpEnggSectionTrainingOrientation extends Model
 {
     use HasFactory;
 }

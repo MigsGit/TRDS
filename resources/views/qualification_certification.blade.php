@@ -419,7 +419,7 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                              <label class="" for="">Mentored by:</label>
-                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_second_mentoredby_oper" name="text_second_mentoredby_oper"></select>
+                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_second_mentoredby_oper" name="text_second_mentoredby_oper" multiple></select>
                                                         </div>
                                                     </div>
 
@@ -466,7 +466,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                   {{-- <div class="card BENGGTQ">
+                                    <div class="card BENGGTQ">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoOper" aria-expanded="false" aria-controls="collapseTwoOper">
                                             <h5>ENGINEERING SECTION (Training and Qualification)</h5>
@@ -691,7 +691,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="card">
+                                     {{-- <div class="card">
                                         <h2 class="accordion-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
                                             <h5>QUALITY CONTROL SECTION (CERTIFICATTION)</h5>
@@ -1732,7 +1732,10 @@
                 let data = response[0];
                 console.log(data);
                 console.log(form.formSubmitOper);
-                
+                if(data.approval_status ==='BENGGTQ'){
+                    $('#collapseTwoOper').addClass('show');
+                    $('#collapseOneOper').removeClass('show');
+                }
                 form.formSubmitOper.find('#qc_slips_id').val(data.id);
                 form.formSubmitOper.find('#textconno_new_operator').val(data.control_no);
                 form.formSubmitOper.find('#select_section').val(data.section_category);
@@ -1899,6 +1902,7 @@
         ],4);
         initDropdownMasterDetailsByFkidCombos([
                 '#transfer_flexibility',
+                '#text_training_orientation_es_oper',
         ],4);
         const initGetSystemOneEmployeeDetailsCombos = (comboSelectors) => {
             comboSelectors.forEach(function(selector) {
@@ -1921,7 +1925,6 @@
             '#text_alert_prod_cc_sec',
             '#text_1st_qualifiedby_es_oper',
             '#text_2nd_qualifiedby_es_oper',
-            '#text_obs_first_result_es_oper',
             //D PPD
             '#text_1st_certified_prod_peqcs_oper',
             '#text_1st_certified_eng_peqcs_oper',
@@ -1936,6 +1939,8 @@
         ]);
         initSelectPassFail([
             '#text_oa_1st_result_es_oper',
+            '#text_obs_first_result_es_oper',
+            '#text_oa_2nd_result_es_oper',
         ])
     });
 

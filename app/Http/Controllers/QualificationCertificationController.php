@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\CommonController;
 use App\Http\Requests\AOperProdTrainingOrientationRequest;
+use App\Http\Requests\BOpEnggSectionTrainingOrientationRequest;
 use App\Http\Requests\QcSlipEmployeeRequest;
 use App\Http\Requests\QcSlipRequest;
 use App\Model\DropdownMaster;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\AOperProdTrainingOrientation;
+use App\Model\Qc\BOpEnggSectionTrainingOrientation;
 use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\Model\QcSlip;
@@ -255,7 +257,7 @@ class QualificationCertificationController extends Controller
                     ];
                     // DB::commit();
                     // AOperProdTrainingOrientation::insert($aOperProdTrainingOrientations);
-                    $aOperToApprovers =  [
+                    $operToApprovers =  [
                         "qc_slips_id" => $qcSlipId,
                         "approval_status" => $currentApprovalStatus, //BENGGTQ
                         'first_approver'  =>  implode(' | ', (array) $request->text_first_trainedby_oper),
@@ -274,10 +276,43 @@ class QualificationCertificationController extends Controller
                     ];
                 }
                 if($qcSlipDetails->approval_status === 'BENGGTQ'){
+                    $validatedData = app(BOpEnggSectionTrainingOrientationRequest::class)->validateResolved();
+                     $bEnggTqDetails =  [
+                        "qc_slips_id" => $qcSlipId,
+                        "traning_items"  =>  implode(' | ', $request->text_training_orientation_es_oper),//multiple DP
+                        "engg_orientation_docs"  =>  implode(' | ', $request->engg_orientation_docs),//multiple DP
+                        "obs_first_result_es_oper"=> $request->text_obs_first_result_es_oper,//PASSED
+                        "first_sample_es_oper"  =>  $request->text_first_sample_es_oper, //INT
+                        "first_ok_es_oper"  =>  $request->text_first_ok_es_oper,//INT
+                        "first_ng_es_oper"  =>  $request->text_first_ng_es_oper,//INT
+                        // "machine_abnormality"  =>  $request->machine_abnormality,//INT
 
+                        "obs_second_result_es_oper"=> $request->text_obs_second_result_es_oper,//PASSED
+                        "second_sample_es_oper"  =>  $request->text_second_sample_es_oper,//INT
+                        "second_ok_es_oper"  =>  $request->text_second_ok_es_oper,//INT
+                        "second_ng_es_oper"  =>  $request->text_second_ng_es_oper,//INT
+                    ];
+                    DB::commit();
+                    BOpEnggSectionTrainingOrientation::insert($bEnggTqDetails);
+                    $operToApprovers = [ //bEnggTrainingQualificationApprover
+                        "first_approver"  =>  implode(' | ', $request->text_1st_qualifiedby_es_oper),//R152 - 1trainedby
+                        "first_date"  =>  $request->text_qc_1st_date_es_oper,//date
+                        "first_time"  =>  $request->text_qc_1st_time_es_oper,//time
+                        "first_status"=> $request->text_oa_1st_result_es_oper,//PASSED
+                        "first_remarks"  =>  $request->text_1st_disqualification_es_oper,//remarks
+
+                        "second_approver"  =>  implode(' | ', $request->text_2nd_qualifiedby_es_oper),//R152 - 2trainedby
+                        "second_date"  =>  $request->text_qc_2nd_date_es_oper,//date
+                        "second_time"  =>  $request->text_qc_2nd_time_es_oper,//time
+                        "second_status"=> $request->text_oa_2nd_result_es_oper,//PASSED
+                        "second_remarks"  =>  $request->text_2nd_disqualification_es_oper,//INT
+                        "approval_status" => 'BENGGTQ'
+                    ];
                 }
             }
-            // OpApprover::insert($aOperToApprovers);
+            // DB::commit();
+            // OpApprover::insert($operToApprovers);
+            return;
             $emailParams = [
                 'qc_slips_id' => $qcSlipId,
                 'update_data'=> [
@@ -289,43 +324,10 @@ class QualificationCertificationController extends Controller
             $changeApprovalStatusParams = [
                 'approval_status'=> $currentApprovalStatus
             ];
-            // DB::commit();
             // return $this->saveFormSendEmail($emailParams); //put in the end of else
-          return  $this->changeApprovalStatus($changeApprovalStatusParams);
+            $this->changeApprovalStatus($changeApprovalStatusParams);
             //Change status into B
             //CHANGE STATUS BENGGTQ
-             $bEnggTqDetails =  [
-                "text_training_orientation_es_oper"  =>  implode(' | ', $request->text_training_orientation_es_oper),//multiple DP
-                "engg_orientation_docs"  =>  implode(' | ', $request->engg_orientation_docs),//multiple DP
-                "obs_first_result_es_oper"=> $request->text_obs_first_result_es_oper,//PASSED
-                "first_sample_es_oper"  =>  $request->text_first_sample_es_oper, //INT
-                "first_ok_es_oper"  =>  $request->text_first_ok_es_oper,//INT
-                "first_ng_es_oper"  =>  $request->text_first_ng_es_oper,//INT
-                "1st_disqualification_es_oper"  =>  $request->text_1st_disqualification_es_oper,//INT
-                "machine_abnormality"  =>  $request->machine_abnormality,//INT
-
-
-                "obs_second_result_es_oper"=> $request->text_obs_second_result_es_oper,//PASSED
-                "second_sample_es_oper"  =>  $request->text_second_sample_es_oper,//INT
-                "second_ok_es_oper"  =>  $request->text_second_ok_es_oper,//INT
-                "second_ng_es_oper"  =>  $request->text_second_ng_es_oper,//INT
-                "2nd_disqualification_es_oper"  =>  $request->text_2nd_disqualification_es_oper,//INT
-            ];
-            $bEnggTrainingQualificationApprover = [
-                "first_approver"  =>  implode(' | ', $request->text_1st_qualifiedby_es_oper),//R152 - 1trainedby
-                "first_date"  =>  $request->text_qc_1st_date_es_oper,//date
-                "first_time"  =>  $request->text_qc_1st_time_es_oper,//time
-                "first_status"=> $request->text_oa_1st_result_es_oper,//PASSED
-                'first_remarks'=> "",
-
-                "second_approver"  =>  implode(' | ', $request->text_2nd_qualifiedby_es_oper),//R152 - 2trainedby
-                "second_date"  =>  $request->text_qc_2nd_date_es_oper,//date
-                "second_time"  =>  $request->text_qc_2nd_time_es_oper,//time
-                "second_status"=> $request->text_oa_2nd_result_es_oper,//PASSED
-                'second_remarks'=> "",
-                "approval_status" => 'BENGGTQ'
-            ];
-
             // BEnggTrainingQualification::insert($bEnggTqApprovers);
             // OpApprover::insert($bEnggTrainingQualificationApprover);
             //Change status into C
@@ -443,8 +445,9 @@ class QualificationCertificationController extends Controller
                 DQCPPDONLY
             */
         }
+        // return $newStatus;
         QcSlip::where('id',$params->qcSlipsId)->update([
-            'status'=> $params->status
+            'status'=> $newStatus
         ]);
     }
     public function getDivDeptSec(Request $request){
