@@ -266,6 +266,10 @@
                 @endif
                 <span style="display:block; font-weight: bold;">
                     {{ $endorsement->created_by_user_details->name ?? '' }}
+                    <br>
+                    {{-- {{ $endorsement->created_by_user_details->employee_info->Position ?? '' }} --}}
+                    Trainer Inspector
+                    <br>
                 </span>
             </td>
             
@@ -279,6 +283,10 @@
                         @endif
                         <span style="display:block; font-weight: bold;">
                             {{ $checker->approver_details->name ?? '' }}
+                            <br>
+                            {{-- {{ $checker->approver_details->employee_info->Position ?? '' }} --}}
+                            QC Training Supervisor
+                            <br><br>
                         </span>
                     </div>
                 @endforeach
@@ -294,6 +302,16 @@
                         @endif
                         <span style="display:block; font-weight: bold;">
                             {{ $approver->approver_details->name ?? '' }}
+                            <br>
+                            {{-- {{ $approver->approver_details->employee_info->Position ?? '' }} --}}
+                             @if ($approver->approver_details->employee_number == 2055)
+                                TU Head
+                            @elseif ($approver->approver_details->employee_number == 'S022')
+                                General Manager
+                            @else
+                                {{ $approver->approver_details->employee_info->Position ?? '' }}
+                            @endif
+                            <br><br>
                         </span>
                     </div>
                 @endforeach

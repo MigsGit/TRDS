@@ -315,5 +315,4 @@ class TrainingAttendanceController extends Controller
             throw $e;
         }
     }
-
 }

@@ -269,6 +269,10 @@
                     <h5 class="modal-title">
                         <strong><center class="questionnaireTitle"></center></strong>
                     </h5>
+
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
 
                 <form method="post" id="formCreateUpdateQuestionnaireDetails" enctype="multipart/form-data">
@@ -360,6 +364,32 @@
             </div>
         </div>
     </div><!-- Create / Update Questionnaire Details Modal End -->
+
+    <!-- Change Questionnaire Details Status Modal End -->
+    <div class="modal fade" id="modalChangeQuestionnaireDetailsStatus">
+        <div class="modal-dialog">
+            <div class="modal-content modal-md">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="h4ChangeQuestionnaireDetailsStatusTitle"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" id="formChangeQuestionnaireDetailsStatus">
+                    @csrf
+                    <div class="modal-body">
+                    <label id="lblChangeQuestionnaireDetailsStatusLabel"></label>
+                    <input type="hidden" name="questionnaire_id" id="txtChangeQuestionnaireDetailsStatusId" placeholder="Questionnaire Id">
+                    <input type="hidden" name="status" id="txtChangeQuestionnaireDetailsStatus" placeholder="Status">
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <button type="submit" id="btnChangeQuestionnaireDetailsStatus" class="btn btn-dark"><i id="iBtnChangeQuestionnaireDetailsStatusIcon" class="fa fa-check"></i> Yes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><!-- Change Questionnaire Details Status Modal End -->
 @endsection
 
 @section('js_content')
@@ -375,6 +405,8 @@
         let getOptions = [];
         let getSelectedAnswers = [];
         let html = ''
+        let questionnaireDetailsStatus
+        let questionnaireDetailsId
 
         $(document).ready(function () {
             $('.select2bs5').select2({
@@ -396,6 +428,11 @@
                 $('#singleMultipleAnswer').empty();
                 $('#identificationEssay').empty();
                 $('#multipleGrid').empty();
+
+
+                getQuestions = [];
+                getOptions = [];
+                getSelectedAnswers = [];
             });
 
             // ===============================================================================================================================================
@@ -507,6 +544,7 @@
                 "processing": false,
                 "serverSide": true,
                 "responsive": true,
+                "order": [[ 3, "asc" ]],
                 "language": {
                     "info": "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
                     "lengthMenu": "Show _MENU_ Questionnaire Record",
@@ -826,6 +864,7 @@
                 $(`input[data-row=${row}]`).prop('checked', false);
                 $(this).prop('checked', true);
                 getSelectedAnswers[row] = column;
+
                 $('#gridAnswerHidden').val(JSON.stringify(getSelectedAnswers));
             });
 
@@ -850,6 +889,29 @@
                 e.preventDefault();
                 $('#fileAttachment').removeClass('d-none')
                 $('#txtAttachment').addClass('d-none')
+            });
+
+            $(document).on('click', '.actionChangeQuestionnaireDetailsStatus',function(e){
+                e.preventDefault();
+
+                questionnaireDetailsStatus = $(this).attr('status');
+                questionnaireDetailsId     = $(this).attr('questionnaire_detail-id');
+
+                $("#txtChangeQuestionnaireDetailsStatusId").val(questionnaireDetailsId);
+                $("#txtChangeQuestionnaireDetailsStatus").val(questionnaireDetailsStatus);
+
+                if(questionnaireDetailsStatus == 0){
+                    $("#lblChangeQuestionnaireDetailsStatusLabel").text('Are you sure to activate?');
+                    $("#h4ChangeQuestionnaireDetailsStatusTitle").html('<i class="fa fa-question-circle"></i> Activate Questionnaire Details');
+                }else{
+                    $("#lblChangeQuestionnaireDetailsStatusLabel").text('Are you sure to deactivate?');
+                    $("#h4ChangeQuestionnaireDetailsStatusTitle").html('<i class="fa fa-question-circle"></i> Deactivate Questionnaire Details');
+                }
+            });
+
+            $("#formChangeQuestionnaireDetailsStatus").submit(function(event){
+                event.preventDefault();
+                ChangeQuestionnaireDetailsStatus();
             });
         });
     </script>

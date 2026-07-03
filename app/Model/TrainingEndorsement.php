@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use App\Model\Hr\HrMemo;
+use App\Model\RapidXUser;
 use App\Model\TrainingEndorsementApprovals;
 use App\Model\TrainingRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,4 +31,5 @@ class TrainingEndorsement extends Model
     public function te_approval_details(){
         return $this->hasMany(TrainingEndorsementApprovals::class, 'training_endorsement_id', 'id');
     }
+    
 }

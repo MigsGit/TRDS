@@ -214,7 +214,6 @@
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        
                         <div>
                             <button type="button" id="btnExportEndorsement" class="btn btn-info" hidden><i class="fa fa-file-export"></i> Export</button>
                             <button type="button" id="btnSubmitEndorsement" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
@@ -249,7 +248,12 @@
                     </div>
                     <div class="form-group">
                         <label for="handsOnRemarks">Remarks</label>
-                        <textarea class="form-control" id="handsOnRemarks" name="hands_on_remarks" rows="3" placeholder="Enter remarks..."></textarea>
+                        {{-- <textarea class="form-control" id="handsOnRemarks" name="hands_on_remarks" rows="3" placeholder="Enter remarks..."></textarea> --}}
+                        <select name="hands_on_remarks" id="handsOnRemarks" class="form-control">
+                            <option value="" selected disabled>--Select--</option>
+                            <option value="Passed">Passed</option>
+                            <option value="Failed">Failed</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="handsOnImage">Select Image <small class="text-muted">(jpg, jpeg, png only)</small></label>

@@ -2,6 +2,7 @@
 
 namespace App\Model;
 
+use App\Model\RapidXUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
