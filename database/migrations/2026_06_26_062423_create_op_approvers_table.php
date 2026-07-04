@@ -20,10 +20,10 @@ class CreateOpApproversTable extends Migration
             ->cascadeOnDelete()->comment('reference from qc_slips_id');
             $table->string('approval_status')->default('PB')->default('PB-PreparedBy | APP-APPROVED | DIS-DISAPPROVED');
             $table->string('decision_status')->default('-')->comment('PEN-Pending | APP-APPROVED | DIS-DISAPPROVED');
-            $table->longText('first_approver');
+            $table->longText('first_approver')->nullable();
             $table->longText('first_approver_2')->nullable();
-            $table->longText('first_date');
-            $table->longText('first_time');
+            $table->longText('first_date')->nullable();
+            $table->longText('first_time')->nullable();
             $table->string('first_status')->default('-')->comment('PEN-Pending | PA-PASSED | FA-FAILED');
             $table->longText('first_remarks')->nullable();
             $table->longText('second_approver')->nullable();
@@ -31,10 +31,10 @@ class CreateOpApproversTable extends Migration
             $table->longText('second_date')->nullable();
             $table->longText('second_time')->nullable();
             $table->string('second_status')->default('-')->comment('PEN-Pending | PA-PASSED | FA-FAILED')->nullable();
-            $table->longText('second_remarks')->nullable();
-            $table->longText('alert_prod_sec')->nullable();
+            $table->longText('second_remarks');
+            $table->longText('alert_prod_sec');
             $table->longText('alert_prod_cc_sec')->nullable();
-            $table->softDeletes(); 
+            $table->softDeletes();
             $table->timestamps();
         });
     }

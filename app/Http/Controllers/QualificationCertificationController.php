@@ -29,12 +29,12 @@ class QualificationCertificationController extends Controller
     }
 
     public function getQcSlipsById(Request $request){
-      
+
         try {
             return $qcSlip = QcSlip::with('product_line','op_approvers')
             ->where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')
-            ->get();    
+            ->get();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             throw $e;
@@ -106,7 +106,7 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-    
+
     public function saveOperApprovers($params){
         try {
             OpApprover::insert($params);
@@ -122,16 +122,15 @@ class QualificationCertificationController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            $opApprover =  OpApprover::where('qc_slips_id',$params['qc_slips_id'])
-            ->where('approval_status',$params['approval_status'])
-            ->update($params['update_data']);
+            DB::commit();
+            $opApprover =  OpApprover::insert($params['update_data']);
             $emailParams = [
                 'qc_slips_id' => $params['qc_slips_id']
             ];
             $message = $this->commonController->emailMsg($emailParams);
             $from = 'issinfoservice@pricon.ph';
             $from_name = 'issinfoservice@pricon.ph';
-            $emailData = [
+            return  $emailData = [
                 // "to" =>$to,
                 "to" =>"mrronquez@pricon.ph",
                 "cc" =>"",
@@ -150,7 +149,6 @@ class QualificationCertificationController extends Controller
             ];
             //TODO: SEND email
 
-            DB::commit();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -188,7 +186,7 @@ class QualificationCertificationController extends Controller
                 'selectSection' => $select_section,
             ];
             $generateControlNumber = $this->generateControlNumber($params);
-         
+
             if(blank($qcSlipId) || $qcSlipId === ""){ //ADD
                 // QcSlipRequest $qcSlipRequest;
                 $validatedData = app(QcSlipRequest::class)->validateResolved();
@@ -228,7 +226,7 @@ class QualificationCertificationController extends Controller
 
                 //  return   QcSlipEmployee::insert($collectOperatorEmployees);
                 //STATUS PB
-                $currentApprovalStatus = 'PB';
+                $currentApprovalStatus = 'APRODTO';
                 $operPreparedByApprovers =  [
                     "qc_slips_id" => $qcSlipId,
                     "approval_status" => $currentApprovalStatus,
@@ -238,7 +236,7 @@ class QualificationCertificationController extends Controller
                     'first_status'=> 'PEN',
                 ];
 
-                //    return  $this->saveOperApprovers($operPreparedByApprovers);
+                return  $this->saveOperApprovers($operPreparedByApprovers);
             }
             if(filled($qcSlipId)){ //UPDATE
                 $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
@@ -276,6 +274,7 @@ class QualificationCertificationController extends Controller
                     ];
                 }
                 if($qcSlipDetails->approval_status === 'BENGGTQ'){
+                    $currentApprovalStatus = $qcSlipDetails->approval_status;
                     $validatedData = app(BOpEnggSectionTrainingOrientationRequest::class)->validateResolved();
                      $bEnggTqDetails =  [
                         "qc_slips_id" => $qcSlipId,
@@ -292,9 +291,10 @@ class QualificationCertificationController extends Controller
                         "second_ok_es_oper"  =>  $request->text_second_ok_es_oper,//INT
                         "second_ng_es_oper"  =>  $request->text_second_ng_es_oper,//INT
                     ];
-                    DB::commit();
-                    BOpEnggSectionTrainingOrientation::insert($bEnggTqDetails);
+                    // DB::commit();
+                    // BOpEnggSectionTrainingOrientation::insert($bEnggTqDetails);
                     $operToApprovers = [ //bEnggTrainingQualificationApprover
+                        "decision_status" => 'APP',
                         "first_approver"  =>  implode(' | ', $request->text_1st_qualifiedby_es_oper),//R152 - 1trainedby
                         "first_date"  =>  $request->text_qc_1st_date_es_oper,//date
                         "first_time"  =>  $request->text_qc_1st_time_es_oper,//time
@@ -306,26 +306,29 @@ class QualificationCertificationController extends Controller
                         "second_time"  =>  $request->text_qc_2nd_time_es_oper,//time
                         "second_status"=> $request->text_oa_2nd_result_es_oper,//PASSED
                         "second_remarks"  =>  $request->text_2nd_disqualification_es_oper,//INT
-                        "approval_status" => 'BENGGTQ'
                     ];
                 }
             }
-            // DB::commit();
-            // OpApprover::insert($operToApprovers);
-            return;
-            $emailParams = [
+            DB::commit();
+            $opApprover =  OpApprover::where('qc_slips_id',$qcSlipId)->where('approval_status',$currentApprovalStatus)->update($operToApprovers);
+
+            $changeApprovalStatusParams = [
+                'qcSlipsId' => $qcSlipId,
+                'approval_status'=> $currentApprovalStatus
+            ];
+            $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
+           return $emailParams = [
                 'qc_slips_id' => $qcSlipId,
                 'update_data'=> [
+                    'qc_slips_id' => $qcSlipId,
+                    'approval_status'=> $getNewStatus['newStatus'],
+                    // "decision_status" => $getNewStatus['newStatus'],
                     'alert_prod_sec' => implode(' | ',$request->text_alert_prod_sec),
                     'alert_prod_cc_sec' => implode(' | ',$request->text_alert_prod_cc_sec),
                 ],
                 'approval_status'=> $currentApprovalStatus,
             ];
-            $changeApprovalStatusParams = [
-                'approval_status'=> $currentApprovalStatus
-            ];
-            // return $this->saveFormSendEmail($emailParams); //put in the end of else
-            $this->changeApprovalStatus($changeApprovalStatusParams);
+            // return   $this->saveFormSendEmail($emailParams); //put in the end of else
             //Change status into B
             //CHANGE STATUS BENGGTQ
             // BEnggTrainingQualification::insert($bEnggTqApprovers);
@@ -437,7 +440,8 @@ class QualificationCertificationController extends Controller
                 $statusName = 'C Qc Certification';
                 break;
             default:
-                # code...
+                $newStatus = 'N/A';
+                $statusName = 'N/A';
                 break;
             /*
                 DPRDPPDONLY
@@ -446,9 +450,12 @@ class QualificationCertificationController extends Controller
             */
         }
         // return $newStatus;
-        QcSlip::where('id',$params->qcSlipsId)->update([
-            'status'=> $newStatus
+        QcSlip::where('id',$params['qcSlipsId'])->update([
+            'approval_status'=> $newStatus
         ]);
+        return [
+          "newStatus" => $newStatus
+        ];
     }
     public function getDivDeptSec(Request $request){
 
