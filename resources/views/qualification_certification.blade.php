@@ -469,7 +469,7 @@
                                     <div class="card BENGGTQ">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoOper" aria-expanded="false" aria-controls="collapseTwoOper">
-                                            <h5>ENGINEERING SECTION (Training and Qualification)</h5>
+                                            <h5>B. ENGINEERING SECTION (Training and Qualification)</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseTwoOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
@@ -691,7 +691,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                     {{-- <div class="card">
+                                    <div class="card">
                                         <h2 class="accordion-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
                                             <h5>QUALITY CONTROL SECTION (CERTIFICATTION)</h5>
@@ -921,20 +921,15 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Certified by:</label>
-                                                    <input class="form-control" type="text" id="text_1st_certifiedby_qcs_oper" name="text_1st_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_1st_certifiedby_qcs_oper_username" name="text_1st_certifiedby_qcs_oper_username">
-                                                    <input type="hidden" id="text_1st_certifiedby_qcs_oper_email" name="text_1st_certifiedby_qcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_1st_certifiedby_qcs_oper" id="text_1st_certifiedby_qcs_oper" multiple>
+                                                    </select>
+                                                    {{-- nmodify --}}
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Certified by:</label>
-                                                    <input class="form-control" type="text" id="text_2nd_certifiedby_qcs_oper" name="text_2nd_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_2nd_certifiedby_qcs_oper_username" name="text_2nd_certifiedby_qcs_oper_username">
-                                                    <input type="hidden" id="text_2nd_certifiedby_qcs_oper_email" name="text_2nd_certifiedby_qcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_certifiedby_qcs_oper" id="text_2nd_certifiedby_qcs_oper" multiple>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -976,7 +971,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="card">
+                                     {{-- <div class="card">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFourOper" aria-expanded="false" aria-controls="collapseFourOper">
                                             <h5>PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h5>
@@ -1732,8 +1727,14 @@
                 let data = response[0];
                 console.log(data);
                 console.log(form.formSubmitOper);
+
                 if(data.approval_status ==='BENGGTQ'){
                     $('#collapseTwoOper').addClass('show');
+                    $('#collapseOneOper').removeClass('show');
+                }
+                if(data.approval_status ==='CQCC'){
+                    $('#collapseThreeOper').addClass('show');
+                    $('#collapseTwoOper').removeClass('show');
                     $('#collapseOneOper').removeClass('show');
                 }
                 form.formSubmitOper.find('#qc_slips_id').val(data.id);

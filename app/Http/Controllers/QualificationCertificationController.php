@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Http\Controllers\CommonController;
 use App\Http\Requests\AOperProdTrainingOrientationRequest;
 use App\Http\Requests\BOpEnggSectionTrainingOrientationRequest;
@@ -10,6 +11,7 @@ use App\Http\Requests\QcSlipRequest;
 use App\Model\DropdownMaster;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\AOperProdTrainingOrientation;
+use App\Model\Qc\CQcCertification;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
 use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
@@ -278,8 +280,8 @@ class QualificationCertificationController extends Controller
                     $validatedData = app(BOpEnggSectionTrainingOrientationRequest::class)->validateResolved();
                      $bEnggTqDetails =  [
                         "qc_slips_id" => $qcSlipId,
-                        "traning_items"  =>  implode(' | ', $request->text_training_orientation_es_oper),//multiple DP
-                        "engg_orientation_docs"  =>  implode(' | ', $request->engg_orientation_docs),//multiple DP
+                        "traning_items"  => collect($request->text_training_orientation_es_oper)->join(' | '),
+                        "engg_orientation_docs"  => collect($request->engg_orientation_docs)->join(' | '),
                         "obs_first_result_es_oper"=> $request->text_obs_first_result_es_oper,//PASSED
                         "first_sample_es_oper"  =>  $request->text_first_sample_es_oper, //INT
                         "first_ok_es_oper"  =>  $request->text_first_ok_es_oper,//INT
@@ -295,29 +297,61 @@ class QualificationCertificationController extends Controller
                     // BOpEnggSectionTrainingOrientation::insert($bEnggTqDetails);
                     $operToApprovers = [ //bEnggTrainingQualificationApprover
                         "decision_status" => 'APP',
-                        "first_approver"  =>  implode(' | ', $request->text_1st_qualifiedby_es_oper),//R152 - 1trainedby
+                        "first_approver"  =>  collect($request->text_1st_qualifiedby_es_oper)->join(' | '),
                         "first_date"  =>  $request->text_qc_1st_date_es_oper,//date
                         "first_time"  =>  $request->text_qc_1st_time_es_oper,//time
                         "first_status"=> $request->text_oa_1st_result_es_oper,//PASSED
                         "first_remarks"  =>  $request->text_1st_disqualification_es_oper,//remarks
 
-                        "second_approver"  =>  implode(' | ', $request->text_2nd_qualifiedby_es_oper),//R152 - 2trainedby
+                        "second_approver"  => collect($request->text_2nd_qualifiedby_es_oper)->join(' | '),
                         "second_date"  =>  $request->text_qc_2nd_date_es_oper,//date
                         "second_time"  =>  $request->text_qc_2nd_time_es_oper,//time
                         "second_status"=> $request->text_oa_2nd_result_es_oper,//PASSED
                         "second_remarks"  =>  $request->text_2nd_disqualification_es_oper,//INT
                     ];
                 }
+                if($qcSlipDetails->approval_status === 'CQCC'){
+                    $cQcCertification = [
+                        "qc_slips_id" => $qcSlipId,
+                        "obs_first_result_qcs_oper" =>  $request->text_obs_first_result_qcs_oper, //PASSED
+                        "obs_second_result_qcs_oper" =>  $request->text_obs_second_result_qcs_oper, //PASSED
+                        "first_sample_qcs_oper" =>  $request->text_first_sample_qcs_oper, //1
+                        "second_sample_qcs_oper" =>  $request->text_second_sample_qcs_oper,//1
+                        "first_ok_qcs_oper" =>  $request->text_first_ok_qcs_oper,//1
+                        "first_ng_qcs_oper" =>  $request->text_first_ng_qcs_oper,//1
+                        "second_ok_qcs_oper" =>  $request->text_second_ok_qcs_oper,//1
+                        "second_ng_qcs_oper" =>  $request->text_second_ng_qcs_oper,//1
+                        'updated_by' => $rapidxEmpNo->rapidx_emp_no,//1
+                        "qcs_station_1st_oper"  =>  collect($request->text_qcs_station_1st_oper)->join(' | '),
+                        "qcs_station_2nd_oper"  =>  collect($request->text_qcs_station_2nd_oper)->join(' | '),
+                    ];
+                    // DB::commit();
+                    // CQcCertification::insert($cQcCertification);
+                   $operToApprovers = [
+                        "first_approver"  =>  collect($request->text_1st_certifiedby_qcs_oper)->join(' | '),
+                        "first_date" =>  $request->text_1st_date_qcs_oper,
+                        "first_time" =>  $request->text_1st_time_qcs_oper,
+                        "first_status" =>  $request->text_oa_1st_result_qcs_oper,
+                        "first_remarks" =>  $request->text_1st_disapproval_qcs_oper,
+                        "second_approver"  =>  collect($request->text_2nd_certifiedby_qcs_oper)->join(' | '),
+                        "second_date" =>  $request->text_2nd_date_qcs_oper,
+                        "second_time" =>  $request->text_2nd_time_qcs_oper,
+                        "second_status" =>  $request->text_oa_2nd_result_qcs_oper,
+                        "second_remarks" =>  $request->text_2nd_disapproval_qcs_oper,
+                    ];
+                }
             }
+            // return;
             DB::commit();
+            //=== Update the Operator Approvers based on the Current Status
             $opApprover =  OpApprover::where('qc_slips_id',$qcSlipId)->where('approval_status',$currentApprovalStatus)->update($operToApprovers);
-
+            //=== Update the Approval Status and Insert the new Approval Status and Emails to the Next Approvers
             $changeApprovalStatusParams = [
                 'qcSlipsId' => $qcSlipId,
                 'approval_status'=> $currentApprovalStatus
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
-           return $emailParams = [
+            $emailParams = [
                 'qc_slips_id' => $qcSlipId,
                 'update_data'=> [
                     'qc_slips_id' => $qcSlipId,
@@ -328,38 +362,12 @@ class QualificationCertificationController extends Controller
                 ],
                 'approval_status'=> $currentApprovalStatus,
             ];
-            // return   $this->saveFormSendEmail($emailParams); //put in the end of else
+            return   $this->saveFormSendEmail($emailParams); //put in the end of else
             //Change status into B
             //CHANGE STATUS BENGGTQ
             // BEnggTrainingQualification::insert($bEnggTqApprovers);
             // OpApprover::insert($bEnggTrainingQualificationApprover);
             //Change status into C
-
-            $cQcCertification = [
-                "text_obs_first_result_qcs_oper" =>  $request->text_obs_first_result_qcs_oper, //PASSED
-                "text_obs_second_result_qcs_oper" =>  $request->text_obs_second_result_qcs_oper, //PASSED
-                "text_first_sample_qcs_oper" =>  $request->text_first_sample_qcs_oper, //1
-                "text_second_sample_qcs_oper" =>  $request->text_second_sample_qcs_oper,//1
-                "text_first_ok_qcs_oper" =>  $request->text_first_ok_qcs_oper,//1
-                "text_first_ng_qcs_oper" =>  $request->text_first_ng_qcs_oper,//1
-                "text_second_ok_qcs_oper" =>  $request->text_second_ok_qcs_oper,//1
-                "text_second_ng_qcs_oper" =>  $request->text_second_ng_qcs_oper,//1
-                "text_qcs_station_1st_oper"  =>  implode(' | ', $request->text_qcs_station_1st_oper),//MULTIPLE
-                "text_qcs_station_2nd_oper"  =>  implode(' | ', $request->text_qcs_station_2nd_oper),//MULTIPLE
-            ];
-
-            $cQcCertificationApprover = [
-                "first_approver"  =>  implode(' | ', $request->text_1st_certifiedby_qcs_oper),//R152 - 2trainedby
-                "first_date" =>  $request->text_1st_date_qcs_oper,
-                "first_time" =>  $request->text_1st_time_qcs_oper,
-                "first_status" =>  $request->text_oa_1st_result_qcs_oper,
-                "first_remarks" =>  $request->text_1st_disapproval_qcs_oper,
-                "second_approver"  =>  implode(' | ', $request->text_2nd_certifiedby_qcs_oper),//R152 - 2trainedby
-                "second_date" =>  $request->text_2nd_date_qcs_oper,
-                "second_time" =>  $request->text_2nd_time_qcs_oper,
-                "second_status" =>  $request->text_oa_2nd_result_qcs_oper,
-                "second_remarks" =>  $request->text_2nd_disapproval_qcs_oper,
-            ];
 
         //Change status into D if the SECTION IS PPS ELSE go to E VALIDATION PROCESS
         //STATUS DPRDPPDONLY DENGGPPDONLY DQCPPDONLY
@@ -438,6 +446,10 @@ class QualificationCertificationController extends Controller
             case 'BENGGTQ':
                 $newStatus = 'CQCC';
                 $statusName = 'C Qc Certification';
+                break;
+            case 'CQCC':
+                $newStatus = 'EQCVP';
+                $statusName = 'EQcValidationProcess';
                 break;
             default:
                 $newStatus = 'N/A';
