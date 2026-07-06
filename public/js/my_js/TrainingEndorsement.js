@@ -114,6 +114,15 @@ $(document).on('click', '.btnViewEndorsement', function () {
                     var handsOnImage = '';
                     var statusHtml = '<span class="badge badge-success">Endorsed</span>';
 
+                    if(!emp.training_request_details_info || Object.keys(emp.training_request_details_info).length === 0){
+                        // toastr.error('No training request details found for this employee.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            html: 'No training request found for ' + (emp.emp_no || 'this employee') + '. <br> Please check training request.',
+                        });
+                        return;
+                    }
                     if (Array.isArray(emp.training_request_details_info.employee_exam_details) && emp.training_request_details_info.employee_exam_details.length > 0) {
                         ratings = emp.training_request_details_info.employee_exam_details.map(function(exam) {
                             return exam.exam_result_details_info && exam.exam_result_details_info.rating !== undefined && exam.exam_result_details_info.rating !== null
