@@ -691,10 +691,10 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="card">
-                                        <h2 class="accordion-header">
-                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
-                                            <h5>QUALITY CONTROL SECTION (CERTIFICATTION)</h5>
+                                    <div class="card C">
+                                        <h2 class="card-header">
+                                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
+                                            <h5>C. QUALITY CONTROL SECTION (CERTIFICATTION)</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseThreeOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
@@ -971,7 +971,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                     {{-- <div class="card">
+                                     {{-- <div class="card PPD">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFourOper" aria-expanded="false" aria-controls="collapseFourOper">
                                             <h5>PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h5>
@@ -1159,7 +1159,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                   <div class="card">
+                                   <div class="card ">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
                                             <h5>VALIDATION PROCESS: ENGINEERING SECTION</h5>
@@ -1263,10 +1263,10 @@
                                         </div>
                                         </div>
                                     </div>--}}
-                                   {{-- <div class="card">
-                                        <h2 class="accordion-header">
+                                   <div class="card EQCVP">
+                                        <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseSixOper" aria-expanded="false" aria-controls="collapseSixOper">
-                                            <h5>VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
+                                            <h5>E. VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseSixOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
@@ -1279,19 +1279,12 @@
 
                                             <div class="row">
                                                 <div class="col-md-1"></div>
-
                                                 <div class="col-md-4">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_vpqcs_oper_1" name="text_vpqcs_oper" value="Production Abnormality Control" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_vpqcs_oper_1" style="font-weight: normal;">Production Abnormality Control</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_vpqcs_oper_2" name="text_vpqcs_oper" value="Defect Escalation Procedure" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_vpqcs_oper_2" style="font-weight: normal;">Defect Escalation Procedure</label>
-                                                    </div>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_vpqcs_oper" id="text_vpqcs_oper">
+                                                        <option value="" selected disabled>Select</option>
+                                                        <option value="1">Production Abnormality Control</option>
+                                                        <option value="2">Defect Escalation Procedure</option>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -1320,20 +1313,14 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after 2nd day):</label>
-                                                    <input class="form-control" type="text" id="text_1st_validatedby_vpqcs_oper" name="text_1st_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_1st_validatedby_vpqcs_oper_username" name="text_1st_validatedby_vpqcs_oper_username">
-                                                    <input type="hidden" id="text_1st_validatedby_vpqcs_oper_email" name="text_1st_validatedby_vpqcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_1st_validatedby_vpqcs_oper[]" id="text_1st_validatedby_vpqcs_oper" multiple>
+                                                    </select>
                                                 </div>
 
-                                                <div class="col-md-6">
+                                                <div class="col-md-6 nmodify2">
                                                     <label class="" for="">Validated by (after re-orientation):</label>
-                                                    <input class="form-control" type="text" id="text_2nd_validatedby_vpqcs_oper" name="text_2nd_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_2nd_validatedby_vpqcs_oper_username" name="text_2nd_validatedby_vpqcs_oper_username">
-                                                    <input type="hidden" id="text_2nd_validatedby_vpqcs_oper_email" name="text_2nd_validatedby_vpqcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_validatedby_vpqcs_oper[]" id="text_2nd_validatedby_vpqcs_oper" multiple>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -1359,22 +1346,12 @@
                                             <!-- ************************************************************ 2ND SECTION VPQCS ******************************************************************* -->
 
                                             <hr style="height: 5px; background-color: black; border: none;">
-
-                                            <div class="row mt-3 mb-1">
-                                                <div class="col-md-4">
-                                                    <div class="form-check ms-5">
-                                                        <input class="form-check-input" type="checkbox" id="text_vpqcs_oper_1_1" name="text_vpqcs_oper_1" value="Pre-production samples and check sheet checking" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_vpqcs_oper_1_1" style="font-weight: normal;">Pre-production samples and check sheet checking</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4"></div>
-
                                                 <div class="col-md-4">
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_application_vpqcs_oper" id="text_application_vpqcs_oper">
                                                         <option value="" selected disabled>Select</option>
-                                                        <option value="Applicable">Applicable</option>
-                                                        <option value="Not Applicable">Not Applicable</option>
+                                                        <option value="1">Pre-production samples and check sheet checking</option>
+                                                        <option value="2">Applicable</option>
+                                                        <option value="3">Not Applicable</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1404,13 +1381,13 @@
                                             <div class="row mb-3 nmodify">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after 3rd day):</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_1st_validatedby_vpes_oper_2" id="text_1st_validatedby_vpes_oper_2" multiple>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_1st_validatedby_vpes_oper_2[]" id="text_1st_validatedby_vpes_oper_2" multiple>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after re-orientation):</label>
-                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_validatedby_vpes_oper_2" id="text_2nd_validatedby_vpes_oper_2" multiple>
+                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_validatedby_vpes_oper_2[]" id="text_2nd_validatedby_vpes_oper_2" multiple>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1439,14 +1416,14 @@
                                         </div>
                                         </div>
                                     </div>
-                                     <div class="card">
-                                        <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSevenOper" aria-expanded="false" aria-controls="collapseSevenOper">
-                                            <h5>QC Validation for Visual Operator</h5>
+                                    <div class="card FVVO">
+                                        <h2 class="card-header">
+                                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseSevenOper" aria-expanded="false" aria-controls="collapseSevenOper">
+                                            <h5>F. QC Validation for Visual Operator</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseSevenOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
-                                        <div class="accordion-body">
+                                        <div class="card-body">
 
                                             <!-- ------------------------------------------------ -->
 
@@ -1455,10 +1432,6 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label class="ms-4" for="">Reference Document</label>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label for="">Discuss the inspection sequence in detail.</label>
                                                 </div>
                                             </div>
 
@@ -1472,20 +1445,6 @@
 
                                                 <div class="col-md-3">
                                                     <input class="form-control" type="text" id="text_refdocno_input_qcvvo_oper" name="text_refdocno_input_qcvvo_oper" placeholder="Enter the reference document number">
-                                                </div>
-
-                                                <div class="col-md-1">
-                                                    <div class="form-check ms-5">
-                                                        <input class="form-check-input" type="checkbox" id="text_ins_seq_qcvvo_oper_yes" name="text_ins_seq_qcvvo_oper" value="Yes" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_ins_seq_qcvvo_oper_yes" style="font-weight: normal;">Yes</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check ms-5">
-                                                        <input class="form-check-input" type="checkbox" id="text_ins_seq_qcvvo_oper_no" name="text_ins_seq_qcvvo_oper" value="No" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_ins_seq_qcvvo_oper_no" style="font-weight: normal;">No</label>
-                                                    </div>
                                                 </div>
                                             </div>
 
@@ -1501,13 +1460,10 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="col-md-4">
+                                                <div class="col-md-4" nmodify6>
                                                     <label class="ms-3" for="">Validated by:</label>
-                                                    <input class="form-control" type="text" id="text_validated1_qcvvo_oper" name="text_validated1_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_validated1_qcvvo_oper_username" name="text_validated1_qcvvo_oper_username">
-                                                    <input type="hidden" id="text_validated1_qcvvo_oper_email" name="text_validated1_qcvvo_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_validated1_qcvvo_oper[]" id="text_validated1_qcvvo_oper" multiple>
+                                                    </select>
                                                 </div>
 
                                                 <div class="col-md-4">
@@ -1522,10 +1478,6 @@
                                                 <div class="col-md-6">
                                                     <label class="ms-4" for="">Reference Document</label>
                                                 </div>
-
-                                                <div class="col-md-6">
-                                                    <label for="">Discuss the inspection sequence in detail.</label>
-                                                </div>
                                             </div>
 
                                             <div class="row mb-3">
@@ -1538,20 +1490,6 @@
 
                                                 <div class="col-md-3">
                                                     <input class="form-control" type="text" id="text_refdocno_input_qcvvo_oper_2" name="text_refdocno_input_qcvvo_oper_2" placeholder="Enter the reference document number">
-                                                </div>
-
-                                                <div class="col-md-1">
-                                                    <div class="form-check ms-5">
-                                                        <input class="form-check-input" type="checkbox" id="text_ins_seq_qcvvo_oper_yes_2" name="text_ins_seq_qcvvo_oper_2" value="Yes" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_ins_seq_qcvvo_oper_yes_2" style="font-weight: normal;">Yes</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check ms-5">
-                                                        <input class="form-check-input" type="checkbox" id="text_ins_seq_qcvvo_oper_no_2" name="text_ins_seq_qcvvo_oper_2" value="No" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_ins_seq_qcvvo_oper_no_2" style="font-weight: normal;">No</label>
-                                                    </div>
                                                 </div>
                                             </div>
 
@@ -1567,13 +1505,10 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="col-md-4">
+                                                <div class="col-md-4 nmodify6">
                                                     <label class="ms-3" for="">Validated by:</label>
-                                                    <input class="form-control" type="text" id="text_validated2_qcvvo_oper" name="text_validated2_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_validated2_qcvvo_oper_username" name="text_validated2_qcvvo_oper_username">
-                                                    <input type="hidden" id="text_validated2_qcvvo_oper_email" name="text_validated2_qcvvo_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_validated2_qcvvo_oper[]" id="text_validated2_qcvvo_oper" multiple>
+                                                    </select>
                                                 </div>
 
                                                 <div class="col-md-4">
@@ -1622,7 +1557,7 @@
 
                                         </div>
                                         </div>
-                                    </div> --}}
+                                    </div> {{--  --}}
                                 </div>
 
                                 <hr style="height: 5px; background-color: black; border: none;">
@@ -1653,22 +1588,16 @@
 
                                 <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
 
-                                <div class="col-md-6">
+                                <div class="col-md-6 nmodify3">
                                     <label for="">Approved / Confirmed by:</label>
-                                    <input class="form-control" type="text" id="text_oper_approved_confirmed_by" name="text_oper_approved_confirmed_by" list="list_display_empno" placeholder="Select Approved / Confirmed by">
-                                    <datalist id="list_display_empno"></datalist>
-
+                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oper_approved_confirmed_by[]" id="text_oper_approved_confirmed_by" multiple>
+                                    </select>
                                     <label for="" class="mt-1">QC Supervisor</label>
-
-                                    <input type="hidden" id="text_oper_approved_confirmed_by_username" name="text_oper_approved_confirmed_by_username">
-                                    <input type="hidden" id="text_oper_approved_confirmed_by_email" name="text_oper_approved_confirmed_by_email">
                                 </div>
-
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
                                     <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
                                 </div>
-
                         </form>
 
                         </div>
@@ -1737,6 +1666,19 @@
                     $('#collapseTwoOper').removeClass('show');
                     $('#collapseOneOper').removeClass('show');
                 }
+                if(data.approval_status ==='EQCVP'){
+                    $('#collapseSixOper').addClass('show');
+                    $('#collapseThreeOper').removeClass('show');
+                    $('#collapseTwoOper').removeClass('show');
+                    $('#collapseOneOper').removeClass('show');
+                }
+                // if(data.approval_status ==='EQCVP'){
+                    $('#collapseSevenOper').addClass('show');
+                    $('#collapseSixOper').removeClass('show');
+                    $('#collapseThreeOper').removeClass('show');
+                    $('#collapseTwoOper').removeClass('show');
+                    $('#collapseOneOper').removeClass('show');
+                // }
                 form.formSubmitOper.find('#qc_slips_id').val(data.id);
                 form.formSubmitOper.find('#textconno_new_operator').val(data.control_no);
                 form.formSubmitOper.find('#select_section').val(data.section_category);
@@ -1934,8 +1876,15 @@
             '#text_2nd_certified_eng_peqcs_oper',
             '#text_2nd_certified_qc_peqcs_oper',
             //EQcValidationProcess
+            '#text_1st_validatedby_vpqcs_oper',
+            '#text_2nd_validatedby_vpqcs_oper',
             '#text_1st_validatedby_vpes_oper_2',
             '#text_2nd_validatedby_vpes_oper_2',
+            //F
+            '#text_validated1_qcvvo_oper',
+            '#text_validated2_qcvvo_oper',
+            //APPROVED BY
+            '#text_oper_approved_confirmed_by',
 
         ]);
         initSelectPassFail([

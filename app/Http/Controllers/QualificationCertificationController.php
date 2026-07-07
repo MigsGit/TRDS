@@ -6,13 +6,17 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\CommonController;
 use App\Http\Requests\AOperProdTrainingOrientationRequest;
 use App\Http\Requests\BOpEnggSectionTrainingOrientationRequest;
+use App\Http\Requests\CQcCertificationRequest;
+use App\Http\Requests\EQcValidationProcessRequest;
 use App\Http\Requests\QcSlipEmployeeRequest;
 use App\Http\Requests\QcSlipRequest;
 use App\Model\DropdownMaster;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\AOperProdTrainingOrientation;
-use App\Model\Qc\CQcCertification;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
+use App\Model\Qc\CQcCertification;
+use App\Model\Qc\EQcValidationProcess;
+use App\Model\Qc\FQcValidation;
 use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\Model\QcSlip;
@@ -258,8 +262,8 @@ class QualificationCertificationController extends Controller
                     // DB::commit();
                     // AOperProdTrainingOrientation::insert($aOperProdTrainingOrientations);
                     $operToApprovers =  [
-                        "qc_slips_id" => $qcSlipId,
-                        "approval_status" => $currentApprovalStatus, //BENGGTQ
+                        "decision_status" => 'APP',
+                        // "approval_status" => $currentApprovalStatus, //BENGGTQ
                         'first_approver'  =>  implode(' | ', (array) $request->text_first_trainedby_oper),
                         'first_approver_2'  => collect($request->text_first_mentoredby_oper)->join(' | '),
                         'first_date'=> $request->text_first_date_oper,
@@ -311,8 +315,10 @@ class QualificationCertificationController extends Controller
                     ];
                 }
                 if($qcSlipDetails->approval_status === 'CQCC'){
+                    $validatedData = app(CQcCertificationRequest::class)->validateResolved();
                     $cQcCertification = [
                         "qc_slips_id" => $qcSlipId,
+                        "decision_status" => 'APP',
                         "obs_first_result_qcs_oper" =>  $request->text_obs_first_result_qcs_oper, //PASSED
                         "obs_second_result_qcs_oper" =>  $request->text_obs_second_result_qcs_oper, //PASSED
                         "first_sample_qcs_oper" =>  $request->text_first_sample_qcs_oper, //1
@@ -328,6 +334,7 @@ class QualificationCertificationController extends Controller
                     // DB::commit();
                     // CQcCertification::insert($cQcCertification);
                    $operToApprovers = [
+                        "decision_status" => 'APP',
                         "first_approver"  =>  collect($request->text_1st_certifiedby_qcs_oper)->join(' | '),
                         "first_date" =>  $request->text_1st_date_qcs_oper,
                         "first_time" =>  $request->text_1st_time_qcs_oper,
@@ -340,8 +347,69 @@ class QualificationCertificationController extends Controller
                         "second_remarks" =>  $request->text_2nd_disapproval_qcs_oper,
                     ];
                 }
+                if($qcSlipDetails->approval_status ==='EQCVP'){
+                    // EQCVP- EQcValidationProcess
+                    // Change status into Go to PROCESS E
+                    // BUKOD Database
+                    $validatedData = app(EQcValidationProcessRequest::class)->validateResolved();
+                    $eQcValidationProcess = [
+                        "qc_slips_id" => $qcSlipId,
+                        "vpqcs_oper" => $request->text_vpqcs_oper,//CHECKBOX Production Abnormality Control | Defect Escalation Procedure
+                        "application_vpqcs_oper" =>  $request->text_application_vpqcs_oper, //MULTIPLE DROPDOWN Production Abnormality Control | Applicable | Not Applicable |
+                    ];
+                    // DB::commit();
+                    // EQcValidationProcess::insert($eQcValidationProcess);
+                    $operToApprovers =  [
+                        "decision_status" => 'APP',
+                        "first_status" =>  $request->text_first_result_vpqcs_oper,
+                        "first_approver"=>  collect($request->text_1st_validatedby_vpqcs_oper)->join(' | '), //R152 - 2trainedby
+                        "first_date" =>  $request->text_1st_date_vpqcs_oper,
+                        'first_time'=> "",
+                        //3rd day
+                        "first_status_2" =>  $request->text_first_result_vpes_oper_2, //PASSED
+                        "first_approver_2"=>  collect($request->text_1st_validatedby_vpes_oper_2)->join(' | '),//R152 - 2trainedby
+                        "first_date_2" =>  $request->text_1st_date_vpes_oper_2,
+                        "first_remarks" =>  $request->text_remarks_vpqcs_oper,
+
+
+                        "second_status" =>  $request->text_second_result_vpqcs_oper,
+                        "second_approver"=> collect($request->text_2nd_validatedby_vpqcs_oper)->join(' | '),
+                        "second_date" =>  $request->text_2nd_date_vpqcs_oper,
+                        "second_status_2" =>  $request->text_second_result_vpes_oper_2, //PASSED
+                        "second_approver_2"=> collect($request->text_2nd_validatedby_vpes_oper_2)->join(' | '),//R152 - 2trainedby
+                        "second_date_2" =>  $request->text_2nd_date_vpes_oper_2,
+                        'second_time'=> "",
+                        "second_remarks" =>  $request->text_remarks_vpes_oper_2,
+
+                    ];
+                }
+                if($qcSlipDetails->approval_status ==='FQCVVO'){
+                    $fQcValidationVisualOperator = [
+                        "qc_slips_id" => $qcSlipId,
+                        'refdocno_input_qcvvo_oper' => $request->text_refdocno_input_qcvvo_oper,
+                        'refdocno_input_qcvvo_oper_2' => $request->text_refdocno_input_qcvvo_oper_2,
+                    ];
+                    $operToApprovers = [
+                        "decision_status" => 'APP',
+                        "first_approver"  =>  collect($request->text_validated1_qcvvo_oper)->join(' | '),
+                        "first_date" =>  $request->text_date1_qcvvo_oper,
+                        "first_time" =>  "",
+                        "first_status" =>  $request->text_obs_first_result_es_oper,
+                        "first_remarks" =>  "",
+
+                        "second_approver"  =>  collect($request->text_validated2_qcvvo_oper)->join(' | '),
+                        "second_date" =>  $request->text_date2_qcvvo_oper,
+                        "second_time" =>  "",
+                        "second_status" =>  $request->text_oa_2nd_result_es_oper,
+                        "second_remarks" =>  "",
+                    ];
+                    DB::commit();
+                    FQcValidation::insert($fQcValidationVisualOperator);
+                }
             }
-            // return;
+        
+            return $request->all();
+            // return $request->all();
             DB::commit();
             //=== Update the Operator Approvers based on the Current Status
             $opApprover =  OpApprover::where('qc_slips_id',$qcSlipId)->where('approval_status',$currentApprovalStatus)->update($operToApprovers);
@@ -362,16 +430,23 @@ class QualificationCertificationController extends Controller
                 ],
                 'approval_status'=> $currentApprovalStatus,
             ];
-            return   $this->saveFormSendEmail($emailParams); //put in the end of else
-            //Change status into B
-            //CHANGE STATUS BENGGTQ
-            // BEnggTrainingQualification::insert($bEnggTqApprovers);
-            // OpApprover::insert($bEnggTrainingQualificationApprover);
-            //Change status into C
 
-        //Change status into D if the SECTION IS PPS ELSE go to E VALIDATION PROCESS
+            if($qcSlipDetails->approval_status != 'QCAPP'){ // EMAIL TO NEXT CREATED BY
+                return   $this->saveFormSendEmail($emailParams); //put in the end of else
+            } //ADD ELSE TO EMAIL TO CREATED BY
+            //Change status into B
+            return 'DONE';
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+
+    public function dPpdProcessOnly($request){
+         //Change status into D if the SECTION IS PPS ELSE go to E VALIDATION PROCESS
         //STATUS DPRDPPDONLY DENGGPPDONLY DQCPPDONLY
-        $cQcCertificationApprover = [
+       return $dPpdCertificationCompletionApprover = [
             "1st_certified_prod_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_prod_peqcs_oper),//R152 - 2trainedby
             "1st_certified_eng_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_eng_peqcs_oper),//R152 - 2trainedby
             "1st_certified_qc_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_qc_peqcs_oper),//R152 - 2trainedby
@@ -389,9 +464,8 @@ class QualificationCertificationController extends Controller
             "second_remarks" =>  $request->text_2nd_disapproval_peqcs_oper,
             'd_alert_prod_sec'=> $request->d_text_alert_prod_sec,
             'd_alert_prod_cc_sec'=> $request->d_text_alert_prod_cc_sec,
-
         ];
-        return $dPpdCertificationCompletion =  [
+        $dPpdCertificationCompletion =  [
            "lot_1st_sample_peqcs_oper"=>  $request->text_lot_1st_sample_peqcs_oper, //INT
            "1st_injected_ng_peqcs_oper"=>  $request->text_1st_injected_ng_peqcs_oper, //INT
            "1st_detected_ng_peqcs_oper"=>  $request->text_1st_detected_ng_peqcs_oper, //INT
@@ -399,36 +473,41 @@ class QualificationCertificationController extends Controller
            "2nd_injected_ng_peqcs_oper"=>  $request->text_2nd_injected_ng_peqcs_oper, //INT
            "2nd_detected_ng_peqcs_oper"=>  $request->text_2nd_detected_ng_peqcs_oper, //INT
         ];
-        // EQCVP- EQcValidationProcess
-        // Change status into Go to PROCESS E
-        // BUKOD Database
-        return $dPpdCertificationCompletion =  [
-            //2nd day
-            "vpqcs_oper" => $request->text_vpqcs_oper,
-            "first_status" =>  $request->text_first_result_vpqcs_oper,//PASSED
-            "first_approver"=> implode(' | ', $request->text_1st_validatedby_vpqcs_oper),//R152 - 2trainedby
-            "first_date" =>  $request->text_1st_date_vpqcs_oper,
 
-            "second_status" =>  $request->text_second_result_vpqcs_oper,
-            "text_2nd_validatedby_vpqcs_oper"=> implode(' | ', $request->text_2nd_validatedby_vpqcs_oper),//R152 - 2trainedby
-            "second_date" =>  $request->text_2nd_date_vpqcs_oper,
-            "first_remarks" =>  $request->text_remarks_vpqcs_oper,
-
-            //3rd day
-            "text_vpqcs_oper_1_1" =>  $request->text_vpqcs_oper_1_1, //CHECKBOX
-            "first_status_2" =>  $request->text_first_result_vpes_oper_2, //PASSED
-            "first_approver_2"=> implode(' | ', $request->text_1st_validatedby_vpes_oper_2),//R152 - 2trainedby
-            "first_date_2" =>  $request->text_1st_date_vpes_oper_2,
-            "text_application_vpqcs_oper" =>  $request->text_application_vpqcs_oper, //DROPDOWN
-            "second_status_2" =>  $request->text_second_result_vpes_oper_2, //PASSED
-            "second_approver_2"=> implode(' | ', $request->text_2nd_validatedby_vpes_oper_2),//R152 - 2trainedby
-            "second_date_2" =>  $request->text_2nd_date_vpes_oper_2,
-            "text_remarks_vpes_oper_2" =>  $request->text_remarks_vpes_oper_2,
-        ];
-
+        try {
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
-            DB::rollback();
+            throw $e;
+        }
+    }
+
+    public function index(Request $request){
+        return $eQcValidationProcess =  [
+                        //2nd day
+                        "vpqcs_oper" => $request->text_vpqcs_oper, //CHECKBOX
+                        "first_status" =>  $request->text_first_result_vpqcs_oper,//PASSED
+                        "first_approver"=>  collect($request->text_1st_validatedby_vpqcs_oper)->join(' | '), //R152 - 2trainedby
+                        "first_date" =>  $request->text_1st_date_vpqcs_oper,
+
+                        "second_status" =>  $request->text_second_result_vpqcs_oper,
+                        "text_2nd_validatedby_vpqcs_oper"=> collect($request->text_2nd_validatedby_vpqcs_oper)->join(' | '),//R152 - 2trainedby
+                        "second_date" =>  $request->text_2nd_date_vpqcs_oper,
+                        "first_remarks" =>  $request->text_remarks_vpqcs_oper,
+
+                        //3rd day
+                        "text_vpqcs_oper_1_1" =>  $request->text_vpqcs_oper_1_1, //CHECKBOX
+                        "first_status_2" =>  $request->text_first_result_vpes_oper_2, //PASSED
+                        "first_approver_2"=>  collect($request->text_1st_validatedby_vpes_oper_2)->join(' | '),//R152 - 2trainedby
+                        "first_date_2" =>  $request->text_1st_date_vpes_oper_2,
+                        "text_application_vpqcs_oper" =>  $request->text_application_vpqcs_oper, //DROPDOWN
+                        "second_status_2" =>  $request->text_second_result_vpes_oper_2, //PASSED
+                        "second_approver_2"=> collect($request->text_2nd_validatedby_vpes_oper_2)->join(' | '),//R152 - 2trainedby
+                        "second_date_2" =>  $request->text_2nd_date_vpes_oper_2,
+                        "text_remarks_vpes_oper_2" =>  $request->text_remarks_vpes_oper_2,
+                    ];
+        try {
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
             throw $e;
         }
     }
@@ -449,8 +528,20 @@ class QualificationCertificationController extends Controller
                 break;
             case 'CQCC':
                 $newStatus = 'EQCVP';
-                $statusName = 'EQcValidationProcess';
+                $statusName = 'E Qc Validation Process';
                 break;
+            case 'EQCVP':
+                $newStatus = 'FQCVVO';
+                $statusName = 'F Qc Validation Visual Operator';
+                break;
+            case 'FQCVVO':
+                $newStatus = 'QCAPP'; //QC Supervisor Appoval
+                $statusName = 'CLOSED';
+                break;
+            // case 'FQCVVO':
+            //     $newStatus = 'OK';
+            //     $statusName = 'CLOSED';
+            //     break;
             default:
                 $newStatus = 'N/A';
                 $statusName = 'N/A';
