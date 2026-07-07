@@ -744,7 +744,7 @@ class TrainingEndorsementController extends Controller
                 $rating = round($percentage) . '%';
 
                 $exams[] = [
-                    'title'  => "Mag Plate Measurement",
+                    'title'  => "MAG PLATE MEASUREMENT",
                     'score'  => $emp->hands_on_rating ?? '',
                     'rating' => $rating ?? '0%',
                     'remark' => $emp->hands_on_remarks ?? '',
