@@ -419,22 +419,33 @@ class QualificationCertificationController extends Controller
                 'approval_status'=> $currentApprovalStatus
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
-            $emailParams = [
-                'qc_slips_id' => $qcSlipId,
-                'update_data'=> [
-                    'qc_slips_id' => $qcSlipId,
-                    'approval_status'=> $getNewStatus['newStatus'],
-                    // "decision_status" => $getNewStatus['newStatus'],
-                    'alert_prod_sec' => implode(' | ',$request->text_alert_prod_sec),
-                    'alert_prod_cc_sec' => implode(' | ',$request->text_alert_prod_cc_sec),
-                ],
-                'approval_status'=> $currentApprovalStatus,
-            ];
+           
 
-            if($qcSlipDetails->approval_status != 'QCAPP'){ // EMAIL TO NEXT CREATED BY
-                return   $this->saveFormSendEmail($emailParams); //put in the end of else
-            } //ADD ELSE TO EMAIL TO CREATED BY
-            //Change status into B
+            if($qcSlipDetails->approval_status === 'QCAPP'){
+                $emailParams = [
+                    'qc_slips_id' => $qcSlipId,
+                    'update_data'=> [
+                        'qc_slips_id' => $qcSlipId,
+                        'approval_status'=> $getNewStatus['newStatus'],
+                        'first_approver' => collect($request->oper_approved_confirmed_by)->join(' | '),
+                    ],
+                    'approval_status'=> $currentApprovalStatus,
+                ];
+            }else{
+                $emailParams = [
+                    'qc_slips_id' => $qcSlipId,
+                    'update_data'=> [
+                        'qc_slips_id' => $qcSlipId,
+                        'approval_status'=> $getNewStatus['newStatus'],
+                        // "decision_status" => $getNewStatus['newStatus'],
+                        'alert_prod_sec' => collect($request->text_alert_prod_sec)->join(' | '),
+                        'alert_prod_cc_sec' => collect($request->text_alert_prod_cc_sec)->join(' | '),
+                    ],
+                    'approval_status'=> $currentApprovalStatus,
+                ];
+            }
+            return   $this->saveFormSendEmail($emailParams);
+            //ADD ELSE TO QC Supervisor Approval for OPERATOR
             return 'DONE';
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
