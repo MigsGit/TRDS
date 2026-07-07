@@ -758,7 +758,7 @@ class TrainingEndorsementController extends Controller
                     'name'                => $detail->name ?? '',
                     'position'            => $posDeptSec,
                     'exams'               => $exams,
-                    'immediate_superior'  => $data->training_request_details->section_head_user->name ?? '',
+                    'immediate_superior'  => $data->training_request_details->requestor->name ?? '',
                     'remarks'             => $emp->will_not_endorse_remarks ?? '',
                 ];
             }
@@ -770,7 +770,7 @@ class TrainingEndorsementController extends Controller
                     'name'                => $detail->name ?? '',
                     'position'            => $posDeptSec,
                     'exams'               => $exams,
-                    'immediate_superior'  => $data->training_request_details->section_head_user->name ?? '',
+                    'immediate_superior'  => $data->training_request_details->requestor->name ?? '',
                     'attachment'          => $emp->hands_on_filename ? asset('public/storage/hands_on_attachments/' . $emp->id . '.' . $emp->hands_on_filename_ext) : '',
                 ];
             }
