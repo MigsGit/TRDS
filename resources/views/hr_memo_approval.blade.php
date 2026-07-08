@@ -73,10 +73,12 @@
                                             <tr>
                                                 <th style="width: 10%;">Action</th>
                                                 <th style="width: 10%;">Status</th>
-                                                <th style="width: 20%;" class="text-center">Document No.</th>
-                                                <th style="width: 20%;" class="text-center">Date Filed</th>
-                                                <th style="width: 20%;"  class="text-center">Reason</th>
-                                                <th style="width: 20%;" class="text-center">Subject</th>
+                                                <th style="width: 15%;" class="text-center">Document No.</th>
+                                                <th style="width: 10%;" class="text-center">Date Filed</th>
+                                                <th style="width: 10%;" class="text-center">Reason</th>
+                                                <th style="width: 15%;" class="text-center">Subject</th>
+                                                <th style="width: 15%;" class="text-center">Prepared By</th>
+                                                <th style="width: 15%;" class="text-center">Received By</th>
                                             </tr>
                                         </thead>
                                     </table>
