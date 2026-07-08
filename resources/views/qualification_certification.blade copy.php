@@ -1448,11 +1448,14 @@
                                                     <input class="form-control" type="text" id="text_refdocno_input_qcvvo_oper" name="text_refdocno_input_qcvvo_oper" placeholder="Enter the reference document number">
                                                 </div>
                                             </div>
+
+
                                             <div class="row mb-5">
                                                 <div class="table-responsive mt-3 mb-5">
                                                     <table id="tbl_fvi_operator" class="table table-bordered table-hover nowrap">
                                                         <thead class="table-primary">
                                                             <tr>
+                                                                <th>Action</th>
                                                                 <th>Employee No.</th>
                                                                 <th>Employee Name</th>
                                                                 <th>Discuss the Inspection Sequence in Details</th>
@@ -1504,24 +1507,8 @@
                                                     <input class="form-control" type="text" id="text_refdocno_input_qcvvo_oper_2" name="text_refdocno_input_qcvvo_oper_2" placeholder="Enter the reference document number">
                                                 </div>
                                             </div>
-                                            <div class="row mb-5">
-                                                <div class="table-responsive mt-3 mb-5">
-                                                    <table id="tbl_fvi_operator_2" class="table table-bordered table-hover nowrap">
-                                                        <thead class="table-primary">
-                                                            <tr>
-                                                                <th>Employee No.</th>
-                                                                <th>Employee Name</th>
-                                                                <th>Discuss the Inspection Sequence in Details</th>
-                                                                <th>Assessment Result</th>
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
                                             <div class="row mb-4">
+
                                                 <div class="col-md-4 nmodify6">
                                                     <label class="ms-3" for="">Validated by:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_validated2_qcvvo_oper[]" id="text_validated2_qcvvo_oper" multiple>
@@ -1606,19 +1593,113 @@
 @section('js_content')
     <script type="text/javascript">
 
+    /**
+     * Sanitize a value before inserting into the DOM to prevent XSS.
+     */
+    function escapeHtml(str) {
+        if (str == null) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    /**
+     * Populate #tbl_fvi_operator tbody from the AJAX success response.
+     * Expected shape: [{ id, employee_no, emp_name }, ...]
+     */
+    function populateFviTable(qcSlipEmployeeData) {
+        var $tbody = $('#tbl_fvi_operator tbody');
+        $tbody.empty();
+
+        if (!qcSlipEmployeeData || qcSlipEmployeeData.length === 0) {
+            $tbody.append('<tr><td colspan="5" class="text-center text-muted">No employees found.</td></tr>');
+            return;
+        }
+
+        $.each(qcSlipEmployeeData, function (index, item) {
+            var id    = parseInt(item.id, 10);
+            var empNo = escapeHtml(item.employee_no);
+            var empName = escapeHtml(item.emp_name || '');
+
+            var $row = $('<tr>').attr('data-fvi-id', id);
+
+            // Col 1 – Action: delete button + hidden id
+            var $actionCell = $('<td>')
+                .append(
+                    $('<input>').attr({ type: 'hidden', name: 'fvi_ids[]', value: id }),
+                   
+                );
+
+            // Col 2 – Employee No. + hidden field for form submission
+            var $empNoCell = $('<td>')
+                .text(empNo)
+                .append(
+                    $('<input>').attr({ type: 'hidden', name: 'fvi_employee_nos[' + id + ']', value: empNo })
+                );
+
+            // Col 3 – Employee Name (display only)
+            var $empNameCell = $('<td>').text(empName);
+
+            // Col 4 – Inspection Sequence dropdown
+            var $sequenceCell = $('<td>').append(
+                $('<select>')
+                    .attr('name', 'sequence_details[' + id + ']')
+                    .addClass('form-control form-control-sm')
+                    .append(
+                        $('<option>').attr({ value: '', disabled: true, selected: true }).text('-- Select --'),
+                        $('<option>').val('Yes').text('Yes'),
+                        $('<option>').val('No').text('No')
+                    )
+            );
+
+            // Col 5 – Assessment Result dropdown
+            var $assessmentCell = $('<td>').append(
+                $('<select>')
+                    .attr('name', 'assessment_results[' + id + ']')
+                    .addClass('form-control form-control-sm')
+                    .append(
+                        $('<option>').attr({ value: '', disabled: true, selected: true }).text('-- Select --'),
+                        $('<option>').val('Pass').text('Pass'),
+                        $('<option>').val('Fail').text('Fail')
+                    )
+            );
+
+            $row.append($actionCell, $empNoCell, $empNameCell, $sequenceCell, $assessmentCell);
+            $tbody.append($row);
+        });
+    }
+
+    /**
+     * Extract the current state of #tbl_fvi_operator as a plain array
+     * so it can be attached to the AJAX payload.
+     */
+    function getFviTableData() {
+        var rows = [];
+        $('#tbl_fvi_operator tbody tr[data-fvi-id]').each(function () {
+            var $row = $(this);
+            var id   = $row.attr('data-fvi-id');
+            rows.push({
+                id              : id,
+                employee_no     : $row.find('input[name="fvi_employee_nos[' + id + ']"]').val(),
+                sequence_detail : $row.find('select[name="sequence_details[' + id + ']"]').val(),
+                assessment_result: $row.find('select[name="assessment_results[' + id + ']"]').val()
+            });
+        });
+        return rows;
+    }
+
     $(document).ready(function () {
         form = {
             formSubmitOper: $('#formSubmitOper'),
         };
         dataTable = {
             operator: '',
-            fvi_operator: '',
-            tbl_fvi_operator_2: '',
         };
         table = {
            operator: '#tbl_operator',
-           fvi_operator: '#tbl_fvi_operator',
-           tbl_fvi_operator_2: '#tbl_fvi_operator_2',
         };
         dataTable.operator = $(table.operator).DataTable({
             "processing" : true,
@@ -1626,7 +1707,7 @@
             "ajax" : {
                 url: "load_qc_slip", //Rapid Ts Warehouse Packaging
                 data: function (param){
-                    // param.qcSlipsId = $('#qc_slips_id').val();;
+                    // param.categoryMaterial = globalVar.categoryMaterialPackaging;
                 },
             },
             fixedHeader: true,
@@ -1642,109 +1723,7 @@
                 { "data" : "created_at" },
             ],
         });
-        dataTable.fvi_operator = $(table.fvi_operator).DataTable({
-            "processing" : true,
-            "serverSide" : true,
-            "ajax" : {
-                url: "load1st_qc_validation", //Rapid Ts Warehouse Packaging
-                // data: function (param){
-                //     param.qcSlipsId = $('#qc_slips_id').val();
-                // },
-            },
-            fixedHeader: true,
-            "columns":[
-                { "data" : "employee_no" },
-                { "data" : "employee_name" },
-                { "data" : "first_take_ins_sequence","name":"first_take_ins_sequence",orderable: false, searchable: false  },
-                { "data" : "first_take_ins_assessment_result","name":"first_take_ins_assessment_result", orderable: false, searchable: false  },
-            ],
-        });
-        dataTable.tbl_fvi_operator_2 = $(table.tbl_fvi_operator_2).DataTable({
-            "processing" : true,
-            "serverSide" : true,
-            "ajax" : {
-                url: "load2nd_qc_validation", //Rapid Ts Warehouse Packaging
-                // data: function (param){
-                //     param.qcSlipsId = $('#qc_slips_id').val();
-                // },
-            },
-            fixedHeader: true,
-            "columns":[
-                { "data" : "employee_no" },
-                { "data" : "employee_name" },
-                { "data" : "second_take_ins_sequence","name":"second_take_ins_sequence",orderable: false, searchable: false  },
-                { "data" : "second_take_ins_assessment_result","name":"second_take_ins_assessment_result", orderable: false, searchable: false  },
-            ],
-        });
-        
-        const saveFirstTakeInsSequence = (params) =>{
-            let data = {
-                qcSlipsId : params.qcSlipsId,
-                qcSlipEmployeesId : params.QcSlipEmployeesId,
-                category : params.category,
-                value : params.value,
-            }
-            call_ajax_serialize(data, {}, 'save_first_take_ins_sequence', function (response) {
-                if (response && response.is_success === 'true') {
-                    // dataTable.fvi_operator.ajax.reload(null, false);
-                } else {
-                    // alert((response && response.message) ? response.message : 'Failed to save. Please try again.');
-                }
-            });
-        }
-        $(document).on('change', '.first_take_ins_sequence',function (e) {
-            let qcSlipsIdData = $(this).attr('qc-slips-id');
-            let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
-            let valueData = $(this).val();
-            let categoryData = 'firstTakeInsSequence';
-            let params = {
-                qcSlipsId : qcSlipsIdData,
-                value : valueData,
-                QcSlipEmployeesId : QcSlipEmployeesIdData,
-                category : categoryData,
-            }
-            saveFirstTakeInsSequence(params);
-        })
-        $(document).on('change', '.first_take_ins_assessment_result',function (e) {
-            let qcSlipsIdData = $(this).attr('qc-slips-id');
-            let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
-            let valueData = $(this).val();
-            let categoryData = 'firstTakeInsAssessmentResult';
-            let params = {
-                qcSlipsId : qcSlipsIdData,
-                value : valueData,
-                QcSlipEmployeesId : QcSlipEmployeesIdData,
-                category : categoryData,
-            }
-            saveFirstTakeInsSequence(params);
 
-        })
-        $(document).on('change', '.second_take_ins_sequence',function (e) {
-            let qcSlipsIdData = $(this).attr('qc-slips-id');
-            let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
-            let valueData = $(this).val();
-            let categoryData = 'secondTakeInsSequence';
-            let params = {
-                qcSlipsId : qcSlipsIdData,
-                value : valueData,
-                QcSlipEmployeesId : QcSlipEmployeesIdData,
-                category : categoryData,
-            }
-            saveFirstTakeInsSequence(params);
-        })
-        $(document).on('change', '.second_take_ins_assessment_result',function (e) {
-            let qcSlipsIdData = $(this).attr('qc-slips-id');
-            let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
-            let valueData = $(this).val();
-            let categoryData = 'secondTakeInsAssessmentResult';
-            let params = {
-                qcSlipsId : qcSlipsIdData,
-                value : valueData,
-                QcSlipEmployeesId : QcSlipEmployeesIdData,
-                category : categoryData,
-            }
-            saveFirstTakeInsSequence(params);
-        })
         const getQcSlipsById  = (params) => {
             let data = {
                 qcSlipsId :  params.qcSlipsId
@@ -1752,11 +1731,10 @@
             call_ajax(data, 'get_qc_slips_by_id', function(response){
                 let data = response.qcSlip[0];
                 let qcSlipEmployeeData = response.qcSlipEmployee;
+                console.log(data);
+                console.log('qcSlipEmployeeData',qcSlipEmployeeData);
 
-                dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
-                dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
-                // dataTable.fvi_operator.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
-
+                populateFviTable(qcSlipEmployeeData);
 
                 if(data.approval_status ==='BENGGTQ'){
                     $('#collapseTwoOper').addClass('show');
@@ -1780,7 +1758,7 @@
                     $('#collapseTwoOper').removeClass('show');
                     $('#collapseOneOper').removeClass('show');
                 // }
-                form.formSubmitOper.find('#qc_slips_id').val(data.id);
+                // form.formSubmitOper.find('#qc_slips_id').val(data.id);
                 form.formSubmitOper.find('#textconno_new_operator').val(data.control_no);
                 form.formSubmitOper.find('#select_section').val(data.section_category);
                 form.formSubmitOper.find('#text_select_position').val(data.position_category);
@@ -1816,7 +1794,7 @@
             const hasValue = valuesArray.some(val => targetIDs.includes(val.trim()));
 
             $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
-        });
+         });
         $(document).on('change', '#text_training_orientation_ps_oper',function (e) {
             e.preventDefault();
             // 1. Grab the value (fallback to empty string if null/undefined)
@@ -1923,6 +1901,7 @@
                 }
             });
         });
+
 
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper');

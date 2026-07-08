@@ -28,20 +28,184 @@ use Illuminate\Support\Facades\DB;
 
 class QualificationCertificationController extends Controller
 {
-
     protected $commonController;
     public function __construct(CommonController $commonController){
         $this->commonController = $commonController;
     }
 
+    public function saveFirstTakeInsSequence(Request $request){
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            if($request->category === "firstTakeInsSequence"){
+                $arrData = [
+                    'first_take_ins_sequence' => $request->value,
+                ];
+            }
+            if($request->category === "firstTakeInsAssessmentResult"){
+                $arrData = [
+                    'first_take_ins_assessment_result' => $request->value,
+                ];
+            }
+            if($request->category === "secondTakeInsSequence"){
+                $arrData = [
+                    'second_take_ins_sequence' => $request->value,
+                ];
+            }
+            if($request->category === "secondTakeInsAssessmentResult"){
+                $arrData = [
+                    'second_take_ins_assessment_result' => $request->value,
+                ];
+            }
+            QcSlipEmployee::
+            where('qc_slips_id',$request->qcSlipsId)
+            ->where('id',$request->qcSlipEmployeesId)
+            ->whereNull('deleted_at')
+            // ->get();
+            ->update($arrData);
+            DB::commit();
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
     public function getQcSlipsById(Request $request){
 
         try {
-            return $qcSlip = QcSlip::with('product_line','op_approvers')
+            $qcSlip = QcSlip::with('product_line','op_approvers')
             ->where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')
             ->get();
-            return response()->json(['is_success' => 'true']);
+            return response()->json(['is_success' => 'true','qcSlip' => $qcSlip]);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    public function load1stQcValidation(Request $request){
+        try {
+           $qcSlipEmployee = QcSlipEmployee::with('system_one_subcon_emp_info','system_one_hris_emp_info')
+            ->where('qc_slips_id',$request->qcSlipsId)
+            ->where('station_to',2)
+            ->whereNull('deleted_at')
+            ->get([
+                'employee_no',
+                'id',
+                'qc_slips_id',
+                'station_to',
+                'first_take_ins_sequence',
+                'first_take_ins_assessment_result',
+            ]);
+            return DataTables($qcSlipEmployee)
+            ->addColumn('employee_name',function ($row){
+                $pricon = $row->system_one_hris_emp_info->EmpName ?? '';
+                $subcon = $row->system_one_subcon_emp_info->EmpName ?? '';
+                $employee_name = $pricon != '' ? $pricon : $subcon;
+                $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$employee_name.' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->addColumn('first_take_ins_sequence',function ($row){
+                $isExist = $row->first_take_ins_sequence ?? '';
+                $cSelected = $isExist === 'YES' ? 'selected' : '';
+                $xSelected = $isExist === 'NO' ? 'selected' : '';
+                $naSelected = $isExist === 'N/A' ? 'selected' : '';
+                // second_take_ins_sequence
+                // second_take_ins_assessment_result
+                $result = '';
+                $result .= '<center>
+                    <select qc-slip-employees-id="'.$row->id.'" qc-slips-id="'.$row->qc_slips_id.'" class="form-control select2bs4 first_take_ins_sequence" style="width: 100%;" name="first_take_ins_sequence" id="first_take_ins_sequence" >
+                        <option value="N/A" '.$cSelected.'>N/A</option>
+                        <option value="YES" '.$xSelected.'>YES</option>
+                        <option value="NO" '.$naSelected.'>NO</option>
+                    </select>';
+                $result .= '</center>';
+                return $result;
+            })
+            ->addColumn('first_take_ins_assessment_result',function ($row){
+                $isExist = $row->first_take_ins_assessment_result ?? '';
+                // $isSelected = $isExist != '' ? 'selected' : '';
+                $cSelected = $isExist === 'PASSED' ? 'selected' : '';
+                $xSelected = $isExist === 'FAILED' ? 'selected' : '';
+                $naSelected = $isExist === 'N/A' ? 'selected' : '';
+                $result = '';
+                $result .= '
+                    <select qc-slip-employees-id="'.$row->id.'" qc-slips-id="'.$row->qc_slips_id.'" class="form-control select2bs4 first_take_ins_assessment_result" style="width: 100%;" name="first_take_ins_assessment_result" id="first_take_ins_assessment_result">
+                        <option value="N/A" '.$naSelected.'>N/A</option>
+                        <option value="PASSED" '.$cSelected.'>PASSED</option>
+                        <option value="FAILED" '.$xSelected.'>FAILED</option>
+                    </select>';
+                $result .= '';
+                return $result;
+            })
+            ->rawColumns(['employee_name','first_take_ins_sequence','first_take_ins_assessment_result'])
+            ->make(true);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    public function load2ndQcValidation(Request $request){
+        try {
+            $qcSlipEmployee = QcSlipEmployee::with('system_one_subcon_emp_info','system_one_hris_emp_info')
+            ->where('qc_slips_id',$request->qcSlipsId)
+            ->where('station_to',2)
+            ->whereNull('deleted_at')
+            ->get([
+                'employee_no',
+                'id',
+                'qc_slips_id',
+                'station_to',
+                'second_take_ins_sequence',
+                'second_take_ins_assessment_result',
+            ]);
+            return DataTables($qcSlipEmployee)
+            ->addColumn('employee_name',function ($row){
+                $pricon = $row->system_one_hris_emp_info->EmpName ?? '';
+                $subcon = $row->system_one_subcon_emp_info->EmpName ?? '';
+                $employee_name = $pricon != '' ? $pricon : $subcon;
+                $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$employee_name.' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->addColumn('second_take_ins_sequence',function ($row){
+                $isExist = $row->second_take_ins_sequence ?? '';
+                $cSelected = $isExist === 'YES' ? 'selected' : '';
+                $xSelected = $isExist === 'NO' ? 'selected' : '';
+                $naSelected = $isExist === 'N/A' ? 'selected' : '';
+                $result = '';
+                $result .= '<center>
+                    <select qc-slip-employees-id="'.$row->id.'" qc-slips-id="'.$row->qc_slips_id.'" class="form-control select2bs4 second_take_ins_sequence" style="width: 100%;" name="second_take_ins_sequence" id="second_take_ins_sequence" >
+                        <option value="N/A" '.$cSelected.'>N/A</option>
+                        <option value="YES" '.$xSelected.'>YES</option>
+                        <option value="NO" '.$naSelected.'>NO</option>
+                    </select>';
+                $result .= '</center>';
+                return $result;
+            })
+            ->addColumn('second_take_ins_assessment_result',function ($row){
+                $isExist = $row->second_take_ins_assessment_result ?? '';
+                // $isSelected = $isExist != '' ? 'selected' : '';
+                $cSelected = $isExist === 'PASSED' ? 'selected' : '';
+                $xSelected = $isExist === 'FAILED' ? 'selected' : '';
+                $naSelected = $isExist === 'N/A' ? 'selected' : '';
+                $result = '';
+                $result .= '
+                    <select qc-slip-employees-id="'.$row->id.'" qc-slips-id="'.$row->qc_slips_id.'" class="form-control select2bs4 second_take_ins_assessment_result" style="width: 100%;" name="second_take_ins_assessment_result" id="second_take_ins_assessment_result">
+                        <option value="N/A" '.$naSelected.'>N/A</option>
+                        <option value="PASSED" '.$cSelected.'>PASSED</option>
+                        <option value="FAILED" '.$xSelected.'>FAILED</option>
+                    </select>';
+                $result .= '';
+                return $result;
+            })
+            ->rawColumns(['employee_name','second_take_ins_sequence','second_take_ins_assessment_result'])
+            ->make(true);
         } catch (Exception $e) {
             throw $e;
         }
@@ -78,7 +242,7 @@ class QualificationCertificationController extends Controller
             ->addColumn('trained_by',function ($row){
                 // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
                 // $personInCharge = $row;
-                return $result = '';
+              return  $result = '';
                 $result .= '<center>';
                 $result .= '<span> '.$personInCharge.' </span>';
                 $result .= '<br>';
@@ -88,7 +252,7 @@ class QualificationCertificationController extends Controller
             ->addColumn('certified_by',function ($row){
                 // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
                 // $personInCharge = $row;
-                return $result = '';
+              return  $result = '';
                 $result .= '<center>';
                 $result .= '<span> '.$personInCharge.' </span>';
                 $result .= '<br>';
@@ -98,7 +262,7 @@ class QualificationCertificationController extends Controller
             ->addColumn('approvers',function ($row){
                 // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
                 // $personInCharge = $row;
-                return $result = '';
+              return  $result = '';
                 $result .= '<center>';
                 $result .= '<span> '.$personInCharge.' </span>';
                 $result .= '<br>';
@@ -107,7 +271,6 @@ class QualificationCertificationController extends Controller
             })
             ->rawColumns(['rawAction','rawStatus','approvers'])
             ->make(true);
-            return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             throw $e;
         }
@@ -407,7 +570,7 @@ class QualificationCertificationController extends Controller
                     FQcValidation::insert($fQcValidationVisualOperator);
                 }
             }
-        
+
             return $request->all();
             // return $request->all();
             DB::commit();
@@ -419,7 +582,7 @@ class QualificationCertificationController extends Controller
                 'approval_status'=> $currentApprovalStatus
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
-           
+
 
             if($qcSlipDetails->approval_status === 'QCAPP'){
                 $emailParams = [
