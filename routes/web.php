@@ -242,29 +242,6 @@ Route::middleware('checkSession')->group(function(){
 
         Route::get('/get_memo_doc_employee_details', 'getMemoDocEmployeeDetails')->name('get_memo_doc_employee_details');
 
-        // =======================================================================================================
-        Route::controller(HrMemoExaminationController::class)->group(function () {
-            // HrMemoExaminationController
-            Route::get('/view_examinations', 'viewExaminationsInfo')->name('view_examinations');
-            Route::post('/add_examinations', 'addExaminationsInfo')->name('add_examinations');
-            Route::get('/get_examinations_by_id', 'getExaminationsById')->name('get_examinations_by_id');
-            Route::post('/update_examinations_status', 'updateExaminationsStatus')->name('update_examinations_status');
-            Route::get('/get_examinations', 'getExaminations')->name('get_examinations');
-        });
-
-        Route::controller(HrMemoController::class)->group(function () {
-            Route::get('/view_hr_memo', 'viewHrMemoInfo')->name('view_hr_memo');
-            Route::get('/view_trainee_details', 'viewTraineeDetails')->name('view_trainee_details');
-            Route::post('/add_hr_memo', 'addHrMemoInfo')->name('add_hr_memo');
-            Route::get('/get_hr_memo_by_id', 'getHrMemoById')->name('get_hr_memo_by_id');
-            Route::post('/update_hr_memo_status', 'updateHrMemoStatus')->name('update_hr_memo_status');
-            Route::get('/get_users', 'getUsers')->name('get_users');
-            Route::get('/get_employee_details', 'getEmployeeDetails')->name('get_employee_details');
-            Route::get('/get_emp_no_dropdown_details', 'getEmpNoDropdownDetails')->name('get_emp_no_dropdown_details');
-            Route::get('/get_email_recipients_dropdown_details', 'getEmailRecipientsDropdownDetails')->name('get_email_recipients_dropdown_details');
-            Route::get('/send_hr_memo_mail', 'sendHrMemoMail')->name('send_hr_memo_mail');
-        });
-
         // USER CONTROLLER
         Route::controller(UserController::class)->group(function () {
             Route::post('/add_user', 'add_user');

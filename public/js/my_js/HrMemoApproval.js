@@ -86,7 +86,9 @@ function initHrMemoApprovalTable($table, url = 'view_hr_memo') {
             { data: 'document_no' },    // customize this per hr_memo_approval
             { data: 'date_filed' },    // customize this per hr_memo_approval
             { data: 'reason_label' },    // customize this per hr_memo_approval
-            { data: 'subject' }    // customize this per hr_memo_approval
+            { data: 'subject' },    // customize this per hr_memo_approval
+            { data: 'prepared_by_label' },    // customize this per hr_memo_approval
+            { data: 'received_by_label' }    // customize this per hr_memo_approval
         ]
     });
 }
