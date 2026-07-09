@@ -278,6 +278,31 @@
         </div>
     </div>
 
+    <!-- Change Exam Result Status Modal End -->
+    <div class="modal fade" id="modalChangeExamResultStatus">
+        <div class="modal-dialog">
+            <div class="modal-content modal-md">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="h4ChangeExamResultStatusTitle"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" id="formChangeExamResultStatus">
+                    @csrf
+                    <div class="modal-body">
+                    <label id="lblChangeExamResultStatusLabel"></label>
+                    <input type="hidden" name="exam_result_details_id" id="txtChangeExamResultStatusId" placeholder="Exam Result Details Id">
+                    <input type="hidden" name="status" id="txtChangeExamResultStatus" placeholder="Status">
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <button type="submit" id="btnChangeExamResultStatus" class="btn btn-dark"><i id="iBtnChangeExamResultStatusIcon" class="fa fa-check"></i> Yes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><!-- Change Exam Result Status Modal End -->
 @endsection
 
 
@@ -364,8 +389,16 @@
                     { data: 'action' },
                     { data: 'exam_taken' },
                     { data: 'date_examination' },
-                    { data: 'exam_result_info.employee_no' },
-                    { data: 'exam_result_info.employee_name' },
+                    { data: 'exam_result_info',
+                            render: function (data) {
+                                return data ? data.employee_no : 'No Data';
+                            }
+                    },
+                    { data: 'exam_result_info',
+                            render: function (data) {
+                                return data ? data.employee_name : 'No Data';
+                            }
+                    },
                     { data: 'score' },
                     { data: 'remark' },
                     { data: 'rating' }
@@ -415,15 +448,39 @@
             $(document).on('click', '.actionChangeExaminationDate',function(e){
                 e.preventDefault();
 
-                examinationResultDetailsId = $(this).attr('examinationResultDetails-id');
-                examinationDate = $(this).attr('examinationResultDetails-examination_date');
-                $("#txtExaminationResultDetailId").val(examinationResultDetailsId);
+                examResultDetailsId = $(this).attr('examinationResultDetails-id');
+                let examinationDate = $(this).attr('examinationResultDetails-examination_date');
+                $("#txtExaminationResultDetailId").val(examResultDetailsId);
                 $("#examinationDate").val(examinationDate);
             });
 
             $("#formChangeExaminationDate").submit(function(event){
                 event.preventDefault();
                 UpdateExaminationDate();
+            });
+
+            $(document).on('click', '.actionChangeExamResultStatus',function(e){
+                e.preventDefault();
+
+                let examResultDetailsStatus = $(this).attr('status');
+                examResultDetailsId     = $(this).attr('examinationResultDetails-id');
+
+                $("#txtChangeExamResultStatusId").val(examResultDetailsId);
+                $("#txtChangeExamResultStatus").val(examResultDetailsStatus);
+
+                if(examResultDetailsStatus == 0){
+                    $("#lblChangeExamResultStatusLabel").text('Are you sure to activate?');
+                    $("#h4ChangeExamResultStatusTitle").html('<i class="fa fa-question-circle"></i> Activate Exam Result Details');
+                }else{
+                    $("#lblChangeExamResultStatusLabel").text('Are you sure to delete?');
+                    $("#h4ChangeExamResultStatusTitle").html('<i class="fa fa-question-circle"></i> Delete Exam Result Details');
+                }
+            });
+
+
+            $("#formChangeExamResultStatus").submit(function(event){
+                event.preventDefault();
+                ChangeExaminationResultStatus();
             });
         });
     </script>

@@ -28,6 +28,18 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                 }
             }
 
+            // Parse questionnaire_details (contains the correct answers)
+            let questionnaireDetails = response.questionnaire_details;
+
+            if (typeof questionnaireDetails === 'string') {
+                try {
+                    questionnaireDetails = JSON.parse(questionnaireDetails);
+                } catch (e) {
+                    console.error("Failed to parse questionnaire_details JSON", e);
+                    questionnaireDetails = {};
+                }
+            }
+
             if (!examResult) {
                 container.innerHTML = `<div class="alert alert-warning">No exam result found.</div>`;
                 return;
@@ -63,17 +75,51 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                 // MULTIPLE CHOICE
                 if (q.category_type === 0 && items.length > 0) {
                     const item = items[0];
+                    const qData = questionnaireDetails[q.exam_no];
+                    const correctItem = qData.answer_choices_question[0];
 
-                    const userAnswers = item.user_answer ? item.user_answer.split(',').map(a => a.trim()) : [];
+                    const userAnswerRaw = item.user_answer ? String(item.user_answer).trim() : '';
+
+                    const userAnswers = userAnswerRaw
+                        ? userAnswerRaw.split(',').map(x => x.trim())
+                        : [];
+
+                    const correctAnswers = String(correctItem.answer || '')
+                        .split(',')
+                        .map(x => x.trim());
+
                     (item.choices || []).forEach(choice => {
-                        const checked = userAnswers.includes(choice.trim()) ? 'checked' : '';
+                        const value = String(choice).trim();
+                        const isChecked = userAnswers.includes(value);
+                        const isCorrect = correctAnswers.includes(value);
 
-                        html += `<div class="form-check">
-                                    <input class="form-check-input"
-                                        type="${q.points > 1 ? 'checkbox' : 'radio'}"
-                                        disabled ${checked}>
-                                    <label class="form-check-label">${choice}</label>
-                                </div>`;
+                        let icon = '';
+
+                        if (isChecked && isCorrect) {
+                            icon = '<i class="fa fa-check text-success ml-1"></i>';
+                        }
+
+                        else if (isChecked && !isCorrect) {
+                            icon = '<i class="fa fa-times text-danger ml-1"></i>';
+                        }
+
+                        else if (!userAnswerRaw && isCorrect) {
+                            icon = '<i class="fa fa-times text-danger ml-1"></i>';
+                        }
+
+                        html += `
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                    type="${q.points > 1 ? 'checkbox' : 'radio'}"
+                                    disabled
+                                    ${isChecked ? 'checked' : ''}>
+
+                                <label class="form-check-label">
+                                    ${choice}
+                                    ${icon}
+                                </label>
+                            </div>
+                        `;
                     });
                 }
 
@@ -96,23 +142,126 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                                 style="width:80px; display:inline-block;"> / ${maxScore}`;
                 }
 
+                // // IDENTIFICATION / ESSAY
+                // if (q.category_type === 1 && items.length > 0) {
+                //     const item = items[0];
+                //     const qData = questionnaireDetails[q.exam_no];
+                //     const correctItem = qData.answer_choices_question[0];
+                //     const userAnswer = item.user_answer
+                //         ? String(item.user_answer).trim()
+                //         : '';
+                //     const correctAnswer = String(correctItem.answer || '').trim();
+                //     const isCorrect =
+                //         userAnswer &&
+                //         userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+                //     let icon = '';
+
+                //     if(isCorrect){
+                //         icon = '<i class="fa fa-check text-success ml-1"></i>';
+                //     }else{
+                //         icon = '<i class="fa fa-times text-danger ml-1"></i>';
+                //     }
+
+                //     if(q.type === 'Identification'){
+                //         html += `
+                //             <div class="input-group mb-2">
+                //                 <input type="text"
+                //                     class="form-control"
+                //                     value="${userAnswer || ''}"
+                //                     readonly>
+
+                //                 <div class="input-group-append">
+                //                     <span class="input-group-text">
+                //                         ${icon}
+                //                     </span>
+                //                 </div>
+                //             </div>
+                //         `;
+
+                //         if(!isCorrect){
+                //             html += `
+                //                 <small class="text-success">
+                //                     Correct Answer: ${correctAnswer}
+                //                 </small>
+                //             `;
+                //         }
+                //     }else{
+                //         html += `
+                //             <div class="mb-2">
+                //                 <textarea class="form-control" rows="4" readonly>${userAnswer}</textarea>
+                //                 <div class="mt-1">${icon}</div>
+                //             </div>
+                //         `;
+                //     }
+                // }
+
                 // GRID / TABLE
                 if (q.category_type === 2 && items.length > 0) {
-                    html += `<div class="table-responsive"><table class="table table-bordered text-center">
-                                <thead><tr><th>Process</th>`;
-                    (items[0].choices || []).forEach(col => html += `<th>${col}</th>`);
-                    html += `</tr></thead><tbody>`;
+                    const qData = questionnaireDetails[q.exam_no];
+
+                    html += `
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                        <thead>
+                        <tr>
+                        <th>Process</th>`;
+
+                    (items[0].choices || []).forEach(col => {
+                        html += `<th>${col}</th>`;
+                    });
+
+                    html += `
+                            </tr>
+                            </thead>
+                            <tbody>`;
 
                     items.forEach(row => {
-                        html += `<tr><td class="text-start">${row.question}</td>`;
-                        (row.choices || []).forEach(colChoice => {
-                            const checked = row.user_answer === colChoice ? 'checked' : '';
-                            html += `<td><input type="radio" disabled ${checked}></td>`;
+                        const correctRow = qData.answer_choices_question
+                            .find(x => x.question === row.question);
+                        const correctAnswer = correctRow
+                            ? String(correctRow.answer).trim()
+                            : '';
+                        const userAnswer = row.user_answer
+                            ? String(row.user_answer).trim()
+                            : '';
+
+                        html += `<tr>`;
+                        html += `<td class="text-start">${row.question}</td>`;
+                        (row.choices || []).forEach(choice => {
+                            const value = String(choice).trim();
+                            const isChecked = userAnswer === value;
+                            const isCorrect = correctAnswer === value;
+                            let icon = '';
+
+                            if(isChecked && isCorrect){
+                                icon = '<i class="fa fa-check text-success ml-1"></i>';
+                            }else if (isChecked && !isCorrect){
+                                icon = '<i class="fa fa-times text-danger ml-1"></i>';
+                            }else if(!userAnswer && isCorrect){
+                                icon = '<i class="fa fa-times text-danger ml-1"></i>';
+                            }else if(!userAnswer && !isCorrect){
+                                icon = '';
+                            }
+
+                            html += `
+                                <td>
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <input type="radio"
+                                            disabled
+                                            ${isChecked ? 'checked' : ''}>
+                                        <span class="ml-1">${icon}</span>
+                                    </div>
+                                </td>
+                            `;
                         });
+
                         html += `</tr>`;
                     });
 
-                    html += `</tbody></table></div>`;
+                    html += `
+                            </tbody>
+                            </table>
+                            </div>`;
                 }
 
                 html += `</div></div>`;
@@ -163,7 +312,6 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
     });
 };
 
-// 🔹 Real-time auto compute for manual scores
 $(document).on('input', '.score-input', function () {
     let manualTotal = 0;
 
@@ -195,16 +343,14 @@ $(document).on('input', '.score-input', function () {
     $('p[name="ratingDisplay"]').html(`<strong>Percentage:</strong> ${percentage}%`);
 
     const passingScore = parseFloat($('#passingScore').text()) || 0;
-    const remark = percentage >= passingScore ? 'Passed' : 'Failed';
+    const remark = percentage == 100 ? 'Passed' : 'Failed';
 
-    // ✅ Update badge text AND color
     const $remarkBadge = $('h4[name="remarkDisplay"]');
     $remarkBadge
         .text(remark)
         .removeClass('badge-success badge-danger')
         .addClass(remark === 'Passed' ? 'badge-success' : 'badge-danger');
 
-    // ✅ Update hidden inputs for form submission
     $('#remarkInput').val(remark);
     $('#manualScoreInput').val(manualTotal);
     $('#scoreInput').val(existingScore);
@@ -279,4 +425,55 @@ const UpdateExaminationDate = () => {
     };
 
     ajaxRequest(ajaxGetUpdateExaminationDate);
+};
+
+const ChangeExaminationResultStatus = (examResultDetailsId) => {
+    let formData = $('#formChangeExamResultStatus').serialize() + '&examResultDetailsId=' + examResultDetailsId;
+
+    const ajaxChangeExamResultStatus = {
+        url: "change_exam_result_status",
+        method: "POST",
+        data: formData,
+        dataType: "json",
+
+        beforeSendCallback: function(){
+            $("#iBtnChangeExamResultStatusIcon").addClass('fa fa-spinner fa-pulse');
+            $("#btnChangeExamResultStatus").prop('disabled', 'disabled');
+        },
+
+        successCallback: function(response){
+            let getExamResultData = response;
+            console.log('getExamResultData:', getExamResultData);
+
+            if(response['hasError'] == '1'){
+                toastr.error('Exam result activation failed!');
+            }else{
+                if($("#txtChangeExamResultStatus").val() == 0){
+                    toastr.success('The exam result has been activated successfully.');
+                    $("#txtChangeExamResultStatus").val(1);
+                }
+                else{
+                    toastr.success('The exam result has been deleted successfully.');
+                    $("#txtChangeExamResultStatus").val(0);
+                }
+                $("#modalChangeExamResultStatus").modal('hide');
+                $("#formChangeExamResultStatus")[0].reset();
+                examResultTableDetails.draw();
+            }
+
+            $("#iBtnChangeExamResultStatusIcon").removeClass('fa fa-spinner fa-pulse');
+            $("#btnChangeExamResultStatus").removeAttr('disabled');
+            $("#iBtnChangeExamResultStatusIcon").addClass('fa fa-check');
+        },
+
+        errorCallback: function(xhr, status, error){
+            console.log('Ajax Error:', xhr.responseText);
+            toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+            $("#iBtnChangeExamResultStatusIcon").removeClass('fa fa-spinner fa-pulse');
+            $("#btnChangeExamResultStatus").removeAttr('disabled');
+            $("#iBtnChangeExamResultStatusIcon").addClass('fa fa-check');
+        }
+    };
+
+    ajaxRequest(ajaxChangeExamResultStatus);
 };

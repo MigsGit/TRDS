@@ -139,6 +139,7 @@ Route::middleware('checkSession')->group(function(){
 
         Route::get('/view_pdf/{id}', 'viewPdf');
         Route::post('update_examination_date', 'updateExaminationDate');
+        Route::post('change_exam_result_status', 'changeExamResultStatus');
     });
 
     // Route::get('/training_request', function () {

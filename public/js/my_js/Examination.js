@@ -118,7 +118,7 @@ const GetExamTrainingRequestEmployeeInfo = (employeeNo, controlNo) => {
             : window.location.origin;
 
     const link = `${baseUrl}/get_exam_training_request_employee_no`;
-    
+
     const ajaxGetExamTrainingRequestEmployeeInfo = {
         url: link,
         method: "GET",
@@ -158,7 +158,7 @@ const GetExamTrainingRequestEmployeeInfo = (employeeNo, controlNo) => {
     ajaxRequest(ajaxGetExamTrainingRequestEmployeeInfo);
 };
 
-const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo) => {
+const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo, getexamTitleId) => {
     const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';
         const baseUrl = systemName
@@ -172,7 +172,8 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo) => {
         method: "GET",
         data: {
             employeeNo: employeeNo,
-            controlNo: controlNo
+            controlNo: controlNo,
+            examTitleId: getexamTitleId
         },
         dataType: "json",
 
@@ -181,11 +182,25 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo) => {
         },
 
         successCallback: function(response){
-            console.log('qwe:', response);
-            let count = response;
-            if(count > 0){
-                $('#txtExamTrainingRequestExaminationTake').val(count);
+            let examResult = response;
+            console.log('Count of exam attempts:', examResult);
+
+            if(examResult.status === false){
+                Swal.fire({
+                    title: 'You have already taken the exam 3 times.',
+                    text: 'You cannot take the exam anymore.',
+                    icon: 'warning',
+                    confirmButtonColor: '#172838',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    $('#btnNext').addClass('d-none');
+                });
+                return
+            }else{
+                $('#btnNext').removeClass('d-none');
             }
+
+            $('#txtExamTrainingRequestExaminationTake').val(examResult.attempt);
         },
 
         errorCallback: function(xhr, status, error){
@@ -239,7 +254,7 @@ const LinkForIdAndRevision = (linkIdRevision) => {
 
                 let details = qwe?.questionnaire_details || [];
 
-                details.sort((a, b) => a.exam_no - b.exam_no);                
+                details.sort((a, b) => a.exam_no - b.exam_no);
                 const fieldsToKeep = [
                     "id",
                     "category_type",
@@ -306,10 +321,10 @@ const ExamSubmission = () => {
 
         const link = `${baseUrl}/exam_submission`;
 
-        // 1. Read the answer key (examination_questionnaire_details) 
+        // 1. Read the answer key (examination_questionnaire_details)
         let questionDetails = JSON.parse($('#txtExaminationQuestionnaireDetails').val() || '{}');
 
-        // 2. Collect user answers into employee_examination_result 
+        // 2. Collect user answers into employee_examination_result
         let employeeExamResult = {};
         let totalScore = 0;
         let totalPoints = 0;
@@ -371,7 +386,7 @@ const ExamSubmission = () => {
                     }
 
                     let correctAnswer = qDetail.answer_choices_question[0]?.answer || null;
-                    let isCorrect = null; 
+                    let isCorrect = null;
 
                     if (qDetail.type === 'Identification') {
                         isCorrect = (userAnswer !== null && correctAnswer !== null) &&
@@ -391,7 +406,7 @@ const ExamSubmission = () => {
                 }
 
                 case 2: {
-                    // Grid / Table type 
+                    // Grid / Table type
                     let items = qDetail.answer_choices_question;
                     let gridAnswers = [];
                     let gridCorrectCount = 0;
@@ -436,8 +451,11 @@ const ExamSubmission = () => {
         } catch(e) {}
 
         let percentage = totalPoints > 0 ? Math.round((totalScore / totalPoints) * 100) : 0;
-        let isPassed = percentage >= passingScore;
-
+        let isPassed = percentage == 100;
+        console.log('totalPoints', totalPoints);
+        console.log('totalScore', totalScore);
+        console.log('percentage', percentage);
+        console.log('isPassed', isPassed);
         employeeExamResult.summary = {
             total_score: parseFloat(totalScore.toFixed(2)),
             total_points: totalPoints,
@@ -454,6 +472,7 @@ const ExamSubmission = () => {
 
         let formData = {
             _token: $('input[name="_token"]').val(),
+            check_existing_record: $('#txtCheckExistingRecord').val(),
             examination_user_info: $('#txtExaminationUserInfo').val(),
             examination_questionnaire: $('#txtExaminationQuestionnaire').val(),
             examination_questionnaire_details: $('#txtExaminationQuestionnaireDetails').val(),
@@ -494,7 +513,7 @@ const ExamSubmission = () => {
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const protocol = window.location.protocol;
-                            const hostname = window.location.hostname; 
+                            const hostname = window.location.hostname;
                             const pathname = window.location.pathname;
                             const segments = pathname.split('/').filter(Boolean);
                             const firstSegment = segments[0] || '';

@@ -230,6 +230,9 @@
                     </button>
                 </div>
                 <div class="card-body">
+                    <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsFkid">
+                    <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsRevision">
+
                     <h3><strong><center class="questionnaireTitle"></center></strong></h3>
                     <h3><strong><center class="questionnaireScoreDisplay"></center></strong></h3>
                     <div class="d-flex justify-content-end mb-3">
@@ -279,8 +282,8 @@
                     @csrf
                     <div class="modal-body">
                         <input type="hidden" name="questionnaire_details_pkid" id="txtCreateUpdateQuestionnaireDetailsPkid">
-                        <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsFkid">
-                        <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsRevision">
+                        <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsGetFkid">
+                        <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsGetRevision">
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -535,6 +538,8 @@
 
                 $('.questionnaireTitle').text(questionnaireExamTitle);
                 $('.questionnaireScoreDisplay').text('0' +'/'+ '0');
+
+                // CHAN
                 $('#txtCreateUpdateQuestionnaireDetailsFkid').val(questionnaireId);
                 $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireRevision);
                 dataQuestionnaireDetails.draw();
@@ -603,6 +608,20 @@
                     { "data": "answer" },
                     { "data": "points" }
                 ]
+            });
+
+
+            $('#buttonCreateQuestionnaireDetails').click(function (e) {
+                e.preventDefault();
+                questionnaireDetailsId = $('#txtCreateUpdateQuestionnaireDetailsFkid').val();
+                questionnaireDetailRevision = $('#txtCreateUpdateQuestionnaireDetailsRevision').val();
+
+                if(questionnaireDetailsId != '' && questionnaireDetailRevision != ''){
+                    $('#txtCreateUpdateQuestionnaireDetailsGetFkid').val(questionnaireDetailsId);
+                    $('#txtCreateUpdateQuestionnaireDetailsGetRevision').val(questionnaireDetailRevision);
+                }else{
+                    window.location.reload();
+                }
             });
 
             $('.btnViewAttachment').click(function (e) {

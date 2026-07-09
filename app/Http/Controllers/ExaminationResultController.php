@@ -65,10 +65,23 @@ class ExaminationResultController extends Controller
     public function viewExamResultDetails(Request $request){
         $rapidx_user_id = $_SESSION['rapidx_user_id'];
 
-        $exam_result_details = ExamResultDetails::with(['exam_result_info', 'exam_attempts_info'])->where('exam_result_status', $request->examStatus)
-            ->where('questionnaire_id', $request->questionnaireId)
-            ->where('questionnaire_revision_no', $request->questionnaireRevision)
-            ->where('status', 0)->where('logdel', 0)
+        // $exam_result_details = ExamResultDetails::with(['exam_result_info', 'exam_attempts_info'])
+        //     ->where('exam_result_status', $request->examStatus)
+        //     ->where('questionnaire_id', $request->questionnaireId)
+        //     ->where('questionnaire_revision_no', $request->questionnaireRevision)
+        //     ->where('status', 0)
+        //     ->where('logdel', 0)
+        //     ->get();
+
+        $exam_result_details = ExamResultDetails::with(['exam_result_info', 'exam_attempts_info'])
+            ->whereHas('exam_result_info', function($q) use ($request) {
+                $q->where('exam_result_status', $request->examStatus)
+                ->where('questionnaire_id', $request->questionnaireId)
+                ->where('questionnaire_revision_no', $request->questionnaireRevision)
+                ->where('status', 0)
+                ->where('logdel', 0);
+            })
+            ->orderBy('created_at', 'asc')
             ->get();
 
         return DataTables::of($exam_result_details)
@@ -92,37 +105,67 @@ class ExaminationResultController extends Controller
                         class="btn btn-info btn-sm text-center mt-2 actionChangeExaminationDate"
                         examinationResultDetails-id="' . $exam_result_detail->id . '"
                         examinationResultDetails-examination_date="' . $exam_result_detail->date_examination . '"
-                        status="0"
                         data-toggle="modal"
                         data-target="#modalChangeExaminationDate"
-                        title="Activate Questionnaire">
+                        title="Change Examination Date">
                         <i class="fas fa-calendar"></i>
                     </button>';
+
+                    $result .= '
+                        <button
+                            type="button"
+                            class="btn btn-danger btn-sm text-center mt-2 actionChangeExamResultStatus"
+                            examinationResultDetails-id="' . $exam_result_detail->id . '"
+                            status="1"
+                            data-toggle="modal"
+                            data-target="#modalChangeExamResultStatus"
+                            title="Delete record">
+                            <i class="fas fa-trash"></i>
+                        </button>';
             }
 
             $result .= '</center>';
             return $result;
         })
 
-        ->addColumn('exam_taken', function($exam_result_detail){
-            $count = count($exam_result_detail->exam_attempts_info);
+        // ->addColumn('exam_taken', function($exam_result_details){
+        //     static $attempt = 0;
+        //     $attempt++;
 
-            if ($count == 1) {
-                $badge = 'success';
-            } elseif ($count == 2) {
-                $badge = 'warning';
+        //     if ($exam_result_details->rating == 100) {
+        //         $badge = 'success';
+        //     } else {
+        //         $badge = 'danger';
+        //     }
+
+        //     $result = '<center>
+        //                 <span class="badge badge-pill badge-' . $badge . '">
+        //                     Attempt ' . $attempt . '
+        //                 </span>
+        //             </center>';
+        //     return $result;
+        // })
+
+        ->addColumn('exam_taken', function ($exam_result_details) {
+            static $attempts = [];
+
+            $employeeNo = $exam_result_details->exam_result_info->employee_no;
+
+            if (!isset($attempts[$employeeNo])) {
+                $attempts[$employeeNo] = 1;
             } else {
-                $badge = 'danger';
+                $attempts[$employeeNo]++;
             }
 
-            $result = "";
-            for ($i = 0; $i < $count; $i++) {
-                $result .= '<center>
-                                <span class="badge badge-pill badge-' . $badge . '">
-                                    Attempt ' . ($i + 1) . '
-                                </span>
-                            </center>';
-            }
+            $badge = $exam_result_details->rating == 100 ? 'success' : 'danger';
+
+            $result = '
+                <center>
+                    <span class="badge badge-pill badge-' . $badge . '">
+                        Attempt ' . $attempts[$employeeNo] . '
+                    </span>
+                </center>
+            ';
             return $result;
         })
 
@@ -196,6 +239,24 @@ class ExaminationResultController extends Controller
             ExamResultDetails::where('id', $request->examination_result_detail_id)
                 ->update([
                     'date_examination' => $request->examination_date,
+                    'updated_at' => now(),
+                ]);
+            DB::commit();
+            return response()->json(['hasError' => 0]);
+        }catch (\Exception $e){
+            DB::rollback();
+            return response()->json(['hasError' => 1, 'exceptionError' => $e]);
+        }
+    }
+
+    public function changeExamResultStatus(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
+        DB::beginTransaction();
+        try{
+            ExamResultDetails::where('id', $request->exam_result_details_id)
+                ->update([
+                    'status' => $request->status,
                     'updated_at' => now(),
                 ]);
             DB::commit();

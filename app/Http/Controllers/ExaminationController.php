@@ -56,6 +56,7 @@ class ExaminationController extends Controller
             ->where('revision', $revision)
             ->where('status', 0)
             ->where('logdel', 0)
+            ->orderBy('exam_no', 'ASC')
             ->get();
 
         return view('theoretical_exam.examination', compact('exam', 'questions'));
@@ -83,10 +84,86 @@ class ExaminationController extends Controller
     public function countExamTrainingRequestExaminationTake(Request $request){
         date_default_timezone_set('Asia/Manila');
 
-        $get_employee_exam_details = ExamResult::with(['exam_result_details_info.qwe'])->where('training_request_ctrl_no', $request->controlNo)->where('employee_no', $request->employeeNo)->where('status', '0')->where('logdel', 0)->get();
-        $count =  optional(data_get($get_employee_exam_details, '0.exam_result_details_info.qwe'))->count() ?? 0;        
-        return response()->json($count);
+        $examResults = ExamResult::with('exam_result_details_info')
+            ->where('training_request_ctrl_no', $request->controlNo)
+            ->where('employee_no', $request->employeeNo)
+            ->where('status', '0')
+            ->where('logdel', 0)
+            ->whereHas('exam_result_details_info.qwe', function ($query) use ($request) {
+                $query->where('questionnaire_id', $request->examTitleId);
+            })
+            ->withCount([
+                'exam_result_details_info as qwe_count' => function ($query) use ($request) {
+                    $query->whereHas('qwe', function ($q) use ($request) {
+                        $q->where('questionnaire_id', $request->examTitleId);
+                    });
+                }
+            ])
+            ->get();
+
+        // Count after getting the data
+        $count = $examResults->sum('qwe_count');
+
+
+        $attemptNumber = $count + 1;
+
+        if ($attemptNumber > 3) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Maximum attempt reached.'
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'examResults' => $examResults,
+            'attempt' => $attemptNumber
+        ]);
     }
+    // public function countExamTrainingRequestExaminationTake(Request $request){
+    //     date_default_timezone_set('Asia/Manila');
+
+    //     $count = ExamResult::where('training_request_ctrl_no', $request->controlNo)
+    //         ->where('employee_no', $request->employeeNo)
+    //         ->where('status', '0')
+    //         ->where('logdel', 0)
+    //         ->whereHas('exam_result_details_info.qwe', function ($query) use ($request) {
+    //             $query->where('questionnaire_id', $request->examTitleId);
+    //         })
+    //         ->withCount([
+    //             'exam_result_details_info as qwe_count' => function ($query) use ($request) {
+    //                 $query->whereHas('qwe', function ($q) use ($request) {
+    //                     $q->where('questionnaire_id', $request->examTitleId);
+    //                 });
+    //             }
+    //         ])
+    //         ->get()
+    //         ->sum('qwe_count');
+
+    //     $attemptNumber = $count + 1;
+
+    //     if ($attemptNumber > 3) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Maximum attempt reached.'
+    //         ]);
+    //     }
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'attempt' => $attemptNumber
+    //     ]);
+    // }
+
+
+    // public function countExamTrainingRequestExaminationTake(Request $request){
+    //     date_default_timezone_set('Asia/Manila');
+
+    //     $get_employee_exam_details = ExamResult::with(['exam_result_details_info.qwe'])->where('training_request_ctrl_no', $request->controlNo)->where('employee_no', $request->employeeNo)->where('status', '0')->where('logdel', 0)->get();
+    //     $count =  optional(data_get($get_employee_exam_details, '0.exam_result_details_info.qwe'))->count() ?? 0;
+    //     return $get_employee_exam_details;
+    //     return response()->json($count);
+    // }
 
     public function getExamTrainingRequestDetailsByIdRevision(Request $request){
         date_default_timezone_set('Asia/Manila');
@@ -103,7 +180,32 @@ class ExaminationController extends Controller
     public function examSubmission(Request $request){
         date_default_timezone_set('Asia/Manila');
 
+        $data = $request->all();
+        $validator = Validator::make($data, [
+            'questionnaire_category'        => 'required',
+            'questionnaire_title'           => 'required',
+            'questionnaire_purpose'         => 'required',
+            'questionnaire_position'        => 'required',
+            'questionnaire_passing_score'   => 'required',
+            'questionnaire_instruction'     => 'required',
+            'questionnaire_department'      => 'required',
+            'questionnaire_product_line'    => 'required'
+        ]);
+
         $request_examination_user_info = json_decode($request->examination_user_info);
+        $request_examination_questionnaire = json_decode($request->examination_questionnaire);
+        $request_employee_examination_result = json_decode($request->employee_examination_result);
+        $summary = $request_employee_examination_result->summary;
+
+        $examResult = ExamResult::where('training_request_ctrl_no', $request_examination_user_info->training_request_ctrl_no)
+            ->where('employee_no', $request_examination_user_info->employee_no)
+            ->where('status', '0')
+            ->where('logdel', 0)
+            ->whereHas('exam_result_details_info', function ($q) use ($request_examination_questionnaire) {
+                $q->where('questionnaire_id', $request_examination_questionnaire->id);
+            })
+            ->first();
+
         $examination_user_info = [
             'training_request_ctrl_no'  => $request_examination_user_info->training_request_ctrl_no,
             'employee_no'               => $request_examination_user_info->employee_no,
@@ -111,12 +213,14 @@ class ExaminationController extends Controller
             'date_hired'                => $request_examination_user_info->date_hired,
             'created_at'                => date('Y-m-d H:i:s')
         ];
-        $examination_user_info['created_at'] = date('Y-m-d H:i:s');
-        $ExamResultId = ExamResult::insertGetId($examination_user_info);
-        
-        $request_examination_questionnaire = json_decode($request->examination_questionnaire);
-        $request_employee_examination_result = json_decode($request->employee_examination_result);
-        $summary = $request_employee_examination_result->summary;
+
+        // $ExamResultId = ExamResult::insertGetId($examination_user_info);
+        if($examResult){
+            $ExamResultId = $examResult->id;
+        }else{
+            $examination_user_info['created_at'] = date('Y-m-d H:i:s');
+            $ExamResultId = ExamResult::insertGetId($examination_user_info);
+        }
 
         $examination_user_details = [
             'exam_result_id'            => $ExamResultId,
