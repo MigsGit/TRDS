@@ -340,6 +340,7 @@ $(document).ready(function() {
     });
 
     AddTrainingform.on('submit', function(e) {
+        console.log('Form submission triggered');
         e.preventDefault();
 
         let table = $('#tblEmployeeListByMemoDoc').DataTable();
@@ -359,6 +360,8 @@ $(document).ready(function() {
             training_endorsement_date: row.training_endorsement_date
         }));
 
+        console.log('Sending AJAX request');
+
         $.ajax({
             url: 'add_training_request',
             method: 'POST',
@@ -369,6 +372,7 @@ $(document).ready(function() {
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
+                console.log('works');
                 if(response.result == 1){
                     toastr.success(response.message);
                     trainingRequestTable.draw(); // Refresh the DataTable
