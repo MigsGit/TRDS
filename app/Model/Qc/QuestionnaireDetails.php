@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\Qc;
+
 
 use Illuminate\Database\Eloquent\Model;
 

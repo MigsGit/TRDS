@@ -211,8 +211,14 @@ class TrainingEndorsementController extends Controller
             'training_endorsement_employees.training_request_details_info',
             'training_endorsement_employees.training_request_details_info.employee_exam_details' => function($query) use ($tr_ctrl_no) {
                 $query->where('training_request_ctrl_no', $tr_ctrl_no);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
             },
-            'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info'
+            'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info'  => function($query) {
+                $query->where('exam_result_status', 1);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
+            }
         ])
         ->where('id', $request->id)
         ->first();
@@ -659,8 +665,14 @@ class TrainingEndorsementController extends Controller
             },
             'training_endorsement_employees.training_request_details_info.employee_exam_details' => function($query) use ($tr_ctrl_no) {
                 $query->where('training_request_ctrl_no', $tr_ctrl_no);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
             },
-            'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info'
+            'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info' => function($query) {
+                $query->where('exam_result_status', 1);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
+            }
         ])
         ->where('id', $request->id)
         ->first();
@@ -732,7 +744,7 @@ class TrainingEndorsementController extends Controller
                 $rating = round($percentage) . '%';
 
                 $exams[] = [
-                    'title'  => "Mag Plate Measurement",
+                    'title'  => "MAG PLATE MEASUREMENT",
                     'score'  => $emp->hands_on_rating ?? '',
                     'rating' => $rating ?? '0%',
                     'remark' => $emp->hands_on_remarks ?? '',
@@ -746,7 +758,7 @@ class TrainingEndorsementController extends Controller
                     'name'                => $detail->name ?? '',
                     'position'            => $posDeptSec,
                     'exams'               => $exams,
-                    'immediate_superior'  => $data->training_request_details->section_head_user->name ?? '',
+                    'immediate_superior'  => $data->training_request_details->requestor->name ?? '',
                     'remarks'             => $emp->will_not_endorse_remarks ?? '',
                 ];
             }
@@ -758,7 +770,7 @@ class TrainingEndorsementController extends Controller
                     'name'                => $detail->name ?? '',
                     'position'            => $posDeptSec,
                     'exams'               => $exams,
-                    'immediate_superior'  => $data->training_request_details->section_head_user->name ?? '',
+                    'immediate_superior'  => $data->training_request_details->requestor->name ?? '',
                     'attachment'          => $emp->hands_on_filename ? asset('public/storage/hands_on_attachments/' . $emp->id . '.' . $emp->hands_on_filename_ext) : '',
                 ];
             }

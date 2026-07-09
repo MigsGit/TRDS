@@ -86,7 +86,9 @@ function initHrMemoApprovalTable($table, url = 'view_hr_memo') {
             { data: 'document_no' },    // customize this per hr_memo_approval
             { data: 'date_filed' },    // customize this per hr_memo_approval
             { data: 'reason_label' },    // customize this per hr_memo_approval
-            { data: 'subject' }    // customize this per hr_memo_approval
+            { data: 'subject' },    // customize this per hr_memo_approval
+            { data: 'prepared_by_label' },    // customize this per hr_memo_approval
+            { data: 'received_by_label' }    // customize this per hr_memo_approval
         ]
     });
 }
@@ -298,6 +300,12 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         const approval = $(this).data('approval');
         traineeDetailsArray = [];
         fetchHrMemoById(id, $modal, dtTraineeDetails, $form, 'view', traineeDetailsArray, approval);
+    });
+
+    // View Disapproval Remarks button
+    $table.on('click', '.btnViewRemarks', function () {
+        const remarks = $(this).data('remarks');
+        showMessage(remarks, 'Disapproval Remarks', function(){});
     });
 
     // Enable button
@@ -1041,6 +1049,34 @@ function confirmAction(message, callback) {
         confirmButtonText: 'Yes'
     }).then((result) => {
         if (result.isConfirmed) callback();
+    });
+}
+
+/**
+ * SweetAlert success helper
+ */
+function showMessage(message, title = 'Information') {
+    Swal.fire({
+        icon: 'info',
+        title: title,
+        // html: message,
+        html: `
+           <div style="
+                border:1px solid #ccc;
+                padding:15px;
+                border-radius:5px;
+                text-align:left;
+                white-space:pre-wrap;
+                max-height:500px;
+                overflow-y:auto;
+            ">
+                ${message}
+            </div>
+        `,
+        width: '800px', // or '60%', '70%', '1000px'
+        showConfirmButton: true,
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'CLOSE'
     });
 }
 

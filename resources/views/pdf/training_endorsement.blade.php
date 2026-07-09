@@ -267,7 +267,8 @@
                 <span style="display:block; font-weight: bold;">
                     {{ $endorsement->created_by_user_details->name ?? '' }}
                     <br>
-                    {{ $endorsement->created_by_user_details->employee_info->Position ?? '' }}
+                    {{-- {{ $endorsement->created_by_user_details->employee_info->Position ?? '' }} --}}
+                    Trainer Inspector
                     <br>
                 </span>
             </td>
@@ -283,7 +284,8 @@
                         <span style="display:block; font-weight: bold;">
                             {{ $checker->approver_details->name ?? '' }}
                             <br>
-                            {{ $checker->approver_details->employee_info->Position ?? '' }}
+                            {{-- {{ $checker->approver_details->employee_info->Position ?? '' }} --}}
+                            QC Training Supervisor
                             <br><br>
                         </span>
                     </div>
@@ -301,7 +303,14 @@
                         <span style="display:block; font-weight: bold;">
                             {{ $approver->approver_details->name ?? '' }}
                             <br>
-                            {{ $approver->approver_details->employee_info->Position ?? '' }}
+                            {{-- {{ $approver->approver_details->employee_info->Position ?? '' }} --}}
+                             @if ($approver->approver_details->employee_number == 2055)
+                                TU Head
+                            @elseif ($approver->approver_details->employee_number == 'S022')
+                                General Manager
+                            @else
+                                {{ $approver->approver_details->employee_info->Position ?? '' }}
+                            @endif
                             <br><br>
                         </span>
                     </div>

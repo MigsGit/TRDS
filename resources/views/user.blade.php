@@ -265,7 +265,7 @@
 
                 <div class="form-group">
                   <label>User Level</label>
-                    <select class="form-control select2bs4 selectUserLevel" name="user_level_id" id="selAddUserLevel" style="width: 100%;" multiple="false">
+                    <select class="form-control select2bs4 selectUserLevel" name="user_level_id" id="selAddUserLevel" style="width: 100%;"   ="false">
                       <!-- Code generated -->
                     </select>
                 </div>
