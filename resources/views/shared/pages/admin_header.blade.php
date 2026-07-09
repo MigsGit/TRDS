@@ -6,7 +6,7 @@
             <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="" class="nav-link">System Title</a>
+            <a href="" class="nav-link">TRDSv2</a>
         </li>
     </ul>
 
@@ -17,7 +17,7 @@
                 <i class="far fa-user"></i>
                 @php
                     echo $_SESSION["rapidx_name"];
-                @endphp 
+                @endphp
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <div class="dropdown-divider"></div>
