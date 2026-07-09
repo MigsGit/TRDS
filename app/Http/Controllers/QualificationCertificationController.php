@@ -297,6 +297,7 @@ class QualificationCertificationController extends Controller
                 'qc_slips_id' => $params['qc_slips_id']
             ];
             $message = $this->commonController->emailMsg($emailParams);
+
             $from = 'issinfoservice@pricon.ph';
             $from_name = 'issinfoservice@pricon.ph';
             return  $emailData = [
@@ -494,6 +495,10 @@ class QualificationCertificationController extends Controller
                         "qcs_station_1st_oper"  =>  collect($request->text_qcs_station_1st_oper)->join(' | '),
                         "qcs_station_2nd_oper"  =>  collect($request->text_qcs_station_2nd_oper)->join(' | '),
                     ];
+                    $arrFinalApprover = [ //Save the Final Approver
+                        "text_oper_approved_confirmed_by"  =>  collect($request->text_qcs_station_1st_oper)->join(' | '),
+                    ];
+                    // QcSlip::where('id',$qcSlipsId->update($arrFinalApprover);
                     // DB::commit();
                     // CQcCertification::insert($cQcCertification);
                    $operToApprovers = [
@@ -566,14 +571,11 @@ class QualificationCertificationController extends Controller
                         "second_status" =>  $request->text_oa_2nd_result_es_oper,
                         "second_remarks" =>  "",
                     ];
-                    DB::commit();
-                    FQcValidation::insert($fQcValidationVisualOperator);
+                    // FQcValidation::insert($fQcValidationVisualOperator);
                 }
             }
 
-            return $request->all();
             // return $request->all();
-            DB::commit();
             //=== Update the Operator Approvers based on the Current Status
             $opApprover =  OpApprover::where('qc_slips_id',$qcSlipId)->where('approval_status',$currentApprovalStatus)->update($operToApprovers);
             //=== Update the Approval Status and Insert the new Approval Status and Emails to the Next Approvers
@@ -583,14 +585,14 @@ class QualificationCertificationController extends Controller
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
 
-
-            if($qcSlipDetails->approval_status === 'QCAPP'){
-                $emailParams = [
+            if($qcSlipDetails->approval_status === 'FQCVVO'){ //FQCVVO to QCAPP - Final Approver QC Supervisor
+                $emailParams = [ //FOR QC
                     'qc_slips_id' => $qcSlipId,
                     'update_data'=> [
                         'qc_slips_id' => $qcSlipId,
                         'approval_status'=> $getNewStatus['newStatus'],
-                        'first_approver' => collect($request->oper_approved_confirmed_by)->join(' | '),
+                        'alert_prod_sec' => $qcSlipDetails->oper_approved_confirmed_by,
+                        'alert_prod_cc_sec' => '',
                     ],
                     'approval_status'=> $currentApprovalStatus,
                 ];
@@ -607,6 +609,7 @@ class QualificationCertificationController extends Controller
                     'approval_status'=> $currentApprovalStatus,
                 ];
             }
+            DB::commit();
             return   $this->saveFormSendEmail($emailParams);
             //ADD ELSE TO QC Supervisor Approval for OPERATOR
             return 'DONE';
@@ -726,7 +729,6 @@ class QualificationCertificationController extends Controller
                 DQCPPDONLY
             */
         }
-        // return $newStatus;
         QcSlip::where('id',$params['qcSlipsId'])->update([
             'approval_status'=> $newStatus
         ]);

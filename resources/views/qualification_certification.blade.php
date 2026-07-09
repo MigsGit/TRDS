@@ -154,6 +154,10 @@
                                     <label for="">QC Slip Id:</label>
                                     <input class="form-control" type="text" class="form-control" id="qc_slips_id" name="qc_slips_id" placeholder="Auto Generated" readonly>
                                 </div>
+                                <div class="col-md-3">
+                                    <label for="">Approval Status:</label>
+                                    <input class="form-control" type="text" class="form-control" id="approval_status" name="approval_status" placeholder="Auto Generated" readonly>
+                                </div>
                                 <div class="row mb-5">
                                     <div class="col-md-3">
                                         <label for="">Control No.:</label>
@@ -1756,8 +1760,9 @@
                 dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
                 dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
                 // dataTable.fvi_operator.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
+                let currentStatus = data.approval_status ??'';
 
-
+                $('#approval_status').val(currentStatus);
                 if(data.approval_status ==='BENGGTQ'){
                     $('#collapseTwoOper').addClass('show');
                     $('#collapseOneOper').removeClass('show');
@@ -1833,13 +1838,7 @@
             $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
          });
 
-        // $(selector).click(function (e) {
-        //     e.preventDefault();
-
-        // });
-        $('#formSendEmail').click(function (e) {
-            e.preventDefault();
-           var $form = $('#formSubmitOper,#formSubmitOper');
+         const saveFormOper = ($form) => {
 
             // 1. Serialize standard form inputs into an array
             var formArray = $form.serializeArray();
@@ -1876,52 +1875,25 @@
                     // Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to save.' });
                 }
             });
-            // call_ajax_serialize(formArray, {}, 'save_form_send_email', function (response) {
-            //     if (response && response.success) {
-            //         Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Approval saved.' });
-            //         $('#modalSendEmail').modal('hide');
-            //     } else {
-            //         Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to save.' });
-            //     }
-            // });
-        });
-        $(document).on('submit', '#formSubmitOper', function (e) {
+         }
+        // $(selector).click(function (e) {
+        //     e.preventDefault();
+
+        // });
+         $('#formSendEmail').click(function (e) {
             e.preventDefault();
-
-            var $form  = $(this);
-            var formArray = $form.serializeArray();
-
-            // Append fields not captured by serializeArray (e.g. position context)
-            formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
-            formArray.push({ name: 'text_select_section',  value: $('#select_section').val() });
-
-            // Convert array to a keyed object, grouping repeated names into arrays
-            var data = {};
-            $.each(formArray, function (i, field) {
-                if (Object.prototype.hasOwnProperty.call(data, field.name)) {
-                    if (!Array.isArray(data[field.name])) {
-                        data[field.name] = [data[field.name]];
-                    }
-                    data[field.name].push(field.value);
-                } else {
-                    data[field.name] = field.value;
-                }
-            });
-
-            // Attach dynamic table payloads
-            data.fvi_employees     = getFviTableData();
-            data.operator_employees = (typeof getOperEmpTableData === 'function')
-                ? getOperEmpTableData()
-                : [];
-
-            call_ajax_serialize(data, {}, 'save_qualification_certification_oper', function (response) {
-                if (response && response.is_success === 'true') {
-                    $('#modalCreateCQForm').modal('hide');
-                    dataTable.operator.ajax.reload(null, false);
-                } else {
-                    alert((response && response.message) ? response.message : 'Failed to save. Please try again.');
-                }
-            });
+            var $form = $('#formSubmitOper,#formSubmitOper');
+            saveFormOper($form);
+        });
+         $(document).on('submit', '#formSubmitOper, #formSubmitOper', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            if($('#approval_status').val() === "FQCVVO"){
+                //TODO: Swal fire
+                saveFormOper($form);
+            }else{
+                $('#modalSendEmail').modal();
+            }
         });
 
         var $positionSelect = $('#text_select_position');

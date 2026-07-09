@@ -18,8 +18,8 @@ class CreateQcSlipEmployeesTable extends Migration
             $table->foreignId('qc_slips_id')->constrained('qc_slips')->onDelete('cascade')->name('fk_slip_emp_slip_id');
             $table->string('employee_no');
             // Pivot context metrics matching your structural HTML table cells
-            $table->string('station_from');
-            $table->string('station_to');
+            $table->foreignId('station_from')->references('id')->on('dropdown_master_details')->comment ='id from dropdown_master_details';
+            $table->foreignId('station_to')->references('id')->on('dropdown_master_details')->comment ='id from dropdown_master_details';
             $table->string('first_take_ins_sequence')->comment('FOR VISUAL INSPECTOR ONLY')->nullable();
             $table->string('first_take_ins_assessment_result')->comment('FOR VISUAL INSPECTOR ONLY')->nullable();
             $table->string('second_take_ins_sequence')->comment('FOR VISUAL INSPECTOR ONLY')->nullable();
