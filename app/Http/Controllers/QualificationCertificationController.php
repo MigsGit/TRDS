@@ -21,6 +21,8 @@ use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\Model\QcSlip;
 use App\Model\SystemHrisViewDivDeptSec;
+use App\Model\SystemOneHrisEmpInfo;
+use App\Model\SystemOneSubconEmpInfo;
 use App\OpApprover;
 use Exception;
 use Illuminate\Http\Request;
@@ -33,6 +35,26 @@ class QualificationCertificationController extends Controller
         $this->commonController = $commonController;
     }
 
+
+    public function updateApproval(Request $request){
+        try {
+            return 'true';
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $qcSlip = QcSlip::
+            where('id',$request->qcSlipsId)
+            ->whereNull('deleted_at')
+            ->update([
+                'status' => 'decision',
+                'appproval_at' => now()
+            ]);
+            DB::commit();
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
     public function saveFirstTakeInsSequence(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');
@@ -212,15 +234,34 @@ class QualificationCertificationController extends Controller
     }
 
     public function loadQcSlip(Request $request){
-       $qcSlip = QcSlip::with('product_line','op_approvers')
+       $qcSlips = QcSlip::with('product_line','op_approvers')
         ->whereNull('deleted_at')
         ->get();
+        $allEmpIds = $qcSlips->pluck('op_approvers') // Grab all op_approvers collections
+            ->flatten()                              // Flatten into a single layer of OpApprover models
+            ->pluck('alert_prod_sec')               // Pull out all the pipe-separated strings
+            ->filter()                               // Remove null or empty entries
+            ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
+                return array_map('trim', explode('|', $item));
+            })
+            ->unique()                               // Drop duplicates
+            ->values()                               // Re-index array keys
+            ->all();                                 // Convert to a raw array for database handling
+
+        // 3. Fetch all matching names from HRIS into a quick-lookup map array
+        $hrisEmployees = SystemOneHrisEmpInfo::whereIn('EmpNo', $allEmpIds)
+            ->get()
+            ->pluck('EmpName');
+        $subconEmployees = SystemOneSubconEmpInfo::whereIn('EmpNo', $allEmpIds)
+            ->get()
+            ->pluck('EmpName');
         try {
-            return DataTables($qcSlip)
+        return DataTables($qcSlips)
             ->addColumn('rawAction',function ($row) use ($request){
                 $result = '';
                 $result .= '<center>';
-                $result .= '<button class="btn btn-sm btn-outline-primary" type="button" qc-slips-id="'.$row->id.'" id="btnGetQcSlipsId"><i class="fa-solid fa fa-edit"></i></button>';
+                $result .= '<button class="btn btn-sm btn-outline-primary" type="button" qc-slips-id="'.$row->id.'" id="btnGetQcSlipsId"><i class="fa-solid fa fa-edit"></i></button> </br></br>';
+                $result .= '<button class="btn btn-sm btn-outline-info" type="button" qc-slips-id="'.$row->id.'" id="btnViewQcSlipsId"><i class="fa-solid fa fa-eye"></i></button>';
                 $result .= '</center>';
                 return $result;
             })
@@ -234,7 +275,8 @@ class QualificationCertificationController extends Controller
                 $result .= '<center>';
                 // $result .= '<span class="'.$getStatus['bgStatus'].'"> '.$getStatus['status'].' </span>';
                 $result .= '<br>';
-                $result .= '<span class="badge rounded-pill bg-danger"> '.$getApprovalStatus['approvalStatus'].' '.$currentApprover.' </span>';
+                $result .= '<span class="badge rounded-pill bg-danger"> Current Approver: </span>';
+                $result .= '<span class="badge rounded-pill bg-danger"> '.$getApprovalStatus['statusName'].' '.$currentApprover.' </span>';
                 $result .= '</center>';
                 $result .= '</br>';
                 return $result;

@@ -11,30 +11,45 @@ class CommonController extends Controller
     public function getApprovalStatus($approvalStatus){
         try {
              switch ($approvalStatus) {
-                 case 'PB':
-                     $approvalStatus = 'Prepared by:';
-                     break;
-                //  case 'CB':
-                //      $approvalStatus = 'Checked by:';
-                //      break;
-                //  case 'AB':
-                //      $approvalStatus = 'Approved by:';
-                //      break;
-                //  case 'EXQC':
-                //      $approvalStatus = 'QC Head:';
-                //      break;
-                //  case 'EXOH':
-                //      $approvalStatus = 'Operation Head:';
-                //      break;
-                //  case 'EXQA':
-                //      $approvalStatus = 'QA Head:';
-                //      break;
+                case 'PB':
+                    $newStatus = 'APRODTO';
+                    $statusName = 'A Production Training Orientation';
+                    break;
+                case 'APRODTO':
+                    $newStatus = 'APRODTO';
+                    $statusName = 'A Production Training Orientation';
+                    break;
+                case 'BENGGTQ':
+                    $newStatus = 'BENGGTQ';
+                    $statusName = 'B Engineer Training Qualification';
+                    break;
+                case 'CQCC':
+                    $newStatus = 'CQCC';
+                    $statusName = 'C Qc Certification';
+                    break;
+                case 'EQCVP':
+                    $newStatus = 'EQCVP';
+                    $statusName = 'E Qc Validation Process';
+                    break;
+                case 'FQCVVO':
+                    $newStatus = 'FQCVVO';
+                    $statusName = 'F Qc Validation Visual Operator';
+                    break;
+                case 'QCAPP':
+                    $newStatus = 'QCAPP'; //QC Supervisor Appoval
+                    $statusName = 'QC Supervisor Approval';
+                    break;
+                // case 'FQCVVO':
+                //     $newStatus = 'OK';
+                //     $statusName = 'CLOSED';
+                //     break;
                  default:
                      $approvalStatus = '---';
                      break;
              }
              return [
-                 'approvalStatus' => $approvalStatus,
+                 'newStatus' => $newStatus,
+                 'statusName' => $statusName,
              ];
         } catch (Exception $e) {
             throw $e;

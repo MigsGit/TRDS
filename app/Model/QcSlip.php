@@ -18,6 +18,6 @@ class QcSlip extends Model
     }
     public function op_approvers()
     {
-        return $this->hasOne(OpApprover::class, 'id', 'qc_slips_id');
+        return $this->hasOne(OpApprover::class, 'qc_slips_id', 'id');
     }
 }

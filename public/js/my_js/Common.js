@@ -156,4 +156,18 @@ const errorHandler = function (errors,formInput){
         formInput.attr('title', errors[0])
     }
 }
-
+/**
+ * SweetAlert confirmation
+ */
+const  swalConfirmAction =(message, callback) => {
+    Swal.fire({
+        text: message,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes'
+    }).then((result) => {
+        if (result.isConfirmed) callback();
+    });
+}

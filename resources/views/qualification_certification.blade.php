@@ -1589,9 +1589,13 @@
                                     </select>
                                     <label for="" class="mt-1">QC Supervisor</label>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
-                                    <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
+                                <div class="modal-footer justify-content-between">
+
+                                    {{-- <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>CLOSE</button>
+                                    <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa fa-file-import me-2" style="color: white"></i>SUBMIT</button>
+                                     --}}
+                                    <button type="button" class="btn btn-danger" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white"></i>Disapproved</button>
+                                    <button type="button" class="btn btn-success" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i>Approved</button>
                                 </div>
                         </form>
 
@@ -1609,8 +1613,8 @@
 
 @section('js_content')
     <script type="text/javascript">
-
     $(document).ready(function () {
+        operEmpArray = [];
         form = {
             formSubmitOper: $('#formSubmitOper'),
         };
@@ -1624,6 +1628,46 @@
            fvi_operator: '#tbl_fvi_operator',
            tbl_fvi_operator_2: '#tbl_fvi_operator_2',
         };
+        
+
+        const updateApproval = (params) => {
+            let data = {
+                decision : params.decision,
+                slipsId : params.slipsId
+            }
+            call_ajax_serialize(data, {}, 'update_approval', function (response) {
+                if (response && response.is_success === 'true') {
+                    // Swal.fire({ icon: 'success', title: 'Success', text: response.message || 'Approval status updated.' });
+                    // dataTable.operator.ajax.reload(null, false);
+                    // $('#modalCreateCQForm').modal('hide');
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to update approval status.' });
+                }
+            });
+        }
+        $('#operDisapproved').click(function (e) {
+                let slipsId = $('#qc_slips_id').val();
+                let decision = 'DIS';
+                let params = {
+                    decision : decision,
+                    slipsId : slipsId
+                }
+                swalConfirmAction('Are you sure you want to DISAPPROVED this request?', function () {
+                    updateApproval(params);
+                });
+        });
+
+        $('#operApproved').click(function (e) {
+            let slipsId = $('#qc_slips_id').val();
+            let decision = 'OK';
+            let params = {
+                decision : decision,
+                slipsId : slipsId
+            }
+            swalConfirmAction('Are you sure you want to APPROVED this request?', function () {
+                updateApproval(params);
+            });
+        });
         dataTable.operator = $(table.operator).DataTable({
             "processing" : true,
             "serverSide" : true,
@@ -1806,7 +1850,14 @@
             console.log('btnGetQcSlipsId clicked');
 
         });
-        operEmpArray = [];
+        $(table.operator).on('click', '#btnViewQcSlipsId','tr',function (e) {
+            e.preventDefault();
+            let qcSlipsId = $(this).attr('qc-slips-id');
+            let params = {
+                qcSlipsId: qcSlipsId,
+            };
+            getQcSlipsById(params);
+        });
         $(document).on('change', '#text_certification_operator',function (e) {
             e.preventDefault();
             // 1. Grab the value (fallback to empty string if null/undefined)
@@ -1885,7 +1936,7 @@
             var $form = $('#formSubmitOper,#formSubmitOper');
             saveFormOper($form);
         });
-         $(document).on('submit', '#formSubmitOper, #formSubmitOper', function (e) {
+        $(document).on('submit', '#formSubmitOper, #formSubmitOper', function (e) {
             e.preventDefault();
             var $form = $(this);
             if($('#approval_status').val() === "FQCVVO"){
@@ -1928,9 +1979,6 @@
         });
 
         togglePositionSection($positionSelect.val());
-// tbl_operator
-
-
 
         initDivDeptSecCombos([
                 '#text_section_operator',
