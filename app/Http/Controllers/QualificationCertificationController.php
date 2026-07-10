@@ -97,7 +97,7 @@ class QualificationCertificationController extends Controller
     public function getQcSlipsById(Request $request){
 
         try {
-            $qcSlip = QcSlip::with('product_line','op_approvers')
+            $qcSlip = QcSlip::with('product_line','op_approvers','qc_slip_employees')
             ->where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')
             ->get();
@@ -336,20 +336,50 @@ class QualificationCertificationController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            DB::commit();
-            $opApprover =  OpApprover::insert($params['update_data']);
+            $rapidxEmpNo =  session('global_user');
+            $to = '';
+            $cc = '';
+            foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
+                $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
+            }
+            if($params['approval_status'] != 'FQCVVO'){ //FQCVVO to QCAPP - Final Approver 
+                foreach (explode(' | ',$params['update_data']['alert_prod_cc_sec']) as $key => $valueRowEmpNo) {
+                    $arrCc[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
+                }
+               
+                $collectCc = collect($arrCc)->map(function($rowEmpNo){
+                
+                    return [
+                        'email' => $rowEmpNo['email'],
+                        'fullName' => $rowEmpNo['fullName'],
+                    ];
+                });
+                $cc = $collectCc->pluck('email')->join(',');
+                
+            }
+            $collectTo = collect($arrCc)->map(function($rowEmpNo){
+            
+                return [
+                    'email' => $rowEmpNo['email'],
+                    'fullName' => $rowEmpNo['fullName'],
+                ];
+            });
+            $to = $collectTo->pluck('email')->join(',');
+            // $from =$currentSession['email'] ?? '';
+            // $from_name = $currentSession['fullName'];
+            // $opApprover =  OpApprover::insert($params['update_data']);
             $emailParams = [
                 'qc_slips_id' => $params['qc_slips_id']
             ];
             $message = $this->commonController->emailMsg($emailParams);
-
             $from = 'issinfoservice@pricon.ph';
             $from_name = 'issinfoservice@pricon.ph';
             return  $emailData = [
                 // "to" =>$to,
                 "to" =>"mrronquez@pricon.ph",
-                "cc" =>"",
-                "bcc" =>"mclegaspi@pricon.ph",
+                // "cc" =>$cc,
+                "cc" =>"mclegaspi@pricon.ph",
+                "bcc" =>"",
                 "from" => $from,
                 "from_name" => $from_name ?? "TRDS Auto Email",
                 // "subject" =>$subject,
@@ -363,7 +393,8 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             //TODO: SEND email
-
+            // return $this->commonController->sendEmail($emailData);
+            DB::commit();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -392,10 +423,10 @@ class QualificationCertificationController extends Controller
             $qcSlipId = $request->qc_slips_id ?? '';
             // $qcSlipId = 2;
             $section = 'QC';
-            // $select_section = $request->select_section;
-            // $select_position = $request->text_select_position;
-            $select_position = 'Operator';
-            $select_section = 'TSF1';
+            $select_section = $request->select_section;
+            $select_position = $request->text_select_position;
+            // $select_position = 'Operator';
+            // $select_section = 'TSF1';
             $params = [
                 'section' => $section,
                 'selectSection' => $select_section,
@@ -439,7 +470,7 @@ class QualificationCertificationController extends Controller
                 ->values()
                 ->all();
 
-                //  return   QcSlipEmployee::insert($collectOperatorEmployees);
+                QcSlipEmployee::insert($collectOperatorEmployees);
                 //STATUS PB
                 $currentApprovalStatus = 'APRODTO';
                 // $operPreparedByApprovers =  [
@@ -451,13 +482,17 @@ class QualificationCertificationController extends Controller
                 //     'first_status'=> 'PEN',
                 // ];
 
-                // return  $this->saveOperApprovers($operPreparedByApprovers);
+                //$this->saveOperApprovers($operPreparedByApprovers);
             }
             if(filled($qcSlipId)){ //UPDATE
+                DB::commit();
                 $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
-                $currentApprovalStatus = $qcSlipDetails->approval_status;
 
                 if($qcSlipDetails->approval_status === 'APRODTO'){
+                    $currentApprovalStatus = $qcSlipDetails->approval_status;
+                    $qcSlipDetails->update([
+                        'status' => 'FORAPP'
+                    ]);
                     $validatedData = app(AOperProdTrainingOrientationRequest::class)->validateResolved();
                     $aOperProdTrainingOrientations = [
                         "qc_slips_id" => $qcSlipId,
@@ -468,7 +503,7 @@ class QualificationCertificationController extends Controller
                         'orientation_docs'  => collect($request->orientation_docs)->join(' | '),
                         'created_at' =>  now(),
                     ];
-                  
+
                     $operToApprovers =  [
                         "decision_status" => 'APP',
                         // "approval_status" => $currentApprovalStatus, //BENGGTQ
@@ -486,11 +521,11 @@ class QualificationCertificationController extends Controller
                         'second_status'=>$request->text_second_a_prod_result,
                         'second_remarks'=> "",
                     ];
-                    // DB::commit();
-                    // AOperProdTrainingOrientation::insert($aOperProdTrainingOrientations);
+                    DB::commit();
+                    AOperProdTrainingOrientation::insert($aOperProdTrainingOrientations);
                 }
+                $currentApprovalStatus = $qcSlipDetails->approval_status;
                 if($qcSlipDetails->approval_status === 'BENGGTQ'){
-                    $currentApprovalStatus = $qcSlipDetails->approval_status;
                     $validatedData = app(BOpEnggSectionTrainingOrientationRequest::class)->validateResolved();
                      $bEnggTqDetails =  [
                         "qc_slips_id" => $qcSlipId,
@@ -507,8 +542,8 @@ class QualificationCertificationController extends Controller
                         "second_ok_es_oper"  =>  $request->text_second_ok_es_oper,//INT
                         "second_ng_es_oper"  =>  $request->text_second_ng_es_oper,//INT
                     ];
-                    // DB::commit();
-                    // BOpEnggSectionTrainingOrientation::insert($bEnggTqDetails);
+                    DB::commit();
+                    BOpEnggSectionTrainingOrientation::insert($bEnggTqDetails);
                     $operToApprovers = [ //bEnggTrainingQualificationApprover
                         "decision_status" => 'APP',
                         "first_approver"  =>  collect($request->text_1st_qualifiedby_es_oper)->join(' | '),
@@ -620,8 +655,20 @@ class QualificationCertificationController extends Controller
                     // FQcValidation::insert($fQcValidationVisualOperator);
                 }
             }
+           $emailParams = [
+                'qc_slips_id' => $qcSlipId,
+                'update_data'=> [
+                    'qc_slips_id' => $qcSlipId,
+                    // 'approval_status'=> $getNewStatus['newStatus'],
+                    'approval_status'=> '',
+                    'alert_prod_sec' => collect($request->text_alert_prod_sec)->join(' | '),
+                    'alert_prod_cc_sec' => collect($request->text_alert_prod_cc_sec)->join(' | '),
+                ],
+                'approval_status'=> $currentApprovalStatus,
+            ];
+            return    $this->saveFormSendEmail($emailParams);
 
-            // return $request->all();
+            return $request->all();
             //=== Update the Operator Approvers based on the Current Status
             $opApprover =  OpApprover::where('qc_slips_id',$qcSlipId)->where('approval_status',$currentApprovalStatus)->update($operToApprovers);
             //=== Update the Approval Status and Insert the new Approval Status and Emails to the Next Approvers
@@ -631,7 +678,7 @@ class QualificationCertificationController extends Controller
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
 
-            if($qcSlipDetails->approval_status === 'FQCVVO'){ //FQCVVO to QCAPP - Final Approver QC Supervisor
+            if($currentApprovalStatus === 'FQCVVO'){ //FQCVVO to QCAPP - Final Approver QC Supervisor
                 $emailParams = [ //FOR QC
                     'qc_slips_id' => $qcSlipId,
                     'update_data'=> [
@@ -656,9 +703,9 @@ class QualificationCertificationController extends Controller
                 ];
             }
             DB::commit();
-            return   $this->saveFormSendEmail($emailParams);
             //ADD ELSE TO QC Supervisor Approval for OPERATOR
-            return 'DONE';
+            // return 'DONE';
+            $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -876,5 +923,15 @@ class QualificationCertificationController extends Controller
         return [
             'currentCtrlNo' => $currentCtrlNo
         ];
+    }
+}
+class EmailService {
+    public function index(Request $request){
+        return 'true' ;
+        try {
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use App\Model\DropdownMasterDetail;
+use App\Model\Qc\QcSlipEmployee;
 use App\OpApprover;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,9 @@ class QcSlip extends Model
 {
     use HasFactory;
 
-   
+    protected $fillable = [
+        'status'
+    ];
     public function product_line()
     {
         return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');
@@ -19,5 +22,9 @@ class QcSlip extends Model
     public function op_approvers()
     {
         return $this->hasOne(OpApprover::class, 'qc_slips_id', 'id');
+    }
+    public function qc_slip_employees()
+    {
+        return $this->hasMany(QcSlipEmployee::class, 'qc_slips_id', 'id');
     }
 }

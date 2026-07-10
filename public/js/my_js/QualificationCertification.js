@@ -23,30 +23,7 @@ const selectPassFail = (comboId) => {
 
     fnGetSelect2Value(paramsGetSelect2Value)
 }
-// const initDropdownMasterDetailsByFkidCombos = (comboSelectors,dropdownMastersId) => {
 
-//     comboSelectors.forEach(function(selector) {
-//             getDropdownMasterDetailsByFkid({
-//                 comboId: $(selector),
-//                 dropdownMastersId: dropdownMastersId
-//             });
-//     });
-// }
-// const getDropdownMasterDetailsByFkid = (params) => {
-//     let data = {
-//         dropdown_masters_id : params.dropdownMastersId
-//     };
-
-//     call_ajax(data,'get_dropdown_master_details_by_fkid',function(response){
-
-//         let paramsGetSelect2Value = {
-//             comboId : params.comboId,
-//             dataValue : response['data']
-//         }
-//         fnGetSelect2Value(paramsGetSelect2Value)
-//     });
-
-// }
 const initDropdownMasterDetailsByFkidCombos = (comboSelectors,dropdownMastersId) => {
 
     comboSelectors.forEach(function(selector) {
@@ -260,6 +237,52 @@ const getOperEmpTableData = () => {
     });
     return employees;
 }
+
+/* ---- Edit ---- */
+
+/**
+ * Best Practice: Populates the main table and synchronizes state during an Edit AJAX request.
+ * @param {Array} qcSlipEmployees - The response payload array containing employee details
+ */
+const populateEditOperEmpTable = (qcSlipEmployees) => {
+    // 1. Clear the main table to prevent old leftovers
+    const $mainTableBody = $('#tbl_certified_list_operator tbody');
+    $mainTableBody.empty();
+
+    // 2. Loop through your incoming collection using jQuery $.each
+    $.each(qcSlipEmployees, function(index, emp) {
+        
+        // Match your application's data-attribute structure
+        const empId = emp.employee_no;
+        const empName = emp.employee_name || empId; // Use fallback if name is in relation
+        const stFrom = emp.station_from;
+        const stTo = emp.station_to;
+        const remarks = emp.remarks || '';
+        
+        // Keep your text display dynamic (e.g., convert "1" to "Station 1" if needed, or use the database value)
+        const stFromText = "Station " + stFrom; 
+        const stToText = "Station " + stTo;
+
+        // 3. Build your standard row HTML precisely matching your creation architecture
+        // CRITICAL: We append data attributes so your "remove" and "get data" functions work perfectly
+        const row = `
+            <tr data-empid="${empId}">
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpMain">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+                <td>${empId}</td>
+                <td>${empName}</td>
+                <td data-value="${stFrom}">${stFromText}</td>
+                <td data-value="${stTo}">${stToText}</td>
+                <td>${remarks}</td>
+            </tr>
+        `;
+
+        $mainTableBody.append(row);
+    });
+};
 
 
 /* ---- Event bindings ---- */

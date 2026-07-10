@@ -1767,7 +1767,7 @@
             call_ajax(data, 'get_qc_slips_by_id', function(response){
                 let data = response.qcSlip[0];
                 let qcSlipEmployeeData = response.qcSlipEmployee;
-               
+               populateEditOperEmpTable(data.qc_slip_employees);
                 dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
                 dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
                 // dataTable.fvi_operator.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
@@ -1825,7 +1825,10 @@
 
             })
         }
-        
+        //  Best Practice: Event Delegation with correct object scoping
+        $(document).on('click', '.btnRemoveOperEmpMain', function() {
+            $(this).closest('tr').remove();
+        });
       
         $(document).on('change', '.first_take_ins_sequence',function (e) {
             let qcSlipsIdData = $(this).attr('qc-slips-id');
@@ -1939,7 +1942,7 @@
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
             formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
-            formArray.push({ name: 'text_select_section', value: $('#text_select_section').val() });
+            formArray.push({ name: 'text_select_section', value: $('#select_section').val() });
 
             // 3. Process the array into a clean key-value object map
             var data = {};
@@ -1963,6 +1966,7 @@
                 if (response.is_success === 'true') {
                     Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
                     $('#modalCreateCQForm').modal('hide');
+                    $('#modalSendEmail').modal('hide');
                     form.formSubmitOper[0].reset();
                 } else {
                     // Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to save.' });

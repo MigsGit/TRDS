@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Model\QcSlip;
+use App\Model\RapidMailer;
+use App\Model\RapidXUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CommonController extends Controller
 {
@@ -70,9 +73,27 @@ class CommonController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            RapidMailer::insert($data);
+            // RapidMailer::insert($data);
+           return RapidMailer::where('pkid',1000)->get();
             DB::commit();
             return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    public function getEmailByRapidxUserId($empNo){
+        try {
+            $user = RapidXUser::where('employee_number',$empNo)->first();
+            if (!$user) {
+                throw new \Exception('User not found. Please add to Rapidx User Module!');
+            }
+            if (!$user->email) {
+                throw new \Exception('User Email not found.  Please add to Rapidx User Module!');
+            }
+           return [
+            'fullName' => $user->name,
+            'email' => $user->email,
+        ];
         } catch (Exception $e) {
             throw $e;
         }

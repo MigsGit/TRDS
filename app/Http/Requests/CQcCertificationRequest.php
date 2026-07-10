@@ -13,7 +13,7 @@ class CQcCertificationRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,7 @@ class CQcCertificationRequest extends FormRequest
     public function rules()
     {
         return [
-          'text_oper_approved_confirmed_by' => ['required'],
+        //   'text_oper_approved_confirmed_by' => ['required'],
         ];
     }
 }
