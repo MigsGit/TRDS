@@ -442,21 +442,21 @@ class QualificationCertificationController extends Controller
                 //  return   QcSlipEmployee::insert($collectOperatorEmployees);
                 //STATUS PB
                 $currentApprovalStatus = 'APRODTO';
-                $operPreparedByApprovers =  [
-                    "qc_slips_id" => $qcSlipId,
-                    "approval_status" => $currentApprovalStatus,
-                    'first_approver'  => $rapidxEmpNo->rapidx_emp_no,
-                    'first_date'=> $date,
-                    'first_time'=> $time,
-                    'first_status'=> 'PEN',
-                ];
+                // $operPreparedByApprovers =  [
+                //     "qc_slips_id" => $qcSlipId,
+                //     "approval_status" => $currentApprovalStatus,
+                //     'first_approver'  => $rapidxEmpNo->rapidx_emp_no,
+                //     'first_date'=> $date,
+                //     'first_time'=> $time,
+                //     'first_status'=> 'PEN',
+                // ];
 
-                return  $this->saveOperApprovers($operPreparedByApprovers);
+                // return  $this->saveOperApprovers($operPreparedByApprovers);
             }
             if(filled($qcSlipId)){ //UPDATE
                 $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
-                $qcSlipDetails->approval_status;
                 $currentApprovalStatus = $qcSlipDetails->approval_status;
+
                 if($qcSlipDetails->approval_status === 'APRODTO'){
                     $validatedData = app(AOperProdTrainingOrientationRequest::class)->validateResolved();
                     $aOperProdTrainingOrientations = [
@@ -468,8 +468,7 @@ class QualificationCertificationController extends Controller
                         'orientation_docs'  => collect($request->orientation_docs)->join(' | '),
                         'created_at' =>  now(),
                     ];
-                    // DB::commit();
-                    // AOperProdTrainingOrientation::insert($aOperProdTrainingOrientations);
+                  
                     $operToApprovers =  [
                         "decision_status" => 'APP',
                         // "approval_status" => $currentApprovalStatus, //BENGGTQ
@@ -477,16 +476,18 @@ class QualificationCertificationController extends Controller
                         'first_approver_2'  => collect($request->text_first_mentoredby_oper)->join(' | '),
                         'first_date'=> $request->text_first_date_oper,
                         'first_time'=> $request->text_first_time_oper,
-                        'first_status'=>"",
+                        'first_status'=>$request->text_first_a_prod_result,
                         'first_remarks'=> "",
 
                         'second_approver' =>  collect($request->text_second_trainedby_oper)->join(' | '),
                         'second_approver_2' =>  collect($request->text_second_mentoredby_oper)->join(' | '),
                         'second_date'=> $request->text_second_date_oper,
                         'second_time'=> $request->text_second_time_oper,
-                        'second_status'=> "",
+                        'second_status'=>$request->text_second_a_prod_result,
                         'second_remarks'=> "",
                     ];
+                    // DB::commit();
+                    // AOperProdTrainingOrientation::insert($aOperProdTrainingOrientations);
                 }
                 if($qcSlipDetails->approval_status === 'BENGGTQ'){
                     $currentApprovalStatus = $qcSlipDetails->approval_status;

@@ -31,7 +31,7 @@
                                             <p class="text-uppercase text-muted small mb-1">Certification workspace</p>
                                             <h5 class="card-title mb-0 text-secondary">Qualification / Certification</h5>
                                         </div>
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCreateCQForm"><i class="fa fa-plus fa-md mr-2"></i>Certify Employee</button>
+                                        <button type="button" id="btnCreateCQForm" class="btn btn-primary" data-toggle="modal" data-target="#modalCreateCQForm"><i class="fa fa-plus fa-md mr-2"></i>Certify Employee</button>
                                     </div>
                                 </div>
 
@@ -400,6 +400,21 @@
                                                 <div class="col-md-6">
                                                     <div class="row">
                                                         <div class="col-md-6">
+                                                                <select class="form-control select2bs4" style="width: 100%;" name="text_first_a_prod_result" id="text_first_a_prod_result">
+                                                                <option value="" selected disabled>Select Result</option>
+                                                                <option value="PASSED">PASSED</option>
+                                                                <option value="FAILED">FAILED</option>
+                                                            </select>
+
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                                <select class="form-control select2bs4" style="width: 100%;" name="text_second_a_prod_result" id="text_second_a_prod_result">
+                                                                <option value="" selected disabled>Select Result</option>
+                                                                <option value="PASSED">PASSED</option>
+                                                                <option value="FAILED">FAILED</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
                                                             <label class="" for="">Trained by:</label>
                                                             <select class="form-control select2bs4" style="width: 100%;" id="text_first_trainedby_oper" name="text_first_trainedby_oper" multiple></select>
 
@@ -409,9 +424,7 @@
                                                             <select class="form-control select2bs4" style="width: 100%;" id="text_first_mentoredby_oper" name="text_first_mentoredby_oper" multiple></select>
                                                         </div>
                                                     </div>
-
                                                 </div>
-
                                                 <div class="col-md-6">
                                                     <div class="row">
                                                         <div class="col-md-6">
@@ -1590,12 +1603,12 @@
                                     <label for="" class="mt-1">QC Supervisor</label>
                                 </div>
                                 <div class="modal-footer justify-content-between">
-
-                                    {{-- <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>CLOSE</button>
-                                    <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa fa-file-import me-2" style="color: white"></i>SUBMIT</button>
-                                     --}}
-                                    <button type="button" class="btn btn-danger" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white"></i>Disapproved</button>
-                                    <button type="button" class="btn btn-success" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i>Approved</button>
+                                    
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
+                                    <button type="submit" class="btn btn-success" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Save</button>
+                                    
+                                    <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button>
+                                    <button type="button" class="btn btn-success" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> Approved</button>
                                 </div>
                         </form>
 
@@ -1668,6 +1681,10 @@
                 updateApproval(params);
             });
         });
+       
+         $(document).on('click', '#btnCreateCQForm',function (e) {
+            form.formSubmitOper[0].reset();
+        });
         dataTable.operator = $(table.operator).DataTable({
             "processing" : true,
             "serverSide" : true,
@@ -1724,7 +1741,10 @@
                 { "data" : "second_take_ins_assessment_result","name":"second_take_ins_assessment_result", orderable: false, searchable: false  },
             ],
         });
-        
+        $('#operDisapproved').addClass('d-none');
+        $('#operApproved').addClass('d-none');
+        $('#operClosed').removeClass('d-none');
+        $('#operSave').removeClass('d-none');
         const saveFirstTakeInsSequence = (params) =>{
             let data = {
                 qcSlipsId : params.qcSlipsId,
@@ -1740,6 +1760,73 @@
                 }
             });
         }
+        const getQcSlipsById  = (params) => {
+            let data = {
+                qcSlipsId :  params.qcSlipsId
+            }
+            call_ajax(data, 'get_qc_slips_by_id', function(response){
+                let data = response.qcSlip[0];
+                let qcSlipEmployeeData = response.qcSlipEmployee;
+               
+                dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
+                dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
+                // dataTable.fvi_operator.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
+                let currentStatus = data.approval_status ??'';
+                
+                $('#operDisapproved').addClass('d-none');
+                $('#operApproved').addClass('d-none');
+                $('#operClosed').removeClass('d-none');
+                $('#operSave').removeClass('d-none');
+
+                $('#approval_status').val(currentStatus);
+                if(data.approval_status ==='BENGGTQ'){
+                    $('#collapseTwoOper').addClass('show');
+                    $('#collapseOneOper').removeClass('show');
+                }
+                if(data.approval_status ==='CQCC'){
+                    $('#collapseThreeOper').addClass('show');
+                    $('#collapseTwoOper').removeClass('show');
+                    $('#collapseOneOper').removeClass('show');
+                }
+                if(data.approval_status ==='EQCVP'){
+                    $('#collapseSixOper').addClass('show');
+                    $('#collapseThreeOper').removeClass('show');
+                    $('#collapseTwoOper').removeClass('show');
+                    $('#collapseOneOper').removeClass('show');
+                }
+                if(data.approval_status ==='FQCVVO'){
+                    $('#collapseSevenOper').addClass('show');
+                    $('#collapseSixOper').removeClass('show');
+                    $('#collapseThreeOper').removeClass('show');
+                    $('#collapseTwoOper').removeClass('show');
+                    $('#collapseOneOper').removeClass('show');
+                }
+                if(data.approval_status ==='QCAPP'){
+                    $('#operDisapproved').removeClass('d-none');
+                    $('#operApproved').removeClass('d-none');
+                    $('#operClosed').addClass('d-none');
+                    $('#operSave').addClass('d-none');
+                }
+                if(data.approval_status ==='OK'){
+                    $('#operDisapproved').addClass('d-none');
+                    $('#operApproved').addClass('d-none');
+                    $('#operClosed').addClass('d-none');
+                    $('#operSave').addClass('d-none');
+                }
+
+                form.formSubmitOper.find('#qc_slips_id').val(data.id);
+                form.formSubmitOper.find('#textconno_new_operator').val(data.control_no);
+                form.formSubmitOper.find('#select_section').val(data.section_category);
+                form.formSubmitOper.find('#text_select_position').val(data.position_category);
+                form.formSubmitOper.find('#text_section_operator').val(data.section);
+                form.formSubmitOper.find('#text_series_operator').val(data.series_name);
+                form.formSubmitOper.find('#text_operator_product_line').val(data.product_line);
+                $('#modalCreateCQForm').modal();
+
+            })
+        }
+        
+      
         $(document).on('change', '.first_take_ins_sequence',function (e) {
             let qcSlipsIdData = $(this).attr('qc-slips-id');
             let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
@@ -1793,53 +1880,7 @@
             }
             saveFirstTakeInsSequence(params);
         })
-        const getQcSlipsById  = (params) => {
-            let data = {
-                qcSlipsId :  params.qcSlipsId
-            }
-            call_ajax(data, 'get_qc_slips_by_id', function(response){
-                let data = response.qcSlip[0];
-                let qcSlipEmployeeData = response.qcSlipEmployee;
-
-                dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
-                dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
-                // dataTable.fvi_operator.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
-                let currentStatus = data.approval_status ??'';
-
-                $('#approval_status').val(currentStatus);
-                if(data.approval_status ==='BENGGTQ'){
-                    $('#collapseTwoOper').addClass('show');
-                    $('#collapseOneOper').removeClass('show');
-                }
-                if(data.approval_status ==='CQCC'){
-                    $('#collapseThreeOper').addClass('show');
-                    $('#collapseTwoOper').removeClass('show');
-                    $('#collapseOneOper').removeClass('show');
-                }
-                if(data.approval_status ==='EQCVP'){
-                    $('#collapseSixOper').addClass('show');
-                    $('#collapseThreeOper').removeClass('show');
-                    $('#collapseTwoOper').removeClass('show');
-                    $('#collapseOneOper').removeClass('show');
-                }
-                // if(data.approval_status ==='EQCVP'){
-                    $('#collapseSevenOper').addClass('show');
-                    $('#collapseSixOper').removeClass('show');
-                    $('#collapseThreeOper').removeClass('show');
-                    $('#collapseTwoOper').removeClass('show');
-                    $('#collapseOneOper').removeClass('show');
-                // }
-                form.formSubmitOper.find('#qc_slips_id').val(data.id);
-                form.formSubmitOper.find('#textconno_new_operator').val(data.control_no);
-                form.formSubmitOper.find('#select_section').val(data.section_category);
-                form.formSubmitOper.find('#text_select_position').val(data.position_category);
-                form.formSubmitOper.find('#text_section_operator').val(data.section);
-                form.formSubmitOper.find('#text_series_operator').val(data.series_name);
-                form.formSubmitOper.find('#text_operator_product_line').val(data.product_line);
-                $('#modalCreateCQForm').modal();
-
-            })
-        }
+      
         $(table.operator).on('click', '#btnGetQcSlipsId','tr',function (e) {
             e.preventDefault();
             let qcSlipsId = $(this).attr('qc-slips-id');
@@ -1919,9 +1960,10 @@
                 : [];
 
             call_ajax_serialize(data,{},'save_qualification_certification_oper', function(response){
-                if (response && response.success) {
-                    // Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
+                if (response.is_success === 'true') {
+                    Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
                     $('#modalCreateCQForm').modal('hide');
+                    form.formSubmitOper[0].reset();
                 } else {
                     // Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to save.' });
                 }
