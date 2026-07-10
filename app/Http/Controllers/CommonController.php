@@ -12,44 +12,55 @@ class CommonController extends Controller
         try {
              switch ($approvalStatus) {
                 case 'PB':
-                    $newStatus = 'APRODTO';
+                    $approvalStatus = 'APRODTO';
                     $statusName = 'A Production Training Orientation';
+                    $spanColor = 'bg-danger';
                     break;
                 case 'APRODTO':
-                    $newStatus = 'APRODTO';
+                    $approvalStatus = 'APRODTO';
                     $statusName = 'A Production Training Orientation';
+                    $spanColor = 'bg-danger';
                     break;
                 case 'BENGGTQ':
-                    $newStatus = 'BENGGTQ';
+                    $approvalStatus = 'BENGGTQ';
                     $statusName = 'B Engineer Training Qualification';
+                    $spanColor = 'bg-danger';
                     break;
                 case 'CQCC':
-                    $newStatus = 'CQCC';
+                    $approvalStatus = 'CQCC';
                     $statusName = 'C Qc Certification';
+                    $spanColor = 'bg-danger';
                     break;
                 case 'EQCVP':
-                    $newStatus = 'EQCVP';
+                    $approvalStatus = 'EQCVP';
                     $statusName = 'E Qc Validation Process';
+                    $spanColor = 'bg-danger';
                     break;
                 case 'FQCVVO':
-                    $newStatus = 'FQCVVO';
+                    $approvalStatus = 'FQCVVO';
                     $statusName = 'F Qc Validation Visual Operator';
+                    $spanColor = 'bg-danger';
                     break;
                 case 'QCAPP':
-                    $newStatus = 'QCAPP'; //QC Supervisor Appoval
+                    $approvalStatus = 'QCAPP'; //QC Supervisor Appoval
                     $statusName = 'QC Supervisor Approval';
+                    $spanColor = 'bg-danger';
                     break;
-                // case 'FQCVVO':
-                //     $newStatus = 'OK';
-                //     $statusName = 'CLOSED';
-                //     break;
+                case 'OK':
+                    $approvalStatus = 'CLOSED';
+                    $statusName = 'CLOSED';
+                    $spanColor = 'bg-success';
+                    break;
                  default:
-                     $approvalStatus = '---';
-                     break;
+                    $approvalStatus = '---';
+                    $statusName = '---';
+                    $spanColor = '';
+                    break;
              }
              return [
-                 'newStatus' => $newStatus,
+                 'approvalStatus' => $approvalStatus,
                  'statusName' => $statusName,
+                 'spanColor' => $spanColor,
              ];
         } catch (Exception $e) {
             throw $e;

@@ -38,14 +38,16 @@ class QualificationCertificationController extends Controller
 
     public function updateApproval(Request $request){
         try {
-            return 'true';
+            // return 'true';
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            $qcSlip = QcSlip::
+           $qcSlip = QcSlip::
             where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')
+            // ->get();
             ->update([
-                'status' => 'decision',
+                'status' => $request->decision,
+                'approval_status' => $request->decision,
                 'appproval_at' => now()
             ]);
             DB::commit();
@@ -234,7 +236,8 @@ class QualificationCertificationController extends Controller
     }
 
     public function loadQcSlip(Request $request){
-       $qcSlips = QcSlip::with('product_line','op_approvers')
+    //newStatus
+      $qcSlips = QcSlip::with('product_line','op_approvers')
         ->whereNull('deleted_at')
         ->get();
         $allEmpIds = $qcSlips->pluck('op_approvers') // Grab all op_approvers collections
@@ -271,12 +274,12 @@ class QualificationCertificationController extends Controller
                 // $approvalStatusEnvironment = $row->environment->approval_status;
                 $approvalStatus = $row->approval_status;
                 // $getStatus = $this->commonInterface->getStatus4m($statusEnvironment);
-                $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
+                    $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
                 $result .= '<center>';
                 // $result .= '<span class="'.$getStatus['bgStatus'].'"> '.$getStatus['status'].' </span>';
                 $result .= '<br>';
-                $result .= '<span class="badge rounded-pill bg-danger"> Current Approver: </span>';
-                $result .= '<span class="badge rounded-pill bg-danger"> '.$getApprovalStatus['statusName'].' '.$currentApprover.' </span>';
+                $result .= '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApprover.' </span> </br>  </br>';
+                $result .= '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> '.$getApprovalStatus['statusName'].'  </span>';
                 $result .= '</center>';
                 $result .= '</br>';
                 return $result;

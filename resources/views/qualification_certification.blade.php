@@ -1633,7 +1633,7 @@
         const updateApproval = (params) => {
             let data = {
                 decision : params.decision,
-                slipsId : params.slipsId
+                qcSlipsId : params.qcSlipsId
             }
             call_ajax_serialize(data, {}, 'update_approval', function (response) {
                 if (response && response.is_success === 'true') {
@@ -1646,11 +1646,11 @@
             });
         }
         $('#operDisapproved').click(function (e) {
-                let slipsId = $('#qc_slips_id').val();
+                let qcSlipsId = $('#qc_slips_id').val();
                 let decision = 'DIS';
                 let params = {
                     decision : decision,
-                    slipsId : slipsId
+                    qcSlipsId : qcSlipsId
                 }
                 swalConfirmAction('Are you sure you want to DISAPPROVED this request?', function () {
                     updateApproval(params);
@@ -1658,11 +1658,11 @@
         });
 
         $('#operApproved').click(function (e) {
-            let slipsId = $('#qc_slips_id').val();
+            let qcSlipsId = $('#qc_slips_id').val();
             let decision = 'OK';
             let params = {
                 decision : decision,
-                slipsId : slipsId
+                qcSlipsId : qcSlipsId
             }
             swalConfirmAction('Are you sure you want to APPROVED this request?', function () {
                 updateApproval(params);

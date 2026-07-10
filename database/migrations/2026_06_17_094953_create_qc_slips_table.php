@@ -28,6 +28,7 @@ class CreateQcSlipsTable extends Migration
             ->cascadeOnDelete()->comment('reference from dropdown_maintenance_details_id');
             $table->string('series_name');
             $table->string('oper_approved_confirmed_by')->nullable()->comment('Last Approver | systemone HRIS');
+            $table->dateTime('appproval_at')->nullable();
             $table->string('created_by')->comment('systemone HRIS');
             $table->softDeletes();
             $table->timestamps();
