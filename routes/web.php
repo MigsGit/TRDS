@@ -74,6 +74,10 @@ Route::middleware('checkSession')->group(function(){
         return view('training_endorsement');
     })->name('training_endorsement');
 
+    Route::get('/ETR', function () {
+        return view('ETR');
+    })->name('ETR');
+
     // TRAINING ENDORSEMENT CONTROLLER
     Route::controller(TrainingEndorsementController::class)->group(function () {
         Route::get('/get_training_endorsements', 'getTrainingEndorsements')->name('get_training_endorsements');
