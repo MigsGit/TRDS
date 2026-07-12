@@ -183,7 +183,7 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo, getexamT
 
         successCallback: function(response){
             let examResult = response;
-            console.log('Count of exam attempts:', examResult);
+            console.log('Exam Result:', examResult);
 
             if(examResult.status === false){
                 Swal.fire({
@@ -195,12 +195,11 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo, getexamT
                 }).then((result) => {
                     $('#btnNext').addClass('d-none');
                 });
-                return
             }else{
                 $('#btnNext').removeClass('d-none');
+                $('#txtExamTrainingRequestExaminationTake').val(examResult.attempt);
             }
 
-            $('#txtExamTrainingRequestExaminationTake').val(examResult.attempt);
         },
 
         errorCallback: function(xhr, status, error){
