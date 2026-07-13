@@ -243,6 +243,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_subcon_employees', 'getSubconEmployees')->name('get_subcon_employees');
         Route::get('/get_direct_employee_info', 'getDirectEmployeeInfo')->name('get_direct_employee_info');
         Route::get('/get_subcon_employee_info', 'getSubconEmployeeInfo')->name('get_subcon_employee_info');
+        Route::get('/view_subcon_employee_info', 'viewSubconEmployeeInfo')->name('view_subcon_employee_info');
         Route::get('/view_direct_employee_info', 'viewDirectEmployeeInfo')->name('view_direct_employee_info');
         Route::get('/get_employee_trainings', 'getEmployeeTrainings')->name('get_employee_trainings');
 
