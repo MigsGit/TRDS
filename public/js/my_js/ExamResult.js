@@ -54,7 +54,7 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                 const firstSegment = pathname.split('/').filter(Boolean)[0];
                 if (q.image && q.image.trim() !== '') {
                     html += `<div class="text-center mb-2">
-                                <img src="${protocol}//${hostname}/${firstSegment}/storage/app/public/questionnaire_attachment/${q.image}" 
+                                <img src="${protocol}//${hostname}/${firstSegment}/storage/app/public/questionnaire_attachment/${q.image}"
                                     style="max-width:200px; cursor:pointer;"
                                     data-toggle="modal" data-target="#imageModal" class="previewImage">
                             </div>`;
@@ -63,14 +63,14 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                 // MULTIPLE CHOICE
                 if (q.category_type === 0 && items.length > 0) {
                     const item = items[0];
-                    
+
                     const userAnswers = item.user_answer ? item.user_answer.split(',').map(a => a.trim()) : [];
                     (item.choices || []).forEach(choice => {
                         const checked = userAnswers.includes(choice.trim()) ? 'checked' : '';
-                        
+
                         html += `<div class="form-check">
-                                    <input class="form-check-input" 
-                                        type="${q.points > 1 ? 'checkbox' : 'radio'}" 
+                                    <input class="form-check-input"
+                                        type="${q.points > 1 ? 'checkbox' : 'radio'}"
                                         disabled ${checked}>
                                     <label class="form-check-label">${choice}</label>
                                 </div>`;
@@ -90,16 +90,16 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                     const maxScore = q.points || 0;
                     const qId = q.exam_no;
 
-                    html += `<input type="number" class="form-control score-input" 
-                                data-question="${qId}" 
-                                max="${maxScore}" min="0" value="0" 
+                    html += `<input type="number" class="form-control score-input"
+                                data-question="${qId}"
+                                max="${maxScore}" min="0" value="0"
                                 style="width:80px; display:inline-block;"> / ${maxScore}`;
                 }
 
                 // GRID / TABLE
                 if (q.category_type === 2 && items.length > 0) {
                     html += `<div class="table-responsive"><table class="table table-bordered text-center">
-                                <thead><tr><th>Process</th>`; 
+                                <thead><tr><th>Process</th>`;
                     (items[0].choices || []).forEach(col => html += `<th>${col}</th>`);
                     html += `</tr></thead><tbody>`;
 
@@ -125,7 +125,7 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                 const badge = s.result === 'Passed' ? 'badge-success' : 'badge-danger';
                 const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-                container.insertAdjacentHTML('beforeend', 
+                container.insertAdjacentHTML('beforeend',
                     `<form method="post" id="formUpdateScoreForIdentificationEssay">
                         <input type="hidden" name="_token" value="${csrf}">
                         <input type="hidden" name="exam_result_details_id" id="getExamResultDetailsId" value="${response.id}">
@@ -243,4 +243,40 @@ const UpdateExamScoreForEmployee = () => {
     };
 
     ajaxRequest(ajaxGetUpdateExamScoreForEmployee);
+};
+
+const UpdateExaminationDate = () => {
+    let form = $('#formChangeExaminationDate')
+    let formData = new FormData(form[0]);
+    const ajaxGetUpdateExaminationDate = {
+        url: "update_examination_date",
+        method: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: "json",
+
+        beforeSendCallback: function(){
+            console.log('Request sending...');
+        },
+
+        successCallback: function(response){
+            if(response['hasError'] == 1){
+                alert('Saving failed!');
+            }else{
+                console.log('Done!')
+
+                $('#formChangeExaminationDate')[0].reset();
+                $('#modalChangeExaminationDate').modal('hide');
+                toastr.success('Saved!');
+                examResultTableDetails.draw();
+            }
+        },
+
+        errorCallback: function(xhr, status, error){
+            console.log('Ajax Error:', xhr.responseText);
+        }
+    };
+
+    ajaxRequest(ajaxGetUpdateExaminationDate);
 };

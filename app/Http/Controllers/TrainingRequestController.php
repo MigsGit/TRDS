@@ -23,6 +23,8 @@ class TrainingRequestController extends Controller
         ->where('logdel', 0)
         ->get();
 
+        // return $trainingRequests;
+
         $receiverUsers = User::with(['user_access_module'])
         ->whereHas('user_access_module', function ($query) {
             $query->whereRaw("FIND_IN_SET(?, user_modules_id)", [5]);
@@ -56,11 +58,14 @@ class TrainingRequestController extends Controller
             $trainingRequests = $trainingRequests->whereIn('status', [0, 1, 2,3]); // All
         }
 
+
         return DataTables()->of($trainingRequests)
         ->addColumn('action', function($trainingRequest) use ($receiverUsers, $tuHeadApproverUser){
-            $trainingRequestDept = RapidXDepartment::where('department_id', $trainingRequest->department_id)->first();
-            $dept = $trainingRequestDept->department_group;
+            $sectionHeadDeptId = $trainingRequest->section_head_user->department_id;
+            $trainingRequestDept = RapidXDepartment::where('department_id', $sectionHeadDeptId)->first();
+            $dept = $trainingRequestDept->department_name;
             // return $dept;
+            // return $trainingRequest->department_id;
             $result = '';
             $result .= '<center>';
 
@@ -252,16 +257,22 @@ class TrainingRequestController extends Controller
 
     public function getHRISSections(Request $request){
         // return 'asd';
-        $systemOneSection = SystemOneHrisSection::with(['department'])
-        ->where('isActive', 0)
-        ->get();
+       $systemOneSection = SystemOneHrisSection::with(['department'])
+    ->where('isActive', 1)
+    // ->select('section', 'department_id')
+    ->distinct()
+    ->get();
+
+    // return $systemOneSection;
+        // $systemOneSection = SystemOneHrisSection::where('isActive', 1)
+        // ->get();
         return response()->json($systemOneSection);
     }
 
     public function getHRISSectionByDepartment(Request $request){
         $systemOneDepartment = SystemOneHrisDepartment::where('isActive', 1)
         ->get();
-        return $systemOneDepartment;
+        // return $systemOneDepartment;
         return response()->json($systemOneDepartment);
     }
 
@@ -411,12 +422,19 @@ class TrainingRequestController extends Controller
 
     public function getUserConformance(Request $request){
         // return 'asd';
-        $trainingRequest = User::whereHas('user_access_module', function ($query) {
-            $query->whereIn('user_modules_id', [3,5,6]);
+       $modules = [3, 5, 6];
+
+        $trainingRequest = User::whereHas('user_access_module', function ($query) use ($modules) {
+            $query->where(function ($q) use ($modules) {
+                foreach ($modules as $module) {
+                    $q->orWhereRaw("FIND_IN_SET(?, user_modules_id)", [$module]);
+                }
+            });
         })
-        ->with(['users'])
+        ->with('users')
         ->get();
 
+        // return $trainingRequest;
         return response()->json($trainingRequest);
     }
 
@@ -489,6 +507,10 @@ class TrainingRequestController extends Controller
         ->where('status', 6)
         ->first();
 
+        // return $memo;
+
+        // return $memo;
+
 
 
         // $traineeDetails = $memo ? $memo->trainee_details : collect();
@@ -510,18 +532,21 @@ class TrainingRequestController extends Controller
 
             if ($td->employment_type == 1) {
                 $td->load(['hris_emp_info' => function ($q) {
-                    $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
-                    ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                    ->select('vw_employeeinfo.*', 'tbl_Training.Venue as Venue');
+                    // $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                    // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                    $q->select('vw_employeeinfo.*');
                 }]);
             } else {
                 $td->load(['subcon_emp_info' => function ($q) {
-                    $q->join('vw_Trainee', 'vw_subcon_employeeinfo.pkid', '=', 'vw_Trainee.fkSubconEmployee')
-                    ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                    ->select('vw_subcon_employeeinfo.*', 'tbl_Training.Venue as Venue');
+                    // $q->join('vw_Trainee', 'vw_subcon_employeeinfo.pkid', '=', 'vw_Trainee.fkSubconEmployee')
+                    // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                    // $q->select('vw_subcon_employeeinfo.*');
                 }]);
             }
         }
+
+        // return $td;
+
 
         return DataTables()->of($traineeDetails)
         ->addColumn('id', function($td){
@@ -581,7 +606,9 @@ class TrainingRequestController extends Controller
                 ($td->hris_emp_info->Department ?? '') . ' / ' .
                 ($td->hris_emp_info->Section ?? '');
             }else{
-                return $td->subcon_emp_info->Position ?? '';
+                return ($td->subcon_emp_info->Position ?? '') . ' / ' .
+                ($td->subcon_emp_info->Department ?? '') . ' / ' .
+                ($td->subcon_emp_info->Section ?? '');
 
             }
 

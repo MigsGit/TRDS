@@ -310,12 +310,13 @@
     });
     $(tbl.TrainingAttendanceRequest).on('click','.aEditAttendance','tr', function () {
         let trainingAttendancesId = $(this).attr('attendance-id');
+        let attendanceDetailsId = $(this).attr('attendance-details-id');
         let row = $(this).closest('tr'); // Get the parent row
         let employeeNo = row.find('td:eq(1)').text()
         let date = row.find('td:eq(3)').text();
 
 
-        $('#trainingRequestDetailsId').val(trainingRequestDetailsId);
+        $('#trainingRequestDetailsId').val(attendanceDetailsId);
         $('#date').val(date);
         $('#rapidxEmpNo').val(employeeNo);
         $('#trainingAttendancesId').val(trainingAttendancesId);

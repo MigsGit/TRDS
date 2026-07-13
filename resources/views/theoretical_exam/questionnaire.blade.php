@@ -231,13 +231,14 @@
                 </div>
                 <div class="card-body">
                     <h3><strong><center class="questionnaireTitle"></center></strong></h3>
+                    <h3><strong><center class="questionnaireScoreDisplay"></center></strong></h3>
                     <div class="d-flex justify-content-end mb-3">
                         <button type="button" class="btn btn-dark" id="buttonCreateQuestionnaireDetails" data-toggle="modal" data-target="#modalCreateUpdateQuestionnaireDetails">
                             <i class="fa fa-plus fa-md"></i> Create New Record
                         </button>
                     </div>
                     <div class="table-responsive">
-                        <table id="tableQuestionnaireDetails" class="table table-bordered table-hover nowrap w-100">
+                        <table id="tableQuestionnaireDetails" class="table table-bordered table-hover w-100">
                             <thead>
                                 <tr>
                                     <th>Action</th>
@@ -259,7 +260,7 @@
             </div>
         </div>
     </div><!-- Questionnaire Details Modal End -->
-    
+
     <!-- Create / Update Questionnaire Details Modal Start -->
     <div class="modal fade" id="modalCreateUpdateQuestionnaireDetails" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
         <div class="modal-dialog modal-xl-custom modal-dialog-centered" role="document">
@@ -268,12 +269,16 @@
                     <h5 class="modal-title">
                         <strong><center class="questionnaireTitle"></center></strong>
                     </h5>
+
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
 
                 <form method="post" id="formCreateUpdateQuestionnaireDetails" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
-                        <input type="text" name="questionnaire_details_pkid" id="txtCreateUpdateQuestionnaireDetailsPkid">
+                        <input type="hidden" name="questionnaire_details_pkid" id="txtCreateUpdateQuestionnaireDetailsPkid">
                         <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsFkid">
                         <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsRevision">
                         <div class="container-fluid">
@@ -288,7 +293,7 @@
                                             <option value="0">Single / Multiple Answer</option>
                                             <option value="1">Identification / Essay</option>
                                             <option value="2">Multiple Grid</option>
-                                        </select>                                    
+                                        </select>
                                     </div>
                                 </div>
 
@@ -309,7 +314,7 @@
                                         <button type="button" class="btn btn-sm btn-dark btnViewAttachment">
                                             <i class="fa fa-eye"></i> View
                                         </button>
-                                        <input type="file" class="form-control reset-value" id="fileUploadImage" name="upload_image" accept="image/jpeg, image/png">                                    
+                                        <input type="file" class="form-control reset-value" id="fileUploadImage" name="upload_image" accept="image/jpeg, image/png">
                                     </div>
 
                                     <div class="input-group d-none" id="txtAttachment" name="div_txt_attachment">
@@ -359,6 +364,32 @@
             </div>
         </div>
     </div><!-- Create / Update Questionnaire Details Modal End -->
+
+    <!-- Change Questionnaire Details Status Modal End -->
+    <div class="modal fade" id="modalChangeQuestionnaireDetailsStatus">
+        <div class="modal-dialog">
+            <div class="modal-content modal-md">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="h4ChangeQuestionnaireDetailsStatusTitle"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" id="formChangeQuestionnaireDetailsStatus">
+                    @csrf
+                    <div class="modal-body">
+                    <label id="lblChangeQuestionnaireDetailsStatusLabel"></label>
+                    <input type="hidden" name="questionnaire_id" id="txtChangeQuestionnaireDetailsStatusId" placeholder="Questionnaire Id">
+                    <input type="hidden" name="status" id="txtChangeQuestionnaireDetailsStatus" placeholder="Status">
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <button type="submit" id="btnChangeQuestionnaireDetailsStatus" class="btn btn-dark"><i id="iBtnChangeQuestionnaireDetailsStatusIcon" class="fa fa-check"></i> Yes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><!-- Change Questionnaire Details Status Modal End -->
 @endsection
 
 @section('js_content')
@@ -374,7 +405,9 @@
         let getOptions = [];
         let getSelectedAnswers = [];
         let html = ''
-            
+        let questionnaireDetailsStatus
+        let questionnaireDetailsId
+
         $(document).ready(function () {
             $('.select2bs5').select2({
                 theme: 'bootstrap-5'
@@ -391,10 +424,15 @@
 
                 $('#txtAttachment').addClass('d-none')
                 $('#fileAttachment').removeClass('d-none')
-                
+
                 $('#singleMultipleAnswer').empty();
                 $('#identificationEssay').empty();
                 $('#multipleGrid').empty();
+
+
+                getQuestions = [];
+                getOptions = [];
+                getSelectedAnswers = [];
             });
 
             // ===============================================================================================================================================
@@ -452,25 +490,25 @@
                 event.preventDefault();
                 CreateUpdateQuestionnaire();
             });
-    
+
             $(document).on('click', '.actionUpdateQuestionnaire',function(e){
                 e.preventDefault();
-    
+
                 questionnaireId = $(this).attr('questionnaire-id');
-    
+
                 $('#txtCreateUpdateQuestionnaireId').val(questionnaireId);
                 GetQuestionnaireById(questionnaireId);
             });
-    
+
             $(document).on('click', '.actionChangeQuestionnaireStatus',function(e){
                 e.preventDefault();
-    
+
                 questionnaireStatus = $(this).attr('status');
                 questionnaireId     = $(this).attr('questionnaire-id');
-    
+
                 $("#txtChangeQuestionnaireStatusId").val(questionnaireId);
                 $("#txtChangeQuestionnaireStatus").val(questionnaireStatus);
-    
+
                 if(questionnaireStatus == 0){
                     $("#lblChangeQuestionnaireStatusLabel").text('Are you sure to activate?');
                     $("#h4ChangeQuestionnaireStatusTitle").html('<i class="fa fa-question-circle"></i> Activate Questionnaire');
@@ -479,7 +517,7 @@
                     $("#h4ChangeQuestionnaireStatusTitle").html('<i class="fa fa-question-circle"></i> Deactivate Questionnaire');
                 }
             });
-    
+
             $("#formChangeQuestionnaireStatus").submit(function(event){
                 event.preventDefault();
                 ChangeQuestionnaireStatus();
@@ -490,21 +528,23 @@
             // ===============================================================================================================================================
             $(document).on('click', '.actionQuestionnaireDetails',function(e){
                 e.preventDefault();
-    
+
                 questionnaireId = $(this).attr('questionnaire-id');
                 questionnaireRevision = $(this).attr('questionnaire-revision');
                 questionnaireExamTitle = $(this).attr('questionnaire-exam_title');
-    
+
                 $('.questionnaireTitle').text(questionnaireExamTitle);
+                $('.questionnaireScoreDisplay').text('0' +'/'+ '0');
                 $('#txtCreateUpdateQuestionnaireDetailsFkid').val(questionnaireId);
                 $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireRevision);
                 dataQuestionnaireDetails.draw();
             });
-    
+
             dataQuestionnaireDetails = $("#tableQuestionnaireDetails").DataTable({
                 "processing": false,
                 "serverSide": true,
                 "responsive": true,
+                "order": [[ 3, "asc" ]],
                 "language": {
                     "info": "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
                     "lengthMenu": "Show _MENU_ Questionnaire Record",
@@ -515,12 +555,24 @@
                     data: function(data){
                         data.questionnaireId = questionnaireId;
                         data.questionnaireRevision = questionnaireRevision;
+                    },
+                    dataSrc: function(json){
+                        let totalPoints = json.totalPoints
+                        let passingScore = json.passingScore
+                        $(".questionnaireScoreDisplay").text(totalPoints +' / '+ passingScore);
+
+                        if(json.totalPoints >= json.passingScore){
+                            $('#buttonCreateQuestionnaireDetails').addClass('d-none');
+                        }else{
+                            $('#buttonCreateQuestionnaireDetails').removeClass('d-none');
+                        }
+                        return json.data;
                     }
                 },
                 "columns": [
                     { "data": "action", orderable: false, searchable: false },
                     { "data": "status" },
-                    { 
+                    {
                         "data": "category_type",
                         "defaultContent": 'N/A',
                         "name": 'Category',
@@ -537,7 +589,7 @@
                     },
                     { "data": "exam_no" },
                     { "data": "image" },
-                    { 
+                    {
                         "data": "description",
                         "createdCell": function(td, cellData, rowData, row, col) {
                             $(td).css({
@@ -550,13 +602,13 @@
                     { "data": "choices" },
                     { "data": "answer" },
                     { "data": "points" }
-                ],
+                ]
             });
-    
-            $('.btnViewAttachment').click(function (e) { 
+
+            $('.btnViewAttachment').click(function (e) {
                 e.preventDefault();
-    
-                let checkFile = $(this).closest('.input-group').find('input[type="file"]')[0];  
+
+                let checkFile = $(this).closest('.input-group').find('input[type="file"]')[0];
                 if(!checkFile || !checkFile.files){
                     let fileName = $('#txteUploadImage').val()
                     console.log('fileName: ', fileName);
@@ -568,20 +620,20 @@
                     }else{
                         let attachment = checkFile.files[0];
                         let view = new FileReader();
-    
+
                         view.onload = function (e) {
                             let newTab = window.open();
                             newTab.document.write(
                                 '<iframe width="100%" height="100%" src="' + e.target.result + '"></iframe>'
                             );
                         };
-    
+
                         view.readAsDataURL(attachment);
-                    }              
+                    }
                 }
             });
 
-            $('#slctQuestionnaireCategoryType').change(function (e) { 
+            $('#slctQuestionnaireCategoryType').change(function (e) {
                 e.preventDefault();
                 let typeOfQuestion = $(this).val()
 
@@ -626,10 +678,10 @@
                         html += '       </div>'
                         html += '   </div>'
                         html += '</div>'
-    
+
                         $('#singleMultipleAnswer').append(html);
                     break;
-    
+
                     case '1':
                         console.log('TEXT');
                         html += '<div class="input-group-prepend w-25">'
@@ -649,10 +701,10 @@
                         html += '<div class="col-md-12 mb-3">'
                         html += '   <input type="text" class="form-control d-none" name="identification[]" id="txtIdentification" placeholder="Answer for identification" style="text-transform: uppercase;" disabled>'
                         html += '</div>'
-    
+
                         $('#identificationEssay').append(html);
                     break;
-    
+
                     case '2':
                         console.log('GRID');
                         html += '<input type="hidden" name="questionnaire_question" id="questionnaireQuestionHidden">';
@@ -696,22 +748,22 @@
                         html += '    <tbody></tbody>';
                         html += '  </table>';
                         html += '</div>';
-    
+
                         $('#multipleGrid').append(html);
                     break;
-    
+
                     default:
-    
+
                     break;
                 }
             });
-    
+
             // ===================================================================================================
             // ========================================== FOR CHOICES ============================================
             // ===================================================================================================
             $(document).on("click", "#btnAddChoice", function (e) {
                 e.preventDefault();
-    
+
                 html = '';
                 html += '<div class="input-group input-group-md mb-3">';
                 html += '   <div class="input-group-prepend">';
@@ -727,47 +779,47 @@
                 html += '       </button>';
                 html += '   </div>';
                 html += '</div>';
-    
+
                 $(".divChoices").append(html);
             });
-    
+
             $(document).on("click", ".btnRemoveChoice", function (e) {
                 e.preventDefault();
                 $(this).closest(".input-group").remove();
             });
-    
+
             $(document).on("change", ".chkAnswer", function (e) {
                 e.preventDefault();
-    
+
                 let groupContainer = $(this).closest(".divChoices");
                 let answers = [];
-    
+
                 groupContainer.find(".input-group").each(function () {
                     let checkbox = $(this).find(".chkAnswer");
-    
+
                     if (checkbox.is(":checked")) {
                         let choiceText = $(this).find("input[name='choices[]']").val();
                         answers.push(choiceText);
                     }
                 });
-    
+
                 $('#choiceAnswerHidden').val(answers)
             });
-    
+
             // ====================================================================================================
             // ============================================ FOR TEXT ==============================================
             // ====================================================================================================
-            $(document).on('change', '#txtQuestionType', function (e) { 
+            $(document).on('change', '#txtQuestionType', function (e) {
                 e.preventDefault();
                 let questionTypeValue = $(this).val()
-    
+
                 if(questionTypeValue == 'Identification'){
                     $('#txtIdentification').removeClass('d-none').prop({'disabled': false, 'required': true})
                 }else{
                     $('#txtIdentification').addClass('d-none').prop({'disabled': true, 'required': false})
                 }
             });
-    
+
             // ====================================================================================================
             // ============================================== GRID ================================================
             // ====================================================================================================
@@ -776,66 +828,90 @@
                 let question = $('#txtQuestion').val().trim();
                 if (!question) return alert("Please enter a question!");
                 getQuestions.push(question);
-                renderTable();
+                RenderTable();
                 $('#txtQuestion').val('');
             });
-    
+
             // Remove question
             $(document).on('click', '.removeQuestion', function() {
                 let index = $(this).data('index');
                 getQuestions.splice(index, 1);
                 getSelectedAnswers.splice(index, 1);
-                renderTable();
+                RenderTable();
             });
-    
+
             // Add option
             $(document).on('click', '#btnAddOption', function() {
                 let optionBtn = $('#txtOption').val().trim();
                 if (!optionBtn) return alert("Please enter an option!");
                 getOptions.push(optionBtn);
-                renderTable();
+                RenderTable();
                 $('#txtOption').val('');
             });
-    
+
             // Remove option
             $(document).on('click', '.removeOption', function() {
                 let index = $(this).data('index');
                 getOptions.splice(index, 1);
-                renderTable();
+                RenderTable();
             });
-    
+
             // Handle radio click per row
             $(document).on('click', 'input[type=radio]', function() {
                 let row = $(this).data('row');
                 let column = $(this).data('column');
-    
+
                 $(`input[data-row=${row}]`).prop('checked', false);
                 $(this).prop('checked', true);
                 getSelectedAnswers[row] = column;
+
                 $('#gridAnswerHidden').val(JSON.stringify(getSelectedAnswers));
             });
-    
+
             $("#formCreateUpdateQuestionnaireDetails").submit(function(event){
                 event.preventDefault();
                 CreateUpdateQuestionnaireDetails();
             });
-    
+
             $(document).on('click', '.actionUpdateQuestionnaireDetails',function(e){
                 e.preventDefault();
-    
+
                 questionnaireDetailsId = $(this).attr('questionnaire_detail-id');
                 questionnaireDetailRevision = $(this).attr('questionnaire_detail-revision');
-    
+
                 $('#txtCreateUpdateQuestionnaireDetailsPkid').val(questionnaireDetailsId);
                 $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireDetailRevision);
 
                 GetQuestionnaireDetailsById(questionnaireDetailsId,questionnaireDetailRevision)
             });
-    
-            $('#btnReUploadFile').click(function (e) { 
+
+            $('#btnReUploadFile').click(function (e) {
                 e.preventDefault();
                 $('#fileAttachment').removeClass('d-none')
                 $('#txtAttachment').addClass('d-none')
+            });
+
+            $(document).on('click', '.actionChangeQuestionnaireDetailsStatus',function(e){
+                e.preventDefault();
+
+                questionnaireDetailsStatus = $(this).attr('status');
+                questionnaireDetailsId     = $(this).attr('questionnaire_detail-id');
+
+                $("#txtChangeQuestionnaireDetailsStatusId").val(questionnaireDetailsId);
+                $("#txtChangeQuestionnaireDetailsStatus").val(questionnaireDetailsStatus);
+
+                if(questionnaireDetailsStatus == 0){
+                    $("#lblChangeQuestionnaireDetailsStatusLabel").text('Are you sure to activate?');
+                    $("#h4ChangeQuestionnaireDetailsStatusTitle").html('<i class="fa fa-question-circle"></i> Activate Questionnaire Details');
+                }else{
+                    $("#lblChangeQuestionnaireDetailsStatusLabel").text('Are you sure to deactivate?');
+                    $("#h4ChangeQuestionnaireDetailsStatusTitle").html('<i class="fa fa-question-circle"></i> Deactivate Questionnaire Details');
+                }
+            });
+
+            $("#formChangeQuestionnaireDetailsStatus").submit(function(event){
+                event.preventDefault();
+                ChangeQuestionnaireDetailsStatus();
             });
         });
     </script>
