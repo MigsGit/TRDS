@@ -23,6 +23,7 @@ class CommonController extends Controller
                     $approvalStatus = 'APRODTO';
                     $statusName = 'A Production Training Orientation';
                     $spanColor = 'bg-danger';
+                    $spanColor = 'bg-danger';
                     break;
                 case 'BENGGTQ':
                     $approvalStatus = 'BENGGTQ';
@@ -32,6 +33,21 @@ class CommonController extends Controller
                 case 'CQCC':
                     $approvalStatus = 'CQCC';
                     $statusName = 'C Qc Certification';
+                    $spanColor = 'bg-danger';
+                    break;
+                case 'DPRDPPDONLY':
+                    $newStatus = 'DPRDPPDONLY';
+                    $statusName = 'D Production Update';
+                    $spanColor = 'bg-danger';
+                    break;
+                case 'DENGGPPDONLY':
+                    $newStatus = 'DENGGPPDONLY';
+                    $statusName = 'D Engineering Update';
+                    $spanColor = 'bg-danger';
+                    break;
+                case 'DQCPPDONLY':
+                    $newStatus = 'DQCPPDONLY';
+                    $statusName = 'D QC Update';
                     $spanColor = 'bg-danger';
                     break;
                 case 'EQCVP':

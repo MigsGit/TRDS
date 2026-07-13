@@ -1603,10 +1603,10 @@
                                     <label for="" class="mt-1">QC Supervisor</label>
                                 </div>
                                 <div class="modal-footer justify-content-between">
-                                    
+
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
                                     <button type="submit" class="btn btn-success" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Save</button>
-                                    
+
                                     <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button>
                                     <button type="button" class="btn btn-success" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> Approved</button>
                                 </div>
@@ -1641,7 +1641,7 @@
            fvi_operator: '#tbl_fvi_operator',
            tbl_fvi_operator_2: '#tbl_fvi_operator_2',
         };
-        
+
 
         const updateApproval = (params) => {
             let data = {
@@ -1681,7 +1681,7 @@
                 updateApproval(params);
             });
         });
-       
+
          $(document).on('click', '#btnCreateCQForm',function (e) {
             form.formSubmitOper[0].reset();
         });
@@ -1772,7 +1772,7 @@
                 dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
                 // dataTable.fvi_operator.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
                 let currentStatus = data.approval_status ??'';
-                
+
                 $('#operDisapproved').addClass('d-none');
                 $('#operApproved').addClass('d-none');
                 $('#operClosed').removeClass('d-none');
@@ -1829,7 +1829,7 @@
         $(document).on('click', '.btnRemoveOperEmpMain', function() {
             $(this).closest('tr').remove();
         });
-      
+
         $(document).on('change', '.first_take_ins_sequence',function (e) {
             let qcSlipsIdData = $(this).attr('qc-slips-id');
             let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
@@ -1883,7 +1883,7 @@
             }
             saveFirstTakeInsSequence(params);
         })
-      
+
         $(table.operator).on('click', '#btnGetQcSlipsId','tr',function (e) {
             e.preventDefault();
             let qcSlipsId = $(this).attr('qc-slips-id');
@@ -2068,6 +2068,9 @@
             '#text_alert_prod_cc_sec',
             '#text_1st_qualifiedby_es_oper',
             '#text_2nd_qualifiedby_es_oper',
+            //C
+            '#text_1st_certifiedby_qcs_oper',
+            '#text_2nd_certifiedby_qcs_oper',
             //D PPD
             '#text_1st_certified_prod_peqcs_oper',
             '#text_1st_certified_eng_peqcs_oper',

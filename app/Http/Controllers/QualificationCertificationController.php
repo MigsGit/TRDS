@@ -342,23 +342,23 @@ class QualificationCertificationController extends Controller
             foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
                 $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
             }
-            if($params['approval_status'] != 'FQCVVO'){ //FQCVVO to QCAPP - Final Approver 
+            if($params['approval_status'] != 'FQCVVO'){ //FQCVVO to QCAPP - Final Approver
                 foreach (explode(' | ',$params['update_data']['alert_prod_cc_sec']) as $key => $valueRowEmpNo) {
                     $arrCc[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
                 }
-               
+
                 $collectCc = collect($arrCc)->map(function($rowEmpNo){
-                
+
                     return [
                         'email' => $rowEmpNo['email'],
                         'fullName' => $rowEmpNo['fullName'],
                     ];
                 });
                 $cc = $collectCc->pluck('email')->join(',');
-                
+
             }
             $collectTo = collect($arrCc)->map(function($rowEmpNo){
-            
+
                 return [
                     'email' => $rowEmpNo['email'],
                     'fullName' => $rowEmpNo['fullName'],
@@ -412,6 +412,28 @@ class QualificationCertificationController extends Controller
         }
     }
 
+    public function savePpdOnly($params){ //dPpdProcessOnly 
+
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            return $request = $params['request'];
+            if($qcSlipDetails->approval_status === 'DPRDPPDONLY'){
+
+            }
+            if($qcSlipDetails->approval_status === 'DENGGPPDONLY'){
+
+            }
+            if($qcSlipDetails->approval_status === 'DQCPPDONLY'){
+
+            }
+            DB::commit();
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
     public function saveQualificationCertificationOper(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');
@@ -423,8 +445,10 @@ class QualificationCertificationController extends Controller
             $qcSlipId = $request->qc_slips_id ?? '';
             // $qcSlipId = 2;
             $section = 'QC';
-            $select_section = $request->select_section;
+            $select_section = $request->text_select_section;
             $select_position = $request->text_select_position;
+            $selectedSection = str_contains($select_section, 'PPD');
+
             // $select_position = 'Operator';
             // $select_section = 'TSF1';
             $params = [
@@ -485,7 +509,6 @@ class QualificationCertificationController extends Controller
                 //$this->saveOperApprovers($operPreparedByApprovers);
             }
             if(filled($qcSlipId)){ //UPDATE
-                DB::commit();
                 $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
 
                 if($qcSlipDetails->approval_status === 'APRODTO'){
@@ -521,7 +544,7 @@ class QualificationCertificationController extends Controller
                         'second_status'=>$request->text_second_a_prod_result,
                         'second_remarks'=> "",
                     ];
-                    DB::commit();
+                    // DB::commit();
                     AOperProdTrainingOrientation::insert($aOperProdTrainingOrientations);
                 }
                 $currentApprovalStatus = $qcSlipDetails->approval_status;
@@ -542,7 +565,7 @@ class QualificationCertificationController extends Controller
                         "second_ok_es_oper"  =>  $request->text_second_ok_es_oper,//INT
                         "second_ng_es_oper"  =>  $request->text_second_ng_es_oper,//INT
                     ];
-                    DB::commit();
+                    // DB::commit();
                     BOpEnggSectionTrainingOrientation::insert($bEnggTqDetails);
                     $operToApprovers = [ //bEnggTrainingQualificationApprover
                         "decision_status" => 'APP',
@@ -562,8 +585,7 @@ class QualificationCertificationController extends Controller
                 if($qcSlipDetails->approval_status === 'CQCC'){
                     $validatedData = app(CQcCertificationRequest::class)->validateResolved();
                     $cQcCertification = [
-                        "qc_slips_id" => $qcSlipId,
-                        "decision_status" => 'APP',
+                        "qc_slips_id" => $qcSlipId, //decision
                         "obs_first_result_qcs_oper" =>  $request->text_obs_first_result_qcs_oper, //PASSED
                         "obs_second_result_qcs_oper" =>  $request->text_obs_second_result_qcs_oper, //PASSED
                         "first_sample_qcs_oper" =>  $request->text_first_sample_qcs_oper, //1
@@ -577,24 +599,32 @@ class QualificationCertificationController extends Controller
                         "qcs_station_2nd_oper"  =>  collect($request->text_qcs_station_2nd_oper)->join(' | '),
                     ];
                     $arrFinalApprover = [ //Save the Final Approver
-                        "text_oper_approved_confirmed_by"  =>  collect($request->text_qcs_station_1st_oper)->join(' | '),
+                        "oper_approved_confirmed_by"  =>  collect($request->text_qcs_station_1st_oper)->join(' | '),
                     ];
-                    // QcSlip::where('id',$qcSlipsId->update($arrFinalApprover);
-                    // DB::commit();
-                    // CQcCertification::insert($cQcCertification);
+                    QcSlip::where('id',$qcSlipId)->update($arrFinalApprover);
+                    CQcCertification::insert($cQcCertification);
                    $operToApprovers = [
                         "decision_status" => 'APP',
-                        "first_approver"  =>  collect($request->text_1st_certifiedby_qcs_oper)->join(' | '),
+                        "first_approver"  =>  collect($request->text_1st_certifiedby_qcs_oper)->join(' | ') ?? 'R152',
                         "first_date" =>  $request->text_1st_date_qcs_oper,
                         "first_time" =>  $request->text_1st_time_qcs_oper,
                         "first_status" =>  $request->text_oa_1st_result_qcs_oper,
                         "first_remarks" =>  $request->text_1st_disapproval_qcs_oper,
-                        "second_approver"  =>  collect($request->text_2nd_certifiedby_qcs_oper)->join(' | '),
+                        "second_approver"  =>  collect($request->text_2nd_certifiedby_qcs_oper)->join(' | ') ?? 'R152',
                         "second_date" =>  $request->text_2nd_date_qcs_oper,
                         "second_time" =>  $request->text_2nd_time_qcs_oper,
                         "second_status" =>  $request->text_oa_2nd_result_qcs_oper,
                         "second_remarks" =>  $request->text_2nd_disapproval_qcs_oper,
                     ];
+
+                }
+                DB::commit();
+
+                if($selectedSection){
+                    $ppdParams = [
+                        'request' => $request->all()
+                    ];
+                    $this->savePpdOnly($ppdParams);
                 }
                 if($qcSlipDetails->approval_status ==='EQCVP'){
                     // EQCVP- EQcValidationProcess
@@ -619,8 +649,6 @@ class QualificationCertificationController extends Controller
                         "first_approver_2"=>  collect($request->text_1st_validatedby_vpes_oper_2)->join(' | '),//R152 - 2trainedby
                         "first_date_2" =>  $request->text_1st_date_vpes_oper_2,
                         "first_remarks" =>  $request->text_remarks_vpqcs_oper,
-
-
                         "second_status" =>  $request->text_second_result_vpqcs_oper,
                         "second_approver"=> collect($request->text_2nd_validatedby_vpqcs_oper)->join(' | '),
                         "second_date" =>  $request->text_2nd_date_vpqcs_oper,
@@ -655,29 +683,16 @@ class QualificationCertificationController extends Controller
                     // FQcValidation::insert($fQcValidationVisualOperator);
                 }
             }
-           $emailParams = [
-                'qc_slips_id' => $qcSlipId,
-                'update_data'=> [
-                    'qc_slips_id' => $qcSlipId,
-                    // 'approval_status'=> $getNewStatus['newStatus'],
-                    'approval_status'=> '',
-                    'alert_prod_sec' => collect($request->text_alert_prod_sec)->join(' | '),
-                    'alert_prod_cc_sec' => collect($request->text_alert_prod_cc_sec)->join(' | '),
-                ],
-                'approval_status'=> $currentApprovalStatus,
-            ];
-            return    $this->saveFormSendEmail($emailParams);
-
-            return $request->all();
+            // $request->all();
             //=== Update the Operator Approvers based on the Current Status
             $opApprover =  OpApprover::where('qc_slips_id',$qcSlipId)->where('approval_status',$currentApprovalStatus)->update($operToApprovers);
             //=== Update the Approval Status and Insert the new Approval Status and Emails to the Next Approvers
-            $changeApprovalStatusParams = [
+           $changeApprovalStatusParams = [
                 'qcSlipsId' => $qcSlipId,
-                'approval_status'=> $currentApprovalStatus
+                'approval_status'=> $currentApprovalStatus,
+                'selectedSection'=> $request->text_select_section,
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
-
             if($currentApprovalStatus === 'FQCVVO'){ //FQCVVO to QCAPP - Final Approver QC Supervisor
                 $emailParams = [ //FOR QC
                     'qc_slips_id' => $qcSlipId,
@@ -783,45 +798,58 @@ class QualificationCertificationController extends Controller
     }
 
     public function changeApprovalStatus($params){
-        switch ($params['approval_status']) {
-            case 'PB':
+        $selectedSection = str_contains($params['selectedSection'], 'PPD');
+        switch (true) {
+            case ($params['approval_status'] === 'PB'):
                 $newStatus = 'APRODTO';
                 $statusName = 'A Production Training Orientation';
                 break;
-            case 'APRODTO':
+
+            case ($params['approval_status'] === 'APRODTO'):
                 $newStatus = 'BENGGTQ';
                 $statusName = 'B Engineer Training Qualification';
                 break;
-            case 'BENGGTQ':
+
+            case ($params['approval_status'] === 'BENGGTQ'):
                 $newStatus = 'CQCC';
                 $statusName = 'C Qc Certification';
                 break;
-            case 'CQCC':
+            case ($params['approval_status'] === 'CQCC' && $selectedSection != 1):
                 $newStatus = 'EQCVP';
                 $statusName = 'E Qc Validation Process';
                 break;
-            case 'EQCVP':
+            case ($params['approval_status'] === 'CQCC' && $selectedSection):
+                $newStatus = 'DPRDPPDONLY';
+                $statusName = 'D Production Update';
+                break;
+            case ($params['approval_status'] === 'DPRDPPDONLY'):
+                $newStatus = 'DENGGPPDONLY';
+                $statusName = 'D Engineering Update';
+                break;
+            case ($params['approval_status'] === 'DENGGPPDONLY'):
+                $newStatus = 'DQCPPDONLY';
+                $statusName = 'D QC Update';
+                break;
+            case ($params['approval_status'] === 'DQCPPDONLY'):
+                $newStatus = 'EQCVP';
+                $statusName = 'E Qc Validation Process';
+                break;
+            case ($params['approval_status'] === 'EQCVP'):
                 $newStatus = 'FQCVVO';
                 $statusName = 'F Qc Validation Visual Operator';
                 break;
-            case 'FQCVVO':
-                $newStatus = 'QCAPP'; //QC Supervisor Appoval
+
+            case ($params['approval_status'] === 'FQCVVO'):
+                $newStatus = 'QCAPP'; // QC Supervisor Approval
                 $statusName = 'CLOSED';
                 break;
-            // case 'FQCVVO':
-            //     $newStatus = 'OK';
-            //     $statusName = 'CLOSED';
-            //     break;
+
             default:
                 $newStatus = 'N/A';
                 $statusName = 'N/A';
                 break;
-            /*
-                DPRDPPDONLY
-                DENGGPPDONLY
-                DQCPPDONLY
-            */
         }
+    
         QcSlip::where('id',$params['qcSlipsId'])->update([
             'approval_status'=> $newStatus
         ]);
