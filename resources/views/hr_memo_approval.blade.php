@@ -298,19 +298,7 @@
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Date Hired</span>
                                             </div>
-                                                <input type="date" class="form-control" name="date_hired" id="dateHired" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend w-50">
-                                                <span class="input-group-text w-100">Training Venue</span>
-                                            </div>
-                                                <!-- <input type="text" class="form-control" name="training_venue" id="trainingVenue" readonly> -->
-                                                <select class="form-control select2bs5" name="training_venue" id="trainingVenue" required></select>
+                                                <input type="date" class="form-control" name="date_hired" id="dateHired" placeholder="Auto Generated" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -321,8 +309,20 @@
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Department</span>
                                             </div>
-                                                <input type="text" class="form-control" name="department" id="department" readonly>
+                                                <input type="text" class="form-control" name="department" id="department" placeholder="Auto Generated" readonly>
                                                 <!-- {{-- <select class="form-control select2bs5" type="text" name="dept_section" id="deptSection"  required></select> --}} -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-50">
+                                                <span class="input-group-text w-100">Training Venue</span>
+                                            </div>
+                                                <!-- <input type="text" class="form-control" name="training_venue" id="trainingVenue" readonly> -->
+                                                <select class="form-control select2bs5 selectTrainingVenue" name="training_venue" id="trainingVenue" required></select>
                                         </div>
                                     </div>
                                 </div>
@@ -336,7 +336,7 @@
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Employee Name</span>
                                             </div>
-                                                <input type="text" class="form-control" name="employee_name" id="employeeName" readonly>
+                                                <input type="text" class="form-control" name="employee_name" id="employeeName" placeholder="Auto Generated" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -347,18 +347,7 @@
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Position</span>
                                             </div>
-                                                <input type="text" class="form-control" name="position" id="position" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend w-50">
-                                                <span class="input-group-text w-100">Endorsement Date</span>
-                                            </div>
-                                                <input type="date" class="form-control" name="endorsement_date" id="endorsementDate" required>
+                                                <input type="text" class="form-control" name="position" id="position" placeholder="Auto Generated" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -369,14 +358,89 @@
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Product Allocation (Section)</span>
                                             </div>
-                                                <input type="text" class="form-control" name="prod_allocation" id="prodAllocation" readonly>
+                                                <input type="text" class="form-control" name="prod_allocation" id="prodAllocation" placeholder="Auto Generated" readonly>
                                                 {{-- <select class="form-control select2bs5" type="text" name="prod_allocation" id="prodAllocation" required></select> --}}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-50">
+                                                <span class="input-group-text w-100">Trainor</span>
+                                            </div>
+                                            <select class="form-control form-control-sm select2bs5 selectTrainor" name="trainor" id="trainor" required></select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- EXAM DETAILS -->
+                        <div class="row">
+                            {{-- LEFT SIDE --}}
+                            <div class="col-sm-6">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-50">
+                                                <span class="input-group-text w-100">Date From</span>
+                                            </div>
+                                                <input type="date" class="form-control" name="date_start" id="dateStart" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-50">
+                                                <span class="input-group-text w-100">Date To</span>
+                                            </div>
+                                                <input type="date" class="form-control" name="date_end" id="dateEnd" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-50">
+                                                <span class="input-group-text w-100">Endorsement Date</span>
+                                            </div>
+                                                <input type="date" class="form-control" name="endorsement_date" id="endorsementDate" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- RIGHT SIDE --}}
+                            <div class="col-sm-6">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-50">
+                                                <span class="input-group-text w-100">Mechanics</span>
+                                            </div>
+                                                <input type="text" class="form-control" name="mechanics" id="mechanics" placeholder="Enter mechanics" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend w-50">
+                                                <span class="input-group-text w-100">Type of Training</span>
+                                            </div>
+                                                <input type="text" class="form-control" name="type_of_training" id="typeOfTraining" placeholder="Enter type of training" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="row">
                             <div class="col">
                                 <div class="table-responsive">
@@ -388,8 +452,9 @@
                                         <thead>
                                             <tr class="bg-light">
                                                 <th style="width: 30%;">Title</th>
-                                                <th style="width: 30%;">Result</th>
-                                                <th style="width: 30%;">Training Remarks</th>
+                                                <th style="width: 30%;">Objective</th>
+                                                <th style="width: 15%;">Result</th>
+                                                <th style="width: 15%;">Remarks</th>
                                                 <th style="width: 10%;">Remove</th>
                                             </tr>
                                         </thead>
