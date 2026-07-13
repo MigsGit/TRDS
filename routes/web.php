@@ -170,8 +170,10 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_users', 'getUsers')->name('get_users');
         Route::get('/get_employee_details', 'getEmployeeDetails')->name('get_employee_details');
         Route::get('/get_emp_no_dropdown_details', 'getEmpNoDropdownDetails')->name('get_emp_no_dropdown_details');
+        Route::get('/get_training_venue_dropdown_details', 'getTrainingVenueDropdownDetails')->name('get_training_venue_dropdown_details');
         Route::get('/get_email_recipients_dropdown_details', 'getEmailRecipientsDropdownDetails')->name('get_email_recipients_dropdown_details');
         Route::get('/send_hr_memo_mail', 'sendHrMemoMail')->name('send_hr_memo_mail');
+        Route::get('/get_trainor_dropdown_details', 'getTrainorDropdownDetails')->name('get_trainor_dropdown_details');
     });
 
     // USER CONTROLLER

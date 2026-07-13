@@ -174,6 +174,9 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
                     <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" required></select>
                 </td>
                 <td>
+                    <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" required></textarea>
+                </td>
+                <td>
                     <select class="form-control form-control-md" name="result[]" id="result" required>
                         <option value="" disabled selected>Select Result</option>
                         <option value="1">Passed</option>
@@ -197,8 +200,10 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         const $tbody = $($tableExam).find('tbody');
         $tbody.html(defaultExamRow);
 
+        getTrainorDetails($formTD.find('.selectTrainor'));
         getExaminations($('#tblExamination tr:last').find('.selectExamTitle'));
-        selectEmpNo($('.selectEmpNo'));
+        selectEmpNo($formTD.find('.selectEmpNo'));
+        selectTrainingVenue($formTD.find('.selectTrainingVenue'));
         $modalTD.modal('show');
     });
 
@@ -222,18 +227,19 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
                 // $formTD.find('#trainingVenue').val(training_venue);
                 $formTD.find('#department').val(emp_details.Department);
                 $formTD.find('#prodAllocation').val(emp_details.Section);
+                // selectTrainingVenue($formTD.find('.selectTrainingVenue'));
 
-                if(training_venue.length > 0){
-                    result = '<option value="" disabled selected> Select Training Venue </option>';
+                // if(training_venue.length > 0){
+                //     result = '<option value="" disabled selected> Select Training Venue </option>';
 
-                    for (let i = 0; i < training_venue.length; i++) {
-                        result += '<option value="' + training_venue[i].Venue + '">' + training_venue[i].Venue + '</option>';
-                    }
-                }else{
-                    result = '<option value="0" selected disabled> -- No record found -- </option>';
-                }
+                //     for (let i = 0; i < training_venue.length; i++) {
+                //         result += '<option value="' + training_venue[i].Venue + '">' + training_venue[i].Venue + '</option>';
+                //     }
+                // }else{
+                //     result = '<option value="0" selected disabled> -- No record found -- </option>';
+                // }
 
-                $formTD.find('#trainingVenue').html(result);
+                // $formTD.find('#trainingVenue').html(result);
                 // if(empId != null){
                     // $formTD.find('#trainingVenue').val(empId).trigger('change');
                 // }
@@ -463,7 +469,15 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         console.log('counterNow', $addButtonTD.data('counter'));
 
         selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
-        $formTD.find('#trainingVenue').val(trainee.training_venue).trigger('change');
+        selectTrainingVenue($formTD.find('.selectTrainingVenue'), trainee.training_venue);
+        getTrainorDetails($formTD.find('.selectTrainor'), trainee.trainor); //CLARK to be continued
+        // console.log('selected training venue', trainee.training_venue);
+        
+        // $formTD.find('#trainingVenue').val(trainee.training_venue).trigger('change');
+        $formTD.find('#dateStart').val(trainee.date_start);
+        $formTD.find('#dateEnd').val(trainee.date_end);
+        $formTD.find('#mechanics').val(trainee.mechanics);
+        $formTD.find('#typeOfTraining').val(trainee.type_of_training);
         $formTD.find('#endorsementDate').val(trainee.endorsement_date);
 
         $tableExam.find('tbody').empty();
@@ -472,6 +486,9 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
                 <tr class="data-row" data-checkbox-id=''>
                     <td>
                         <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" required></select>
+                    </td>
+                    <td>
+                        <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" required></textarea>
                     </td>
                     <td>
                         <select class="form-control form-control-md" name="result[]" id="result" required>
@@ -496,6 +513,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
             $tableExam.find('tbody').append(rowExams);
             getExaminations($('#tblExamination tr:last').find('.selectExamTitle'), exam.exam_title);
+            $('#tblExamination tr:last').find('#objective').val(exam.objective);
             $('#tblExamination tr:last').find('#result').val(exam.result);
             $('#tblExamination tr:last').find('#remarks').val(exam.remarks);
         });
@@ -515,6 +533,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         let trainee = traineeDetailsArray.find(item => item.action.id == id);
 
         selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
+        selectTrainingVenue($formTD.find('.selectTrainingVenue'), trainee.training_venue);
         $formTD.find('#endorsementDate').val(trainee.endorsement_date);
 
         $tableExam.find('tbody').empty();
@@ -523,6 +542,9 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
                 <tr class="data-row" data-checkbox-id=''>
                     <td>
                         <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" disabled></select>
+                    </td>
+                    <td>
+                        <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" required></textarea>
                     </td>
                     <td>
                         <select class="form-control form-control-md" name="result[]" id="result" disabled>
@@ -547,6 +569,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
             $tableExam.find('tbody').append(rowExams);
             getExaminations($('#tblExamination tr:last').find('.selectExamTitle'), exam.exam_title);
+            $('#tblExamination tr:last').find('#objective').val(exam.objective);
             $('#tblExamination tr:last').find('#result').val(exam.result);
             $('#tblExamination tr:last').find('#remarks').val(exam.remarks);
         });
@@ -564,6 +587,11 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         let section = $formTD.find('#prodAllocation').val();
         let trainingVenue = $formTD.find('#trainingVenue').val();
         let endorsementDate = $formTD.find('#endorsementDate').val();
+        let date_start = $formTD.find('#dateStart').val();
+        let date_end = $formTD.find('#dateEnd').val();
+        let trainor = $formTD.find('#trainor').val();
+        let mechanics = $formTD.find('#mechanics').val();
+        let type_of_training = $formTD.find('#typeOfTraining').val();
         // let counterNow = $form.find('#btnAddTrainee').data('counter');
         let counterNow = $form.find('#btnAddTrainee').data('counter') || null;
         console.log('counterNow', counterNow);
@@ -573,7 +601,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             return;
         }
 
-        if(endorsementDate == '' || trainingVenue == ''){
+        if(endorsementDate == '' || trainingVenue == '' || trainor == '' || date_start == '' || date_end == '' || mechanics == '' || type_of_training == ''){
             showError('Please fill up the required fields.');
             return;
         }
@@ -586,16 +614,17 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
         $('.data-row').each(function (){
             let exam_title = $(this).find('.selectExamTitle').val();
+            let objective = $(this).find('#objective').val();
             let result = $(this).find('#result').val();
             let remarks = $(this).find('#remarks').val();
 
-            if(exam_title == null || result == null || remarks == ''){
+            if(exam_title == null || objective == null || result == null || remarks == ''){
                 showError('Please fill in all examination details.');
                 hasError = true;
                 return false; // stops the .each loop
             }
 
-            exam_list.push({exam_title, result, remarks});
+            exam_list.push({exam_title, objective, result, remarks});
         });
 
         if(hasError){
@@ -619,6 +648,11 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             department: department,
             section: section,
             training_venue: trainingVenue,
+            trainor: trainor,
+            date_start: date_start,
+            date_end: date_end,
+            mechanics: mechanics,
+            type_of_training: type_of_training,
             endorsement_date: endorsementDate,
             exam_details: exam_list
         }
@@ -749,6 +783,44 @@ function selectEmpNo(cboElement, empId = null, mode = null){
     });
 }
 
+function selectTrainingVenue(cboElement, trainingId = null, mode = null){
+    let result = '<option value="" disabled selected> Select One </option>';
+    $.ajax({
+        method: "get",
+        url: "get_training_venue_dropdown_details",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value="" disabled selected>--Loading--</option>';
+        },
+        success: function (response) {
+            let venue = response.training_venue;
+            if(venue.length > 0){
+                    result = '<option value="" disabled selected> Select Training Venue </option>';
+
+                for (let i = 0; i < venue.length; i++) {
+                    result += '<option value="' + venue[i].Venue + '">' + venue[i].Venue + '</option>';
+                }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+
+            cboElement.html(result);
+            if(trainingId != null){
+                cboElement.val(trainingId).trigger('change');
+            }
+
+            if(mode == 'view'){
+                cboElement.prop('disabled', true).trigger('change.select2');
+            }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}
+
 function getExaminations(cboElement, examId = null, mode = null){
     let result = '<option value="" disabled selected> Select Examination </option>';
     $.ajax({
@@ -775,6 +847,44 @@ function getExaminations(cboElement, examId = null, mode = null){
             cboElement.html(result);
             if(examId != null){
                 cboElement.val(examId).trigger('change');
+            }
+
+            if(mode == 'view'){
+                cboElement.prop('disabled', true).trigger('change.select2');
+            }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}
+
+
+function getTrainorDetails(cboElement, trainorId = null, mode = null){
+    let result = '<option value="" disabled selected> Select Trainor </option>';
+    $.ajax({
+        method: "get",
+        url: "get_trainor_dropdown_details",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value="" disabled selected>--Loading--</option>';
+        },
+        success: function (response) {
+            let trainorList = response.trainor_list;
+            if(trainorList.length > 0){
+                    result = '<option value="" disabled selected> Select Trainor </option>';
+
+                for (let ti = 0; ti < trainorList.length; ti++) {
+                    result += '<option value="' + trainorList[ti]['EmpNo'] + '">' + trainorList[ti]['TrainorName'] + '</option>';
+                }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+            cboElement.html(result);
+            if(trainorId != null){
+                cboElement.val(trainorId).trigger('change');
             }
 
             if(mode == 'view'){
@@ -923,21 +1033,22 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
                     position = item.hris_emp_info.Position;
                     department = item.hris_emp_info.Department;
                     section = item.hris_emp_info.Section;
-                    trainingVenue = item.hris_emp_info.Venue ?? "N/A";
+                    // trainingVenue = item.hris_emp_info.Venue ?? "N/A";
                 }else if(item.employment_type == 2){ //SUBCON
                     empName = item.subcon_emp_info.EmpName;
                     position = item.subcon_emp_info.Position;
                     department = item.subcon_emp_info.Department;
                     section = item.subcon_emp_info.Section;
-                    trainingVenue = item.subcon_emp_info.Venue ?? "N/A";
+                    // trainingVenue = item.subcon_emp_info.Venue ?? "N/A";
                 }
 
                 item.emp_exam_details.forEach(function(exam_item){
                     let exam_title = exam_item.category;
+                    let objective = exam_item.objective;
                     let result = exam_item.result;
                     let remarks = exam_item.training_remarks;
 
-                    exam_list.push({exam_title, result, remarks});
+                    exam_list.push({exam_title, objective, result, remarks});
                 });
 
                 let traineeDetailsList = {
@@ -947,8 +1058,13 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
                     position: position,
                     department: department,
                     section: section,
-                    training_venue: trainingVenue,
                     endorsement_date: item.endorsement_date,
+                    training_venue: item.emp_exam_details[0].training_venue,
+                    trainor: item.emp_exam_details[0].trainor,
+                    date_start: item.emp_exam_details[0].date_start,
+                    date_end: item.emp_exam_details[0].date_end,
+                    type_of_training: item.emp_exam_details[0].type_of_training,
+                    mechanics: item.emp_exam_details[0].mechanics,
                     exam_details: exam_list
                 }
 
