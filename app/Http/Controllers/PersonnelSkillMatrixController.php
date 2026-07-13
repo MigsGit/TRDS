@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Model\SystemOneHrisEmpInfo;
 use App\Model\SystemOneSubconEmpInfo;
 use App\Model\SystemoneEmployeeTraining;
+use App\Model\Hr\HrMemo;
+use App\Model\Hr\HrMemoTraineeDetails;
+use App\Model\Hr\HrMemoTraineeCategoryDetails;
 use Yajra\DataTables\Facades\DataTables;
 
 class PersonnelSkillMatrixController extends Controller
@@ -67,7 +70,7 @@ class PersonnelSkillMatrixController extends Controller
             $result .= '<button type="button" class="btn btn-sm btn-primary btnUpdateSubconEmpInfo" data-empno="' . $users->EmpNo .'">
                             <i class="fas fa-edit fa-md me-2"></i>
                         </button>';
-            $result .= '<button type="button" class="btn btn-sm btn-info btnViewEmployeeSkillMatrix ml-1" data-empno="' . $users->EmpNo .'">
+            $result .= '<button type="button" class="btn btn-sm btn-info btnViewSubconEmpInfo ml-1" data-empno="' . $users->EmpNo .'">
                             <i class="fas fa-eye fa-md me-2"></i>
                         </button>';
             $result .= '</center>';
@@ -114,49 +117,99 @@ class PersonnelSkillMatrixController extends Controller
         ->first();
 
         return response()->json($employeeDetails);
-
     }
 
-        public function getEmployeeTrainings(Request $request){
-        // Query for DataTables
-        $query = SystemoneEmployeeTraining::where('EmpNo', $request->id)
-            ->select([
-                'EmpNo',
-                'PeriodFrom',
-                'PeriodTo',
-                'Title',
-                'Objective',
-                'Trainor',
-                'Result',
-                'Venue',
-                'Mechanics',
-                'TypeTraining',
-                'Remarks'
-            ]);
+    public function viewSubconEmployeeInfo(Request $request){
+        $employeeDetails = SystemOneSubconEmpInfo::where('EmpNo', $request->id)
+        ->first();
 
-        // Single query to get all summary counts
-        $summary = SystemoneEmployeeTraining::selectRaw("
-                COUNT(*) AS total,
-                SUM(CASE WHEN Result = 'Passed' THEN 1 ELSE 0 END) AS passed,
-                SUM(CASE WHEN Result = 'Complied' THEN 1 ELSE 0 END) AS complied,
-                SUM(CASE WHEN Result = 'Failed' THEN 1 ELSE 0 END) AS failed,
-                SUM(CASE WHEN Result = 'Actual Hands on' THEN 1 ELSE 0 END) AS handsOn
-            ")
-            ->where('EmpNo', $request->id)
-            ->first();
+        return response()->json($employeeDetails);
+    }
+
+    public function getEmployeeTrainings(Request $request)
+    {
+
+        $query = HrMemoTraineeCategoryDetails::with([
+            'exam_info_test',
+            'employee_info_tist',
+            'rapidx_system_one_hris_emp_info'
+        ])
+        ->whereHas('employee_info_tist', function ($q) use ($request) {
+            $q->where('employee_no', $request->id);
+        });
+
+        // Clone the query so the counts don't affect the DataTables query
+        $passed   = (clone $query)->where('result', 1)->count();
+        $complied = (clone $query)->where('result', 2)->count();
+        $failed   = (clone $query)->where('result', 3)->count();
+        $total    = (clone $query)->count();
 
         return DataTables::eloquent($query)
-            ->addColumn('trainingDate', function ($row) {
-                return $row->PeriodFrom . ' - ' . $row->PeriodTo;
-            })
-            ->with([
-                'passed'   => (int) $summary->passed,
-                'complied' => (int) $summary->complied,
-                'failed'   => (int) $summary->failed,
-                'handsOn'  => (int) $summary->handsOn,
-                'total'    => (int) $summary->total,
-            ])
-            ->rawColumns(['trainingDate'])
-            ->toJson();
+        ->addColumn('trainingDate', function ($row) {
+                if (!$row->date_start && !$row->date_end) {
+                    return '';
+                }
+
+                return $row->date_start . ' - ' . $row->date_end;
+        })
+        ->addColumn('title', function ($row) {
+            return optional($row->exam_info_test)->examination_name;
+        })
+        ->addColumn('objective', function ($row) {
+            if(!$row->objective){
+                return '';
+            }
+            return $row->objective;
+        })
+        ->addColumn('trainor', function ($row) {
+            $trainor = $row->rapidx_system_one_hris_emp_info;
+
+            if (!$trainor) {
+                return '';
+            }
+
+            return trim($trainor->FirstName . ' ' . $trainor->LastName);
+        })
+        ->addColumn('result', function ($row) {
+            switch ((int) $row->result) {
+                case 1:
+                    return '<span class="badge badge-success">Passed</span>';
+
+                case 2:
+                    return '<span class="badge badge-primary">Complied</span>';
+
+                case 3:
+                    return '<span class="badge badge-danger">Failed</span>';
+
+                default:
+                    return '<span class="badge badge-secondary">N/A</span>';
+            }
+        })
+        ->addColumn('trainingVenue', function ($row) {
+            if(!$row->training_venue){
+                return '';
+            }
+            return $row->training_venue;
+        })
+        ->addColumn('mechanics', function ($row) {
+            if(!$row->mechanics){
+                return '';
+            }
+            return $row->mechanics;
+        })
+        ->addColumn('typeOfTraining', function ($row) {
+            if(!$row->type_of_training){
+                return '';
+            }
+            return $row->type_of_training;
+        })
+        ->with([
+            'passed'   => $passed,
+            'complied' => $complied,
+            'failed'   => $failed,
+            'total'    => $total,
+        ])
+        ->rawColumns(['result'])
+        ->make(true);
     }
 }

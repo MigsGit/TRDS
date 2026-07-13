@@ -360,18 +360,13 @@
                                 </tr>
 
                                 <tr>
-                                    <th class="text-warning text-right">Complied:</th>
+                                    <th class="text-primary text-right">Complied:</th>
                                     <td id="lblComplied">0</td>
                                 </tr>
 
                                 <tr>
                                     <th class="text-danger text-right">Failed:</th>
                                     <td id="lblFailed">0</td>
-                                </tr>
-
-                                <tr>
-                                    <th class="text-info text-right">Hands-on:</th>
-                                    <td id="lblHandsOn">0</td>
                                 </tr>
 
                                 <tr>
@@ -412,12 +407,12 @@
                                                     <th class="text-center">Date</th>
                                                     <th class="text-center">Title</th>
                                                     <th class="text-center">Objective</th>
-                                                    <th class="text-center">Trainer</th>
+                                                    <th class="text-center">Trainor</th>
                                                     <th class="text-center">Results</th>
                                                     <th class="text-center">Venue</th>
                                                     <th class="text-center">Mechanics</th>
                                                     <th class="text-center">Type of Training</th>
-                                                    <th class="text-center">Remarks</th>
+                                                    {{-- <th class="text-center">Remarks</th> --}}
                                                 </tr>
                                             </thead>
                                             <tbody></tbody>
