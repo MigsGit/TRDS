@@ -115,7 +115,6 @@ class QualificationCertificationController extends Controller
             ->values()
             ->all();
            
-
             // $qcSlipReasons = collect($qcSlip);
             return response()->json(['is_success' => 'true','qcSlip' => $qcSlip,'rawReasonsStringCollection' => $rawReasonsStringCollection]);
         } catch (Exception $e) {

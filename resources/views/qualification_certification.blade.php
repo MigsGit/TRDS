@@ -1817,12 +1817,10 @@
                 const targetSelector = '#text_certification_operator';
                 let editSelectionsMap = {};
                 editSelectionsMap[targetSelector] = response.rawReasonsStringCollection;
-                console.log('targetSelector',editSelectionsMap[targetSelector]);
-                
                 initDropdownMasterDetailsByFkidCombos(
                     [targetSelector], 
                     3, 
-                    editSelectionsMap 
+                    editSelectionsMap
                 );
                
                 form.formSubmitOper.find('#qc_slips_id').val(data.id);

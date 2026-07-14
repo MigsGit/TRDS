@@ -42,19 +42,17 @@ const getDropdownMasterDetailsByFkid = (params) => {
     };
 
     call_ajax(data,'get_dropdown_master_details_by_fkid',function(response){
-        // return;
         let paramsGetSelect2Value = {
             comboId : params.comboId,
             dataValue : response['data'],
             selectedValues : params.selectedValues ?? []
         }
-
-        fnGetSelect2Value2(paramsGetSelect2Value)
+        fnGetSelect2ValueMultiple(paramsGetSelect2Value)
     });
 
 }
 
-const fnGetSelect2Value2 = (params) => {
+const fnGetSelect2ValueMultiple = (params) => {
     if (params.comboId.hasClass("select2-hidden-accessible")) {
         params.comboId.select2('destroy').empty();
     } else {
@@ -106,112 +104,27 @@ const fnGetSelect2Value2 = (params) => {
     }
 }
 
-const fnGetSelect2Value23 = (params) => {
-    // 1. Reset dropdown completely to clear out old instances and cached data
-    if (params.comboId.hasClass("select2-hidden-accessible")) {
-        params.comboId.select2('destroy').empty();
-    } else {
-        params.comboId.empty();
-    }
-
-    // 2. Remap the database array columns explicitly to 'id' and 'text'
-    // CRITICAL: We enforce String(obj.id) so the data types match the val() array exactly!
-    const mappedSelect2Data = $.map(params.dataValue, function(obj) {
-        return {
-            id: String(obj.id), 
-            text: obj.dropdown_masters_details
-        };
-    });
-
-    // 3. Render dataset structures with a clean placeholder configuration
-    params.comboId.select2({
-        data: mappedSelect2Data, 
-        theme: 'bootstrap-5',
-        multiple: true,
-        placeholder: 'Select Reason...',
-        allowClear: true
-    });
-
-    // 4. Monitor active value updates
-    params.comboId.off('change').on('change', function() {
-        let selectedObjects = $(this).select2('data');
-        let extractedData = selectedObjects.map(function(item) {
-            return { id: item.id, text: item.text };
-        });
-    });
-
-    // 5. Set pre-selected data layers cleanly
-    if (params.selectedValues && Array.isArray(params.selectedValues)) {
-        // Enforce all IDs to be clean strings to match our mappedSelect2Data IDs
-        const cleanStringIds = params.selectedValues.map(id => String(id).trim());
-        
-        // Pass the string array and trigger the change event
-        params.comboId.val(cleanStringIds).trigger('change');
-    } else {
-        params.comboId.val(null).trigger('change');
-    }
-}
-
-const fnGetSelect2Value21 = (params) => {
-    // 1. Reset dropdown components completely to avoid memory leak duplication bugs
-    // if (params.comboId.hasClass("select2-hidden-accessible")) {
-    //     params.comboId.select2('destroy').empty();
-    // }
-
-    // 2. Render dataset mapping structures
-    params.comboId.select2({
-        data: params.dataValue,
-        theme: 'bootstrap-5',
-        multiple: true
-    });
-
-    // 3. Monitor active value updates
-    params.comboId.off('change').on('change', function() {
-        let selectedObjects = $(this).select2('data');
-        let extractedData = selectedObjects.map(function(item) {
-            return { id: item.id, text: item.text };
-        });
-    });
-
-    // 4. Set pre-selected data layers cleanly
-    if (params.selectedValues && Array.isArray(params.selectedValues)) {
-        const cleanStringIds = params.selectedValues.map(id => String(id));
-        params.comboId.val(cleanStringIds).trigger('change');
-    } else {
-        params.comboId.val(null).trigger('change');
-    }
-}
 
 const fnGetSelect2Value = (params) =>  {
-    // 1. Initialize the Select2 dropdown with your AJAX data source
     params.comboId.select2({
         data : params.dataValue,
         theme: 'bootstrap-5',
     });
-
-    // 2. Set up a listener for changes to cleanly pull the entire object data matrix
     params.comboId.on('change', function() {
-        // .select2('data') returns an array of selected option objects [{id: "...", text: "...", ...}]
         let selectedObjects = $(this).select2('data');
 
         let extractedData = selectedObjects.map(function(item) {
             return {
-                id: item.id,     // The underlying database primary key/value
-                text: item.text  // The string display description/label
+                id: item.id,     
+                text: item.text 
             };
         });
 
-        // You can now store 'extractedData' to your global queue variables or use it directly!
     });
-
-    // If your backend payload contains pre-selected values, map their keys to set them:
     var arrValue = [];
     $.each(params.dataValue, function(key, value){
         arrValue.push(value.id); // Push the ID to pre-select it
     });
-
-    // Un-comment this line if you want the dropdown to auto-select items arriving from AJAX:
-    // params.comboId.val(arrValue).trigger('change');
 }
 
 
