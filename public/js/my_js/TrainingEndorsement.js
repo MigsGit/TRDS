@@ -457,16 +457,16 @@ $('#trainingReqCtrl').on('keyup', function (e) {
                     var hasPassed = false;
                     var examTitles = '';
                     var examRemarks = '';
-                    if (Array.isArray(emp.employee_exam_details) && emp.employee_exam_details.length > 0) {
-                        ratings = emp.employee_exam_details.map(function(exam) {
-                            return exam.exam_result_details_info && exam.exam_result_details_info.rating !== undefined && exam.exam_result_details_info.rating !== null
-                                ? exam.exam_result_details_info.rating
+                    if (Array.isArray(emp.employee_exam_details.exam_result_details_info) && emp.employee_exam_details.exam_result_details_info.length > 0) {
+                        ratings = emp.employee_exam_details.exam_result_details_info.map(function(exam) {
+                            return exam && exam.rating !== undefined && exam.rating !== null
+                                ? exam.rating
                                 : '';
                         }).join(' | ');
 
-                        remarks = emp.employee_exam_details.map(function(exam) {
-                            return exam.exam_result_details_info && exam.exam_result_details_info.remark !== undefined && exam.exam_result_details_info.remark !== null
-                                ? exam.exam_result_details_info.remark
+                        remarks = emp.employee_exam_details.exam_result_details_info.map(function(exam) {
+                            return exam && exam.remark !== undefined && exam.remark !== null
+                                ? exam.remark
                                 : '';
                         }).join(' | ');
                         examRemarks = remarks;
@@ -474,9 +474,9 @@ $('#trainingReqCtrl').on('keyup', function (e) {
                         // Check if any remarks contain 'Passed' (case-insensitive)
                         hasPassed = /passed/i.test(remarks);
 
-                        var questionnaireArr = emp.employee_exam_details.map(function(exam) {
-                            return exam.exam_result_details_info && exam.exam_result_details_info.questionnaire !== undefined && exam.exam_result_details_info.questionnaire !== null
-                                ? exam.exam_result_details_info.questionnaire
+                        var questionnaireArr = emp.employee_exam_details.exam_result_details_info.map(function(exam) {
+                            return exam && exam.questionnaire !== undefined && exam.questionnaire !== null
+                                ? exam.questionnaire
                                 : null;
                         }).filter(function(q) { return q !== null; });
                         // If the backend returns an array of JSON strings, parse them
