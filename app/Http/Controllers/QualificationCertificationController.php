@@ -97,11 +97,27 @@ class QualificationCertificationController extends Controller
     public function getQcSlipsById(Request $request){
 
         try {
-            $qcSlip = QcSlip::with('product_line','op_approvers','qc_slip_employees')
+            $qcSlip = QcSlip::with('product_line','op_approvers','qc_slip_employees','qc_reason_certification')
             ->where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')
-            ->get();
-            return response()->json(['is_success' => 'true','qcSlip' => $qcSlip]);
+            ->first();
+            if (!$qcSlip || !$qcSlip->qc_reason_certification) {
+                return []; // Return empty array defensively if no record or reasons exist
+            }
+
+            $rawReasonsString = $qcSlip->qc_reason_certification->reason_of_certification; 
+
+            $rawReasonsStringCollection =  collect(explode('|', $rawReasonsString))
+                ->map(function($id) {
+                    return trim($id); // Safely strips spaces around each ID
+                })
+            ->filter()
+            ->values()
+            ->all();
+           
+
+            // $qcSlipReasons = collect($qcSlip);
+            return response()->json(['is_success' => 'true','qcSlip' => $qcSlip,'rawReasonsStringCollection' => $rawReasonsStringCollection]);
         } catch (Exception $e) {
             throw $e;
         }
@@ -234,7 +250,6 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-
     public function loadQcSlip(Request $request){
     //newStatus
       $qcSlips = QcSlip::with('product_line','op_approvers')
@@ -320,7 +335,6 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-
     public function saveOperApprovers($params){
         try {
             OpApprover::insert($params);
@@ -605,12 +619,12 @@ class QualificationCertificationController extends Controller
                     CQcCertification::insert($cQcCertification);
                    $operToApprovers = [
                         "decision_status" => 'APP',
-                        "first_approver"  =>  collect($request->text_1st_certifiedby_qcs_oper)->join(' | ') ?? 'R152',
+                        "first_approver"  =>  collect($request->text_1st_certifiedby_qcs_oper)->join(' | '),
                         "first_date" =>  $request->text_1st_date_qcs_oper,
                         "first_time" =>  $request->text_1st_time_qcs_oper,
                         "first_status" =>  $request->text_oa_1st_result_qcs_oper,
                         "first_remarks" =>  $request->text_1st_disapproval_qcs_oper,
-                        "second_approver"  =>  collect($request->text_2nd_certifiedby_qcs_oper)->join(' | ') ?? 'R152',
+                        "second_approver"  =>  collect($request->text_2nd_certifiedby_qcs_oper)->join(' | '),
                         "second_date" =>  $request->text_2nd_date_qcs_oper,
                         "second_time" =>  $request->text_2nd_time_qcs_oper,
                         "second_status" =>  $request->text_oa_2nd_result_qcs_oper,
@@ -768,28 +782,28 @@ class QualificationCertificationController extends Controller
 
     public function index(Request $request){
         return $eQcValidationProcess =  [
-                        //2nd day
-                        "vpqcs_oper" => $request->text_vpqcs_oper, //CHECKBOX
-                        "first_status" =>  $request->text_first_result_vpqcs_oper,//PASSED
-                        "first_approver"=>  collect($request->text_1st_validatedby_vpqcs_oper)->join(' | '), //R152 - 2trainedby
-                        "first_date" =>  $request->text_1st_date_vpqcs_oper,
+            //2nd day
+            "vpqcs_oper" => $request->text_vpqcs_oper, //CHECKBOX
+            "first_status" =>  $request->text_first_result_vpqcs_oper,//PASSED
+            "first_approver"=>  collect($request->text_1st_validatedby_vpqcs_oper)->join(' | '), //R152 - 2trainedby
+            "first_date" =>  $request->text_1st_date_vpqcs_oper,
 
-                        "second_status" =>  $request->text_second_result_vpqcs_oper,
-                        "text_2nd_validatedby_vpqcs_oper"=> collect($request->text_2nd_validatedby_vpqcs_oper)->join(' | '),//R152 - 2trainedby
-                        "second_date" =>  $request->text_2nd_date_vpqcs_oper,
-                        "first_remarks" =>  $request->text_remarks_vpqcs_oper,
+            "second_status" =>  $request->text_second_result_vpqcs_oper,
+            "text_2nd_validatedby_vpqcs_oper"=> collect($request->text_2nd_validatedby_vpqcs_oper)->join(' | '),//R152 - 2trainedby
+            "second_date" =>  $request->text_2nd_date_vpqcs_oper,
+            "first_remarks" =>  $request->text_remarks_vpqcs_oper,
 
-                        //3rd day
-                        "text_vpqcs_oper_1_1" =>  $request->text_vpqcs_oper_1_1, //CHECKBOX
-                        "first_status_2" =>  $request->text_first_result_vpes_oper_2, //PASSED
-                        "first_approver_2"=>  collect($request->text_1st_validatedby_vpes_oper_2)->join(' | '),//R152 - 2trainedby
-                        "first_date_2" =>  $request->text_1st_date_vpes_oper_2,
-                        "text_application_vpqcs_oper" =>  $request->text_application_vpqcs_oper, //DROPDOWN
-                        "second_status_2" =>  $request->text_second_result_vpes_oper_2, //PASSED
-                        "second_approver_2"=> collect($request->text_2nd_validatedby_vpes_oper_2)->join(' | '),//R152 - 2trainedby
-                        "second_date_2" =>  $request->text_2nd_date_vpes_oper_2,
-                        "text_remarks_vpes_oper_2" =>  $request->text_remarks_vpes_oper_2,
-                    ];
+            //3rd day
+            "text_vpqcs_oper_1_1" =>  $request->text_vpqcs_oper_1_1, //CHECKBOX
+            "first_status_2" =>  $request->text_first_result_vpes_oper_2, //PASSED
+            "first_approver_2"=>  collect($request->text_1st_validatedby_vpes_oper_2)->join(' | '),//R152 - 2trainedby
+            "first_date_2" =>  $request->text_1st_date_vpes_oper_2,
+            "text_application_vpqcs_oper" =>  $request->text_application_vpqcs_oper, //DROPDOWN
+            "second_status_2" =>  $request->text_second_result_vpes_oper_2, //PASSED
+            "second_approver_2"=> collect($request->text_2nd_validatedby_vpes_oper_2)->join(' | '),//R152 - 2trainedby
+            "second_date_2" =>  $request->text_2nd_date_vpes_oper_2,
+            "text_remarks_vpes_oper_2" =>  $request->text_remarks_vpes_oper_2,
+        ];
         try {
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {

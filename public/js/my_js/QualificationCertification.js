@@ -24,14 +24,17 @@ const selectPassFail = (comboId) => {
     fnGetSelect2Value(paramsGetSelect2Value)
 }
 
-const initDropdownMasterDetailsByFkidCombos = (comboSelectors,dropdownMastersId) => {
-
+const initDropdownMasterDetailsByFkidCombos = (comboSelectors,dropdownMastersId,specificValues ={}) => {
     comboSelectors.forEach(function(selector) {
             getDropdownMasterDetailsByFkid({
                 comboId: $(selector),
-                dropdownMastersId: dropdownMastersId
+                dropdownMastersId: dropdownMastersId,
+                selectedValues : (specificValues && specificValues[selector]) ? specificValues[selector] : null
             });
     });
+    
+    console.log('11',specificValues);
+    
 }
 const getDropdownMasterDetailsByFkid = (params) => {
     let data = {
@@ -42,14 +45,142 @@ const getDropdownMasterDetailsByFkid = (params) => {
         // return;
         let paramsGetSelect2Value = {
             comboId : params.comboId,
-            dataValue : response['data']
+            dataValue : response['data'],
+            selectedValues : params.selectedValues ?? []
         }
 
-        fnGetSelect2Value(paramsGetSelect2Value)
+        fnGetSelect2Value2(paramsGetSelect2Value)
     });
 
 }
 
+const fnGetSelect2Value2 = (params) => {
+    if (params.comboId.hasClass("select2-hidden-accessible")) {
+        params.comboId.select2('destroy').empty();
+    } else {
+        params.comboId.empty();
+    }
+
+    const mappedSelect2Data = $.map(params.dataValue || [], function(obj) {
+        let displayId = obj.id !== undefined ? String(obj.id) : '';
+        
+        let displayText = '';
+        if (typeof obj === 'object') {
+            // Priority list of known column names
+            displayText = obj.dropdown_masters_details || obj.dropdown_master_details || obj.text || obj.value;
+            
+            if (!displayText) {
+                for (let key in obj) {
+                    if (key !== 'id' && typeof obj[key] === 'string' && obj[key].trim().length > 0) {
+                        displayText = obj[key];
+                        break;
+                    }
+                }
+            }
+        } else if (typeof obj === 'string') {
+            return { id: obj, text: obj };
+        }
+
+        return {
+            id: displayId,
+            text: displayText || 'Missing Label'
+        };
+    });
+
+
+    // 4. Initialize Select2
+    params.comboId.select2({
+        data: mappedSelect2Data, 
+        theme: 'bootstrap-5',
+        multiple: true,
+        placeholder: 'Select Reason...',
+        allowClear: true
+    });
+
+    // 5. Force the selected pills into view
+    if (params.selectedValues && Array.isArray(params.selectedValues)) {
+        const cleanStringIds = params.selectedValues.map(id => String(id).trim());
+        params.comboId.val(cleanStringIds).trigger('change');
+    } else {
+        params.comboId.val(null).trigger('change');
+    }
+}
+
+const fnGetSelect2Value23 = (params) => {
+    // 1. Reset dropdown completely to clear out old instances and cached data
+    if (params.comboId.hasClass("select2-hidden-accessible")) {
+        params.comboId.select2('destroy').empty();
+    } else {
+        params.comboId.empty();
+    }
+
+    // 2. Remap the database array columns explicitly to 'id' and 'text'
+    // CRITICAL: We enforce String(obj.id) so the data types match the val() array exactly!
+    const mappedSelect2Data = $.map(params.dataValue, function(obj) {
+        return {
+            id: String(obj.id), 
+            text: obj.dropdown_masters_details
+        };
+    });
+
+    // 3. Render dataset structures with a clean placeholder configuration
+    params.comboId.select2({
+        data: mappedSelect2Data, 
+        theme: 'bootstrap-5',
+        multiple: true,
+        placeholder: 'Select Reason...',
+        allowClear: true
+    });
+
+    // 4. Monitor active value updates
+    params.comboId.off('change').on('change', function() {
+        let selectedObjects = $(this).select2('data');
+        let extractedData = selectedObjects.map(function(item) {
+            return { id: item.id, text: item.text };
+        });
+    });
+
+    // 5. Set pre-selected data layers cleanly
+    if (params.selectedValues && Array.isArray(params.selectedValues)) {
+        // Enforce all IDs to be clean strings to match our mappedSelect2Data IDs
+        const cleanStringIds = params.selectedValues.map(id => String(id).trim());
+        
+        // Pass the string array and trigger the change event
+        params.comboId.val(cleanStringIds).trigger('change');
+    } else {
+        params.comboId.val(null).trigger('change');
+    }
+}
+
+const fnGetSelect2Value21 = (params) => {
+    // 1. Reset dropdown components completely to avoid memory leak duplication bugs
+    // if (params.comboId.hasClass("select2-hidden-accessible")) {
+    //     params.comboId.select2('destroy').empty();
+    // }
+
+    // 2. Render dataset mapping structures
+    params.comboId.select2({
+        data: params.dataValue,
+        theme: 'bootstrap-5',
+        multiple: true
+    });
+
+    // 3. Monitor active value updates
+    params.comboId.off('change').on('change', function() {
+        let selectedObjects = $(this).select2('data');
+        let extractedData = selectedObjects.map(function(item) {
+            return { id: item.id, text: item.text };
+        });
+    });
+
+    // 4. Set pre-selected data layers cleanly
+    if (params.selectedValues && Array.isArray(params.selectedValues)) {
+        const cleanStringIds = params.selectedValues.map(id => String(id));
+        params.comboId.val(cleanStringIds).trigger('change');
+    } else {
+        params.comboId.val(null).trigger('change');
+    }
+}
 
 const fnGetSelect2Value = (params) =>  {
     // 1. Initialize the Select2 dropdown with your AJAX data source

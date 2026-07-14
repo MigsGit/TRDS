@@ -1765,9 +1765,9 @@
                 qcSlipsId :  params.qcSlipsId
             }
             call_ajax(data, 'get_qc_slips_by_id', function(response){
-                let data = response.qcSlip[0];
+                let data = response.qcSlip;
                 let qcSlipEmployeeData = response.qcSlipEmployee;
-               populateEditOperEmpTable(data.qc_slip_employees);
+                populateEditOperEmpTable(data.qc_slip_employees);
                 dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
                 dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
                 // dataTable.fvi_operator.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
@@ -1777,8 +1777,8 @@
                 $('#operApproved').addClass('d-none');
                 $('#operClosed').removeClass('d-none');
                 $('#operSave').removeClass('d-none');
-
                 $('#approval_status').val(currentStatus);
+
                 if(data.approval_status ==='BENGGTQ'){
                     $('#collapseTwoOper').addClass('show');
                     $('#collapseOneOper').removeClass('show');
@@ -1814,6 +1814,17 @@
                     $('#operSave').addClass('d-none');
                 }
 
+                const targetSelector = '#text_certification_operator';
+                let editSelectionsMap = {};
+                editSelectionsMap[targetSelector] = response.rawReasonsStringCollection;
+                console.log('targetSelector',editSelectionsMap[targetSelector]);
+                
+                initDropdownMasterDetailsByFkidCombos(
+                    [targetSelector], 
+                    3, 
+                    editSelectionsMap 
+                );
+               
                 form.formSubmitOper.find('#qc_slips_id').val(data.id);
                 form.formSubmitOper.find('#textconno_new_operator').val(data.control_no);
                 form.formSubmitOper.find('#select_section').val(data.section_category);
