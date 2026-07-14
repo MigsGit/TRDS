@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use App\Model\DropdownMasterDetail;
+use App\Model\Qc\AOperProdTrainingOrientation;
 use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\OpApprover;
@@ -22,7 +23,7 @@ class QcSlip extends Model
     // }
     public function op_approvers()
     {
-        return $this->hasOne(OpApprover::class, 'qc_slips_id', 'id');
+        return $this->hasMany(OpApprover::class, 'qc_slips_id', 'id');
     }
     public function qc_slip_employees()
     {
@@ -36,8 +37,13 @@ class QcSlip extends Model
     {
        return $this->dropdown_master_detail('product_line');
     }
-     public function qc_reason_certification()
+    public function qc_reason_certification()
     {
         return $this->hasOne(QcReasonCertification::class, 'qc_slips_id', 'id');
     }
+    public function a_oper_prod_training_orientation()
+    {
+        return $this->hasOne(AOperProdTrainingOrientation::class, 'qc_slips_id', 'id');
+    }
+    
 }

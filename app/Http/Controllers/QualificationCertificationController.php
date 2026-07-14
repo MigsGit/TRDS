@@ -97,26 +97,79 @@ class QualificationCertificationController extends Controller
     public function getQcSlipsById(Request $request){
 
         try {
-            $qcSlip = QcSlip::with('product_line','op_approvers','qc_slip_employees','qc_reason_certification')
+            $qcSlip = QcSlip::with(
+                'op_approvers',
+                'qc_slip_employees',
+                'qc_reason_certification',
+                'a_oper_prod_training_orientation',
+            )
             ->where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')
             ->first();
-            if (!$qcSlip || !$qcSlip->qc_reason_certification) {
-                return []; // Return empty array defensively if no record or reasons exist
-            }
+
 
             $rawReasonsString = $qcSlip->qc_reason_certification->reason_of_certification; 
+            $rawAOperProdTrainingOrientation = $qcSlip->a_oper_prod_training_orientation->traning_items; 
 
             $rawReasonsStringCollection =  collect(explode('|', $rawReasonsString))
                 ->map(function($id) {
-                    return trim($id); // Safely strips spaces around each ID
+                    return trim($id);
                 })
             ->filter()
             ->values()
             ->all();
-           
+
+            $rawAOperProdTrainingOrientationCollection =  collect(explode('|', $rawAOperProdTrainingOrientation))
+                ->map(function($id) {
+                    return trim($id);
+                })
+            ->filter()
+            ->values()
+            ->all();
+
+           $approversGroupByApprovalStatus = collect($qcSlip->op_approvers)->groupBy('approval_status')->toArray();
+            
+            // return $approversCollection = collect($qcSlip)->groupBy('approval_status')->toArray();
+            $approversCollection = collect($approversGroupByApprovalStatus)->map(function ($items) {
+            return collect($items)->map(function ($item) {
+                // Convert object to array if it's an Eloquent model or StdClass
+                $itemArray = (array) $item;
+
+                // Helper function to explode string by pipe cleanly, ignoring nulls/empties
+                $explodePipedString = function ($value) {
+                    if (is_null($value) || trim($value) === '') {
+                        return [];
+                    }
+                    // Explode by '|' and trim extra spaces from the results
+                    return array_map('trim', explode('|', $value));
+                };
+
+                // Inject the dynamic collection arrays back into the payload object
+                $itemArray['first_approver_exploded']  = $explodePipedString($itemArray['first_approver'] ?? null);
+                $itemArray['second_approver_exploded'] = $explodePipedString($itemArray['second_approver'] ?? null);
+                
+                // You can also explode alerts if needed!
+                $itemArray['alert_prod_sec_exploded']  = $explodePipedString($itemArray['alert_prod_sec'] ?? null);
+
+                return $itemArray;
+            });
+        });
+
+        /*
+            Get the ID Text in the backend
+
+            id: r152
+            text: miguel legaspi
+        
+        */
             // $qcSlipReasons = collect($qcSlip);
-            return response()->json(['is_success' => 'true','qcSlip' => $qcSlip,'rawReasonsStringCollection' => $rawReasonsStringCollection]);
+            return response()->json([
+                'is_success' => 'true',
+                'qcSlip' => $qcSlip,
+                'rawReasonsStringCollection' => $rawReasonsStringCollection,
+                'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection,
+                'approversCollection' => $approversCollection,
+            ]);
         } catch (Exception $e) {
             throw $e;
         }

@@ -540,7 +540,7 @@
         });
     }
 
-    function getSystemOneEmployeeDetails(comboId){
+    const getSystemOneEmployeeDetailsRev1 = (comboId) => {
         comboId.select2({
             theme: 'bootstrap-5',
             placeholder: 'Search Employee Name or ID...',
@@ -569,6 +569,9 @@
             }
        });
     }
+ 
+
+  
     function getSystemOneEmployeeDetailstest(cboElement,userId=null){
         let result = '<option value="">N/A</option>';
         $.ajax({
