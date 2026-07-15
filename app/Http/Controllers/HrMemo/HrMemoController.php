@@ -11,6 +11,8 @@ use App\Model\Hr\HrMemo;
 use App\Model\Hr\HrMemoEmailRecipients;
 use App\Model\Hr\HrMemoTraineeDetails;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
+use App\Exports\InspectorSkillChart;
+use Maatwebsite\Excel\Facades\Excel;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -312,8 +314,6 @@ class HrMemoController extends Controller
     }
 
     public function addHrMemoInfo(Request $request){
-        // return $request->all();
-        // return $trainees = json_decode($request->trainee_details, true);
         $validation = array(
             'subject' => 'required',
             'from' => 'required',
@@ -433,7 +433,6 @@ class HrMemoController extends Controller
                                 'category'            => $ed['exam_title'],
                                 'objective'           => $ed['objective'],
                                 'trainor'             => $td['trainor'],
-                                'mechanics'           => $td['mechanics'],
                                 'type_of_training'    => $td['type_of_training'],
                                 'result'              => $ed['result'],
                                 'training_venue'      => $td['training_venue'],
@@ -596,7 +595,7 @@ class HrMemoController extends Controller
 
     public function getTrainorDropdownDetails(Request $request)
     {
-        $trainorQuery = "
+        $pmiTrainorQuery = "
             SELECT
                 pkid,
                 EmpNo,
@@ -606,10 +605,37 @@ class HrMemoController extends Controller
             ORDER BY TrainorName ASC
         ";
 
-        $trainor_list = DB::connection('mysql_systemone')->select($trainorQuery);
+        $subconTrainorQuery = "
+            SELECT
+                pkid,
+                EmpNo,
+                CONCAT(FirstName, ' ', LastName) AS TrainorName
+            FROM tbl_EmployeeInfo
+            WHERE fkSection = 401 AND fkPosition IN (21, 87, 106, 123, 134) AND EmpStatus = 1
+            ORDER BY TrainorName ASC
+        ";
+
+        $hris = DB::connection('mysql_systemone')->select($pmiTrainorQuery);
+        $subcon = DB::connection('mysql_subcon')->select($subconTrainorQuery);
+
+        $merged_trainor_list = array_merge($hris, $subcon);
             
         return response()->json([
-            'trainor_list' => $trainor_list
+            'trainor_list' => $merged_trainor_list
         ]);
+    }
+
+    public function exportInspectorSkillChart(Request $request)
+    {
+        $request->validate([
+            'section_export'   => 'required',
+        ]);
+
+        $selectedSheets = $request->input('section_export', []);
+
+        return Excel::download(
+            new InspectorSkillChart($selectedSheets),
+            'QC Inspectors Skill Chart.xlsx'
+        );
     }
 }

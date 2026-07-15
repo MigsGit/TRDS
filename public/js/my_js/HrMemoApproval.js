@@ -175,10 +175,10 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         $formTD.find('#trainor').prop('disabled', false);
         $formTD.find('#dateStart').prop('disabled', false);
         $formTD.find('#dateEnd').prop('disabled', false);
-        $formTD.find('#mechanics').prop('disabled', false);
         $formTD.find('#typeOfTraining').prop('disabled', false);
         $formTD.find('#endorsementDate').prop('disabled', false);
         $formTD.find('#btnAddExamination').prop('hidden', false);
+        $modalTD.find('#btnAddTraineeDetailsToList').prop('hidden', false);
 
         // Remove all rows except template row
         $($tableExam).find('tbody tr:not(.data-row)').remove();
@@ -416,6 +416,16 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     });
 
     $tableTD.on('click', '.editTDRow', function(e) {
+        $formTD.find('#employeeNumber').prop('disabled', false);
+        $formTD.find('#dateStart').prop('disabled', false);
+        $formTD.find('#dateEnd').prop('disabled', false);
+        $formTD.find('#typeOfTraining').prop('disabled', false);
+        $formTD.find('#trainingVenue').prop('disabled', false);
+        $formTD.find('#trainor').prop('disabled', false);
+        $formTD.find('#endorsementDate').prop('disabled', false);
+        $formTD.find('#btnAddExamination').prop('hidden', false);
+        $modalTD.find('#btnAddTraineeDetailsToList').prop('hidden', false);
+
         e.preventDefault();
         let editId = $(this).data("id");
         let trainee = traineeDetailsArray.find(item => item.action.id == editId);
@@ -429,7 +439,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
         $formTD.find('#dateStart').val(trainee.date_start);
         $formTD.find('#dateEnd').val(trainee.date_end);
-        $formTD.find('#mechanics').val(trainee.mechanics);
         $formTD.find('#typeOfTraining').val(trainee.type_of_training);
         $formTD.find('#endorsementDate').val(trainee.endorsement_date);
 
@@ -480,7 +489,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         $formTD.find('#employeeNumber').prop('disabled', true);
         $formTD.find('#dateStart').prop('disabled', true);
         $formTD.find('#dateEnd').prop('disabled', true);
-        $formTD.find('#mechanics').prop('disabled', true);
         $formTD.find('#typeOfTraining').prop('disabled', true);
         $formTD.find('#trainingVenue').prop('disabled', true);
         $formTD.find('#trainor').prop('disabled', true);
@@ -497,7 +505,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         
         $formTD.find('#dateStart').val(trainee.date_start);
         $formTD.find('#dateEnd').val(trainee.date_end);
-        $formTD.find('#mechanics').val(trainee.mechanics);
         $formTD.find('#typeOfTraining').val(trainee.type_of_training);
         $formTD.find('#endorsementDate').val(trainee.endorsement_date);
 
@@ -555,7 +562,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         let date_start = $formTD.find('#dateStart').val();
         let date_end = $formTD.find('#dateEnd').val();
         let trainor = $formTD.find('#trainor').val();
-        let mechanics = $formTD.find('#mechanics').val();
         let type_of_training = $formTD.find('#typeOfTraining').val();
         // let counterNow = $form.find('#btnAddTrainee').data('counter');
         let counterNow = $form.find('#btnAddTrainee').data('counter') || null;
@@ -566,7 +572,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             return;
         }
 
-        if(endorsementDate == '' || trainingVenue == '' || trainor == '' || date_start == '' || date_end == '' || mechanics == '' || type_of_training == ''){
+        if(endorsementDate == '' || trainingVenue == '' || trainor == '' || date_start == '' || date_end == '' || type_of_training == ''){
             showError('Please fill up the required fields.');
             return;
         }
@@ -616,7 +622,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             trainor: trainor,
             date_start: date_start,
             date_end: date_end,
-            mechanics: mechanics,
             type_of_training: type_of_training,
             endorsement_date: endorsementDate,
             exam_details: exam_list
@@ -1035,7 +1040,6 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
                     date_start: item.emp_exam_details[0].date_start,
                     date_end: item.emp_exam_details[0].date_end,
                     type_of_training: item.emp_exam_details[0].type_of_training,
-                    mechanics: item.emp_exam_details[0].mechanics,
                     exam_details: exam_list
                 }
 
