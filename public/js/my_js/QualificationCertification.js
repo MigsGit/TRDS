@@ -1,4 +1,4 @@
-$(document).ready(function () {
+// $(document).ready(function () {
     const getApprovalStatusToggle = (params) => {
         let approvalStatus = params.approval_status;
          if(approvalStatus ==='BENGGTQ'){
@@ -87,8 +87,8 @@ $(document).ready(function () {
                 });
                 console.log('11',specificValues[selector]);
         });
-        
-        
+
+
     }
     const getDropdownMasterDetailsByFkid = (params) => {
         let data = {
@@ -116,7 +116,7 @@ $(document).ready(function () {
     */
     const initGetSystemOneEmployeeDetailsCombos = (comboSelectors, selectedValuesMap = {}) => {
         console.log('selectedValuesMap', selectedValuesMap);
-        
+
         comboSelectors.forEach(function(selector) {
             // Fetch the pre-selected employee objects specifically for this selector
             const preSelectedEmployees = selectedValuesMap[selector] || []; // Expected array: [{id: 'R152', text: 'John Doe'}, ...]
@@ -139,24 +139,24 @@ $(document).ready(function () {
         comboId.select2({
             theme: 'bootstrap-5',
             placeholder: 'Search Employee Name or ID...',
-            minimumInputLength: 2, 
+            minimumInputLength: 2,
             multiple: true, // Crucial for handling array selections
             ajax: {
                 url: "get_system_one_employee_details",
                 dataType: 'json',
-                delay: 250, 
+                delay: 250,
                 data: function (params) {
                     return {
-                        search: params.term, 
-                        page: params.page || 1 
+                        search: params.term,
+                        page: params.page || 1
                     };
                 },
                 processResults: function (data, params) {
                     params.page = params.page || 1;
                     return {
-                        results: data.results, 
+                        results: data.results,
                         pagination: {
-                            more: data.pagination.more 
+                            more: data.pagination.more
                         }
                     };
                 },
@@ -192,7 +192,7 @@ $(document).ready(function () {
     //EmpNo only
     const initGetSystemOneEmployeeDetailsCombosTest = (comboSelectors, selectedValuesMap = {}) => {
     console.log('selectedValuesMap', selectedValuesMap);
-    
+
     comboSelectors.forEach(function(selector) {
         // Fetch raw input array (Can be simple string IDs like ["R152", "R131"] or objects [{id, text}])
         const rawInputData = selectedValuesMap[selector] || [];
@@ -205,13 +205,13 @@ $(document).ready(function () {
                     text: String(item.text || item.name || item.id || '').trim()
                 };
             }
-            
-            // If it's a flat string ID (e.g., "R152"), fallback safely by using it as both ID and text 
+
+            // If it's a flat string ID (e.g., "R152"), fallback safely by using it as both ID and text
             // until the user triggers a remote server search query.
             let cleanId = String(item).trim();
             return {
                 id: cleanId,
-                text: cleanId 
+                text: cleanId
             };
         });
 
@@ -231,16 +231,16 @@ $(document).ready(function () {
         comboId.select2({
             theme: 'bootstrap-5',
             placeholder: 'Search Employee Name or ID...',
-            minimumInputLength: 2, 
+            minimumInputLength: 2,
             multiple: true, // Crucial for handling array selections
             ajax: {
                 url: "get_system_one_employee_details",
                 dataType: 'json',
-                delay: 250, 
+                delay: 250,
                 data: function (params) {
                     return {
-                        search: params.term, 
-                        page: params.page || 1 
+                        search: params.term,
+                        page: params.page || 1
                     };
                 },
                 processResults: function (data, params) {
@@ -248,7 +248,7 @@ $(document).ready(function () {
                     return {
                         results: data.results, // Backend must format this to match: [{id: "R152", text: "Abdul"}]
                         pagination: {
-                            more: data.pagination.more 
+                            more: data.pagination.more
                         }
                     };
                 },
@@ -289,12 +289,12 @@ $(document).ready(function () {
 
         const mappedSelect2Data = $.map(params.dataValue || [], function(obj) {
             let displayId = obj.id !== undefined ? String(obj.id) : '';
-            
+
             let displayText = '';
             if (typeof obj === 'object') {
                 // Priority list of known column names
                 displayText = obj.dropdown_masters_details || obj.dropdown_master_details || obj.text || obj.value;
-                
+
                 if (!displayText) {
                     for (let key in obj) {
                         if (key !== 'id' && typeof obj[key] === 'string' && obj[key].trim().length > 0) {
@@ -316,7 +316,7 @@ $(document).ready(function () {
 
         // 4. Initialize Select2
         params.comboId.select2({
-            data: mappedSelect2Data, 
+            data: mappedSelect2Data,
             theme: 'bootstrap-5',
             multiple: true,
             placeholder: 'Select Reason...',
@@ -343,8 +343,8 @@ $(document).ready(function () {
 
             let extractedData = selectedObjects.map(function(item) {
                 return {
-                    id: item.id,     
-                    text: item.text 
+                    id: item.id,
+                    text: item.text
                 };
             });
 
@@ -522,16 +522,16 @@ $(document).ready(function () {
 
         // 2. Loop through your incoming collection using jQuery $.each
         $.each(qcSlipEmployees, function(index, emp) {
-            
+
             // Match your application's data-attribute structure
             const empId = emp.employee_no;
             const empName = emp.employee_name || empId; // Use fallback if name is in relation
             const stFrom = emp.station_from;
             const stTo = emp.station_to;
             const remarks = emp.remarks || '';
-            
+
             // Keep your text display dynamic (e.g., convert "1" to "Station 1" if needed, or use the database value)
-            const stFromText = "Station " + stFrom; 
+            const stFromText = "Station " + stFrom;
             const stToText = "Station " + stTo;
 
             // 3. Build your standard row HTML precisely matching your creation architecture
@@ -559,41 +559,65 @@ $(document).ready(function () {
         let response = params.response;
         let approversCollection = response.approversCollection
         // console.log('approversCollection', approversCollection);
-        
-        
-        let aProdToFirst = approversCollection.APRODTO[0].first_approver_exploded ?? [];
-        let aProdToSecond = approversCollection.APRODTO[0].second_approver_exploded ?? [];
+
+        let aProd = approversCollection.APRODTO[0];
+        let aProdToFirst = aProd.first_approver_exploded ?? [];
+        let aProdToFirstMentoredBy = aProd.first_approver2_exploded ?? [];
+        let aProdToSecond = aProd.second_approver_exploded ?? [];
+        let aProdToSecondMentoredBy = aProd.second_approver2_exploded ?? [];
+
         let bEnggTqFirst = approversCollection.BENGGTQ[0].first_approver_exploded ?? [];
         let bEnggTqSecond = approversCollection.BENGGTQ[0].second_approver_exploded ?? [];
-        // console.log('approversCollection', approversCollection.CQCC[0]);
-        // console.log('approversCollection', approversCollection.EQCVP[0]);
-        // console.log('approversCollection', approversCollection.FQCVVO[0]);
-        // console.log('approversCollection', approversCollection.QCAPP[0]);
-        // 2. HELPER FUNCTION: Map a flat array of string IDs into Select2 [{id, text}] objects
-            const mapStringArrayToSelect2 = (stringArray) => {
-                return stringArray.map(function(empNo) {
-                    let cleanEmpNo = String(empNo).trim();
-                    return {
-                        id: cleanEmpNo,    // The actual form submit value
-                        text: cleanEmpNo   // Visual tag pill label text
-                    };
-                });
-            };
+        let cQccSecond = approversCollection.CQCC[0].second_approver_exploded ?? [];
+        let eQcvpSecond = approversCollection.EQCVP[0].second_approver_exploded ?? [];
+        let fQcvvoSecond = approversCollection.FQCVVO[0].second_approver_exploded ?? [];
+        let qCappSecond = approversCollection.QCAPP [0].second_approver_exploded ?? [];
+
+        // 1. Map them to a standard format Select2 expects: {id, text}
+        const mappedaProdToFirst = aProdToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedaProdToFirstMentoredBy = aProdToFirstMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedaProdToSecond = aProdToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedaProdToSecondMentoredBy = aProdToSecondMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
+        console.log('mappedaProdToFirstMentoredBy222',mappedaProdToFirstMentoredBy);
+        // const mappedcQccSecond = cQccSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        // const mappedeQcvpSecond = eQcvpSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        // const mappedfQcvvoSecond = fQcvvoSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        // const mappedqCappSecond = qCappSecond.map(emp => ({ id: emp.id, text: emp.name }));
+
         // 2. Assign those formatted arrays to their target selectors inside the map
         let editSelectionsMap = {};
-        editSelectionsMap['#text_first_trainedby_oper'] = mappedProdToFirst;
-        editSelectionsMap['#text_second_trainedby_oper'] = mappedProdToSecond;
-
-        // editSelectionsMap['#text_first_mentoredby_oper'] = mapStringArrayToSelect2(mentors);
-
+        editSelectionsMap['#text_first_trainedby_oper'] = mappedaProdToFirst;
+        editSelectionsMap['#text_first_mentoredby_oper'] = mappedaProdToFirstMentoredBy;
+        editSelectionsMap['#text_second_trainedby_oper'] = mappedaProdToSecond;
+        editSelectionsMap['#text_second_mentoredby_oper'] = mappedaProdToSecondMentoredBy;
         // 3. Initialize all employee selectors simultaneously
         initGetSystemOneEmployeeDetailsCombos(
             [
                 '#text_first_trainedby_oper',
-                '#text_second_trainedby_oper'
+                '#text_first_mentoredby_oper',
+                '#text_second_trainedby_oper',
+                '#text_second_mentoredby_oper',
             ],
             editSelectionsMap
         );
+    }
+
+    function checkCheckboxesFromColumn(rawString, prefix = 'chk') {
+        if (!rawString || rawString.trim() === '') return;
+
+        // Explode by '|' and trim whitespace
+        const codes = rawString.split('|').map(item => item.trim());
+
+        codes.forEach(function(code) {
+            // Convert "PP-MDGEN-135" to lowercase and swap dashes with underscores -> "pp_mdgen_135"
+            let formattedId = code.toLowerCase().replace(/-/g, '_');
+
+            // Target your element (e.g., "#chk_pp_mdgen_135" or "#chk_other_pp_mdgen_135")
+            let checkboxSelector = `#${prefix}_${formattedId}`;
+
+            // Find and check the element
+            form.formSubmitOper.find(checkboxSelector).prop('checked', true);
+        });
     }
 
     // ---- Get Data
@@ -605,6 +629,8 @@ $(document).ready(function () {
             let data = response.qcSlip;
             let qcSlipEmployeeData = response.qcSlipEmployee;
             let qcReasonCertification = data.qc_reason_certification;
+            let aOperProdTrainingOrientation = data.a_oper_prod_training_orientation;
+            let opApprovers = data.op_approvers;
             populateEditOperEmpTable(data.qc_slip_employees);
             dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
             dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
@@ -617,49 +643,74 @@ $(document).ready(function () {
             $('#operSave').removeClass('d-none');
             $('#approval_status').val(currentStatus);
 
-            //Toggle Collapse based on approval status
+            // ==== Toggle Collapse based on approval status
             getApprovalStatusToggle({ approval_status: currentStatus });
-
-            const arrProductLine = Array.isArray(data.product_line) ? data.product_line : [data.product_line];
-            const productLine = '#text_operator_product_line';
-            let editSelectionsMap2 = {};
-            editSelectionsMap2[productLine] = arrProductLine;
-            initDropdownMasterDetailsByFkidCombos(
-                [productLine], 
-                2, 
-                editSelectionsMap2
-            );
-            
-            const textCertificationOperator = '#text_certification_operator';
-            let editSelectionsMap3 = {};
-            editSelectionsMap3[textCertificationOperator] = response.rawReasonsStringCollection;
-            initDropdownMasterDetailsByFkidCombos(
-                [textCertificationOperator], 
-                3, 
-                editSelectionsMap3
-            );
-            const arrTransferFlexibility = Array.isArray(qcReasonCertification.transfer_flexibility) ? qcReasonCertification.transfer_flexibility : [qcReasonCertification.transfer_flexibility];
-            const transferFlexibility = '#transfer_flexibility';
-            let editSelectionsMap4 = {};
-            editSelectionsMap4[transferFlexibility] = arrTransferFlexibility;
-            initDropdownMasterDetailsByFkidCombos(
-                [transferFlexibility], 
-                4, 
-                editSelectionsMap4
-            );
-            
+            // ==== Get All Approvers / Validated by/ Mentored by
             let paramsGetEmpNo = {
                 response : response,
             };
             getEmployeeDetailsByEmpNoSelect2(paramsGetEmpNo);
-            
+
+            // ==== QC Slip
+
             form.formSubmitOper.find('#qc_slips_id').val(data.id);
             form.formSubmitOper.find('#textconno_new_operator').val(data.control_no);
             form.formSubmitOper.find('#select_section').val(data.section_category);
             form.formSubmitOper.find('#text_select_position').val(data.position_category);
             form.formSubmitOper.find('#text_section_operator').val(data.section);
             form.formSubmitOper.find('#text_series_operator').val(data.series_name);
-            form.formSubmitOper.find('#text_operator_product_line').val(data.product_line);
+            // form.formSubmitOper.find('#text_operator_product_line').val(data.product_line);
+
+            const arrProductLine = Array.isArray(data.product_line) ? data.product_line : [data.product_line];
+            const productLine = '#text_operator_product_line';
+            let editSelectionsMap2 = {};
+            editSelectionsMap2[productLine] = arrProductLine;
+            initDropdownMasterDetailsByFkidCombos(
+                [productLine],
+                2,
+                editSelectionsMap2
+            );
+            // ==== QC Reason Certification
+            const textCertificationOperator = '#text_certification_operator';
+            let editSelectionsMap3 = {};
+            editSelectionsMap3[textCertificationOperator] = response.rawReasonsStringCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [textCertificationOperator],
+                3,
+                editSelectionsMap3
+            );
+            // ==== A PROD
+            const arraProdTrainingItems = Array.isArray(response.rawAOperProdTrainingOrientationCollection) ? response.rawAOperProdTrainingOrientationCollection : [response.rawAOperProdTrainingOrientationCollection];
+            const aProdTrainingItems = '#text_training_orientation_ps_oper';
+            let editSelectionsMap4 = {};
+            editSelectionsMap4[aProdTrainingItems] = response.rawAOperProdTrainingOrientationCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [aProdTrainingItems],
+                4,
+                editSelectionsMap4
+            );
+
+
+            let aProdData = response.approversCollection.APRODTO[0];
+
+            form.formSubmitOper.find('#defect_escalation').val(aOperProdTrainingOrientation.defect_escalation).trigger('change');
+            form.formSubmitOper.find('#production_abnormality').val(aOperProdTrainingOrientation.production_abnormality).trigger('change');
+            form.formSubmitOper.find('#text_first_date_oper').val(aProdData.first_date);
+            form.formSubmitOper.find('#text_first_time_oper').val(aProdData.first_time);
+            form.formSubmitOper.find('#text_second_date_oper').val(aProdData.second_date);
+            form.formSubmitOper.find('#text_second_time_oper').val(aProdData.second_time);
+
+            // 1. Let's say this is your raw string from the database response
+            const orientationDocs = aOperProdTrainingOrientation.orientation_docs;
+            const enggTqOrientationDocs = aOperProdTrainingOrientation.engg_tq_orientation_docs;
+            // 2. Uncheck ALL checkboxes in the form first to have a clean state
+            form.formSubmitOper.find('input[type="checkbox"]').prop('checked', false);
+            // 3. Check ALL checkboxes in the form based on the orientation docs or
+            checkCheckboxesFromColumn(orientationDocs,'chk');
+            checkCheckboxesFromColumn(enggTqOrientationDocs,'chk');
+
+            //=== B ENGG
+
             $('#modalCreateCQForm').modal();
 
         })
@@ -699,4 +750,4 @@ $(document).ready(function () {
         $(this).closest('tr').remove();
     });
 
-});
+// });

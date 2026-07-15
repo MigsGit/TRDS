@@ -122,6 +122,26 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+        
+        'mysql_hris_subcon' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST_HRIS_SUBCON', '192.168.3.240'),
+            'port' => env('DB_PORT_HRIS_SUBCON', '3306'),
+            'database' => env('DB_DATABASE_HRIS_SUBCON', 'forge'),
+            'username' => env('DB_USERNAME_HRIS_SUBCON', 'forge'),
+            'password' => env('DB_PASSWORD_HRIS_SUBCON', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
         'mysql_rapid_auto_mailer' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),

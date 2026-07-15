@@ -18,6 +18,16 @@ class OpApprover extends Model
     {
         return $this->hasOne(SystemOneHrisEmpInfo::class, 'EmpNo', 'alert_prod_sec');
     }
+    public function system_one_hris_subcon_alert_prod_sec()
+    {
+       return $this->system_one_hris_subcon_emp_info('alert_prod_sec');
+    }
+
+    public function system_one_hris_subcon_emp_info($column)
+    {
+        return $this->hasOne(SystemOneHrisSubcon::class, 'EmpNo', $column);
+    }
+
 
     /**
      * 2. Dynamic Attribute to get ALL employees when piped

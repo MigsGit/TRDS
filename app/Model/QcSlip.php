@@ -45,5 +45,5 @@ class QcSlip extends Model
     {
         return $this->hasOne(AOperProdTrainingOrientation::class, 'qc_slips_id', 'id');
     }
-    
+
 }

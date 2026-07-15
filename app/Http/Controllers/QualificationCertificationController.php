@@ -22,6 +22,7 @@ use App\Model\Qc\QcSlipEmployee;
 use App\Model\QcSlip;
 use App\Model\SystemHrisViewDivDeptSec;
 use App\Model\SystemOneHrisEmpInfo;
+use App\Model\SystemOneHrisSubcon;
 use App\Model\SystemOneSubconEmpInfo;
 use App\OpApprover;
 use Exception;
@@ -34,8 +35,6 @@ class QualificationCertificationController extends Controller
     public function __construct(CommonController $commonController){
         $this->commonController = $commonController;
     }
-
-
     public function updateApproval(Request $request){
         try {
             // return 'true';
@@ -94,7 +93,7 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-    public function getQcSlipsById(Request $request){
+    public function getQcSlipsById(Request $request){ //nmodify
 
         try {
             $qcSlip = QcSlip::with(
@@ -108,8 +107,8 @@ class QualificationCertificationController extends Controller
             ->first();
 
 
-            $rawReasonsString = $qcSlip->qc_reason_certification->reason_of_certification; 
-            $rawAOperProdTrainingOrientation = $qcSlip->a_oper_prod_training_orientation->traning_items; 
+            $rawReasonsString = $qcSlip->qc_reason_certification->reason_of_certification;
+            $rawAOperProdTrainingOrientation = $qcSlip->a_oper_prod_training_orientation->traning_items;
 
             $rawReasonsStringCollection =  collect(explode('|', $rawReasonsString))
                 ->map(function($id) {
@@ -127,48 +126,97 @@ class QualificationCertificationController extends Controller
             ->values()
             ->all();
 
-           $approversGroupByApprovalStatus = collect($qcSlip->op_approvers)->groupBy('approval_status')->toArray();
-            
-            // return $approversCollection = collect($qcSlip)->groupBy('approval_status')->toArray();
-            $approversCollection = collect($approversGroupByApprovalStatus)->map(function ($items) {
-            return collect($items)->map(function ($item) {
-                // Convert object to array if it's an Eloquent model or StdClass
-                $itemArray = (array) $item;
+           $rawPayload = collect($qcSlip->op_approvers)->groupBy('approval_status')->toArray();
 
-                // Helper function to explode string by pipe cleanly, ignoring nulls/empties
-                $explodePipedString = function ($value) {
-                    if (is_null($value) || trim($value) === '') {
-                        return [];
-                    }
-                    // Explode by '|' and trim extra spaces from the results
-                    return array_map('trim', explode('|', $value));
-                };
 
-                // Inject the dynamic collection arrays back into the payload object
-                $itemArray['first_approver_exploded']  = $explodePipedString($itemArray['first_approver'] ?? null);
-                $itemArray['second_approver_exploded'] = $explodePipedString($itemArray['second_approver'] ?? null);
-                
-                // You can also explode alerts if needed!
-                $itemArray['alert_prod_sec_exploded']  = $explodePipedString($itemArray['alert_prod_sec'] ?? null);
+            $approversCollection = collect($qcSlip)->groupBy('approval_status')->toArray();
 
-                return $itemArray;
+            // Helper closure to cleanly explode piped string values into trimmed arrays
+            $explodePipedString = function ($value) {
+                if (is_null($value) || trim($value) === '') {
+                    return [];
+                }
+                return array_map('trim', explode('|', $value));
+            };
+
+            // 2. Step One: Parse and collect ALL unique EmpNo values across all status groups
+            $allEmployeeNumbers = [];
+            foreach ($rawPayload as $status => $items) {
+                foreach ($items as $item) {
+                    $itemArray = (array) $item;
+
+                    // Collect from all possible employee fields
+                    $firstApprovers = $explodePipedString($itemArray['first_approver'] ?? null);
+                    $secondApprovers = $explodePipedString($itemArray['second_approver'] ?? null);
+                    $alerts = $explodePipedString($itemArray['alert_prod_sec'] ?? null);
+
+                    $allEmployeeNumbers = array_merge($allEmployeeNumbers, $firstApprovers, $secondApprovers, $alerts);
+                }
+            }
+
+            // Filter to keep only unique, non-empty employee numbers
+            $uniqueEmployeeNumbers = array_unique(array_filter($allEmployeeNumbers));
+
+            // 3. Step Two: Bulk fetch employee details from your HRIS table in ONE query
+            // This maps 'EmpNo' to their corresponding database columns (e.g., 'First_Name', 'Last_Name', or 'Full_Name')
+            $employeeDbMap = SystemOneHrisSubcon::whereIn('EmpNo', $uniqueEmployeeNumbers)
+                ->get(['EmpNo', 'empname']) // Fetch only needed columns
+                ->keyBy('EmpNo') // Key the collection by EmpNo for O(1) lookup speed
+                ->toArray();
+
+            // 4. Step Three: Map the data payload and inject matching Select2 structured object lists
+            $processedData = collect($rawPayload)->map(function ($items) use ($explodePipedString, $employeeDbMap) {
+                return collect($items)->map(function ($item) use ($explodePipedString, $employeeDbMap) {
+                    $itemArray = (array) $item;
+
+                    // Explode the fields
+                    $firstExploded  = $explodePipedString($itemArray['first_approver'] ?? null);
+                    $firstExploded2  = $explodePipedString($itemArray['first_approver_2'] ?? null);
+                    $secondExploded = $explodePipedString($itemArray['second_approver'] ?? null);
+                    $secondExploded2 = $explodePipedString($itemArray['second_approver_2'] ?? null);
+                    $alertsExploded = $explodePipedString($itemArray['alert_prod_sec'] ?? null);
+
+                    // Helper closure to build Select2 formatting: [{id: "R144", name: "John Doe"}]
+                    $mapToSelect2Structure = function ($empNoArray) use ($employeeDbMap) {
+                        return array_map(function ($empNo) use ($employeeDbMap) {
+                            $cleanEmpNo = trim($empNo);
+
+                            // Look up details from our pre-fetched database map
+                            $employeeInfo = $employeeDbMap[$cleanEmpNo] ?? null;
+
+                            // Fallback to the EmpNo if the record is not found in the HRIS table
+                            $displayName = $cleanEmpNo;
+                            if ($employeeInfo) {
+                                // Adjust these keys based on your actual SystemOneHrisSubcon column names
+                                $displayName = $employeeInfo['empname'];
+                            }
+
+                            return [
+                                'id' => $cleanEmpNo,
+                                'name' => trim($displayName)
+                            ];
+                        }, $empNoArray);
+                    };
+
+                    // Map and attach the completed objects directly to the output array keys
+                    $itemArray['first_approver_exploded']  = $mapToSelect2Structure($firstExploded);
+                    $itemArray['first_approver2_exploded']  = $mapToSelect2Structure($firstExploded2);
+                    $itemArray['second_approver_exploded'] = $mapToSelect2Structure($secondExploded);
+                    $itemArray['second_approver2_exploded'] = $mapToSelect2Structure($secondExploded2);
+                    $itemArray['alert_prod_sec_exploded']  = $mapToSelect2Structure($alertsExploded);
+
+                    return $itemArray;
+                });
             });
-        });
 
-        /*
-            Get the ID Text in the backend
 
-            id: r152
-            text: miguel legaspi
-        
-        */
             // $qcSlipReasons = collect($qcSlip);
             return response()->json([
                 'is_success' => 'true',
                 'qcSlip' => $qcSlip,
                 'rawReasonsStringCollection' => $rawReasonsStringCollection,
                 'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection,
-                'approversCollection' => $approversCollection,
+                'approversCollection' => $processedData,
             ]);
         } catch (Exception $e) {
             throw $e;
@@ -478,7 +526,7 @@ class QualificationCertificationController extends Controller
         }
     }
 
-    public function savePpdOnly($params){ //dPpdProcessOnly 
+    public function savePpdOnly($params){ //dPpdProcessOnly
 
         try {
             date_default_timezone_set('Asia/Manila');
@@ -533,7 +581,7 @@ class QualificationCertificationController extends Controller
                     'section' =>  $request->text_section_operator,
                     'series_name' =>  $request->text_series_operator,
                     'product_line' =>  $request->text_operator_product_line,
-                    'created_by' =>  $rapidxEmpNo->rapidx_emp_no,
+                    'created_by' =>  $rapidxEmpNo->rapidx_EmpNo,
                     'created_at' =>  now(),
                 ];
                 // $qcSlipId = QcSlip::insertGetId($saveQcSlip);
@@ -566,7 +614,7 @@ class QualificationCertificationController extends Controller
                 // $operPreparedByApprovers =  [
                 //     "qc_slips_id" => $qcSlipId,
                 //     "approval_status" => $currentApprovalStatus,
-                //     'first_approver'  => $rapidxEmpNo->rapidx_emp_no,
+                //     'first_approver'  => $rapidxEmpNo->rapidx_EmpNo,
                 //     'first_date'=> $date,
                 //     'first_time'=> $time,
                 //     'first_status'=> 'PEN',
@@ -660,7 +708,7 @@ class QualificationCertificationController extends Controller
                         "first_ng_qcs_oper" =>  $request->text_first_ng_qcs_oper,//1
                         "second_ok_qcs_oper" =>  $request->text_second_ok_qcs_oper,//1
                         "second_ng_qcs_oper" =>  $request->text_second_ng_qcs_oper,//1
-                        'updated_by' => $rapidxEmpNo->rapidx_emp_no,//1
+                        'updated_by' => $rapidxEmpNo->rapidx_EmpNo,//1
                         "qcs_station_1st_oper"  =>  collect($request->text_qcs_station_1st_oper)->join(' | '),
                         "qcs_station_2nd_oper"  =>  collect($request->text_qcs_station_2nd_oper)->join(' | '),
                     ];
@@ -793,7 +841,6 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-
     public function dPpdProcessOnly($request){
          //Change status into D if the SECTION IS PPS ELSE go to E VALIDATION PROCESS
         //STATUS DPRDPPDONLY DENGGPPDONLY DQCPPDONLY
@@ -831,7 +878,6 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-
     public function index(Request $request){
         return $eQcValidationProcess =  [
             //2nd day
@@ -862,7 +908,6 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-
     public function changeApprovalStatus($params){
         $selectedSection = str_contains($params['selectedSection'], 'PPD');
         switch (true) {
@@ -915,7 +960,7 @@ class QualificationCertificationController extends Controller
                 $statusName = 'N/A';
                 break;
         }
-    
+
         QcSlip::where('id',$params['qcSlipsId'])->update([
             'approval_status'=> $newStatus
         ]);
@@ -1019,13 +1064,4 @@ class QualificationCertificationController extends Controller
         ];
     }
 }
-class EmailService {
-    public function index(Request $request){
-        return 'true' ;
-        try {
-            return response()->json(['is_success' => 'true']);
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
-}
+
