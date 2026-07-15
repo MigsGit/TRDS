@@ -61,6 +61,16 @@ function resetHrMemoApprovalForm(formSelector, dtTraineeDetails) {
     $formSelector[0].reset();
     $formSelector.find('input[type="hidden"]').val('');
 
+    $formSelector.find('#subject').prop('disabled', false);
+    $formSelector.find('#classification').prop('disabled', false);
+    $formSelector.find('#reason').prop('disabled', false);
+    $formSelector.find('#dateFiled').prop('disabled', false);
+    $formSelector.find('#selectTo').prop('disabled', false);
+    $formSelector.find('#selectCc').prop('disabled', false);
+    $formSelector.find('#notedBy').prop('disabled', false);
+    $formSelector.find('#btnAddTrainee').prop('disabled', false);
+    $formSelector.find('#btnAddTrainee').prop('hidden', false);
+
     $formSelector.find('#btnSubmitHrMemoApproval').removeClass('d-none');
     $formSelector.find('#btnApprove').addClass('d-none');
     $formSelector.find('#btnDisapprove').addClass('d-none')
@@ -157,9 +167,18 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     $addButtonTD.on('click', function (){
         $formTD[0].reset();
         $formTD.find('input[type="hidden"]').val('');
-        // $addButtonTD.data('counter', traineeIdCounter)
         $addButtonTD.data('counter', null);
-        console.log('counterNow', $addButtonTD.data('counter'));
+        // console.log('counterNow', $addButtonTD.data('counter'));
+
+        $formTD.find('#employeeNumber').prop('disabled', false);
+        $formTD.find('#trainingVenue').prop('disabled', false);
+        $formTD.find('#trainor').prop('disabled', false);
+        $formTD.find('#dateStart').prop('disabled', false);
+        $formTD.find('#dateEnd').prop('disabled', false);
+        $formTD.find('#mechanics').prop('disabled', false);
+        $formTD.find('#typeOfTraining').prop('disabled', false);
+        $formTD.find('#endorsementDate').prop('disabled', false);
+        $formTD.find('#btnAddExamination').prop('hidden', false);
 
         // Remove all rows except template row
         $($tableExam).find('tbody tr:not(.data-row)').remove();
@@ -218,34 +237,11 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             success: function (response) {
                 emp_details = response['emp_details'][0];
                 training_venue = response['training_venue'];
-                console.log('emp_details',emp_details);
-                console.log('training_venue',training_venue);
-
                 $formTD.find('#employeeName').val(emp_details.EmpName);
                 $formTD.find('#dateHired').val(emp_details.DateHired);
                 $formTD.find('#position').val(emp_details.Position);
-                // $formTD.find('#trainingVenue').val(training_venue);
                 $formTD.find('#department').val(emp_details.Department);
                 $formTD.find('#prodAllocation').val(emp_details.Section);
-                // selectTrainingVenue($formTD.find('.selectTrainingVenue'));
-
-                // if(training_venue.length > 0){
-                //     result = '<option value="" disabled selected> Select Training Venue </option>';
-
-                //     for (let i = 0; i < training_venue.length; i++) {
-                //         result += '<option value="' + training_venue[i].Venue + '">' + training_venue[i].Venue + '</option>';
-                //     }
-                // }else{
-                //     result = '<option value="0" selected disabled> -- No record found -- </option>';
-                // }
-
-                // $formTD.find('#trainingVenue').html(result);
-                // if(empId != null){
-                    // $formTD.find('#trainingVenue').val(empId).trigger('change');
-                // }
-                // if(mode == 'view'){
-                //     $formTD.find('#trainingVenue').prop('disabled', true).trigger('change.select2');
-                // }
             }
         });
     });
@@ -351,37 +347,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         });
     });
 
-    // HR Disapprove button
-    // $form.on('click', '#btnHRDisapprove', function () {
-    //     const id = $form.find('#txtHrMemoId').val();
-    //     let updateStatusTo = 4; // disapproved
-
-    //     Swal.fire({
-    //         title: 'Disapprove HR Memo',
-    //         input: 'textarea',
-    //         id: 'hrDisapproveRemarks',
-    //         inputLabel: 'Remarks',
-    //         inputPlaceholder: 'Enter reason for disapproval...',
-    //         inputAttributes: {
-    //             'aria-label': 'Enter remarks'
-    //         },
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Submit',
-    //         cancelButtonText: 'Cancel',
-    //         inputValidator: (value) => {
-    //             if (!value) {
-    //                 return 'Remarks is required!';
-    //             }
-    //         }
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             let remarks = result.value;
-
-    //             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
-    //         }
-    //     });
-    // });
-
     // HR Approve button
     $form.on('click', '#btnHRApprove', function () {
         const id = $form.find('#txtHrMemoId').val();
@@ -401,16 +366,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
         });
     });
-
-    // Disapprove button
-    // $form.on('click', '#btnTUDisapprove', function () {
-    //     const id = $form.find('#txtHrMemoId').val();
-    //     let updateStatusTo = 7; //disapproved
-    //     // let forApproval = true;
-    //     confirmAction('Disapprove HR Memo Document?', function () {
-    //         updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
-    //     });
-    // });
 
     // TU Disapprove button
     $form.on('click', '#btnTUDisapprove', function () {
@@ -470,10 +425,8 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
         selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
         selectTrainingVenue($formTD.find('.selectTrainingVenue'), trainee.training_venue);
-        getTrainorDetails($formTD.find('.selectTrainor'), trainee.trainor); //CLARK to be continued
-        // console.log('selected training venue', trainee.training_venue);
-        
-        // $formTD.find('#trainingVenue').val(trainee.training_venue).trigger('change');
+        getTrainorDetails($formTD.find('.selectTrainor'), trainee.trainor);
+
         $formTD.find('#dateStart').val(trainee.date_start);
         $formTD.find('#dateEnd').val(trainee.date_end);
         $formTD.find('#mechanics').val(trainee.mechanics);
@@ -525,6 +478,12 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     $tableTD.on('click', '.viewTDRow', function(e) {
         e.preventDefault();
         $formTD.find('#employeeNumber').prop('disabled', true);
+        $formTD.find('#dateStart').prop('disabled', true);
+        $formTD.find('#dateEnd').prop('disabled', true);
+        $formTD.find('#mechanics').prop('disabled', true);
+        $formTD.find('#typeOfTraining').prop('disabled', true);
+        $formTD.find('#trainingVenue').prop('disabled', true);
+        $formTD.find('#trainor').prop('disabled', true);
         $formTD.find('#endorsementDate').prop('disabled', true);
         $formTD.find('#btnAddExamination').prop('hidden', true);
         $modalTD.find('#btnAddTraineeDetailsToList').prop('hidden', true);
@@ -534,6 +493,12 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
         selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
         selectTrainingVenue($formTD.find('.selectTrainingVenue'), trainee.training_venue);
+        getTrainorDetails($formTD.find('.selectTrainor'), trainee.trainor);
+        
+        $formTD.find('#dateStart').val(trainee.date_start);
+        $formTD.find('#dateEnd').val(trainee.date_end);
+        $formTD.find('#mechanics').val(trainee.mechanics);
+        $formTD.find('#typeOfTraining').val(trainee.type_of_training);
         $formTD.find('#endorsementDate').val(trainee.endorsement_date);
 
         $tableExam.find('tbody').empty();
@@ -544,7 +509,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
                         <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" disabled></select>
                     </td>
                     <td>
-                        <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" required></textarea>
+                        <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" disabled></textarea>
                     </td>
                     <td>
                         <select class="form-control form-control-md" name="result[]" id="result" disabled>
@@ -683,6 +648,12 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         if ($('#modalHrMemoApproval').hasClass('show')) {
             $('body').addClass('modal-open');
         }
+    });
+
+    $('#btnShowExportReportModal').on('click', function (){
+        const $formExport = $('#exportInspectorSkillChart');
+        $formExport[0].reset();
+        $('#modalExportReport').modal('show');
     });
 }
 
