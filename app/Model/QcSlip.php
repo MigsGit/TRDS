@@ -4,6 +4,9 @@ namespace App\Model;
 
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\AOperProdTrainingOrientation;
+use App\Model\Qc\BOpEnggSectionTrainingOrientation;
+use App\Model\Qc\CQcCertification;
+use App\Model\Qc\EQcValidationProcess;
 use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\OpApprover;
@@ -44,6 +47,22 @@ class QcSlip extends Model
     public function a_oper_prod_training_orientation()
     {
         return $this->hasOne(AOperProdTrainingOrientation::class, 'qc_slips_id', 'id');
+    }
+    public function b_op_engg_section_training_orientation()
+    {
+        return $this->hasOne(BOpEnggSectionTrainingOrientation::class, 'qc_slips_id', 'id');
+    }
+    public function c_qc_certification()
+    {
+        return $this->hasOne(CQcCertification::class, 'qc_slips_id', 'id');
+    }
+    public function e_qc_validation_process()
+    {
+        return $this->hasOne(EQcValidationProcess::class, 'qc_slips_id', 'id');
+    }
+    public function f_qc_validation()
+    {
+        return $this->hasOne(FQcValidations::class, 'qc_slips_id', 'id');
     }
 
 }

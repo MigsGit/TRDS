@@ -101,6 +101,10 @@ class QualificationCertificationController extends Controller
                 'qc_slip_employees',
                 'qc_reason_certification',
                 'a_oper_prod_training_orientation',
+                'b_op_engg_section_training_orientation',
+                'c_qc_certification',
+                // 'e_qc_validation_processes',
+                // 'f_qc_validations',
             )
             ->where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')
@@ -109,8 +113,17 @@ class QualificationCertificationController extends Controller
 
             $rawReasonsString = $qcSlip->qc_reason_certification->reason_of_certification;
             $rawAOperProdTrainingOrientation = $qcSlip->a_oper_prod_training_orientation->traning_items;
+            $rawBOpEnggSectionTrainingOrientation = $qcSlip->b_op_engg_section_training_orientation->traning_items;
 
             $rawReasonsStringCollection =  collect(explode('|', $rawReasonsString))
+                ->map(function($id) {
+                    return trim($id);
+                })
+            ->filter()
+            ->values()
+            ->all();
+
+            $rawBOpEnggSectionTrainingOrientationCollection =  collect(explode('|', $rawBOpEnggSectionTrainingOrientation))
                 ->map(function($id) {
                     return trim($id);
                 })
@@ -215,6 +228,7 @@ class QualificationCertificationController extends Controller
                 'is_success' => 'true',
                 'qcSlip' => $qcSlip,
                 'rawReasonsStringCollection' => $rawReasonsStringCollection,
+                'rawBEnggTrainingItemsCollection' => $rawBOpEnggSectionTrainingOrientationCollection,
                 'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection,
                 'approversCollection' => $processedData,
             ]);

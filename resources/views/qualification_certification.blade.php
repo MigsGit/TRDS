@@ -243,7 +243,7 @@
                                                 <div class="col-md-3">
                                                         <label class="" for="">Defect Escalation:</label>
                                                         <select class="form-control select2bs4" style="width: 100%;" id="defect_escalation" name="defect_escalation" multiple>
-                                                            <option value="" disabled>Select Result</option>                                <option value="1" >Rule when to escalate </option>
+                                                             <option value="" disabled selected>Select Result</option>                                <option value="1" >Rule when to escalate </option>
                                                             <option value="2" >Filling-up of forms
                                                             </option>
                                                         </select>
@@ -251,7 +251,7 @@
                                                 <div class="col-md-3">
                                                         <label class="" for="">Production Abnormlity Control (IMS-PMI-025):</label>
                                                         <select class="form-control select2bs4" style="width: 100%;" id="production_abnormality" name="production_abnormality" multiple>
-                                                            <option value="" disabled>Select Result</option>                                <option value="1" >Rule when to escalate </option>
+                                                             <option value="" disabled selected>Select Result</option>                                <option value="1" >Rule when to escalate </option>
                                                             <option value="2" >Filling-up of forms
                                                             </option>
                                                         </select>
@@ -399,14 +399,14 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                                 <select class="form-control select2bs4" style="width: 100%;" name="text_first_a_prod_result" id="text_first_a_prod_result">
-                                                            <option value="" disabled>Select Result</option>                                    <option value="PASSED">PASSED</option>
+                                                            <option value="" disabled selected>Select Result</option>             <option value="PASSED">PASSED</option>
                                                                 <option value="FAILED">FAILED</option>
                                                             </select>
 
                                                         </div>
                                                         <div class="col-md-6">
                                                                 <select class="form-control select2bs4" style="width: 100%;" name="text_second_a_prod_result" id="text_second_a_prod_result">
-                                                            <option value="" disabled>Select Result</option>                                    <option value="PASSED">PASSED</option>
+                                                             <option value="" disabled selected>Select Result</option>                                    <option value="PASSED" selected >PASSED</option>
                                                                 <option value="FAILED">FAILED</option>
                                                             </select>
                                                         </div>
@@ -485,7 +485,7 @@
                                         <div id="collapseTwoOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
                                         <div class="card-body">
                                             <p class="mb-3">TRAINING ITEMS:</p>
-                                            <div class="col-md-3">
+                                            <div class="col-md-6">
                                                 <label class="" for="">TRAINING ITEMS:</label>
                                                 <select class="form-control select2bs4" style="width: 100%;" id="text_training_orientation_es_oper" name="text_training_orientation_es_oper" multiple></select>
                                             </div>
@@ -588,8 +588,9 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">1. Observation / Interview Result</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_obs_second_result_es_oper" id="text_obs_second_result_es_oper">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
-                                                        <option value="FAILED">FAILED</option>
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -631,8 +632,8 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_es_oper" id="text_oa_1st_result_es_oper" multiple>
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_es_oper" id="text_oa_1st_result_es_oper">
+                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -725,7 +726,8 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">1.1 Observation / Interview Result</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_obs_first_result_qcs_oper" id="text_obs_first_result_qcs_oper">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                        <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -733,7 +735,8 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">1.1 Observation / Interview Result</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_obs_second_result_qcs_oper" id="text_obs_second_result_qcs_oper">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                        <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -896,7 +899,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_qcs_oper" id="text_oa_1st_result_qcs_oper">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -904,7 +907,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_2nd_result_qcs_oper" id="text_oa_2nd_result_qcs_oper">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -1036,7 +1039,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">2. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_peqcs_oper" id="text_oa_1st_result_peqcs_oper">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -1044,7 +1047,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">2. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_2nd_result_peqcs_oper" id="text_oa_2nd_result_peqcs_oper">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -1205,7 +1208,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_vpes_oper" id="text_first_result_vpes_oper">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -1213,7 +1216,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_vpes_oper" id="text_second_result_vpes_oper">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -1294,7 +1297,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_vpqcs_oper" id="text_first_result_vpqcs_oper">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -1302,7 +1305,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_vpqcs_oper" id="text_second_result_vpqcs_oper">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -1360,7 +1363,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_vpes_oper_2" id="text_first_result_vpes_oper_2">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -1368,7 +1371,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_vpes_oper_2" id="text_second_result_vpes_oper_2">
-                                                            <option value="" disabled>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -1679,7 +1682,7 @@
             initDropdownMasterDetailsByFkidCombos([
                     '#transfer_flexibility',
                     '#text_training_orientation_es_oper',
-            ],4);
+            ],5);
         });
         dataTable.operator = $(table.operator).DataTable({
             "processing" : true,
@@ -1741,7 +1744,7 @@
         $('#operApproved').addClass('d-none');
         $('#operClosed').removeClass('d-none');
         $('#operSave').removeClass('d-none');
-        
+
         //  Best Practice: Event Delegation with correct object scoping
         $(document).on('click', '.btnRemoveOperEmpMain', function() {
             $(this).closest('tr').remove();
@@ -1947,7 +1950,7 @@
                 '#text_section_operator',
         ]);
 
-      
+
         const initSelectPassFail = (comboSelectors) => {
 
             comboSelectors.forEach(function(selector) {

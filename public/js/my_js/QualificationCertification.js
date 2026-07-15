@@ -568,6 +568,7 @@
 
         let bEnggTqFirst = approversCollection.BENGGTQ[0].first_approver_exploded ?? [];
         let bEnggTqSecond = approversCollection.BENGGTQ[0].second_approver_exploded ?? [];
+
         let cQccSecond = approversCollection.CQCC[0].second_approver_exploded ?? [];
         let eQcvpSecond = approversCollection.EQCVP[0].second_approver_exploded ?? [];
         let fQcvvoSecond = approversCollection.FQCVVO[0].second_approver_exploded ?? [];
@@ -579,6 +580,9 @@
         const mappedaProdToSecond = aProdToSecond.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedaProdToSecondMentoredBy = aProdToSecondMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
         console.log('mappedaProdToFirstMentoredBy222',mappedaProdToFirstMentoredBy);
+
+        const mappedbEnggTqFirst= bEnggTqFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedbEnggTqSecond = bEnggTqSecond.map(emp => ({ id: emp.id, text: emp.name }));
         // const mappedcQccSecond = cQccSecond.map(emp => ({ id: emp.id, text: emp.name }));
         // const mappedeQcvpSecond = eQcvpSecond.map(emp => ({ id: emp.id, text: emp.name }));
         // const mappedfQcvvoSecond = fQcvvoSecond.map(emp => ({ id: emp.id, text: emp.name }));
@@ -586,17 +590,26 @@
 
         // 2. Assign those formatted arrays to their target selectors inside the map
         let editSelectionsMap = {};
+        //A
         editSelectionsMap['#text_first_trainedby_oper'] = mappedaProdToFirst;
         editSelectionsMap['#text_first_mentoredby_oper'] = mappedaProdToFirstMentoredBy;
         editSelectionsMap['#text_second_trainedby_oper'] = mappedaProdToSecond;
         editSelectionsMap['#text_second_mentoredby_oper'] = mappedaProdToSecondMentoredBy;
+        //B
+        editSelectionsMap['#text_1st_qualifiedby_es_oper'] = mappedbEnggTqFirst;
+        editSelectionsMap['#text_2nd_qualifiedby_es_oper'] = mappedbEnggTqSecond;
+
         // 3. Initialize all employee selectors simultaneously
         initGetSystemOneEmployeeDetailsCombos(
             [
+                //A
                 '#text_first_trainedby_oper',
                 '#text_first_mentoredby_oper',
                 '#text_second_trainedby_oper',
                 '#text_second_mentoredby_oper',
+                //B
+                '#text_1st_qualifiedby_es_oper',
+                '#text_2nd_qualifiedby_es_oper',
             ],
             editSelectionsMap
         );
@@ -630,7 +643,11 @@
             let qcSlipEmployeeData = response.qcSlipEmployee;
             let qcReasonCertification = data.qc_reason_certification;
             let aOperProdTrainingOrientation = data.a_oper_prod_training_orientation;
+            let bOpEnggSectionTrainingOrientation = data.b_op_engg_section_training_orientation;
+            let cQcCertification = data.c_qc_certification;
+
             let opApprovers = data.op_approvers;
+
             populateEditOperEmpTable(data.qc_slip_employees);
             dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
             dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
@@ -680,6 +697,7 @@
                 editSelectionsMap3
             );
             // ==== A PROD
+            let aProdData = response.approversCollection.APRODTO[0];
             const arraProdTrainingItems = Array.isArray(response.rawAOperProdTrainingOrientationCollection) ? response.rawAOperProdTrainingOrientationCollection : [response.rawAOperProdTrainingOrientationCollection];
             const aProdTrainingItems = '#text_training_orientation_ps_oper';
             let editSelectionsMap4 = {};
@@ -689,9 +707,6 @@
                 4,
                 editSelectionsMap4
             );
-
-
-            let aProdData = response.approversCollection.APRODTO[0];
 
             form.formSubmitOper.find('#defect_escalation').val(aOperProdTrainingOrientation.defect_escalation).trigger('change');
             form.formSubmitOper.find('#production_abnormality').val(aOperProdTrainingOrientation.production_abnormality).trigger('change');
@@ -708,8 +723,75 @@
             // 3. Check ALL checkboxes in the form based on the orientation docs or
             checkCheckboxesFromColumn(orientationDocs,'chk');
             checkCheckboxesFromColumn(enggTqOrientationDocs,'chk');
+            checkCheckboxesFromColumn(enggTqOrientationDocs,'chk');
 
             //=== B ENGG
+
+            let aEnggData = response.approversCollection.BENGGTQ[0];
+            //  initDropdownMasterDetailsByFkidCombos([
+            //         '#transfer_flexibility',
+            //         '#text_training_orientation_es_oper',
+            // ],5);
+
+            const arraBEnggTrainingItems = Array.isArray( response.rawBEnggTrainingItemsCollection) ?  response.rawBEnggTrainingItemsCollection : [ response.rawBEnggTrainingItemsCollection];
+            console.log('rawBEnggTrainingItemsCollection',arraBEnggTrainingItems  );
+
+            const aBEnggTrainingItems = '#text_training_orientation_es_oper';
+            let editSelectionsMap5 = {};
+            editSelectionsMap5[aBEnggTrainingItems] =  response.rawBEnggTrainingItemsCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [aBEnggTrainingItems],
+                5,
+                editSelectionsMap5
+            );
+            checkCheckboxesFromColumn(bOpEnggSectionTrainingOrientation.engg_orientation_docs,'chk');
+
+            form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation.obs_first_result_es_oper);
+            form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation.first_sample_es_oper);
+            form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation.first_ok_es_oper);
+            form.formSubmitOper.find('#text_first_ok_es_oper').val(bOpEnggSectionTrainingOrientation.first_ng_es_oper);
+
+            form.formSubmitOper.find('#text_obs_second_result_es_oper').val(bOpEnggSectionTrainingOrientation.obs_second_result_es_oper);
+            form.formSubmitOper.find('#text_second_sample_es_oper').val(bOpEnggSectionTrainingOrientation.second_sample_es_oper);
+            form.formSubmitOper.find('#text_second_ok_es_oper').val(bOpEnggSectionTrainingOrientation.second_ok_es_oper);
+            form.formSubmitOper.find('#text_second_ng_es_oper').val(bOpEnggSectionTrainingOrientation.second_ng_es_oper);
+
+            form.formSubmitOper.find('#text_1st_disqualification_es_oper').val(aEnggData.first_remarks);
+            form.formSubmitOper.find('#text_2nd_disqualification_es_oper').val(aEnggData.second_remarks);
+
+            form.formSubmitOper.find('#text_qc_1st_date_es_oper').val(aEnggData.first_date);
+            form.formSubmitOper.find('#text_qc_1st_time_es_oper').val(aEnggData.first_time);
+            form.formSubmitOper.find('#text_qc_2nd_date_es_oper').val(aEnggData.second_date);
+            form.formSubmitOper.find('#text_qc_2nd_time_es_oper').val(aEnggData.second_time);
+
+
+
+            //C
+            // "obs_first_result_qcs_oper": "PASSED",
+            // "first_sample_qcs_oper": 1,
+            // "first_ok_qcs_oper": 1,
+            // "first_ng_qcs_oper": 1,
+            // "qcs_station_1st_oper": "Visual | Assembly | Others",
+            // "obs_second_result_qcs_oper": "PASSED",
+            // "second_ok_qcs_oper": 1,
+            // "second_sample_qcs_oper": 1,
+            // "second_ng_qcs_oper": 1,
+            // "qcs_station_2nd_oper": "Visual | Assembly | Others",
+            // "updated_by": "R152",
+            // "deleted_at": null,
+            // "created_at": null,
+            // "updated_at": null
+            
+            form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcCertification.obs_first_result_qcs_oper);
+            form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcCertification.first_sample_qcs_oper);
+            form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcCertification.first_ok_qcs_oper);
+            form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcCertification.first_ng_qcs_oper);
+            form.formSubmitOper.find('#text_qcs_station_1st_oper').val(cQcCertification.qcs_station_1st_oper);
+            form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcCertification.obs_second_result_qcs_oper);
+            form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcCertification.second_ok_qcs_oper);
+            form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcCertification.second_sample_qcs_oper);
+            form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcCertification.second_ng_qcs_oper);
+            form.formSubmitOper.find('#text_qcs_station_2nd_oper').val(cQcCertification.qcs_station_2nd_oper);
 
             $('#modalCreateCQForm').modal();
 
