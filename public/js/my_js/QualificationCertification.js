@@ -695,7 +695,6 @@
             let aOperProdTrainingOrientation = data.a_oper_prod_training_orientation;
             let bOpEnggSectionTrainingOrientation = data.b_op_engg_section_training_orientation;
             let cQcCertification = data.c_qc_certification;
-            let fQcValidation = data.f_qc_validation;
 
             let opApprovers = data.op_approvers;
 
@@ -726,7 +725,7 @@
             form.formSubmitOper.find('#text_select_position').val(data.position_category);
             form.formSubmitOper.find('#text_section_operator').val(data.section);
             form.formSubmitOper.find('#text_series_operator').val(data.series_name);
-            form.formSubmitOper.find('#select_section').val(data.section_category);
+            $('#select_section').val(data.section_category);
 
             // form.formSubmitOper.find('#text_operator_product_line').val(data.product_line);
 
@@ -828,16 +827,16 @@
             //C QC Certification
             const cQcData = response?.approversCollection?.CQCC?.[0] ?? null;
             if (cQcData && typeof cQcData === 'object') {
-                form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcData.obs_first_result_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcData.first_sample_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcData.first_ok_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcData.first_ng_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_qcs_station_1st_oper').val(cQcData.qcs_station_1st_oper ?? '');
-                form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcData.obs_second_result_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcData.second_ok_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcData.second_sample_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcData.second_ng_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_qcs_station_2nd_oper').val(cQcData.qcs_station_2nd_oper ?? '');
+                form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcCertification.obs_first_result_qcs_oper ?? '').trigger('change');
+                form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcCertification.first_sample_qcs_oper ?? '').trigger('change');
+                form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcCertification.first_ok_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcCertification.first_ng_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_qcs_station_1st_oper').val(cQcCertification.qcs_station_1st_oper ?? '');
+                form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcCertification.obs_second_result_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcCertification.second_ok_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcCertification.second_sample_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcCertification.second_ng_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_qcs_station_2nd_oper').val(cQcCertification.qcs_station_2nd_oper ?? '');
 
                 form.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData.first_status ?? '').trigger('change');
                 form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData.second_status ?? '').trigger('change');
@@ -868,10 +867,13 @@
 
             //F QC Validation
             const fQcVvo = response?.approversCollection?.FQCVVO?.[0] ?? {};
+            const fQcValidation = data.f_qc_validation ?? {};
+
             form.formSubmitOper.find('#text_date1_qcvvo_oper').val(fQcVvo.first_date ?? '');
             form.formSubmitOper.find('#text_date2_qcvvo_oper').val(fQcVvo.second_date ?? '');
-            let refdocnoInputQcvvoOper = fQcVvo.refdocno_input_qcvvo_oper ?? '';
-            let refdocnoInputQcvvoOper2 = fQcVvo.refdocno_input_qcvvo_oper_2 ?? '';
+            
+            let refdocnoInputQcvvoOper = fQcValidation?.refdocno_input_qcvvo_oper ?? '';
+            let refdocnoInputQcvvoOper2 = fQcValidation?.refdocno_input_qcvvo_oper_2 ?? '';
             form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper').val(refdocnoInputQcvvoOper);
             form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper_2').val(refdocnoInputQcvvoOper2);
             if(refdocnoInputQcvvoOper != ""){

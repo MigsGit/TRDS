@@ -495,14 +495,14 @@ class QualificationCertificationController extends Controller
             $to = $collectTo->pluck('email')->join(',');
             // $from =$currentSession['email'] ?? '';
             // $from_name = $currentSession['fullName'];
-            // $opApprover =  OpApprover::insert($params['update_data']);
+            $opApprover =  OpApprover::insert($params['update_data']);
             $emailParams = [
                 'qc_slips_id' => $params['qc_slips_id']
             ];
             $message = $this->commonController->emailMsg($emailParams);
             $from = 'issinfoservice@pricon.ph';
             $from_name = 'issinfoservice@pricon.ph';
-            return  $emailData = [
+           $emailData = [
                 // "to" =>$to,
                 "to" =>"mrronquez@pricon.ph",
                 // "cc" =>$cc,
@@ -595,7 +595,7 @@ class QualificationCertificationController extends Controller
                     'section' =>  $request->text_section_operator,
                     'series_name' =>  $request->text_series_operator,
                     'product_line' =>  $request->text_operator_product_line,
-                    'created_by' =>  $rapidxEmpNo->rapidx_EmpNo,
+                    'created_by' =>  $rapidxEmpNo->rapidx_emp_no,
                     'created_at' =>  now(),
                 ];
                 // $qcSlipId = QcSlip::insertGetId($saveQcSlip);
@@ -628,7 +628,7 @@ class QualificationCertificationController extends Controller
                 // $operPreparedByApprovers =  [
                 //     "qc_slips_id" => $qcSlipId,
                 //     "approval_status" => $currentApprovalStatus,
-                //     'first_approver'  => $rapidxEmpNo->rapidx_EmpNo,
+                //     'first_approver'  => $rapidxEmpNo->rapidx_emp_no,
                 //     'first_date'=> $date,
                 //     'first_time'=> $time,
                 //     'first_status'=> 'PEN',
@@ -722,7 +722,7 @@ class QualificationCertificationController extends Controller
                         "first_ng_qcs_oper" =>  $request->text_first_ng_qcs_oper,//1
                         "second_ok_qcs_oper" =>  $request->text_second_ok_qcs_oper,//1
                         "second_ng_qcs_oper" =>  $request->text_second_ng_qcs_oper,//1
-                        'updated_by' => $rapidxEmpNo->rapidx_EmpNo,//1
+                        'updated_by' => $rapidxEmpNo->rapidx_emp_no,//1
                         "qcs_station_1st_oper"  =>  collect($request->text_qcs_station_1st_oper)->join(' | '),
                         "qcs_station_2nd_oper"  =>  collect($request->text_qcs_station_2nd_oper)->join(' | '),
                     ];
@@ -746,9 +746,9 @@ class QualificationCertificationController extends Controller
                     ];
 
                 }
-                DB::commit();
+                // DB::commit();
 
-                if($selectedSection){
+                if($selectedSection && $qcSlipDetails->approval_status === "DPRDPPDONLY"){
                     $ppdParams = [
                         'request' => $request->all()
                     ];
@@ -945,17 +945,21 @@ class QualificationCertificationController extends Controller
                 $statusName = 'E Qc Validation Process';
                 break;
             case ($params['approval_status'] === 'CQCC' && $selectedSection):
-                $newStatus = 'DPRDPPDONLY';
-                $statusName = 'D Production Update';
+                $newStatus = 'DPPDONLY';
+                $statusName = 'D PPD Production, Engg, QC Update';
                 break;
-            case ($params['approval_status'] === 'DPRDPPDONLY'):
-                $newStatus = 'DENGGPPDONLY';
-                $statusName = 'D Engineering Update';
-                break;
-            case ($params['approval_status'] === 'DENGGPPDONLY'):
-                $newStatus = 'DQCPPDONLY';
-                $statusName = 'D QC Update';
-                break;
+            // case ($params['approval_status'] === 'CQCC' && $selectedSection):
+            //     $newStatus = 'DPRDPPDONLY';
+            //     $statusName = 'D Production Update';
+            //     break;
+            // case ($params['approval_status'] === 'DPRDPPDONLY'):
+            //     $newStatus = 'DENGGPPDONLY';
+            //     $statusName = 'D Engineering Update';
+            //     break;
+            // case ($params['approval_status'] === 'DENGGPPDONLY'):
+            //     $newStatus = 'DQCPPDONLY';
+            //     $statusName = 'D QC Update';
+            //     break;
             case ($params['approval_status'] === 'DQCPPDONLY'):
                 $newStatus = 'EQCVP';
                 $statusName = 'E Qc Validation Process';

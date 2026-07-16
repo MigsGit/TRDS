@@ -35,21 +35,26 @@ class CommonController extends Controller
                     $statusName = 'C Qc Certification';
                     $spanColor = 'bg-danger';
                     break;
-                case 'DPRDPPDONLY':
-                    $newStatus = 'DPRDPPDONLY';
-                    $statusName = 'D Production Update';
+                case 'DPPDONLY':
+                    $newStatus = 'DPPDONLY';
+                    $statusName = 'D PPD Update';
                     $spanColor = 'bg-danger';
                     break;
-                case 'DENGGPPDONLY':
-                    $newStatus = 'DENGGPPDONLY';
-                    $statusName = 'D Engineering Update';
-                    $spanColor = 'bg-danger';
-                    break;
-                case 'DQCPPDONLY':
-                    $newStatus = 'DQCPPDONLY';
-                    $statusName = 'D QC Update';
-                    $spanColor = 'bg-danger';
-                    break;
+                // case 'DPRDPPDONLY':
+                //     $newStatus = 'DPRDPPDONLY';
+                //     $statusName = 'D Production Update';
+                //     $spanColor = 'bg-danger';
+                //     break;
+                // case 'DENGGPPDONLY':
+                //     $newStatus = 'DENGGPPDONLY';
+                //     $statusName = 'D Engineering Update';
+                //     $spanColor = 'bg-danger';
+                //     break;
+                // case 'DQCPPDONLY':
+                //     $newStatus = 'DQCPPDONLY';
+                //     $statusName = 'D QC Update';
+                //     $spanColor = 'bg-danger';
+                //     break;
                 case 'EQCVP':
                     $approvalStatus = 'EQCVP';
                     $statusName = 'E Qc Validation Process';
