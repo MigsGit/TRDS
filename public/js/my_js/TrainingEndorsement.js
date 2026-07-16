@@ -457,53 +457,57 @@ $('#trainingReqCtrl').on('keyup', function (e) {
                     var hasPassed = false;
                     var examTitles = '';
                     var examRemarks = '';
-                    if (Array.isArray(emp.employee_exam_details.exam_result_details_info) && emp.employee_exam_details.exam_result_details_info.length > 0) {
-                        ratings = emp.employee_exam_details.exam_result_details_info.map(function(exam) {
-                            return exam && exam.rating !== undefined && exam.rating !== null
-                                ? exam.rating
-                                : '';
-                        }).join(' | ');
+                    console.log('emp.employee_exam_details', emp.id);
+                    if(emp.employee_exam_details != null){
+                        if (Array.isArray(emp.employee_exam_details.exam_result_details_info) && emp.employee_exam_details.exam_result_details_info !== undefined && emp.employee_exam_details.exam_result_details_info.length > 0) {
+                            ratings = emp.employee_exam_details.exam_result_details_info.map(function(exam) {
+                                return exam && exam.rating !== undefined && exam.rating !== null
+                                    ? exam.rating
+                                    : '';
+                            }).join(' | ');
 
-                        remarks = emp.employee_exam_details.exam_result_details_info.map(function(exam) {
-                            return exam && exam.remark !== undefined && exam.remark !== null
-                                ? exam.remark
-                                : '';
-                        }).join(' | ');
-                        examRemarks = remarks;
+                            remarks = emp.employee_exam_details.exam_result_details_info.map(function(exam) {
+                                return exam && exam.remark !== undefined && exam.remark !== null
+                                    ? exam.remark
+                                    : '';
+                            }).join(' | ');
+                            examRemarks = remarks;
 
-                        // Check if any remarks contain 'Passed' (case-insensitive)
-                        hasPassed = /passed/i.test(remarks);
+                            // Check if any remarks contain 'Passed' (case-insensitive)
+                            hasPassed = /passed/i.test(remarks);
 
-                        var questionnaireArr = emp.employee_exam_details.exam_result_details_info.map(function(exam) {
-                            return exam && exam.questionnaire !== undefined && exam.questionnaire !== null
-                                ? exam.questionnaire
-                                : null;
-                        }).filter(function(q) { return q !== null; });
-                        // If the backend returns an array of JSON strings, parse them
-                        var parsedQuestionnaires = questionnaireArr.map(function(q) {
-                            if (typeof q === 'string') {
-                                try {
-                                    return JSON.parse(q);
-                                } catch (e) {
-                                    return null;
+                            var questionnaireArr = emp.employee_exam_details.exam_result_details_info.map(function(exam) {
+                                return exam && exam.questionnaire !== undefined && exam.questionnaire !== null
+                                    ? exam.questionnaire
+                                    : null;
+                            }).filter(function(q) { return q !== null; });
+                            // If the backend returns an array of JSON strings, parse them
+                            var parsedQuestionnaires = questionnaireArr.map(function(q) {
+                                if (typeof q === 'string') {
+                                    try {
+                                        return JSON.parse(q);
+                                    } catch (e) {
+                                        return null;
+                                    }
                                 }
-                            }
-                            return q;
-                        }).filter(function(q) { return q !== null; });
-                        questionnaire = JSON.stringify(parsedQuestionnaires);
-                        // Extract all exam_title values and join with |
-                        try {
-                            const qArr = JSON.parse(questionnaire);
-                            if (Array.isArray(qArr) && qArr.length > 0) {
-                                hasExam = true;
+                                return q;
+                            }).filter(function(q) { return q !== null; });
+                            questionnaire = JSON.stringify(parsedQuestionnaires);
+                            // Extract all exam_title values and join with |
+                            try {
+                                const qArr = JSON.parse(questionnaire);
+                                if (Array.isArray(qArr) && qArr.length > 0) {
+                                    hasExam = true;
 
-                                examTitles = qArr.map(q => q && q.exam_title ? q.exam_title : '').filter(Boolean).join(' | ');
-                            }
-                        } catch (e) {
+                                    examTitles = qArr.map(q => q && q.exam_title ? q.exam_title : '').filter(Boolean).join(' | ');
+                                }
+                            } catch (e) {
 
-                            examTitles = '';
+                                examTitles = '';
+                            }
                         }
                     }
+
                     // Determine status and action buttons
                     let statusHtml = '';
                     let rowClass = '';
