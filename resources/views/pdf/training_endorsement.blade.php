@@ -178,7 +178,8 @@
                             <td>{{ $exam['title'] ?? '' }}</td>
                             <td>{{ $exam['score'] ?? '' }}</td>
                             <td>{{ $exam['rating'] ?? '' }}</td>
-                            <td class="{{ strtolower($exam['remark'] ?? '') === 'passed' ? 'badge-passed' : 'badge-failed' }}">
+                            {{-- <td class="{{ strtolower($exam['remark'] ?? '') === 'passed' ? 'badge-passed' : 'badge-failed' }}"> --}}
+                            <td class="{{ str_contains(strtolower($exam['remark'] ?? ''), 'passed') ? 'badge-passed' : 'badge-failed' }}">
                                 {{ $exam['remark'] ?? '' }}
                             </td>
                             @if($index === 0)

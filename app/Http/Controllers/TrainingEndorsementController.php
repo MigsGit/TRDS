@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 
-
 class TrainingEndorsementController extends Controller
 {
     protected $CommonController;
@@ -709,6 +708,7 @@ class TrainingEndorsementController extends Controller
                             //         : $examDetail->questionnaire;
                             //     $examTitle = $questionnaire['exam_title'] ?? '';
                             // }
+                            $examResult = json_decode($exam->exam_result, true);
                             if ($exam->questionnaire) {
                                 $questionnaire = is_string($exam->questionnaire)
                                     ? json_decode($exam->questionnaire, true)
@@ -717,10 +717,26 @@ class TrainingEndorsementController extends Controller
                             }
 
                             $totalScore = ($exam->score ?? 0) + ($exam->identification_essay_score ?? 0);
-                            $totalItems = $questionnaire['total_items'] ?? $questionnaire['total_points'] ?? '';
-                            $score = $totalItems ? $totalScore . '/' . $totalItems : $totalScore;
-                            $rating = $exam->rating ?? '';
-                            $remark = $exam->remark ?? '';
+                            // $totalItems = $questionnaire['total_items'] ?? $questionnaire['total_points'] ?? '';
+                            $totalItems = $exam->total_items ?? $exam->total_points ?? '';
+                            // $score = $totalItems ? $totalScore . '/' . $totalItems : $totalScore;
+                            $score = $totalScore . '/' . ($examResult['summary']['total_score'] ?? '');
+                            // dd($examResult['summary']['total_score']);
+                            // $rating = $exam->rating ?? '';
+                            $rating = $exam->rating ? $exam->rating . '%' : '';
+
+                            if(is_null($exam->attempt)){
+                                $appendRemarks = "on 1st attempt";
+                            }
+                            else{
+                                $attemptCount = $exam->attempt ?? 1;
+                                $formatter = new \NumberFormatter('en_US', \NumberFormatter::ORDINAL);
+                                $appendRemarks = "on " . $formatter->format($attemptCount) . " attempt";
+                            }
+                            
+
+                            // $remark = $exam->remark ?? '';
+                            $remark = ($exam->remark ?? '') . ' ' . $appendRemarks;
 
                             $exams[] = [
                                 'title'  => $examTitle,
@@ -821,7 +837,7 @@ class TrainingEndorsementController extends Controller
             }
         }
 
-        // return $data;
+        // return $employees;
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,
