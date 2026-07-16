@@ -6,6 +6,7 @@ use App\Http\Controllers\HrMemo\HrMemoExaminationController;
 use App\Http\Controllers\QualificationCertificationController;
 use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\TrainingAttendanceController;
+use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PersonnelSkillMatrixController;
@@ -69,6 +70,28 @@ Route::middleware('checkSession')->group(function(){
         return view('theoretical_exam/examination_result');
     })->name('examination_result');
 
+    Route::get('/training_endorsement', function () {
+        return view('training_endorsement');
+    })->name('training_endorsement');
+
+    // TRAINING ENDORSEMENT CONTROLLER
+    Route::controller(TrainingEndorsementController::class)->group(function () {
+        Route::get('/get_training_endorsements', 'getTrainingEndorsements')->name('get_training_endorsements');
+        Route::get('/get_training_endorsement_by_id', 'getTrainingEndorsementById')->name('get_training_endorsement_by_id');
+        Route::post('/save_training_endorsement', 'saveTrainingEndorsement')->name('save_training_endorsement');
+        Route::post('/delete_training_endorsement', 'deleteTrainingEndorsement')->name('delete_training_endorsement');
+        Route::get('/get_endorsement_users', 'getEndorsementUsers')->name('get_endorsement_users');
+        Route::get('/get_current_user', 'getCurrentUser')->name('get_current_user');
+        Route::get('/get_all_email', 'getAllEmail')->name('get_all_email');
+        Route::get('/get_training_request_controls', 'getTrainingRequestControls')->name('get_training_request_controls');
+        Route::get('/get_training_request_ctrl_details', 'getTrainingRequestDetails')->name('get_training_request_ctrl_details');
+        Route::get('/get_employees_for_not_endorsed', 'getEmployeesForNotEndorsed')->name('get_employees_for_not_endorsed');
+        Route::post('/add_not_endorsed_emp', 'addNotEndorsedEmp')->name('add_not_endorsed_emp');
+        Route::get('/export_endorsement_pdf', 'exportEndorsementPdf')->name('export_endorsement_pdf');
+        Route::post('/proceed_endorsement_approval', 'proceedEndorsementApproval')->name('proceed_endorsement_approval');
+        Route::post('/approve_endorsement', 'approveEndorsement')->name('approve_endorsement');
+        Route::post('/disapprove_endorsement', 'disapproveEndorsement')->name('disapprove_endorsement');
+    });
     Route::get('/personnel_skill_matrix', function () {
         return view('personnel_skill_matrix');
     })->name('personnel_skill_matrix');
@@ -98,6 +121,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('view_questionnaire_details', 'viewQuestionnaireDetails');
         Route::post('create_update_questionnaire_details', 'createUpdateQuestionnaireDetails');
         Route::get('get_questionnaire_details_by_id', 'getQuestionnaireDetailsById');
+        Route::post('change_questionnaire_details_status', 'changeQuestionnaireDetailsStatus');
     });
 
     Route::controller(ExaminationController::class)->group(function () {
@@ -119,6 +143,7 @@ Route::middleware('checkSession')->group(function(){
         Route::post('update_exam_score_for_employee', 'updateExamScoreForEmployee');
 
         Route::get('/view_pdf/{id}', 'viewPdf');
+        Route::post('update_examination_date', 'updateExaminationDate');
     });
 
     // =======================================================================================================

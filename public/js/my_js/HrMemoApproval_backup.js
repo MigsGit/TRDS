@@ -76,8 +76,6 @@ function initHrMemoApprovalTable($table, url = 'view_hr_memo') {
     return $table.DataTable({
         processing: true,
         serverSide: true,
-        scrollY: '380px',
-        scrollCollapse: true,
         ajax: { url: url },
         fixedHeader: true,
         columns: [
@@ -86,9 +84,7 @@ function initHrMemoApprovalTable($table, url = 'view_hr_memo') {
             { data: 'document_no' },    // customize this per hr_memo_approval
             { data: 'date_filed' },    // customize this per hr_memo_approval
             { data: 'reason_label' },    // customize this per hr_memo_approval
-            { data: 'subject' },    // customize this per hr_memo_approval
-            { data: 'prepared_by_label' },    // customize this per hr_memo_approval
-            { data: 'received_by_label' }    // customize this per hr_memo_approval
+            { data: 'subject' }    // customize this per hr_memo_approval
         ]
     });
 }
@@ -120,10 +116,7 @@ function initTraineeDetailsTable($table1) {
             },
             { data: "emp_no" },
             { data: "emp_name" },
-            { data: "position" },
-            { data: "department" },
-            { data: "section" },
-            { data: "training_venue" },
+            { data: "traning_venue" },
             { data: "endorsement_date" }
         ],
     });
@@ -211,35 +204,13 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             data: { employee_number: empNo },
             dataType: "json",
             success: function (response) {
-                emp_details = response['emp_details'][0];
-                training_venue = response['training_venue'];
-                console.log('emp_details',emp_details);
-                console.log('training_venue',training_venue);
-
+                emp_details = response[0];
                 $formTD.find('#employeeName').val(emp_details.EmpName);
                 $formTD.find('#dateHired').val(emp_details.DateHired);
                 $formTD.find('#position').val(emp_details.Position);
-                // $formTD.find('#trainingVenue').val(training_venue);
+                $formTD.find('#trainingVenue').val(emp_details.Venue);
                 $formTD.find('#department').val(emp_details.Department);
                 $formTD.find('#prodAllocation').val(emp_details.Section);
-
-                if(training_venue.length > 0){
-                    result = '<option value="" disabled selected> Select Training Venue </option>';
-
-                    for (let i = 0; i < training_venue.length; i++) {
-                        result += '<option value="' + training_venue[i].Venue + '">' + training_venue[i].Venue + '</option>';
-                    }
-                }else{
-                    result = '<option value="0" selected disabled> -- No record found -- </option>';
-                }
-
-                $formTD.find('#trainingVenue').html(result);
-                // if(empId != null){
-                    // $formTD.find('#trainingVenue').val(empId).trigger('change');
-                // }
-                // if(mode == 'view'){
-                //     $formTD.find('#trainingVenue').prop('disabled', true).trigger('change.select2');
-                // }
             }
         });
     });
@@ -302,12 +273,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         fetchHrMemoById(id, $modal, dtTraineeDetails, $form, 'view', traineeDetailsArray, approval);
     });
 
-    // View Disapproval Remarks button
-    $table.on('click', '.btnViewRemarks', function () {
-        const remarks = $(this).data('remarks');
-        showMessage(remarks, 'Disapproval Remarks', function(){});
-    });
-
     // Enable button
     $table.on('click', '.btnEnable', function () {
         const id = $(this).data('id');
@@ -345,38 +310,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         });
     });
 
-    // HR Disapprove button
-    // $form.on('click', '#btnHRDisapprove', function () {
-    //     const id = $form.find('#txtHrMemoId').val();
-    //     let updateStatusTo = 4; // disapproved
-
-    //     Swal.fire({
-    //         title: 'Disapprove HR Memo',
-    //         input: 'textarea',
-    //         id: 'hrDisapproveRemarks',
-    //         inputLabel: 'Remarks',
-    //         inputPlaceholder: 'Enter reason for disapproval...',
-    //         inputAttributes: {
-    //             'aria-label': 'Enter remarks'
-    //         },
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Submit',
-    //         cancelButtonText: 'Cancel',
-    //         inputValidator: (value) => {
-    //             if (!value) {
-    //                 return 'Remarks is required!';
-    //             }
-    //         }
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             let remarks = result.value;
-
-    //             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
-    //         }
-    //     });
-    // });
-
-    // HR Approve button
+    // Approve button
     $form.on('click', '#btnHRApprove', function () {
         const id = $form.find('#txtHrMemoId').val();
         let updateStatusTo = 5; //approved
@@ -386,7 +320,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         });
     });
 
-    // TU Approve button
+    // Approve button
     $form.on('click', '#btnTUApprove', function () {
         const id = $form.find('#txtHrMemoId').val();
         let updateStatusTo = 6; //approved
@@ -397,43 +331,12 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     });
 
     // Disapprove button
-    // $form.on('click', '#btnTUDisapprove', function () {
-    //     const id = $form.find('#txtHrMemoId').val();
-    //     let updateStatusTo = 7; //disapproved
-    //     // let forApproval = true;
-    //     confirmAction('Disapprove HR Memo Document?', function () {
-    //         updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
-    //     });
-    // });
-
-    // TU Disapprove button
     $form.on('click', '#btnTUDisapprove', function () {
         const id = $form.find('#txtHrMemoId').val();
-        let updateStatusTo = 7; // disapproved
-
-        Swal.fire({
-            title: 'Disapprove HR Memo',
-            input: 'textarea',
-            id: 'tuDisapproveRemarks',
-            inputLabel: 'Remarks',
-            inputPlaceholder: 'Enter reason for disapproval...',
-            inputAttributes: {
-                'aria-label': 'Enter remarks'
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Submit',
-            cancelButtonText: 'Cancel',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Remarks is required!';
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let remarks = result.value;
-
-                updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
-            }
+        let updateStatusTo = 7; //disapproved
+        // let forApproval = true;
+        confirmAction('Disapprove HR Memo Document?', function () {
+            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
         });
     });
 
@@ -463,7 +366,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         console.log('counterNow', $addButtonTD.data('counter'));
 
         selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
-        $formTD.find('#trainingVenue').val(trainee.training_venue).trigger('change');
         $formTD.find('#endorsementDate').val(trainee.endorsement_date);
 
         $tableExam.find('tbody').empty();
@@ -559,10 +461,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     $('#btnAddTraineeDetailsToList').on('click', function (e) {
         e.preventDefault();
         let empId = $formTD.find('#employeeNumber').val();
-        let position = $formTD.find('#position').val();
-        let department = $formTD.find('#department').val();
-        let section = $formTD.find('#prodAllocation').val();
-        let trainingVenue = $formTD.find('#trainingVenue').val();
         let endorsementDate = $formTD.find('#endorsementDate').val();
         // let counterNow = $form.find('#btnAddTrainee').data('counter');
         let counterNow = $form.find('#btnAddTrainee').data('counter') || null;
@@ -573,14 +471,15 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             return;
         }
 
-        if(endorsementDate == '' || trainingVenue == ''){
-            showError('Please fill up the required fields.');
+        if(endorsementDate == ''){
+            showError('Please fill up the Endorsement date.');
             return;
         }
 
         let empType = $formTD.find('#employeeNumber').find('option:selected').data('emp_type');
         let empNumber = $formTD.find('#employeeNumber').find('option:selected').text();
         let empName = $formTD.find('#employeeName').val();
+        let trainingVenue = $formTD.find('#trainingVenue').val();
         let exam_list = [];
         let hasError = false;
 
@@ -615,10 +514,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             },
             emp_no: empNumber,
             emp_name : empName,
-            position: position,
-            department: department,
-            section: section,
-            training_venue: trainingVenue,
+            traning_venue: trainingVenue,
             endorsement_date: endorsementDate,
             exam_details: exam_list
         }
@@ -643,12 +539,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         dtTraineeDetails.rows.add(traineeDetailsArray).draw();
         showSuccess('Trainee details added to the list.');
         $modalTD.modal('hide');
-    });
-
-    $modalTD.on('hidden.bs.modal', function () {
-        if ($('#modalHrMemoApproval').hasClass('show')) {
-            $('body').addClass('modal-open');
-        }
     });
 }
 
@@ -843,7 +733,6 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
                 $form.find('#btnSubmitHrMemoApproval').addClass('d-none');
                 $form.find('#btnHRApprove').removeClass('d-none');
                 $form.find('#btnHRDisapprove').removeClass('d-none');
-                $form.find('#hrDisapproveRemarks').prop('disabled', false);
                 $form.find('#btnTUApprove').addClass('d-none');
                 $form.find('#btnTUDisapprove').addClass('d-none');
 
@@ -857,7 +746,6 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
                 $form.find('#btnHRDisapprove').addClass('d-none');
                 $form.find('#btnTUApprove').removeClass('d-none');
                 $form.find('#btnTUDisapprove').removeClass('d-none');
-                $form.find('#tuDisapproveRemarks').prop('disabled', false);
 
                 $form.find('#btnAddTrainee').prop('disabled', true);
                 $form.find('#btnAddTrainee').prop('hidden', true);
@@ -920,16 +808,10 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
 
                 if(item.employment_type == 1){ //HRIS
                     empName = item.hris_emp_info.EmpName;
-                    position = item.hris_emp_info.Position;
-                    department = item.hris_emp_info.Department;
-                    section = item.hris_emp_info.Section;
-                    trainingVenue = item.hris_emp_info.Venue ?? "N/A";
+                    trainingVenue = item.hris_emp_info.Venue;
                 }else if(item.employment_type == 2){ //SUBCON
                     empName = item.subcon_emp_info.EmpName;
-                    position = item.subcon_emp_info.Position;
-                    department = item.subcon_emp_info.Department;
-                    section = item.subcon_emp_info.Section;
-                    trainingVenue = item.subcon_emp_info.Venue ?? "N/A";
+                    training_venue = item.subcon_emp_info.Venue;
                 }
 
                 item.emp_exam_details.forEach(function(exam_item){
@@ -944,10 +826,7 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
                     action: {id: counterNow, emp_id: item.hris_id, emp_type: item.employment_type, status: response.status},
                     emp_no: item.employee_no,
                     emp_name: empName,
-                    position: position,
-                    department: department,
-                    section: section,
-                    training_venue: trainingVenue,
+                    traning_venue: trainingVenue,
                     endorsement_date: item.endorsement_date,
                     exam_details: exam_list
                 }
@@ -981,15 +860,13 @@ function disableForm($form, status = null){
 /**
  * Disable or update hr_memo_approval status
  */
-function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null, remarks = '') {
-// function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null) {
+function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null) {
     $.ajax({
         type: 'POST',
         url: 'update_hr_memo_status',
         data: {
             id: id,
-            new_status: updateToStatus,
-            remarks: remarks
+            new_status: updateToStatus
         },
         dataType: 'json',
         success: function (response) {
@@ -999,7 +876,6 @@ function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null, rem
                     modal.modal('hide');
                 }
 
-                //temp comment when testing
                 if(updateToStatus > 2){
                     SendHrMemoMail(id, updateToStatus);
                 }
@@ -1049,34 +925,6 @@ function confirmAction(message, callback) {
         confirmButtonText: 'Yes'
     }).then((result) => {
         if (result.isConfirmed) callback();
-    });
-}
-
-/**
- * SweetAlert success helper
- */
-function showMessage(message, title = 'Information') {
-    Swal.fire({
-        icon: 'info',
-        title: title,
-        // html: message,
-        html: `
-           <div style="
-                border:1px solid #ccc;
-                padding:15px;
-                border-radius:5px;
-                text-align:left;
-                white-space:pre-wrap;
-                max-height:500px;
-                overflow-y:auto;
-            ">
-                ${message}
-            </div>
-        `,
-        width: '800px', // or '60%', '70%', '1000px'
-        showConfirmButton: true,
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: 'CLOSE'
     });
 }
 

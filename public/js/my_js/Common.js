@@ -145,15 +145,46 @@ const resetFormValues = (params) => {
 }
 
 
-const errorHandler = function (errors,formInput){
-    if(errors === undefined){
-        formInput.removeClass('is-invalid')
-        formInput.addClass('is-valid')
-        formInput.attr('title', '')
-    }else {
-        formInput.removeClass('is-valid')
-        formInput.addClass('is-invalid');
-        formInput.attr('title', errors[0])
+
+const handleValidatorErrors = (errors) => {
+    
+    document.querySelectorAll('div input').forEach(function(input) {
+        input.classList.remove('is-invalid');
+    });
+    document.querySelectorAll('div select').forEach(function(input) {
+        input.classList.remove('is-invalid');
+    });
+    document.querySelectorAll('div textarea').forEach(function(input) {
+        input.classList.remove('is-invalid');
+    });
+    // Loop through each field in the errors object
+    for (let field in errors) {
+        if (errors.hasOwnProperty(field)) {
+            // Extract the error messages for the field
+            let fieldErrorMessage = errors[field];
+
+            // Add invalid class & title validation
+            if(field){
+                // document.querySelector(`[name="${field}"]`).classList.add('is-invalid');
+                document.querySelectorAll(`[name="${field}"], [name="${field}[]"]`).forEach(function(el) {
+                    el.classList.add('is-invalid');
+                });
+                // document.querySelector(`[name="${field}"]`).classList.add('is-invalid');
+                // document.querySelector(`[name="${field}"]`).classList.add('is-invalid');
+
+            }
+        }
     }
 }
 
+const showSwalLoading = (params) => {
+    Swal.fire({
+        width: '20rem',
+        html: '<em>Loading..</em>',
+        allowOutsideClick: false,
+        onRender: function () {
+            $('.swal2-content').prepend('<div class="spinner-border text-dark" role="status" style="width: 3rem; height: 3rem;"><span class="sr-only">Loading...</span></div>');
+        },
+        showConfirmButton: false,
+    });
+}
