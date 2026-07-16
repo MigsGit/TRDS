@@ -24,10 +24,12 @@ use App\Model\SystemHrisViewDivDeptSec;
 use App\Model\SystemOneHrisEmpInfo;
 use App\Model\SystemOneHrisSubcon;
 use App\Model\SystemOneSubconEmpInfo;
+use App\Model\Qc\DPpdCertificationCompletion;
 use App\OpApprover;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
 
 class QualificationCertificationController extends Controller
 {
@@ -746,13 +748,15 @@ class QualificationCertificationController extends Controller
                     ];
 
                 }
-                // DB::commit();
 
-                if($selectedSection && $qcSlipDetails->approval_status === "DPRDPPDONLY"){
+                if($selectedSection && $qcSlipDetails->approval_status === "DPPDONLY"){
                     $ppdParams = [
                         'request' => $request->all()
                     ];
-                  return  $this->dPpdProcessOnly($ppdParams);
+                    DB::commit();
+                    return  $this->dPpdProcessOnly($ppdParams);
+                    return response()->json(['is_success' => 'true']);
+
                 }
                 if($qcSlipDetails->approval_status ==='EQCVP'){
                     // EQCVP- EQcValidationProcess
@@ -855,45 +859,90 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
+
+    public function index(Request $request){
+        return 'true' ;
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            DB::commit();
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
     public function dPpdProcessOnly($params){
          //Change status into D if the SECTION IS PPS ELSE go to E VALIDATION PROCESS
         //STATUS DPRDPPDONLY DENGGPPDONLY DQCPPDONLY
-        $request = $params['request'];
-        return $dPpdCertificationCompletionApprover = [
-            "1st_certified_prod_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_prod_peqcs_oper),//R152 - 2trainedby
-            "1st_certified_eng_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_eng_peqcs_oper),//R152 - 2trainedby
-            "1st_certified_qc_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_qc_peqcs_oper),//R152 - 2trainedby
-            "first_date" =>  $request->text_1st_date_peqcs_oper,
-            "first_time" =>  $request->text_1st_time_peqcs_oper,
-            "first_status" =>  $request->text_oa_1st_result_peqcs_oper,
-            "first_remarks" =>  $request->text_1st_disapproval_peqcs_oper,
-
-            "2nd_certified_prod_peqcs_oper"  =>  implode(' | ', $request->text_2nd_certified_prod_peqcs_oper),//R152 - 2trainedby
-            "2nd_certified_eng_peqcs_oper"  =>  implode(' | ', $request->text_2nd_certified_eng_peqcs_oper),//R152 - 2trainedby
-            "2nd_certified_qc_peqcs_oper"  =>  implode(' | ', $request->text_2nd_certified_qc_peqcs_oper),//R152 - 2trainedby
-            "second_date" =>  $request->text_2nd_date_peqcs_oper,
-            "second_time" =>  $request->text_2nd_time_peqcs_oper,
-            "second_status" =>  $request->text_oa_2nd_result_peqcs_oper,
-            "second_remarks" =>  $request->text_2nd_disapproval_peqcs_oper,
-            'd_alert_prod_sec'=> $request->d_text_alert_prod_sec,
-            'd_alert_prod_cc_sec'=> $request->d_text_alert_prod_cc_sec,
-        ];
-        $dPpdCertificationCompletion =  [
-           "lot_1st_sample_peqcs_oper"=>  $request->text_lot_1st_sample_peqcs_oper, //INT
-           "1st_injected_ng_peqcs_oper"=>  $request->text_1st_injected_ng_peqcs_oper, //INT
-           "1st_detected_ng_peqcs_oper"=>  $request->text_1st_detected_ng_peqcs_oper, //INT
-           "2nd_sample_peqcs_oper"=>  $request->text_2nd_sample_peqcs_oper, //INT
-           "2nd_injected_ng_peqcs_oper"=>  $request->text_2nd_injected_ng_peqcs_oper, //INT
-           "2nd_detected_ng_peqcs_oper"=>  $request->text_2nd_detected_ng_peqcs_oper, //INT
-        ];
-
         try {
-            return response()->json(['is_success' => 'true']);
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $request = $params['request'];
+            $qcSlipsId = $request['qc_slips_id'];
+            $dPpdCertificationCompletion =  [
+                'qc_slips_id' => $qcSlipsId,
+                "lot_1st_sample_peqcs_oper"=>  $request['text_lot_1st_sample_peqcs_oper'],
+                "1st_injected_ng_peqcs_oper"=>  $request['text_1st_injected_ng_peqcs_oper'],
+                "1st_detected_ng_peqcs_oper"=>  $request['text_1st_detected_ng_peqcs_oper'],
+                "2nd_sample_peqcs_oper"=>  $request['text_2nd_sample_peqcs_oper'],
+                "2nd_injected_ng_peqcs_oper"=>  $request['text_2nd_injected_ng_peqcs_oper'],
+                "2nd_detected_ng_peqcs_oper"=>  $request['text_2nd_detected_ng_peqcs_oper'],
+            ];
+        
+            //  DPpdCertificationCompletion::insert($dPpdCertificationCompletion);
+            $dPpdCertificationCompletionApprover = [
+                "first_approver"  =>  collect($request['text_1st_certified_prod_peqcs_oper'])->join(' | '),//R152 - 2trainedby
+                "first_approver_2"  =>  collect($request['text_1st_certified_eng_peqcs_oper'])->join(' | '),//R152 - 2trainedby
+                "first_approver_3"  => collect($request['text_1st_certified_qc_peqcs_oper'])->join(' | '),//R152 - 2trainedby
+                "first_date" =>  $request['text_1st_date_peqcs_oper'],
+                "first_time" =>  $request['text_1st_time_peqcs_oper'],
+                "first_status" =>  $request['text_oa_1st_result_peqcs_oper'],
+                "first_remarks" =>  $request['text_1st_disapproval_peqcs_oper'],
+
+                "second_approver"  => collect($request['text_2nd_certified_prod_peqcs_oper'])->join(' | '),//R152 - 2trainedby
+                "second_approver_2"  => collect($request['text_2nd_certified_eng_peqcs_oper'])->join(' | ') ,//R152 - 2trainedby
+                "second_approver_3"  => collect($request['text_2nd_certified_qc_peqcs_oper'])->join(' | '),//R152 - 2trainedby
+                "second_date" =>  $request['text_2nd_date_peqcs_oper'],
+                "second_time" =>  $request['text_2nd_time_peqcs_oper'],
+                "second_status" =>  $request['text_oa_2nd_result_peqcs_oper'],
+                "second_remarks" =>  $request['text_2nd_disapproval_peqcs_oper'],
+            ];
+            $dPpdCertificationCompletionQuery = DPpdCertificationCompletion::where('qc_slips_id',$qcSlipsId);
+            $requiredApprover = [
+               "first_approver",
+               "first_approver_2",
+               "first_approver_3",
+               "first_date",
+               "first_time",
+               "first_status",
+               "first_remarks",
+               "1st_injected_ng_peqcs_oper",
+               "1st_detected_ng_peqcs_oper",
+               "2nd_sample_peqcs_oper",
+               "2nd_injected_ng_peqcs_oper",
+               "2nd_detected_ng_peqcs_oper",
+            ];
+            DB::commit();
+            // $merge =  array_merge($dPpdCertificationCompletion,$requiredApprover);
+            collect($requiredApprover)->each(function ($rowdPpdCertificationCompletion) use ($dPpdCertificationCompletionQuery) {
+                $dPpdCertificationCompletionQuery->whereNotNull($rowdPpdCertificationCompletion);
+            });
+            return $dPpdCertificationCompletionQuery->count();
+            if($results_column_2_4 > 1){
+                return [
+                    'isChangeStatus' => 'true' //Change E Status 
+                ];
+            }
+            return [
+                    'isChangeStatus' => 'false' //Change E Status 
+            ];
+            //NULLABLE TABLE D , CHANGE THE VALIDATION TO OP APPROVER , CREATE NEW DATABASE FOR E ENGG
         } catch (Exception $e) {
             throw $e;
         }
     }
-    public function index(Request $request){
+    public function index1(Request $request){
         return $eQcValidationProcess =  [
             //2nd day
             "vpqcs_oper" => $request->text_vpqcs_oper, //CHECKBOX

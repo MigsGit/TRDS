@@ -647,8 +647,9 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_es_oper" id="text_oa_1st_result_es_oper">
-                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
-                                                        <option value="FAILED">FAILED</option>
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
 
@@ -714,7 +715,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="card C">
+                                    <div class="card CQCC">
                                         <h2 class="card-header">
                                         <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
                                             <h5>C. QUALITY CONTROL SECTION (CERTIFICATTION)</h5>
@@ -994,10 +995,10 @@
                                         </div>
                                         </div>
                                     </div>
-                                     {{-- <div class="card PPD">
+                                    <div class="card PPD">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFourOper" aria-expanded="false" aria-controls="collapseFourOper">
-                                            <h5>PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h5>
+                                            <h5>D PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseFourOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
@@ -1180,7 +1181,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                   <div class="card ">
+                                  {{-- <div class="card E ENGG VALIDATION">
                                         <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
                                             <h5>VALIDATION PROCESS: ENGINEERING SECTION</h5>
@@ -1281,8 +1282,8 @@
 
                                         </div>
                                         </div>
-                                    </div>--}}
-                                   <div class="card EQCVP">
+                                    </div> --}}
+                                   <div class="card FQCVP">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseSixOper" aria-expanded="false" aria-controls="collapseSixOper">
                                             <h5>E. VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
@@ -1435,7 +1436,7 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="card FVVO">
+                                    <div class="card GVVO">
                                         <h2 class="card-header">
                                         <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseSevenOper" aria-expanded="false" aria-controls="collapseSevenOper">
                                             <h5>F. QC Validation for Visual Operator</h5>

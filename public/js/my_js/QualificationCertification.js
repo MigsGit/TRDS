@@ -1,6 +1,7 @@
 // $(document).ready(function () {
     const getApprovalStatusToggle = (params) => {
         let approvalStatus = params.approval_status;
+        $('#data-toggle').removeClass('show');
          if(approvalStatus ==='BENGGTQ'){
                 $('#collapseTwoOper').addClass('show');
                 $('#collapseOneOper').removeClass('show');
@@ -15,6 +16,9 @@
                 $('#collapseThreeOper').removeClass('show');
                 $('#collapseTwoOper').removeClass('show');
                 $('#collapseOneOper').removeClass('show');
+            }
+            if(approvalStatus ==='DPPDONLY'){
+                $('#collapseFourOper').addClass('show');
             }
             if(approvalStatus ==='FQCVVO'){
                 $('#collapseSevenOper').addClass('show');
