@@ -669,6 +669,7 @@ class TrainingEndorsementController extends Controller
             },
             'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info' => function($query) {
                 $query->where('exam_result_status', 1);
+                $query->where('remark', 'Passed');
                 $query->where('status', 0);
                 $query->where('logdel', 0);
             }
