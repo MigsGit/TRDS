@@ -1,9 +1,16 @@
+/* Select 2 Attr */
+$('.select2bs4').each(function () {
+    $(this).select2({
+        theme: 'bootstrap-5',
+        dropdownParent: $(this).parent(),
+    });
+});
+
 /**
  * Reusable function for using Ajax Request
  *
  * @param {object} options
  */
-
 const ajaxRequest = (options) => {
     var defaults = {
         url: '',
@@ -119,7 +126,7 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
             if( result.status === 422 ){
                 toastr.error(errorResponse.message);
 
-                // errorHandler( errors.first_molding_device_id,formModal.firstMolding.find('#first_molding_device_id') );  
+                // errorHandler( errors.first_molding_device_id,formModal.firstMolding.find('#first_molding_device_id') );
             }
 
         }

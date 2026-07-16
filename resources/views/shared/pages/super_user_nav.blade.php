@@ -136,9 +136,9 @@
                 </li>
 
                 <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>Personal Skill Matrix </p>
+                    <a href="{{ route('personnel_skill_matrix') }}"  class="nav-link">
+                        <i class="fas fa-blind"></i>
+                        <p>Personnel Skill Matrix</p>
                     </a>
                 </li>
                 @if ( in_array(16,explode(',', $globalUser->user_modules_id)) )
@@ -149,14 +149,17 @@
                         </a>
                     </li>
                 @endif
-              
+
 
                 <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-list-alt"></i>
-                        <p>Qualification / Certification </p>
+                    <a href="{{ route('qualification_certification') }}" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Qualification / Certification</p>
                     </a>
                 </li>
+
+               g --}}
+
             </ul>
         </nav>
     </div><!-- Sidebar -->

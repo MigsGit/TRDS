@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Validator;
 
 use Yajra\DataTables\Facades\DataTables;
 
+use App\Model\ExamTitle;
 use App\Model\Questionnaires;
+use App\Model\ExamResultDetails;
 use App\Model\QuestionnaireDetails;
 use App\Model\SystemOneHrisSection;
 use App\Model\SystemOneHrisPosition;
@@ -37,7 +39,7 @@ class QuestionnairesController extends Controller
                     $result .=  '<button type="button" class="btn text-center dropdown-item actionViewRevisionQuestionnaire" questionnaire-id="' . $questionnaire->id . '" data-toggle="modal" data-target="#modalCreateUpdateQuestionnaire" title="View Questionnaire"><i class="fa fa-eye"></i> Revision</button>';
                 }
                 $result .=  '   <button type="button" class="btn text-center dropdown-item actionUpdateQuestionnaire" questionnaire-id="' . $questionnaire->id . '" data-toggle="modal" data-target="#modalCreateUpdateQuestionnaire" title="Update Questionnaire"><i class="fa fa-edit"></i> Update</button>';
-                $result .=  '   <button type="button" class="btn text-center dropdown-item actionQuestionnaireDetails" questionnaire-id="' . $questionnaire->id . '" questionnaire-revision="' . $questionnaire->revision . '" questionnaire-exam_title="' . $questionnaire->exam_title . '" data-toggle="modal" data-target="#modalQuestionnaireDetails" title="Questionnaire Details"><i class="fa fa-list-ul"></i> Details</button>';
+                $result .=  '   <button type="button" class="btn text-center dropdown-item actionQuestionnaireDetails" questionnaire-id="' . $questionnaire->id . '" questionnaire-revision="' . $questionnaire->revision . '" questionnaire-exam_title="' . $questionnaire->exam_title . '" questionnaire-description="' . $questionnaire->description . '" data-toggle="modal" data-target="#modalQuestionnaireDetails" title="Questionnaire Details"><i class="fa fa-list-ul"></i> Details</button>';
                 $result .=  '   <button type="button" class="btn text-center dropdown-item actionChangeQuestionnaireStatus" questionnaire-id="' . $questionnaire->id . '" status="1" data-toggle="modal" data-target="#modalChangeQuestionnaireStatus" title="Deactivate Questionnaire"><i class="fa fa-ban"></i> Inactive</button>';
                 $result .=  '</button>';
 
@@ -96,6 +98,14 @@ class QuestionnairesController extends Controller
         return response()->json($hris_section);
     }
 
+    public function getExamTitle(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
+        $exam_title = ExamTitle::where('status', 0)->where('logdel', 0)->orderBy('exam_title', 'ASC')->get();
+
+        return response()->json($exam_title);
+    }
+
     public function createUpdateQuestionnaire(Request $request){
         date_default_timezone_set('Asia/Manila');
 
@@ -103,6 +113,7 @@ class QuestionnairesController extends Controller
         $validator = Validator::make($data, [
             'questionnaire_category'        => 'required',
             'questionnaire_title'           => 'required',
+            'questionnaire_description'     => 'required',
             'questionnaire_purpose'         => 'required',
             'questionnaire_position'        => 'required',
             'questionnaire_passing_score'   => 'required',
@@ -114,6 +125,7 @@ class QuestionnairesController extends Controller
         $questionnaires_record = [
             'category'          => $request->questionnaire_category,
             'exam_title'        => $request->questionnaire_title,
+            'description'       => $request->questionnaire_description,
             'purpose'           => $request->questionnaire_purpose,
             'position'          => $request->questionnaire_position,
             'passing_score'     => $request->questionnaire_passing_score,
@@ -127,8 +139,8 @@ class QuestionnairesController extends Controller
         }else{
             DB::beginTransaction();
             try{
-                $count_production_data = Questionnaires::where('id', $request->questionnaire_id)->where('logdel', 0)->exists();
-                if($count_production_data == 0){
+                $check_data = Questionnaires::where('id', $request->questionnaire_id)->where('logdel', 0)->exists();
+                if($check_data == 0){
                     $exists = Questionnaires::where([
                         'id'   => $request->questionnaire_id,
                         'logdel' => 0,
@@ -138,7 +150,6 @@ class QuestionnairesController extends Controller
                         return response()->json(['result' => 1]);
                     }
 
-                    $questionnaires_record['created_by']    = '';
                     $questionnaires_record['created_at']    = date('Y-m-d H:i:s');
 
                     Questionnaires::insert($questionnaires_record);
@@ -153,10 +164,17 @@ class QuestionnairesController extends Controller
                     if($exists){
                         return response()->json(['result' => 1]);
                     }else{
-                        $questionnaires_record['updated_by']    = '';
                         $questionnaires_record['updated_at']    = date('Y-m-d H:i:s');
 
                         Questionnaires::where('id', $request->questionnaire_id)->where('logdel', 0)->update($questionnaires_record);
+
+                        $questionnaires_record['id'] = $request->questionnaire_id;
+                        ExamResultDetails::where('questionnaire_id', $request->questionnaire_id)
+                            ->where('logdel', 0)
+                            ->where('status', 0)
+                            ->update([
+                                'questionnaire' => json_encode($questionnaires_record),
+                            ]);
                     }
                 }
 
@@ -527,5 +545,18 @@ class QuestionnairesController extends Controller
             DB::rollback();
             return response()->json(['hasError' => 1, 'exceptionError' => $e]);
         }
+    }
+
+    public function reorder(Request $request){
+        DB::transaction(function () use ($request) {
+            foreach($request->rows as $row){
+                QuestionnaireDetails::where('id',$row['id'])->where('status', 0)->where('logdel', 0)
+                    ->update([
+                        'exam_no'=>$row['exam_no']
+                    ]);
+            }
+        });
+
+        return response()->json([ 'success'=> true ]);
     }
 }

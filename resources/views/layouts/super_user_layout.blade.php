@@ -110,6 +110,8 @@
                 @include('shared.pages.admin_footer')
             </div>
 
+            
+
             <!-- JS LINKS -->
             @include('shared.js_links.js_links')
             @yield('js_content')

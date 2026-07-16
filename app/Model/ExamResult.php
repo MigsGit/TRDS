@@ -13,7 +13,7 @@ class ExamResult extends Model
     protected $connection = 'mysql';
 
     public function exam_result_details_info(){
-        return $this->hasOne(ExamResultDetails::class, 'exam_result_id', 'id');
+        return $this->hasMany(ExamResultDetails::class, 'exam_result_id', 'id');
     }
-    
+
 }

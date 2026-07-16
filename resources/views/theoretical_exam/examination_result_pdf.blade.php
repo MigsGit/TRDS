@@ -10,7 +10,7 @@
             margin-bottom: 10px;
             padding: 10px;
             page-break-inside: avoid;
-            break-inside: avoid;   
+            break-inside: avoid;
         }
         table { width: 100%; border-collapse: collapse; margin-top: 5px; }
         table, th, td { border: 1px solid #000; }
@@ -25,9 +25,9 @@
 <div style="text-align:center;">
     <span style="margin-right: 25px;"><strong>Score:</strong> {{ $examResultDetails[0]->identification_essay_score + $examResultDetails[0]->score }} / {{ $questions['summary']['total_points'] }}</span>
     <span style="margin-right: 25px;"><strong>Passing Score:</strong> {{ $questionnaireInfo['passing_score'] }}</span>
-    <span style="margin-right: 25px;"><strong>Percentage:</strong> {{ $examResultDetails[0]['rating'] }}</span>
+    <span style="margin-right: 25px;"><strong>Percentage:</strong> {{ $examResultDetails[0]['rating'] }}%</span>
     <span style="margin-right: 25px;">
-        <strong>Rating:</strong> 
+        <strong>Rating:</strong>
         <span style="padding: 2px 10px; border-radius: 12px; color: #fff; font-weight: bold; background-color: {{ str_contains(strtolower($examResultDetails[0]['remark']), 'passed') ? '#28a745' : '#dc3545' }};">
             {{ $examResultDetails[0]['remark'] }}
         </span>
@@ -65,6 +65,18 @@
     </tr>
 </table>
 <hr>
+
+<!-- Description -->
+<span style="width:100%; font-size: 13px;">
+    <strong>
+        Description:
+    </strong>
+</span><br><br>
+<span>
+    {{ $questionnaireInfo['description'] }}
+</span><br><br>
+
+<!-- Instruction -->
 <span style="width:100%; font-size: 13px;">
     <strong>
         Instruction:
@@ -74,13 +86,13 @@
     {{ $questionnaireInfo['exam_instruction'] }}
 </span>
 <hr>
+
 @foreach($questions as $key => $question)
     @if($key === 'summary')
         @continue
     @endif
 
     <div class="card" style="margin-top: 20px;">
-
         <!-- QUESTION HEADER -->
         <div>
             <strong>
@@ -99,8 +111,11 @@
 
         <!-- IMAGE -->
         @if(!empty($question['image']))
-            <div style="text-align:center; margin:5px 0;">
-                <img src="{{ storage_path() . ("/app/public/questionnaire_attachment/". $question['image']) }}">
+            <div style="text-align:center; margin:10px 0;">
+                <img
+                    src="{{ storage_path('app/public/questionnaire_attachment/' . $question['image']) }}"
+                    style="display:block; max-width:100%; height:auto; margin:0 auto;"
+                >
             </div>
         @endif
 
@@ -118,7 +133,7 @@
                         <div style="margin-bottom: 5px;">
                             <input type="{{ $question['points'] > 1 ? 'checkbox' : 'radio' }}"
                                 {{ in_array(trim($choice), $userAnswers) ? 'checked' : '' }}>
-                            
+
                             <span style="margin-left: 5px;">{{ $choice }}</span>
                         </div>
                     @endforeach
