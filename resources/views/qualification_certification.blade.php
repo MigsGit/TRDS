@@ -899,7 +899,8 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_qcs_oper" id="text_oa_1st_result_qcs_oper">
-                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                        <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -907,7 +908,8 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_2nd_result_qcs_oper" id="text_oa_2nd_result_qcs_oper">
-                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                        <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
