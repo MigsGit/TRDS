@@ -1299,16 +1299,18 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_vpqcs_oper" id="text_first_result_vpqcs_oper">
-                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
-                                                        <option value="FAILED">FAILED</option>
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_vpqcs_oper" id="text_second_result_vpqcs_oper">
-                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
-                                                        <option value="FAILED">FAILED</option>
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1365,16 +1367,18 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_vpes_oper_2" id="text_first_result_vpes_oper_2">
-                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
-                                                        <option value="FAILED">FAILED</option>
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_vpes_oper_2" id="text_second_result_vpes_oper_2">
-                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
-                                                        <option value="FAILED">FAILED</option>
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
                                             </div>

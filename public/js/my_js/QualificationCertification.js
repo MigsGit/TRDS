@@ -561,6 +561,7 @@
         // console.log('approversCollection', approversCollection);
 
         let aProd = approversCollection.APRODTO[0];
+        let eQcvp = approversCollection.EQCVP[0];
         let aProdToFirst = aProd.first_approver_exploded ?? [];
         let aProdToFirstMentoredBy = aProd.first_approver2_exploded ?? [];
         let aProdToSecond = aProd.second_approver_exploded ?? [];
@@ -777,16 +778,16 @@
 
             //C QC Certification
             let cQcData = response.approversCollection.CQCC[0];
-            form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcCertification.obs_first_result_qcs_oper);
-            form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcCertification.first_sample_qcs_oper);
-            form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcCertification.first_ok_qcs_oper);
-            form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcCertification.first_ng_qcs_oper);
-            form.formSubmitOper.find('#text_qcs_station_1st_oper').val(cQcCertification.qcs_station_1st_oper);
-            form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcCertification.obs_second_result_qcs_oper);
-            form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcCertification.second_ok_qcs_oper);
-            form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcCertification.second_sample_qcs_oper);
-            form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcCertification.second_ng_qcs_oper);
-            form.formSubmitOper.find('#text_qcs_station_2nd_oper').val(cQcCertification.qcs_station_2nd_oper);
+            form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcData.obs_first_result_qcs_oper);
+            form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcData.first_sample_qcs_oper);
+            form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcData.first_ok_qcs_oper);
+            form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcData.first_ng_qcs_oper);
+            form.formSubmitOper.find('#text_qcs_station_1st_oper').val(cQcData.qcs_station_1st_oper);
+            form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcData.obs_second_result_qcs_oper);
+            form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcData.second_ok_qcs_oper);
+            form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcData.second_sample_qcs_oper);
+            form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcData.second_ng_qcs_oper);
+            form.formSubmitOper.find('#text_qcs_station_2nd_oper').val(cQcData.qcs_station_2nd_oper);
 
             form.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData.first_status).trigger('change');
             form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData.second_status).trigger('change');
@@ -797,8 +798,23 @@
             form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData.second_date);
             form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData.second_time);
 
+            //D
+            let eQcValidationProcess = data.e_qc_validation_process;
+            let eQcvpData = response.approversCollection.EQCVP[0];
+            form.formSubmitOper.find('#text_vpqcs_oper').val(eQcValidationProcess.vpqcs_oper).trigger('change');
+            form.formSubmitOper.find('#text_application_vpqcs_oper').val(eQcValidationProcess.application_vpqcs_oper).trigger('change');
 
 
+            form.formSubmitOper.find('#text_first_result_vpqcs_oper').val(cQcData.first_status).trigger('change');
+            form.formSubmitOper.find('#text_first_result_vpes_oper_2').val(cQcData.first_status_2).trigger('change');
+            form.formSubmitOper.find('#text_second_result_vpqcs_oper').val(cQcData.second_status).trigger('change');
+            form.formSubmitOper.find('#text_second_result_vpes_oper_2').val(cQcData.second_status_2).trigger('change');
+            form.formSubmitOper.find('#text_remarks_vpqcs_oper').val(eQcvpData.first_remarks);
+            form.formSubmitOper.find('#text_remarks_vpes_oper_2').val(eQcvpData.second_remarks);
+            form.formSubmitOper.find('#text_1st_date_vpqcs_oper').val(eQcvpData.first_date);
+            form.formSubmitOper.find('#text_1st_date_vpes_oper_2').val(eQcvpData.first_date_2);
+            form.formSubmitOper.find('#text_2nd_date_vpqcs_oper').val(eQcvpData.second_date);
+            form.formSubmitOper.find('#text_2nd_date_vpes_oper_2').val(eQcvpData.second_date_2);
 
 
             $('#modalCreateCQForm').modal();
