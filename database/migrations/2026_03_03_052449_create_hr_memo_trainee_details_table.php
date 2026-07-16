@@ -18,7 +18,7 @@ class CreateHrMemoTraineeDetailsTable extends Migration
             $table->unsignedBigInteger('hr_memo_id')->comment('hr_memos.id');
             $table->string('hris_id')->nullable();
             $table->string('employee_no');
-            $table->string('training_venue')->nullable();
+            // $table->string('training_venue')->nullable();
             $table->date('endorsement_date')->nullable();
             $table->string('department')->nullable();
             $table->string('prod_allocation')->nullable();

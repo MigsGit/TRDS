@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 
-
 class TrainingEndorsementController extends Controller
 {
     protected $CommonController;
@@ -670,6 +669,7 @@ class TrainingEndorsementController extends Controller
             },
             'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info' => function($query) {
                 $query->where('exam_result_status', 1);
+                $query->where('remark', 'Passed');
                 $query->where('status', 0);
                 $query->where('logdel', 0);
             }
@@ -681,7 +681,6 @@ class TrainingEndorsementController extends Controller
             abort(404, 'Endorsement not found.');
         }
 
-        // return $data;
         // Build employees array for the PDF
         $employees = [];
         $employees_will_not_endorse = [];
@@ -691,37 +690,67 @@ class TrainingEndorsementController extends Controller
             if (!$detail) continue;
 
             $exams = [];
-            if ($detail->employee_exam_details && $detail->employee_exam_details->count() > 0) {
-                foreach ($detail->employee_exam_details as $examResult) {
-                    $examDetail = $examResult->exam_result_details_info;
+            // if ($detail->employee_exam_details && $detail->employee_exam_details->count() > 0) {
+            if ($detail->employee_exam_details ) {
+                // foreach ($detail->employee_exam_details as $examResult) {
+                    $examDetail = $detail->employee_exam_details->exam_result_details_info;
                     $examTitle = '';
                     $score = '';
                     $rating = '';
                     $remark = '';
 
                     if ($examDetail) {
+                        foreach ($examDetail as $exam) {
+
                         // Parse questionnaire JSON for exam_title
-                        if ($examDetail->questionnaire) {
-                            $questionnaire = is_string($examDetail->questionnaire)
-                                ? json_decode($examDetail->questionnaire, true)
-                                : $examDetail->questionnaire;
-                        $examTitle = $questionnaire['exam_title'] ?? '';
+                            // if ($examDetail->questionnaire) {
+                            //     $questionnaire = is_string($examDetail->questionnaire)
+                            //         ? json_decode($examDetail->questionnaire, true)
+                            //         : $examDetail->questionnaire;
+                            //     $examTitle = $questionnaire['exam_title'] ?? '';
+                            // }
+                            $examResult = json_decode($exam->exam_result, true);
+                            if ($exam->questionnaire) {
+                                $questionnaire = is_string($exam->questionnaire)
+                                    ? json_decode($exam->questionnaire, true)
+                                    : $exam->questionnaire;
+                                $examTitle = $questionnaire['exam_title'] ?? '';
+                            }
+
+                            $totalScore = ($exam->score ?? 0) + ($exam->identification_essay_score ?? 0);
+                            // $totalItems = $questionnaire['total_items'] ?? $questionnaire['total_points'] ?? '';
+                            $totalItems = $exam->total_items ?? $exam->total_points ?? '';
+                            // $score = $totalItems ? $totalScore . '/' . $totalItems : $totalScore;
+                            $score = $totalScore . '/' . ($examResult['summary']['total_score'] ?? '');
+                            // dd($examResult['summary']['total_score']);
+                            // $rating = $exam->rating ?? '';
+                            $rating = $exam->rating ? $exam->rating . '%' : '';
+
+                            if(is_null($exam->attempt)){
+                                $appendRemarks = "on 1st attempt";
+                            }
+                            else{
+                                $attemptCount = $exam->attempt ?? 1;
+                                $formatter = new \NumberFormatter('en_US', \NumberFormatter::ORDINAL);
+                                $appendRemarks = "on " . $formatter->format($attemptCount) . " attempt";
+                            }
+                            
+
+                            // $remark = $exam->remark ?? '';
+                            $remark = ($exam->remark ?? '') . ' ' . $appendRemarks;
+
+                            $exams[] = [
+                                'title'  => $examTitle,
+                                'score'  => $score,
+                                'rating' => $rating,
+                                'remark' => $remark,
+                            ];
                         }
 
-                        $totalScore = ($examDetail->score ?? 0) + ($examDetail->identification_essay_score ?? 0);
-                        $totalItems = $questionnaire['total_items'] ?? $questionnaire['total_points'] ?? '';
-                        $score = $totalItems ? $totalScore . '/' . $totalItems : $totalScore;
-                        $rating = $examDetail->rating ?? '';
-                        $remark = $examDetail->remark ?? '';
                     }
 
-                    $exams[] = [
-                        'title'  => $examTitle,
-                        'score'  => $score,
-                        'rating' => $rating,
-                        'remark' => $remark,
-                    ];
-                }
+                   
+                // }
             }
 
             $posDeptSec = implode(' / ', array_filter([
@@ -809,7 +838,7 @@ class TrainingEndorsementController extends Controller
             }
         }
 
-        // return $data;
+        // return $employees;
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,

@@ -13,7 +13,7 @@ use App\RapidXUser;
 use App\Model\RapidXDepartment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-
+use Illuminate\Support\Facades\DB;
 
 class TrainingRequestController extends Controller
 {
@@ -61,6 +61,11 @@ class TrainingRequestController extends Controller
 
         return DataTables()->of($trainingRequests)
         ->addColumn('action', function($trainingRequest) use ($receiverUsers, $tuHeadApproverUser){
+            // $trainingRequestDept = RapidXDepartment::where('department_id', $trainingRequest->department_id)->first();
+            $sectionHeadDeptId = $trainingRequest->section_head_user->department_id;
+            $trainingRequestDept = RapidXDepartment::where('department_id', $sectionHeadDeptId)->first();
+            $dept = $trainingRequestDept->department_name;
+
             $sectionHeadDeptId = $trainingRequest->section_head_user->department_id;
             $trainingRequestDept = RapidXDepartment::where('department_id', $sectionHeadDeptId)->first();
             $dept = $trainingRequestDept->department_name;
@@ -402,6 +407,7 @@ class TrainingRequestController extends Controller
 
             Mail::send('mail.new_training_request_notification', $data, function ($message) use ($recipientEmail, $recipientName, $bccEmail) {
                 $message->to($recipientEmail, $recipientName);
+                $message->cc(['kcalcantara@pricon.ph, cnpoblete@pricon.ph']);
                     if ($bccEmail) {
                         $message->bcc($bccEmail);
                     }

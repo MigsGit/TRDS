@@ -15,7 +15,7 @@ class AddReceivedByToHrMemos extends Migration
     {
         Schema::table('hr_memos', function (Blueprint $table) {
            $table->string('received_by')->nullable()->after('noted_by');
-           $table->date('received_date')->nullable()->after('received_by');;
+           $table->date('received_date')->nullable()->after('received_by');
         });
     }
 
