@@ -122,7 +122,21 @@
 
                         <div class="row">
                             <div class="col-md-6">
-                                <x-section-select name="select_section" id="select_section" label="Select Section" />
+                                <div class="form-group">
+                                    <label for="text_select_position">Select Section</label>
+                                {{-- <x-section-select name="select_section" id="select_section" label="Select Section" /> --}}
+                                    <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="select_section" id="select_section">
+                                        <option value="" selected disabled>Select Position</option>
+                                        <option value="TSF1" selected>TS-F1</option>
+                                        <option value="TSF3">TS-F3</option>
+                                        <option value="CN">CN</option>
+                                        <option value="CNF3">CN-F3</option>
+                                        <option value="PPDCN">PPD-CN</option>
+                                        <option value="PPDTS">PPD-TS</option>
+                                        <option value="PPDF3">PPD-F3</option>
+                                        <option value="YF">YF</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="col-md-6">

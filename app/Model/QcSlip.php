@@ -7,6 +7,7 @@ use App\Model\Qc\AOperProdTrainingOrientation;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
 use App\Model\Qc\CQcCertification;
 use App\Model\Qc\EQcValidationProcess;
+use App\Model\Qc\FQcValidation;
 use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\OpApprover;
@@ -62,7 +63,7 @@ class QcSlip extends Model
     }
     public function f_qc_validation()
     {
-        return $this->hasOne(FQcValidations::class, 'qc_slips_id', 'id');
+        return $this->hasOne(FQcValidation::class, 'qc_slips_id', 'id');
     }
 
 }

@@ -104,7 +104,7 @@ class QualificationCertificationController extends Controller
                 'b_op_engg_section_training_orientation',
                 'c_qc_certification',
                 'e_qc_validation_process',
-                // 'f_qc_validation',
+                'f_qc_validation',
             )
             ->where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')
