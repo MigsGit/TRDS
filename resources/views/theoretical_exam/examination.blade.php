@@ -35,6 +35,7 @@
     <section class="content-header">
         <div class="container-fluid">
             <h1 id="examTitleId" value="{{ $exam->id }}">{{ $exam->exam_title }}</h1>
+            <p id="examInstructionId">{{ $exam->description }}</p>
             <p id="examInstructionId">{{ $exam->exam_instruction }}</p>
         </div>
     </section>
@@ -212,12 +213,9 @@
                                                 </table>
                                             </div>
                                         @break
-
                                     @endswitch
-
                                 </div>
                             </div>
-
                         @empty
                             <div class="alert alert-warning">No questions available.</div>
                         @endforelse
@@ -225,8 +223,12 @@
 
                     <div class="mt-3 d-flex justify-content-between">
                         <button type="button" id="btnPrev" class="btn btn-secondary">Previous</button>
-                        {{-- <button type="button" id="btnCheckExam" class="btn btn-success">Checking Exam</button> --}}
-                        <button type="submit" id="btnSubmitExam" class="btn btn-success">Submit Exam</button>
+                        {{-- <button type="submit" id="btnSubmitExam" class="btn btn-success">Submit Exam</button> --}}
+                        @if($questions->count() > 0)
+                            <button type="submit" id="btnSubmitExam" class="btn btn-success">
+                                Submit Exam
+                            </button>
+                        @endif
                     </div>
                 </form>
             </div>

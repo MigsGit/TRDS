@@ -18,10 +18,10 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
             $('#txtExamTrainingRequestName').val(employeeInfo.employee_name);
             $('#txtExamTrainingRequestDateHired').val(employeeInfo.date_hired);
             $('#txtExamTrainingRequestDateExamination').val(response.date_examination);
-            if (typeof examResult === 'string') {
-                try {
+            if(typeof examResult === 'string'){
+                try{
                     examResult = JSON.parse(examResult);
-                } catch (e) {
+                }catch(e){
                     console.error("Failed to parse exam_result JSON", e);
                     container.innerHTML = `<div class="alert alert-danger">Invalid exam result format.</div>`;
                     return;
@@ -31,16 +31,16 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
             // Parse questionnaire_details (contains the correct answers)
             let questionnaireDetails = response.questionnaire_details;
 
-            if (typeof questionnaireDetails === 'string') {
-                try {
+            if(typeof questionnaireDetails === 'string'){
+                try{
                     questionnaireDetails = JSON.parse(questionnaireDetails);
-                } catch (e) {
+                }catch(e){
                     console.error("Failed to parse questionnaire_details JSON", e);
                     questionnaireDetails = {};
                 }
             }
 
-            if (!examResult) {
+            if(!examResult){
                 container.innerHTML = `<div class="alert alert-warning">No exam result found.</div>`;
                 return;
             }
@@ -64,7 +64,7 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                 const hostname = window.location.hostname;
                 const pathname = window.location.pathname;
                 const firstSegment = pathname.split('/').filter(Boolean)[0];
-                if (q.image && q.image.trim() !== '') {
+                if(q.image && q.image.trim() !== ''){
                     html += `<div class="text-center mb-2">
                                 <img src="${protocol}//${hostname}/${firstSegment}/storage/app/public/questionnaire_attachment/${q.image}"
                                     style="max-width:200px; cursor:pointer;"
@@ -73,13 +73,11 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                 }
 
                 // MULTIPLE CHOICE
-                if (q.category_type === 0 && items.length > 0) {
+                if(q.category_type === 0 && items.length > 0){
                     const item = items[0];
                     const qData = questionnaireDetails[q.exam_no];
                     const correctItem = qData.answer_choices_question[0];
-
                     const userAnswerRaw = item.user_answer ? String(item.user_answer).trim() : '';
-
                     const userAnswers = userAnswerRaw
                         ? userAnswerRaw.split(',').map(x => x.trim())
                         : [];
@@ -95,15 +93,11 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
 
                         let icon = '';
 
-                        if (isChecked && isCorrect) {
+                        if(isChecked && isCorrect){
                             icon = '<i class="fa fa-check text-success ml-1"></i>';
-                        }
-
-                        else if (isChecked && !isCorrect) {
+                        }else if(isChecked && !isCorrect){
                             icon = '<i class="fa fa-times text-danger ml-1"></i>';
-                        }
-
-                        else if (!userAnswerRaw && isCorrect) {
+                        }else if(!userAnswerRaw && isCorrect){
                             icon = '<i class="fa fa-times text-danger ml-1"></i>';
                         }
 
@@ -124,12 +118,12 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                 }
 
                 // IDENTIFICATION / ESSAY
-                if (q.category_type === 1 && items.length > 0) {
+                if(q.category_type === 1 && items.length > 0){
                     const item = items[0];
                     const ans = item.user_answer || '';
-                    if (q.type === 'Identification') {
+                    if(q.type === 'Identification'){
                         html += `<input type="text" class="form-control" value="${ans}" readonly>`;
-                    } else if (q.type === 'Essay') {
+                    }else if(q.type === 'Essay'){
                         html += `<textarea class="form-control" rows="4" readonly>${ans}</textarea>`;
                     }
 
@@ -196,7 +190,7 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                 // }
 
                 // GRID / TABLE
-                if (q.category_type === 2 && items.length > 0) {
+                if(q.category_type === 2 && items.length > 0){
                     const qData = questionnaireDetails[q.exam_no];
 
                     html += `
@@ -235,7 +229,7 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
 
                             if(isChecked && isCorrect){
                                 icon = '<i class="fa fa-check text-success ml-1"></i>';
-                            }else if (isChecked && !isCorrect){
+                            }else if(isChecked && !isCorrect){
                                 icon = '<i class="fa fa-times text-danger ml-1"></i>';
                             }else if(!userAnswer && isCorrect){
                                 icon = '<i class="fa fa-times text-danger ml-1"></i>';
@@ -428,7 +422,7 @@ const UpdateExaminationDate = () => {
 };
 
 const ChangeExaminationResultStatus = (examResultDetailsId) => {
-    let formData = $('#formChangeExamResultStatus').serialize() + '&examResultDetailsId=' + examResultDetailsId;
+    let formData = $('#formChangeExamResultStatus').serialize();
 
     const ajaxChangeExamResultStatus = {
         url: "change_exam_result_status",
