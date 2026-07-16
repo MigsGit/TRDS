@@ -37,7 +37,7 @@
                             <!-- Start Page Content -->
                             <div class="card-body">
                                 <div class="float-sm-right">
-                                    <button class="btn btn-success" id="btnShowModalRequestTraining">
+                                    <button class="btn btn-success" id="btnChooseFileToExport">
                                         <i class="fas fa-file-export fa-md me-2"></i> Export Report
                                     </button>
                                 </div>
@@ -113,7 +113,7 @@
     <!-- MODAL -->
 
     <!-- Update Employee Modal -->
-    <div class="modal fade" id="updateEmpInfoModalId" tabindex="-1" role="dialog">
+    <div class="modal fade" id="updateEmpInfoModalId" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
 
@@ -200,7 +200,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
+                                    {{-- <div class="form-group row">
                                         <div class="col-md-12 text-center">
                                             <div class="form-check">
                                                 <input class="form-check-input"type="checkbox"id="visualExam">
@@ -208,13 +208,13 @@
                                                 </label>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                         </div>
 
                         <!-- Qualification -->
-                        <div class="card">
+                        {{-- <div class="card">
                                 <div class="card-header accordion-header bg-light">
                                     <h5 class="mb-0">
                                         <button class="btn btn-link text-dark font-weight-bold" data-toggle="collapse" data-target="#collapseTwo">
@@ -229,10 +229,10 @@
                                     <!-- Your Qualification Table -->
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <!-- Skill Card -->
-                        <div class="card">
+                        {{-- <div class="card">
                             <div class="card-header accordion-header bg-light">
                                 <h5 class="mb-0">
                                     <button class="btn btn-link text-dark font-weight-bold" data-toggle="collapse" data-target="#collapseThree">
@@ -246,7 +246,7 @@
                                     <!-- Skill Card Table -->
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
 
                 </div>
@@ -261,7 +261,7 @@
     </div>
 
     <!-- View Employee Modal -->
-    <div class="modal fade" id="viewEmpInfoModalId" tabindex="-1" role="dialog">
+    <div class="modal fade" id="viewEmpInfoModalId" tabindex="-1" role="dialog" data-backdrop="static">
         {{-- <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document"> --}}
         <div class="modal-dialog modal-dialog-scrollable modal-semi-full">
             <div class="modal-content">
@@ -405,12 +405,15 @@
                                             <thead>
                                                 <tr>
                                                     <th class="text-center">Date</th>
-                                                    <th class="text-center">Title</th>
+                                                    <th class="text-center">Training Title / Reason for Certification</th>
+                                                    <th class="text-center">Series Name / Family</th>
+                                                    <th class="text-center">Station</th>
+                                                    <th class="text-center">Detailed Stations</th>
                                                     <th class="text-center">Objective</th>
                                                     <th class="text-center">Trainor</th>
                                                     <th class="text-center">Results</th>
                                                     <th class="text-center">Venue</th>
-                                                    <th class="text-center">Mechanics</th>
+                                                    {{-- <th class="text-center">Mechanics</th> --}}
                                                     <th class="text-center">Type of Training</th>
                                                     {{-- <th class="text-center">Remarks</th> --}}
                                                 </tr>
@@ -432,6 +435,80 @@
                     <button class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i>
                         Close
                     </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="chooseExportReportId" data-backdrop="static" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-scrollable modal-md">
+            <div class="modal-content">
+
+                <!-- Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title font-weight-bold">
+                        Choose file to Export
+                    </h4>
+
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body">
+                    <div class="col-md-12 mb-3">
+                        <button class="btn btn-warning text-light w-100 py-3 fs-5 d-flex align-items-center justify-content-center gap-2" data-toggle="modal" title="Click this to generate pdf file." data-target="#modalGenerateSkillMatrixDetails">
+                            <i class="fas fa-eye fa-lg mr-2" aria-hidden="true"></i> <span>Employee Skill Map</span>
+                        </button>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <a role="button" class="btn btn-success w-100 py-3 fs-5 d-flex align-items-center justify-content-center gap-2" data-placement="bottom" title="Click this to generate excel file." >
+                            <i class="fas fa-list fa-lg mr-2" aria-hidden="true"></i> <span>List of Certified Personnel</span>
+                        </a>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <a role="button" class="btn btn-info w-100 py-3 fs-5 d-flex align-items-center justify-content-center gap-2" data-placement="bottom" title="Click this to generate excel file." data-original-title="" data-toggle="modal" data-target="#modalDateRangeCertificationMatrix">
+                            <i class="fas fa-certificate fa-lg mr-2" aria-hidden="true"></i> <span>Inspectors Certification Matrix</span>
+                        </a>
+                    </div>
+
+                     <div class="col-md-12 mb-3">
+                        <a role="button" class="btn btn-primary w-100 py-3 fs-5 d-flex align-items-center justify-content-center gap-2" data-placement="bottom" title="Click this to generate excel file.">
+                            <i class="fas fa-chart-bar fa-lg mr-2" aria-hidden="true"></i> <span>Inspectors Skill Chart</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalGenerateSkillMatrixDetails" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+
+                <!-- Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title font-weight-bold">
+                        Skill Map
+                    </h4>
+
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btnGenerateVisualMatrix" id="btnGenerateVisualMatrix">Export</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
 
             </div>
