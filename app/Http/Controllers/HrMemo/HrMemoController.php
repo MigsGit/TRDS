@@ -30,6 +30,7 @@ class HrMemoController extends Controller
     }
 
     public function viewHrMemoInfo(Request $request){
+        date_default_timezone_set('Asia/Manila');
         $globalUser = session('global_user');
         // return $globalUser;
         $user_access = explode(',', $globalUser->user_modules_id);
@@ -156,8 +157,20 @@ class HrMemoController extends Controller
         ->addColumn('received_by_label', function($hr_memo_details){
             $received_by_name = $hr_memo_details->received_by_info->name ?? 'Not Yet Received';
             $received_date = !empty($hr_memo_details->received_date) ? date('M j, Y h:i:s A', strtotime($hr_memo_details->received_date)) : '---';
-            $received_status = !empty($hr_memo_details->received_date) ? 'Received' : 'Pending';
-            $badge_status = !empty($hr_memo_details->received_date) ? 'badge-success' : 'badge-secondary';
+
+            if($hr_memo_details->status < 5){
+                $received_status = 'N/A';
+                $badge_status = 'badge-secondary';
+            }else if($hr_memo_details->status >= 5 && $hr_memo_details->status <= 6){
+                $received_status = !empty($hr_memo_details->received_date) ? 'Received' : 'Pending';
+                $badge_status = !empty($hr_memo_details->received_date) ? 'badge-success' : 'badge-warning';
+            }else{
+                $received_status = 'Disapproved';
+                $badge_status = 'badge-danger';
+            }
+
+            // $received_status = !empty($hr_memo_details->received_date) ? 'Received' : 'Pending';
+            // $badge_status = !empty($hr_memo_details->received_date) ? 'badge-success' : 'badge-secondary';
                 
             $result = "
                 <center>
@@ -314,6 +327,8 @@ class HrMemoController extends Controller
     }
 
     public function addHrMemoInfo(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
         $validation = array(
             'subject' => 'required',
             'from' => 'required',

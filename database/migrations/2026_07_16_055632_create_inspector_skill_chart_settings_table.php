@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateHrMemoExaminationsTable extends Migration
+class CreateInspectorSkillChartSettingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateHrMemoExaminationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('hr_memo_examinations', function (Blueprint $table) {
+        Schema::create('inspector_skill_chart_settings', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('examination_name');
-            $table->longText('objective')->nullable();
-            $table->text('description')->nullable();
+            $table->string('section');
+            $table->string('process_station');
+            $table->string('product_line');
             $table->string('status')->default(0)->comment('0 - Active, 1 - Inactive');
             $table->timestamps();
         });
@@ -30,6 +30,6 @@ class CreateHrMemoExaminationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hr_memo_examinations');
+        Schema::dropIfExists('inspector_skill_chart_settings');
     }
 }

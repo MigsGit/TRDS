@@ -430,7 +430,7 @@
                                             <div class="input-group-prepend w-50">
                                                 <span class="input-group-text w-100">Type of Training</span>
                                             </div>
-                                                <input type="text" class="form-control" name="type_of_training" id="typeOfTraining" placeholder="Enter type of training" required>
+                                                <input type="text" class="form-control" name="type_of_training" id="typeOfTraining" placeholder="Enter type of training" required value="Orientation">
                                         </div>
                                     </div>
                                 </div>
@@ -497,9 +497,9 @@
                         <!-- <div class="row" style="display:flex; gap:10px; align-items:end; margin-top:15px;"> -->
                         <div class="row">
                             <div class="col">
-                                <label>Section</label>
+                                <label>Section/s</label>
                                 <select class="form-control select2bs5" name="section_export[]" id="selectSectionToExport" multiple required>
-                                    <option value="" disabled selected>Select Section</option>
+                                    <option value="" disabled selected>Select Section/s</option>
                                     <option value="TSF1">TS-F1</option>
                                     <option value="TSF3">TS-F3</option>
                                     <option value="CN">CN</option>

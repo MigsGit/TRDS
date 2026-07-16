@@ -16,7 +16,7 @@ class AddColumnsToTraineeExamDetails extends Migration
         Schema::table('hr_memo_trainee_category_details', function (Blueprint $table) {
             $table->date('date_start')->nullable()->after('trainee_details_id');
             $table->date('date_end')->nullable()->after('date_start');
-            $table->string('objective')->nullable()->after('category');
+            $table->longText('objective')->nullable()->after('category');
             $table->string('trainor')->nullable()->comment('db_rapidx.employee_number')->after('objective');
             $table->string('mechanics')->nullable()->after('trainor');
             $table->string('type_of_training')->nullable()->after('mechanics');

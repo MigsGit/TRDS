@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\HrMemo;
+namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 
 use DataTables;
-use App\Model\Hr\HrMemoExamination;
+use App\Model\InspectorSkillChart\InspectorSkillChartSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class HrMemoExaminationController extends Controller
+class InspSkillChartSettingController extends Controller
 {
     public function viewProcessStationsInfo(Request $request){
-        $examination_details = HrMemoExamination::get();
+        $examination_details = InspectorSkillChartSetting::get();
 
         return DataTables::of($examination_details)
         ->addColumn('action', function($examination_details){
@@ -47,7 +47,9 @@ class HrMemoExaminationController extends Controller
 
     public function addProcessStationInfo(Request $request){
         $validation = array(
-            'exam_name' => ['required', 'string', 'max:255']
+            'section' => ['required', 'string', 'max:255'],
+            'process_station' => ['required', 'string', 'max:255'],
+            'product_line' => ['required', 'string', 'max:255']
         );
 
         $data = $request->all();
@@ -59,15 +61,16 @@ class HrMemoExaminationController extends Controller
 
             try{
                 $process_array = array(
-                    'examination_name' => $request->exam_name,
-                    'objective' => $request->objective
+                    'section' => $request->section,
+                    'process_station' => $request->process_station,
+                    'product_line' => $request->product_line
                 );
 
                 if(isset($request->id)){ // EDIT
-                    HrMemoExamination::where('id', $request->id)
+                    InspectorSkillChartSetting::where('id', $request->id)
                     ->update($process_array);
                 }else{ // ADD
-                    HrMemoExamination::insert($process_array);
+                    InspectorSkillChartSetting::insert($process_array);
                 }
 
                 DB::commit();
@@ -80,18 +83,18 @@ class HrMemoExaminationController extends Controller
     }
 
     public function getProcessStationById(Request $request){
-        return HrMemoExamination::where('id', $request->id)->first();
+        return InspectorSkillChartSetting::where('id', $request->id)->first();
     }
 
     public function getProcessStations(Request $request){
-        return HrMemoExamination::where('status', 0)->get();
+        return InspectorSkillChartSetting::where('status', 0)->get();
     }
 
     public function updateProcessStationStatus(Request $request){
         DB::beginTransaction();
 
         try {
-            $examination = HrMemoExamination::findOrFail($request->id);
+            $examination = InspectorSkillChartSetting::findOrFail($request->id);
 
             $examination->status = $examination->status == 1 ? 0 : 1;
             $examination->save();
