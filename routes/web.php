@@ -10,7 +10,8 @@ use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PersonnelSkillMatrixController;
-use App\Model\Questionnaires;
+use App\Http\Controllers\ExamTitleController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -117,6 +118,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('get_systemone_hris_department', 'getSystemoneHrisDepartment');
         Route::get('get_systemone_hris_position', 'getSystemoneHrisPosition');
         Route::get('get_systemone_hris_section', 'getSystemoneHrisSection');
+        Route::get('get_exam_title', 'getExamTitle');
         Route::post('create_update_questionnaire', 'createUpdateQuestionnaire');
         Route::get('get_questionnaire_by_id', 'getQuestionnaireById');
         Route::post('change_questionnaire_status', 'changeQuestionnaireStatus');
@@ -126,6 +128,7 @@ Route::middleware('checkSession')->group(function(){
         Route::post('create_update_questionnaire_details', 'createUpdateQuestionnaireDetails');
         Route::get('get_questionnaire_details_by_id', 'getQuestionnaireDetailsById');
         Route::post('change_questionnaire_details_status', 'changeQuestionnaireDetailsStatus');
+        Route::post('reorder','reorder')->name('reorder');
     });
 
     Route::controller(ExaminationController::class)->group(function () {
@@ -137,7 +140,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('count_exam_training_request_examination_take', 'countExamTrainingRequestExaminationTake')->name('count_exam_training_request_examination_take');
 
         Route::post('exam_submission', 'examSubmission');
-        Route::get('get_exam_training_request_details_by_id_revision', 'getExamTrainingRequestDetailsByIdRevision');
+        Route::get('get_exam_training_request_details_by_revision_id', 'getExamTrainingRequestDetailsByRevisionId');
     });
 
     Route::controller(ExaminationResultController::class)->group(function () {
@@ -148,7 +151,15 @@ Route::middleware('checkSession')->group(function(){
 
         Route::get('/view_pdf/{id}', 'viewPdf');
         Route::post('update_examination_date', 'updateExaminationDate');
+        Route::post('update_examination_date', 'updateExaminationDate');
         Route::post('change_exam_result_status', 'changeExamResultStatus');
+        });
+
+        Route::controller(ExamTitleController::class)->group(function () {
+            Route::get('view_exam_title', 'viewExamTitle');
+            Route::post('create_update_exam_title', 'createUpdateExamTitle');
+            Route::get('get_exam_title_by_id', 'getExamTitleById');
+            Route::post('change_exam_title_status', 'changeExamTitleStatus');
     });
 
     // =======================================================================================================

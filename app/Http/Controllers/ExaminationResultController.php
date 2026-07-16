@@ -20,7 +20,6 @@ use App\Model\TrainingRequestDetails;
 
 use App\Model\ExamResult;
 use App\Model\ExamResultDetails;
-use App\Model\ExamAttempts;
 
 class ExaminationResultController extends Controller
 {
@@ -65,15 +64,7 @@ class ExaminationResultController extends Controller
     public function viewExamResultDetails(Request $request){
         $rapidx_user_id = $_SESSION['rapidx_user_id'];
 
-        // $exam_result_details = ExamResultDetails::with(['exam_result_info', 'exam_attempts_info'])
-        //     ->where('exam_result_status', $request->examStatus)
-        //     ->where('questionnaire_id', $request->questionnaireId)
-        //     ->where('questionnaire_revision_no', $request->questionnaireRevision)
-        //     ->where('status', 0)
-        //     ->where('logdel', 0)
-        //     ->get();
-
-        $exam_result_details = ExamResultDetails::with(['exam_result_info', 'exam_attempts_info'])
+        $exam_result_details = ExamResultDetails::with(['exam_result_info'])
             ->whereHas('exam_result_info', function($q) use ($request) {
                 $q->where('exam_result_status', $request->examStatus)
                 ->where('questionnaire_id', $request->questionnaireId)
@@ -81,6 +72,8 @@ class ExaminationResultController extends Controller
                 ->where('status', 0)
                 ->where('logdel', 0);
             })
+            ->where('status', 0)
+            ->where('logdel', 0)
             ->orderBy('created_at', 'asc')
             ->get();
 
@@ -128,24 +121,6 @@ class ExaminationResultController extends Controller
             return $result;
         })
 
-        // ->addColumn('exam_taken', function($exam_result_details){
-        //     static $attempt = 0;
-        //     $attempt++;
-
-        //     if ($exam_result_details->rating == 100) {
-        //         $badge = 'success';
-        //     } else {
-        //         $badge = 'danger';
-        //     }
-
-        //     $result = '<center>
-        //                 <span class="badge badge-pill badge-' . $badge . '">
-        //                     Attempt ' . $attempt . '
-        //                 </span>
-        //             </center>';
-        //     return $result;
-        // })
-
         ->addColumn('exam_taken', function ($exam_result_details) {
             static $attempts = [];
 
@@ -185,7 +160,7 @@ class ExaminationResultController extends Controller
 
     public function getEmployeeExamResultById(Request $request){
         date_default_timezone_set('Asia/Manila');
-        $exam_result_details = ExamResultDetails::with(['exam_result_info', 'exam_attempts_info'])
+        $exam_result_details = ExamResultDetails::with(['exam_result_info'])
             ->where('id', $request->examResultDetailsId)
             ->first();
 
@@ -194,6 +169,7 @@ class ExaminationResultController extends Controller
 
     public function updateExamScoreForEmployee(Request $request){
         date_default_timezone_set('Asia/Manila');
+        // return $request;
         // $total_score = floatval($request->score) + floatval($request->manual_score);
         $exam_result_details = ExamResultDetails::where('id', $request->exam_result_details_id)
             ->update([
@@ -208,14 +184,15 @@ class ExaminationResultController extends Controller
     }
 
     public function viewPdf($id){
-        $exam_result_detail = ExamResultDetails::with(['exam_result_info', 'exam_attempts_info'])
-                                ->where('id', $id)
-                                ->where('exam_result_status', 1)
-                                ->where('status', 0)
-                                ->where('logdel', 0)
-                                ->get();
-                                // return $exam_result_detail;
-        $take_exam =  $exam_result_detail[0]->exam_attempts_info->count();
+        $exam_result_detail =
+            ExamResultDetails::with(['exam_result_info'])
+                ->where('id', $id)
+                ->where('exam_result_status', 1)
+                ->where('status', 0)
+                ->where('logdel', 0)
+                ->get();
+                // return $exam_result_detail;
+        $take_exam =  $exam_result_detail->count();
 
         $questionnaire_info = json_decode($exam_result_detail[0]->questionnaire, true);
         $questions = json_decode($exam_result_detail[0]->exam_result, true);
