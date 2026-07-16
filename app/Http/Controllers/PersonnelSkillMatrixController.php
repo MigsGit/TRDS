@@ -145,6 +145,7 @@ class PersonnelSkillMatrixController extends Controller
         $total    = (clone $query)->count();
 
         return DataTables::eloquent($query)
+
         ->addColumn('trainingDate', function ($row) {
                 if (!$row->date_start && !$row->date_end) {
                     return '';
@@ -154,6 +155,15 @@ class PersonnelSkillMatrixController extends Controller
         })
         ->addColumn('title', function ($row) {
             return optional($row->exam_info_test)->examination_name;
+        })
+        ->addColumn('seriesName', function ($row) {
+                return '';
+        })
+         ->addColumn('station', function ($row) {
+                return '';
+        })
+         ->addColumn('detailedStation', function ($row) {
+                return '';
         })
         ->addColumn('objective', function ($row) {
             if(!$row->objective){
@@ -191,12 +201,12 @@ class PersonnelSkillMatrixController extends Controller
             }
             return $row->training_venue;
         })
-        ->addColumn('mechanics', function ($row) {
-            if(!$row->mechanics){
-                return '';
-            }
-            return $row->mechanics;
-        })
+        // ->addColumn('mechanics', function ($row) {
+        //     if(!$row->mechanics){
+        //         return '';
+        //     }
+        //     return $row->mechanics;
+        // })
         ->addColumn('typeOfTraining', function ($row) {
             if(!$row->type_of_training){
                 return '';

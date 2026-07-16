@@ -61,6 +61,11 @@ class TrainingRequestController extends Controller
 
         return DataTables()->of($trainingRequests)
         ->addColumn('action', function($trainingRequest) use ($receiverUsers, $tuHeadApproverUser){
+            // $trainingRequestDept = RapidXDepartment::where('department_id', $trainingRequest->department_id)->first();
+            $sectionHeadDeptId = $trainingRequest->section_head_user->department_id;
+            $trainingRequestDept = RapidXDepartment::where('department_id', $sectionHeadDeptId)->first();
+            $dept = $trainingRequestDept->department_name;
+
             $sectionHeadDeptId = $trainingRequest->section_head_user->department_id;
             $trainingRequestDept = RapidXDepartment::where('department_id', $sectionHeadDeptId)->first();
             $dept = $trainingRequestDept->department_name;
