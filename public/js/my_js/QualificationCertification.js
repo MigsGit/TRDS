@@ -561,6 +561,7 @@
         // console.log('approversCollection', approversCollection);
 
         let aProd = approversCollection.APRODTO[0];
+        let eQcvp = approversCollection.EQCVP[0];
         let aProdToFirst = aProd.first_approver_exploded ?? [];
         let aProdToFirstMentoredBy = aProd.first_approver2_exploded ?? [];
         let aProdToSecond = aProd.second_approver_exploded ?? [];
@@ -572,7 +573,12 @@
         let cQcFirst = approversCollection.CQCC[0].first_approver_exploded ?? [];
         let cQcSecond = approversCollection.CQCC[0].second_approver_exploded ?? [];
 
-        let eQcvpSecond = approversCollection.EQCVP[0].second_approver_exploded ?? [];
+        let eQcvpToFirst = eQcvp.first_approver_exploded ?? [];
+        let eQcvpToFirst2 = eQcvp.first_approver2_exploded ?? [];
+        let eQcvpToSecond = eQcvp.second_approver_exploded ?? [];
+        let eQcvpToSecond2 = eQcvp.second_approver2_exploded ?? [];
+
+
         let fQcvvoSecond = approversCollection.FQCVVO[0].second_approver_exploded ?? [];
         let qCappSecond = approversCollection.QCAPP [0].second_approver_exploded ?? [];
 
@@ -588,7 +594,11 @@
 
         const mappedcQcFirst = cQcFirst.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedcQcSecond = cQcSecond.map(emp => ({ id: emp.id, text: emp.name }));
-        // const mappedeQcvpSecond = eQcvpSecond.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedeQcvpToFirst = eQcvpToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedeQcvpToFirst2 = eQcvpToFirst2.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedeQcvpToSecond = eQcvpToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedeQcvpToSecond2 = eQcvpToSecond2.map(emp => ({ id: emp.id, text: emp.name }));
         // const mappedfQcvvoSecond = fQcvvoSecond.map(emp => ({ id: emp.id, text: emp.name }));
         // const mappedqCappSecond = qCappSecond.map(emp => ({ id: emp.id, text: emp.name }));
 
@@ -606,6 +616,11 @@
         editSelectionsMap['#text_1st_certifiedby_qcs_oper'] = mappedcQcFirst;
         editSelectionsMap['#text_2nd_certifiedby_qcs_oper'] = mappedcQcSecond;
 
+        editSelectionsMap['#text_1st_validatedby_vpqcs_oper'] = mappedeQcvpToFirst;
+        editSelectionsMap['#text_1st_validatedby_vpes_oper_2'] = mappedeQcvpToFirst2;
+        editSelectionsMap['#text_2nd_validatedby_vpqcs_oper'] = mappedeQcvpToSecond;
+        editSelectionsMap['#text_2nd_validatedby_vpes_oper_2'] = mappedeQcvpToSecond2;
+
         // 3. Initialize all employee selectors simultaneously
         initGetSystemOneEmployeeDetailsCombos(
             [
@@ -620,6 +635,11 @@
                 //C
                 '#text_1st_certifiedby_qcs_oper',
                 '#text_2nd_certifiedby_qcs_oper',
+
+                '#text_1st_validatedby_vpqcs_oper',
+                '#text_1st_validatedby_vpes_oper_2',
+                '#text_2nd_validatedby_vpqcs_oper',
+                '#text_2nd_validatedby_vpes_oper_2',
             ],
             editSelectionsMap
         );
@@ -777,16 +797,16 @@
 
             //C QC Certification
             let cQcData = response.approversCollection.CQCC[0];
-            form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcCertification.obs_first_result_qcs_oper);
-            form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcCertification.first_sample_qcs_oper);
-            form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcCertification.first_ok_qcs_oper);
-            form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcCertification.first_ng_qcs_oper);
-            form.formSubmitOper.find('#text_qcs_station_1st_oper').val(cQcCertification.qcs_station_1st_oper);
-            form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcCertification.obs_second_result_qcs_oper);
-            form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcCertification.second_ok_qcs_oper);
-            form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcCertification.second_sample_qcs_oper);
-            form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcCertification.second_ng_qcs_oper);
-            form.formSubmitOper.find('#text_qcs_station_2nd_oper').val(cQcCertification.qcs_station_2nd_oper);
+            form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcData.obs_first_result_qcs_oper);
+            form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcData.first_sample_qcs_oper);
+            form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcData.first_ok_qcs_oper);
+            form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcData.first_ng_qcs_oper);
+            form.formSubmitOper.find('#text_qcs_station_1st_oper').val(cQcData.qcs_station_1st_oper);
+            form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcData.obs_second_result_qcs_oper);
+            form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcData.second_ok_qcs_oper);
+            form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcData.second_sample_qcs_oper);
+            form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcData.second_ng_qcs_oper);
+            form.formSubmitOper.find('#text_qcs_station_2nd_oper').val(cQcData.qcs_station_2nd_oper);
 
             form.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData.first_status).trigger('change');
             form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData.second_status).trigger('change');
@@ -797,8 +817,23 @@
             form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData.second_date);
             form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData.second_time);
 
+            //D
+            let eQcValidationProcess = data.e_qc_validation_process;
+            let eQcvpData = response.approversCollection.EQCVP[0];
+            form.formSubmitOper.find('#text_vpqcs_oper').val(eQcValidationProcess.vpqcs_oper).trigger('change');
+            form.formSubmitOper.find('#text_application_vpqcs_oper').val(eQcValidationProcess.application_vpqcs_oper).trigger('change');
 
 
+            form.formSubmitOper.find('#text_first_result_vpqcs_oper').val(cQcData.first_status).trigger('change');
+            form.formSubmitOper.find('#text_first_result_vpes_oper_2').val(cQcData.first_status_2).trigger('change');
+            form.formSubmitOper.find('#text_second_result_vpqcs_oper').val(cQcData.second_status).trigger('change');
+            form.formSubmitOper.find('#text_second_result_vpes_oper_2').val(cQcData.second_status_2).trigger('change');
+            form.formSubmitOper.find('#text_remarks_vpqcs_oper').val(eQcvpData.first_remarks);
+            form.formSubmitOper.find('#text_remarks_vpes_oper_2').val(eQcvpData.second_remarks);
+            form.formSubmitOper.find('#text_1st_date_vpqcs_oper').val(eQcvpData.first_date);
+            form.formSubmitOper.find('#text_1st_date_vpes_oper_2').val(eQcvpData.first_date_2);
+            form.formSubmitOper.find('#text_2nd_date_vpqcs_oper').val(eQcvpData.second_date);
+            form.formSubmitOper.find('#text_2nd_date_vpes_oper_2').val(eQcvpData.second_date_2);
 
 
             $('#modalCreateCQForm').modal();
