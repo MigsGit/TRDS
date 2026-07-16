@@ -190,10 +190,10 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         const defaultExamRow = `
             <tr class="data-row" data-checkbox-id=''>
                 <td>
-                    <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" required></select>
+                    <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" id="title" required></select>
                 </td>
                 <td>
-                    <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" required></textarea>
+                    <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" readonly></textarea>
                 </td>
                 <td>
                     <select class="form-control form-control-md" name="result[]" id="result" required>
@@ -244,6 +244,12 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
                 $formTD.find('#prodAllocation').val(emp_details.Section);
             }
         });
+    });
+
+    // Handle exam selection
+    $tableExam.on('change', '.selectExamTitle', function (e) {
+        let objective = $tableExam.find('option:selected').data('objective');
+        $tableExam.find('#objective').val(objective);
     });
 
     $addButtonExam.on('click', function () {
@@ -447,10 +453,10 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             let rowExams = `
                 <tr class="data-row" data-checkbox-id=''>
                     <td>
-                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" required></select>
+                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" id="title" required></select>
                     </td>
                     <td>
-                        <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" required></textarea>
+                        <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" readonly></textarea>
                     </td>
                     <td>
                         <select class="form-control form-control-md" name="result[]" id="result" required>
@@ -513,7 +519,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             let rowExams = `
                 <tr class="data-row" data-checkbox-id=''>
                     <td>
-                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" disabled></select>
+                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" id="title" disabled></select>
                     </td>
                     <td>
                         <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" disabled></textarea>
@@ -815,7 +821,7 @@ function getExaminations(cboElement, examId = null, mode = null){
                 }
 
                 for (let di = 0; di < response.length; di++) {
-                    result += '<option value="' + response[di]['id'] + '">' + response[di]['examination_name'] + '</option>';
+                    result += '<option value="' + response[di]['id'] + '" data-objective="' + response[di]['objective'] + '">' + response[di]['examination_name'] + '</option>';
                 }
             }else{
                 result = '<option value="0" selected disabled> -- No record found -- </option>';

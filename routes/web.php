@@ -9,6 +9,7 @@ use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\InspSkillChartSettingController;
 use App\Http\Controllers\PersonnelSkillMatrixController;
 use App\Http\Controllers\ExamTitleController;
 
@@ -34,6 +35,10 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/user_master', function () {
         return view('user');
     })->name('user_master');
+
+    Route::get('/insp_skill_chart_setting', function () {
+        return view('inspector_skill_chart_settings');
+    })->name('insp_skill_chart_setting');
 
     Route::get('/hr_memo_exam', function () {
         return view('hr_memo_examination');
@@ -186,6 +191,15 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/send_hr_memo_mail', 'sendHrMemoMail')->name('send_hr_memo_mail');
         Route::get('/get_trainor_dropdown_details', 'getTrainorDropdownDetails')->name('get_trainor_dropdown_details');
         Route::get('/export_inspector_skill_chart', 'exportInspectorSkillChart')->name('export_inspector_skill_chart');
+    });
+
+    // =======================================================================================================
+    Route::controller(InspSkillChartSettingController::class)->group(function () {
+        Route::get('/view_process_stations', 'viewProcessStationsInfo')->name('view_process_stations');
+        Route::post('/add_process_station', 'addProcessStationInfo')->name('add_process_station');
+        Route::get('/get_process_station_by_id', 'getProcessStationById')->name('get_process_station_by_id');
+        Route::post('/update_process_station_status', 'updateProcessStationStatus')->name('update_process_station_status');
+        Route::get('/get_process_stations', 'getProcessStations')->name('get_process_stations');
     });
 
     // USER CONTROLLER

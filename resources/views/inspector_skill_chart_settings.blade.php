@@ -1,7 +1,7 @@
 @php $layout = 'layouts.super_user_layout'; @endphp
 
 @extends($layout)
-@section('title', 'Examinations')
+@section('title', 'Inspector Skill Chart Settings')
 @section('content_page')
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
@@ -10,13 +10,13 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>List of Examinations</h1>
+                        <h1>Inspector Skill Chart Settings</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a>
                             </li>
-                            <li class="breadcrumb-item active">List of Examinations</li>
+                            <li class="breadcrumb-item active">Process / Station</li>
                         </ol>
                     </div>
                 </div>
@@ -32,24 +32,25 @@
                         <!-- general form elements -->
                         <div class="card card-dark">
                             <div class="card-header">
-                                <h3 class="card-title">Examinations Module</h3>
+                                <h3 class="card-title">Inspector Skill Chart Settings Module</h3>
                             </div>
 
                             <!-- Start Page Content -->
                             <div class="card-body">
                                 <div style="float: right;">
-                                    <button class="btn btn-dark" id="btnShowAddExaminationModal">
-                                        <i class="fa fa-plus"></i> Add Examination
+                                    <button class="btn btn-dark" id="btnShowAddProcessStationModal">
+                                        <i class="fa fa-plus"></i> Add Process / Station
                                     </button>
                                 </div> <br><br>
                                 <div class="table-responsive">
-                                    <table id="tblExaminations" class="table table-bordered table-striped table-hover"
+                                    <table id="tblProcessStation" class="table table-bordered table-striped table-hover"
                                         style="width: 100%;">
                                         <thead>
                                             <tr>
                                                 <th style="width: 10%;">Action</th>
-                                                <th style="width: 20%;">Examination Name</th>
-                                                <th style="width: 60%;">Objective</th>
+                                                <th style="width: 20%;">Section</th>
+                                                <th style="width: 20%;">Process / Station</th>
+                                                <th style="width: 60%;">Product Line/s</th>
                                                 <th style="width: 10%;">Status</th>
                                             </tr>
                                         </thead>
@@ -70,31 +71,52 @@
     <!-- /.content-wrapper -->
 
     <!-- MODALS -->
-    <div class="modal fade" id="modalAddExaminations">
+    <div class="modal fade" id="modalAddProcessStation">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-plus"></i> Add/Edit Examination Info</h4>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> Add/Edit Process / Station Info</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form method="post" id="formExaminations" autocomplete="off">
+                <form method="post" id="formProcessStation" autocomplete="off">
                     @csrf
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-sm-12">
-                                <input type="hidden" id="txtExaminationId" name="id">
+                                <input type="hidden" name="id" id="txtProcessId">
 
                                 <div class="form-group">
-                                    <label>Examination Name</label>
-                                    <input type="text" class="form-control" name="exam_name" id="txtExaminationName" placeholder="Enter Exam Name">
+                                    <label>Section</label>
+                                    <select class="form-control select2bs5" name="section" id="section" required>
+                                        <option value="" disabled selected>Select One</option>
+                                        <option value="TS-F1">TS-F1</option>
+                                        <option value="TS-F3">TS-F3</option>
+                                        <option value="CN">CN</option>
+                                        <option value="CN-F3">CN-F3</option>
+                                        <option value="PPD-CN">PPD-CN</option>
+                                        <option value="PPD-TS">PPD-TS</option>
+                                        <option value="PPD-F3">PPD-F3</option>
+                                        <option value="YF">YF</option>
+                                    </select>
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Objective</label>
-                                    <input type="text" class="form-control" name="objective" id="txtObjective" placeholder="Enter Objective">
+                                    <label>Process / Station</label>
+                                    <select class="form-control select2bs5" name="process_station" id="processStation" required>
+                                        <option value="" disabled selected>Select One</option>
+                                        <option value="IQC">IQC</option>
+                                        <option value="IPQC">IPQC</option>
+                                        <option value="OQC">OQC</option>
+                                    </select>
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Product Line</label>
+                                    <input type="text" class="form-control" name="product_line" id="productLine" placeholder="Enter Product Line" required>
+                                </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -113,8 +135,6 @@
 @endsection
 
 @section('js_content')
-    {{-- <script type="text/javascript"> --}}
-        <script src="{{ asset('public/js/my_js/HrMemoExamination.js') }}?<?=time()?>"></script>
-    {{-- </script> --}}
+    <script src="{{ asset('public/js/my_js/InspectorSkillChartSettings.js') }}?<?=time()?>"></script>
 @endsection
 

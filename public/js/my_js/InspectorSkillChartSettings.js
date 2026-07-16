@@ -2,9 +2,10 @@ $(document).ready(function () {
     // --------------------------------------
     // Cache DOM elements
     // --------------------------------------
-    const $table = $('#tblExaminations');        // e.g., #tblExaminations
-    const $form = $('#formExaminations');        // e.g., #formExaminations
-    const $modal = $('#modalAddExaminations');      // e.g., #modalAddExaminations
+    const $table = $('#tblProcessStation');        
+    const $form = $('#formProcessStation');        
+    const $modal = $('#modalAddProcessStation');
+    const $addProductLine = $('#btnAddProductLine');
 
     // --------------------------------------
     // Initialize global AJAX setup (once per project)
@@ -18,12 +19,12 @@ $(document).ready(function () {
     // --------------------------------------
     // Initialize DataTable
     // --------------------------------------
-    const dtExaminations = initExaminationsTable($table);
+    const dtProcessStation = initProcessStationsTable($table);
 
     // --------------------------------------
     // Bind all event handlers
     // --------------------------------------
-    bindExaminationsEvents($table, $form, $modal, dtExaminations);
+    bindProcessStationsEvents($table, $form, $modal, dtProcessStation, $addProductLine);
 });
 
 /**
@@ -39,7 +40,7 @@ function resetExaminationForm(formSelector) {
 /**
  * Initialize DataTable
  */
-function initExaminationsTable($table, url = 'view_examinations') {
+function initProcessStationsTable($table, url = 'view_process_stations') {
     return $table.DataTable({
         processing: true,
         serverSide: true,
@@ -47,8 +48,9 @@ function initExaminationsTable($table, url = 'view_examinations') {
         fixedHeader: true,
         columns: [
             { data: 'action', orderable: false, searchable: false },
-            { data: 'examination_name' },    // customize this per examinations
-            { data: 'objective' },    // customize this per examinations
+            { data: 'section' },    // customize this per process_stations
+            { data: 'process_station' },    // customize this per process_stations
+            { data: 'product_line' },    // customize this per process_stations
             { data: 'status_label' }
         ]
     });
@@ -57,30 +59,30 @@ function initExaminationsTable($table, url = 'view_examinations') {
 /**
  * Bind events for buttons, forms, etc.
  */
-function bindExaminationsEvents($table, $form, $modal, dtExaminations){
+function bindProcessStationsEvents($table, $form, $modal, dtProcessStation, $addProductLine){
 
-    $('#btnShowAddExaminationModal').on('click', function () {
+    $('#btnShowAddProcessStationModal').on('click', function () {
         resetExaminationForm($form);
-        $('#modalAddExaminations').modal('show');
+        $modal.modal('show');
     });
 
     // Submit form (Add / Edit)
     $form.on('submit', function (e) {
         e.preventDefault();
-        saveExaminations($form, $modal, dtExaminations);
+        saveProcessStations($form, $modal, dtProcessStation);
     });
 
     // Edit button
     $table.on('click', '.btnEdit', function () {
         const id = $(this).data('id');
-        fetchExaminationsById(id, $modal);
+        fetchProcessStationsById(id, $modal);
     });
 
     // Disable button
     $table.on('click', '.btnDisable', function () {
         const id = $(this).data('id');
         confirmAction('Are you sure you want to disable this examination?', function () {
-            updateExaminationsStatus(id, dtExaminations);
+            updateProcessStationsStatus(id, dtProcessStation);
         });
     });
 
@@ -88,23 +90,23 @@ function bindExaminationsEvents($table, $form, $modal, dtExaminations){
     $table.on('click', '.btnEnable', function () {
         const id = $(this).data('id');
         confirmAction('Are you sure you want to enable this examination?', function () {
-            updateExaminationsStatus(id, dtExaminations);
+            updateProcessStationsStatus(id, dtProcessStation);
         });
     });
 }
 
 /**
- * Save (add/update) examinations data
+ * Save (add/update) process_stations data
  */
-function saveExaminations($form, $modal, dtExaminations) {
+function saveProcessStations($form, $modal, dtProcessStation) {
     $.ajax({
         type: 'POST',
-        url: 'add_examinations',
+        url: 'add_process_station',
         data: $form.serialize(),
         dataType: 'json',
         success: function (response) {
             if (response.result === 1) {
-                dtExaminations.draw(false);
+                dtProcessStation.draw(false);
                 $modal.modal('hide');
                 $form[0].reset();
                 showSuccess('Successfully saved!');
@@ -118,19 +120,21 @@ function saveExaminations($form, $modal, dtExaminations) {
 }
 
 /**
- * Fetch examinations data by ID
+ * Fetch process_stations data by ID
  */
-function fetchExaminationsById(id, $modal) {
+function fetchProcessStationsById(id, $modal) {
     $.ajax({
         type: 'GET',
-        url: 'get_examinations_by_id',
+        url: 'get_process_station_by_id',
         data: { id },
         dataType: 'json',
         success: function (response) {
-            // Populate modal fields (adjust names per examinations)
-            $('#txtExaminationId').val(response.id);
-            $('#txtExaminationName').val(response.examination_name);
-            $('#txtObjective').val(response.objective);
+            // Populate modal fields (adjust names per process_stations)
+            
+            $('#txtProcessId').val(response.id);
+            $('#section').val(response.section);
+            $('#processStation').val(response.process_station);
+            $('#productLine').val(response.product_line);
             $modal.modal('show');
         },
         error: function (xhr) {
@@ -141,18 +145,18 @@ function fetchExaminationsById(id, $modal) {
 }
 
 /**
- * Disable or update examinations status
+ * Disable or update process_stations status
  */
-function updateExaminationsStatus(id, dtExaminations) {
+function updateProcessStationsStatus(id, dtProcessStation) {
     $.ajax({
         type: 'POST',
-        url: 'update_examinations_status',
+        url: 'update_process_station_status',
         data: { id },
         dataType: 'json',
         success: function (response) {
             if (response.success) {
                 showSuccess('Status updated successfully.');
-                dtExaminations.draw(false);
+                dtProcessStation.draw(false);
             }else {
                 // ⚠️ If success is false
                 Swal.fire({
