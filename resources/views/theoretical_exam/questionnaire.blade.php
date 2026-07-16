@@ -661,6 +661,10 @@
             GetSystemOneHrisSection($('.get-systemone-hris-section'))
             GetExamTitle($('.get-exam-title'))
 
+            $('#questionnaire-tab').click(function (e) {
+                e.preventDefault();
+                GetExamTitle($('.get-exam-title'))
+            });
             dataQuestionnaire = $("#tableQuestionnaire").DataTable({
                 "processing" : false,
                 "serverSide" : true,
