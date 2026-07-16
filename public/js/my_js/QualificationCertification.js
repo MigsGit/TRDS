@@ -557,31 +557,37 @@
 
     const getEmployeeDetailsByEmpNoSelect2 = (params) => {
         let response = params.response;
-        let approversCollection = response.approversCollection
-        // console.log('approversCollection', approversCollection);
+        // Safe access: optional chaining prevents crash if approversCollection is missing from response
+        const approversCollection = response?.approversCollection ?? null;
 
-        let aProd = approversCollection.APRODTO[0];
-        let eQcvp = approversCollection.EQCVP[0];
-        let aProdToFirst = aProd.first_approver_exploded ?? [];
-        let aProdToFirstMentoredBy = aProd.first_approver2_exploded ?? [];
-        let aProdToSecond = aProd.second_approver_exploded ?? [];
-        let aProdToSecondMentoredBy = aProd.second_approver2_exploded ?? [];
+        // Guard: exit early if the entire approvers collection is absent
+        if (!approversCollection || typeof approversCollection !== 'object') {
+            return;
+        }
 
-        let bEnggTqFirst = approversCollection.BENGGTQ[0].first_approver_exploded ?? [];
-        let bEnggTqSecond = approversCollection.BENGGTQ[0].second_approver_exploded ?? [];
+        const aProd = approversCollection?.APRODTO?.[0] ?? null;
+        const eQcvp = approversCollection?.EQCVP?.[0]  ?? null;
 
-        let cQcFirst = approversCollection.CQCC[0].first_approver_exploded ?? [];
-        let cQcSecond = approversCollection.CQCC[0].second_approver_exploded ?? [];
+        const aProdToFirst            = aProd?.first_approver_exploded   ?? [];
+        const aProdToFirstMentoredBy  = aProd?.first_approver2_exploded  ?? [];
+        const aProdToSecond           = aProd?.second_approver_exploded  ?? [];
+        const aProdToSecondMentoredBy = aProd?.second_approver2_exploded ?? [];
 
-        let eQcvpToFirst = eQcvp.first_approver_exploded ?? [];
-        let eQcvpToFirst2 = eQcvp.first_approver2_exploded ?? [];
-        let eQcvpToSecond = eQcvp.second_approver_exploded ?? [];
-        let eQcvpToSecond2 = eQcvp.second_approver2_exploded ?? [];
+        const bEnggTqFirst  = approversCollection?.BENGGTQ?.[0]?.first_approver_exploded  ?? [];
+        const bEnggTqSecond = approversCollection?.BENGGTQ?.[0]?.second_approver_exploded ?? [];
 
-        let fQcvvoFirst = approversCollection.FQCVVO[0].first_approver_exploded ?? [];
-        let fQcvvoSecond = approversCollection.FQCVVO[0].second_approver_exploded ?? [];
+        const cQcFirst  = approversCollection?.CQCC?.[0]?.first_approver_exploded  ?? [];
+        const cQcSecond = approversCollection?.CQCC?.[0]?.second_approver_exploded ?? [];
 
-        let qCappApprover = approversCollection.QCAPP [0].alert_prod_sec_exploded ?? [];
+        const eQcvpToFirst   = eQcvp?.first_approver_exploded   ?? [];
+        const eQcvpToFirst2  = eQcvp?.first_approver2_exploded  ?? [];
+        const eQcvpToSecond  = eQcvp?.second_approver_exploded  ?? [];
+        const eQcvpToSecond2 = eQcvp?.second_approver2_exploded ?? [];
+
+        const fQcvvoFirst  = approversCollection?.FQCVVO?.[0]?.first_approver_exploded  ?? [];
+        const fQcvvoSecond = approversCollection?.FQCVVO?.[0]?.second_approver_exploded ?? [];
+
+        const qCappApprover = approversCollection?.QCAPP?.[0]?.alert_prod_sec_exploded ?? [];
 
         // 1. Map them to a standard format Select2 expects: {id, text}
         const mappedaProdToFirst = aProdToFirst.map(emp => ({ id: emp.id, text: emp.name }));
@@ -720,12 +726,11 @@
             form.formSubmitOper.find('#text_select_position').val(data.position_category);
             form.formSubmitOper.find('#text_section_operator').val(data.section);
             form.formSubmitOper.find('#text_series_operator').val(data.series_name);
-            $('#select_section').val(data.section_category);
+            form.formSubmitOper.find('#select_section').val(data.section_category);
 
             // form.formSubmitOper.find('#text_operator_product_line').val(data.product_line);
-            setTimeout(function() {
-                console.log('section_category',data.section_category);
-            },1000)
+
+
 
             const arrProductLine = Array.isArray(data.product_line) ? data.product_line : [data.product_line];
             const productLine = '#text_operator_product_line';
@@ -746,11 +751,12 @@
                 editSelectionsMap3
             );
             // ==== A PROD
-            let aProdData = response.approversCollection.APRODTO[0];
+            // Safe access: optional chaining prevents "Cannot read properties of undefined" if API shape changes
+            const aProdData = response?.approversCollection?.APRODTO?.[0] ?? null;
             const arraProdTrainingItems = Array.isArray(response.rawAOperProdTrainingOrientationCollection) ? response.rawAOperProdTrainingOrientationCollection : [response.rawAOperProdTrainingOrientationCollection];
             const aProdTrainingItems = '#text_training_orientation_ps_oper';
             let editSelectionsMap4 = {};
-            editSelectionsMap4[aProdTrainingItems] = response.rawAOperProdTrainingOrientationCollection;
+            editSelectionsMap4[aProdTrainingItems] = arraProdTrainingItems;
             initDropdownMasterDetailsByFkidCombos(
                 [aProdTrainingItems],
                 4,
@@ -759,10 +765,17 @@
 
             form.formSubmitOper.find('#defect_escalation').val(aOperProdTrainingOrientation.defect_escalation).trigger('change');
             form.formSubmitOper.find('#production_abnormality').val(aOperProdTrainingOrientation.production_abnormality).trigger('change');
-            form.formSubmitOper.find('#text_first_date_oper').val(aProdData.first_date);
-            form.formSubmitOper.find('#text_first_time_oper').val(aProdData.first_time);
-            form.formSubmitOper.find('#text_second_date_oper').val(aProdData.second_date);
-            form.formSubmitOper.find('#text_second_time_oper').val(aProdData.second_time);
+            // Guard: validate aProdData exists and has properties before reading from it
+            if (aProdData && typeof aProdData === 'object') {
+                const approverFirstDate  = aProdData.first_date  ?? '';
+                const approverFirstTime  = aProdData.first_time  ?? '';
+                const approverSecondDate = aProdData.second_date ?? '';
+                const approverSecondTime = aProdData.second_time ?? '';
+                form.formSubmitOper.find('#text_first_date_oper').val(approverFirstDate);
+                form.formSubmitOper.find('#text_first_time_oper').val(approverFirstTime);
+                form.formSubmitOper.find('#text_second_date_oper').val(approverSecondDate);
+                form.formSubmitOper.find('#text_second_time_oper').val(approverSecondTime);
+            }
 
             // 1. Let's say this is your raw string from the database response
             const orientationDocs = aOperProdTrainingOrientation.orientation_docs;
@@ -776,7 +789,7 @@
 
             //=== B ENGG
 
-            let aEnggData = response.approversCollection.BENGGTQ[0];
+            const aEnggData = response?.approversCollection?.BENGGTQ?.[0] ?? null;
             //  initDropdownMasterDetailsByFkidCombos([
             //         '#transfer_flexibility',
             //         '#text_training_orientation_es_oper',
@@ -804,61 +817,67 @@
             form.formSubmitOper.find('#text_second_sample_es_oper').val(bOpEnggSectionTrainingOrientation.second_sample_es_oper);
             form.formSubmitOper.find('#text_second_ok_es_oper').val(bOpEnggSectionTrainingOrientation.second_ok_es_oper);
             form.formSubmitOper.find('#text_second_ng_es_oper').val(bOpEnggSectionTrainingOrientation.second_ng_es_oper);
-            form.formSubmitOper.find('#text_1st_disqualification_es_oper').val(aEnggData.first_remarks);
-            form.formSubmitOper.find('#text_2nd_disqualification_es_oper').val(aEnggData.second_remarks);
-            form.formSubmitOper.find('#text_qc_1st_date_es_oper').val(aEnggData.first_date);
-            form.formSubmitOper.find('#text_qc_1st_time_es_oper').val(aEnggData.first_time);
-            form.formSubmitOper.find('#text_qc_2nd_date_es_oper').val(aEnggData.second_date);
-            form.formSubmitOper.find('#text_qc_2nd_time_es_oper').val(aEnggData.second_time);
+            if (aEnggData && typeof aEnggData === 'object') {
+                form.formSubmitOper.find('#text_1st_disqualification_es_oper').val(aEnggData.first_remarks ?? '');
+                form.formSubmitOper.find('#text_2nd_disqualification_es_oper').val(aEnggData.second_remarks ?? '');
+                form.formSubmitOper.find('#text_qc_1st_date_es_oper').val(aEnggData.first_date ?? '');
+                form.formSubmitOper.find('#text_qc_1st_time_es_oper').val(aEnggData.first_time ?? '');
+                form.formSubmitOper.find('#text_qc_2nd_date_es_oper').val(aEnggData.second_date ?? '');
+                form.formSubmitOper.find('#text_qc_2nd_time_es_oper').val(aEnggData.second_time ?? '');
+            }
             //C QC Certification
-            let cQcData = response.approversCollection.CQCC[0];
-            form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcData.obs_first_result_qcs_oper);
-            form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcData.first_sample_qcs_oper);
-            form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcData.first_ok_qcs_oper);
-            form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcData.first_ng_qcs_oper);
-            form.formSubmitOper.find('#text_qcs_station_1st_oper').val(cQcData.qcs_station_1st_oper);
-            form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcData.obs_second_result_qcs_oper);
-            form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcData.second_ok_qcs_oper);
-            form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcData.second_sample_qcs_oper);
-            form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcData.second_ng_qcs_oper);
-            form.formSubmitOper.find('#text_qcs_station_2nd_oper').val(cQcData.qcs_station_2nd_oper);
+            const cQcData = response?.approversCollection?.CQCC?.[0] ?? null;
+            if (cQcData && typeof cQcData === 'object') {
+                form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcData.obs_first_result_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcData.first_sample_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcData.first_ok_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcData.first_ng_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_qcs_station_1st_oper').val(cQcData.qcs_station_1st_oper ?? '');
+                form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcData.obs_second_result_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcData.second_ok_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcData.second_sample_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcData.second_ng_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_qcs_station_2nd_oper').val(cQcData.qcs_station_2nd_oper ?? '');
 
-            form.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData.first_status).trigger('change');
-            form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData.second_status).trigger('change');
-            form.formSubmitOper.find('#text_1st_disapproval_qcs_oper').val(cQcData.first_remarks);
-            form.formSubmitOper.find('#text_2nd_disapproval_qcs_oper').val(cQcData.second_remarks);
-            form.formSubmitOper.find('#text_1st_date_qcs_oper').val(cQcData.first_date);
-            form.formSubmitOper.find('#text_1st_time_qcs_oper').val(cQcData.first_time);
-            form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData.second_date);
-            form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData.second_time);
+                form.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData.first_status ?? '').trigger('change');
+                form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData.second_status ?? '').trigger('change');
+                form.formSubmitOper.find('#text_1st_disapproval_qcs_oper').val(cQcData.first_remarks ?? '');
+                form.formSubmitOper.find('#text_2nd_disapproval_qcs_oper').val(cQcData.second_remarks ?? '');
+                form.formSubmitOper.find('#text_1st_date_qcs_oper').val(cQcData.first_date ?? '');
+                form.formSubmitOper.find('#text_1st_time_qcs_oper').val(cQcData.first_time ?? '');
+                form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData.second_date ?? '');
+                form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData.second_time ?? '');
+            }
 
             //E Qc Validation Process
             let eQcValidationProcess = data.e_qc_validation_process;
-            let eQcvpData = response.approversCollection.EQCVP[0];
-            form.formSubmitOper.find('#text_vpqcs_oper').val(eQcValidationProcess.vpqcs_oper).trigger('change');
-            form.formSubmitOper.find('#text_application_vpqcs_oper').val(eQcValidationProcess.application_vpqcs_oper).trigger('change');
+            const eQcvpData = response?.approversCollection?.EQCVP?.[0] ?? null;
+            form.formSubmitOper.find('#text_vpqcs_oper').val(eQcValidationProcess?.vpqcs_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_application_vpqcs_oper').val(eQcValidationProcess?.application_vpqcs_oper ?? '').trigger('change');
 
-            form.formSubmitOper.find('#text_first_result_vpqcs_oper').val(cQcData.first_status).trigger('change');
-            form.formSubmitOper.find('#text_first_result_vpes_oper_2').val(cQcData.first_status_2).trigger('change');
-            form.formSubmitOper.find('#text_second_result_vpqcs_oper').val(cQcData.second_status).trigger('change');
-            form.formSubmitOper.find('#text_second_result_vpes_oper_2').val(cQcData.second_status_2).trigger('change');
-            form.formSubmitOper.find('#text_remarks_vpqcs_oper').val(eQcvpData.first_remarks);
-            form.formSubmitOper.find('#text_remarks_vpes_oper_2').val(eQcvpData.second_remarks);
-            form.formSubmitOper.find('#text_1st_date_vpqcs_oper').val(eQcvpData.first_date);
-            form.formSubmitOper.find('#text_1st_date_vpes_oper_2').val(eQcvpData.first_date_2);
-            form.formSubmitOper.find('#text_2nd_date_vpqcs_oper').val(eQcvpData.second_date);
-            form.formSubmitOper.find('#text_2nd_date_vpes_oper_2').val(eQcvpData.second_date_2);
+            form.formSubmitOper.find('#text_first_result_vpqcs_oper').val(cQcData?.first_status ?? '').trigger('change');
+            form.formSubmitOper.find('#text_first_result_vpes_oper_2').val(cQcData?.first_status_2 ?? '').trigger('change');
+            form.formSubmitOper.find('#text_second_result_vpqcs_oper').val(cQcData?.second_status ?? '').trigger('change');
+            form.formSubmitOper.find('#text_second_result_vpes_oper_2').val(cQcData?.second_status_2 ?? '').trigger('change');
+            form.formSubmitOper.find('#text_remarks_vpqcs_oper').val(eQcvpData?.first_remarks ?? '');
+            form.formSubmitOper.find('#text_remarks_vpes_oper_2').val(eQcvpData?.second_remarks ?? '');
+            form.formSubmitOper.find('#text_1st_date_vpqcs_oper').val(eQcvpData?.first_date ?? '');
+            form.formSubmitOper.find('#text_1st_date_vpes_oper_2').val(eQcvpData?.first_date_2 ?? '');
+            form.formSubmitOper.find('#text_2nd_date_vpqcs_oper').val(eQcvpData?.second_date ?? '');
+            form.formSubmitOper.find('#text_2nd_date_vpes_oper_2').val(eQcvpData?.second_date_2 ?? '');
 
             //F QC Validation
-            let fQcVvo = response.approversCollection.FQCVVO[0] ?? [];
-            form.formSubmitOper.find('#text_date1_qcvvo_oper').val(fQcVvo.first_date);
-            form.formSubmitOper.find('#text_date2_qcvvo_oper').val(fQcVvo.second_date);
-            form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper').val(fQcValidation.refdocno_input_qcvvo_oper);
-            form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper_2').val(fQcValidation.refdocno_input_qcvvo_oper);
-            if(fQcValidation.refdocno_input_qcvvo_oper != ""){
+            const fQcVvo = response?.approversCollection?.FQCVVO?.[0] ?? {};
+            form.formSubmitOper.find('#text_date1_qcvvo_oper').val(fQcVvo.first_date ?? '');
+            form.formSubmitOper.find('#text_date2_qcvvo_oper').val(fQcVvo.second_date ?? '');
+            let refdocnoInputQcvvoOper = fQcVvo.refdocno_input_qcvvo_oper ?? '';
+            let refdocnoInputQcvvoOper2 = fQcVvo.refdocno_input_qcvvo_oper_2 ?? '';
+            form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper').val(refdocnoInputQcvvoOper);
+            form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper_2').val(refdocnoInputQcvvoOper2);
+            if(refdocnoInputQcvvoOper != ""){
                 form.formSubmitOper.find('#text_refdoc_qcvvo_oper').prop('checked', true);
             }
-            if(fQcValidation.refdocno_input_qcvvo_oper != ""){
+            if(refdocnoInputQcvvoOper2 != ""){
                 form.formSubmitOper.find('#text_refdoc_qcvvo_oper_2').prop('checked', true);
             }
 

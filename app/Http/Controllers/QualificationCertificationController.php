@@ -752,7 +752,7 @@ class QualificationCertificationController extends Controller
                     $ppdParams = [
                         'request' => $request->all()
                     ];
-                    $this->savePpdOnly($ppdParams);
+                  return  $this->dPpdProcessOnly($ppdParams);
                 }
                 if($qcSlipDetails->approval_status ==='EQCVP'){
                     // EQCVP- EQcValidationProcess
@@ -855,10 +855,11 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-    public function dPpdProcessOnly($request){
+    public function dPpdProcessOnly($params){
          //Change status into D if the SECTION IS PPS ELSE go to E VALIDATION PROCESS
         //STATUS DPRDPPDONLY DENGGPPDONLY DQCPPDONLY
-       return $dPpdCertificationCompletionApprover = [
+        $request = $params['request'];
+        return $dPpdCertificationCompletionApprover = [
             "1st_certified_prod_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_prod_peqcs_oper),//R152 - 2trainedby
             "1st_certified_eng_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_eng_peqcs_oper),//R152 - 2trainedby
             "1st_certified_qc_peqcs_oper"  =>  implode(' | ', $request->text_1st_certified_qc_peqcs_oper),//R152 - 2trainedby
