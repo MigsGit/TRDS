@@ -193,7 +193,6 @@
 
                                     <div class="col-md-3">
                                         <label for="">Product Line:</label>
-
                                          <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_line">
                                         </select>
                                     </div>
@@ -238,7 +237,7 @@
 
                                 <!-- **************************************************************      APRODTO          ************************************************************************************************* -->
 
-                                <div class="accordion" id="accordionExampleOper">
+                               {{-- <div class="accordion" id="accordionExampleOper">
                                      <div class="card APRODTO">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOneOper" aria-expanded="true" aria-controls="collapseOneOper">
@@ -413,8 +412,9 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                                 <select class="form-control select2bs4" style="width: 100%;" name="text_first_a_prod_result" id="text_first_a_prod_result">
-                                                            <option value="" disabled selected>Select Result</option>             <option value="PASSED">PASSED</option>
-                                                                <option value="FAILED">FAILED</option>
+                                                              <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
                                                             </select>
 
                                                         </div>
@@ -471,22 +471,6 @@
                                                     <input class="form-control" type="time" id="text_second_time_oper" name="text_second_time_oper">
                                                 </div>
                                             </div>
-
-                                            {{-- <div class="row mb-2">
-                                                <div class="col-md-6"></div>
-                                                <div class="col-md-3">
-                                                    <label class="" for="">Send Email Alert to:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" id="text_alert_prod_sec" name="text_alert_prod_sec"></select>
-                                                </div>
-
-                                                <div class="col-md-3">
-                                                    <label class="" for="">Add cc:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" id="text_alert_prod_cc_sec" name="text_alert_prod_cc_sec" multiple></select>
-
-                                                </div>
-                                            </div> --}}
-                                            <!-- ------------------------------------------------ -->
-
                                         </div>
                                         </div>
                                     </div>
@@ -947,7 +931,6 @@
                                                     <label class="" for="">Certified by:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_1st_certifiedby_qcs_oper" id="text_1st_certifiedby_qcs_oper" multiple>
                                                     </select>
-                                                    {{-- nmodify --}}
                                                 </div>
 
                                                 <div class="col-md-6">
@@ -1056,7 +1039,8 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">2. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_peqcs_oper" id="text_oa_1st_result_peqcs_oper">
-                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                        <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -1064,7 +1048,8 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">2. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_2nd_result_peqcs_oper" id="text_oa_2nd_result_peqcs_oper">
-                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
+                                                        <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
@@ -1180,112 +1165,104 @@
 
                                         </div>
                                         </div>
-                                    </div>
-                                  {{-- <div class="card E ENGG VALIDATION">
-                                        <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
+                                    </div>--}}
+                                    <div class="card EENGGVALIDATION">
+                                        <h2 class="card-header">
+                                            
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
                                             <h5>VALIDATION PROCESS: ENGINEERING SECTION</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseFiveOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
-                                        <div class="accordion-body">
+                                        <div id="collapseFiveOper" class="accordion-collapse collapse">
+                                            <div class="card-body">
+                                                <div class="row mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="ms-5" for="">Engineering Validation Result:</label>
+                                                    </div>
 
-                                            <!-- ------------------------------------------------ -->
+                                                    <div class="col-md-5"></div>
 
-                                            <div class="row mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="ms-5" for="">Engineering Validation Result:</label>
-                                                </div>
-
-                                                <div class="col-md-5"></div>
-
-                                                <div class="col-md-4">
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_application_vpes_oper" id="text_application_vpes_oper">
-                                                        <option value="" selected disabled>Select</option>
-                                                        <option value="Applicable">Applicable</option>
-                                                        <option value="Not Applicable">Not Applicable</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-4">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_vpes_oper_1" name="text_vpes_oper" value="Pre-production samples and check sheet checking" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_vpes_oper_1" style="font-weight: normal;">Pre-production samples and check sheet checking</label>
+                                                    <div class="col-md-4">
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_application_vpes_oper" id="text_application_vpes_oper">
+                                                            <option value="" selected disabled>Select</option>
+                                                            <option value="1">Applicable</option>
+                                                            <option value="2">Not Applicable</option>
+                                                        </select>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            <h5 class="mt-3 mb-3">RESULT</h5>
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
 
-                                            <div class="row mb-4">
-                                                <div class="col-md-6">
-                                                    <label class="" for="">First Take</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_vpes_oper" id="text_first_result_vpes_oper">
-                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
-                                                        <option value="FAILED">FAILED</option>
-                                                    </select>
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_vpes_oper_1" name="text_vpes_oper" value="1" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_vpes_oper_1" style="font-weight: normal;">Pre-production samples and check sheet checking</label>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
-                                                <div class="col-md-6">
-                                                    <label class="" for="">Second Take</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_vpes_oper" id="text_second_result_vpes_oper">
-                                                             <option value="" disabled selected>Select Result</option>                                ion value="PASSED">PASSED</opion>
-                                                        <option value="FAILED">FAILED</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                                                <h5 class="mt-3 mb-3">RESULT</h5>
 
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label class="" for="">Validated by (after 2nd day):</label>
-                                                    <input class="form-control" type="text" id="text_1st_validatedby_vpes_oper" name="text_1st_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
+                                                <div class="row mb-4">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">First Take</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_vpes_oper" id="text_first_result_vpes_oper">
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
 
-                                                    <input type="hidden" id="text_1st_validatedby_vpes_oper_username" name="text_1st_validatedby_vpes_oper_username">
-                                                    <input type="hidden" id="text_1st_validatedby_vpes_oper_email" name="text_1st_validatedby_vpes_oper_email">
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label class="" for="">Validated by (after re-orientation):</label>
-                                                    <input class="form-control" type="text" id="text_2nd_validatedby_vpes_oper" name="text_2nd_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_2nd_validatedby_vpes_oper_username" name="text_2nd_validatedby_vpes_oper_username">
-                                                    <input type="hidden" id="text_2nd_validatedby_vpes_oper_email" name="text_2nd_validatedby_vpes_oper_email">
-                                                </div>
-                                            </div>
-
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label class="" for="">Date:</label>
-                                                    <input class="form-control" type="date" id="text_1st_date_vpes_oper" name="text_1st_date_vpes_oper">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Second Take</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_vpes_oper" id="text_second_result_vpes_oper">
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
 
-                                                <div class="col-md-6">
-                                                    <label class="" for="">Date:</label>
-                                                    <input class="form-control" type="date" id="text_2nd_date_vpes_oper" name="text_2nd_date_vpes_oper">
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Validated by (after 2nd day):</label>
+                                                            <select class="form-control select2bs4" style="width: 100%;" name="text_1st_validatedby_vpes_oper" id="text_1st_validatedby_vpes_oper" multiple>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Validated by (after re-orientation):</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_validatedby_vpes_oper" id="text_2nd_validatedby_vpes_oper" multiple>
+                                                        </select>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="row mb-5">
-                                                <div class="col-md-12">
-                                                    <label class="" for="">Remarks:</label>
-                                                    <input class="form-control" type="text" name="text_remarks_vpes_oper" id="text_remarks_vpes_oper" placeholder="Enter remarks">
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_1st_date_vpes_oper" name="text_1st_date_vpes_oper">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_2nd_date_vpes_oper" name="text_2nd_date_vpes_oper">
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <!-- ------------------------------------------------ -->
+                                                <div class="row mb-5">
+                                                    <div class="col-md-12">
+                                                        <label class="" for="">Remarks:</label>
+                                                        <input class="form-control" type="text" name="text_remarks_vpes_oper" id="text_remarks_vpes_oper" placeholder="Enter remarks">
+                                                    </div>
+                                                </div>
 
+                                                </div>
                                         </div>
-                                        </div>
-                                    </div> --}}
-                                   <div class="card FQCVP">
+                                    </div> 
+                                   {{-- <div class="card FQCVP">
                                         <h2 class="card-header">
-                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseSixOper" aria-expanded="false" aria-controls="collapseSixOper">
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseSixOper">
                                             <h5>E. VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
                                         </button>
                                         </h2>
@@ -1594,7 +1571,7 @@
 
                                         </div>
                                         </div>
-                                    </div> {{--  --}}
+                                    </div>  --}}
                                 </div>
 
                                 <hr style="height: 5px; background-color: black; border: none;">
@@ -1906,6 +1883,7 @@
             call_ajax_serialize(data,{},'save_qualification_certification_oper', function(response){
                 if (response.is_success === 'true') {
                     Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
+                    dataTable.operator.draw();
                     $('#modalCreateCQForm').modal('hide');
                     $('#modalSendEmail').modal('hide');
                     form.formSubmitOper[0].reset();
@@ -2003,6 +1981,9 @@
             '#text_2nd_certified_prod_peqcs_oper',
             '#text_2nd_certified_eng_peqcs_oper',
             '#text_2nd_certified_qc_peqcs_oper',
+            
+            '#text_1st_validatedby_vpes_oper',
+            '#text_2nd_validatedby_vpes_oper',
             //EQcValidationProcess
             '#text_1st_validatedby_vpqcs_oper',
             '#text_2nd_validatedby_vpqcs_oper',

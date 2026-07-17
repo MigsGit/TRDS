@@ -40,6 +40,11 @@ class CommonController extends Controller
                     $statusName = 'D PPD Update';
                     $spanColor = 'bg-danger';
                     break;
+                case 'EENGVP':
+                    $approvalStatus = 'EENGVP';
+                    $statusName = 'E Engineering Validation Process';
+                    $spanColor = 'bg-danger';
+                    break;
                 // case 'DPRDPPDONLY':
                 //     $newStatus = 'DPRDPPDONLY';
                 //     $statusName = 'D Production Update';

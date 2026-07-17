@@ -18,6 +18,8 @@ class CreateEQcValidationProcessesTable extends Migration
             $table->foreignId('qc_slips_id')->constrained('qc_slips')->cascadeOnDelete()->comment('reference from qc_slips_id');
             $table->tinyInteger('vpqcs_oper')->comment('1 Production Abnormality Control | 2 Defect Escalation Procedure');;
             $table->tinyInteger('application_vpqcs_oper')->comment('1 Production Abnormality Control | 2 Applicable | 3 Not Applicable |');
+            $table->tinyInteger('engg_application_vpes_oper')->comment('1 Production Abnormality Control | 2 Defect Escalation Procedure');;
+            $table->tinyInteger('engg_vpes_oper')->comment('1 Production Abnormality Control | 2 Applicable | 3 Not Applicable |');
             $table->softDeletes();
             $table->timestamps();
         });

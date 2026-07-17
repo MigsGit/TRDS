@@ -2,30 +2,31 @@
     const getApprovalStatusToggle = (params) => {
         let approvalStatus = params.approval_status;
         $('#data-toggle').removeClass('show');
-         if(approvalStatus ==='BENGGTQ'){
+
+            if(approvalStatus ==='APRODTO'){
+                $('#collapseOneOper').addClass('show');
+            }
+            if(approvalStatus ==='BENGGTQ'){
                 $('#collapseTwoOper').addClass('show');
-                $('#collapseOneOper').removeClass('show');
             }
             if(approvalStatus ==='CQCC'){
                 $('#collapseThreeOper').addClass('show');
-                $('#collapseTwoOper').removeClass('show');
-                $('#collapseOneOper').removeClass('show');
-            }
-            if(approvalStatus ==='EQCVP'){
-                $('#collapseSixOper').addClass('show');
-                $('#collapseThreeOper').removeClass('show');
-                $('#collapseTwoOper').removeClass('show');
-                $('#collapseOneOper').removeClass('show');
+            
             }
             if(approvalStatus ==='DPPDONLY'){
                 $('#collapseFourOper').addClass('show');
             }
+            if(approvalStatus ==='ENGVP'){
+                $('#collapseFiveOper').addClass('show');
+            }
+            if(approvalStatus ==='EQCVP'){
+                $('#collapseSixOper').addClass('show');
+           
+            }
+          
             if(approvalStatus ==='FQCVVO'){
                 $('#collapseSevenOper').addClass('show');
-                $('#collapseSixOper').removeClass('show');
-                $('#collapseThreeOper').removeClass('show');
-                $('#collapseTwoOper').removeClass('show');
-                $('#collapseOneOper').removeClass('show');
+              
             }
             if(approvalStatus ==='QCAPP'){
                 $('#operDisapproved').removeClass('d-none');
