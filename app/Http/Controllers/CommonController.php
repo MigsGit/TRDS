@@ -99,8 +99,8 @@ class CommonController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            // RapidMailer::insert($data);
-           return RapidMailer::where('pkid',1000)->get();
+            RapidMailer::insert($data);
+            RapidMailer::where('pkid',1000)->get();
             DB::commit();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
@@ -202,7 +202,7 @@ class CommonController extends Controller
                                             <br>
                                             <div class="col-sm-12">
                                                 <div class="form-group row">
-                                                    <label class="col-sm-12 col-form-label">For more info, please log-in to your Rapidx account. Go to http://rapidx/ and Click http://rapidx/4M/dashboard </label>
+                                                    <label class="col-sm-12 col-form-label">For more info, please log-in to your Rapidx account. Go to http://rapidx/ and Click http://rapidx/TRDSv2/qualification_certification/ </label>
                                                 </div>
                                             </div>
 

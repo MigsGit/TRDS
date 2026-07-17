@@ -1262,7 +1262,7 @@
                                     </div>
                                    <div class="card FQCVP">
                                         <h2 class="card-header">
-                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseSixOper">
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseSixOper" aria-expanded="false" aria-controls="collapseSixOper">
                                             <h5>E. VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
                                         </button>
                                         </h2>
@@ -1630,11 +1630,9 @@
             }
             call_ajax_serialize(data, {}, 'update_approval', function (response) {
                 if (response && response.is_success === 'true') {
-                    // Swal.fire({ icon: 'success', title: 'Success', text: response.message || 'Approval status updated.' });
-                    // dataTable.operator.ajax.reload(null, false);
-                    // $('#modalCreateCQForm').modal('hide');
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to update approval status.' });
+                    Swal.fire({ icon: 'success', title: 'Success', text: response.message || 'Approval status updated.' });
+                    dataTable.operator.draw();
+                    $('#modalCreateCQForm').modal('hide');
                 }
             });
         }

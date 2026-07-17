@@ -653,7 +653,6 @@
 
         editSelectionsMap['#text_1st_certifiedby_qcs_oper'] = mappedcQcFirst;
         editSelectionsMap['#text_2nd_certifiedby_qcs_oper'] = mappedcQcSecond;
-
         editSelectionsMap['#text_1st_certified_prod_peqcs_oper'] = mappeddPpdOnlyToFirst;
         editSelectionsMap['#text_1st_certified_eng_peqcs_oper'] = mappeddPpdOnlyToFirst2;
         editSelectionsMap['#text_1st_certified_qc_peqcs_oper'] = mappeddPpdOnlyToSecond;
@@ -661,10 +660,14 @@
         editSelectionsMap['#text_2nd_certified_eng_peqcs_oper'] = mappeddPpdOnlyToSecond3;
         editSelectionsMap['#text_2nd_certified_qc_peqcs_oper'] = mappeddPpdOnlyToSecond4;
 
-
-
         editSelectionsMap['#text_1st_validatedby_vpes_oper'] = mappedeEngvpToFirst;
         editSelectionsMap['#text_2nd_validatedby_vpes_oper'] = mappedeEngvpToSecond;
+
+        editSelectionsMap['#text_1st_validatedby_vpqcs_oper'] = mappedeQcvpToFirst;
+        editSelectionsMap['#text_1st_validatedby_vpes_oper_2'] = mappedeQcvpToFirst2;
+        editSelectionsMap['#text_2nd_validatedby_vpqcs_oper'] = mappedeQcvpToSecond;
+        editSelectionsMap['#text_2nd_validatedby_vpes_oper_2'] = mappedeQcvpToSecond2;
+
 
         editSelectionsMap['#text_validated1_qcvvo_oper'] = mappedfQcvvoFirst;
         editSelectionsMap['#text_validated2_qcvvo_oper'] = mappedfQcvvoSecond;

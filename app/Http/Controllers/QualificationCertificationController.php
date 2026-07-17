@@ -66,7 +66,7 @@ class QualificationCertificationController extends Controller
             // return 'true';
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-           $qcSlip = QcSlip::
+            $qcSlip = QcSlip::
             where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')
             // ->get();
@@ -75,6 +75,12 @@ class QualificationCertificationController extends Controller
                 'approval_status' => $request->decision,
                 'appproval_at' => now()
             ]);
+             $operToApprovers = [
+                "decision_status"  => 'APP',
+             ];
+            $opApprover =  OpApprover::where('qc_slips_id',$request->qcSlipsId)->where('decision_status','PEN')
+            // ->get();
+            ->update($operToApprovers);
             DB::commit();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
@@ -535,11 +541,18 @@ class QualificationCertificationController extends Controller
             foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
                 $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
             }
-            if($params['approval_status'] != 'FQCVVO'){ //FQCVVO to QCAPP - Final Approver
+            //Send to Approver Attention To | CC is exclude the FQCVVO TO QCAPP Last Approver
+            $collectTo = collect($arrTo)->map(function($rowEmpNo){
+                return [
+                    'email' => $rowEmpNo['email'],
+                    'fullName' => $rowEmpNo['fullName'],
+                ];
+            });
+            if($params['approval_status'] != 'FQCVVO'){
+
                 foreach (explode(' | ',$params['update_data']['alert_prod_cc_sec']) as $key => $valueRowEmpNo) {
                     $arrCc[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
                 }
-
                 $collectCc = collect($arrCc)->map(function($rowEmpNo){
 
                     return [
@@ -550,13 +563,7 @@ class QualificationCertificationController extends Controller
                 $cc = $collectCc->pluck('email')->join(',');
 
             }
-            $collectTo = collect($arrCc)->map(function($rowEmpNo){
 
-                return [
-                    'email' => $rowEmpNo['email'],
-                    'fullName' => $rowEmpNo['fullName'],
-                ];
-            });
             $to = $collectTo->pluck('email')->join(',');
             // $from =$currentSession['email'] ?? '';
             // $from_name = $currentSession['fullName'];
@@ -566,28 +573,31 @@ class QualificationCertificationController extends Controller
             ];
             $message = $this->commonController->emailMsg($emailParams);
             $from = 'issinfoservice@pricon.ph';
-            $from_name = 'issinfoservice@pricon.ph';
-           $emailData = [
-                // "to" =>$to,
-                "to" =>"mrronquez@pricon.ph",
-                // "cc" =>$cc,
-                "cc" =>"mclegaspi@pricon.ph",
-                "bcc" =>"",
+            // $from_name = 'issinfoservice@pricon.ph';
+            $subject = "FOR YOUR APPROVALL : TRDS - Qualification Certification";
+            $rapidxEmpNo =  session('global_user');
+            $emailData = [
+                "to" =>$to,
+                // "to" =>"mrronquez@pricon.ph",
+                "cc" =>$cc,
+                // "cc" =>"",
+                "bcc" =>"mclegaspi@pricon.ph",
                 "from" => $from,
                 "from_name" => $from_name ?? "TRDS Auto Email",
-                // "subject" =>$subject,
+                "subject" =>$subject,
                 "message" =>  $message,
                 "attachment_filename" => "",
                 "attachment" => "",
                 "send_date_time" => now(),
                 "date_time_sent" => "",
                 "date_created" => now(),
-                "created_by" => session('rapidx_username'),
+                // "created_by" => session('rapidx_username'),
+                "created_by" => $rapidxEmpNo->name,
                 "system_name" => "rapidx_TRDS",
             ];
             //TODO: SEND email
-            // return $this->commonController->sendEmail($emailData);
             DB::commit();
+            $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -610,7 +620,6 @@ class QualificationCertificationController extends Controller
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
 
-            $validatedData = app(SendEmailRequest::class)->validateResolved();
             $rapidxEmpNo =  session('global_user');
             $dateTime = now();
             $date = now()->toDateString();
@@ -629,10 +638,9 @@ class QualificationCertificationController extends Controller
                 'selectSection' => $select_section,
             ];
             $generateControlNumber = $this->generateControlNumber($params);
-
             if(blank($qcSlipId) || $qcSlipId === ""){ //ADD
                 // QcSlipRequest $qcSlipRequest;
-                return 'true';
+                $validatedData = app(SendEmailRequest::class)->validateResolved();
                 $validatedData = app(QcSlipRequest::class)->validateResolved();
                 $saveQcSlip =  [
                     'control_no' =>  $generateControlNumber['currentCtrlNo'],
@@ -686,6 +694,9 @@ class QualificationCertificationController extends Controller
                $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
 
                $currentApprovalStatus = $qcSlipDetails->approval_status;
+                if($qcSlipDetails->approval_status != 'FQCVVO'){
+                    $validatedData = app(SendEmailRequest::class)->validateResolved();
+                }
                 if($qcSlipDetails->approval_status === 'APRODTO'){
                     // $currentApprovalStatus = $qcSlipDetails->approval_status;
                     $qcSlipDetails->update([
@@ -874,10 +885,12 @@ class QualificationCertificationController extends Controller
                     // FQcValidation::insert($fQcValidationVisualOperator);
                 }
             }
-        //   return  $request->all();
+            //   return  $request->all();
             //=== Update the Operator Approvers based on the Current Status
             if($currentApprovalStatus != "DPPDONLY"){
-                $opApprover =  OpApprover::where('qc_slips_id',$qcSlipId)->where('approval_status',$currentApprovalStatus)->update($operToApprovers);
+                $opApprover =  OpApprover::where('qc_slips_id',$qcSlipId)->where('approval_status',$currentApprovalStatus)
+                // ->get();
+                ->update($operToApprovers);
             }
             //=== Update the Approval Status and Insert the new Approval Status and Emails to the Next Approvers
            $changeApprovalStatusParams = [
