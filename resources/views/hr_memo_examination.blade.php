@@ -93,7 +93,7 @@
 
                                 <div class="form-group">
                                     <label>Objective</label>
-                                    <input type="text" class="form-control" name="objective" id="txtObjective" placeholder="Enter Objective">
+                                    <textarea class="form-control" name="objective" id="txtObjective" placeholder="Enter Objective"></textarea>
                                 </div>
                             </div>
                         </div>
