@@ -81,6 +81,7 @@ class QualificationCertificationController extends Controller
             $opApprover =  OpApprover::where('qc_slips_id',$request->qcSlipsId)->where('decision_status','PEN')
             // ->get();
             ->update($operToApprovers);
+            //TODO: Email to Created By if Approved
             DB::commit();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
@@ -574,7 +575,7 @@ class QualificationCertificationController extends Controller
             $message = $this->commonController->emailMsg($emailParams);
             $from = 'issinfoservice@pricon.ph';
             // $from_name = 'issinfoservice@pricon.ph';
-            $subject = "FOR YOUR APPROVALL : TRDS - Qualification Certification";
+            $subject = "FOR YOUR APPROVAL : TRDS - Qualification Certification";
             $rapidxEmpNo =  session('global_user');
             $emailData = [
                 "to" =>$to,
@@ -885,7 +886,6 @@ class QualificationCertificationController extends Controller
                     // FQcValidation::insert($fQcValidationVisualOperator);
                 }
             }
-            //   return  $request->all();
             //=== Update the Operator Approvers based on the Current Status
             if($currentApprovalStatus != "DPPDONLY"){
                 $opApprover =  OpApprover::where('qc_slips_id',$qcSlipId)->where('approval_status',$currentApprovalStatus)

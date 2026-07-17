@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Model\QcSlip;
 use App\Model\RapidMailer;
 use App\Model\RapidXUser;
+use App\Model\SystemOneHrisSubcon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -128,6 +129,8 @@ class CommonController extends Controller
         $qcSlip = QcSlip::with('product_line')->where('id',$params['qc_slips_id'])
         ->whereNull('deleted_at')
         ->first();
+        //TODO: Created By SystemOneHrisSubcon
+
         // if($getEcrStatus['status'] == 'DISAPPROVED'){
         //     $header = "Your ECR has been disapproved";
         // }else if($getEcrStatus['status'] == 'APPROVED'){
