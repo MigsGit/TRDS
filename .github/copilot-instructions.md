@@ -4,7 +4,7 @@ You are an expert AI pair-programmer specializing in Laravel 8, PHP 7.4+, JavaSc
 
 ## Tech Stack & Version Constraints
 - **Backend Framework**: Laravel 8.x
-- **PHP Version**: PHP 7.4 / 8.0 compatible
+- **PHP Version**: PHP 7.4 compatible
 - **Database**: MySQL (optimized index queries, transaction safety)
 - **UI Frameworks**: Bootstrap 5, Select2, DataTables (jQuery-friendly)
 - **Frontend Layer**: jQuery (Bootstrap 5, Select2, DataTables). Do not write modern ES modules or build-step-reliant scripts unless matching the active file.
