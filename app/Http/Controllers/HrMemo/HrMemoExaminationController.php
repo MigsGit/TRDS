@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class HrMemoExaminationController extends Controller
 {
-    public function viewProcessStationsInfo(Request $request){
+    public function viewExaminationsInfo(Request $request){
         $examination_details = HrMemoExamination::get();
 
         return DataTables::of($examination_details)
@@ -45,7 +45,7 @@ class HrMemoExaminationController extends Controller
         ->make(true);
     }
 
-    public function addProcessStationInfo(Request $request){
+    public function addExaminationsInfo(Request $request){
         $validation = array(
             'exam_name' => ['required', 'string', 'max:255']
         );
@@ -59,8 +59,7 @@ class HrMemoExaminationController extends Controller
 
             try{
                 $process_array = array(
-                    'examination_name' => $request->exam_name,
-                    'objective' => $request->objective
+                    'examination_name' => $request->exam_name
                 );
 
                 if(isset($request->id)){ // EDIT
@@ -79,15 +78,15 @@ class HrMemoExaminationController extends Controller
         }
     }
 
-    public function getProcessStationById(Request $request){
+    public function getExaminationsById(Request $request){
         return HrMemoExamination::where('id', $request->id)->first();
     }
 
-    public function getProcessStations(Request $request){
+    public function getExaminations(Request $request){
         return HrMemoExamination::where('status', 0)->get();
     }
 
-    public function updateProcessStationStatus(Request $request){
+    public function updateExaminationsStatus(Request $request){
         DB::beginTransaction();
 
         try {
