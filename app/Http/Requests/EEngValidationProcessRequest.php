@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DPpdCertificationCompletionRequest extends FormRequest
+class EEngValidationProcessRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,19 @@ class DPpdCertificationCompletionRequest extends FormRequest
      */
     public function rules()
     {
+       
         return [
-            'lot_1st_sample_peqcs_opery' => ['required'],
-            '1st_injected_ng_peqcs_opery' => ['required'],
-            '1st_detected_ng_peqcs_opery' => ['required'],
+            'text_application_vpes_oper' => ['required'],
+            'text_vpes_oper' => ['required'],
+            'text_1st_validatedby_vpes_oper' => ['required'],
+            'text_1st_date_vpes_oper' => ['required'],
+            'text_first_result_vpes_oper' => ['required'],
         ];
+        
+        
+        
+        
+        
+        
     }
 }

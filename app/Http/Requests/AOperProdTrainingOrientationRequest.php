@@ -24,11 +24,15 @@ class AOperProdTrainingOrientationRequest extends FormRequest
     public function rules()
     {
         return [
-            'text_first_trainedby_oper' => ['required'],
-            'text_first_mentoredby_oper' => ['required'],
+           
             'text_training_orientation_ps_oper' => ['required'],
             'defect_escalation' => ['required'],
             'production_abnormality' => ['required'],
+            'text_first_trainedby_oper' => ['required'],
+            'text_first_mentoredby_oper' => ['required'],
+            'text_first_date_oper' => ['required'],
+            'text_first_time_oper' => ['required'],
+            'text_first_a_prod_result' => ['required'],
         ];
     }
 }

@@ -26,6 +26,12 @@ class EQcValidationProcessRequest extends FormRequest
         return [
             'text_vpqcs_oper' => ['required'],
             'text_application_vpqcs_oper' => ['required'],
+             'text_first_result_vpqcs_oper' => ['required'],
+             'text_1st_validatedby_vpqcs_oper' => ['required'],
+             'text_1st_date_vpqcs_oper' => ['required'],
+             'text_first_result_vpes_oper_2' => ['required'],
+             'text_1st_validatedby_vpes_oper_2' => ['required'],
+             'text_1st_date_vpes_oper_2' => ['required'],
         ];
     }
 }

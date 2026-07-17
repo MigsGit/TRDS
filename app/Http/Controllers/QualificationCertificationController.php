@@ -7,14 +7,17 @@ use App\Http\Controllers\CommonController;
 use App\Http\Requests\AOperProdTrainingOrientationRequest;
 use App\Http\Requests\BOpEnggSectionTrainingOrientationRequest;
 use App\Http\Requests\CQcCertificationRequest;
+use App\Http\Requests\DPpdCertificationCompletionRequest;
 use App\Http\Requests\EQcValidationProcessRequest;
 use App\Http\Requests\QcSlipEmployeeRequest;
 use App\Http\Requests\QcSlipRequest;
+use App\Http\Requests\SendEmailRequest;
 use App\Model\DropdownMaster;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\AOperProdTrainingOrientation;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
 use App\Model\Qc\CQcCertification;
+use App\Model\Qc\DPpdCertificationCompletion;
 use App\Model\Qc\EQcValidationProcess;
 use App\Model\Qc\FQcValidation;
 use App\Model\Qc\QcReasonCertification;
@@ -24,7 +27,6 @@ use App\Model\SystemHrisViewDivDeptSec;
 use App\Model\SystemOneHrisEmpInfo;
 use App\Model\SystemOneHrisSubcon;
 use App\Model\SystemOneSubconEmpInfo;
-use App\Model\Qc\DPpdCertificationCompletion;
 use App\OpApprover;
 use Exception;
 use Illuminate\Http\Request;
@@ -607,6 +609,8 @@ class QualificationCertificationController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
+
+            $validatedData = app(SendEmailRequest::class)->validateResolved();
             $rapidxEmpNo =  session('global_user');
             $dateTime = now();
             $date = now()->toDateString();
@@ -628,6 +632,7 @@ class QualificationCertificationController extends Controller
 
             if(blank($qcSlipId) || $qcSlipId === ""){ //ADD
                 // QcSlipRequest $qcSlipRequest;
+                return 'true';
                 $validatedData = app(QcSlipRequest::class)->validateResolved();
                 $saveQcSlip =  [
                     'control_no' =>  $generateControlNumber['currentCtrlNo'],
@@ -713,7 +718,6 @@ class QualificationCertificationController extends Controller
                         'second_status'     => $this->getSafe($request, 'text_second_a_prod_result'),
                         'second_remarks'    => '',
                     ];
-                    // DB::commit();
                     AOperProdTrainingOrientation::insert($aOperProdTrainingOrientations);
                 }
                 // $currentApprovalStatus = $qcSlipDetails->approval_status;
@@ -732,7 +736,6 @@ class QualificationCertificationController extends Controller
                         "second_ok_es_oper"         => $this->getSafe($request, 'text_second_ok_es_oper'),
                         "second_ng_es_oper"         => $this->getSafe($request, 'text_second_ng_es_oper'),
                     ];
-                    // DB::commit();
                     BOpEnggSectionTrainingOrientation::insert($bEnggTqDetails);
                     $operToApprovers = [
                         "decision_status"  => 'APP',
@@ -786,6 +789,8 @@ class QualificationCertificationController extends Controller
 
                 }
                 if($selectedSection && $qcSlipDetails->approval_status === "DPPDONLY"){
+                    $validatedData = app(DPpdCertificationCompletionRequest::class)->validateResolved();
+
                     $ppdParams = [
                         'request' => $request->all()
                     ];
@@ -825,7 +830,6 @@ class QualificationCertificationController extends Controller
                         "vpqcs_oper"             => $this->getSafe($request, 'text_vpqcs_oper'),
                         "application_vpqcs_oper" => $this->getSafe($request, 'text_application_vpqcs_oper'),
                     ];
-                    // DB::commit();
                     EQcValidationProcess::where('qc_slips_id',$qcSlipId)->update($eQcValidationProcess);
                     $operToApprovers = [
                         "decision_status"   => 'APP',
@@ -906,7 +910,7 @@ class QualificationCertificationController extends Controller
                     'approval_status'=> $currentApprovalStatus,
                 ];
             }
-            // DB::commit();
+            DB::commit();
             //ADD ELSE TO QC Supervisor Approval for OPERATOR
             // return 'DONE';
             $this->saveFormSendEmail($emailParams);
