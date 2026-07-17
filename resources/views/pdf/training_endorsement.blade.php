@@ -178,7 +178,8 @@
                             <td>{{ $exam['title'] ?? '' }}</td>
                             <td>{{ $exam['score'] ?? '' }}</td>
                             <td>{{ $exam['rating'] ?? '' }}</td>
-                            <td class="{{ strtolower($exam['remark'] ?? '') === 'passed' ? 'badge-passed' : 'badge-failed' }}">
+                            {{-- <td class="{{ strtolower($exam['remark'] ?? '') === 'passed' ? 'badge-passed' : 'badge-failed' }}"> --}}
+                            <td class="{{ str_contains(strtolower($exam['remark'] ?? ''), 'passed') ? 'badge-passed' : 'badge-failed' }}">
                                 {{ $exam['remark'] ?? '' }}
                             </td>
                             @if($index === 0)
@@ -220,31 +221,8 @@
         $approvedBy = $endorsement->te_approval_details->where('approval_type', 'approved_by') ?? collect();
     @endphp
 
-    <br><br><br>
-    {{-- <table style="width:100%; border:none; margin-top:20px;">
-        <tr>
-            <td style="width:33%; text-align:center; vertical-align:top;">
-                <strong>Prepared by:</strong><br><br>
-                {{ $endorsement->created_by_user_details->name ?? '' }}
-            </td>
-            <td style="width:33%; text-align:center; vertical-align:top;">
-                <strong>Checked by:</strong><br><br>
-                @foreach($checkedBy as $checker)
-                    <img src="http://rapidx/RapidX_E-Signature/{{ $checker->approver_details->employee_number.'.png' }}" alt="Signature" style="width:100px; height:auto;"><br>
-                    {{ $checker->approver_details->name ?? '' }}<br>
-                @endforeach
-            </td>
-            <td style="width:33%; text-align:center; vertical-align:top;">
-                <strong>Approved by:</strong><br><br>
-                @foreach($approvedBy as $approver)
-                    <img src="http://rapidx/RapidX_E-Signature/{{ $approver->approver_details->employee_number.'.png' }}" style="width:100px; height:auto;"><br>
-                    {{ $approver->approver_details->name ?? '' }}<br>
-                @endforeach
-            </td>
-        </tr>
-    </table> --}}
-
-    <table style="width:100%; border:none; margin-top:10px; border-collapse: collapse;">
+    <br>
+    <table style="width:100%; border:none; border-collapse: collapse; page-break-inside: avoid;">
         <tr>
             <td style="width:33%; text-align:center; padding-bottom: 10px; font-weight: bold;">
                 Prepared by:
@@ -267,15 +245,13 @@
                 <span style="display:block; font-weight: bold;">
                     {{ $endorsement->created_by_user_details->name ?? '' }}
                     <br>
-                    {{-- {{ $endorsement->created_by_user_details->employee_info->Position ?? '' }} --}}
                     Trainer Inspector
-                    <br>
                 </span>
             </td>
             
-            <td style="width:33%; text-align:center; vertical-align: bottom; padding: 0 10px;">
+            <td style="width:33%; text-align:center; vertical-align: top; padding: 0 10px;">
                 @foreach($checkedBy as $checker)
-                    <div style="display: block; text-align: center;">
+                    <div style="display: block; text-align: center; margin-bottom: 15px;">
                         @if ($endorsement->status > 2)
                             <img src="http://rapidx/RapidX_E-Signature/{{ $checker->approver_details->employee_number.'.png' }}" 
                                 alt="Signature" 
@@ -284,17 +260,15 @@
                         <span style="display:block; font-weight: bold;">
                             {{ $checker->approver_details->name ?? '' }}
                             <br>
-                            {{-- {{ $checker->approver_details->employee_info->Position ?? '' }} --}}
                             QC Training Supervisor
-                            <br><br>
                         </span>
                     </div>
                 @endforeach
             </td>
             
-            <td style="width:33%; text-align:center; vertical-align: bottom; padding: 0 10px;">
+            <td style="width:33%; text-align:center; vertical-align: top; padding: 0 10px;">
                 @foreach($approvedBy as $approver)
-                    <div style="display: block; text-align: center;">
+                    <div style="display: block; text-align: center; margin-bottom: 15px;">
                         @if ($endorsement->status == 3)
                             <img src="http://rapidx/RapidX_E-Signature/{{ $approver->approver_details->employee_number.'.png' }}" 
                                 alt="Signature" 
@@ -303,21 +277,20 @@
                         <span style="display:block; font-weight: bold;">
                             {{ $approver->approver_details->name ?? '' }}
                             <br>
-                            {{-- {{ $approver->approver_details->employee_info->Position ?? '' }} --}}
-                             @if ($approver->approver_details->employee_number == 2055)
+                            @if ($approver->approver_details->employee_number == 2055)
                                 TU Head
                             @elseif ($approver->approver_details->employee_number == 'S022')
                                 General Manager
                             @else
                                 {{ $approver->approver_details->employee_info->Position ?? '' }}
                             @endif
-                            <br><br>
                         </span>
                     </div>
                 @endforeach
             </td>
         </tr>
     </table>
+    
     
     {{-- @foreach($employees as $employee)
         @if(!empty($employee['attachment']))
@@ -333,7 +306,7 @@
                 <p style="font-weight: bold; font-size: 12px; margin-bottom: 10px;">
                     {{ $employee['name'] ?? '' }} - Hands-On Attachment:
                 </p>
-                <img src="{{ $employee['attachment'] }}" alt="" style="max-width: 100%; max-height: 650px; object-fit: contain; display: block; border: 1px solid #ccc;">
+                <img src="{{ $employee['attachment'] }}" alt="" style="max-width: 100%; max-height: 600px; object-fit: contain; display: block; border: 1px solid #ccc;">
             </div>
         @endif
     @endforeach

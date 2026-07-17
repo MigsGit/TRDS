@@ -45,6 +45,7 @@ class TrainingRequestDetails extends Model
         return $this->hasOne(HrMemo::class, 'id', 'training_memo_doc_id');
     }
     public function employee_exam_details(){
-        return $this->hasMany(ExamResult::class, 'employee_no','emp_no');
+        // return $this->hasMany(ExamResult::class, 'employee_no','emp_no');
+        return $this->hasOne(ExamResult::class, 'employee_no','emp_no');
     }
 }
