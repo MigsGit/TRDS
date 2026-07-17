@@ -6,6 +6,7 @@ use App\Model\DropdownMasterDetail;
 use App\Model\Qc\AOperProdTrainingOrientation;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
 use App\Model\Qc\CQcCertification;
+use App\Model\Qc\DPpdCertificationCompletion;
 use App\Model\Qc\EQcValidationProcess;
 use App\Model\Qc\FQcValidation;
 use App\Model\Qc\QcReasonCertification;
@@ -56,6 +57,10 @@ class QcSlip extends Model
     public function c_qc_certification()
     {
         return $this->hasOne(CQcCertification::class, 'qc_slips_id', 'id');
+    }
+    public function d_ppd_certification_completion()
+    {
+        return $this->hasOne(DPpdCertificationCompletion::class, 'qc_slips_id', 'id');
     }
     public function e_qc_validation_process()
     {

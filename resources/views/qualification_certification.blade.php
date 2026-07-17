@@ -237,7 +237,7 @@
 
                                 <!-- **************************************************************      APRODTO          ************************************************************************************************* -->
 
-                               {{-- <div class="accordion" id="accordionExampleOper">
+                             <div class="accordion" id="accordionExampleOper">
                                      <div class="card APRODTO">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOneOper" aria-expanded="true" aria-controls="collapseOneOper">
@@ -1165,7 +1165,7 @@
 
                                         </div>
                                         </div>
-                                    </div>--}}
+                                    </div>-
                                     <div class="card EENGGVALIDATION">
                                         <h2 class="card-header">
                                             

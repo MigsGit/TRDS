@@ -105,6 +105,7 @@ class QualificationCertificationController extends Controller
                 'a_oper_prod_training_orientation',
                 'b_op_engg_section_training_orientation',
                 'c_qc_certification',
+                'd_ppd_certification_completion',
                 'e_qc_validation_process',
                 'f_qc_validation',
             )
@@ -187,9 +188,13 @@ class QualificationCertificationController extends Controller
                     // Explode the fields
                     $firstExploded  = $explodePipedString($itemArray['first_approver'] ?? null);
                     $firstExploded2  = $explodePipedString($itemArray['first_approver_2'] ?? null);
+                    $firstExploded3  = $explodePipedString($itemArray['first_approver_3'] ?? null);
                     $secondExploded = $explodePipedString($itemArray['second_approver'] ?? null);
                     $secondExploded2 = $explodePipedString($itemArray['second_approver_2'] ?? null);
+                    $secondExploded3 = $explodePipedString($itemArray['second_approver_3'] ?? null);
                     $alertsExploded = $explodePipedString($itemArray['alert_prod_sec'] ?? null);
+
+                
 
                     // Helper closure to build Select2 formatting: [{id: "R144", name: "John Doe"}]
                     $mapToSelect2Structure = function ($empNoArray) use ($employeeDbMap) {
@@ -216,8 +221,10 @@ class QualificationCertificationController extends Controller
                     // Map and attach the completed objects directly to the output array keys
                     $itemArray['first_approver_exploded']  = $mapToSelect2Structure($firstExploded);
                     $itemArray['first_approver2_exploded']  = $mapToSelect2Structure($firstExploded2);
+                    $itemArray['first_approver3_exploded']  = $mapToSelect2Structure($firstExploded3);
                     $itemArray['second_approver_exploded'] = $mapToSelect2Structure($secondExploded);
                     $itemArray['second_approver2_exploded'] = $mapToSelect2Structure($secondExploded2);
+                    $itemArray['second_approver3_exploded'] = $mapToSelect2Structure($secondExploded3);
                     $itemArray['alert_prod_sec_exploded']  = $mapToSelect2Structure($alertsExploded);
 
                     return $itemArray;
@@ -766,16 +773,15 @@ class QualificationCertificationController extends Controller
                         'engg_application_vpes_oper' => $request->text_application_vpes_oper,
                         'engg_vpes_oper' => $request->text_vpes_oper,
                     ];
-                    // EQcValidationProcess::insert($eQcValidationProcess);
-                    EQcValidationProcess::where('qc_slips_id',$qcSlipId)->update($eEngVp);
+                    EQcValidationProcess::insert($eEngVp);
+                    // EQcValidationProcess::where('qc_slips_id',$qcSlipId)->update($eEngVp);
                     $operToApprovers = [
-                        "decision_status" => 'APP',
-                        'first_approver' => $request->text_first_result_vpes_oper,
-                        'first_date' => $request->text_second_result_vpes_oper,
-                        'first_time' =>  collect($request->text_1st_validatedby_vpes_oper)->join(' | '),
-                        'first_status' => $request->text_1st_date_vpes_oper,
-                        'first_remarks' => $request->text_remarks_vpes_oper,
+                        'first_approver' =>  collect($request->text_1st_validatedby_vpes_oper)->join(' | '),
                         'second_approver' => collect($request->text_2nd_validatedby_vpes_oper)->join(' | '),
+                        'first_date' => $request->text_1st_date_vpes_oper, 
+                        'first_status' => $request->text_first_result_vpes_oper, 
+                        'first_remarks' => $request->text_remarks_vpes_oper,
+                        'second_status' => $request->text_second_result_vpes_oper,
                         'second_date' => $request->text_2nd_date_vpes_oper,
                     ];
                         
