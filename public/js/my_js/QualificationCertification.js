@@ -12,7 +12,7 @@
             }
             if(approvalStatus ==='CQCC'){
                 $('#collapseThreeOper').addClass('show');
-            
+
             }
             if(approvalStatus ==='DPPDONLY'){
                 $('#collapseFourOper').addClass('show');
@@ -25,7 +25,7 @@
             }
             if(approvalStatus ==='FQCVVO'){
                 $('#collapseSevenOper').addClass('show');
-              
+
             }
             if(approvalStatus ==='QCAPP'){
                 $('#operDisapproved').removeClass('d-none');
@@ -561,8 +561,8 @@
         // Safe access: optional chaining prevents crash if approversCollection is missing from response
         const approversCollection = response?.approversCollection ?? null;
         const rawOperApprovedConfirmedBy = response?.rawOperApprovedConfirmedBy ?? null;
-    
-        
+
+
         // Guard: exit early if the entire approvers collection is absent
         if (!approversCollection || typeof approversCollection !== 'object') {
             return;
@@ -660,18 +660,18 @@
         editSelectionsMap['#text_2nd_certified_prod_peqcs_oper'] = mappeddPpdOnlyToSecond2;
         editSelectionsMap['#text_2nd_certified_eng_peqcs_oper'] = mappeddPpdOnlyToSecond3;
         editSelectionsMap['#text_2nd_certified_qc_peqcs_oper'] = mappeddPpdOnlyToSecond4;
-        
-        
+
+
 
         editSelectionsMap['#text_1st_validatedby_vpes_oper'] = mappedeEngvpToFirst;
         editSelectionsMap['#text_2nd_validatedby_vpes_oper'] = mappedeEngvpToSecond;
-        
+
         editSelectionsMap['#text_validated1_qcvvo_oper'] = mappedfQcvvoFirst;
         editSelectionsMap['#text_validated2_qcvvo_oper'] = mappedfQcvvoSecond;
 
         editSelectionsMap['#text_oper_approved_confirmed_by'] = mappedOperApprovedConfirmedBy;
-        
-        
+
+
         // 3. Initialize all employee selectors simultaneously
         initGetSystemOneEmployeeDetailsCombos(
             [
@@ -747,7 +747,6 @@
             populateEditOperEmpTable(data.qc_slip_employees);
             dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
             dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
-            // dataTable.fvi_operator.ajax.url(`view_training_attendance_request_details?trainingAttendanceRequest=${trainingRequestDetailsId} && fromDate=${fromDate??''} && toDate=${toDate??''}`).draw();
             let currentStatus = data.approval_status ??'';
 
             $('#operDisapproved').addClass('d-none');
@@ -889,20 +888,13 @@
                 form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData.second_date ?? '');
                 form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData.second_time ?? '');
             }
-            
+
             // D PPD ONLY Process
             const dPpdOnly = response?.approversCollection?.DPPDONLY?.[0] ?? null;
             const dPpdCertificationCompletion = data.d_ppd_certification_completion;
-            if (dPpdOnly && typeof dPpdOnly === 'object') { 
-
-                // lot_1st_sample_peqcs_oper: 1,
-                // 1st_injected_ng_peqcs_oper: 1,
-                // 1st_detected_ng_peqcs_oper: 1,
-                // 2nd_sample_peqcs_oper: 2,
-                // 2nd_injected_ng_peqcs_oper: 2,
-                // 2nd_detected_ng_peqcs_oper: 2,
+            if (dPpdOnly && typeof dPpdOnly === 'object') {
                  form.formSubmitOper.find('#text_lot_1st_sample_peqcs_oper').val(dPpdCertificationCompletion?.lot_1st_sample_peqcs_oper ?? '');
-              
+
                 form.formSubmitOper.find('#text_1st_injected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_injected_ng_peqcs_oper'] ?? '');
                 form.formSubmitOper.find('#1st_detected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_detected_ng_peqcs_oper'] ?? '');
                 form.formSubmitOper.find('#text_1st_detected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_detected_ng_peqcs_oper'] ?? '');form.formSubmitOper.find('#text_2nd_sample_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_sample_peqcs_oper'] ?? '');
@@ -917,21 +909,22 @@
                 form.formSubmitOper.find('#text_1st_time_peqcs_oper').val(dPpdOnly?.first_time ?? '');
                 form.formSubmitOper.find('#text_2nd_date_peqcs_oper').val(dPpdOnly?.second_date ?? '');
                 form.formSubmitOper.find('#text_2nd_time_peqcs_oper').val(dPpdOnly?.second_time ?? '');
-
-
-  
             }
             // E ENGG Validation Process
             const eQcValidationProcess = data.e_qc_validation_process;
             const eEngvpData = response?.approversCollection?.EENGVP?.[0] ?? null;
             form.formSubmitOper.find('#text_application_vpes_oper').val(eQcValidationProcess?.engg_application_vpes_oper ?? '').trigger('change');
-            form.formSubmitOper.find('#text_vpes_oper').val(eQcValidationProcess?.engg_vpes_oper ?? '').trigger('change');
-            form.formSubmitOper.find('#text_first_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
-            form.formSubmitOper.find('#text_second_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
+            let vpesOper = eQcValidationProcess?.engg_vpes_oper ?? '';
+            if(vpesOper != ""){
+                form.formSubmitOper.find('#text_vpes_oper_1').prop('checked', true);
+            }
+            // form.formSubmitOper.find('#text_vpes_oper').val(eQcValidationProcess?.engg_vpes_oper ?? '').trigger('change');
+            // form.formSubmitOper.find('#text_first_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
+            // form.formSubmitOper.find('#text_second_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
             form.formSubmitOper.find('#text_1st_date_vpes_oper').val(eEngvpData?.first_date ?? '');
             form.formSubmitOper.find('#text_2nd_date_vpes_oper').val(eEngvpData?.second_date ?? '');
             form.formSubmitOper.find('#text_remarks_vpes_oper').val(eEngvpData?.first_remarks ?? '');
-         
+
             //E Qc Validation Process
             const eQcvpData = response?.approversCollection?.EQCVP?.[0] ?? null;
 
@@ -955,7 +948,7 @@
 
             form.formSubmitOper.find('#text_date1_qcvvo_oper').val(fQcVvo.first_date ?? '');
             form.formSubmitOper.find('#text_date2_qcvvo_oper').val(fQcVvo.second_date ?? '');
-            
+
             let refdocnoInputQcvvoOper = fQcValidation?.refdocno_input_qcvvo_oper ?? '';
             let refdocnoInputQcvvoOper2 = fQcValidation?.refdocno_input_qcvvo_oper_2 ?? '';
             form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper').val(refdocnoInputQcvvoOper);
@@ -1005,5 +998,4 @@
     $(document).on('click', '.btnRemoveOperEmpMain', () => {
         $(this).closest('tr').remove();
     });
-
 // });

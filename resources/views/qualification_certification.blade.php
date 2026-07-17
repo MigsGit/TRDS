@@ -1170,7 +1170,7 @@
                                         <h2 class="card-header">
                                             
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
-                                            <h5>VALIDATION PROCESS: ENGINEERING SECTION</h5>
+                                            <h5>E.VALIDATION PROCESS: ENGINEERING SECTION</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseFiveOper" class="accordion-collapse collapse">
@@ -1260,7 +1260,7 @@
                                                 </div>
                                         </div>
                                     </div> 
-                                   {{-- <div class="card FQCVP">
+                                   <div class="card FQCVP">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseSixOper">
                                             <h5>E. VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
@@ -1571,7 +1571,7 @@
 
                                         </div>
                                         </div>
-                                    </div>  --}}
+                                    </div> 
                                 </div>
 
                                 <hr style="height: 5px; background-color: black; border: none;">

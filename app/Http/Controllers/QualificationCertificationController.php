@@ -149,7 +149,7 @@ class QualificationCertificationController extends Controller
             ->filter()
             ->values()
             ->all();
-          
+
 
             $rawBOpEnggSectionTrainingOrientationCollection =  collect(explode('|', $rawBOpEnggSectionTrainingOrientation))
                 ->map(function($id) {
@@ -172,7 +172,7 @@ class QualificationCertificationController extends Controller
 
             $approversCollection = collect($qcSlip)->groupBy('approval_status')->toArray();
 
-          
+
             // 2. Step One: Parse and collect ALL unique EmpNo values across all status groups
             $allEmployeeNumbers = [];
             foreach ($rawPayload as $status => $items) {
@@ -212,7 +212,7 @@ class QualificationCertificationController extends Controller
                     $secondExploded3 = $explodePipedString($itemArray['second_approver_3'] ?? null);
                     $alertsExploded = $explodePipedString($itemArray['alert_prod_sec'] ?? null);
 
-                
+
 
                     // Helper closure to build Select2 formatting: [{id: "R144", name: "John Doe"}]
                     $mapToSelect2Structure = function ($empNoArray) use ($employeeDbMap) {
@@ -394,10 +394,11 @@ class QualificationCertificationController extends Controller
     }
     public function loadQcSlip(Request $request){
     //newStatus
-      $qcSlips = QcSlip::with('product_line','op_approvers')
+    $qcSlips = QcSlip::with('product_line','op_approvers','op_approvers_pending')
         ->whereNull('deleted_at')
         ->get();
-        $allEmpIds = $qcSlips->pluck('op_approvers') // Grab all op_approvers collections
+                                 // Convert to a raw array for database handling
+        $allEmpIdsTo= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
             ->flatten()                              // Flatten into a single layer of OpApprover models
             ->pluck('alert_prod_sec')               // Pull out all the pipe-separated strings
             ->filter()                               // Remove null or empty entries
@@ -407,14 +408,26 @@ class QualificationCertificationController extends Controller
             ->unique()                               // Drop duplicates
             ->values()                               // Re-index array keys
             ->all();                                 // Convert to a raw array for database handling
+        $allEmpIdsCc= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
+            ->flatten()                              // Flatten into a single layer of OpApprover models
+            ->pluck('alert_prod_cc_sec')               // Pull out all the pipe-separated strings
+            ->filter()                               // Remove null or empty entries
+            ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
+                return array_map('trim', explode('|', $item));
+            })
+            ->unique()                               // Drop duplicates
+            ->values()                               // Re-index array keys
+            ->all();                                 // Convert to a raw array for database handling
 
         // 3. Fetch all matching names from HRIS into a quick-lookup map array
-        $hrisEmployees = SystemOneHrisEmpInfo::whereIn('EmpNo', $allEmpIds)
+        $arrHrisSubconEmpNo = array_merge($allEmpIdsTo,$allEmpIdsCc);
+        $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', $arrHrisSubconEmpNo)
             ->get()
-            ->pluck('EmpName');
-        $subconEmployees = SystemOneSubconEmpInfo::whereIn('EmpNo', $allEmpIds)
-            ->get()
-            ->pluck('EmpName');
+            ->pluck('empname');
+        // $hrisSubconCc = SystemOneHrisSubcon::whereIn('EmpNo', $allEmpIdsTo)
+        //     ->get()
+        //     ->pluck('empname');
+
         try {
         return DataTables($qcSlips)
             ->addColumn('rawAction',function ($row) use ($request){
@@ -425,17 +438,26 @@ class QualificationCertificationController extends Controller
                 $result .= '</center>';
                 return $result;
             })
-            ->addColumn('rawStatus',function ($row) use ($request){
-                 $result = '';
-                $currentApprover = $row->created_by ?? '';
+            ->addColumn('rawStatus',function ($row) use ($request,$hrisSubcon){
+                $result = '';
+                $current = $row->op_approvers_pending ?? [];
                 // $approvalStatusEnvironment = $row->environment->approval_status;
                 $approvalStatus = $row->approval_status;
                 // $getStatus = $this->commonInterface->getStatus4m($statusEnvironment);
                     $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
+                 if(count($current) === 0){
+                    $currentApprover = "";
+                    $resultCurrenApprover = "";
+                 }else{
+                    $currentApprover =  collect($hrisSubcon)->join(' | ') ?? '';
+                    $resultCurrenApprover = '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApprover.' </span> </br>  </br>';
+                 }
+
+
                 $result .= '<center>';
                 // $result .= '<span class="'.$getStatus['bgStatus'].'"> '.$getStatus['status'].' </span>';
                 $result .= '<br>';
-                $result .= '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApprover.' </span> </br>  </br>';
+                $result .= $resultCurrenApprover;
                 $result .= '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> '.$getApprovalStatus['statusName'].'  </span>';
                 $result .= '</center>';
                 $result .= '</br>';
@@ -666,7 +688,7 @@ class QualificationCertificationController extends Controller
             }
             if(filled($qcSlipId)){ //UPDATE
                $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
-               
+
                $currentApprovalStatus = $qcSlipDetails->approval_status;
                 if($qcSlipDetails->approval_status === 'APRODTO'){
                     // $currentApprovalStatus = $qcSlipDetails->approval_status;
@@ -786,7 +808,7 @@ class QualificationCertificationController extends Controller
                     }
                 }
                 if($qcSlipDetails->approval_status === 'EENGVP'){
-                  
+
                     $eEngVp = [
                         'qc_slips_id' => $qcSlipId,
                         'engg_application_vpes_oper' => $request->text_application_vpes_oper,
@@ -797,14 +819,14 @@ class QualificationCertificationController extends Controller
                     $operToApprovers = [
                         'first_approver' =>  collect($request->text_1st_validatedby_vpes_oper)->join(' | '),
                         'second_approver' => collect($request->text_2nd_validatedby_vpes_oper)->join(' | '),
-                        'first_date' => $request->text_1st_date_vpes_oper, 
-                        'first_status' => $request->text_first_result_vpes_oper, 
+                        'first_date' => $request->text_1st_date_vpes_oper,
+                        'first_status' => $request->text_first_result_vpes_oper,
                         'first_remarks' => $request->text_remarks_vpes_oper,
                         'second_status' => $request->text_second_result_vpes_oper,
                         'second_date' => $request->text_2nd_date_vpes_oper,
                     ];
-                        
-                }   
+
+                }
                 if($qcSlipDetails->approval_status ==='EQCVP'){
                     // EQCVP- EQcValidationProcess
                     // Change status into Go to PROCESS E
@@ -938,7 +960,7 @@ class QualificationCertificationController extends Controller
                 "2nd_injected_ng_peqcs_oper"=>  $request['text_2nd_injected_ng_peqcs_oper'],
                 "2nd_detected_ng_peqcs_oper"=>  $request['text_2nd_detected_ng_peqcs_oper'],
             ];
-        
+
             // DPpdCertificationCompletion::insert($dPpdCertificationCompletion);
             $dPpdCertificationCompletionApprover = [
                 "decision_status" => 'APP',
@@ -973,7 +995,7 @@ class QualificationCertificationController extends Controller
                "first_time",
                "first_status",
             ];
-         
+
             // $merge =  array_merge($dPpdCertificationCompletion,$requiredApprover);
            collect($requiredApprover)->each(function ($rowdPpdCertificationCompletion) use ($dPpdCertificationCompletionQuery) {
                 $dPpdCertificationCompletionQuery->whereNotNull($rowdPpdCertificationCompletion);
@@ -981,11 +1003,11 @@ class QualificationCertificationController extends Controller
             $count = $dPpdCertificationCompletionQuery->count();
             if($count > 1){
                 return [
-                    'isChangeStatus' => 'true' //Change E Status 
+                    'isChangeStatus' => 'true' //Change E Status
                 ];
             }
             return [
-                    'isChangeStatus' => 'false' //Change E Status 
+                    'isChangeStatus' => 'false' //Change E Status
             ];
             //NULLABLE TABLE D , CHANGE THE VALIDATION TO OP APPROVER , CREATE NEW DATABASE FOR E ENGG
         } catch (Exception $e) {
@@ -1059,7 +1081,7 @@ class QualificationCertificationController extends Controller
             //     $newStatus = 'DQCPPDONLY';
             //     $statusName = 'D QC Update';
             //     break;
-           
+
             case ($params['approval_status'] === 'DPPDONLY'):
                 $newStatus = 'EENGVP';
                 $statusName = 'E Engineering Validation Process';

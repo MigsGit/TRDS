@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class SystemOneHrisSubcon extends Model
 {
 
-    protected $table = 'vw_pmi_subcon_hris';
+    protected $table = 'vw_pmi_subcon_hris'; //ALL EMPLOYEEE
     protected $connection = 'mysql_hris_subcon';
 }
