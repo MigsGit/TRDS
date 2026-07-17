@@ -27,6 +27,7 @@ class CreateExamResultDetailsTable extends Migration
             $table->string('remark')->nullable();
             $table->date('date_examination')->nullable();
             $table->unsignedTinyInteger('exam_result_status')->default(0)->comment = '0-For Review, 1-Completed';
+            $table->unsignedTinyInteger('attempt')->comment = 'Conditional: 1st attempt = 70-99%, 2nd Attempt = 90-99%, 3rd Attempt = 100%';
             $table->unsignedTinyInteger('status')->default(0)->comment = '0-active, 1-deactivate';
             $table->unsignedTinyInteger('logdel')->default(0)->comment = '0-Show, 1-Hide';
             $table->timestamps();

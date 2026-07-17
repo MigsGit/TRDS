@@ -9,18 +9,15 @@
             text-align: center;
             vertical-align: middle;
         }
-
         table.table tbody td{
             vertical-align: middle;
         }
-
         #tableQuestionnaire thead th {
             position: sticky;
             top: 0;
             background: #f8f9fa; /* Light header color */
             z-index: 5;
         }
-
         .removeQuestion {
             position: absolute;
             top: 2px;
@@ -28,17 +25,24 @@
             padding: 0 4px;
             font-size: 0.75rem;
         }
-
         th.position-relative {
             position: relative;
         }
-
         .removeOption {
             position: absolute;
             top: 2px;
             right: 2px;
             padding: 0 4px;
             font-size: 0.75rem;
+        }
+        #tableQuestionnaireDetails tbody tr.dt-rowReorder-moving {
+            background-color: #d8a8a8 !important;
+            box-shadow:
+                0 12px 55px rgba(185, 179, 179, 0.18),
+                0 4px 40px rgba(15, 15, 15, 0.08);
+            transform: scale(1.03);
+            /* border-radius: 24px; */
+            opacity: .95;
         }
     </style>
     <div class="content-wrapper">
@@ -64,32 +68,104 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card">
+
                             <div class="card-header">
-                                <h3 class="card-title" style="margin-top: 8px;"><strong>Questionnaire</strong></h3>
+                                <h3 class="card-title" style="margin-top:8px;">
+                                    <strong>Questionnaire</strong>
+                                </h3>
                             </div>
+
                             <div class="card-body">
-                                <div class="d-flex justify-content-end mb-3">
-                                    <button type="button" class="btn btn-dark" id="buttonCreateQuestionnaire" data-toggle="modal" data-target="#modalCreateUpdateQuestionnaire">
-                                        <i class="fa fa-plus fa-md"></i> Create New Record
-                                    </button>
-                                </div>
-                                <div class="table-responsive" style="max-height: 80vh; overflow-y: auto;">
-                                    <table id="tableQuestionnaire" class="table table-bordered table-hover w-100">
-                                        <thead>
-                                            <tr>
-                                                <th>Action</th>
-                                                <th>Status</th>
-                                                <th>Category</th>
-                                                <th>Exam Title</th>
-                                                <th>Exam Instruction</th>
-                                                <th>Purpose</th>
-                                                <th>Department</th>
-                                                <th>Position</th>
-                                                <th>Product Line</th>
-                                                <th>Passing Score</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+
+                                <!-- Tabs -->
+                                <ul class="nav nav-tabs" id="questionnaireTabs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active"
+                                        id="questionnaire-tab"
+                                        data-toggle="tab"
+                                        href="#questionnaire"
+                                        role="tab">
+                                            Questionnaire
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a class="nav-link"
+                                        id="title-tab"
+                                        data-toggle="tab"
+                                        href="#title"
+                                        role="tab">
+                                            Exam Title
+                                        </a>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content pt-3">
+                                    <!-- Questionnaire Tab -->
+                                    <div class="tab-pane fade show active"
+                                        id="questionnaire"
+                                        role="tabpanel">
+
+                                        <div class="d-flex justify-content-end mb-3">
+                                            <button type="button"
+                                                    class="btn btn-dark"
+                                                    id="buttonCreateQuestionnaire"
+                                                    data-toggle="modal"
+                                                    data-target="#modalCreateUpdateQuestionnaire">
+                                                <i class="fa fa-plus fa-md"></i>
+                                                Create New Record
+                                            </button>
+                                        </div>
+
+                                        <div class="table-responsive" style="max-height:80vh; overflow-y:auto;">
+                                            <table id="tableQuestionnaire" class="table table-bordered table-hover w-100">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Action</th>
+                                                        <th>Status</th>
+                                                        <th>Category</th>
+                                                        <th>Exam Title</th>
+                                                        <th>Description</th>
+                                                        <th>Exam Instruction</th>
+                                                        <th>Purpose</th>
+                                                        <th>Department</th>
+                                                        <th>Position</th>
+                                                        <th>Product Line</th>
+                                                        <th>Passing Score</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Title Tab -->
+                                    <div class="tab-pane fade" id="title" role="tabpanel">
+                                        <div class="d-flex justify-content-end mb-3">
+                                            <button type="button"
+                                                    class="btn btn-dark"
+                                                    id="buttonCreateDescription"
+                                                    data-toggle="modal"
+                                                    data-target="#modalCreateUpdateExamTitle">
+                                                <i class="fa fa-plus fa-md"></i>
+                                                Create New Record
+                                            </button>
+                                        </div>
+
+                                        <div class="table-responsive" style="max-height:80vh; overflow-y:auto;">
+                                            <table id="tableExamTitle" class="table table-bordered table-hover w-100">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Action</th>
+                                                        <th>Status</th>
+                                                        <th>Exam Title</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- DataTables or dynamic rows -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -117,58 +193,111 @@
                     <div class="modal-body">
                         <input type="hidden" name="questionnaire_id" id="txtCreateUpdateQuestionnaireId">
                         <div class="container-fluid">
-                            <div class="row">
-                                <div class="col-md-6">
+                            <!-- Questionnaire Details -->
+                            <div class="card card-outline card-primary">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-clipboard-list mr-1"></i>
+                                        Questionnaire Details
+                                    </h3>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <!-- Category | Passing Score -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="font-weight-bold">Category</label>
+                                                <select class="form-control"
+                                                        name="questionnaire_category"
+                                                        id="slctQuestionnaireCategory">
+                                                    <option value="0" selected>Newly Hired</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="font-weight-bold">Passing Score</label>
+                                                <input type="number"
+                                                    class="form-control"
+                                                    id="nmbrQuestionnairePassingScore" name="questionnaire_passing_score">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-0">
+                                                <label class="font-weight-bold">Position</label>
+                                                <select class="form-control select2bs5 get-systemone-hris-position"
+                                                        id="slctQuestionnairePosition" name="questionnaire_position"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-0">
+                                                <label class="font-weight-bold">Department</label>
+                                                <select class="form-control select2bs5 get-systemone-hris-department"
+                                                        id="slctQuestionnaireDepartment" name="questionnaire_department"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-0">
+                                                <label class="font-weight-bold">Product Line</label>
+                                                <select class="form-control select2bs5 get-systemone-hris-section"
+                                                        id="slctQuestionnaireProductLine" name="questionnaire_product_line"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <!-- Questionnaire Content -->
+                            <div class="card card-outline card-success">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-file-alt mr-1"></i>
+                                        Questionnaire Content
+                                    </h3>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <!-- Exam Title -->
                                     <div class="form-group">
-                                        <label class="font-weight-bold">Category: </label>
-                                        <select class="form-control" name="questionnaire_category" id="slctQuestionnaireCategory" required>
-                                            {{-- <option value="" selected disabled>-- Select Category --</option> --}}
-                                            <option selected value="0">Newly Hired</option>
-                                            {{-- <option value="1">Certification</option>
-                                            <option value="2">Re-Certification</option> --}}
+                                        <label class="font-weight-bold">Exam Title</label>
+                                        <select class="form-control get-exam-title select2bs5"
+                                                id="slctQuestionnaireExamTitle"
+                                                name="questionnaire_title">
                                         </select>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">Title: </label>
-                                        <textarea class="form-control" rows="2" name="questionnaire_title" id="txtQuestionnaireTitle" required></textarea>
-                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="font-weight-bold">Description</label>
+                                                <textarea class="form-control" rows="2" id="txtQuestionnaireDescription" name="questionnaire_description"></textarea>
+                                            </div>
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">Purpose: </label>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" name="questionnaire_purpose" id="txtQuestionnairePurpose" required>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="font-weight-bold">Purpose</label>
+                                                <textarea class="form-control" rows="2" id="txtQuestionnairePurpose" name="questionnaire_purpose"></textarea>
+                                            </div>
                                         </div>
                                     </div>
 
+
+                                    <!-- Instruction -->
                                     <div class="form-group mb-0">
-                                        <label class="font-weight-bold">Position: </label>
-                                        <select class="form-control select2bs5 get-systemone-hris-position" name="questionnaire_position" id="slctQuestionnairePosition" required></select>
-                                    </div>
-                                </div>
-
-                                <!-- Right Column -->
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">Passing Score: </label>
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" name="questionnaire_passing_score" id="nmbrQuestionnairePassingScore" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">Instruction: </label>
-                                        <textarea class="form-control" rows="2" name="questionnaire_instruction" id="txtQuestionnaireInstruction" required></textarea>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">Department: </label>
-                                        <select class="form-control select2bs5 get-systemone-hris-department" name="questionnaire_department" id="slctQuestionnaireDepartment" required></select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">Product Line: </label>
-                                        <select class="form-control select2bs5 get-systemone-hris-section" name="questionnaire_product_line" id="slctQuestionnaireProductLine" required></select>
+                                        <label class="font-weight-bold">Instruction</label>
+                                        <textarea class="form-control" rows="3" id="txtQuestionnaireInstruction" name="questionnaire_instruction"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -185,7 +314,6 @@
                             Save Questionnaire
                         </button>
                     </div>
-
                 </form>
             </div>
         </div>
@@ -230,7 +358,11 @@
                     </button>
                 </div>
                 <div class="card-body">
+                    <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsFkid">
+                    <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsRevision">
+
                     <h3><strong><center class="questionnaireTitle"></center></strong></h3>
+                    <h3><strong><center class="questionnaireDescription"></center></strong></h3>
                     <h3><strong><center class="questionnaireScoreDisplay"></center></strong></h3>
                     <div class="d-flex justify-content-end mb-3">
                         <button type="button" class="btn btn-dark" id="buttonCreateQuestionnaireDetails" data-toggle="modal" data-target="#modalCreateUpdateQuestionnaireDetails">
@@ -238,6 +370,7 @@
                         </button>
                     </div>
                     <div class="table-responsive">
+                        <meta name="csrf-token" content="{{ csrf_token() }}">
                         <table id="tableQuestionnaireDetails" class="table table-bordered table-hover w-100">
                             <thead>
                                 <tr>
@@ -279,8 +412,8 @@
                     @csrf
                     <div class="modal-body">
                         <input type="hidden" name="questionnaire_details_pkid" id="txtCreateUpdateQuestionnaireDetailsPkid">
-                        <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsFkid">
-                        <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsRevision">
+                        <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsGetFkid">
+                        <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsGetRevision">
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -390,6 +523,88 @@
             </div>
         </div>
     </div><!-- Change Questionnaire Details Status Modal End -->
+
+    <!-- --------------------------------------------------------------------------------------------------------------------- -->
+    <!-- --------------------------------------------------------------------------------------------------------------------- -->
+    <!-- --------------------------------------------------------------------------------------------------------------------- -->
+    <!-- Create/Update Exam Title Modal -->
+    <div class="modal fade"id="modalCreateUpdateExamTitle" tabindex="-1" role="dialog" aria-labelledby="createUpdateExamTitleLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+            <div class="modal-content shadow">
+
+                <!-- Modal Header -->
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="createUpdateExamTitleLabel">
+                        <i class="fa fa-edit mr-2"></i>
+                        Create/Update Exam Title
+                    </h5>
+
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form method="post" id="formCreateUpdateExamTitle" enctype="multipart/form-data">
+                    @csrf
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <input type="hidden" name="exam_title_id" id="txtExamTitleId">
+
+                        <div class="form-group">
+                            <label for="lblExamTitle" class="font-weight-bold">
+                                Exam Title
+                            </label>
+
+                            <input type="text"
+                                class="form-control"
+                                id="examTitle"
+                                name="exam_title"
+                                placeholder="Enter Exam Title"
+                                autocomplete="off"
+                                required>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer bg-light justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" id="btnExamTitle" class="btn btn-dark px-4">
+                            <i id="iBtnExamTitleIcon" class="fa fa-check mr-1"></i>
+                            Save Exam Title
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Exam Title Status Modal End -->
+    <div class="modal fade" id="modalChangeExamTitleStatus">
+        <div class="modal-dialog">
+            <div class="modal-content modal-md">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="h4ChangeExamTitleStatusTitle"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" id="formChangeExamTitleStatus">
+                    @csrf
+                    <div class="modal-body">
+                    <label id="lblChangeExamTitleStatusLabel"></label>
+                    <input type="hidden" name="exam_title_id" id="txtChangeExamTitleStatusId" placeholder="Exam Title Id">
+                    <input type="hidden" name="status" id="txtChangeExamTitleStatus" placeholder="Status">
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <button type="submit" id="btnChangeExamTitleStatus" class="btn btn-dark"><i id="iBtnChangeExamTitleStatusIcon" class="fa fa-check"></i> Yes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><!-- Change Exam Title Status Modal End -->
 @endsection
 
 @section('js_content')
@@ -407,10 +622,13 @@
         let html = ''
         let questionnaireDetailsStatus
         let questionnaireDetailsId
+        let dataTableExamTitle
+        let isReordering = false;
 
         $(document).ready(function () {
             $('.select2bs5').select2({
                 theme: 'bootstrap-5'
+
             });
 
             $(document).on('hidden.bs.modal', function () {
@@ -441,12 +659,17 @@
             GetSystemOneHrisDepartment($('.get-systemone-hris-department'))
             GetSystemOneHrisPosition($('.get-systemone-hris-position'))
             GetSystemOneHrisSection($('.get-systemone-hris-section'))
+            GetExamTitle($('.get-exam-title'))
 
+            $('#questionnaire-tab').click(function (e) {
+                e.preventDefault();
+                GetExamTitle($('.get-exam-title'))
+            });
             dataQuestionnaire = $("#tableQuestionnaire").DataTable({
                 "processing" : false,
                 "serverSide" : true,
                 "responsive": true,
-                "order": [[3, "asc"],[3, "asc"]],
+                "order": [[1, "asc"],[3, "asc"]],
                 "language": {
                     "info": "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
                     "lengthMenu": "Show _MENU_ Questionnaire Record",
@@ -463,7 +686,6 @@
                         "orderable": true,
                         "searchable": true,
                         "render": function (data, type, row) {
-
                             switch (row.category) {
                                 case 0:
                                     return "Newly Hired";
@@ -477,6 +699,7 @@
                         },
                     },
                     { "data" : "exam_title"},
+                    { "data" : "description"},
                     { "data" : "exam_instruction"},
                     { "data" : "purpose"},
                     { "data" : "department"},
@@ -532,24 +755,99 @@
                 questionnaireId = $(this).attr('questionnaire-id');
                 questionnaireRevision = $(this).attr('questionnaire-revision');
                 questionnaireExamTitle = $(this).attr('questionnaire-exam_title');
+                questionnaireDescription = $(this).attr('questionnaire-description');
 
                 $('.questionnaireTitle').text(questionnaireExamTitle);
+                $('.questionnaireDescription').text(questionnaireDescription);
                 $('.questionnaireScoreDisplay').text('0' +'/'+ '0');
+
+                // CHAN
                 $('#txtCreateUpdateQuestionnaireDetailsFkid').val(questionnaireId);
                 $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireRevision);
                 dataQuestionnaireDetails.draw();
             });
 
+            // dataQuestionnaireDetails = $("#tableQuestionnaireDetails").DataTable({
+            //     "processing": false,
+            //     "serverSide": true,
+            //     "responsive": true,
+            //     "order": [[ 3, "asc" ]],
+            //     "language": {
+            //         "info": "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
+            //         "lengthMenu": "Show _MENU_ Questionnaire Record",
+            //     },
+            //     "ajax": {
+            //         url: "view_questionnaire_details",
+            //         type: "GET",
+            //         data: function(data){
+            //             data.questionnaireId = questionnaireId;
+            //             data.questionnaireRevision = questionnaireRevision;
+            //         },
+            //         dataSrc: function(json){
+            //             let totalPoints = json.totalPoints
+            //             let passingScore = json.passingScore
+            //             $(".questionnaireScoreDisplay").text(totalPoints +' / '+ passingScore);
+
+            //             if(json.totalPoints >= json.passingScore){
+            //                 $('#buttonCreateQuestionnaireDetails').addClass('d-none');
+            //             }else{
+            //                 $('#buttonCreateQuestionnaireDetails').removeClass('d-none');
+            //             }
+            //             return json.data;
+            //         }
+            //     },
+            //     "columns": [
+            //         { "data": "action", orderable: false, searchable: false },
+            //         { "data": "status" },
+            //         {
+            //             "data": "category_type",
+            //             "defaultContent": 'N/A',
+            //             "name": 'Category',
+            //             "orderable": true,
+            //             "searchable": true,
+            //             "render": function (data, type, row) {
+            //                 switch (Number(row.category_type)) {
+            //                     case 0: return "CHOICES";
+            //                     case 1: return "TEXT";
+            //                     case 2: return "GRID";
+            //                     default: return "Unknown";
+            //                 }
+            //             }
+            //         },
+            //         { "data": "exam_no" },
+            //         { "data": "image" },
+            //         {
+            //             "data": "description",
+            //             "createdCell": function(td, cellData, rowData, row, col) {
+            //                 $(td).css({
+            //                     'white-space': 'normal',
+            //                     'word-break': 'break-word'
+            //                 });
+            //             }
+            //         },
+            //         { "data": "question" },
+            //         { "data": "choices" },
+            //         { "data": "answer" },
+            //         { "data": "points" }
+            //     ]
+            // });
+
             dataQuestionnaireDetails = $("#tableQuestionnaireDetails").DataTable({
-                "processing": false,
-                "serverSide": true,
-                "responsive": true,
-                "order": [[ 3, "asc" ]],
-                "language": {
-                    "info": "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
-                    "lengthMenu": "Show _MENU_ Questionnaire Record",
+                processing: false,
+                serverSide: true,
+                responsive: true,
+                rowId: 'id',
+                rowReorder: {
+                    dataSrc: 'exam_no',
+                    selector: 'td.reorder',
+                    update: false
                 },
-                "ajax": {
+                order: [[3, "asc"]],
+                language: {
+                    info: "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
+                    lengthMenu: "Show _MENU_ Questionnaire Record",
+                },
+                ajax: {
                     url: "view_questionnaire_details",
                     type: "GET",
                     data: function(data){
@@ -557,52 +855,164 @@
                         data.questionnaireRevision = questionnaireRevision;
                     },
                     dataSrc: function(json){
-                        let totalPoints = json.totalPoints
-                        let passingScore = json.passingScore
-                        $(".questionnaireScoreDisplay").text(totalPoints +' / '+ passingScore);
+                        let totalPoints = json.totalPoints;
+                        let passingScore = json.passingScore;
 
-                        if(json.totalPoints >= json.passingScore){
-                            $('#buttonCreateQuestionnaireDetails').addClass('d-none');
+                        $(".questionnaireScoreDisplay")
+                            .text(totalPoints + " / " + passingScore);
+
+                        if(totalPoints >= passingScore){
+                            $("#buttonCreateQuestionnaireDetails")
+                                .addClass("d-none");
                         }else{
-                            $('#buttonCreateQuestionnaireDetails').removeClass('d-none');
+                            $("#buttonCreateQuestionnaireDetails")
+                                .removeClass("d-none");
                         }
                         return json.data;
                     }
                 },
-                "columns": [
-                    { "data": "action", orderable: false, searchable: false },
-                    { "data": "status" },
-                    {
-                        "data": "category_type",
-                        "defaultContent": 'N/A',
-                        "name": 'Category',
-                        "orderable": true,
-                        "searchable": true,
-                        "render": function (data, type, row) {
-                            switch (Number(row.category_type)) {
-                                case 0: return "CHOICES";
-                                case 1: return "TEXT";
-                                case 2: return "GRID";
-                                default: return "Unknown";
+                columns: [
+                    { data: "action", orderable:false, searchable:false },
+                    { data:"status" },
+                    {data:"category_type",
+                        defaultContent:"N/A",
+                        render:function(data,type,row){
+
+                            switch(Number(row.category_type)){
+                                case 0:
+                                    return "CHOICES";
+                                case 1:
+                                    return "TEXT";
+                                case 2:
+                                    return "GRID";
+                                default:
+                                    return "Unknown";
                             }
                         }
                     },
-                    { "data": "exam_no" },
-                    { "data": "image" },
-                    {
-                        "data": "description",
-                        "createdCell": function(td, cellData, rowData, row, col) {
+                    { data:"exam_no", className:"reorder",
+                        render:function(data){
+                            return '<span style="cursor:move;">' + data + '</span>';
+                        }
+                    },
+                    { data:"image"},
+                    { data:"description",
+                        createdCell:function(td){
                             $(td).css({
-                                'white-space': 'normal',
-                                'word-break': 'break-word'
+                                whiteSpace:"normal",
+                                wordBreak:"break-word"
                             });
                         }
                     },
-                    { "data": "question" },
-                    { "data": "choices" },
-                    { "data": "answer" },
-                    { "data": "points" }
+                    { data:"question" },
+                    { data:"choices" },
+                    { data:"answer" },
+                    { data:"points" }
                 ]
+            });
+
+            $('#tableQuestionnaireDetails').on('row-reorder-changed', function(e, nodes){
+                $(nodes).each(function(){
+                    $(this)
+                        .addClass('dt-rowReorder-moving')
+                        .delay(444)
+                        .queue(function(next){
+                            $(this).removeClass('dt-rowReorder-moving');
+                            next();
+                        });
+                });
+            });
+
+            $('#tableQuestionnaireDetails').on('row-reorder.dt', function (e, diff) {
+                // Prevent multiple requests
+                if (isReordering) {
+                    return;
+                }
+
+                // Ignore if nothing really changed
+                diff = diff.filter(function (item) {
+                    return item.oldData != item.newData;
+                });
+
+                if (!diff.length) {
+                    return;
+                }
+
+                let rows = [];
+
+                diff.forEach(function (item) {
+
+                    let row = dataQuestionnaireDetails.row(item.node);
+
+                    // Skip invalid rows
+                    if (!row.any()) {
+                        return;
+                    }
+
+                    let rowData = row.data();
+
+                    if (!rowData || typeof rowData.id === "undefined") {
+                        return;
+                    }
+
+                    rows.push({
+                        id: rowData.id,
+                        exam_no: item.newData
+                    });
+
+                });
+
+                if (!rows.length) {
+                    return;
+                }
+
+                isReordering = true;
+                $.ajax({
+                    url: "{{ route('reorder') }}",
+                    type: "POST",
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        rows: rows
+                    },
+                    beforeSend: function () {
+                        // Prevent another reorder while request is running
+                        isReordering = true;
+
+                        // Disable drag
+                        dataQuestionnaireDetails.rowReorder.disable();
+
+                        // Optional: show processing
+                        $('#tableQuestionnaireDetails').addClass('opacity-50');
+                    },
+                    success: function (response) {
+                        console.log(response);
+                    },
+                    error: function (xhr) {
+                        console.log(xhr.responseText);
+                    },
+                    complete: function () {
+                        // Reload latest data without resetting page
+                        dataQuestionnaireDetails.ajax.reload(null, false);
+
+                        // Enable dragging again
+                        dataQuestionnaireDetails.rowReorder.enable();
+
+                        isReordering = false;
+                    }
+                });
+            });
+
+            $('#buttonCreateQuestionnaireDetails').click(function (e) {
+                e.preventDefault();
+                questionnaireDetailsId = $('#txtCreateUpdateQuestionnaireDetailsFkid').val();
+                questionnaireDetailRevision = $('#txtCreateUpdateQuestionnaireDetailsRevision').val();
+
+                if(questionnaireDetailsId != '' && questionnaireDetailRevision != ''){
+                    $('#txtCreateUpdateQuestionnaireDetailsGetFkid').val(questionnaireDetailsId);
+                    $('#txtCreateUpdateQuestionnaireDetailsGetRevision').val(questionnaireDetailRevision);
+                }else{
+                    window.location.reload();
+                }
             });
 
             $('.btnViewAttachment').click(function (e) {
@@ -913,6 +1323,82 @@
                 event.preventDefault();
                 ChangeQuestionnaireDetailsStatus();
             });
+
+            // ====================================================================================================
+            // ====================================================================================================
+            // ====================================================================================================
+            dataTableExamTitle = $("#tableExamTitle").DataTable({
+                processing: false,
+                serverSide: true,
+                responsive: true,
+                order: [[1, 'asc'], [2, "asc"]],
+                language: {
+                    info: "Showing _START_ to _END_ of _TOTAL_ User Record",
+                    lengthMenu: "Show _MENU_ User Record",
+                },
+                ajax: {
+                    url: "view_exam_title",
+                },
+                columns: [
+                    { data: "action", orderable: false, searchable: false },
+                    {
+                        data: "status",
+                        defaultContent: "N/A",
+                        name: "status",
+                        orderable: true,
+                        searchable: true,
+                        createdCell: function (td) {
+                            $(td).addClass('text-center');
+                        },
+                        render: function (data, type, row) {
+                            if (data == 0) {
+                                return '<span class="badge badge-success">Active</span>';
+                            } else {
+                                return '<span class="badge badge-danger">Inactive</span>';
+                            }
+                        }
+                    },
+                    { data: "exam_title" },
+                ]
+            });
+
+            $("#formCreateUpdateExamTitle").submit(function(event){
+                event.preventDefault();
+                CreateUpdateExamTitle();
+            });
+
+            $(document).on('click', '.actionCreateUpdateExamTitle',function(e){
+                e.preventDefault();
+
+                examTitleId = $(this).attr('exam-title-id');
+                $('#txtExamTitleId').val(examTitleId);
+
+                GetExamTitleById(examTitleId);
+            });
+
+            $(document).on('click', '.actionChangeExamTitleStatus',function(e){
+                e.preventDefault();
+
+                let examTitleStatus = $(this).attr('status');
+                let examTitleId     = $(this).attr('exam-title-id');
+
+                $("#txtChangeExamTitleStatusId").val(examTitleId);
+                $("#txtChangeExamTitleStatus").val(examTitleStatus);
+
+                if(examTitleStatus == 0){
+                    $("#lblChangeExamTitleStatusLabel").text('Are you sure to activate?');
+                    $("#h4ChangeExamTitleStatusTitle").html('<i class="fa fa-question-circle"></i> Activate Exam Title');
+                }else{
+                    $("#lblChangeExamTitleStatusLabel").text('Are you sure to deactivate?');
+                    $("#h4ChangeExamTitleStatusTitle").html('<i class="fa fa-question-circle"></i> Deactivate Exam Title');
+                }
+            });
+
+            $("#formChangeExamTitleStatus").submit(function(event){
+                event.preventDefault();
+                ChangeExamTitleStatus();
+            });
+
         });
     </script>
 @endsection
