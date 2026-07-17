@@ -83,6 +83,23 @@ const  call_ajax = (data = null, handler, fn,elFormId =null) => {
     });
 }
 
+const applyValidationState = (errors, formSelector) => {
+    const $form = formSelector;
+
+    // reset
+    $form.find('.form-control, .form-select').each(function () {
+        $(this).removeClass('is-invalid is-valid').attr('title', '');
+        // bootstrap.Tooltip.getInstance(this)?.dispose();
+    });
+
+    if (!errors) return;
+    Object.keys(errors).forEach(field => {
+        const el = $form.find(`[name="${field}"]`);
+        if (el) {
+            $(el).addClass('is-invalid').attr('title', errors[field][0]);
+        }
+    });
+}
 const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId =null) => {
     data = $.param(data) + '&' + serialized_data;
 	$.ajax({
@@ -108,7 +125,7 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
             let errorResponse = result.responseJSON;
             let status = result.status;
 
-            console.log('errorResponse',errorResponse);
+            // console.log('errorResponse',errorResponse);
             // console.log(errorResponse.msg);
             // console.log(errorResponse.trainingAttendanceIsExists);
             // console.log(errorResponse.isSuccess);
@@ -124,7 +141,11 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
             }
 
             if( result.status === 422 ){
-                toastr.error(errorResponse.message);
+                
+                    Swal.fire({ icon: 'error', title: 'Error', text: ('Please check the required fields.')});
+                    toastr.error(errorResponse.message);
+                    applyValidationState(errorResponse.errors, elFormId); // <-- replaces all if-else
+                // toastr.error(errorResponse.message);
 
                 // errorHandler( errors.first_molding_device_id,formModal.firstMolding.find('#first_molding_device_id') );
             }

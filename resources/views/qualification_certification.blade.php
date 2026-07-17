@@ -1168,7 +1168,7 @@
                                     </div>-
                                     <div class="card EENGGVALIDATION">
                                         <h2 class="card-header">
-                                            
+
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
                                             <h5>E.VALIDATION PROCESS: ENGINEERING SECTION</h5>
                                         </button>
@@ -1259,7 +1259,7 @@
 
                                                 </div>
                                         </div>
-                                    </div> 
+                                    </div>
                                    <div class="card FQCVP">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseSixOper">
@@ -1571,7 +1571,7 @@
 
                                         </div>
                                         </div>
-                                    </div> 
+                                    </div>
                                 </div>
 
                                 <hr style="height: 5px; background-color: black; border: none;">
@@ -1854,6 +1854,8 @@
          const saveFormOper = ($form) => {
 
             // 1. Serialize standard form inputs into an array
+            // console.log('saveFormOper called',$form[0]);
+            // return;
             var formArray = $form.serializeArray();
 
             // 2. Push extra custom field values manually
@@ -1873,7 +1875,7 @@
                 } else {
                     data[field.name] = field.value;
                 }
-            });
+            },$form[0]);
 
             // 4. Safely pull your dynamic table data array
             data.operator_employees = (typeof getOperEmpTableData === 'function')
@@ -1886,11 +1888,9 @@
                     dataTable.operator.draw();
                     $('#modalCreateCQForm').modal('hide');
                     $('#modalSendEmail').modal('hide');
-                    form.formSubmitOper[0].reset();
-                } else {
-                    // Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to save.' });
+                    // form.formSubmitOper[0].reset();
                 }
-            });
+            },$form);
          }
         // $(selector).click(function (e) {
         //     e.preventDefault();
@@ -1981,7 +1981,7 @@
             '#text_2nd_certified_prod_peqcs_oper',
             '#text_2nd_certified_eng_peqcs_oper',
             '#text_2nd_certified_qc_peqcs_oper',
-            
+
             '#text_1st_validatedby_vpes_oper',
             '#text_2nd_validatedby_vpes_oper',
             //EQcValidationProcess
