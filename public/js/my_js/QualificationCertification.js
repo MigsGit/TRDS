@@ -89,10 +89,7 @@
                     dropdownMastersId: dropdownMastersId,
                     selectedValues : (specificValues && specificValues[selector]) ? specificValues[selector] : null
                 });
-                console.log('11',specificValues[selector]);
         });
-
-
     }
     const getDropdownMasterDetailsByFkid = (params) => {
         let data = {
@@ -563,7 +560,9 @@
         let response = params.response;
         // Safe access: optional chaining prevents crash if approversCollection is missing from response
         const approversCollection = response?.approversCollection ?? null;
-
+        const rawOperApprovedConfirmedBy = response?.rawOperApprovedConfirmedBy ?? null;
+    
+        
         // Guard: exit early if the entire approvers collection is absent
         if (!approversCollection || typeof approversCollection !== 'object') {
             return;
@@ -574,6 +573,7 @@
         const dPpdOnly = approversCollection?.DPPDONLY?.[0]  ?? null;
 
 
+        const operApprovedConfirmedBy = rawOperApprovedConfirmedBy   ?? [];
         const aProdToFirst            = aProd?.first_approver_exploded   ?? [];
         const aProdToFirstMentoredBy  = aProd?.first_approver2_exploded  ?? [];
         const aProdToSecond           = aProd?.second_approver_exploded  ?? [];
@@ -603,9 +603,10 @@
         const fQcvvoFirst  = approversCollection?.FQCVVO?.[0]?.first_approver_exploded  ?? [];
         const fQcvvoSecond = approversCollection?.FQCVVO?.[0]?.second_approver_exploded ?? [];
 
-        const qCappApprover = approversCollection?.QCAPP?.[0]?.alert_prod_sec_exploded ?? [];
+        const qCappApprover = approversCollection?.QCAPP?.[0]?.oper_approved_confirmed_by ?? [];
 
         // 1. Map them to a standard format Select2 expects: {id, text}
+        const mappedOperApprovedConfirmedBy = operApprovedConfirmedBy.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedaProdToFirst = aProdToFirst.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedaProdToFirstMentoredBy = aProdToFirstMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedaProdToSecond = aProdToSecond.map(emp => ({ id: emp.id, text: emp.name }));
@@ -668,8 +669,9 @@
         editSelectionsMap['#text_validated1_qcvvo_oper'] = mappedfQcvvoFirst;
         editSelectionsMap['#text_validated2_qcvvo_oper'] = mappedfQcvvoSecond;
 
-        editSelectionsMap['#text_oper_approved_confirmed_by'] = mappedqCappApprover;
-
+        editSelectionsMap['#text_oper_approved_confirmed_by'] = mappedOperApprovedConfirmedBy;
+        
+        
         // 3. Initialize all employee selectors simultaneously
         initGetSystemOneEmployeeDetailsCombos(
             [

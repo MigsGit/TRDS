@@ -112,8 +112,32 @@ class QualificationCertificationController extends Controller
             ->where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')
             ->first();
+             // Helper closure to cleanly explode piped string values into trimmed arrays
+            $explodePipedString = function ($value) {
+                if (is_null($value) || trim($value) === '') {
+                    return [];
+                }
+                return array_map('trim', explode('|', $value));
+            };
 
-
+            $rawOperApprovedConfirmedBy =  collect(explode('|', $qcSlip->oper_approved_confirmed_by))
+                ->map(function($id) {
+                    return trim($id);
+                })
+            ->filter()
+            ->values()
+            ->all();
+             $employeeOperApprovedConfirmedBy = SystemOneHrisSubcon::whereIn('EmpNo', $rawOperApprovedConfirmedBy)
+                ->get(['EmpNo', 'empname']) // Fetch only needed columns
+                ->keyBy('EmpNo') // Key the collection by EmpNo for O(1) lookup speed
+                ->toArray();
+			$arrOperApprovedConfirmedBy = [];
+            foreach($employeeOperApprovedConfirmedBy as $key => $value){
+				$array_data 				= array();
+				$array_data['id'] 		= $value['EmpNo'];
+				$array_data['name'] 		= $value['empname'];
+				$arrOperApprovedConfirmedBy[]			= $array_data;
+			}
             $rawReasonsString = $qcSlip->qc_reason_certification->reason_of_certification;
             $rawAOperProdTrainingOrientation = $qcSlip->a_oper_prod_training_orientation->traning_items;
             $rawBOpEnggSectionTrainingOrientation = $qcSlip->b_op_engg_section_training_orientation->traning_items;
@@ -125,6 +149,7 @@ class QualificationCertificationController extends Controller
             ->filter()
             ->values()
             ->all();
+          
 
             $rawBOpEnggSectionTrainingOrientationCollection =  collect(explode('|', $rawBOpEnggSectionTrainingOrientation))
                 ->map(function($id) {
@@ -147,14 +172,7 @@ class QualificationCertificationController extends Controller
 
             $approversCollection = collect($qcSlip)->groupBy('approval_status')->toArray();
 
-            // Helper closure to cleanly explode piped string values into trimmed arrays
-            $explodePipedString = function ($value) {
-                if (is_null($value) || trim($value) === '') {
-                    return [];
-                }
-                return array_map('trim', explode('|', $value));
-            };
-
+          
             // 2. Step One: Parse and collect ALL unique EmpNo values across all status groups
             $allEmployeeNumbers = [];
             foreach ($rawPayload as $status => $items) {
@@ -182,7 +200,7 @@ class QualificationCertificationController extends Controller
 
             // 4. Step Three: Map the data payload and inject matching Select2 structured object lists
             $processedData = collect($rawPayload)->map(function ($items) use ($explodePipedString, $employeeDbMap) {
-                return collect($items)->map(function ($item) use ($explodePipedString, $employeeDbMap) {
+            return collect($items)->map(function ($item) use ($explodePipedString, $employeeDbMap) {
                     $itemArray = (array) $item;
 
                     // Explode the fields
@@ -236,6 +254,7 @@ class QualificationCertificationController extends Controller
             return response()->json([
                 'is_success' => 'true',
                 'qcSlip' => $qcSlip,
+                'rawOperApprovedConfirmedBy' => $arrOperApprovedConfirmedBy,
                 'rawReasonsStringCollection' => $rawReasonsStringCollection,
                 'rawBEnggTrainingItemsCollection' => $rawBOpEnggSectionTrainingOrientationCollection,
                 'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection,
