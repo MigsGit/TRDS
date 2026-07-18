@@ -33,6 +33,7 @@ class AOperProdTrainingOrientationRequest extends FormRequest
             'text_first_date_oper' => ['required'],
             'text_first_time_oper' => ['required'],
             'text_first_a_prod_result' => ['required'],
+            'text_second_a_prod_result'  => 'required_if:text_first_a_prod_result,FAILED',
         ];
     }
 }

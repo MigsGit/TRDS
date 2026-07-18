@@ -70,7 +70,8 @@
                                                         <!-- <button class="btn btn-primary"><i class="fa fa-plus me-2"></i> Add New</button> -->
                                                     </div>
                                                     <div class="table-responsive">
-                                                        <table id="tbl_operator" class="table table-striped table-hover table-bordered nowrap">
+                                                        {{-- <table id="tbl_operator" class="table table-striped table-hover table-bordered nowrap"> --}}
+                                                             <table id="tbl_operator" class="table table-striped table-hover table-bordered nowrap">
                                                             <thead class="table-primary">
                                                                 <tr>
                                                                 <th>Action</th>
@@ -256,7 +257,8 @@
                                                 <div class="col-md-3">
                                                         <label class="" for="">Defect Escalation:</label>
                                                         <select class="form-control select2bs4" style="width: 100%;" id="defect_escalation" name="defect_escalation" multiple>
-                                                             <option value="" disabled selected>Select Result</option>                                <option value="1" >Rule when to escalate </option>
+                                                             <option value="" disabled>Select Result</option>
+                                                             <option value="1" >Rule when to escalate </option>
                                                             <option value="2" >Filling-up of forms
                                                             </option>
                                                         </select>
@@ -264,7 +266,7 @@
                                                 <div class="col-md-3">
                                                         <label class="" for="">Production Abnormlity Control (IMS-PMI-025):</label>
                                                         <select class="form-control select2bs4" style="width: 100%;" id="production_abnormality" name="production_abnormality" multiple>
-                                                             <option value="" disabled selected>Select Result</option>                                <option value="1" >Rule when to escalate </option>
+                                                             <option value="" disabled>Select Result</option>                                <option value="1" >Rule when to escalate </option>
                                                             <option value="2" >Filling-up of forms
                                                             </option>
                                                         </select>
@@ -409,21 +411,17 @@
                                             <h5 class="mt-3 mb-3">RESULT</h5>
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                                <select class="form-control select2bs4" style="width: 100%;" name="text_first_a_prod_result" id="text_first_a_prod_result">
+                                                     <div class="col-md-6">
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_first_a_prod_result" id="text_first_a_prod_result">
                                                               <option value="" disabled selected>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
-                                                            </select>
-
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                                <select class="form-control select2bs4" style="width: 100%;" name="text_second_a_prod_result" id="text_second_a_prod_result">
-                                                             <option value="" disabled selected>Select Result</option>                                    <option value="PASSED" selected >PASSED</option>
-                                                                <option value="FAILED">FAILED</option>
-                                                            </select>
-                                                        </div>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                    </div>
+                                                    <div class="row">
+                                                       
                                                         <div class="col-md-6">
                                                             <label class="" for="">Trained by:</label>
                                                             <select class="form-control select2bs4" style="width: 100%;" id="text_first_trainedby_oper" name="text_first_trainedby_oper[]" multiple></select>
@@ -436,6 +434,14 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
+                                                     <div class="col-md-6">
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_second_a_prod_result" id="text_second_a_prod_result">
+                                                              <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+                                                     <div class="col-md-6"></div>
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <label class="" for="">Trained by:</label>
@@ -579,7 +585,9 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">1. Observation / Interview Result</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_obs_first_result_es_oper" id="text_obs_first_result_es_oper">
-
+                                                        <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
 
@@ -640,7 +648,9 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_2nd_result_es_oper" id="text_oa_2nd_result_es_oper">
-
+                                                        <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1679,6 +1689,7 @@
                     '#transfer_flexibility',
                     '#text_training_orientation_es_oper',
             ],5);
+            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
         });
         dataTable.operator = $(table.operator).DataTable({
             "processing" : true,
@@ -1689,6 +1700,11 @@
                     // param.qcSlipsId = $('#qc_slips_id').val();;
                 },
             },
+                'columnDefs': [
+                    { responsivePriority: 1, targets: 0 },  // Action always visible
+                    { responsivePriority: 2, targets: 1 },  // Status next priority
+                    { responsivePriority: 1, targets: -1 } // Date Filed hides first on small screens
+                ],
             fixedHeader: true,
             "columns":[
                 // { "data" : "rawBulkCheckBox", orderable:false, searchable:false },
@@ -1696,11 +1712,12 @@
                 { "data" : "rawStatus", orderable:false, searchable:false },
                 { "data" : "control_no" },
                 { "data" : "series_name" },
-                { "data" : "approvers" },
+                { "data" : "created_by" },
                 // { "data" : "certified_by" },
                 // { "data" : "approved_conformed_by" },
                 { "data" : "created_at" },
             ],
+            
         });
         dataTable.fvi_operator = $(table.fvi_operator).DataTable({
             "processing" : true,
@@ -1994,11 +2011,11 @@
             '#text_oper_approved_confirmed_by',
 
         ]);
-        initSelectPassFail([
-            '#text_oa_1st_result_es_oper',
-            '#text_obs_first_result_es_oper',
-            '#text_oa_2nd_result_es_oper',
-        ]);
+        // initSelectPassFail([
+        //     '#text_oa_1st_result_es_oper',
+        //     '#text_obs_first_result_es_oper',
+        //     '#text_oa_2nd_result_es_oper',
+        // ]);
 
         // Delete a row from the FVI table
         $(document).on('click', '#tbl_fvi_operator .btn-delete-fvi-row', function () {

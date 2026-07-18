@@ -147,8 +147,9 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
             // console.log(result.statusText);
             // $('#modal-loading').modal('hide');
             if( status === 500){
-                toastr.error(errorResponse.msg ?? '');
-                toastr.error(errorResponse.message ?? '');
+                toastr.error((errorResponse.message) ? errorResponse.message : 'Internal Server Error.' ?? '');
+                // toastr.error(errorResponse.message ?? '');
+                // Swal.fire({ icon: 'error', title: 'Error', text: (errorResponse.message) ? errorResponse.message : 'Internal Server Error.'});
             }
             if( result.status === 409 ){
 
@@ -159,8 +160,10 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
                 toastr.error(errorResponse.message);
                 applyValidationState(errorResponse.errors, elFormId); // <-- replaces all if-else
 
-                errorHandler(errorResponse.errors['text_alert_prod_sec'], $('#text_alert_prod_sec')); // <-- replaces all if-else
-                errorHandler(errorResponse.errors['text_alert_prod_cc_sec'], $('#text_alert_prod_cc_sec')); // <-- replaces all if-else
+                errorHandler(errorResponse.errors['text_oper_approved_confirmed_by'], $('#text_oper_approved_confirmed_by')); // <-- replaces all if-else
+                errorHandler(errorResponse.errors['text_alert_prod_sec'], $('#text_alert_prod_sec'));
+                errorHandler(errorResponse.errors['text_alert_prod_cc_sec'], $('#text_alert_prod_cc_sec'));
+                errorHandler(errorResponse.errors['text_qcs_station_1st_oper'], $('#text_qcs_station_1st_oper')); 
             }
 
         }

@@ -34,6 +34,16 @@ class CQcCertificationRequest extends FormRequest
             'text_1st_time_qcs_oper' => ['required'],
             'text_oa_1st_result_qcs_oper' => ['required'],
             'text_1st_disapproval_qcs_oper' => ['required'],
+            'text_qcs_station_1st_oper' => ['required'],
+            // 'text_obs_second_result_qcs_oper'  => 'required_with:text_obs_first_result_qcs_oper,FAILED|nullable',
+            'text_obs_second_result_qcs_oper'  => 'required_if:text_obs_first_result_qcs_oper,FAILED',
+            'text_oa_2nd_result_qcs_oper'  => 'required_if:text_oa_1st_result_qcs_oper,FAILED',
+        ];
+    }
+     public function messages()
+    {
+        return [
+            'text_qcs_station_1st_oper' => 'Please Select the Checkbox List.',
         ];
     }
 }

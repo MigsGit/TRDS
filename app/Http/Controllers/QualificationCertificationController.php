@@ -43,7 +43,7 @@ class QualificationCertificationController extends Controller
     /**
      * Safely read a scalar request field, defaulting to $default when absent or null.
      */
-    private function getSafe(Request $request, string $key, string $default = ''): string
+    private function getSafe(Request $request, string $key, $default = NULL)
     {
         return $request->input($key) ?? $default;
     }
@@ -52,7 +52,7 @@ class QualificationCertificationController extends Controller
      * Safely collect an array/scalar request field and join items with $separator.
      * Returns $default when the field is absent, null, or empty.
      */
-    private function joinSafe(Request $request, string $key, string $separator = ' | ', string $default = ''): string
+    private function joinSafe(Request $request, string $key, string $separator = ' | ', string $default = NULL)
     {
         $value = $request->input($key);
         if (empty($value)) {
@@ -160,9 +160,9 @@ class QualificationCertificationController extends Controller
 				$array_data['name'] 		= $value['empname'];
 				$arrOperApprovedConfirmedBy[]			= $array_data;
 			}
-            $rawReasonsString = $qcSlip->qc_reason_certification->reason_of_certification;
-            $rawAOperProdTrainingOrientation = $qcSlip->a_oper_prod_training_orientation->traning_items;
-            $rawBOpEnggSectionTrainingOrientation = $qcSlip->b_op_engg_section_training_orientation->traning_items;
+            $rawReasonsString = $qcSlip->qc_reason_certification->reason_of_certification ?? '';
+            $rawAOperProdTrainingOrientation = $qcSlip->a_oper_prod_training_orientation->traning_items ?? '';
+            $rawBOpEnggSectionTrainingOrientation = $qcSlip->b_op_engg_section_training_orientation->traning_items ?? '';
 
             $rawReasonsStringCollection =  collect(explode('|', $rawReasonsString))
                 ->map(function($id) {
@@ -172,22 +172,27 @@ class QualificationCertificationController extends Controller
             ->values()
             ->all();
 
-
-            $rawBOpEnggSectionTrainingOrientationCollection =  collect(explode('|', $rawBOpEnggSectionTrainingOrientation))
+             if($rawBOpEnggSectionTrainingOrientation != ''){
+                $rawBOpEnggSectionTrainingOrientationCollection =  collect(explode('|', $rawBOpEnggSectionTrainingOrientation))
                 ->map(function($id) {
                     return trim($id);
                 })
-            ->filter()
-            ->values()
-            ->all();
-
-            $rawAOperProdTrainingOrientationCollection =  collect(explode('|', $rawAOperProdTrainingOrientation))
+                ->filter()
+                ->values()
+                ->all();
+            }
+            if($rawAOperProdTrainingOrientation != ''){
+                 $rawAOperProdTrainingOrientationCollection =  collect(explode('|', $rawAOperProdTrainingOrientation))
                 ->map(function($id) {
                     return trim($id);
                 })
-            ->filter()
-            ->values()
-            ->all();
+                ->filter()
+                ->values()
+                ->all();
+            }
+
+          
+           
 
            $rawPayload = collect($qcSlip->op_approvers)->groupBy('approval_status')->toArray();
 
@@ -278,8 +283,8 @@ class QualificationCertificationController extends Controller
                 'qcSlip' => $qcSlip,
                 'rawOperApprovedConfirmedBy' => $arrOperApprovedConfirmedBy,
                 'rawReasonsStringCollection' => $rawReasonsStringCollection,
-                'rawBEnggTrainingItemsCollection' => $rawBOpEnggSectionTrainingOrientationCollection,
-                'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection,
+                'rawBEnggTrainingItemsCollection' => $rawBOpEnggSectionTrainingOrientationCollection ?? '',
+                'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection ?? '',
                 'approversCollection' => $processedData,
             ]);
         } catch (Exception $e) {
@@ -416,10 +421,10 @@ class QualificationCertificationController extends Controller
     }
     public function loadQcSlip(Request $request){
     //newStatus
-    $qcSlips = QcSlip::with('product_line','op_approvers','op_approvers_pending')
+    $qcSlips = QcSlip::with('product_line','op_approvers','op_approvers_pending','system_one_hris_subcon')
         ->whereNull('deleted_at')
         ->get();
-                                 // Convert to a raw array for database handling
+        // Convert to a raw array for database handling
         $allEmpIdsTo= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
             ->flatten()                              // Flatten into a single layer of OpApprover models
             ->pluck('alert_prod_sec')               // Pull out all the pipe-separated strings
@@ -445,11 +450,7 @@ class QualificationCertificationController extends Controller
         $arrHrisSubconEmpNo = array_merge($allEmpIdsTo,$allEmpIdsCc);
         $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', $arrHrisSubconEmpNo)
             ->get()
-            ->pluck('empname');
-        // $hrisSubconCc = SystemOneHrisSubcon::whereIn('EmpNo', $allEmpIdsTo)
-        //     ->get()
-        //     ->pluck('empname');
-
+            ->pluck('empname', 'EmpNo');
         try {
         return DataTables($qcSlips)
             ->addColumn('rawAction',function ($row) use ($request){
@@ -460,33 +461,68 @@ class QualificationCertificationController extends Controller
                 $result .= '</center>';
                 return $result;
             })
-            ->addColumn('rawStatus',function ($row) use ($request,$hrisSubcon){
-                $result = '';
+            ->addColumn('rawStatus', function ($row) use ($hrisSubcon) {
                 $current = $row->op_approvers_pending ?? [];
-                // $approvalStatusEnvironment = $row->environment->approval_status;
                 $approvalStatus = $row->approval_status;
-                // $getStatus = $this->commonInterface->getStatus4m($statusEnvironment);
-                    $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
-                 if(count($current) === 0){
-                    $currentApprover = "";
-                    $resultCurrenApprover = "";
-                 }else{
-                    $currentApprover =  collect($hrisSubcon)->join(' | ') ?? '';
-                    $resultCurrenApprover = '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApprover.' </span> </br>  </br>';
-                 }
+                $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
 
+                $resultCurrentApprover = '';
 
-                $result .= '<center>';
-                // $result .= '<span class="'.$getStatus['bgStatus'].'"> '.$getStatus['status'].' </span>';
-                $result .= '<br>';
-                $result .= $resultCurrenApprover;
-                $result .= '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> '.$getApprovalStatus['statusName'].'  </span>';
-                $result .= '</center>';
-                $result .= '</br>';
-                return $result;
+                if (count($current) > 0) {
+                    // Get THIS row's own emp IDs from alert_prod_sec (pipe-separated)
+                    $empIds = collect($current)
+                        ->pluck('alert_prod_sec')
+                        ->filter()
+                        ->flatMap(function ($item) {
+                            return array_map('trim', explode('|', $item));
+                        })
+                        ->unique();
+
+                    // Map emp IDs -> names using the lookup, drop unmatched
+                    $currentApprover = $empIds
+                        ->map(function ($empId) use ($hrisSubcon) {
+                            return $hrisSubcon[$empId] ?? null;
+                        })
+                        ->filter()
+                        ->join(' | ');
+
+                    if ($currentApprover !== '') {
+                        $resultCurrentApprover = '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApprover.' </span></br></br>';
+                    }
+                }
+
+                return '<center><br>'
+                    . $resultCurrentApprover
+                    . '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> '.$getApprovalStatus['statusName'].' </span>'
+                    . '</center></br>';
             })
+            // ->addColumn('rawStatus',function ($row) use ($request,$hrisSubcon){
+            //     $result = '';
+            //     $current = $row->op_approvers_pending ?? [];
+            //     // $approvalStatusEnvironment = $row->environment->approval_status;
+            //     $approvalStatus = $row->approval_status;
+            //     // $getStatus = $this->commonInterface->getStatus4m($statusEnvironment);
+            //         $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
+            //      if(count($current) === 0){
+            //         $currentApprover = "";
+            //         $resultCurrenApprover = "";
+            //      }else{
+            //         $currentApprover =  collect($hrisSubcon)->join(' | ') ?? '';
+            //         $resultCurrenApprover = '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApprover.' </span> </br>  </br>';
+            //      }
+
+
+            //     $result .= '<center>';
+            //     // $result .= '<span class="'.$getStatus['bgStatus'].'"> '.$getStatus['status'].' </span>';
+            //     $result .= '<br>';
+            //     $result .= $resultCurrenApprover;
+            //     $result .= '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> '.$getApprovalStatus['statusName'].'  </span>';
+            //     $result .= '</center>';
+            //     $result .= '</br>';
+            //     return $result;
+            // })
             ->addColumn('trained_by',function ($row){
-                // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
+                $personInCharge = $row->rapid_x_user->name ?? '';
                 // $personInCharge = $row;
               return  $result = '';
                 $result .= '<center>';
@@ -505,17 +541,27 @@ class QualificationCertificationController extends Controller
                 $result .= '</br>';
                 return $result;
             })
-            ->addColumn('approvers',function ($row){
-                // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
-                // $personInCharge = $row;
-              return  $result = '';
+            ->addColumn('created_by',function ($row){
+                $personInCharge = $row->system_one_hris_subcon[0]['empname'] ?? '';
+                // $personInCharge = $row; 
+                $result = '';
                 $result .= '<center>';
                 $result .= '<span> '.$personInCharge.' </span>';
                 $result .= '<br>';
                 $result .= '</br>';
                 return $result;
             })
-            ->rawColumns(['rawAction','rawStatus','approvers'])
+            ->addColumn('created_at',function ($row){
+                // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
+                // $personInCharge = $row;
+                $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$row->created_at->format('F j, Y').' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->rawColumns(['rawAction','rawStatus','created_by','created_at'])
             ->make(true);
         } catch (Exception $e) {
             throw $e;
@@ -598,7 +644,7 @@ class QualificationCertificationController extends Controller
             ];
             //TODO: SEND email
             DB::commit();
-            $this->commonController->sendEmail($emailData);
+            // $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -653,16 +699,16 @@ class QualificationCertificationController extends Controller
                     'created_by' =>  $rapidxEmpNo->rapidx_emp_no,
                     'created_at' =>  now(),
                 ];
-                // $qcSlipId = QcSlip::insertGetId($saveQcSlip);
+                $qcSlipId = QcSlip::insertGetId($saveQcSlip);
                 $reasonOfCertification =  [
                     'qc_slips_id' => $qcSlipId,
-                    'reason_of_certification' => implode(' | ',$request->text_certification_operator),
-                    'transfer_flexibility' => implode(' | ',$request->transfer_flexibility),
+                    'reason_of_certification' =>  $this->joinSafe($request, 'text_certification_operator'),
+                    'transfer_flexibility' => $this->joinSafe($request, 'transfer_flexibility'),
                     'others' => $request->others,
                     'created_at' =>  now(),
                 ];
 
-                // $saveQcReasonCertification = QcReasonCertification::insert($reasonOfCertification);
+                $saveQcReasonCertification = QcReasonCertification::insert($reasonOfCertification);
 
                 $collectOperatorEmployees = collect($request->operator_employees)->map(function($rowOperatorEmployees)use ($qcSlipId){
                     return [
@@ -678,16 +724,14 @@ class QualificationCertificationController extends Controller
                 ->all();
 
                 QcSlipEmployee::insert($collectOperatorEmployees);
+                $qcSlipEmployeeCount = QcSlipEmployee::where('qc_slips_id',$qcSlipId)->count();
+                if ($qcSlipEmployeeCount === 0) {
+                    return response()->json(['is_success' => 'false','message'=>"Please Add the Employee Details"],500);
+
+                }
                 //STATUS PB
                 $currentApprovalStatus = 'APRODTO';
-                // $operPreparedByApprovers =  [
-                //     "qc_slips_id" => $qcSlipId,
-                //     "approval_status" => $currentApprovalStatus,
-                //     'first_approver'  => $rapidxEmpNo->rapidx_emp_no,
-                //     'first_date'=> $date,
-                //     'first_time'=> $time,
-                //     'first_status'=> 'PEN',
-                // ];
+                $operToApprovers =  [];
 
                 //$this->saveOperApprovers($operPreparedByApprovers);
             }

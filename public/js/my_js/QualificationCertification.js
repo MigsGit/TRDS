@@ -1,4 +1,32 @@
 // $(document).ready(function () {
+    /**
+     * Synchronizes a group of checkboxes with a piped string value from the database.
+     * @param {string} nameAttribute - The HTML name attribute of the checkbox group.
+     * @param {string} rawDbValue - The piped string from your database (e.g., "Visual | Assembly").
+     */
+    function syncCheckboxesWithDb(nameAttribute, rawDbValue) {
+        // 1. Explode and clean your database values into an array of clean strings
+        // If the database value is null/empty, fall back to an empty array
+        const activeValues = rawDbValue 
+            ? rawDbValue.split('|').map(item => item.trim()) 
+            : [];
+
+        // 2. Query all checkboxes with that specific name attribute inside your form container
+        form.formSubmitOper.find(`input[type="checkbox"][name="${nameAttribute}"]`).each(function() {
+            const checkbox = $(this);
+            const checkboxValue = checkbox.val(); // e.g., "Visual", "Assembly", "Others"
+
+            // 3. Set prop to true if it matches, false if it does not.
+            // This automatically handles BOTH checking and unchecking!
+            checkbox.prop('checked', activeValues.includes(checkboxValue));
+        });
+    }
+
+    // ==========================================
+    // HOW TO EXECUTE IT FOR YOUR TWO TABLES:
+    // ==========================================
+
+
     const getApprovalStatusToggle = (params) => {
         let approvalStatus = params.approval_status;
             $('.btn-link').removeClass('show');
@@ -473,7 +501,7 @@
             const row = `<tr data-empid="${entry.empId}">
                 <td>
                     <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpMain">
-                        <i class="fa-solid fa-trash"></i>
+                        <i class="fa-solid fa fa-trash"></i>
                     </button>
                 </td>
                 <td>${entry.empId}</td>
@@ -744,8 +772,8 @@
             let aOperProdTrainingOrientation = data.a_oper_prod_training_orientation;
             let bOpEnggSectionTrainingOrientation = data.b_op_engg_section_training_orientation;
             let cQcCertification = data.c_qc_certification;
-
             let opApprovers = data.op_approvers;
+            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
 
             populateEditOperEmpTable(data.qc_slip_employees);
             dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
@@ -807,8 +835,8 @@
                 editSelectionsMap4
             );
 
-            form.formSubmitOper.find('#defect_escalation').val(aOperProdTrainingOrientation.defect_escalation).trigger('change');
-            form.formSubmitOper.find('#production_abnormality').val(aOperProdTrainingOrientation.production_abnormality).trigger('change');
+            form.formSubmitOper.find('#defect_escalation').val(aOperProdTrainingOrientation?.defect_escalation).trigger('change');
+            form.formSubmitOper.find('#production_abnormality').val(aOperProdTrainingOrientation?.production_abnormality).trigger('change');
             // Guard: validate aProdData exists and has properties before reading from it
             if (aProdData && typeof aProdData === 'object') {
                 const approverFirstDate  = aProdData.first_date  ?? '';
@@ -822,8 +850,8 @@
             }
 
             // 1. Let's say this is your raw string from the database response
-            const orientationDocs = aOperProdTrainingOrientation.orientation_docs;
-            const enggTqOrientationDocs = aOperProdTrainingOrientation.engg_tq_orientation_docs;
+            const orientationDocs = aOperProdTrainingOrientation?.orientation_docs;
+            const enggTqOrientationDocs = aOperProdTrainingOrientation?.engg_tq_orientation_docs;
             // 2. Uncheck ALL checkboxes in the form first to have a clean state
             form.formSubmitOper.find('input[type="checkbox"]').prop('checked', false);
             // 3. Check ALL checkboxes in the form based on the orientation docs or
@@ -849,47 +877,54 @@
                 5,
                 editSelectionsMap5
             );
-            checkCheckboxesFromColumn(bOpEnggSectionTrainingOrientation.engg_orientation_docs,'chk');
+            checkCheckboxesFromColumn(bOpEnggSectionTrainingOrientation?.engg_orientation_docs,'chk');
 
-            form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation.obs_first_result_es_oper);
-            form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation.first_sample_es_oper);
-            form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation.first_ok_es_oper);
-            form.formSubmitOper.find('#text_first_ok_es_oper').val(bOpEnggSectionTrainingOrientation.first_ng_es_oper);
+            form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper);
+            form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
+            form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ok_es_oper);
+            form.formSubmitOper.find('#text_first_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
+            form.formSubmitOper.find('#text_oa_1st_result_es_oper').val(bOpEnggSectionTrainingOrientation?.oa_1st_result_es_oper);
+            // form.formSubmitOper.find('#text_first_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
 
-            form.formSubmitOper.find('#text_obs_second_result_es_oper').val(bOpEnggSectionTrainingOrientation.obs_second_result_es_oper);
-            form.formSubmitOper.find('#text_second_sample_es_oper').val(bOpEnggSectionTrainingOrientation.second_sample_es_oper);
-            form.formSubmitOper.find('#text_second_ok_es_oper').val(bOpEnggSectionTrainingOrientation.second_ok_es_oper);
-            form.formSubmitOper.find('#text_second_ng_es_oper').val(bOpEnggSectionTrainingOrientation.second_ng_es_oper);
+
+            form.formSubmitOper.find('#text_obs_second_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_second_result_es_oper);
+            form.formSubmitOper.find('#text_second_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.second_sample_es_oper);
+            form.formSubmitOper.find('#text_second_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ok_es_oper);
+            form.formSubmitOper.find('#text_second_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ng_es_oper);
             if (aEnggData && typeof aEnggData === 'object') {
-                form.formSubmitOper.find('#text_1st_disqualification_es_oper').val(aEnggData.first_remarks ?? '');
-                form.formSubmitOper.find('#text_2nd_disqualification_es_oper').val(aEnggData.second_remarks ?? '');
-                form.formSubmitOper.find('#text_qc_1st_date_es_oper').val(aEnggData.first_date ?? '');
-                form.formSubmitOper.find('#text_qc_1st_time_es_oper').val(aEnggData.first_time ?? '');
-                form.formSubmitOper.find('#text_qc_2nd_date_es_oper').val(aEnggData.second_date ?? '');
-                form.formSubmitOper.find('#text_qc_2nd_time_es_oper').val(aEnggData.second_time ?? '');
+                form.formSubmitOper.find('#text_1st_disqualification_es_oper').val(aEnggData?.first_remarks ?? '');
+                form.formSubmitOper.find('#text_2nd_disqualification_es_oper').val(aEnggData?.second_remarks ?? '');
+                form.formSubmitOper.find('#text_qc_1st_date_es_oper').val(aEnggData?.first_date ?? '');
+                form.formSubmitOper.find('#text_qc_1st_time_es_oper').val(aEnggData?.first_time ?? '');
+                form.formSubmitOper.find('#text_qc_2nd_date_es_oper').val(aEnggData?.second_date ?? '');
+                form.formSubmitOper.find('#text_qc_2nd_time_es_oper').val(aEnggData?.second_time ?? '');
             }
-            //C QC Certification
+            // ==== C QC Certification
             const cQcData = response?.approversCollection?.CQCC?.[0] ?? null;
-            if (cQcData && typeof cQcData === 'object') {
-                form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcCertification.obs_first_result_qcs_oper ?? '').trigger('change');
-                form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcCertification.first_sample_qcs_oper ?? '').trigger('change');
-                form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcCertification.first_ok_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcCertification.first_ng_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_qcs_station_1st_oper').val(cQcCertification.qcs_station_1st_oper ?? '');
-                form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcCertification.obs_second_result_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcCertification.second_ok_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcCertification.second_sample_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcCertification.second_ng_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_qcs_station_2nd_oper').val(cQcCertification.qcs_station_2nd_oper ?? '');
+            form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcCertification?.obs_first_result_qcs_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcCertification?.first_sample_qcs_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcCertification?.first_ok_qcs_oper ?? '');
+            form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcCertification?.first_ng_qcs_oper ?? '');
+            form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcCertification?.obs_second_result_qcs_oper ?? '');
+            form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcCertification?.second_ok_qcs_oper ?? '');
+            form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcCertification?.second_sample_qcs_oper ?? '');
+            form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcCertification?.second_ng_qcs_oper ?? '');
 
-                form.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData.first_status ?? '').trigger('change');
-                form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData.second_status ?? '').trigger('change');
-                form.formSubmitOper.find('#text_1st_disapproval_qcs_oper').val(cQcData.first_remarks ?? '');
-                form.formSubmitOper.find('#text_2nd_disapproval_qcs_oper').val(cQcData.second_remarks ?? '');
-                form.formSubmitOper.find('#text_1st_date_qcs_oper').val(cQcData.first_date ?? '');
-                form.formSubmitOper.find('#text_1st_time_qcs_oper').val(cQcData.first_time ?? '');
-                form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData.second_date ?? '');
-                form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData.second_time ?? '');
+
+            // Execute for the first table (1st Oper)
+            syncCheckboxesWithDb('text_qcs_station_1st_oper', cQcCertification?.qcs_station_1st_oper);
+            // Execute for the second table (2nd Oper)
+            syncCheckboxesWithDb('text_qcs_station_2nd_oper', cQcCertification?.qcs_station_2nd_oper);
+            if (cQcData && typeof cQcData === 'object') {
+
+                form.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData?.first_status ?? '').trigger('change');
+                form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData?.second_status ?? '').trigger('change');
+                form.formSubmitOper.find('#text_1st_disapproval_qcs_oper').val(cQcData?.first_remarks ?? '');
+                form.formSubmitOper.find('#text_2nd_disapproval_qcs_oper').val(cQcData?.second_remarks ?? '');
+                form.formSubmitOper.find('#text_1st_date_qcs_oper').val(cQcData?.first_date ?? '');
+                form.formSubmitOper.find('#text_1st_time_qcs_oper').val(cQcData?.first_time ?? '');
+                form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData?.second_date ?? '');
+                form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData?.second_time ?? '');
             }
 
             // D PPD ONLY Process

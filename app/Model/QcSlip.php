@@ -11,6 +11,7 @@ use App\Model\Qc\EQcValidationProcess;
 use App\Model\Qc\FQcValidation;
 use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
+use App\Model\RapidXUser;
 use App\OpApprover;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +27,10 @@ class QcSlip extends Model
     // {
     //     return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');
     // }
+    public function system_one_hris_subcon()
+    {
+        return $this->hasMany(SystemOneHrisSubcon::class, 'EmpNo',  'created_by');
+    }
     public function op_approvers()
     {
         return $this->hasMany(OpApprover::class, 'qc_slips_id',  'id')->whereNull('deleted_at');
