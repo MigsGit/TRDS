@@ -32,6 +32,14 @@ class EQcValidationProcessRequest extends FormRequest
              'text_first_result_vpes_oper_2' => ['required'],
              'text_1st_validatedby_vpes_oper_2' => ['required'],
              'text_1st_date_vpes_oper_2' => ['required'],
+
+            'text_second_result_vpqcs_oper'  => 'required_if:text_first_result_vpqcs_oper,FAILED',
+            'text_2nd_validatedby_vpqcs_oper' => 'required_with:text_second_result_vpqcs_oper',
+            'text_2nd_date_vpqcs_oper' => 'required_with:text_second_result_vpqcs_oper',
+            'text_second_result_vpes_oper_2'  => 'required_if:text_first_result_vpes_oper_2,FAILED',
+            'text_2nd_validatedby_vpes_oper_2' => 'required_with:text_second_result_vpes_oper_2',
+            'text_2nd_date_vpes_oper_2' => 'required_with:text_second_result_vpes_oper_2',
+
         ];
     }
 }

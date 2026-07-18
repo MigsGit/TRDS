@@ -200,7 +200,7 @@
                                 </div>
                                 <div class="row mt-2 mb-5">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-primary" id="" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                        <button type="button" class="btn btn-primary" id="btnEmployeeOperator" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
                                     </div>
                                 </div>
                                 <div class="table-responsive mt-3 mb-5">
@@ -1171,11 +1171,11 @@
 
                                             <label for="">Note: NG Injection process shall be taken from first lot output</label>
 
-                                            <!-- ------------------------------------------------ -->
+            
 
                                         </div>
                                         </div>
-                                    </div>-
+                                    </div>
                                     <div class="card EENGGVALIDATION">
                                         <h2 class="card-header">
 
@@ -1690,6 +1690,7 @@
                     '#text_training_orientation_es_oper',
             ],5);
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            $('#btnEmployeeOperator').prop('disabled',false);
         });
         dataTable.operator = $(table.operator).DataTable({
             "processing" : true,
@@ -1907,10 +1908,6 @@
                 }
             },$form);
          }
-        // $(selector).click(function (e) {
-        //     e.preventDefault();
-
-        // });
          $('#formSendEmail').click(function (e) {
             e.preventDefault();
             var $form = $('#formSubmitOper,#formSubmitOper');

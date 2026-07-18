@@ -8,6 +8,7 @@ use App\Http\Requests\AOperProdTrainingOrientationRequest;
 use App\Http\Requests\BOpEnggSectionTrainingOrientationRequest;
 use App\Http\Requests\CQcCertificationRequest;
 use App\Http\Requests\DPpdCertificationCompletionRequest;
+use App\Http\Requests\EEngValidationProcessRequest;
 use App\Http\Requests\EQcValidationProcessRequest;
 use App\Http\Requests\QcSlipEmployeeRequest;
 use App\Http\Requests\QcSlipRequest;
@@ -61,6 +62,90 @@ class QualificationCertificationController extends Controller
         return collect((array) $value)->filter()->join($separator);
     }
 
+    public function saveOperApprovers($params){
+        try {
+            OpApprover::insert($params);
+            DB::commit();
+            return [
+                'is_success' => 'true'
+            ];
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    public function saveFormSendEmail($params){
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $rapidxEmpNo =  session('global_user');
+            $to = '';
+            $cc = '';
+            foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
+                $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
+            }
+            //Send to Approver Attention To | CC is exclude the FQCVVO TO QCAPP Last Approver
+            $collectTo = collect($arrTo)->map(function($rowEmpNo){
+                return [
+                    'email' => $rowEmpNo['email'],
+                    'fullName' => $rowEmpNo['fullName'],
+                ];
+            });
+            if($params['approval_status'] != 'FQCVVO'){
+
+                foreach (explode(' | ',$params['update_data']['alert_prod_cc_sec']) as $key => $valueRowEmpNo) {
+                    $arrCc[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
+                }
+                $collectCc = collect($arrCc)->map(function($rowEmpNo){
+
+                    return [
+                        'email' => $rowEmpNo['email'],
+                        'fullName' => $rowEmpNo['fullName'],
+                    ];
+                });
+                $cc = $collectCc->pluck('email')->join(',');
+
+            }
+
+            $to = $collectTo->pluck('email')->join(',');
+            // $from =$currentSession['email'] ?? '';
+            // $from_name = $currentSession['fullName'];
+            $opApprover =  OpApprover::insert($params['update_data']);
+            $emailParams = [
+                'qc_slips_id' => $params['qc_slips_id']
+            ];
+            $message = $this->commonController->emailMsg($emailParams);
+            $from = 'issinfoservice@pricon.ph';
+            // $from_name = 'issinfoservice@pricon.ph';
+            $subject = "FOR YOUR APPROVAL : TRDS - Qualification Certification";
+            $rapidxEmpNo =  session('global_user');
+            $emailData = [
+                "to" =>$to,
+                // "to" =>"mrronquez@pricon.ph",
+                "cc" =>$cc,
+                // "cc" =>"",
+                "bcc" =>"mclegaspi@pricon.ph",
+                "from" => $from,
+                "from_name" => $from_name ?? "TRDS Auto Email",
+                "subject" =>$subject,
+                "message" =>  $message,
+                "attachment_filename" => "",
+                "attachment" => "",
+                "send_date_time" => now(),
+                "date_time_sent" => "",
+                "date_created" => now(),
+                // "created_by" => session('rapidx_username'),
+                "created_by" => $rapidxEmpNo->name,
+                "system_name" => "rapidx_TRDS",
+            ];
+            //TODO: SEND email
+            DB::commit();
+            // $this->commonController->sendEmail($emailData);
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
     public function updateApproval(Request $request){
         try {
             // return 'true';
@@ -122,6 +207,9 @@ class QualificationCertificationController extends Controller
         try {
             $qcSlip = QcSlip::with(
                 'op_approvers',
+                'qc_slip_employees.system_one_hris_subcon',
+                'qc_slip_employees.get_station_from',
+                'qc_slip_employees.get_station_to',
                 'qc_slip_employees',
                 'qc_reason_certification',
                 'a_oper_prod_training_orientation',
@@ -567,90 +655,7 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-    public function saveOperApprovers($params){
-        try {
-            OpApprover::insert($params);
-            DB::commit();
-            return [
-                'is_success' => 'true'
-            ];
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
-    public function saveFormSendEmail($params){
-        try {
-            date_default_timezone_set('Asia/Manila');
-            DB::beginTransaction();
-            $rapidxEmpNo =  session('global_user');
-            $to = '';
-            $cc = '';
-            foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
-                $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
-            }
-            //Send to Approver Attention To | CC is exclude the FQCVVO TO QCAPP Last Approver
-            $collectTo = collect($arrTo)->map(function($rowEmpNo){
-                return [
-                    'email' => $rowEmpNo['email'],
-                    'fullName' => $rowEmpNo['fullName'],
-                ];
-            });
-            if($params['approval_status'] != 'FQCVVO'){
-
-                foreach (explode(' | ',$params['update_data']['alert_prod_cc_sec']) as $key => $valueRowEmpNo) {
-                    $arrCc[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
-                }
-                $collectCc = collect($arrCc)->map(function($rowEmpNo){
-
-                    return [
-                        'email' => $rowEmpNo['email'],
-                        'fullName' => $rowEmpNo['fullName'],
-                    ];
-                });
-                $cc = $collectCc->pluck('email')->join(',');
-
-            }
-
-            $to = $collectTo->pluck('email')->join(',');
-            // $from =$currentSession['email'] ?? '';
-            // $from_name = $currentSession['fullName'];
-            $opApprover =  OpApprover::insert($params['update_data']);
-            $emailParams = [
-                'qc_slips_id' => $params['qc_slips_id']
-            ];
-            $message = $this->commonController->emailMsg($emailParams);
-            $from = 'issinfoservice@pricon.ph';
-            // $from_name = 'issinfoservice@pricon.ph';
-            $subject = "FOR YOUR APPROVAL : TRDS - Qualification Certification";
-            $rapidxEmpNo =  session('global_user');
-            $emailData = [
-                "to" =>$to,
-                // "to" =>"mrronquez@pricon.ph",
-                "cc" =>$cc,
-                // "cc" =>"",
-                "bcc" =>"mclegaspi@pricon.ph",
-                "from" => $from,
-                "from_name" => $from_name ?? "TRDS Auto Email",
-                "subject" =>$subject,
-                "message" =>  $message,
-                "attachment_filename" => "",
-                "attachment" => "",
-                "send_date_time" => now(),
-                "date_time_sent" => "",
-                "date_created" => now(),
-                // "created_by" => session('rapidx_username'),
-                "created_by" => $rapidxEmpNo->name,
-                "system_name" => "rapidx_TRDS",
-            ];
-            //TODO: SEND email
-            DB::commit();
-            // $this->commonController->sendEmail($emailData);
-            return response()->json(['is_success' => 'true']);
-        } catch (Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-    }
+ 
     public function updateOperApprovers($params){
         try {
             DB::commit();
@@ -857,7 +862,7 @@ class QualificationCertificationController extends Controller
                     }
                 }
                 if($qcSlipDetails->approval_status === 'EENGVP'){
-
+                    $validatedData = app(EEngValidationProcessRequest::class)->validateResolved();
                     $eEngVp = [
                         'qc_slips_id'               => $qcSlipId,
                         'engg_application_vpes_oper'=> $this->getSafe($request, 'text_application_vpes_oper'),
@@ -877,9 +882,6 @@ class QualificationCertificationController extends Controller
 
                 }
                 if($qcSlipDetails->approval_status ==='EQCVP'){
-                    // EQCVP- EQcValidationProcess
-                    // Change status into Go to PROCESS E
-                    // BUKOD Database
                     $validatedData = app(EQcValidationProcessRequest::class)->validateResolved();
                     $eQcValidationProcess = [
                         "qc_slips_id"            => $qcSlipId,

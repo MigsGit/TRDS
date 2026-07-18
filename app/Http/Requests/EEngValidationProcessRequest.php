@@ -30,6 +30,7 @@ class EEngValidationProcessRequest extends FormRequest
             'text_1st_validatedby_vpes_oper' => ['required'],
             'text_1st_date_vpes_oper' => ['required'],
             'text_first_result_vpes_oper' => ['required'],
+            'text_second_result_vpes_oper'  => 'required_if:text_first_result_vpes_oper,FAILED',
         ];
         
         

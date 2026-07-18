@@ -544,7 +544,7 @@
      * Best Practice: Populates the main table and synchronizes state during an Edit AJAX request.
      * @param {Array} qcSlipEmployees - The response payload array containing employee details
      */
-    const populateEditOperEmpTable = (qcSlipEmployees) => {
+    const populateEditOperEmpTable = (qcSlipEmployees,approvalStatus) => {
         // 1. Clear the main table to prevent old leftovers
         const $mainTableBody = $('#tbl_certified_list_operator tbody');
         $mainTableBody.empty();
@@ -554,28 +554,29 @@
 
             // Match your application's data-attribute structure
             const empId = emp.employee_no;
-            const empName = emp.employee_name || empId; // Use fallback if name is in relation
-            const stFrom = emp.station_from;
-            const stTo = emp.station_to;
+            const empName = emp.system_one_hris_subcon.empname ??''; // Use fallback if name is in relation
+            const stFrom = emp.get_station_from.dropdown_masters_details ??'';
+            const stTo = emp.get_station_to.dropdown_masters_details ?? '';
             const remarks = emp.remarks || '';
 
-            // Keep your text display dynamic (e.g., convert "1" to "Station 1" if needed, or use the database value)
-            const stFromText = "Station " + stFrom;
-            const stToText = "Station " + stTo;
-
+            let remove =``;
+            if(approvalStatus === 'APRODTO'){
+                remove += ` <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpMain">
+                            <i class="fa-solid fa fa-trash"></i>
+                        </button>`;
+            }
+         
             // 3. Build your standard row HTML precisely matching your creation architecture
             // CRITICAL: We append data attributes so your "remove" and "get data" functions work perfectly
             const row = `
                 <tr data-empid="${empId}">
                     <td>
-                        <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpMain">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+                       ${remove}
                     </td>
                     <td>${empId}</td>
                     <td>${empName}</td>
-                    <td data-value="${stFrom}">${stFromText}</td>
-                    <td data-value="${stTo}">${stToText}</td>
+                    <td data-value="${stFrom}">${stFrom}</td>
+                    <td data-value="${stTo}">${stTo}</td>
                     <td>${remarks}</td>
                 </tr>
             `;
@@ -774,8 +775,10 @@
             let cQcCertification = data.c_qc_certification;
             let opApprovers = data.op_approvers;
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            const approvalStatus = data.appproval_status ?? '';
+            populateEditOperEmpTable(data.qc_slip_employees,approvalStatus);
 
-            populateEditOperEmpTable(data.qc_slip_employees);
+            $('#btnEmployeeOperator').prop('disabled', approvalStatus === 'APRODTO' ? false : true);
             dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
             dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
             let currentStatus = data.approval_status ??'';
