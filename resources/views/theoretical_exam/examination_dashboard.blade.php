@@ -114,7 +114,7 @@
         </div>
     </section>
 
-    <section class="content">
+    {{-- <section class="content">
         <div class="container-fluid px-2">
             <div class="exam-wrapper">
                 <div class="row">
@@ -151,7 +151,65 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
+    <section class="content">
+    <div class="container-fluid px-2">
+
+        <!-- SELECT DROPDOWN -->
+        <form method="GET" action="{{ route('examDashboard') }}">
+            <div class="mb-3">
+                <select name="department" class="form-control" onchange="this.form.submit()">
+                    <option value="">-- Select Department --</option>
+                    @foreach($allCategories->unique('department') as $category)
+                        <option value="{{ $category->department }}"
+                            {{ request('department') == $category->department ? 'selected' : '' }}>
+                            {{ $category->department }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </form>
+
+        <!-- EXAM CARDS -->
+        <div class="exam-wrapper">
+            <div class="row">
+                @forelse($examCategories as $category)
+                    <div class="col-lg-3 col-md-4 col-sm-6 mt-4">
+                        <div class="exam-card">
+                            <div>
+                                <div class="exam-title">{{ $category->exam_title }}</div>
+                                <div class="exam-subtitle">For {{ $category->position }}</div>
+
+                                <div class="exam-purpose">
+                                    {{ $category->purpose }}
+                                </div>
+
+                                <div class="exam-meta">
+                                    <div><strong>Department:</strong> {{ $category->department }}</div>
+                                    <div><strong>Product Line:</strong> {{ $category->product_line }}</div>
+                                </div>
+                            </div>
+
+                            <div class="exam-footer">
+                                <a href="{{ route('startExam', ['id' => $category->id, 'revision' => $category->revision]) }}"
+                                    class="btn-start">
+                                    Start Exam
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-12 text-center">
+                        <div class="alert alert-warning">
+                            Please select an exam to display.
+                        </div>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+    </div>
+</section>
 </div>
 @endsection
 

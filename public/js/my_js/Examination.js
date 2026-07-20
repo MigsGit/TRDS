@@ -1,5 +1,5 @@
 const GetExamTrainingRequestControlNo = (element) => {
-    try {
+    try{
         const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';
 
@@ -18,13 +18,13 @@ const GetExamTrainingRequestControlNo = (element) => {
                 const data = Array.isArray(response) ? response : [];
                 let html = '';
 
-                if (data.length) {
+                if(data.length){
                     html += '<option value="" disabled selected>Select Control No</option>';
                     html += data.map(item => {
                         const controlNo = item?.ctrl_number ?? 'No Control No';
                         return `<option value="${controlNo}">${controlNo}</option>`;
                     }).join('');
-                } else {
+                }else{
                     html = '<option value="" disabled selected>Not found</option>';
                 }
 
@@ -42,14 +42,14 @@ const GetExamTrainingRequestControlNo = (element) => {
 
         ajaxRequest(ajaxGetExamTrainingRequestControlNo);
 
-    } catch (err) {
+    }catch(err){
         console.error('Unexpected error:', err);
         element.html('<option value="" disabled selected>Error loading data</option>');
     }
 };
 
 const GetExamTrainingRequestEmployeeNo = (element, selectedControlNo) => {
-    try {
+    try{
         const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';
         const baseUrl = systemName
@@ -68,7 +68,7 @@ const GetExamTrainingRequestEmployeeNo = (element, selectedControlNo) => {
                 const examTrainingRequestEmployeeNo = response[0]?.training_request_details || [];
                 let result = '';
 
-                if (examTrainingRequestEmployeeNo.length > 0) {
+                if(examTrainingRequestEmployeeNo.length > 0){
                     result += '<option value="" disabled selected>Select Employee No</option>';
 
                     examTrainingRequestEmployeeNo.forEach(item => {
@@ -80,16 +80,7 @@ const GetExamTrainingRequestEmployeeNo = (element, selectedControlNo) => {
                     });
 
                     element.html(result);
-
-                    // element.off('change').on('change', function () {
-                    //     const selectedOption = $(this).find('option:selected');
-                    //     const name = selectedOption.data('name') || '';
-                    //     const dateHired = selectedOption.data('date-hired') || '';
-                    //     $('#txtExamTrainingRequestName').val(name);
-                    //     $('#txtExamTrainingRequestDateHired').val(dateHired);
-                    // });
-
-                } else {
+                }else{
                     element.html('<option value="" disabled selected>Not found</option>');
                 }
             },
@@ -103,8 +94,7 @@ const GetExamTrainingRequestEmployeeNo = (element, selectedControlNo) => {
         };
 
         ajaxRequest(ajaxGetExamTrainingRequestEmployeeNo);
-
-    } catch (err) {
+    }catch (err){
         console.error('Unexpected error:', err);
         element.html('<option value="" disabled selected>Error loading data</option>');
     }
@@ -118,7 +108,7 @@ const GetExamTrainingRequestEmployeeInfo = (employeeNo, controlNo) => {
             : window.location.origin;
 
     const link = `${baseUrl}/get_exam_training_request_employee_no`;
-    
+
     const ajaxGetExamTrainingRequestEmployeeInfo = {
         url: link,
         method: "GET",
@@ -134,8 +124,8 @@ const GetExamTrainingRequestEmployeeInfo = (employeeNo, controlNo) => {
 
         successCallback: function(response){
             if(response.length > 0){
-                if (response[0].training_request_details.length > 0) {
-                    for (let index = 0; index < response[0].training_request_details.length; index++) {
+                if(response[0].training_request_details.length > 0){
+                    for(let index = 0; index < response[0].training_request_details.length; index++){
                         if(response[0].training_request_details[index].emp_no === employeeNo){
                             const employeeInfo = response[0].training_request_details[index];
                             $('#txtExamTrainingRequestName').val(employeeInfo.name)
@@ -143,8 +133,8 @@ const GetExamTrainingRequestEmployeeInfo = (employeeNo, controlNo) => {
                         }
                     }
                 }else{
-                console.log('No data found for employeeNo:', employeeNo, 'and controlNo:', controlNo);
-            }
+                    console.log('No data found for employeeNo:', employeeNo, 'and controlNo:', controlNo);
+                }
             }else{
                 console.log('No data found for employeeNo:', employeeNo, 'and controlNo:', controlNo);
             }
@@ -158,7 +148,7 @@ const GetExamTrainingRequestEmployeeInfo = (employeeNo, controlNo) => {
     ajaxRequest(ajaxGetExamTrainingRequestEmployeeInfo);
 };
 
-const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo) => {
+const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo, getexamTitleId) => {
     const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';
         const baseUrl = systemName
@@ -172,7 +162,8 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo) => {
         method: "GET",
         data: {
             employeeNo: employeeNo,
-            controlNo: controlNo
+            controlNo: controlNo,
+            examTitleId: getexamTitleId
         },
         dataType: "json",
 
@@ -181,10 +172,72 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo) => {
         },
 
         successCallback: function(response){
-            console.log('qwe:', response);
-            let count = response;
-            if(count > 0){
-                $('#txtExamTrainingRequestExaminationTake').val(count);
+            let examResult = response;
+            console.log('Exam Result:', examResult);
+
+            let alertConfig = null;
+            if(examResult.status === false){
+                alertConfig = {
+                    title: 'You have already taken the exam 3 times.',
+                    text: 'You cannot take the exam anymore.',
+                    icon: 'warning'
+                };
+            }else{
+                let checkForExam = examResult.examResults[0].exam_result_details_info;
+                console.log('checkForExam:', checkForExam);
+
+                for (const exam of checkForExam) {
+                    if(exam.rating === 100){
+                        alertConfig = {
+                            title: 'Exam Completed Successfully',
+                            text: 'You have already passed this exam. Retaking the exam is not permitted.',
+                            icon: 'success'
+                        };
+                        break;
+                    }
+    
+                    if(exam.exam_result_status === 0){
+                        alertConfig = {
+                            title: 'Previous Exam Not Completed',
+                            text: 'You must complete your previous exam before taking a new exam.',
+                            icon: 'warning'
+                        };
+                        break;
+                    }
+    
+                    if(exam.attempt === 1 && exam.rating < 70){
+                        alertConfig = {
+                            title: 'Exam Failed',
+                            text: 'Your score did not meet the required passing score. You are disqualified and cannot take the exam again.',
+                            icon: 'warning'
+                        };
+                        break;
+                    }
+    
+                    if(exam.attempt === 2 && exam.rating < 90){
+                        alertConfig = {
+                            title: 'Exam Failed',
+                            text: 'Your score did not meet the required passing score after your second attempt. You are disqualified and cannot take the exam again.',
+                            icon: 'warning'
+                        };
+                        break;
+                    }
+                }
+            }
+
+            if(alertConfig){
+                Swal.fire({
+                    ...alertConfig,
+                    confirmButtonColor: '#172838',
+                    confirmButtonText: '<i class="fa fa-check"></i> OK',
+                    confirmButtonText: 'CONFIRM <i class="fas fa-hand-pointer"></i> ',
+                    allowHtml: true
+                }).then(() => {
+                    $('#btnNext').addClass('d-none');
+                });
+            }else{
+                $('#btnNext').removeClass('d-none');
+                $('#txtExamTrainingRequestExaminationTake').val(examResult.attempt);
             }
         },
 
@@ -197,14 +250,14 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo) => {
 };
 
 const LinkForIdAndRevision = (linkIdRevision) => {
-    try {
+    try{
         const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';
         const baseUrl = systemName
             ? `${window.location.origin}/${systemName}`
             : window.location.origin;
 
-        const link = `${baseUrl}/get_exam_training_request_details_by_id_revision`;
+        const link = `${baseUrl}/get_exam_training_request_details_by_revision_id`;
 
         const ajaxGetExamTrainingRequestDetailsByIdRevision = {
             url: link,
@@ -219,27 +272,26 @@ const LinkForIdAndRevision = (linkIdRevision) => {
             },
 
             successCallback: function(response){
-                const qwe = response?.qwe || {};
+                const getQuestionnaireDetails = response?.getQuestionnaireDetails || {};
                 let questionnaire = {
-                    id: qwe.id || '',
-                    revision: qwe.revision,
-                    category: qwe.category || '',
-                    exam_title: qwe.exam_title || '',
-                    exam_instruction: qwe.exam_instruction || '',
-                    purpose: qwe.purpose || '',
-                    department: qwe.department || '',
-                    position: qwe.position || '',
-                    product_line: qwe.product_line || '',
-                    passing_score: qwe.passing_score || 0
+                    id: getQuestionnaireDetails.id || '',
+                    revision: getQuestionnaireDetails.revision,
+                    category: getQuestionnaireDetails.category || '',
+                    exam_title: getQuestionnaireDetails.exam_title || '',
+                    exam_description: getQuestionnaireDetails.description || '',
+                    exam_instruction: getQuestionnaireDetails.exam_instruction || '',
+                    purpose: getQuestionnaireDetails.purpose || '',
+                    department: getQuestionnaireDetails.department || '',
+                    position: getQuestionnaireDetails.position || '',
+                    product_line: getQuestionnaireDetails.product_line || '',
+                    passing_score: getQuestionnaireDetails.passing_score || 0
                 };
-                console.log('qweqwe: ', questionnaire);
-
+                console.log('questionnaire: ', questionnaire);
 
                 $('#txtExaminationQuestionnaire').val(JSON.stringify(questionnaire));
 
-                let details = qwe?.questionnaire_details || [];
-
-                details.sort((a, b) => a.exam_no - b.exam_no);                
+                let details = getQuestionnaireDetails?.questionnaire_details || [];
+                details.sort((a, b) => a.exam_no - b.exam_no);
                 const fieldsToKeep = [
                     "id",
                     "category_type",
@@ -256,11 +308,11 @@ const LinkForIdAndRevision = (linkIdRevision) => {
 
                     // Parse answer_choices_question safely
                     let parsedAnswer = [];
-                    try {
+                    try{
                         parsedAnswer = item.answer_choices_question
                             ? JSON.parse(item.answer_choices_question)
                             : [];
-                    } catch (e) {
+                    }catch(e){
                         console.error('Invalid JSON in answer_choices_question for exam_no', examNo);
                     }
 
@@ -290,14 +342,13 @@ const LinkForIdAndRevision = (linkIdRevision) => {
         };
 
         ajaxRequest(ajaxGetExamTrainingRequestDetailsByIdRevision);
-
-    } catch (err) {
+    }catch (err){
         console.error('Unexpected error:', err);
     }
 };
 
 const ExamSubmission = () => {
-    try {
+    try{
         const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';
         const baseUrl = systemName
@@ -306,10 +357,10 @@ const ExamSubmission = () => {
 
         const link = `${baseUrl}/exam_submission`;
 
-        // 1. Read the answer key (examination_questionnaire_details) 
+        // 1. Read the answer key (examination_questionnaire_details)
         let questionDetails = JSON.parse($('#txtExaminationQuestionnaireDetails').val() || '{}');
 
-        // 2. Collect user answers into employee_examination_result 
+        // 2. Collect user answers into employee_examination_result
         let employeeExamResult = {};
         let totalScore = 0;
         let totalPoints = 0;
@@ -329,18 +380,18 @@ const ExamSubmission = () => {
                 answer_choices_question: []
             };
 
-            switch (categoryType) {
+            switch(categoryType){
                 case 0: {
                     // ── Multiple choice ──
                     let userAnswer = null;
 
-                    if (qDetail.points > 1) {
+                    if(qDetail.points > 1){
                         let selectedValues = [];
                         $(`input[name="answers[${qId}][]"]:checked`).each(function() {
                             selectedValues.push($(this).val());
                         });
                         userAnswer = selectedValues.length > 0 ? selectedValues.join(',') : null;
-                    } else {
+                    }else{
                         let checkedRadio = $(`input[name="answers[${qId}]"]:checked`);
                         userAnswer = checkedRadio.length > 0 ? checkedRadio.val() : null;
                     }
@@ -350,7 +401,7 @@ const ExamSubmission = () => {
                     let userArr = userAnswer ? String(userAnswer).split(',').sort() : [];
                     let isCorrect = (correctArr.length === userArr.length) && correctArr.every((val, i) => val === userArr[i]);
 
-                    if (isCorrect) totalScore += qDetail.points;
+                    if(isCorrect) totalScore += qDetail.points;
                     totalPoints += qDetail.points;
 
                     resultEntry.answer_choices_question = [{
@@ -371,7 +422,7 @@ const ExamSubmission = () => {
                     }
 
                     let correctAnswer = qDetail.answer_choices_question[0]?.answer || null;
-                    let isCorrect = null; 
+                    let isCorrect = null;
 
                     if (qDetail.type === 'Identification') {
                         isCorrect = (userAnswer !== null && correctAnswer !== null) &&
@@ -391,7 +442,7 @@ const ExamSubmission = () => {
                 }
 
                 case 2: {
-                    // Grid / Table type 
+                    // Grid / Table type
                     let items = qDetail.answer_choices_question;
                     let gridAnswers = [];
                     let gridCorrectCount = 0;
@@ -430,14 +481,17 @@ const ExamSubmission = () => {
 
         // 3. Build summary
         let passingScore = 0;
-        try {
+        try{
             let questionnaire = JSON.parse($('#txtExaminationQuestionnaire').val() || '{}');
             passingScore = questionnaire.passing_score || 0;
-        } catch(e) {}
+        }catch(e){}
 
         let percentage = totalPoints > 0 ? Math.round((totalScore / totalPoints) * 100) : 0;
-        let isPassed = percentage >= passingScore;
-
+        let isPassed = percentage == 100;
+        console.log('totalPoints', totalPoints);
+        console.log('totalScore', totalScore);
+        console.log('percentage', percentage);
+        console.log('isPassed', isPassed);
         employeeExamResult.summary = {
             total_score: parseFloat(totalScore.toFixed(2)),
             total_points: totalPoints,
@@ -454,13 +508,15 @@ const ExamSubmission = () => {
 
         let formData = {
             _token: $('input[name="_token"]').val(),
+            attempts: $('#txtExamTrainingRequestExaminationTake').val(),
+            check_existing_record: $('#txtCheckExistingRecord').val(),
             examination_user_info: $('#txtExaminationUserInfo').val(),
             examination_questionnaire: $('#txtExaminationQuestionnaire').val(),
             examination_questionnaire_details: $('#txtExaminationQuestionnaireDetails').val(),
             employee_examination_result: JSON.stringify(employeeExamResult)
         };
 
-        const ajaxExamSSubmission = {
+        const ajaxExamSubmission = {
             url: link,
             method: "POST",
             data: formData,
@@ -479,7 +535,6 @@ const ExamSubmission = () => {
                     let tist = employeeExamResult.summary
                     console.log('Exam Result Submitted:', tist);
 
-                   // SweetAlert popup
                     Swal.fire({
                         title: '📝 Employee Exam Result',
                         confirmButtonColor: '#172838',
@@ -493,17 +548,15 @@ const ExamSubmission = () => {
                         icon: tist.result === 'Passed' ? 'success' : 'error',
                         confirmButtonText: 'OK'
                     }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Build the redirect URL
+                        if(result.isConfirmed){
                             const protocol = window.location.protocol;
-                            const hostname = window.location.hostname; 
+                            const hostname = window.location.hostname;
                             const pathname = window.location.pathname;
                             const segments = pathname.split('/').filter(Boolean);
                             const firstSegment = segments[0] || '';
                             const secondSegment = segments[1] || '';
                             const newUrl = `${protocol}//${hostname}/${firstSegment}/${secondSegment}/`;
 
-                            // Redirect after OK click
                             window.location.href = newUrl;
                         }
                     });
@@ -516,9 +569,8 @@ const ExamSubmission = () => {
             }
         };
 
-        ajaxRequest(ajaxExamSSubmission);
-
-    } catch (err) {
+        ajaxRequest(ajaxExamSubmission);
+    }catch(err){
         console.error('Unexpected error:', err);
     }
 };

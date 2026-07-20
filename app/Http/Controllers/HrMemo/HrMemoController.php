@@ -11,6 +11,8 @@ use App\Model\Hr\HrMemo;
 use App\Model\Hr\HrMemoEmailRecipients;
 use App\Model\Hr\HrMemoTraineeDetails;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
+use App\Exports\InspectorSkillChart;
+use Maatwebsite\Excel\Facades\Excel;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,18 +22,20 @@ use Illuminate\Support\Facades\Cache;
 
 class HrMemoController extends Controller
 {
-    private function actionButton($class, $icon, $id, $extraClass = '', $approval = false){
-        return "<button class='btn {$class} btn-sm {$extraClass}' data-id='{$id}' data-approval='{$approval}'>
+    private function actionButton($class, $icon, $id, $extraClass = '', $approval = false, $remarks = ''){
+        $remarksSafe = htmlspecialchars($remarks, ENT_QUOTES, 'UTF-8');
+        return "<button class='btn {$class} btn-sm {$extraClass}' data-id='{$id}' data-approval='{$approval}' data-remarks=\"{$remarksSafe}\">
                     <i class='fa-solid {$icon}'></i>
                 </button>";
     }
 
     public function viewHrMemoInfo(Request $request){
+        date_default_timezone_set('Asia/Manila');
         $globalUser = session('global_user');
         // return $globalUser;
         $user_access = explode(',', $globalUser->user_modules_id);
 
-        $hr_memo_details = HrMemo::with(['prepared_by_info', 'noted_by_info', 'email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
+        $hr_memo_details = HrMemo::with(['prepared_by_info', 'received_by_info', 'noted_by_info', 'email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
 
         return DataTables::of($hr_memo_details)
         ->addColumn('action', function($hr_memo_details) use ($user_access, $globalUser){
@@ -69,8 +73,7 @@ class HrMemoController extends Controller
                 }else{
                     $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
                 }
-            }
-            else if ($isForTUReceiving){
+            }else if ($isForTUReceiving){
                 if($canApproveTU){
                     $result .= $this->actionButton('btn-success btnView', 'fas fa-check-square', $id, 'mr-1', 'true');
                 }else{
@@ -78,6 +81,8 @@ class HrMemoController extends Controller
                 }
             }else if ($isHRDisapproved || $isTUDisapproved){
                 $result .= $this->actionButton('btn-secondary btnEdit', 'fas fa-edit', $id, 'mr-1');
+                // $remarksSafe = json_encode($hr_memo_details->remarks);
+                $result .= $this->actionButton('btn-danger btnViewRemarks', 'fas fa-comment-dots', $id, 'mr-1', 'false', $hr_memo_details->remarks); //CLARK TESTING
                 $result .= $this->actionButton('btn-success btnFinalSubmit', 'fas fa-check-square', $id, 'mr-1');
             }else{
                 $result .= $this->actionButton('btn-info btnView', 'fas fa-eye', $id, 'mr-1');
@@ -86,23 +91,23 @@ class HrMemoController extends Controller
             $result .= "</center>";
             return $result;
         })
-        ->addColumn('status_label', function($pth_details){
+        ->addColumn('status_label', function($hr_memo_details){
             $result = "";
             $result .= "<center>";
 
-            if($pth_details->status == 1){
+            if($hr_memo_details->status == 1){
                 $result .= "<span class='badge rounded-pill bg-info'>Pending</gspan>";
-            }else if($pth_details->status == 2){
+            }else if($hr_memo_details->status == 2){
                 $result .= "<span class='badge rounded-pill bg-secondary'>Cancelled</span>";
-            }else if($pth_details->status == 3){
+            }else if($hr_memo_details->status == 3){
                 $result .= "<span class='badge rounded-pill bg-primary'>For HR Approval</span>";
-            }else if($pth_details->status == 4){
+            }else if($hr_memo_details->status == 4){
                 $result .= "<span class='badge rounded-pill bg-danger'>HR Disapproved</span>";
-            }else if($pth_details->status == 5){
+            }else if($hr_memo_details->status == 5){
                 $result .= "<span class='badge rounded-pill bg-primary'>For TU Receiving</span>";
-            }else if($pth_details->status == 6){
+            }else if($hr_memo_details->status == 6){
                 $result .= "<span class='badge rounded-pill bg-success'>TU Received</span>";
-            }else if($pth_details->status == 7){
+            }else if($hr_memo_details->status == 7){
                 $result .= "<span class='badge rounded-pill bg-danger'>TU Disapproved</span>";
             }else{
                 $result .= "<span class='badge rounded-pill bg-info'>N/A</span>";
@@ -111,23 +116,23 @@ class HrMemoController extends Controller
 
             return $result;
         })
-        ->addColumn('reason_label', function($pth_details){
+        ->addColumn('reason_label', function($hr_memo_details){
             $result = "";
             $result .= "<center>";
 
-            if($pth_details->status == 1){
+            if($hr_memo_details->reason == 1){
                 $result .= "<span'>Newly Hired</span>";
-            }else if($pth_details->status == 2){
+            }else if($hr_memo_details->reason == 2){
                 $result .= "<span'>Maternity Leave</span>";
-            }else if($pth_details->status == 3){
+            }else if($hr_memo_details->reason == 3){
                 $result .= "<span'>Sick Leave</span>";
-            }else if($pth_details->status == 4){
+            }else if($hr_memo_details->reason == 4){
                 $result .= "<span'>Vacation Leave</span>";
-            }else if($pth_details->status == 5){
+            }else if($hr_memo_details->reason == 5){
                 $result .= "<span'>Promoted</span>";
-            }else if($pth_details->status == 6){
+            }else if($hr_memo_details->reason == 6){
                 $result .= "<span'>Transferred</span>";
-            }else if($pth_details->status == 7){
+            }else if($hr_memo_details->reason == 7){
                 $result .= "<span'>Regularization</span>";
             }else{
                 $result .= "<span'>N/A</span>";
@@ -136,7 +141,47 @@ class HrMemoController extends Controller
 
             return $result;
         })
-        ->rawColumns(['action', 'reason_label', 'status_label'])
+        ->addColumn('prepared_by_label', function($hr_memo_details){
+            $prepared_by_name = $hr_memo_details->prepared_by_info->name ?? (object) ['name' => 'N/A'];
+            $created_at_date = $hr_memo_details->created_at ? date("M j, Y h:i:s A", strtotime($hr_memo_details->created_at)) : '---';
+
+            $result = "
+                <center>
+                    <strong>{$prepared_by_name}<strong><br>
+                    <span class='badge badge-success'>Applied</span><br>
+                    <small class='text-muted'>$created_at_date</small>
+                </center>";
+
+            return $result;
+        })
+        ->addColumn('received_by_label', function($hr_memo_details){
+            $received_by_name = $hr_memo_details->received_by_info->name ?? 'Not Yet Received';
+            $received_date = !empty($hr_memo_details->received_date) ? date('M j, Y h:i:s A', strtotime($hr_memo_details->received_date)) : '---';
+
+            if($hr_memo_details->status < 5){
+                $received_status = 'N/A';
+                $badge_status = 'badge-secondary';
+            }else if($hr_memo_details->status >= 5 && $hr_memo_details->status <= 6){
+                $received_status = !empty($hr_memo_details->received_date) ? 'Received' : 'Pending';
+                $badge_status = !empty($hr_memo_details->received_date) ? 'badge-success' : 'badge-warning';
+            }else{
+                $received_status = 'Disapproved';
+                $badge_status = 'badge-danger';
+            }
+
+            // $received_status = !empty($hr_memo_details->received_date) ? 'Received' : 'Pending';
+            // $badge_status = !empty($hr_memo_details->received_date) ? 'badge-success' : 'badge-secondary';
+                
+            $result = "
+                <center>
+                    <strong>{$received_by_name}<strong><br>
+                    <span class='badge {$badge_status}'>{$received_status}</span><br>
+                    <small class='text-muted'>$received_date</small>
+                </center>";
+
+            return $result;
+        })
+        ->rawColumns(['action', 'reason_label', 'status_label', 'prepared_by_label', 'received_by_label']) // Specify the columns that contain HTML
         ->make(true);
     }
 
@@ -146,7 +191,8 @@ class HrMemoController extends Controller
                 ->whereNotNull('email')
                 ->where('user_stat', 1)
                 ->when($request->hr_only == 'true', function ($query) use ($request) {
-                    return $query->where('department_id', 29); //HRD
+                    // return $query->where('department_id', 29); //ALL HRD
+                    return $query->whereIn('employee_number', ['1810', 'T078']); //ESM & GAC only
                 })
                 ->get();
         return response()->json($emails);
@@ -228,27 +274,61 @@ class HrMemoController extends Controller
             INNER JOIN db_hris.tbl_Division ON tbl_EmployeeInfo.fkDivision = tbl_Division.pkid
         ";
 
+        $trainingVenueQuery = "
+            SELECT
+                Venue
+            FROM tbl_training_venue
+            WHERE Venue != '' AND logdel = 0
+            ORDER BY Venue ASC
+        ";
+
         // CASE 1: Employee number exists
         // if (!empty($empNo)) {
+        
+            $training_venue = DB::connection('mysql_systemone')->select($trainingVenueQuery);
 
             $hris = DB::connection('mysql_systemone')
                 ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
+                
 
             if (!empty($hris)) {
-                return response()->json($hris);
+                return response()->json([
+                    'emp_details' => $hris,
+                    'training_venue' => $training_venue
+                ]);
             }
 
             // fallback to subcon
             $subcon = DB::connection('mysql_subcon')
                 ->select($subconQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
 
-            return response()->json($subcon);
+            return response()->json([
+                'emp_details' => $subcon,
+                'training_venue' => $training_venue
+            ]);
         // }
     }
 
+    public function getTrainingVenueDropdownDetails(Request $request)
+    {
+        $trainingVenueQuery = "
+            SELECT
+                Venue
+            FROM tbl_training_venue
+            WHERE Venue != '' AND logdel = 0
+            ORDER BY Venue ASC
+        ";
+
+        $training_venue = DB::connection('mysql_systemone')->select($trainingVenueQuery);
+
+        return response()->json([
+            'training_venue' => $training_venue
+        ]);
+    }
+
     public function addHrMemoInfo(Request $request){
-        // return $request->all();
-        // return $trainees = json_decode($request->trainee_details, true);
+        date_default_timezone_set('Asia/Manila');
+
         $validation = array(
             'subject' => 'required',
             'from' => 'required',
@@ -299,6 +379,8 @@ class HrMemoController extends Controller
                     'date_filed' => $request->date_filed,
                     'prepared_by' => $request->prepared_by,
                     'noted_by' => $request->noted_by,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
                 );
 
                 if(isset($request->hr_memo_id)){ // EDIT
@@ -361,8 +443,14 @@ class HrMemoController extends Controller
                             HrMemoTraineeCategoryDetails::insert([
                                 'hr_memo_id'          => $hr_memo_id,
                                 'trainee_details_id'  => $trainee_detail_id,
+                                'date_start'          => $td['date_start'],
+                                'date_end'            => $td['date_end'],
                                 'category'            => $ed['exam_title'],
+                                'objective'           => $ed['objective'],
+                                'trainor'             => $td['trainor'],
+                                'type_of_training'    => $td['type_of_training'],
                                 'result'              => $ed['result'],
+                                'training_venue'      => $td['training_venue'],
                                 'training_remarks'    => $ed['remarks']
                             ]);
                         }
@@ -394,21 +482,21 @@ class HrMemoController extends Controller
                 if ($td->employment_type == 1) {
                     // HRIS employee
                     $td->load(['hris_emp_info' => function ($q) {
-                        $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
-                        ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                        ->select(
+                        // $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                        // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                        $q->select(
                             'vw_employeeinfo.*',
-                            'tbl_Training.Venue as Venue'
+                            // 'tbl_Training.Venue as Venue'
                         );
                     }]);
                 } else {
                     // Subcon employee
                     $td->load(['subcon_emp_info' => function ($q) {
-                        $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
-                        ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                        ->select(
+                        // $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                        // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                        $q->select(
                             'vw_employeeinfo.*',
-                            'tbl_Training.Venue as Venue'
+                            // 'tbl_Training.Venue as Venue'
                         );
                     }]);
                 }
@@ -420,11 +508,15 @@ class HrMemoController extends Controller
 
     public function updateHrMemoStatus(Request $request){
         DB::beginTransaction();
+        $globalUser = session('global_user');
+        date_default_timezone_set('Asia/Manila');
 
         try {
             $memo = HrMemo::findOrFail($request->id);
-
             $memo->status = $request->new_status;
+            $memo->remarks = $request->remarks;
+            $request->new_status == 6 ? $memo->received_by = $globalUser->rapidx_emp_id : null;
+            $request->new_status == 6 ? $memo->received_date = date('Y-m-d H:i:s') : null;
             $memo->save();
 
             DB::commit(); // ✅ commit here
@@ -432,6 +524,7 @@ class HrMemoController extends Controller
             return response()->json([
                 'success' => true,
                 'new_status' => $memo->status,
+                // 'remarks' => $memo->remarks,
                 'message' => 'Hr Memo status updated successfully.'
             ]);
         } catch (\Throwable $e) { // ✅ catch everything including DB errors
@@ -452,38 +545,55 @@ class HrMemoController extends Controller
 
     public function sendHrMemoMail(Request $request){
         $hr_memo = HrMemo::with(['prepared_by_info', 'noted_by_info', 'email_recipients.rapidx_user'])->where('id', $request->hr_memo_id)->whereNull('deleted_at')->first();
-        // return $hr_memo;
+        // return $hr_memo->noted_by_info->email;
         // $data = ['application' => $hr_memo, 'approver_details' => $approver_details];
+        $send_hr_to = $hr_memo->noted_by_info->email;
+        // $send_hr_cc = $hr_memo->prepared_by_info->email;
+        $send_hr_cc = [$hr_memo->prepared_by_info->email, 'cdcasuyon@pricon.ph'];
 
-        $send_to = [];
-        $send_cc = [];
+        $send_tu_to = [];
+        $send_tu_cc = [];
 
         foreach ($hr_memo->email_recipients as $recipient){
             if($recipient->type == 'to'){
-                $send_to[] = $recipient->rapidx_user->email;
+                $send_tu_to[] = $recipient->rapidx_user->email;
             }else if($recipient->type == 'cc'){
-                $send_cc[] = $recipient->rapidx_user->email;
+                $send_tu_cc[] = $recipient->rapidx_user->email;
             }
         }
 
         // if($hr_memo){
             switch ($request->status) {
                 case 3: { //FOR APPROVAL
-                        Mail::send('mail.hr_memo_mail', ['hr_memo' => $hr_memo], function ($message) use ($send_to, $send_cc, $hr_memo) {
-                            $message->to($send_to)->subject('TRDSv2 Memo: ' . $hr_memo->subject);
+                        Mail::send('mail.hr_memo_mail', ['hr_memo' => $hr_memo], function ($message) use ($send_hr_to, $send_hr_cc, $hr_memo) {
+                            $message->to($send_hr_to)->subject('TRDSv2 Memo: ' . $hr_memo->subject);
 
-                            if(!empty($send_cc)){
-                                $message->cc($send_cc);
+                            if(!empty($send_hr_cc)){
+                                $message->cc($send_hr_cc);
                             }
                         });
 
                         break;
                     }
-                case 4: { //APPROVED
+                case 4: { //HR DISAPPROVED
 
                         break;
                     }
-                case 5: { //DISAPPROVED
+                case 5: { //HR APPROVED, FOR TU RECEIVING
+                        Mail::send('mail.hr_memo_mail', ['hr_memo' => $hr_memo], function ($message) use ($send_tu_to, $send_tu_cc, $hr_memo) {
+                            $message->to($send_tu_to)->subject('TRDSv2 Memo: ' . $hr_memo->subject);
+
+                            if(!empty($send_tu_cc)){
+                                $message->cc($send_tu_cc);
+                            }
+                        });
+                        break;
+                    }
+                case 6: { //TU RECEIVED
+
+                        break;
+                    }
+                case 7: { //TU DISAPPROVED
 
                         break;
                     }
@@ -496,5 +606,51 @@ class HrMemoController extends Controller
         // }else{
         //     return response()->json(['result' => 2]);
         // }
+    }
+
+    public function getTrainorDropdownDetails(Request $request)
+    {
+        $pmiTrainorQuery = "
+            SELECT
+                pkid,
+                EmpNo,
+                CONCAT(FirstName, ' ', LastName) AS TrainorName
+            FROM tbl_EmployeeInfo
+            WHERE fkSection = 401 AND fkPosition IN (80, 97) AND EmpStatus = 1
+            ORDER BY TrainorName ASC
+        ";
+
+        $subconTrainorQuery = "
+            SELECT
+                pkid,
+                EmpNo,
+                CONCAT(FirstName, ' ', LastName) AS TrainorName
+            FROM tbl_EmployeeInfo
+            WHERE fkSection = 401 AND fkPosition IN (21, 87, 106, 123, 134) AND EmpStatus = 1
+            ORDER BY TrainorName ASC
+        ";
+
+        $hris = DB::connection('mysql_systemone')->select($pmiTrainorQuery);
+        $subcon = DB::connection('mysql_subcon')->select($subconTrainorQuery);
+
+        $merged_trainor_list = array_merge($hris, $subcon);
+            
+        return response()->json([
+            'trainor_list' => $merged_trainor_list
+        ]);
+    }
+
+    public function exportInspectorSkillChart(Request $request)
+    {
+        $request->validate([
+            'section_export'   => 'required',
+        ]);
+
+        $selectedSheets = $request->input('section_export', []);
+
+        return Excel::download(
+            new InspectorSkillChart($selectedSheets),
+            'QC Inspectors Skill Chart.xlsx'
+        );
     }
 }

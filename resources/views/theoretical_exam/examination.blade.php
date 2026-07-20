@@ -34,8 +34,9 @@
     <!-- Header -->
     <section class="content-header">
         <div class="container-fluid">
-            <h1>{{ $exam->exam_title }}</h1>
-            <p>{{ $exam->exam_instruction }}</p>
+            <h1 id="examTitleId" value="{{ $exam->id }}">{{ $exam->exam_title }}</h1>
+            <p id="examInstructionId">{{ $exam->description }}</p>
+            <p id="examInstructionId">{{ $exam->exam_instruction }}</p>
         </div>
     </section>
 
@@ -80,7 +81,7 @@
                                             <input type="date" class="form-control" name="exam_training_request_date_examination" id="examTrainingRequestDateExamination" value="{{ date('Y-m-d') }}"  required readonly>
                                         </div>
                                     </div>
-        
+
                                     <div class="form-group">
                                         <label class="font-weight-bold">Examination Take: </label>
                                             <input type="number" class="form-control" name="exam_training_request_examination_take" id="txtExamTrainingRequestExaminationTake" required readonly>
@@ -95,12 +96,12 @@
                 </div>
             </div>
 
-            <div class="d-none" id="stepTwo"> 
+            <div class="d-none" id="stepTwo">
                 <form method="POST" id="formExamSubmission">
                     @csrf
                     <div class="exam-scroll-container">
                         <input type="hidden" class="w-100" name="examination_user_info" id="txtExaminationUserInfo" readonly>
-                        <input type="hidden" class="w-100" name="employee_examination_result" id="txtEmployeeExaminationResult" placeholder="EXAM RESULT PER EMPLOYEE" readonly> <!-- this is for exam result -->
+                        <input type="hidden" class="w-100" name="employee_examination_result" id="txtEmployeeExaminationResult" placeholder="EXAM RESULT PER EMPLOYEE" readonly>
                         <input type="hidden" class="w-100" name="examination_questionnaire" id="txtExaminationQuestionnaire">
                         <input type="hidden" class="w-100" name="examination_questionnaire_details" id="txtExaminationQuestionnaireDetails">
 
@@ -109,9 +110,8 @@
                                 $items = json_decode($question->answer_choices_question, true);
                             @endphp
 
-                            <div class="card mb-3">
+                            <div class="card examCheckingCard mb-3">
                                 <div class="card-body">
-
                                     <!-- QUESTION HEADER -->
                                     <div class="d-flex justify-content-between align-items-start">
                                         <strong>
@@ -131,10 +131,10 @@
                                     <!-- IMAGE -->
                                     @if($question->image)
                                         <div class="text-center mb-2">
-                                            <img 
-                                                src="{{ asset('storage/app/public/questionnaire_attachment/' . $question->image) }}" 
+                                            <img
+                                                src="{{ asset('storage/app/public/questionnaire_attachment/' . $question->image) }}"
                                                 style="max-width:200px; cursor:pointer;"
-                                                data-toggle="modal" 
+                                                data-toggle="modal"
                                                 data-target="#imageModal"
                                                 class="previewImage"
                                             >
@@ -213,12 +213,9 @@
                                                 </table>
                                             </div>
                                         @break
-
                                     @endswitch
-
                                 </div>
                             </div>
-
                         @empty
                             <div class="alert alert-warning">No questions available.</div>
                         @endforelse
@@ -226,7 +223,12 @@
 
                     <div class="mt-3 d-flex justify-content-between">
                         <button type="button" id="btnPrev" class="btn btn-secondary">Previous</button>
-                        <button type="submit" id="btnSubmitExam" class="btn btn-success">Submit Exam</button>
+                        {{-- <button type="submit" id="btnSubmitExam" class="btn btn-success">Submit Exam</button> --}}
+                        @if($questions->count() > 0)
+                            <button type="submit" id="btnSubmitExam" class="btn btn-success">
+                                Submit Exam
+                            </button>
+                        @endif
                     </div>
                 </form>
             </div>
@@ -242,6 +244,7 @@
                 </div>
             </div>
         </div>
+
     </section>
 </div>
 @endsection
@@ -250,8 +253,8 @@
 @section('js_content')
     <script type="text/javascript">
         const path = window.location.pathname;
-        const parts = path.split('/').filter(Boolean); 
-        const linkIdRevision = parts.slice(-2); 
+        const parts = path.split('/').filter(Boolean);
+        const linkIdRevision = parts.slice(-2);
 
         $(document).ready(function () {
             console.log('linkIdRevision', linkIdRevision);
@@ -260,7 +263,7 @@
 
             GetExamTrainingRequestControlNo($('.get-training_request-ctrl_no'));
 
-            $('#slctExamTrainingRequestCtrlNo').change(function (e) { 
+            $('#slctExamTrainingRequestCtrlNo').change(function (e) {
                 e.preventDefault();
                 const selectedControlNo = $(this).val();
 
@@ -268,16 +271,17 @@
                 GetExamTrainingRequestEmployeeNo($('.get-training_request-employee_no'), selectedControlNo);
             });
 
-            $('#slctExamTrainingRequestEmployeeNo').change(function (e) { 
+            $('#slctExamTrainingRequestEmployeeNo').change(function (e) {
                 e.preventDefault();
+                let getexamTitleId = $('#examTitleId').attr('value');
                 let getData = $(this).val()
                 let getControlNo = $('#slctExamTrainingRequestCtrlNo').val()
 
                 GetExamTrainingRequestEmployeeInfo(getData, getControlNo);
-                CountExamTrainingRequestExaminationTake(getData, getControlNo);
+                CountExamTrainingRequestExaminationTake(getData, getControlNo, getexamTitleId);
             });
 
-            $('#btnNext').click(function (e) { 
+            $('#btnNext').click(function (e) {
                 e.preventDefault();
                 console.log('Ctrl. No.: ', $('#slctExamTrainingRequestCtrlNo').val());
                 console.log('Employee No.: ', $('#slctExamTrainingRequestEmployeeNo').val());
@@ -310,13 +314,13 @@
                     $('#stepOne').addClass('d-none');
                     $('#stepTwo').removeClass('d-none');
 
-                    console.log('linkIdRevision: ', linkIdRevision); 
+                    console.log('linkIdRevision: ', linkIdRevision);
 
                     LinkForIdAndRevision(linkIdRevision);
                 }
             });
 
-            $('#btnPrev').click(function (e) { 
+            $('#btnPrev').click(function (e) {
                 e.preventDefault();
                 $('#stepTwo').addClass('d-none');
                 $('#stepOne').removeClass('d-none');
@@ -326,9 +330,82 @@
                 $('#modalImage').attr('src', $(this).attr('src'));
             });
 
-            $('#formExamSubmission').submit(function (e) { 
+            $('#formExamSubmission').submit(function (e) {
                 e.preventDefault();
-                ExamSubmission()
+
+                let valid = true;
+
+                $('.examCheckingCard').removeClass('border border-danger');
+                $('.examCheckingCard').each(function () {
+                    let card = $(this);
+                    let answered = true;
+
+                    // Check radio groups
+                    let radioNames = [];
+
+                    card.find('input[type="radio"]').each(function () {
+                        let name = $(this).attr('name');
+                        if (!radioNames.includes(name)) {
+                            radioNames.push(name);
+                        }
+                    });
+
+                    for (let i = 0; i < radioNames.length; i++) {
+                        if (card.find('input[name="' + radioNames[i] + '"]:checked').length === 0) {
+                            answered = false;
+                            break;
+                        }
+                    }
+
+                    // Check checkbox
+                    if (answered &&
+                        card.find('input[type="checkbox"]').length > 0 &&
+                        card.find('input[type="checkbox"]:checked').length === 0) {
+                        answered = false;
+                    }
+
+                    // Check text
+                    if (answered) {
+                        card.find('input[type="text"]').each(function () {
+                            if ($(this).val().trim() === '') {
+                                answered = false;
+                                return false;
+                            }
+                        });
+                    }
+
+                    // Check textarea
+                    if (answered) {
+                        card.find('textarea').each(function () {
+                            if ($(this).val().trim() === '') {
+                                answered = false;
+                                return false;
+                            }
+                        });
+                    }
+
+                    if (!answered) {
+                        valid = false;
+                        card.addClass('border border-danger');
+                    }
+
+                });
+
+                if (!valid) {
+                    $('html, body').animate({
+                        scrollTop: $('.border-danger').first().offset().top - 100
+                    }, 500);
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Incomplete Exam',
+                        text: 'Please answer all questions before submitting.'
+                    });
+
+                    return;
+                }
+
+                ExamSubmission();
             });
         });
     </script>

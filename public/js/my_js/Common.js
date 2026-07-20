@@ -175,9 +175,6 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
 }
 
 
-
-
-
 const showSwalLoading = (params) => {
     Swal.fire({
         width: '20rem',
@@ -204,7 +201,7 @@ const resetFormValues = (params) => {
 /**
  * SweetAlert confirmation
  */
-const  swalConfirmAction =(message, callback) => {
+const  swalConfirmation =(message, callback) => {
     Swal.fire({
         text: message,
         icon: 'warning',
@@ -215,4 +212,36 @@ const  swalConfirmAction =(message, callback) => {
     }).then((result) => {
         if (result.isConfirmed) callback();
     });
+}
+
+
+const handleValidatorErrors = (errors) => {
+    
+    document.querySelectorAll('div input').forEach(function(input) {
+        input.classList.remove('is-invalid');
+    });
+    document.querySelectorAll('div select').forEach(function(input) {
+        input.classList.remove('is-invalid');
+    });
+    document.querySelectorAll('div textarea').forEach(function(input) {
+        input.classList.remove('is-invalid');
+    });
+    // Loop through each field in the errors object
+    for (let field in errors) {
+        if (errors.hasOwnProperty(field)) {
+            // Extract the error messages for the field
+            let fieldErrorMessage = errors[field];
+
+            // Add invalid class & title validation
+            if(field){
+                // document.querySelector(`[name="${field}"]`).classList.add('is-invalid');
+                document.querySelectorAll(`[name="${field}"], [name="${field}[]"]`).forEach(function(el) {
+                    el.classList.add('is-invalid');
+                });
+                // document.querySelector(`[name="${field}"]`).classList.add('is-invalid');
+                // document.querySelector(`[name="${field}"]`).classList.add('is-invalid');
+
+            }
+        }
+    }
 }

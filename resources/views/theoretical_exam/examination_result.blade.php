@@ -197,7 +197,7 @@
                             </div>
                         </div>
 
-                        <div class="d-none" id="stepTwo"> 
+                        <div class="d-none" id="stepTwo">
                             <div class="exam-scroll-container">
                                 <input type="text" class="w-100" name="exam_result_details_id" id="examResultDetailsId" readonly>
                             </div>
@@ -224,12 +224,91 @@
             </div>
         </div>
     </div>
+
+    <!-- Change Examination Date Modal -->
+    <div class="modal fade"id="modalChangeExaminationDate" tabindex="-1" role="dialog" aria-labelledby="changeExaminationDateLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+            <div class="modal-content shadow">
+
+                <!-- Modal Header -->
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="changeExaminationDateLabel">
+                        <i class="fa fa-calendar-alt mr-2"></i>
+                        Change Examination Date
+                    </h5>
+
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form method="post" id="formChangeExaminationDate" enctype="multipart/form-data">
+                    @csrf
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <input type="hidden" name="examination_result_detail_id" id="txtExaminationResultDetailId">
+
+                        <div class="form-group">
+                            <label for="lblExaminationDate" class="font-weight-bold">
+                                Examination Date
+                            </label>
+
+                            <input type="date"
+                                class="form-control"
+                                id="examinationDate"
+                                name="examination_date"
+                                placeholder="Enter Examination Date"
+                                autocomplete="off"
+                                required>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer bg-light justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" id="btnExaminationDate" class="btn btn-dark px-4">
+                            <i id="iBtnExaminationDateIcon" class="fa fa-check mr-1"></i>
+                            Save Date
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Exam Result Status Modal End -->
+    <div class="modal fade" id="modalChangeExamResultStatus">
+        <div class="modal-dialog">
+            <div class="modal-content modal-md">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="h4ChangeExamResultStatusTitle"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" id="formChangeExamResultStatus">
+                    @csrf
+                    <div class="modal-body">
+                    <label id="lblChangeExamResultStatusLabel"></label>
+                    <input type="hidden" name="exam_result_details_id" id="txtChangeExamResultStatusId" placeholder="Exam Result Details Id">
+                    <input type="hidden" name="status" id="txtChangeExamResultStatus" placeholder="Status">
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <button type="submit" id="btnChangeExamResultStatus" class="btn btn-dark"><i id="iBtnChangeExamResultStatusIcon" class="fa fa-check"></i> Yes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><!-- Change Exam Result Status Modal End -->
 @endsection
 
 
 @section('js_content')
     <script type="text/javascript">
-        let examResultTable; 
+        let examResultTable;
         let examResultTableDetails;
         let examResultId;
         let examResultDetailsId;
@@ -310,8 +389,16 @@
                     { data: 'action' },
                     { data: 'exam_taken' },
                     { data: 'date_examination' },
-                    { data: 'exam_result_info.employee_no' },
-                    { data: 'exam_result_info.employee_name' },
+                    { data: 'exam_result_info',
+                            render: function (data) {
+                                return data ? data.employee_no : 'No Data';
+                            }
+                    },
+                    { data: 'exam_result_info',
+                            render: function (data) {
+                                return data ? data.employee_name : 'No Data';
+                            }
+                    },
                     { data: 'score' },
                     { data: 'remark' },
                     { data: 'rating' }
@@ -336,14 +423,14 @@
                 GetEmployeeExamResultById(examResultDetailsId);
             });
 
-            $('#btnNext').click(function (e) { 
+            $('#btnNext').click(function (e) {
                 e.preventDefault();
                 $('#stepOne').addClass('d-none');
                 $('#stepTwo').removeClass('d-none');
 
             });
 
-            $('#btnPrev').click(function (e) { 
+            $('#btnPrev').click(function (e) {
                 e.preventDefault();
                 $('#stepTwo').addClass('d-none');
                 $('#stepOne').removeClass('d-none');
@@ -358,6 +445,43 @@
                 UpdateExamScoreForEmployee();
             });
 
+            $(document).on('click', '.actionChangeExaminationDate',function(e){
+                e.preventDefault();
+
+                examResultDetailsId = $(this).attr('examinationResultDetails-id');
+                let examinationDate = $(this).attr('examinationResultDetails-examination_date');
+                $("#txtExaminationResultDetailId").val(examResultDetailsId);
+                $("#examinationDate").val(examinationDate);
+            });
+
+            $("#formChangeExaminationDate").submit(function(event){
+                event.preventDefault();
+                UpdateExaminationDate();
+            });
+
+            $(document).on('click', '.actionChangeExamResultStatus',function(e){
+                e.preventDefault();
+
+                let examResultDetailsStatus = $(this).attr('status');
+                examResultDetailsId     = $(this).attr('examinationResultDetails-id');
+
+                $("#txtChangeExamResultStatusId").val(examResultDetailsId);
+                $("#txtChangeExamResultStatus").val(examResultDetailsStatus);
+
+                if(examResultDetailsStatus == 0){
+                    $("#lblChangeExamResultStatusLabel").text('Are you sure to activate?');
+                    $("#h4ChangeExamResultStatusTitle").html('<i class="fa fa-question-circle"></i> Activate Exam Result Details');
+                }else{
+                    $("#lblChangeExamResultStatusLabel").text('Are you sure to delete?');
+                    $("#h4ChangeExamResultStatusTitle").html('<i class="fa fa-question-circle"></i> Delete Exam Result Details');
+                }
+            });
+
+
+            $("#formChangeExamResultStatus").submit(function(event){
+                event.preventDefault();
+                ChangeExaminationResultStatus();
+            });
         });
     </script>
 @endsection
