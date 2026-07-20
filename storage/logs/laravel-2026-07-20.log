@@ -844,3 +844,7 @@
 #31 /var/www/TRDSv2/artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle()
 #32 {main}
 "} 
+[2026-07-20 23:08:54] local.ERROR: Cannot use App\Http\Controllers\PersonnelSkillMatrixController as PersonnelSkillMatrixController because the name is already in use {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot use App\\Http\\Controllers\\PersonnelSkillMatrixController as PersonnelSkillMatrixController because the name is already in use at \\\\RAPIDX\\RAPIDX SYSTEMS\\TRDSv2\\routes\\web.php:16)
+[stacktrace]
+#0 {main}
+"} 

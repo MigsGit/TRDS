@@ -376,7 +376,7 @@ class QualificationCertificationController extends Controller
                 'rawReasonsStringCollection' => $rawReasonsStringCollection,
                 'rawBEnggTrainingItemsCollection' => $rawBOpEnggSectionTrainingOrientationCollection ?? '',
                 'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection ?? '',
-                'rawReasonTransferFlexibility' => $rawReasonTransferFlexibility ?? '',
+                'rawReasonTransferFlexibility' => $rawReasonTransferFlexibilityCollection ?? '',
                 'approversCollection' => $processedData,
             ]);
         } catch (Exception $e) {
