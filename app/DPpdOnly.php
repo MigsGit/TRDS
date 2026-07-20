@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Model\Qc;
+namespace App;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class QcReasonCertification extends Model
+class DPpdOnly extends Model
 {
-    
+    use HasFactory;
 }

@@ -4727,9 +4727,6 @@
                                             </div>
 
                                             <label for="">Note: NG Injection process shall be taken from first lot output</label>
-
-                                            <!-- ------------------------------------------------ -->
-
                                         </div>
                                         </div>
                                     </div>

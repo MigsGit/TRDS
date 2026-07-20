@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class OpEnggSectionTrainingOrientationRequest extends FormRequest
+class DPpdCertificationCompletionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class OpEnggSectionTrainingOrientationRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,9 @@ class OpEnggSectionTrainingOrientationRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'lot_1st_sample_peqcs_opery' => ['required'],
+            '1st_injected_ng_peqcs_opery' => ['required'],
+            '1st_detected_ng_peqcs_opery' => ['required'],
         ];
     }
 }
