@@ -200,7 +200,7 @@
                                 </div>
                                 <div class="row mt-2 mb-5">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-primary" id="btnEmployeeOperator" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                        <button type="button" class="btn btn-primary" id="btnEmployeeOperator" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa fa-user-plus me-3"></i>Add Employee</button>
                                     </div>
                                 </div>
                                 <div class="table-responsive mt-3 mb-5">
@@ -421,7 +421,7 @@
                                                     <div class="col-md-6">
                                                     </div>
                                                     <div class="row">
-                                                       
+
                                                         <div class="col-md-6">
                                                             <label class="" for="">Trained by:</label>
                                                             <select class="form-control select2bs4" style="width: 100%;" id="text_first_trainedby_oper" name="text_first_trainedby_oper[]" multiple></select>
@@ -1171,7 +1171,7 @@
 
                                             <label for="">Note: NG Injection process shall be taken from first lot output</label>
 
-            
+
 
                                         </div>
                                         </div>
@@ -1718,7 +1718,7 @@
                 // { "data" : "approved_conformed_by" },
                 { "data" : "created_at" },
             ],
-            
+
         });
         dataTable.fvi_operator = $(table.fvi_operator).DataTable({
             "processing" : true,
@@ -1916,12 +1916,25 @@
         $(document).on('submit', '#formSubmitOper, #formSubmitOper', function (e) {
             e.preventDefault();
             var $form = $(this);
-            if($('#approval_status').val() === "FQCVVO"){
-                //TODO: Swal fire
-                saveFormOper($form);
-            }else{
-                $('#modalSendEmail').modal();
+            Swal.fire({
+            title: 'Are you sure you want to save this request?',
+            // html: 'This will allow you to add employees who will not be endorsed for this training endorsement.<br> <em style="font-size: 1rem;">You can specify the reason for not endorsing each employee.</em>',
+            html: '<em style="font-size: 1rem;">The next Approver is QC Supervisor Approver</em>',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, proceed',
+            cancelButtonText: 'Cancel'
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                if($('#approval_status').val() === "FQCVVO"){
+                    //TODO: Swal fire
+                    saveFormOper($form);
+                }else{
+                    $('#modalSendEmail').modal();
+                }
             }
+        });
+
         });
 
         var $positionSelect = $('#text_select_position');

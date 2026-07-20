@@ -65,8 +65,10 @@ const  call_ajax = (data = null, handler, fn,elFormId =null) => {
         url: handler,
         beforeSend: function(){
             // console.log('call_ajax elFormId',elFormId);
-            // return;
-            $('#modal-loading').modal('show');
+            // return
+            showSwalLoading();
+            Swal.close();
+
             if(elFormId !=null){
                 elFormId[0].reset();
             }
@@ -124,10 +126,11 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         beforeSend: function(){
-            $('#modal-loading').modal('show');
-
+            // $('#modal-loading').modal('show');
+            showSwalLoading();
         },
         success: function (result) {
+            Swal.close();
             fn(result);
             $('#modal-loading').modal('hide');
             if(elFormId !=null){
@@ -136,6 +139,7 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
 
         },
         error: function (result) {
+            Swal.close();
             let errorResponse = result.responseJSON;
             let status = result.status;
 
@@ -147,7 +151,7 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
             // console.log(result.statusText);
             // $('#modal-loading').modal('hide');
             if( status === 500){
-                toastr.error((errorResponse.message) ? errorResponse.message : 'Internal Server Error.' ?? '');
+                toastr.error('Internal Server Error! Please Contact ISS');
                 // toastr.error(errorResponse.message ?? '');
                 // Swal.fire({ icon: 'error', title: 'Error', text: (errorResponse.message) ? errorResponse.message : 'Internal Server Error.'});
             }
@@ -163,10 +167,26 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
                 errorHandler(errorResponse.errors['text_oper_approved_confirmed_by'], $('#text_oper_approved_confirmed_by')); // <-- replaces all if-else
                 errorHandler(errorResponse.errors['text_alert_prod_sec'], $('#text_alert_prod_sec'));
                 errorHandler(errorResponse.errors['text_alert_prod_cc_sec'], $('#text_alert_prod_cc_sec'));
-                errorHandler(errorResponse.errors['text_qcs_station_1st_oper'], $('#text_qcs_station_1st_oper')); 
+                errorHandler(errorResponse.errors['text_qcs_station_1st_oper'], $('#text_qcs_station_1st_oper'));
             }
 
         }
+    });
+}
+
+
+
+
+
+const showSwalLoading = (params) => {
+    Swal.fire({
+        width: '20rem',
+        html: '<em>Loading..</em>',
+        allowOutsideClick: false,
+        onRender: function () {
+            $('.swal2-content').prepend('<div class="spinner-border text-dark" role="status" style="width: 3rem; height: 3rem;"><span class="sr-only">Loading...</span></div>');
+        },
+        showConfirmButton: false,
     });
 }
 

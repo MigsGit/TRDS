@@ -31,6 +31,7 @@ class QcSlipEmployee extends Model
     {
         return $this->hasOne(SystemOneHrisSubcon::class, 'EmpNo', 'employee_no');
     }
+
     public function dropdown_master_detail($column)
     {
         return $this->hasOne(DropdownMasterDetail::class, 'id', $column);
@@ -43,6 +44,6 @@ class QcSlipEmployee extends Model
     {
        return $this->dropdown_master_detail('station_to');
     }
-    
+
 
 }

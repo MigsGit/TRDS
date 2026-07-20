@@ -16,12 +16,12 @@ class CreateDPpdCertificationCompletionsTable extends Migration
         Schema::create('d_ppd_certification_completions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('qc_slips_id')->constrained('qc_slips')->cascadeOnDelete()->comment('reference from qc_slips_id');
-            $table->tinyInteger('lot_1st_sample_peqcs_oper')->comment('1 Production Abnormality Control | 2 Defect Escalation Procedure');
-            $table->tinyInteger('1st_injected_ng_peqcs_oper')->comment('1 Production Abnormality Control | 2 Defect Escalation Procedure');
-            $table->tinyInteger('1st_detected_ng_peqcs_oper')->comment('1 Production Abnormality Control | 2 Defect Escalation Procedure');
-            $table->tinyInteger('2nd_sample_peqcs_oper')->comment('1 Production Abnormality Control | 2 Defect Escalation Procedure');
-            $table->tinyInteger('2nd_injected_ng_peqcs_oper')->comment('1 Production Abnormality Control | 2 Defect Escalation Procedure');
-            $table->tinyInteger('2nd_detected_ng_peqcs_oper')->comment('1 Production Abnormality Control | 2 Defect Escalation Procedure');
+            $table->string('lot_1st_sample_peqcs_oper');
+            $table->string('1st_injected_ng_peqcs_oper');
+            $table->string('1st_detected_ng_peqcs_oper');
+            $table->string('2nd_sample_peqcs_oper')->nullable();
+            $table->string('2nd_injected_ng_peqcs_oper')->nullable();
+            $table->string('2nd_detected_ng_peqcs_oper')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

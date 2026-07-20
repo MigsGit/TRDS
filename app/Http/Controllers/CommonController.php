@@ -17,7 +17,7 @@ class CommonController extends Controller
              switch ($approvalStatus) {
                 case 'PB':
                     $approvalStatus = 'APRODTO';
-                    $statusName = 'A Production Training Orientation';
+                    $statusName = 'PREPARED BY';
                     $spanColor = 'bg-danger';
                     break;
                 case 'APRODTO':
@@ -110,7 +110,7 @@ class CommonController extends Controller
     }
     public function getEmailByRapidxUserId($empNo){
         try {
-            $user = RapidXUser::where('employee_number',$empNo)->first();
+        return    $user = RapidXUser::where('employee_number',$empNo)->first();
             if (!$user) {
                 throw new \Exception('User not found. Please add to Rapidx User Module!');
             }
@@ -126,18 +126,16 @@ class CommonController extends Controller
         }
     }
     public function emailMsg($params){
-        $qcSlip = QcSlip::with('product_line')->where('id',$params['qc_slips_id'])
+        $qcSlip = QcSlip::with('product_line','system_one_hris_subcon')->where('id',$params['qc_slips_id'])
         ->whereNull('deleted_at')
         ->first();
-        //TODO: Created By SystemOneHrisSubcon
-
         // if($getEcrStatus['status'] == 'DISAPPROVED'){
         //     $header = "Your ECR has been disapproved";
         // }else if($getEcrStatus['status'] == 'APPROVED'){
         //     $header = "Your ECR has been approved";
         // }else{
             // }
-        $header = "Please see the Certification/Qualificationfor your update.";
+        $header = "Please see the Certification/Qualification for your update.";
         return $msg = '<!DOCTYPE html>
             <html>
                 <head>
@@ -198,7 +196,7 @@ class CommonController extends Controller
                                                     <label class="col-sm-12 col-form-label"><b> Product Line : </b><span class="text-black"> '.$qcSlip->product_line.' </span></label>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label class="col-sm-12 col-form-label"><b> Created By : </b><span class="text-black"> '.$qcSlip->created_by.' </span></label>
+                                                    <label class="col-sm-12 col-form-label"><b> Created By : </b><span class="text-black"> '.$qcSlip->system_one_hris_subcon[0]['empname'].' </span></label>
                                                 </div>
                                             </div>
                                             <br>

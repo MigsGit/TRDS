@@ -24,11 +24,8 @@ class FQcValidationRequest extends FormRequest
     public function rules()
     {
         return [
-            'refdocno_input_qcvvo_oper' => 'required',
-            'refdocno_input_qcvvo_oper_2' => 'required',
             'text_validated1_qcvvo_oper' => 'required',
             'text_date1_qcvvo_oper' => 'required',
-            'text_obs_first_result_es_oper' => 'required',
         ];
     }
 }

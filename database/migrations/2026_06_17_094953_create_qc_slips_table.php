@@ -17,12 +17,11 @@ class CreateQcSlipsTable extends Migration
 
             $table->id();
             $table->string('control_no')->unique()->index();
-            $table->string('status')->default('PB')->comment('1 PB-Preparedby | ');
-            $table->string('approval_status')->default('PB')->comment('1 PB-Preparedby | ');
+            $table->string('status')->default('PB')->comment('1 PB-Preparedby | FORAPP- FORAPPROVAL | OK - CLOSED');
+            $table->string('approval_status')->default('PB')->comment('look for op_approvers approval status');
             $table->string('section_category');
             $table->string('position_category');
             $table->string('section')->comment('systemone HRIS');
-            // $table->string('product_line')->comment('dropdown_maintenance_details');
             $table->foreignId('product_line')
             ->constrained('dropdown_master_details')
             ->cascadeOnDelete()->comment('reference from dropdown_maintenance_details_id');

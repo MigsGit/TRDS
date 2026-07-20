@@ -10,6 +10,7 @@ use App\Http\Requests\CQcCertificationRequest;
 use App\Http\Requests\DPpdCertificationCompletionRequest;
 use App\Http\Requests\EEngValidationProcessRequest;
 use App\Http\Requests\EQcValidationProcessRequest;
+use App\Http\Requests\FQcValidationRequest;
 use App\Http\Requests\QcSlipEmployeeRequest;
 use App\Http\Requests\QcSlipRequest;
 use App\Http\Requests\SendEmailRequest;
@@ -139,7 +140,7 @@ class QualificationCertificationController extends Controller
             ];
             //TODO: SEND email
             DB::commit();
-            // $this->commonController->sendEmail($emailData);
+            $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -278,16 +279,8 @@ class QualificationCertificationController extends Controller
                 ->values()
                 ->all();
             }
-
-          
-           
-
-           $rawPayload = collect($qcSlip->op_approvers)->groupBy('approval_status')->toArray();
-
-
+            $rawPayload = collect($qcSlip->op_approvers)->groupBy('approval_status')->toArray();
             $approversCollection = collect($qcSlip)->groupBy('approval_status')->toArray();
-
-
             // 2. Step One: Parse and collect ALL unique EmpNo values across all status groups
             $allEmployeeNumbers = [];
             foreach ($rawPayload as $status => $items) {
@@ -558,24 +551,37 @@ class QualificationCertificationController extends Controller
 
                 if (count($current) > 0) {
                     // Get THIS row's own emp IDs from alert_prod_sec (pipe-separated)
-                    $empIds = collect($current)
+                    $empIdsTo = collect($current)
                         ->pluck('alert_prod_sec')
                         ->filter()
                         ->flatMap(function ($item) {
                             return array_map('trim', explode('|', $item));
                         })
                         ->unique();
-
+                    $empIdsCc = collect($current)
+                        ->pluck('alert_prod_cc_sec')
+                        ->filter()
+                        ->flatMap(function ($item) {
+                            return array_map('trim', explode('|', $item));
+                        })
+                        ->unique();
                     // Map emp IDs -> names using the lookup, drop unmatched
-                    $currentApprover = $empIds
+                    $currentApproverTo = $empIdsTo
                         ->map(function ($empId) use ($hrisSubcon) {
                             return $hrisSubcon[$empId] ?? null;
                         })
                         ->filter()
                         ->join(' | ');
+                    $currentApproverCc = $empIdsCc
+                        ->map(function ($empId) use ($hrisSubcon) {
+                            return $hrisSubcon[$empId] ?? null;
+                        })
+                        ->filter()
+                        ->join(' | ');
+                //    return $empIdsCc = array_merge($empIdsTo,$empIdsCc);
 
-                    if ($currentApprover !== '') {
-                        $resultCurrentApprover = '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApprover.' </span></br></br>';
+                    if ($currentApproverTo !== '') {
+                        $resultCurrentApprover = '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApproverTo.' | '.$currentApproverCc.' </span></br></br>';
                     }
                 }
 
@@ -584,31 +590,6 @@ class QualificationCertificationController extends Controller
                     . '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> '.$getApprovalStatus['statusName'].' </span>'
                     . '</center></br>';
             })
-            // ->addColumn('rawStatus',function ($row) use ($request,$hrisSubcon){
-            //     $result = '';
-            //     $current = $row->op_approvers_pending ?? [];
-            //     // $approvalStatusEnvironment = $row->environment->approval_status;
-            //     $approvalStatus = $row->approval_status;
-            //     // $getStatus = $this->commonInterface->getStatus4m($statusEnvironment);
-            //         $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
-            //      if(count($current) === 0){
-            //         $currentApprover = "";
-            //         $resultCurrenApprover = "";
-            //      }else{
-            //         $currentApprover =  collect($hrisSubcon)->join(' | ') ?? '';
-            //         $resultCurrenApprover = '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApprover.' </span> </br>  </br>';
-            //      }
-
-
-            //     $result .= '<center>';
-            //     // $result .= '<span class="'.$getStatus['bgStatus'].'"> '.$getStatus['status'].' </span>';
-            //     $result .= '<br>';
-            //     $result .= $resultCurrenApprover;
-            //     $result .= '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> '.$getApprovalStatus['statusName'].'  </span>';
-            //     $result .= '</center>';
-            //     $result .= '</br>';
-            //     return $result;
-            // })
             ->addColumn('trained_by',function ($row){
                 $personInCharge = $row->rapid_x_user->name ?? '';
                 // $personInCharge = $row;
@@ -631,7 +612,7 @@ class QualificationCertificationController extends Controller
             })
             ->addColumn('created_by',function ($row){
                 $personInCharge = $row->system_one_hris_subcon[0]['empname'] ?? '';
-                // $personInCharge = $row; 
+                // $personInCharge = $row;
                 $result = '';
                 $result .= '<center>';
                 $result .= '<span> '.$personInCharge.' </span>';
@@ -655,7 +636,7 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
- 
+
     public function updateOperApprovers($params){
         try {
             DB::commit();
@@ -830,7 +811,7 @@ class QualificationCertificationController extends Controller
                         "qcs_station_2nd_oper"      => $this->joinSafe($request, 'text_qcs_station_2nd_oper'),
                     ];
                     $arrFinalApprover = [
-                        "oper_approved_confirmed_by" => $this->joinSafe($request, 'text_qcs_station_1st_oper'),
+                        "oper_approved_confirmed_by" => $this->joinSafe($request, 'text_oper_approved_confirmed_by'),
                     ];
                     QcSlip::where('id',$qcSlipId)->update($arrFinalApprover);
                     CQcCertification::insert($cQcCertification);
@@ -910,6 +891,7 @@ class QualificationCertificationController extends Controller
                     ];
                 }
                 if($qcSlipDetails->approval_status ==='FQCVVO'){
+                    app(FQcValidationRequest::class)->validateResolved();
                     $fQcValidationVisualOperator = [
                         "qc_slips_id" => $qcSlipId,
                         'refdocno_input_qcvvo_oper' => $request->text_refdocno_input_qcvvo_oper,
@@ -929,7 +911,7 @@ class QualificationCertificationController extends Controller
                         "second_status"    => $this->getSafe($request, 'text_oa_2nd_result_es_oper'),
                         "second_remarks"   => '',
                     ];
-                    // FQcValidation::insert($fQcValidationVisualOperator);
+                    FQcValidation::insert($fQcValidationVisualOperator);
                 }
             }
             //=== Update the Operator Approvers based on the Current Status
@@ -939,7 +921,7 @@ class QualificationCertificationController extends Controller
                 ->update($operToApprovers);
             }
             //=== Update the Approval Status and Insert the new Approval Status and Emails to the Next Approvers
-           $changeApprovalStatusParams = [
+            $changeApprovalStatusParams = [
                 'qcSlipsId' => $qcSlipId,
                 'approval_status'=> $currentApprovalStatus,
                 'selectedSection'=> $request->text_select_section,
@@ -951,7 +933,7 @@ class QualificationCertificationController extends Controller
                     'update_data'=> [
                         'qc_slips_id' => $qcSlipId,
                         'approval_status'=> $getNewStatus['newStatus'],
-                        'alert_prod_sec' => $qcSlipDetails->oper_approved_confirmed_by,
+                        'alert_prod_sec' => $this->joinSafe($request, 'text_oper_approved_confirmed_by'),
                         'alert_prod_cc_sec' => '',
                     ],
                     'approval_status'=> $currentApprovalStatus,
@@ -970,8 +952,6 @@ class QualificationCertificationController extends Controller
                 ];
             }
             DB::commit();
-            //ADD ELSE TO QC Supervisor Approval for OPERATOR
-            // return 'DONE';
             $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
@@ -979,6 +959,7 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
+
 
     public function index(Request $request){
         return 'true' ;
