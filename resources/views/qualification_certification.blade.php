@@ -5,10 +5,14 @@
 @section('content_page')
 @php
     $classificationTabs = [
-        ['key' => 'mh', 'label' => 'MH', 'active' => true],
+        ['key' => 'operator', 'label' => 'Operator', 'active' => true],
     ];
 @endphp
-
+<style>
+    .card-body {
+       max-height: 80vh; overflow-y: auto;
+    }
+</style>
 <div class="wrapper">
     <div class="content-wrapper">
         <section class="content-header">
@@ -54,9 +58,9 @@
 
                                     <div class="tab-content" id="myTabContent">
                                         <!-- For MH Tab -->
-                                        <div class="tab-pane fade show active" id="mh" role="tabpanel" aria-labelledby="for-checking-tab">
+                                        <div class="tab-pane fade show active" id="operator" role="tabpanel" aria-labelledby="for-checking-tab">
                                             <div class="card shadow-sm border-0">
-                                                <div class="card-body">
+                                                <div class="card-body overflow-auto">
 
                                                     <!-- Edited 4-24-25 -->
                                                     <div class="row mt-2 mb-2">
@@ -165,11 +169,11 @@
                             @csrf
                                 <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
 
-                                <div class="col-md-3">
+                                <div class="col-md-3 d-none">
                                     <label for="">QC Slip Id:</label>
                                     <input class="form-control" type="text" class="form-control" id="qc_slips_id" name="qc_slips_id" placeholder="Auto Generated" readonly>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3  d-none">
                                     <label for="">Approval Status:</label>
                                     <input class="form-control" type="text" class="form-control" id="approval_status" name="approval_status" placeholder="Auto Generated" readonly>
                                 </div>

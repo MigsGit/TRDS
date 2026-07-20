@@ -894,8 +894,8 @@ class QualificationCertificationController extends Controller
                     app(FQcValidationRequest::class)->validateResolved();
                     $fQcValidationVisualOperator = [
                         "qc_slips_id" => $qcSlipId,
-                        'refdocno_input_qcvvo_oper' => $request->text_refdocno_input_qcvvo_oper,
-                        'refdocno_input_qcvvo_oper_2' => $request->text_refdocno_input_qcvvo_oper_2,
+                        'refdocno_input_qcvvo_oper' => $this->getSafe($request, 'text_refdocno_input_qcvvo_oper'),
+                        'refdocno_input_qcvvo_oper_2' => $this->getSafe($request, 'text_refdocno_input_qcvvo_oper_2'),
                     ];
                     $operToApprovers = [
                         "decision_status"  => 'APP',
@@ -912,6 +912,7 @@ class QualificationCertificationController extends Controller
                         "second_remarks"   => '',
                     ];
                     FQcValidation::insert($fQcValidationVisualOperator);
+                    DB::commit();
                 }
             }
             //=== Update the Operator Approvers based on the Current Status

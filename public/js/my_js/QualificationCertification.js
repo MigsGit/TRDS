@@ -7,8 +7,8 @@
     function syncCheckboxesWithDb(nameAttribute, rawDbValue) {
         // 1. Explode and clean your database values into an array of clean strings
         // If the database value is null/empty, fall back to an empty array
-        const activeValues = rawDbValue 
-            ? rawDbValue.split('|').map(item => item.trim()) 
+        const activeValues = rawDbValue
+            ? rawDbValue.split('|').map(item => item.trim())
             : [];
 
         // 2. Query all checkboxes with that specific name attribute inside your form container
@@ -459,7 +459,7 @@
             <td>
                 <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpRow"
                         data-index="${idx}">
-                    <i class="fa-solid fa-trash"></i>
+                    <i class="fa-solid fa fa-trash"></i>
                 </button>
             </td>
             <td>${empId}</td>
@@ -555,8 +555,8 @@
             // Match your application's data-attribute structure
             const empId = emp.employee_no;
             const empName = emp.system_one_hris_subcon.empname ??''; // Use fallback if name is in relation
-            const stFrom = emp.get_station_from.dropdown_masters_details ??'';
-            const stTo = emp.get_station_to.dropdown_masters_details ?? '';
+            const stFrom = emp.get_station_from?.dropdown_masters_details ??'';
+            const stTo = emp.get_station_to?.dropdown_masters_details ?? '';
             const remarks = emp.remarks || '';
 
             let remove =``;
@@ -565,7 +565,7 @@
                             <i class="fa-solid fa fa-trash"></i>
                         </button>`;
             }
-         
+
             // 3. Build your standard row HTML precisely matching your creation architecture
             // CRITICAL: We append data attributes so your "remove" and "get data" functions work perfectly
             const row = `
@@ -760,6 +760,15 @@
             form.formSubmitOper.find(checkboxSelector).prop('checked', true);
         });
     }
+    function select2Value(params) {
+        // value = "1 | 2" from DB
+        const selected = (params.value ?? '')
+            .split('|')
+            .map(v => v.trim())
+            .filter(v => v !== '');
+
+        params.combo.val(selected).trigger('change');
+    }
 
     // ---- Get Data
     const getQcSlipsById  = (params) => {
@@ -837,9 +846,15 @@
                 4,
                 editSelectionsMap4
             );
-
-            form.formSubmitOper.find('#defect_escalation').val(aOperProdTrainingOrientation?.defect_escalation).trigger('change');
-            form.formSubmitOper.find('#production_abnormality').val(aOperProdTrainingOrientation?.production_abnormality).trigger('change');
+            let defectParams = 
+            select2Value({
+                combo : form.formSubmitOper.find('#defect_escalation'),
+                value : aOperProdTrainingOrientation?.defect_escalation,
+            });
+            select2Value({
+                combo : form.formSubmitOper.find('#production_abnormality'),
+                value : aOperProdTrainingOrientation?.production_abnormality,
+            });
             // Guard: validate aProdData exists and has properties before reading from it
             if (aProdData && typeof aProdData === 'object') {
                 const approverFirstDate  = aProdData.first_date  ?? '';

@@ -34,13 +34,13 @@ class BOpEnggSectionTrainingOrientationRequest extends FormRequest
              'text_qc_1st_date_es_oper' => ['required'],
              'text_qc_1st_time_es_oper' => ['required'],
              'text_oa_1st_result_es_oper' => ['required'],
-             'text_qcs_station_1st_oper_1' => ['required'],
+            //  'text_qcs_station_1st_oper_1' => ['required'],
              'text_obs_second_result_es_oper'  => 'required_if:text_obs_first_result_es_oper,FAILED',
 
 
-                    
+
         ];
-        
+
     }
      public function messages()
     {
