@@ -933,7 +933,7 @@ $(document).on('click', '.btnEditEndorsement', function(){
                             const qArr = JSON.parse(questionnaire);
                             if (Array.isArray(qArr) && qArr.length > 0) {
                                 hasExam = true;
-                                examTitles = qArr.map(q => q && q.exam_title ? q.exam_title : '').filter(Boolean).join(' | ');
+                                examTitles = qArr.map(q => q && q.description ? q.description : '').filter(Boolean).join(' | ');
                             }
                         } catch (e) {
                             examTitles = '';
