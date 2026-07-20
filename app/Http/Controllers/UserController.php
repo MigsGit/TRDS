@@ -307,7 +307,7 @@ class UserController extends Controller
         return response()->json(['userCollection' => $userCollection]);
     }
     public function getSystemOneEmployeeDetails(Request $request){ //nmodify
-
+    // return response()->json(['token' => csrf_token()]);
         $search = $request->input('search');
     $page = $request->input('page', 1);
     $perPage = 20; // Load 20 results at a time

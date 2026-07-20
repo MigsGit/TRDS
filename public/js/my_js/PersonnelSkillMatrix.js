@@ -5,6 +5,9 @@ $(document).ready(function() {
     const subconEmployee = $('#tblSubconEmployees');
     const updateEmpInfoModalId = $('#updateEmpInfoModalId');
     const viewEmpInfoModalId = $('#viewEmpInfoModalId');
+    const btnChooseFileToExport = $('#btnChooseFileToExport');
+    const chooseExportReportModal = $('#chooseExportReportId');
+    const exportSkillMatrix = $('#btnGenerateVisualMatrix');
 
 
 
@@ -69,11 +72,14 @@ $(document).ready(function() {
         columns: [
             { data: 'trainingDate'},
             { data: 'title'},
+            { data: 'seriesName'},
+            { data: 'station'},
+            { data: 'detailedStation'},
             { data: 'objective' },
             { data: 'trainor' },
             { data: 'result' },
             { data: 'trainingVenue' },
-            { data: 'mechanics' },
+            // { data: 'mechanics' },
             { data: 'typeOfTraining' },
         ]
     });
@@ -232,6 +238,19 @@ $(document).ready(function() {
             .removeClass('text-dark')
             .addClass('text-white');
     });
+
+    btnChooseFileToExport.on('click', function () {
+        console.log('clicked');
+        chooseExportReportModal.modal('show');
+    });
+
+    exportSkillMatrix.on('click', function(){
+        console.log('exportClicked');
+    });
+
+
+
+
 
 });
 

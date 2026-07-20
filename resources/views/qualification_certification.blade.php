@@ -5,10 +5,14 @@
 @section('content_page')
 @php
     $classificationTabs = [
-        ['key' => 'mh', 'label' => 'MH', 'active' => true],
+        ['key' => 'operator', 'label' => 'Operator', 'active' => true],
     ];
 @endphp
-
+<style>
+    .card-body {
+       max-height: 80vh; overflow-y: auto;
+    }
+</style>
 <div class="wrapper">
     <div class="content-wrapper">
         <section class="content-header">
@@ -31,7 +35,7 @@
                                             <p class="text-uppercase text-muted small mb-1">Certification workspace</p>
                                             <h5 class="card-title mb-0 text-secondary">Qualification / Certification</h5>
                                         </div>
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCreateCQForm"><i class="fa fa-plus fa-md mr-2"></i>Certify Employee</button>
+                                        <button type="button" id="btnCreateCQForm" class="btn btn-primary" data-toggle="modal" data-target="#modalCreateCQForm"><i class="fa fa-plus fa-md mr-2"></i>Certify Employee</button>
                                     </div>
                                 </div>
 
@@ -54,9 +58,9 @@
 
                                     <div class="tab-content" id="myTabContent">
                                         <!-- For MH Tab -->
-                                        <div class="tab-pane fade show active" id="mh" role="tabpanel" aria-labelledby="for-checking-tab">
+                                        <div class="tab-pane fade show active" id="operator" role="tabpanel" aria-labelledby="for-checking-tab">
                                             <div class="card shadow-sm border-0">
-                                                <div class="card-body">
+                                                <div class="card-body overflow-auto">
 
                                                     <!-- Edited 4-24-25 -->
                                                     <div class="row mt-2 mb-2">
@@ -70,16 +74,19 @@
                                                         <!-- <button class="btn btn-primary"><i class="fa fa-plus me-2"></i> Add New</button> -->
                                                     </div>
                                                     <div class="table-responsive">
-                                                        <table id="tbl_mh" class="table table-striped table-hover table-bordered nowrap">
+                                                        {{-- <table id="tbl_operator" class="table table-striped table-hover table-bordered nowrap"> --}}
+                                                             <table id="tbl_operator" class="table table-striped table-hover table-bordered nowrap">
                                                             <thead class="table-primary">
                                                                 <tr>
                                                                 <th>Action</th>
+                                                                <th>Status</th>
                                                                 <th>Ctrl No. / Doc No.</th>
+                                                                <th>Series Name</th>
+                                                                <th>Approvers</th>
                                                                 <th>Date Filed</th>
-                                                                <th>Trained by</th>
                                                                 <!-- <th>Qualified by</th> -->
-                                                                <th>Certified by</th>
-                                                                <th>Approved / Conformed by</th>
+                                                                {{-- <th>Certified by</th> --}}
+                                                                {{-- <th>Approved / Conformed by</th> --}}
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -120,7 +127,21 @@
 
                         <div class="row">
                             <div class="col-md-6">
-                                <x-section-select name="select_section" id="select_section" label="Select Section" />
+                                <div class="form-group">
+                                    <label for="text_select_position">Select Section</label>
+                                {{-- <x-section-select name="select_section" id="select_section" label="Select Section" /> --}}
+                                    <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="select_section" id="select_section">
+                                        <option value="" selected disabled>Select Position</option>
+                                        <option value="TSF1" selected>TS-F1</option>
+                                        <option value="TSF3">TS-F3</option>
+                                        <option value="CN">CN</option>
+                                        <option value="CNF3">CN-F3</option>
+                                        <option value="PPDCN">PPD-CN</option>
+                                        <option value="PPDTS">PPD-TS</option>
+                                        <option value="PPDF3">PPD-F3</option>
+                                        <option value="YF">YF</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="col-md-6">
@@ -144,16 +165,24 @@
 
                         <!-- FORMAT 5 Operator -->
                         <div class="d-none" id="div_Oper">
-                        <form  id="formSubmit_Oper" >
+                            <form  id="formSubmitOper" >
                             @csrf
                                 <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
 
+                                <div class="col-md-3 d-none">
+                                    <label for="">QC Slip Id:</label>
+                                    <input class="form-control" type="text" class="form-control" id="qc_slips_id" name="qc_slips_id" placeholder="Auto Generated" readonly>
+                                </div>
+                                <div class="col-md-3  d-none">
+                                    <label for="">Approval Status:</label>
+                                    <input class="form-control" type="text" class="form-control" id="approval_status" name="approval_status" placeholder="Auto Generated" readonly>
+                                </div>
                                 <div class="row mb-5">
                                     <div class="col-md-3">
                                         <label for="">Control No.:</label>
-                                        <input class="form-control" type="hidden" class="form-control d-none" id="textconno_new_operator" name="textconno_new_operator" placeholder="Select section to generate Control No." readonly>
-                                        <input class="form-control" type="text" class="form-control" id="" name="textconno_new_operator" placeholder="Auto Generated" readonly>
-                                        <input class="form-control" type="hidden" class="form-control" id="textconno_operator" name="textconno_operator" readonly>
+                                        {{-- <input class="form-control" type="hidden" class="form-control d-none" id="textconno_new_operator" name="textconno_new_operator" placeholder="Select section to generate Control No." readonly> --}}
+                                        <input class="form-control" type="text" class="form-control" id="textconno_new_operator" name="textconno_new_operator" placeholder="Auto Generated" readonly>
+                                       {{--  <input class="form-control" type="hidden" class="form-control" id="textconno_operator" name="textconno_operator" readonly> --}}
                                     </div>
 
                                     <div class="col-md-3">
@@ -169,18 +198,15 @@
 
                                     <div class="col-md-3">
                                         <label for="">Product Line:</label>
-
                                          <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_line">
                                         </select>
                                     </div>
                                 </div>
-
                                 <div class="row mt-2 mb-5">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-primary" id="" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
+                                        <button type="button" class="btn btn-primary" id="btnEmployeeOperator" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa fa-user-plus me-3"></i>Add Employee</button>
                                     </div>
                                 </div>
-
                                 <div class="table-responsive mt-3 mb-5">
                                     <table id="tbl_certified_list_operator" class="table table-bordered table-hover nowrap">
                                         <thead class="table-primary">
@@ -198,7 +224,6 @@
                                         </tbody>
                                     </table>
                                 </div>
-
                                 <div class="row mb-5">
                                     <div class="col-md-12">
                                         <label for="">Reason for Certification:</label>
@@ -210,17 +235,15 @@
                                     <div class="col-md-12">
                                         <label for="">Lateral Transfer Flexibility:</label>
                                         <select class="form-control select2bs4" style="width: 100%;" name="transfer_flexibility[]" id="transfer_flexibility" multiple>
-                                             <option value="1">3.1 Transfer to another station (E.g: final visual, insertion,IQC, IPQC, OQC, etc)</option>
-                                            <option value="2">3.2 Transfer to other production section (E.g: TS,PPS,CN, YF)</option>
-                                            <option value="3">3.3 Transfer to other product line (E.g: TS: BGA-FP, QFP; CN: FMS, PJS; YF: EOL, FOL; PPS: Molding CN, Molding TS, Grinding, Stamping; MH-WHS, MH-Prodn)
+
                                         </select>
                                     </div>
                                 </div>
 
                                 <!-- **************************************************************      APRODTO          ************************************************************************************************* -->
 
-                                <div class="accordion" id="accordionExampleOper">
-                                    {{-- <div class="card APRODTO">
+                             <div class="accordion" id="accordionExampleOper">
+                                     <div class="card APRODTO">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOneOper" aria-expanded="true" aria-controls="collapseOneOper">
                                             <h5>A. PRODUCTION SECTION (Training and Orientation)</h5>
@@ -238,8 +261,8 @@
                                                 <div class="col-md-3">
                                                         <label class="" for="">Defect Escalation:</label>
                                                         <select class="form-control select2bs4" style="width: 100%;" id="defect_escalation" name="defect_escalation" multiple>
-                                                            <option value="" selected disabled>Select Result</option>
-                                                            <option value="1" >Rule when to escalate </option>
+                                                             <option value="" disabled>Select Result</option>
+                                                             <option value="1" >Rule when to escalate </option>
                                                             <option value="2" >Filling-up of forms
                                                             </option>
                                                         </select>
@@ -247,8 +270,7 @@
                                                 <div class="col-md-3">
                                                         <label class="" for="">Production Abnormlity Control (IMS-PMI-025):</label>
                                                         <select class="form-control select2bs4" style="width: 100%;" id="production_abnormality" name="production_abnormality" multiple>
-                                                            <option value="" selected disabled>Select Result</option>
-                                                            <option value="1" >Rule when to escalate </option>
+                                                             <option value="" disabled>Select Result</option>                                <option value="1" >Rule when to escalate </option>
                                                             <option value="2" >Filling-up of forms
                                                             </option>
                                                         </select>
@@ -393,10 +415,20 @@
                                             <h5 class="mt-3 mb-3">RESULT</h5>
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
+                                                     <div class="col-md-6">
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_first_a_prod_result" id="text_first_a_prod_result">
+                                                              <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                    </div>
                                                     <div class="row">
+
                                                         <div class="col-md-6">
                                                             <label class="" for="">Trained by:</label>
-                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_first_trainedby_oper" name="text_first_trainedby_oper" multiple></select>
+                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_first_trainedby_oper" name="text_first_trainedby_oper[]" multiple></select>
 
                                                         </div>
                                                         <div class="col-md-6">
@@ -404,21 +436,24 @@
                                                             <select class="form-control select2bs4" style="width: 100%;" id="text_first_mentoredby_oper" name="text_first_mentoredby_oper" multiple></select>
                                                         </div>
                                                     </div>
-
                                                 </div>
-
                                                 <div class="col-md-6">
+                                                     <div class="col-md-6">
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_second_a_prod_result" id="text_second_a_prod_result">
+                                                              <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
+                                                     <div class="col-md-6"></div>
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <label class="" for="">Trained by:</label>
-                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_second_trainedby_oper" name="text_second_trainedby_oper" multiple></select>
-
-                                                            <input type="hidden" id="text_second_trainedby_oper_username" name="text_second_trainedby_oper_username">
-                                                            <input type="hidden" id="text_second_trainedby_oper_email" name="text_second_trainedby_oper_email" multiple>
+                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_second_trainedby_oper" name="text_second_trainedby_oper[]" multiple></select>
                                                         </div>
                                                         <div class="col-md-6">
                                                              <label class="" for="">Mentored by:</label>
-                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_second_mentoredby_oper" name="text_second_mentoredby_oper"></select>
+                                                            <select class="form-control select2bs4" style="width: 100%;" id="text_second_mentoredby_oper" name="text_second_mentoredby_oper" multiple></select>
                                                         </div>
                                                     </div>
 
@@ -446,35 +481,19 @@
                                                     <input class="form-control" type="time" id="text_second_time_oper" name="text_second_time_oper">
                                                 </div>
                                             </div>
-
-                                            <div class="row mb-2">
-                                                <div class="col-md-6"></div>
-                                                <div class="col-md-3">
-                                                    <label class="" for="">Send Email Alert to:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" id="text_alert_prod_sec" name="text_alert_prod_sec"></select>
-                                                </div>
-
-                                                <div class="col-md-3">
-                                                    <label class="" for="">Add cc:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" id="text_alert_prod_cc_sec" name="text_alert_prod_cc_sec" multiple></select>
-
-                                                </div>
-                                            </div>
-                                            <!-- ------------------------------------------------ -->
-
                                         </div>
                                         </div>
                                     </div>
                                     <div class="card BENGGTQ">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoOper" aria-expanded="false" aria-controls="collapseTwoOper">
-                                            <h5>ENGINEERING SECTION (Training and Qualification)</h5>
+                                            <h5>B. ENGINEERING SECTION (Training and Qualification)</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseTwoOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
                                         <div class="card-body">
                                             <p class="mb-3">TRAINING ITEMS:</p>
-                                            <div class="col-md-3">
+                                            <div class="col-md-6">
                                                 <label class="" for="">TRAINING ITEMS:</label>
                                                 <select class="form-control select2bs4" style="width: 100%;" id="text_training_orientation_es_oper" name="text_training_orientation_es_oper" multiple></select>
                                             </div>
@@ -570,16 +589,18 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">1. Observation / Interview Result</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_obs_first_result_es_oper" id="text_obs_first_result_es_oper">
-
+                                                        <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">1. Observation / Interview Result</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_obs_second_result_es_oper" id="text_obs_second_result_es_oper">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -621,17 +642,19 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_es_oper" id="text_oa_1st_result_es_oper" multiple>
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_es_oper" id="text_oa_1st_result_es_oper">
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_2nd_result_es_oper" id="text_oa_2nd_result_es_oper">
-
+                                                        <option value="" disabled selected>Select Result</option>
+                                                        <option value="PASSED">PASSED</option>
+                                                        <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -690,10 +713,10 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="card">
-                                        <h2 class="accordion-header">
-                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
-                                            <h5>QUALITY CONTROL SECTION (CERTIFICATTION)</h5>
+                                    <div class="card CQCC">
+                                        <h2 class="card-header">
+                                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeOper" aria-expanded="false" aria-controls="collapseThreeOper">
+                                            <h5>C. QUALITY CONTROL SECTION (CERTIFICATTION)</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseThreeOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
@@ -716,7 +739,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">1.1 Observation / Interview Result</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_obs_first_result_qcs_oper" id="text_obs_first_result_qcs_oper">
-                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="" disabled selected>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
@@ -725,7 +748,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">1.1 Observation / Interview Result</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_obs_second_result_qcs_oper" id="text_obs_second_result_qcs_oper">
-                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="" disabled selected>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
@@ -889,7 +912,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_qcs_oper" id="text_oa_1st_result_qcs_oper">
-                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="" disabled selected>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
@@ -898,7 +921,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">3. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_2nd_result_qcs_oper" id="text_oa_2nd_result_qcs_oper">
-                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="" disabled selected>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
@@ -920,20 +943,14 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Certified by:</label>
-                                                    <input class="form-control" type="text" id="text_1st_certifiedby_qcs_oper" name="text_1st_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_1st_certifiedby_qcs_oper_username" name="text_1st_certifiedby_qcs_oper_username">
-                                                    <input type="hidden" id="text_1st_certifiedby_qcs_oper_email" name="text_1st_certifiedby_qcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_1st_certifiedby_qcs_oper" id="text_1st_certifiedby_qcs_oper" multiple>
+                                                    </select>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Certified by:</label>
-                                                    <input class="form-control" type="text" id="text_2nd_certifiedby_qcs_oper" name="text_2nd_certifiedby_qcs_oper" list="list_display_empno" placeholder="Select Certified by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_2nd_certifiedby_qcs_oper_username" name="text_2nd_certifiedby_qcs_oper_username">
-                                                    <input type="hidden" id="text_2nd_certifiedby_qcs_oper_email" name="text_2nd_certifiedby_qcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_certifiedby_qcs_oper" id="text_2nd_certifiedby_qcs_oper" multiple>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -975,10 +992,10 @@
                                         </div>
                                         </div>
                                     </div>
-                                    <div class="card">
+                                    <div class="card PPD">
                                         <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFourOper" aria-expanded="false" aria-controls="collapseFourOper">
-                                            <h5>PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h5>
+                                            <h5>D PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseFourOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
@@ -1036,7 +1053,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">2. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_1st_result_peqcs_oper" id="text_oa_1st_result_peqcs_oper">
-                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="" disabled selected>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
@@ -1045,7 +1062,7 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">2. Overall Assessment:</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oa_2nd_result_peqcs_oper" id="text_oa_2nd_result_peqcs_oper">
-                                                        <option value="" selected disabled>Select Result</option>
+                                                        <option value="" disabled selected>Select Result</option>
                                                         <option value="PASSED">PASSED</option>
                                                         <option value="FAILED">FAILED</option>
                                                     </select>
@@ -1158,119 +1175,109 @@
 
                                             <label for="">Note: NG Injection process shall be taken from first lot output</label>
 
-                                            <!-- ------------------------------------------------ -->
+
 
                                         </div>
                                         </div>
                                     </div>
-                                   <div class="card">
-                                        <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
-                                            <h5>VALIDATION PROCESS: ENGINEERING SECTION</h5>
+                                    <div class="card EENGGVALIDATION">
+                                        <h2 class="card-header">
+
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFiveOper" aria-expanded="false" aria-controls="collapseFiveOper">
+                                            <h5>E.VALIDATION PROCESS: ENGINEERING SECTION</h5>
                                         </button>
                                         </h2>
-                                        <div id="collapseFiveOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
-                                        <div class="accordion-body">
+                                        <div id="collapseFiveOper" class="accordion-collapse collapse">
+                                            <div class="card-body">
+                                                <div class="row mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="ms-5" for="">Engineering Validation Result:</label>
+                                                    </div>
 
-                                            <!-- ------------------------------------------------ -->
+                                                    <div class="col-md-5"></div>
 
-                                            <div class="row mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="ms-5" for="">Engineering Validation Result:</label>
-                                                </div>
-
-                                                <div class="col-md-5"></div>
-
-                                                <div class="col-md-4">
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_application_vpes_oper" id="text_application_vpes_oper">
-                                                        <option value="" selected disabled>Select</option>
-                                                        <option value="Applicable">Applicable</option>
-                                                        <option value="Not Applicable">Not Applicable</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-1"></div>
-
-                                                <div class="col-md-4">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_vpes_oper_1" name="text_vpes_oper" value="Pre-production samples and check sheet checking" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_vpes_oper_1" style="font-weight: normal;">Pre-production samples and check sheet checking</label>
+                                                    <div class="col-md-4">
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_application_vpes_oper" id="text_application_vpes_oper">
+                                                            <option value="" selected disabled>Select</option>
+                                                            <option value="1">Applicable</option>
+                                                            <option value="2">Not Applicable</option>
+                                                        </select>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            <h5 class="mt-3 mb-3">RESULT</h5>
+                                                <div class="row">
+                                                    <div class="col-md-1"></div>
 
-                                            <div class="row mb-4">
-                                                <div class="col-md-6">
-                                                    <label class="" for="">First Take</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_vpes_oper" id="text_first_result_vpes_oper">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
-                                                    </select>
+                                                    <div class="col-md-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="text_vpes_oper_1" name="text_vpes_oper" value="1" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
+                                                            <label class="fs-5  " for="text_vpes_oper_1" style="font-weight: normal;">Pre-production samples and check sheet checking</label>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
-                                                <div class="col-md-6">
-                                                    <label class="" for="">Second Take</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_vpes_oper" id="text_second_result_vpes_oper">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                                                <h5 class="mt-3 mb-3">RESULT</h5>
 
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label class="" for="">Validated by (after 2nd day):</label>
-                                                    <input class="form-control" type="text" id="text_1st_validatedby_vpes_oper" name="text_1st_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
+                                                <div class="row mb-4">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">First Take</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_vpes_oper" id="text_first_result_vpes_oper">
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
 
-                                                    <input type="hidden" id="text_1st_validatedby_vpes_oper_username" name="text_1st_validatedby_vpes_oper_username">
-                                                    <input type="hidden" id="text_1st_validatedby_vpes_oper_email" name="text_1st_validatedby_vpes_oper_email">
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label class="" for="">Validated by (after re-orientation):</label>
-                                                    <input class="form-control" type="text" id="text_2nd_validatedby_vpes_oper" name="text_2nd_validatedby_vpes_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_2nd_validatedby_vpes_oper_username" name="text_2nd_validatedby_vpes_oper_username">
-                                                    <input type="hidden" id="text_2nd_validatedby_vpes_oper_email" name="text_2nd_validatedby_vpes_oper_email">
-                                                </div>
-                                            </div>
-
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label class="" for="">Date:</label>
-                                                    <input class="form-control" type="date" id="text_1st_date_vpes_oper" name="text_1st_date_vpes_oper">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Second Take</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_vpes_oper" id="text_second_result_vpes_oper">
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
 
-                                                <div class="col-md-6">
-                                                    <label class="" for="">Date:</label>
-                                                    <input class="form-control" type="date" id="text_2nd_date_vpes_oper" name="text_2nd_date_vpes_oper">
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Validated by (after 2nd day):</label>
+                                                            <select class="form-control select2bs4" style="width: 100%;" name="text_1st_validatedby_vpes_oper" id="text_1st_validatedby_vpes_oper" multiple>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Validated by (after re-orientation):</label>
+                                                        <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_validatedby_vpes_oper" id="text_2nd_validatedby_vpes_oper" multiple>
+                                                        </select>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="row mb-5">
-                                                <div class="col-md-12">
-                                                    <label class="" for="">Remarks:</label>
-                                                    <input class="form-control" type="text" name="text_remarks_vpes_oper" id="text_remarks_vpes_oper" placeholder="Enter remarks">
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_1st_date_vpes_oper" name="text_1st_date_vpes_oper">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="" for="">Date:</label>
+                                                        <input class="form-control" type="date" id="text_2nd_date_vpes_oper" name="text_2nd_date_vpes_oper">
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <!-- ------------------------------------------------ -->
+                                                <div class="row mb-5">
+                                                    <div class="col-md-12">
+                                                        <label class="" for="">Remarks:</label>
+                                                        <input class="form-control" type="text" name="text_remarks_vpes_oper" id="text_remarks_vpes_oper" placeholder="Enter remarks">
+                                                    </div>
+                                                </div>
 
+                                                </div>
                                         </div>
-                                        </div>
-                                    </div>--}}
-                                    <div class="card">
-                                        <h2 class="accordion-header">
+                                    </div>
+                                   <div class="card FQCVP">
+                                        <h2 class="card-header">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseSixOper" aria-expanded="false" aria-controls="collapseSixOper">
-                                            <h5>VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
+                                            <h5>E. VALIDATION PROCESS: QUALITY CONTROL SECTION</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseSixOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
@@ -1283,19 +1290,12 @@
 
                                             <div class="row">
                                                 <div class="col-md-1"></div>
-
                                                 <div class="col-md-4">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_vpqcs_oper_1" name="text_vpqcs_oper" value="Production Abnormality Control" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_vpqcs_oper_1" style="font-weight: normal;">Production Abnormality Control</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="text_vpqcs_oper_2" name="text_vpqcs_oper" value="Defect Escalation Procedure" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_vpqcs_oper_2" style="font-weight: normal;">Defect Escalation Procedure</label>
-                                                    </div>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_vpqcs_oper" id="text_vpqcs_oper">
+                                                        <option value="" selected disabled>Select</option>
+                                                        <option value="1">Production Abnormality Control</option>
+                                                        <option value="2">Defect Escalation Procedure</option>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -1305,18 +1305,18 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_vpqcs_oper" id="text_first_result_vpqcs_oper">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_vpqcs_oper" id="text_second_result_vpqcs_oper">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1324,20 +1324,14 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after 2nd day):</label>
-                                                    <input class="form-control" type="text" id="text_1st_validatedby_vpqcs_oper" name="text_1st_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_1st_validatedby_vpqcs_oper_username" name="text_1st_validatedby_vpqcs_oper_username">
-                                                    <input type="hidden" id="text_1st_validatedby_vpqcs_oper_email" name="text_1st_validatedby_vpqcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_1st_validatedby_vpqcs_oper[]" id="text_1st_validatedby_vpqcs_oper" multiple>
+                                                    </select>
                                                 </div>
 
-                                                <div class="col-md-6">
+                                                <div class="col-md-6 nmodify2">
                                                     <label class="" for="">Validated by (after re-orientation):</label>
-                                                    <input class="form-control" type="text" id="text_2nd_validatedby_vpqcs_oper" name="text_2nd_validatedby_vpqcs_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_2nd_validatedby_vpqcs_oper_username" name="text_2nd_validatedby_vpqcs_oper_username">
-                                                    <input type="hidden" id="text_2nd_validatedby_vpqcs_oper_email" name="text_2nd_validatedby_vpqcs_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_validatedby_vpqcs_oper[]" id="text_2nd_validatedby_vpqcs_oper" multiple>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -1363,22 +1357,12 @@
                                             <!-- ************************************************************ 2ND SECTION VPQCS ******************************************************************* -->
 
                                             <hr style="height: 5px; background-color: black; border: none;">
-
-                                            <div class="row mt-3 mb-1">
-                                                <div class="col-md-4">
-                                                    <div class="form-check ms-5">
-                                                        <input class="form-check-input" type="checkbox" id="text_vpqcs_oper_1_1" name="text_vpqcs_oper_1" value="Pre-production samples and check sheet checking" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_vpqcs_oper_1_1" style="font-weight: normal;">Pre-production samples and check sheet checking</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4"></div>
-
                                                 <div class="col-md-4">
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_application_vpqcs_oper" id="text_application_vpqcs_oper">
                                                         <option value="" selected disabled>Select</option>
-                                                        <option value="Applicable">Applicable</option>
-                                                        <option value="Not Applicable">Not Applicable</option>
+                                                        <option value="1">Pre-production samples and check sheet checking</option>
+                                                        <option value="2">Applicable</option>
+                                                        <option value="3">Not Applicable</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1389,18 +1373,18 @@
                                                 <div class="col-md-6">
                                                     <label class="" for="">First Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_first_result_vpes_oper_2" id="text_first_result_vpes_oper_2">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Second Take</label>
                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_second_result_vpes_oper_2" id="text_second_result_vpes_oper_2">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
+                                                            <option value="" disabled selected>Select Result</option>
+                                                            <option value="PASSED">PASSED</option>
+                                                            <option value="FAILED">FAILED</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1408,13 +1392,13 @@
                                             <div class="row mb-3 nmodify">
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after 3rd day):</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_1st_validatedby_vpes_oper_2" id="text_1st_validatedby_vpes_oper_2" multiple>
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_1st_validatedby_vpes_oper_2[]" id="text_1st_validatedby_vpes_oper_2" multiple>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <label class="" for="">Validated by (after re-orientation):</label>
-                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_validatedby_vpes_oper_2" id="text_2nd_validatedby_vpes_oper_2" multiple>
+                                                     <select class="form-control select2bs4" style="width: 100%;" name="text_2nd_validatedby_vpes_oper_2[]" id="text_2nd_validatedby_vpes_oper_2" multiple>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1443,26 +1427,23 @@
                                         </div>
                                         </div>
                                     </div>
-                                     {{--<div class="card">
-                                        <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseSevenOper" aria-expanded="false" aria-controls="collapseSevenOper">
-                                            <h5>QC Validation for Visual Operator</h5>
+                                    <div class="card GVVO">
+                                        <h2 class="card-header">
+                                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseSevenOper" aria-expanded="false" aria-controls="collapseSevenOper">
+                                            <h5>F. QC Validation for Visual Operator</h5>
                                         </button>
                                         </h2>
                                         <div id="collapseSevenOper" class="accordion-collapse collapse" data-parent="#accordionExampleOper">
-                                        <div class="accordion-body">
+                                        <div class="card-body">
 
-                                            <!-- ------------------------------------------------ -->
-
-                                            <p><> Reference Document</p>
+                                            <h6 class="mt-3 mb-3">RESULT:</h6>
+                                            <div class="col-md-4">
+                                                <label class="ms-3" for="">First Take:</label>
+                                            </div>
 
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label class="ms-4" for="">Reference Document</label>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label for="">Discuss the inspection sequence in detail.</label>
                                                 </div>
                                             </div>
 
@@ -1477,41 +1458,29 @@
                                                 <div class="col-md-3">
                                                     <input class="form-control" type="text" id="text_refdocno_input_qcvvo_oper" name="text_refdocno_input_qcvvo_oper" placeholder="Enter the reference document number">
                                                 </div>
+                                            </div>
+                                            <div class="row mb-5">
+                                                <div class="table-responsive mt-3 mb-5">
+                                                    <table id="tbl_fvi_operator" class="table table-bordered table-hover nowrap">
+                                                        <thead class="table-primary">
+                                                            <tr>
+                                                                <th>Employee No.</th>
+                                                                <th>Employee Name</th>
+                                                                <th>Discuss the Inspection Sequence in Details</th>
+                                                                <th>Assessment Result</th>
+                                                            </tr>
+                                                        </thead>
 
-                                                <div class="col-md-1">
-                                                    <div class="form-check ms-5">
-                                                        <input class="form-check-input" type="checkbox" id="text_ins_seq_qcvvo_oper_yes" name="text_ins_seq_qcvvo_oper" value="Yes" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_ins_seq_qcvvo_oper_yes" style="font-weight: normal;">Yes</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check ms-5">
-                                                        <input class="form-check-input" type="checkbox" id="text_ins_seq_qcvvo_oper_no" name="text_ins_seq_qcvvo_oper" value="No" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_ins_seq_qcvvo_oper_no" style="font-weight: normal;">No</label>
-                                                    </div>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                             </div>
-
-                                            <h6 class="mt-3 mb-3">RESULT:</h6>
-
                                             <div class="row mb-5">
-                                                <div class="col-md-4">
-                                                    <label class="ms-3" for="">First Take:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_result1__qcvvo_oper" id="text_result1__qcvvo_oper">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
-                                                    </select>
-                                                </div>
-
-                                                <div class="col-md-4">
+                                                <div class="col-md-4" nmodify6>
                                                     <label class="ms-3" for="">Validated by:</label>
-                                                    <input class="form-control" type="text" id="text_validated1_qcvvo_oper" name="text_validated1_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_validated1_qcvvo_oper_username" name="text_validated1_qcvvo_oper_username">
-                                                    <input type="hidden" id="text_validated1_qcvvo_oper_email" name="text_validated1_qcvvo_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_validated1_qcvvo_oper[]" id="text_validated1_qcvvo_oper" multiple>
+                                                    </select>
                                                 </div>
 
                                                 <div class="col-md-4">
@@ -1520,18 +1489,20 @@
                                                 </div>
                                             </div>
 
-                                            <p><> Reference Document</p>
 
+
+                                            <hr style="height: 5px; background-color: black; border: none;">
+                                            <h6 class="mt-3 mb-3">RESULT:</h6>
+                                                <div class="row mb-3">
+                                                   <div class="col-md-4">
+                                                    <label class="ms-3" for="">Second Take:</label>
+                                                 </div>
+                                            </div>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label class="ms-4" for="">Reference Document</label>
                                                 </div>
-
-                                                <div class="col-md-6">
-                                                    <label for="">Discuss the inspection sequence in detail.</label>
-                                                </div>
                                             </div>
-
                                             <div class="row mb-3">
                                                 <div class="col-md-3">
                                                     <div class="form-check ms-5">
@@ -1543,41 +1514,29 @@
                                                 <div class="col-md-3">
                                                     <input class="form-control" type="text" id="text_refdocno_input_qcvvo_oper_2" name="text_refdocno_input_qcvvo_oper_2" placeholder="Enter the reference document number">
                                                 </div>
+                                            </div>
+                                            <div class="row mb-5">
+                                                <div class="table-responsive mt-3 mb-5">
+                                                    <table id="tbl_fvi_operator_2" class="table table-bordered table-hover nowrap">
+                                                        <thead class="table-primary">
+                                                            <tr>
+                                                                <th>Employee No.</th>
+                                                                <th>Employee Name</th>
+                                                                <th>Discuss the Inspection Sequence in Details</th>
+                                                                <th>Assessment Result</th>
+                                                            </tr>
+                                                        </thead>
 
-                                                <div class="col-md-1">
-                                                    <div class="form-check ms-5">
-                                                        <input class="form-check-input" type="checkbox" id="text_ins_seq_qcvvo_oper_yes_2" name="text_ins_seq_qcvvo_oper_2" value="Yes" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_ins_seq_qcvvo_oper_yes_2" style="font-weight: normal;">Yes</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2">
-                                                    <div class="form-check ms-5">
-                                                        <input class="form-check-input" type="checkbox" id="text_ins_seq_qcvvo_oper_no_2" name="text_ins_seq_qcvvo_oper_2" value="No" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                                        <label class="fs-5  " for="text_ins_seq_qcvvo_oper_no_2" style="font-weight: normal;">No</label>
-                                                    </div>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                             </div>
-
-                                            <h6 class="mt-3 mb-3">RESULT:</h6>
-
                                             <div class="row mb-4">
-                                                <div class="col-md-4">
-                                                    <label class="ms-3" for="">Second Take:</label>
-                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_result2__qcvvo_oper" id="text_result2__qcvvo_oper">
-                                                        <option value="" selected disabled>Select Result</option>
-                                                        <option value="PASSED">PASSED</option>
-                                                        <option value="FAILED">FAILED</option>
-                                                    </select>
-                                                </div>
-
-                                                <div class="col-md-4">
+                                                <div class="col-md-4 nmodify6">
                                                     <label class="ms-3" for="">Validated by:</label>
-                                                    <input class="form-control" type="text" id="text_validated2_qcvvo_oper" name="text_validated2_qcvvo_oper" list="list_display_empno" placeholder="Select Validated by">
-                                                    <datalist id="list_display_empno"></datalist>
-
-                                                    <input type="hidden" id="text_validated2_qcvvo_oper_username" name="text_validated2_qcvvo_oper_username">
-                                                    <input type="hidden" id="text_validated2_qcvvo_oper_email" name="text_validated2_qcvvo_oper_email">
+                                                    <select class="form-control select2bs4" style="width: 100%;" name="text_validated2_qcvvo_oper[]" id="text_validated2_qcvvo_oper" multiple>
+                                                    </select>
                                                 </div>
 
                                                 <div class="col-md-4">
@@ -1626,53 +1585,25 @@
 
                                         </div>
                                         </div>
-                                    </div> --}}
+                                    </div>
                                 </div>
 
                                 <hr style="height: 5px; background-color: black; border: none;">
 
-                                <!-- <h4 class="mb-3">PRODUCTION SECTION (Training and Orientation)</h4> -->
-
-                                <!-- **************************************************************      2ND SECTION          ************************************************************************************************* -->
-
-                                <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
-
-                                <!-- ************************************************************ 3RD SECTION ******************************************************************* -->
-
-                                <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
-
-                                <!-- ************************************************************ 4TH SECTION - BACK PAGE - ******************************************************************* -->
-
-                                <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
-
-                                <!-- ************************************************************ 5TH SECTION - BACK PAGE - ******************************************************************* -->
-
-                                <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
-
-                                <!-- ************************************************************ 6TH SECTION - BACK PAGE - ******************************************************************* -->
-
-                                <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
-
-                                <!-- ************************************************************ 6TH SECTION - BACK PAGE - ******************************************************************* -->
-
-                                <!-- <hr style="height: 5px; background-color: black; border: none;"> -->
-
-                                <div class="col-md-6">
+                                <div class="col-md-6 nmodify3">
                                     <label for="">Approved / Confirmed by:</label>
-                                    <input class="form-control" type="text" id="text_oper_approved_confirmed_by" name="text_oper_approved_confirmed_by" list="list_display_empno" placeholder="Select Approved / Confirmed by">
-                                    <datalist id="list_display_empno"></datalist>
-
+                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oper_approved_confirmed_by[]" id="text_oper_approved_confirmed_by" multiple>
+                                    </select>
                                     <label for="" class="mt-1">QC Supervisor</label>
-
-                                    <input type="hidden" id="text_oper_approved_confirmed_by_username" name="text_oper_approved_confirmed_by_username">
-                                    <input type="hidden" id="text_oper_approved_confirmed_by_email" name="text_oper_approved_confirmed_by_email">
                                 </div>
+                                <div class="modal-footer justify-content-between">
 
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
-                                    <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
+                                    <button type="submit" class="btn btn-success" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Save</button>
+
+                                    <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button>
+                                    <button type="button" class="btn btn-success" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> Approved</button>
                                 </div>
-
                         </form>
 
                         </div>
@@ -1681,1190 +1612,234 @@
             </div>
         </div>
 
-        <!-- Modal Select Employee for Operator -->
-        <div class="modal" id="select_Employee_operator" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">Qualification / Certification Form</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
 
-                    <div class="modal-body">
-
-
-
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label for="">Station (From):</label>
-
-                                 <select class="form-control select2bs4" style="width: 100%;" name="text_oper_station_from" id="text_oper_station_from" placeholder="Enter Station (From)">
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="">Station (To):</label>
-                                  <select class="form-control select2bs4" style="width: 100%;" name="text_oper_station_to" id="text_oper_station_to" placeholder="Enter Station (From)">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="">Operator Name:</label>
-                                <select class="form-control select2bs4" style="width: 100%;" id="text_oper_emp_number" name="text_oper_emp_number" placeholder="Enter Employee Number">
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="">Remarks:</label>
-                                <input type="text" class="form-control" id="text_oper_remarks" name="text_oper_remarks" placeholder="Enter Remarks">
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-primary btnAddOPEREmp" id="btnAddOPEREmp"><i class="fa-solid fa-plus"></i> Add to Table</button>
-
-                        <hr style="border: 1px solid black;">
-
-                        <h5 class="mb-3">Selected Employees:</h5>
-
-                        <table class="table table-bordered tbl_oper_add_emp" id="tbl_oper_add_emp">
-                            <thead class="table-info">
-                                <tr>
-                                    <th>Action</th>
-                                    <th>Employee No.</th>
-                                    <th>Employee Name</th>
-                                    <th>Station (From)</th>
-                                    <th>Station (To)</th>
-                                    <th>Remarks</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- <tr>
-                                    <td>Paul Bariring</td>
-                                    <td>PB0328</td>
-                                    <td>Gas Station</td>
-                                    <td>Police Station</td>
-                                </tr>
-                                <tr>
-                                    <td>Jowee Maramag</td>
-                                    <td>JM1213</td>
-                                    <td>Radio Station</td>
-                                    <td>Train Station</td>
-                                </tr> -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary btnAddSelectedOPEREmp" id="btnAddSelectedOPEREmp"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" >Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW MODAL FOR OPERATOR -->
-        <div class="modal" id="modalViewOper" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Qualification / Certification Form</h1>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-
-                            {{-- <form id="formSubmit_oper"> --}}
-                                <h3 class="mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
-
-                                <div class="row mb-5">
-                                    <div class="col-md-3">
-                                        <label for="">Control No.:</label>
-                                        <input class="form-control" type="text" class="form-control" id="text_view_oper_conno" name="text_view_oper_conno" readonly>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label for="">Production Section:</label>
-                                        <input class="form-control" type="text" name="text_view_oper_section" id="text_view_oper_section" readonly>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label for="">Series Name:</label>
-                                        <input class="form-control" type="text" id="text_view_oper_series" name="text_view_oper_series" readonly>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label for="">Product Line:</label>
-                                        <input class="form-control" type="text" id="text_view_oper_product_line" name="text_view_oper_product_line" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="table-responsive mt-3 mb-3">
-                                    <table id="tbl_view_certified_list_Oper" class="table table-bordered table-hover nowrap">
-                                        <thead class="table-primary">
-                                            <tr>
-                                                <!-- <th>Action</th> -->
-                                                <th>Employee No.</th>
-                                                <th>Operator's Name</th>
-                                                <th>Station (From)</th>
-                                                <th>Station (To)</th>
-                                                <th>Remarks</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-12">
-                                        <label for="">Reason for Certification:</label>
-                                        <input type="text" class="form-control" name="text_view_oper_certification" id="text_view_oper_certification" readonly>
-                                    </div>
-                                </div>
-
-                                <hr style="height: 5px; background-color: black; border: none;">
-
-                                <h4 class="mt-3 mb-3">PRODUCTION SECTION (Training and Orientation)</h4>
-
-                                <div class="table-responsive mt-3 mb-5">
-                                    <table id="tbl_view_oper_training_orientation" class="table table-bordered table-hover nowrap">
-                                        <thead class="table-primary">
-                                            <tr>
-                                                <!-- <th>Action</th> -->
-                                                <th>Training</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <h5 class="mt-3 mb-3">RESULT</h5>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">First Take:</label>
-                                        <input class="form-control" name="text_view_first_result_oper" id="text_view_first_result_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Second Take:</label>
-                                        <input class="form-control" name="text_view_second_result_oper" id="text_view_second_result_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Trained by:</label>
-                                        <input class="form-control" type="text" id="text_view_first_trainedby_oper" name="text_view_first_trainedby_oper" multiple readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Trained by:</label>
-                                        <input class="form-control" type="text" id="text_view_second_trainedby_oper" name="text_view_second_trainedby_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-5">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date & Time:</label>
-                                        <input class="form-control" type="text" id="text_view_first_date_time_oper" name="text_view_first_date_time_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date & Time:</label>
-                                        <input class="form-control" type="text" id="text_view_second_date_time_oper" name="text_view_second_date_time_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <!-- **************************************************************      2ND SECTION          ************************************************************************************************* -->
-
-                                <hr style="height: 5px; background-color: black; border: none;">
-
-                                <h4 class="mb-3">ENGINEERING SECTION (Training and Qualification)</h4>
-
-                                <div class="table-responsive mt-3 mb-5">
-                                    <table id="tbl_view_oper_es_training_orientation" class="table table-bordered table-hover nowrap">
-                                        <thead class="table-primary">
-                                            <tr>
-                                                <!-- <th>Action</th> -->
-                                                <th>Training</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <h5 class="mt-3 mb-3">RESULT</h5>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label class="" for="">First Take:</label>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Second Take:</label>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <label class="" for="">1.1 Observation / Interview Result</label>
-                                        <input class="form-control" name="text_view_obs_first_result_es_oper" id="text_view_obs_first_result_es_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">1.1 Observation / Interview Result</label>
-                                        <input class="form-control" name="text_view_obs_second_result_es_oper" id="text_view_obs_second_result_es_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-2">
-                                        <label class="" for="">2. Sample Checking:</label>
-                                        <input class="form-control" type="text" name="text_view_first_sample_es_oper" id="text_view_first_sample_es_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">OK:</label>
-                                        <input class="form-control" type="text" name="text_view_first_ok_es_oper" id="text_view_first_ok_es_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">NG:</label>
-                                        <input class="form-control" type="text" name="text_view_first_ng_es_oper" id="text_view_first_ng_es_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">2. Sample Checking:</label>
-                                        <input class="form-control" type="text" name="text_view_second_sample_es_oper" id="text_view_second_sample_es_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">OK:</label>
-                                        <input class="form-control" type="text" name="text_view_second_ok_es_oper" id="text_view_second_ok_es_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">NG:</label>
-                                        <input class="form-control" type="text" name="text_view_second_ng_es_oper" id="text_view_second_ng_es_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">3. Overall Assessment:</label>
-                                        <input class="form-control" name="text_view_oa_1st_result_es_oper" id="text_view_oa_1st_result_es_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">3. Overall Assessment:</label>
-                                        <input class="form-control" name="text_view_oa_2nd_result_es_oper" id="text_view_oa_2nd_result_es_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Reason for Disqualification:</label>
-                                        <input class="form-control" type="text" id="text_view_1st_disqualification_es_oper" name="text_view_1st_disqualification_es_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Reason for Disqualification:</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_disqualification_es_oper" name="text_view_2nd_disqualification_es_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Qualified by:</label>
-                                        <input class="form-control" type="text" id="text_view_1st_qualifiedby_es_oper" name="text_view_1st_qualifiedby_es_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Qualified by:</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_qualifiedby_es_oper" name="text_view_2nd_qualifiedby_es_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-5">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date & Time:</label>
-                                        <input class="form-control" type="text" id="text_view_qc_1st_date_es_oper" name="text_view_qc_1st_date_es_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date & Time:</label>
-                                        <input class="form-control" type="text" id="text_view_qc_2nd_date_es_oper" name="text_view_qc_2nd_date_es_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <!-- ************************************************************ 3RD SECTION ******************************************************************* -->
-
-                                <hr style="height: 5px; background-color: black; border: none;">
-
-                                <h4 class="mb-3">QUALITY CONTROL SECTION (CERTIFICATTION)</h4>
-
-                                <p class="mb-3">Let the operator discuss the details of training/orientation conducted by concerned Supervisor nad Eng'r as per check items specified.</p>
-
-                                <h5 class="mt-3 mb-3">RESULT</h5>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label class="" for="">First Take:</label>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Second Take:</label>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <label class="" for="">1.1 Observation / Interview Result</label>
-                                        <input class="form-control" name="text_view_obs_first_result_qcs_oper" id="text_view_obs_first_result_qcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">1.1 Observation / Interview Result</label>
-                                        <input class="form-control" name="text_view_obs_second_result_qcs_oper" id="text_view_obs_second_result_qcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-2">
-                                        <label class="" for="">2. Sample Checking:</label>
-                                        <input class="form-control" type="text" name="text_view_first_sample_qcs_oper" id="text_view_first_sample_qcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">OK:</label>
-                                        <input class="form-control" type="text" name="text_view_first_ok_qcs_oper" id="text_view_first_ok_qcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">NG:</label>
-                                        <input class="form-control" type="text" name="text_view_first_ng_qcs_oper" id="text_view_first_ng_qcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">2. Sample Checking:</label>
-                                        <input class="form-control" type="text" name="text_view_second_sample_qcs_oper" id="text_view_second_sample_qcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">OK:</label>
-                                        <input class="form-control" type="text" name="text_view_second_ok_qcs_oper" id="text_view_second_ok_qcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">NG:</label>
-                                        <input class="form-control" type="text" name="text_view_second_ng_qcs_oper" id="text_view_second_ng_qcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-1">
-                                    <div class="col-md-6">
-                                        <div class="table-responsive">
-                                            <table id="" class="table table-bordered table-hover nowrap">
-                                                <thead class="table table-warning">
-                                                    <tr class="text-center">
-                                                        <th></th>
-                                                        <th>Station</th>
-                                                        <th>Type of Exam</th>
-                                                        <th>Method</th>
-                                                    </tr>
-                                                </thead>
-
-                                                <tbody>
-                                                    <tr>
-                                                        <td><input type="checkbox" id="text_view_qcs_station_1st_oper_1" name="text_view_qcs_station_1st_oper" value="Visual"></td>
-                                                        <td>Visual</td>
-                                                        <td>Judgement Confirmation</td>
-                                                        <td>Using GRR sample (50pcs.)</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><input type="checkbox" id="text_view_qcs_station_1st_oper_2" name="text_view_qcs_station_1st_oper" value="Assembly"></td>
-                                                        <td>Assembly</td>
-                                                        <td>Judgement Confirmation</td>
-                                                        <td>50 samples drawn from their actual output</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><input type="checkbox" id="text_view_qcs_station_1st_oper_3" name="text_view_qcs_station_1st_oper" value="Others"></td>
-                                                        <td>Others (Parts Prep/Prov. Insertion/Packing/ etc)</td>
-                                                        <td>Work Confirmation</td>
-                                                        <td>50 samples drawn from their actual output</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><input type="checkbox" id="text_view_qcs_station_1st_oper_4" name="text_view_qcs_station_1st_oper" value="Rework Station"></td>
-                                                        <td>Rework Station (PPS only)</td>
-                                                        <td>Work Confirmation</td>
-                                                        <td>50 samples drawn from their actual output</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><input type="checkbox" id="text_view_qcs_station_1st_oper_5" name="text_view_qcs_station_1st_oper" value="Segregation Station"></td>
-                                                        <td>Segregation Station</td>
-                                                        <td>Work Confirmation</td>
-                                                        <td>50 samples drawn from their actual output</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="table-responsive">
-                                            <table id="" class="table table-bordered table-hover nowrap">
-                                                <thead class="table table-warning">
-                                                    <tr class="text-center">
-                                                        <th></th>
-                                                        <th>Station</th>
-                                                        <th>Type of Exam</th>
-                                                        <th>Method</th>
-                                                    </tr>
-                                                </thead>
-
-                                                <tbody>
-                                                    <tr>
-                                                        <td><input type="checkbox" id="text_view_qcs_station_2nd_oper_1" name="text_view_qcs_station_2nd_oper" value="Visual"></td>
-                                                        <td>Visual</td>
-                                                        <td>Judgement Confirmation</td>
-                                                        <td>Using GRR sample (50pcs.)</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><input type="checkbox" id="text_view_qcs_station_2nd_oper_2" name="text_view_qcs_station_2nd_oper" value="Assembly"></td>
-                                                        <td>Assembly</td>
-                                                        <td>Judgement Confirmation</td>
-                                                        <td>50 samples drawn from their actual output</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><input type="checkbox" id="text_view_qcs_station_2nd_oper_3" name="text_view_qcs_station_2nd_oper" value="Others"></td>
-                                                        <td>Others (Parts Prep/Prov. Insertion/Packing/ etc)</td>
-                                                        <td>Work Confirmation</td>
-                                                        <td>50 samples drawn from their actual output</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><input type="checkbox" id="text_view_qcs_station_2nd_oper_4" name="text_view_qcs_station_2nd_oper" value="Rework Station"></td>
-                                                        <td>Rework Station (PPS only)</td>
-                                                        <td>Work Confirmation</td>
-                                                        <td>50 samples drawn from their actual output</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td><input type="checkbox" id="text_view_qcs_station_2nd_oper_5" name="text_view_qcs_station_2nd_oper" value="Segregation Station"></td>
-                                                        <td>Segregation Station</td>
-                                                        <td>Work Confirmation</td>
-                                                        <td>50 samples drawn from their actual output</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p for="">** Assembly operators are those who install parts</p>
-                                        <p for="">** if sample size is equals or exceeds on the lot size, conduct 100% inspection</p>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <p for="">** Assembly operators are those who install parts</p>
-                                        <p for="">** if sample size is equals or exceeds on the lot size, conduct 100% inspection</p>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">3. Overall Assessment:</label>
-                                        <input class="form-control" name="text_view_oa_1st_result_qcs_oper" id="text_view_oa_1st_result_qcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">3. Overall Assessment:</label>
-                                        <input class="form-control" name="text_view_oa_2nd_result_qcs_oper" id="text_view_oa_2nd_result_qcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Reason for Disapproval:</label>
-                                        <input class="form-control" type="text" id="text_view_1st_disapproval_qcs_oper" name="text_view_1st_disapproval_qcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Reason for Disapproval:</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_disapproval_qcs_oper" name="text_view_2nd_disapproval_qcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Certified by:</label>
-                                        <input class="form-control" type="text" id="text_view_1st_certifiedby_qcs_oper" name="text_view_1st_certifiedby_qcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Certified by:</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_certifiedby_qcs_oper" name="text_view_2nd_certifiedby_qcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-5">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date & Time:</label>
-                                        <input class="form-control" type="text" id="text_view_1st_date_qcs_oper" name="text_view_1st_date_qcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date & Time:</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_date_qcs_oper" name="text_view_2nd_date_qcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-1">
-                                        <label for="">Note:</label>
-                                    </div>
-
-                                    <div class="col-md-10">
-                                        <p for="">#1 For PPS Finishing and Visual, complete the certification/qualification at the back page</p>
-                                        <p for="">#2 For Engineering and QC Validation result, please update the back page</p>
-                                    </div>
-                                </div>
-
-                                <!-- ************************************************************ 4TH SECTION - BACK PAGE - ******************************************************************* -->
-
-                                <hr style="height: 5px; background-color: black; border: none;">
-
-                                <h4 class="mb-3">PRODUCTION, ENGINEERING & QUALITY CONTROL SECTION (Certification-Completion)</h4>
-
-                                <p class="mb-3">FOR PPS Visual Operators only</p>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label class="" for="">First Take:</label>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Second Take:</label>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-2">
-                                        <label class="" for="">1. Lot Qty (1st lot):</label>
-                                        <input class="form-control" type="text" name="lot_view_1st_sample_peqcs_oper" id="lot_view_1st_sample_peqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">Injected NG Qty:</label>
-                                        <input class="form-control" type="text" name="text_view_1st_injected_ng_peqcs_oper" id="text_view_1st_injected_ng_peqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">Detected NG:</label>
-                                        <input class="form-control" type="text" name="text_view_1st_detected_ng_peqcs_oper" id="text_view_1st_detected_ng_peqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">1. Lot Qty (1st lot):</label>
-                                        <input class="form-control" type="text" name="text_view_2nd_sample_peqcs_oper" id="text_view_2nd_sample_peqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">Injected NG Qty:</label>
-                                        <input class="form-control" type="text" name="text_view_2nd_injected_ng_peqcs_oper" id="text_view_2nd_injected_ng_peqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="" for="">Detected NG:</label>
-                                        <input class="form-control" type="text" name="text_view_2nd_detected_ng_peqcs_oper" id="text_view_2nd_detected_ng_peqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">2. Overall Assessment:</label>
-                                        <input class="form-control" name="text_view_oa_1st_result_peqcs_oper" id="text_view_oa_1st_result_peqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">2. Overall Assessment:</label>
-                                        <input class="form-control" name="text_view_oa_2nd_result_peqcs_oper" id="text_view_oa_2nd_result_peqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Reason for Disapproval:</label>
-                                        <input class="form-control" type="text" id="text_view_1st_disapproval_peqcs_oper" name="text_view_1st_disapproval_peqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Reason for Disapproval:</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_disapproval_peqcs_oper" name="text_view_2nd_disapproval_peqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label for="">Certified by:</label>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="">Certified by:</label>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-1">
-                                        <p for="">Production:</p>
-                                    </div>
-
-                                    <div class="col-md-5">
-                                        <input class="form-control mb-2" type="text" id="text_view_1st_certified_prod_peqcs_oper" name="text_view_1st_certified_prod_peqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-1">
-                                        <p for="">Production:</p>
-                                    </div>
-
-                                    <div class="col-md-5">
-                                        <input class="form-control mb-2" type="text" id="text_view_2nd_certified_prod_peqcs_oper" name="text_view_2nd_certified_prod_peqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-1">
-                                        <p for="">Engineering:</p>
-                                    </div>
-
-                                    <div class="col-md-5">
-                                        <input class="form-control mb-2" type="text" id="text_view_1st_certified_eng_peqcs_oper" name="text_view_1st_certified_eng_peqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-1">
-                                        <p for="">Engineering:</p>
-                                    </div>
-
-                                    <div class="col-md-5">
-                                        <input class="form-control mb-2" type="text" id="text_view_2nd_certified_eng_peqcs_oper" name="text_view_2nd_certified_eng_peqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-1">
-                                        <p for="">Quality Control:</p>
-                                    </div>
-
-                                    <div class="col-md-5">
-                                        <input class="form-control mb-2" type="text" id="text_view_1st_certified_qc_peqcs_oper" name="text_view_1st_certified_qc_peqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-1">
-                                        <p for="">Quality Control:</p>
-                                    </div>
-
-                                    <div class="col-md-5">
-                                        <input class="form-control mb-2" type="text" id="text_view_2nd_certified_qc_peqcs_oper" name="text_view_2nd_certified_qc_peqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-5">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date & Time:</label>
-                                        <input class="form-control" type="text" id="text_view_1st_date_peqcs_oper" name="text_view_1st_date_peqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date & Time:</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_date_peqcs_oper" name="text_view_2nd_date_peqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <label for="">Note: NG Injection process shall be taken from first lot output</label>
-
-                                <!-- ************************************************************ 5TH SECTION - BACK PAGE - ******************************************************************* -->
-
-                                <hr style="height: 5px; background-color: black; border: none;">
-
-                                <h4 class="mb-3">VALIDATION PROCESS: ENGINEERING SECTION</h4>
-
-                                <div class="row mb-1">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Engineering Validation Result:</label>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <input class="form-control" name="text_view_application_vpes_oper" id="text_view_application_vpes_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <input class="form-control" name="text_view_vpes_oper_1" id="text_view_vpes_oper_1" readonly>
-                                    </div>
-                                </div>
-
-                                <h5 class="mt-3 mb-3">RESULT</h5>
-
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <label class="" for="">First Take</label>
-                                        <input class="form-control" name="text_view_first_result_vpes_oper" id="text_view_first_result_vpes_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Second Take</label>
-                                        <input class="form-control" name="text_view_second_result_vpes_oper" id="text_view_second_result_vpes_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Validated by (after 2nd day):</label>
-                                        <input class="form-control" type="text" id="text_view_1st_validatedby_vpes_oper" name="text_view_1st_validatedby_vpes_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Validated by (after re-orientation):</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_validatedby_vpes_oper" name="text_view_2nd_validatedby_vpes_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date:</label>
-                                        <input class="form-control" type="text" id="text_view_1st_date_vpes_oper" name="text_view_1st_date_vpes_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date:</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_date_vpes_oper" name="text_view_2nd_date_vpes_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-12">
-                                        <label class="" for="">Remarks:</label>
-                                        <input class="form-control" type="text" name="text_view_remarks_vpes_oper" id="text_view_remarks_vpes_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <!-- ************************************************************ 6TH SECTION - BACK PAGE - ******************************************************************* -->
-
-                                <hr style="height: 5px; background-color: black; border: none;">
-
-                                <h4 class="mb-3">VALIDATION PROCESS: QUALITY CONTROL SECTION</h4>
-
-                                <div class="row mb-1">
-                                    <div class="col-md-3">
-                                        <label class="" for="">QC Validation for other section</label>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <input class="form-control" name="text_view_vpqcs_oper" id="text_view_vpqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <h5 class="mt-3 mb-3">RESULT</h5>
-
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <label class="" for="">First Take</label>
-                                        <input class="form-control" name="text_view_first_result_vpqcs_oper" id="text_view_first_result_vpqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Second Take</label>
-                                        <input class="form-control" name="text_view_second_result_vpqcs_oper" id="text_view_second_result_vpqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Validated by (after 2nd day):</label>
-                                        <input class="form-control" type="text" id="text_view_1st_validatedby_vpqcs_oper" name="text_view_1st_validatedby_vpqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Validated by (after re-orientation):</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_validatedby_vpqcs_oper" name="text_view_2nd_validatedby_vpqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date:</label>
-                                        <input class="form-control" type="text" id="text_view_1st_date_vpqcs_oper" name="text_view_1st_date_vpqcs_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date:</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_date_vpqcs_oper" name="text_view_2nd_date_vpqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-12">
-                                        <label class="" for="">Remarks:</label>
-                                        <input class="form-control" type="text" name="text_view_remarks_vpqcs_oper" id="text_view_remarks_vpqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <!-- ************************************************************ 2ND SECTION VPQCS ******************************************************************* -->
-
-                                <hr style="height: 5px; background-color: black; border: none;">
-
-                                <div class="row mt-3 mb-1">
-                                    <div class="col-md-6">
-                                        <input class="form-control" name="text_view_vpqcs_oper_1_1" id="text_view_vpqcs_oper_1_1" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <input class="form-control" name="text_view_application_vpqcs_oper" id="text_view_application_vpqcs_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <h5 class="mt-3 mb-3">RESULT</h5>
-
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <label class="" for="">First Take</label>
-                                        <input class="form-control" name="text_view_first_result_vpes_oper_2" id="text_view_first_result_vpes_oper_2" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Second Take</label>
-                                        <input class="form-control" name="text_view_second_result_vpes_oper_2" id="text_view_second_result_vpes_oper_2" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Validated by (after 3rd day):</label>
-                                        <input class="form-control" type="text" id="text_view_1st_validatedby_vpes_oper_2" name="text_view_1st_validatedby_vpes_oper_2" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Validated by (after re-orientation):</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_validatedby_vpes_oper_2" name="text_view_2nd_validatedby_vpes_oper_2" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date:</label>
-                                        <input class="form-control" type="text" id="text_view_1st_date_vpes_oper_2" name="text_view_1st_date_vpes_oper_2" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="" for="">Date:</label>
-                                        <input class="form-control" type="text" id="text_view_2nd_date_vpes_oper_2" name="text_view_2nd_date_vpes_oper_2" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-12">
-                                        <label class="" for="">Remarks:</label>
-                                        <input class="form-control" type="text" name="text_view_remarks_vpes_oper_2" id="text_view_remarks_vpes_oper_2" readonly>
-                                    </div>
-                                </div>
-
-                                <!-- ************************************************************ 6TH SECTION - BACK PAGE - ******************************************************************* -->
-
-                                <hr style="height: 5px; background-color: black; border: none;">
-
-                                <h4 class="mb-3">QC Validation for Visual Operator</h4>
-
-                                <p><> Reference Document</p>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Work Instruction Document</label>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="">Discuss the inspection sequence in detail.</label>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <input class="form-control" type="text" id="text_view_refdocno_input_qcvvo_oper" name="text_view_refdocno_input_qcvvo_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <input class="form-control" type="text" id="text_view_ins_seq_qcvvo_oper" name="text_view_ins_seq_qcvvo_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <h6 class="mt-3 mb-3">RESULT:</h6>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <label class="" for="">First Take:</label>
-                                        <input class="form-control" name="text_view_result1_qcvvo_oper" id="text_view_result1_qcvvo_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label class="" for="">Validated by:</label>
-                                        <input class="form-control" type="text" id="text_view_validated1_qcvvo_oper" name="text_view_validated1_qcvvo_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label class="" for="">Date:</label>
-                                        <input class="form-control" type="text" id="text_view_date1_qcvvo_oper" name="text_view_date1_qcvvo_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <p><> Reference Document</p>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label class="" for="">Work Instruction Document</label>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="">Discuss the inspection sequence in detail.</label>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <input class="form-control" type="text" id="text_view_refdocno_input_qcvvo_oper_2" name="text_view_refdocno_input_qcvvo_oper_2" readonly>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <input class="form-control" type="text" id="text_view_ins_seq_qcvvo_oper_2" name="text_view_ins_seq_qcvvo_oper_2" readonly>
-                                    </div>
-                                </div>
-
-                                <h6 class="mt-3 mb-3">RESULT:</h6>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <label class="ms-3" for="">Second Take:</label>
-                                        <input class="form-control" name="text_view_result2__qcvvo_oper" id="text_view_result2__qcvvo_oper" readonly>
-
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label class="ms-3" for="">Validated by:</label>
-                                        <input class="form-control" type="text" id="text_view_validated2_qcvvo_oper" name="text_view_validated2_qcvvo_oper" readonly>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label class="ms-3" for="">Date:</label>
-                                        <input class="form-control" type="text" id="text_view_date2_qcvvo_oper" name="text_view_date2_qcvvo_oper" readonly>
-                                    </div>
-                                </div>
-
-                                <hr style="height: 5px; background-color: black; border: none;">
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <div class="table-responsive">
-                                            <table id="" class="table table-bordered table-hover nowrap">
-                                                <thead class="table table-warning">
-                                                    <tr class="text-center">
-                                                        <th>Designation</th>
-                                                        <th>Training / Orientation</th>
-                                                        <th>Qualifier</th>
-                                                        <th>Certifier</th>
-                                                        <th>Approver / Confirmation</th>
-                                                    </tr>
-                                                </thead>
-
-                                                <tbody>
-                                                    <tr>
-                                                        <td>Operator</td>
-                                                        <td>Supervisor and/or Material Handler</td>
-                                                        <td>Process Engineer</td>
-                                                        <td>QC Inspector</td>
-                                                        <td>QC Supervisor</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="">Approved / Confirmed by:</label>
-                                        <input class="form-control" type="text" id="text_view_oper_approved_confirmed_by" name="text_view_oper_approved_confirmed_by" readonly>
-                                        <label for="" class="mt-1">QC Supervisor</label>
-                                    </div>
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
-                                </div>
-
-                            {{-- </form> --}}
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- GENERATE REPORT FOR OPERATOR -->
-        <div class="modal" id="" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">GENERATE PDF</h1>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-
-                        <form method="POST" action="exportOperFormPDF.php" id="formGeneratePDF" target="_blank">
-
-                            <input type="text" name="text_report_oper_conno" id="text_report_oper_conno">
-                            <input type="text" name="text_report_fk_cq_oper_conno" id="text_report_fk_cq_oper_conno">
-                            <input type="text" name="text_report_oper_cq_section" id="text_report_oper_cq_section">
-
-                            <input type="text" name="text_report_oper_cq_series" id="text_report_oper_cq_series">
-                            <input type="text" name="text_report_oper_cq_prodLine" id="text_report_oper_cq_prodLine">
-                            <input type="text" name="text_report_oper_cq_cert_reason" id="text_report_oper_cq_cert_reason">
-                            <input type="text" name="text_report_oper_cq_training" id="text_report_oper_cq_training">
-                            <input type="text" name="text_report_oper_cq_pt_result1" id="text_report_oper_cq_pt_result1">
-                            <input type="text" name="text_report_oper_cq_pt_trainedby1" id="text_report_oper_cq_pt_trainedby1">
-                            <input type="text" name="text_report_oper_cq_pt_date_time1" id="text_report_oper_cq_pt_date_time1">
-                            <input type="text" name="text_report_oper_cq_pt_result2" id="text_report_oper_cq_pt_result2">
-                            <input type="text" name="text_report_oper_cq_pt_trainedby2" id="text_report_oper_cq_pt_trainedby2">
-                            <input type="text" name="text_report_oper_cq_pt_date_time2" id="text_report_oper_cq_pt_date_time2">
-                            <input type="text" name="text_report_oper_cq_et_training" id="text_report_oper_cq_et_training">
-                            <input type="text" name="text_report_oper_cq_es_obs_result1" id="text_report_oper_cq_es_obs_result1">
-                            <input type="text" name="text_report_oper_cq_es_sample1" id="text_report_oper_cq_es_sample1">
-                            <input type="text" name="text_report_oper_cq_es_ok1" id="text_report_oper_cq_es_ok1">
-                            <input type="text" name="text_report_oper_cq_es_ng1" id="text_report_oper_cq_es_ng1">
-                            <input type="text" name="text_report_oper_cq_es_oa1" id="text_report_oper_cq_es_oa1">
-                            <input type="text" name="text_report_oper_cq_es_disqualification_reason1" id="text_report_oper_cq_es_disqualification_reason1">
-                            <input type="text" name="text_report_oper_cq_es_qualifiedby1" id="text_report_oper_cq_es_qualifiedby1">
-                            <input type="text" name="text_report_oper_cq_es_date_time1" id="text_report_oper_cq_es_date_time1">
-                            <input type="text" name="text_report_oper_cq_es_obs_result2" id="text_report_oper_cq_es_obs_result2">
-                            <input type="text" name="text_report_oper_cq_es_sample2" id="text_report_oper_cq_es_sample2">
-                            <input type="text" name="text_report_oper_cq_es_ok2" id="text_report_oper_cq_es_ok2">
-                            <input type="text" name="text_report_oper_cq_es_ng2" id="text_report_oper_cq_es_ng2">
-                            <input type="text" name="text_report_oper_cq_es_oa2" id="text_report_oper_cq_es_oa2">
-                            <input type="text" name="text_report_oper_cq_es_disqualification_reason2" id="text_report_oper_cq_es_disqualification_reason2">
-                            <input type="text" name="text_report_oper_cq_es_qualifiedby2" id="text_report_oper_cq_es_qualifiedby2">
-                            <input type="text" name="text_report_oper_cq_es_date_time2" id="text_report_oper_cq_es_date_time2">
-                            <input type="text" name="text_report_oper_cq_qcs_obs_result1" id="text_report_oper_cq_qcs_obs_result1">
-                            <input type="text" name="text_report_oper_cq_qcs_sample1" id="text_report_oper_cq_qcs_sample1">
-                            <input type="text" name="text_report_oper_cq_qcs_ok1" id="text_report_oper_cq_qcs_ok1">
-                            <input type="text" name="text_report_oper_cq_qcs_ng1" id="text_report_oper_cq_qcs_ng1">
-                            <input type="text" name="text_report_oper_cq_qcs_training1" id="text_report_oper_cq_qcs_training1">
-                            <input type="text" name="text_report_oper_cq_qcs_oa_result1" id="text_report_oper_cq_qcs_oa_result1">
-                            <input type="text" name="text_report_oper_cq_qcs_disapproval_reason1" id="text_report_oper_cq_qcs_disapproval_reason1">
-                            <input type="text" name="text_report_oper_cq_qcs_certifiedby1" id="text_report_oper_cq_qcs_certifiedby1">
-                            <input type="text" name="text_report_oper_cq_qcs_date_time1" id="text_report_oper_cq_qcs_date_time1">
-                            <input type="text" name="text_report_oper_cq_qcs_obs_result2" id="text_report_oper_cq_qcs_obs_result2">
-                            <input type="text" name="text_report_oper_cq_qcs_sample2" id="text_report_oper_cq_qcs_sample2">
-                            <input type="text" name="text_report_oper_cq_qcs_ok2" id="text_report_oper_cq_qcs_ok2">
-                            <input type="text" name="text_report_oper_cq_qcs_ng2" id="text_report_oper_cq_qcs_ng2">
-                            <input type="text" name="text_report_oper_cq_qcs_training2" id="text_report_oper_cq_qcs_training2">
-                            <input type="text" name="text_report_oper_cq_qcs_oa_result2" id="text_report_oper_cq_qcs_oa_result2">
-                            <input type="text" name="text_report_oper_cq_qcs_disapproval_reason2" id="text_report_oper_cq_qcs_disapproval_reason2">
-                            <input type="text" name="text_report_oper_cq_qcs_certifiedby2" id="text_report_oper_cq_qcs_certifiedby2">
-                            <input type="text" name="text_report_oper_cq_qcs_date_time2" id="text_report_oper_cq_qcs_date_time2">
-
-                            <!-- FOR BACK PAGE -->
-
-                            <input type="text" name="text_report_oper_cq_peqc_lot1" id="text_report_oper_cq_peqc_lot1">
-                            <input type="text" name="text_report_oper_cq_peqc_inj1" id="text_report_oper_cq_peqc_inj1">
-                            <input type="text" name="text_report_oper_cq_peqc_dej1" id="text_report_oper_cq_peqc_dej1">
-                            <input type="text" name="text_report_oper_cq_peqc_oa_result1" id="text_report_oper_cq_peqc_oa_result1">
-                            <input type="text" name="text_report_oper_cq_peqc_disapproval_reason1" id="text_report_oper_cq_peqc_disapproval_reason1">
-                            <input type="text" name="text_report_oper_cq_peqc_prod_certified1" id="text_report_oper_cq_peqc_prod_certified1">
-                            <input type="text" name="text_report_oper_cq_peqc_eng_certified1" id="text_report_oper_cq_peqc_eng_certified1">
-                            <input type="text" name="text_report_oper_cq_peqc_qc_certified1" id="text_report_oper_cq_peqc_qc_certified1">
-                            <input type="text" name="text_report_oper_cq_peqc_date_time1" id="text_report_oper_cq_peqc_date_time1">
-                            <input type="text" name="text_report_oper_cq_peqc_lot2" id="text_report_oper_cq_peqc_lot2">
-                            <input type="text" name="text_report_oper_cq_peqc_inj2" id="text_report_oper_cq_peqc_inj2">
-                            <input type="text" name="text_report_oper_cq_peqc_dej2" id="text_report_oper_cq_peqc_dej2">
-                            <input type="text" name="text_report_oper_cq_peqc_oa_result2" id="text_report_oper_cq_peqc_oa_result2">
-                            <input type="text" name="text_report_oper_cq_peqc_disapproval_reason2" id="text_report_oper_cq_peqc_disapproval_reason2">
-                            <input type="text" name="text_report_oper_cq_peqc_prod_certified2" id="text_report_oper_cq_peqc_prod_certified2">
-                            <input type="text" name="text_report_oper_cq_peqc_eng_certified2" id="text_report_oper_cq_peqc_eng_certified2">
-                            <input type="text" name="text_report_oper_cq_peqc_qc_certified2" id="text_report_oper_cq_peqc_qc_certified2">
-                            <input type="text" name="text_report_oper_cq_peqc_date_time2" id="text_report_oper_cq_peqc_date_time2">
-                            <input type="text" name="text_report_oper_cq_vpes_applicable" id="text_report_oper_cq_vpes_applicable">
-                            <input type="text" name="text_report_oper_cq_vpes_validation_result" id="text_report_oper_cq_vpes_validation_result">
-                            <input type="text" name="text_report_oper_cq_vpes_result1" id="text_report_oper_cq_vpes_result1">
-                            <input type="text" name="text_report_oper_cq_vpes_validatedby1" id="text_report_oper_cq_vpes_validatedby1">
-                            <input type="text" name="text_report_oper_cq_vpes_date1" id="text_report_oper_cq_vpes_date1">
-                            <input type="text" name="text_report_oper_cq_vpes_result2" id="text_report_oper_cq_vpes_result2">
-                            <input type="text" name="text_report_oper_cq_vpes_validatedby2" id="text_report_oper_cq_vpes_validatedby2">
-                            <input type="text" name="text_report_oper_cq_vpes_date2" id="text_report_oper_cq_vpes_date2">
-                            <input type="text" name="text_report_oper_cq_vpes_remarks" id="text_report_oper_cq_vpes_remarks">
-                            <input type="text" name="text_report_oper_cq_vpqcs_validation_station" id="text_report_oper_cq_vpqcs_validation_station">
-                            <input type="text" name="text_report_oper_cq_vpqcs_result1" id="text_report_oper_cq_vpqcs_result1">
-                            <input type="text" name="text_report_oper_cq_vpqcs_validatedby1" id="text_report_oper_cq_vpqcs_validatedby1">
-                            <input type="text" name="text_report_oper_cq_vpqcs_date1" id="text_report_oper_cq_vpqcs_date1">
-                            <input type="text" name="text_report_oper_cq_vpqcs_result2" id="text_report_oper_cq_vpqcs_result2">
-                            <input type="text" name="text_report_oper_cq_vpqcs_validatedby2" id="text_report_oper_cq_vpqcs_validatedby2">
-                            <input type="text" name="text_report_oper_cq_vpqcs_date2" id="text_report_oper_cq_vpqcs_date2">
-                            <input type="text" name="text_report_oper_cq_vpqcs_remarks" id="text_report_oper_cq_vpqcs_remarks">
-                            <input type="text" name="text_report_oper_cq_vpqcs_sheet_checking" id="text_report_oper_cq_vpqcs_sheet_checking">
-                            <input type="text" name="text_report_oper_cq_vpqcs_applicable" id="text_report_oper_cq_vpqcs_applicable">
-                            <input type="text" name="text_report_oper_cq_vpqcs_sheet_result1" id="text_report_oper_cq_vpqcs_sheet_result1">
-                            <input type="text" name="text_report_oper_cq_vpqcs_sheet_validatedby1" id="text_report_oper_cq_vpqcs_sheet_validatedby1">
-                            <input type="text" name="text_report_oper_cq_vpqcs_sheet_date1" id="text_report_oper_cq_vpqcs_sheet_date1">
-                            <input type="text" name="text_report_oper_cq_vpqcs_sheet_result2" id="text_report_oper_cq_vpqcs_sheet_result2">
-                            <input type="text" name="text_report_oper_cq_vpqcs_sheet_validatedby2" id="text_report_oper_cq_vpqcs_sheet_validatedby2">
-                            <input type="text" name="text_report_oper_cq_vpqcs_sheet_date2" id="text_report_oper_cq_vpqcs_sheet_date2">
-                            <input type="text" name="text_report_oper_cq_vpqcs_sheet_remarks" id="text_report_oper_cq_vpqcs_sheet_remarks">
-                            <input type="text" name="text_report_oper_cq_vvo_docno1" id="text_report_oper_cq_vvo_docno1">
-                            <input type="text" name="text_report_oper_cq_vvo_sequence_details1" id="text_report_oper_cq_vvo_sequence_details1">
-                            <input type="text" name="text_report_oper_cq_vvo_result1" id="text_report_oper_cq_vvo_result1">
-                            <input type="text" name="text_report_oper_cq_vvo_validatedby1" id="text_report_oper_cq_vvo_validatedby1">
-                            <input type="text" name="text_report_oper_cq_vvo_date1" id="text_report_oper_cq_vvo_date1">
-                            <input type="text" name="text_report_oper_cq_vvo_docno2" id="text_report_oper_cq_vvo_docno2">
-                            <input type="text" name="text_report_oper_cq_vvo_sequence_details2" id="text_report_oper_cq_vvo_sequence_details2">
-                            <input type="text" name="text_report_oper_cq_vvo_result2" id="text_report_oper_cq_vvo_result2">
-                            <input type="text" name="text_report_oper_cq_vvo_validatedby2" id="text_report_oper_cq_vvo_validatedby2">
-                            <input type="text" name="text_report_oper_cq_vvo_date2" id="text_report_oper_cq_vvo_date2">
-                            <input type="text" name="text_report_oper_cq_approved_confirmedby" id="text_report_oper_cq_approved_confirmedby">
-
-                            <input type="submit" class="btn btn-warning float-start pdf" id="pdf" name="pdf" value="Generate PDF">
-                        </form>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        @include('components.operator_prodn_training_orientation')
     </div>
 </div>
 @endsection
 
 @section('js_content')
     <script type="text/javascript">
-    $(function () {
-         // In-memory array that holds employees staged in the modal
+    $(document).ready(function () {
         operEmpArray = [];
+        form = {
+            formSubmitOper: $('#formSubmitOper'),
+        };
+        dataTable = {
+            operator: '',
+            fvi_operator: '',
+            tbl_fvi_operator_2: '',
+        };
+        table = {
+           operator: '#tbl_operator',
+           fvi_operator: '#tbl_fvi_operator',
+           tbl_fvi_operator_2: '#tbl_fvi_operator_2',
+        };
+
+
+        const updateApproval = (params) => {
+            let data = {
+                decision : params.decision,
+                qcSlipsId : params.qcSlipsId
+            }
+            call_ajax_serialize(data, {}, 'update_approval', function (response) {
+                if (response && response.is_success === 'true') {
+                    Swal.fire({ icon: 'success', title: 'Success', text: response.message || 'Approval status updated.' });
+                    dataTable.operator.draw();
+                    $('#modalCreateCQForm').modal('hide');
+                }
+            });
+        }
+        $('#operDisapproved').click(function (e) {
+                let qcSlipsId = $('#qc_slips_id').val();
+                let decision = 'DIS';
+                let params = {
+                    decision : decision,
+                    qcSlipsId : qcSlipsId
+                }
+                swalConfirmAction('Are you sure you want to DISAPPROVED this request?', function () {
+                    updateApproval(params);
+                });
+        });
+
+        $('#operApproved').click(function (e) {
+            let qcSlipsId = $('#qc_slips_id').val();
+            let decision = 'OK';
+            let params = {
+                decision : decision,
+                qcSlipsId : qcSlipsId
+            }
+            swalConfirmAction('Are you sure you want to APPROVED this request?', function () {
+                updateApproval(params);
+            });
+        });
+
+         $(document).on('click', '#btnCreateCQForm',function (e) {
+            form.formSubmitOper[0].reset();
+             initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_operator_product_line',
+            ],2);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_certification_operator',
+            ],3);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_ps_oper',
+            ],4);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#transfer_flexibility',
+                    '#text_training_orientation_es_oper',
+            ],5);
+            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            $('#btnEmployeeOperator').prop('disabled',false);
+        });
+        dataTable.operator = $(table.operator).DataTable({
+            "processing" : true,
+            "serverSide" : true,
+            "ajax" : {
+                url: "load_qc_slip", //Rapid Ts Warehouse Packaging
+                data: function (param){
+                    // param.qcSlipsId = $('#qc_slips_id').val();;
+                },
+            },
+                'columnDefs': [
+                    { responsivePriority: 1, targets: 0 },  // Action always visible
+                    { responsivePriority: 2, targets: 1 },  // Status next priority
+                    { responsivePriority: 1, targets: -1 } // Date Filed hides first on small screens
+                ],
+            fixedHeader: true,
+            "columns":[
+                // { "data" : "rawBulkCheckBox", orderable:false, searchable:false },
+                { "data" : "rawAction", orderable:false, searchable:false },
+                { "data" : "rawStatus", orderable:false, searchable:false },
+                { "data" : "control_no" },
+                { "data" : "series_name" },
+                { "data" : "created_by" },
+                // { "data" : "certified_by" },
+                // { "data" : "approved_conformed_by" },
+                { "data" : "created_at" },
+            ],
+
+        });
+        dataTable.fvi_operator = $(table.fvi_operator).DataTable({
+            "processing" : true,
+            "serverSide" : true,
+            "ajax" : {
+                url: "load1st_qc_validation", //Rapid Ts Warehouse Packaging
+                // data: function (param){
+                //     param.qcSlipsId = $('#qc_slips_id').val();
+                // },
+            },
+            fixedHeader: true,
+            "columns":[
+                { "data" : "employee_no" },
+                { "data" : "employee_name" },
+                { "data" : "first_take_ins_sequence","name":"first_take_ins_sequence",orderable: false, searchable: false  },
+                { "data" : "first_take_ins_assessment_result","name":"first_take_ins_assessment_result", orderable: false, searchable: false  },
+            ],
+        });
+        dataTable.tbl_fvi_operator_2 = $(table.tbl_fvi_operator_2).DataTable({
+            "processing" : true,
+            "serverSide" : true,
+            "ajax" : {
+                url: "load2nd_qc_validation", //Rapid Ts Warehouse Packaging
+                // data: function (param){
+                //     param.qcSlipsId = $('#qc_slips_id').val();
+                // },
+            },
+            fixedHeader: true,
+            "columns":[
+                { "data" : "employee_no" },
+                { "data" : "employee_name" },
+                { "data" : "second_take_ins_sequence","name":"second_take_ins_sequence",orderable: false, searchable: false  },
+                { "data" : "second_take_ins_assessment_result","name":"second_take_ins_assessment_result", orderable: false, searchable: false  },
+            ],
+        });
+        $('#operDisapproved').addClass('d-none');
+        $('#operApproved').addClass('d-none');
+        $('#operClosed').removeClass('d-none');
+        $('#operSave').removeClass('d-none');
+
+        //  Best Practice: Event Delegation with correct object scoping
+        $(document).on('click', '.btnRemoveOperEmpMain', function() {
+            $(this).closest('tr').remove();
+        });
+
+        $(document).on('change', '.first_take_ins_sequence',function (e) {
+            let qcSlipsIdData = $(this).attr('qc-slips-id');
+            let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
+            let valueData = $(this).val();
+            let categoryData = 'firstTakeInsSequence';
+            let params = {
+                qcSlipsId : qcSlipsIdData,
+                value : valueData,
+                QcSlipEmployeesId : QcSlipEmployeesIdData,
+                category : categoryData,
+            }
+            saveFirstTakeInsSequence(params);
+        })
+        $(document).on('change', '.first_take_ins_assessment_result',function (e) {
+            let qcSlipsIdData = $(this).attr('qc-slips-id');
+            let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
+            let valueData = $(this).val();
+            let categoryData = 'firstTakeInsAssessmentResult';
+            let params = {
+                qcSlipsId : qcSlipsIdData,
+                value : valueData,
+                QcSlipEmployeesId : QcSlipEmployeesIdData,
+                category : categoryData,
+            }
+            saveFirstTakeInsSequence(params);
+
+        })
+        $(document).on('change', '.second_take_ins_sequence',function (e) {
+            let qcSlipsIdData = $(this).attr('qc-slips-id');
+            let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
+            let valueData = $(this).val();
+            let categoryData = 'secondTakeInsSequence';
+            let params = {
+                qcSlipsId : qcSlipsIdData,
+                value : valueData,
+                QcSlipEmployeesId : QcSlipEmployeesIdData,
+                category : categoryData,
+            }
+            saveFirstTakeInsSequence(params);
+        })
+        $(document).on('change', '.second_take_ins_assessment_result',function (e) {
+            let qcSlipsIdData = $(this).attr('qc-slips-id');
+            let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
+            let valueData = $(this).val();
+            let categoryData = 'secondTakeInsAssessmentResult';
+            let params = {
+                qcSlipsId : qcSlipsIdData,
+                value : valueData,
+                QcSlipEmployeesId : QcSlipEmployeesIdData,
+                category : categoryData,
+            }
+            saveFirstTakeInsSequence(params);
+        })
+
+        $(table.operator).on('click', '#btnGetQcSlipsId','tr',function (e) {
+            e.preventDefault();
+            let qcSlipsId = $(this).attr('qc-slips-id');
+            let params = {
+                qcSlipsId: qcSlipsId,
+            };
+            getQcSlipsById(params);
+            console.log('btnGetQcSlipsId clicked');
+
+        });
+        $(table.operator).on('click', '#btnViewQcSlipsId','tr',function (e) {
+            e.preventDefault();
+            let qcSlipsId = $(this).attr('qc-slips-id');
+            let params = {
+                qcSlipsId: qcSlipsId,
+            };
+            getQcSlipsById(params);
+        });
         $(document).on('change', '#text_certification_operator',function (e) {
             e.preventDefault();
             // 1. Grab the value (fallback to empty string if null/undefined)
@@ -2879,7 +1854,7 @@
             const hasValue = valuesArray.some(val => targetIDs.includes(val.trim()));
 
             $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
-         });
+        });
         $(document).on('change', '#text_training_orientation_ps_oper',function (e) {
             e.preventDefault();
             // 1. Grab the value (fallback to empty string if null/undefined)
@@ -2895,14 +1870,21 @@
 
             $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
          });
-        $(document).on('submit', '#formSubmit_oper, #formSubmit_Oper', function (e) {
-            e.preventDefault();
 
-            var $form = $(this);
-            $form.append('text_select_position', $('#text_select_position').val());
-            $form.append('text_select_section', $('#text_select_section').val());
-            // Serialize form into an object (handles multiple inputs with same name)
+         const saveFormOper = ($form) => {
+
+            // 1. Serialize standard form inputs into an array
+            // console.log('saveFormOper called',$form[0]);
+            // return;
             var formArray = $form.serializeArray();
+
+            // 2. Push extra custom field values manually
+            formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
+            formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
+            formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
+            formArray.push({ name: 'text_select_section', value: $('#select_section').val() });
+
+            // 3. Process the array into a clean key-value object map
             var data = {};
             $.each(formArray, function(i, field) {
                 if (data[field.name] !== undefined) {
@@ -2913,28 +1895,51 @@
                 } else {
                     data[field.name] = field.value;
                 }
-            });
+            },$form[0]);
 
-            // Add the Operator Employees table data (empId, empName, stFrom, stTo)
+            // 4. Safely pull your dynamic table data array
             data.operator_employees = (typeof getOperEmpTableData === 'function')
                 ? getOperEmpTableData()
                 : [];
 
-
-            // Send to server
-            let serialized_data = {
-
-            }
-            call_ajax_serialize(data,serialized_data,'save_qualification_certification_oper', function(response){
-                if (response && response.success) {
+            call_ajax_serialize(data,{},'save_qualification_certification_oper', function(response){
+                if (response.is_success === 'true') {
                     Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
+                    dataTable.operator.draw();
                     $('#modalCreateCQForm').modal('hide');
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Error', text: (response && response.message) ? response.message : 'Failed to save.' });
+                    $('#modalSendEmail').modal('hide');
+                    // form.formSubmitOper[0].reset();
                 }
-            });
+            },$form);
+         }
+         $('#formSendEmail').click(function (e) {
+            e.preventDefault();
+            var $form = $('#formSubmitOper,#formSubmitOper');
+            saveFormOper($form);
+        });
+        $(document).on('submit', '#formSubmitOper, #formSubmitOper', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            Swal.fire({
+            title: 'Are you sure you want to save this request?',
+            // html: 'This will allow you to add employees who will not be endorsed for this training endorsement.<br> <em style="font-size: 1rem;">You can specify the reason for not endorsing each employee.</em>',
+            html: '<em style="font-size: 1rem;">The next Approver is QC Supervisor Approver</em>',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, proceed',
+            cancelButtonText: 'Cancel'
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                if($('#approval_status').val() === "FQCVVO"){
+                    //TODO: Swal fire
+                    saveFormOper($form);
+                }else{
+                    $('#modalSendEmail').modal();
+                }
+            }
         });
 
+        });
 
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper');
@@ -2968,80 +1973,69 @@
         });
 
         togglePositionSection($positionSelect.val());
-    });
-
-        function initDivDeptSecCombos(comboSelectors) {
-            comboSelectors.forEach(function(selector) {
-                    getDivDeptSec({ comboId: $(selector) });
-            });
-            // comboSelectors.forEach(function(selector) {
-            //         getDivDeptSec({ comboId: $(selector) });
-            // });
-        }
 
         initDivDeptSecCombos([
                 '#text_section_operator',
         ]);
 
 
-
-        initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-        ],1);
-
-
-        initDropdownMasterDetailsByFkidCombos([
-            '#text_operator_product_line',
-        ],2);
-
-        initDropdownMasterDetailsByFkidCombos([
-                '#text_certification_operator',
-        ],3);
-
-        initDropdownMasterDetailsByFkidCombos([
-                '#text_training_orientation_ps_oper',
-        ],4);
-        const initGetSystemOneEmployeeDetailsCombos = (comboSelectors) => {
-
-            comboSelectors.forEach(function(selector) {
-                    getSystemOneEmployeeDetails($(selector));
-            });
-        }
         const initSelectPassFail = (comboSelectors) => {
 
             comboSelectors.forEach(function(selector) {
                     selectPassFail($(selector));
             });
         }
-
+        // const initGetSystemOneEmployeeDetailsCombos = (comboSelectors) => {
+        //     comboSelectors.forEach(function(selector) {
+        //             getSystemOneEmployeeDetails($(selector));
+        //     });
+        // }
         initGetSystemOneEmployeeDetailsCombos([
-                '#text_oper_emp_number',
-                '#text_first_trainedby_oper',
-                '#text_first_mentoredby_oper',
-                '#text_second_trainedby_oper',
-                '#text_second_mentoredby_oper',
-                '#text_alert_prod_sec',
-                '#text_alert_prod_cc_sec',
-                '#text_1st_qualifiedby_es_oper',
-                '#text_2nd_qualifiedby_es_oper',
-                '#text_obs_first_result_es_oper',
-                //D PPD
-                '#text_1st_certified_prod_peqcs_oper',
-                '#text_1st_certified_eng_peqcs_oper',
-                '#text_1st_certified_qc_peqcs_oper',
-                '#text_2nd_certified_prod_peqcs_oper',
-                '#text_2nd_certified_eng_peqcs_oper',
-                '#text_2nd_certified_qc_peqcs_oper',
-                //EQcValidationProcess
-                '#text_1st_validatedby_vpes_oper_2',
-                '#text_2nd_validatedby_vpes_oper_2',
+            '#text_oper_emp_number',
+            '#text_first_trainedby_oper',
+            '#text_first_mentoredby_oper',
+            '#text_second_trainedby_oper',
+            '#text_second_mentoredby_oper',
+            '#text_alert_prod_sec',
+            '#text_alert_prod_cc_sec',
+            '#text_1st_qualifiedby_es_oper',
+            '#text_2nd_qualifiedby_es_oper',
+            //C
+            '#text_1st_certifiedby_qcs_oper',
+            '#text_2nd_certifiedby_qcs_oper',
+            //D PPD
+            '#text_1st_certified_prod_peqcs_oper',
+            '#text_1st_certified_eng_peqcs_oper',
+            '#text_1st_certified_qc_peqcs_oper',
+            '#text_2nd_certified_prod_peqcs_oper',
+            '#text_2nd_certified_eng_peqcs_oper',
+            '#text_2nd_certified_qc_peqcs_oper',
+
+            '#text_1st_validatedby_vpes_oper',
+            '#text_2nd_validatedby_vpes_oper',
+            //EQcValidationProcess
+            '#text_1st_validatedby_vpqcs_oper',
+            '#text_2nd_validatedby_vpqcs_oper',
+            '#text_1st_validatedby_vpes_oper_2',
+            '#text_2nd_validatedby_vpes_oper_2',
+            //F
+            '#text_validated1_qcvvo_oper',
+            '#text_validated2_qcvvo_oper',
+            //APPROVED BY
+            '#text_oper_approved_confirmed_by',
 
         ]);
-        initSelectPassFail([
-            '#text_oa_1st_result_es_oper',
-        ])
-        // call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId =null);
+        // initSelectPassFail([
+        //     '#text_oa_1st_result_es_oper',
+        //     '#text_obs_first_result_es_oper',
+        //     '#text_oa_2nd_result_es_oper',
+        // ]);
+
+        // Delete a row from the FVI table
+        $(document).on('click', '#tbl_fvi_operator .btn-delete-fvi-row', function () {
+            $(this).closest('tr').remove();
+        });
+    });
 
     </script>
 @endsection

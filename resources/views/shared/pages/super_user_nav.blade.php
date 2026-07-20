@@ -35,6 +35,13 @@
                         <p>User list</p>
                     </a>
                 </li>
+                
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('insp_skill_chart_setting') }}"  class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Inspector Skill Chart Settings</p>
+                    </a>
+                </li>
 
                 <li class="nav-header font-weight-bold">Modules</li>
                 {{-- <li class="nav-item has-treeview">
@@ -142,7 +149,6 @@
                         </a>
                     </li>
                 @endif
-
 
                 <li class="nav-item has-treeview">
                     <a href="{{ route('qualification_certification') }}" class="nav-link">
