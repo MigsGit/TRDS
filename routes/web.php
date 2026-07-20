@@ -1,17 +1,17 @@
 <?php
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\ExaminationResultController;
+use App\Http\Controllers\ExamTitleController;
 use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
+use App\Http\Controllers\ListOfCertPersonnelController;
+use App\Http\Controllers\PersonnelSkillMatrixController;
 use App\Http\Controllers\QualificationCertificationController;
 use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PersonnelSkillMatrixController;
-use App\Http\Controllers\ExamTitleController;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -259,6 +259,11 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/view_direct_employee_info', 'viewDirectEmployeeInfo')->name('view_direct_employee_info');
         Route::get('/get_employee_trainings', 'getEmployeeTrainings')->name('get_employee_trainings');
 
+    });
+
+    Route::controller(ListOfCertPersonnelController::class)->group(function(){
+        Route::get('/get_dropdown_select_certpersonnel', 'getDropdownSelectCertPersonnel')->name('get_dropdown_select_certpersonnel');
+        Route::get('/export_list_cert_personnel', 'exportListCertPersonnel')->name('export_list_cert_personnel');
     });
 
 

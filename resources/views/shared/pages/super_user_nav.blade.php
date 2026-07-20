@@ -151,7 +151,15 @@
                     </a>
                 </li>
 
-               g --}}
+                <li class="nav-header font-weight-bold">Export</li>
+                <li class="nav-item has-treeview">
+                    <a id="btnListCertPersonnel" class="nav-link">
+                        <i class="fas fa-file-excel"></i>
+                        <p>List of Certified Personnel</p>
+                    </a>
+                </li>
+
+
 
             </ul>
         </nav>
