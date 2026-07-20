@@ -834,6 +834,13 @@
                 3,
                 editSelectionsMap3
             );
+            // let editSelectionsMap6 = {};
+            // editSelectionsMap6['#transfer_flexibility'] = response.rawReasonTransferFlexibility;
+            // initDropdownMasterDetailsByFkidCombos(
+            //     ['#transfer_flexibility'],
+            //     6,
+            //     editSelectionsMap6
+            // );
             // ==== A PROD
             // Safe access: optional chaining prevents "Cannot read properties of undefined" if API shape changes
             const aProdData = response?.approversCollection?.APRODTO?.[0] ?? null;
@@ -846,7 +853,7 @@
                 4,
                 editSelectionsMap4
             );
-            let defectParams = 
+            let defectParams =
             select2Value({
                 combo : form.formSubmitOper.find('#defect_escalation'),
                 value : aOperProdTrainingOrientation?.defect_escalation,

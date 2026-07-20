@@ -252,6 +252,7 @@ class QualificationCertificationController extends Controller
             $rawReasonsString = $qcSlip->qc_reason_certification->reason_of_certification ?? '';
             $rawAOperProdTrainingOrientation = $qcSlip->a_oper_prod_training_orientation->traning_items ?? '';
             $rawBOpEnggSectionTrainingOrientation = $qcSlip->b_op_engg_section_training_orientation->traning_items ?? '';
+            $rawReasonTransferFlexibility = $qcSlip->qc_reason_certification->transfer_flexibility ?? '';
 
             $rawReasonsStringCollection =  collect(explode('|', $rawReasonsString))
                 ->map(function($id) {
@@ -272,6 +273,15 @@ class QualificationCertificationController extends Controller
             }
             if($rawAOperProdTrainingOrientation != ''){
                  $rawAOperProdTrainingOrientationCollection =  collect(explode('|', $rawAOperProdTrainingOrientation))
+                ->map(function($id) {
+                    return trim($id);
+                })
+                ->filter()
+                ->values()
+                ->all();
+            }
+            if($rawReasonTransferFlexibility != ''){
+                 $rawReasonTransferFlexibilityCollection =  collect(explode('|', $rawReasonTransferFlexibility))
                 ->map(function($id) {
                     return trim($id);
                 })
@@ -366,6 +376,7 @@ class QualificationCertificationController extends Controller
                 'rawReasonsStringCollection' => $rawReasonsStringCollection,
                 'rawBEnggTrainingItemsCollection' => $rawBOpEnggSectionTrainingOrientationCollection ?? '',
                 'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection ?? '',
+                'rawReasonTransferFlexibility' => $rawReasonTransferFlexibility ?? '',
                 'approversCollection' => $processedData,
             ]);
         } catch (Exception $e) {
