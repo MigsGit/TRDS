@@ -1690,9 +1690,11 @@
                     '#text_training_orientation_ps_oper',
             ],4);
             initDropdownMasterDetailsByFkidCombos([
-                    '#transfer_flexibility',
                     '#text_training_orientation_es_oper',
             ],5);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#transfer_flexibility',
+            ],6);
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
         });
@@ -1829,7 +1831,6 @@
                 qcSlipsId: qcSlipsId,
             };
             getQcSlipsById(params);
-            console.log('btnGetQcSlipsId clicked');
 
         });
         $(table.operator).on('click', '#btnViewQcSlipsId','tr',function (e) {
