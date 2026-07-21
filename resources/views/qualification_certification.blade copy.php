@@ -1630,7 +1630,7 @@
             var $actionCell = $('<td>')
                 .append(
                     $('<input>').attr({ type: 'hidden', name: 'fvi_ids[]', value: id }),
-                   
+
                 );
 
             // Col 2 – Employee No. + hidden field for form submission
@@ -1789,7 +1789,7 @@
                 ? selectedValue
                 : selectedValue.toString().split(',');
 
-            const targetIDs = ['213', '216'];
+            const targetIDs = ['214', '216'];
 
             const hasValue = valuesArray.some(val => targetIDs.includes(val.trim()));
 
@@ -1804,7 +1804,7 @@
                 ? selectedValue
                 : selectedValue.toString().split(',');
 
-            const targetIDs = ['213', '216'];
+            const targetIDs = ['214', '216'];
 
             const hasValue = valuesArray.some(val => targetIDs.includes(val.trim()));
 

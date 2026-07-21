@@ -834,6 +834,15 @@
                 3,
                 editSelectionsMap3
             );
+            // ==== Flexibility
+            const transferFlexibility = '#transfer_flexibility';
+            let editSelectionsMap6 = {};
+            editSelectionsMap6[transferFlexibility] = response.rawReasonsStringCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [transferFlexibility],
+                6,
+                editSelectionsMap6
+            );
             // ==== A PROD
             // Safe access: optional chaining prevents "Cannot read properties of undefined" if API shape changes
             const aProdData = response?.approversCollection?.APRODTO?.[0] ?? null;
@@ -846,7 +855,7 @@
                 4,
                 editSelectionsMap4
             );
-            let defectParams = 
+            let defectParams =
             select2Value({
                 combo : form.formSubmitOper.find('#defect_escalation'),
                 value : aOperProdTrainingOrientation?.defect_escalation,
@@ -857,10 +866,15 @@
             });
             // Guard: validate aProdData exists and has properties before reading from it
             if (aProdData && typeof aProdData === 'object') {
-                const approverFirstDate  = aProdData.first_date  ?? '';
-                const approverFirstTime  = aProdData.first_time  ?? '';
-                const approverSecondDate = aProdData.second_date ?? '';
-                const approverSecondTime = aProdData.second_time ?? '';
+                const approverFirstStatus  = aProdData?.first_status  ?? '';
+                const approverSecondStatus  = aProdData?.second_status  ?? '';
+                const approverFirstDate  = aProdData?.first_date  ?? '';
+                const approverFirstTime  = aProdData?.first_time  ?? '';
+                const approverSecondDate = aProdData?.second_date ?? '';
+                const approverSecondTime = aProdData?.second_time ?? '';
+
+                form.formSubmitOper.find('#text_first_a_prod_result').val(approverFirstStatus).trigger('change');
+                form.formSubmitOper.find('#text_second_a_prod_result').val(approverSecondStatus).trigger('change');
                 form.formSubmitOper.find('#text_first_date_oper').val(approverFirstDate);
                 form.formSubmitOper.find('#text_first_time_oper').val(approverFirstTime);
                 form.formSubmitOper.find('#text_second_date_oper').val(approverSecondDate);
@@ -974,9 +988,9 @@
             if(vpesOper != ""){
                 form.formSubmitOper.find('#text_vpes_oper_1').prop('checked', true);
             }
-            // form.formSubmitOper.find('#text_vpes_oper').val(eQcValidationProcess?.engg_vpes_oper ?? '').trigger('change');
-            // form.formSubmitOper.find('#text_first_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
-            // form.formSubmitOper.find('#text_second_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_vpes_oper').val(eQcValidationProcess?.engg_vpes_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_first_result_vpes_oper').val(eEngvpData?.first_status ?? '').trigger('change');
+            form.formSubmitOper.find('#text_second_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
             form.formSubmitOper.find('#text_1st_date_vpes_oper').val(eEngvpData?.first_date ?? '');
             form.formSubmitOper.find('#text_2nd_date_vpes_oper').val(eEngvpData?.second_date ?? '');
             form.formSubmitOper.find('#text_remarks_vpes_oper').val(eEngvpData?.first_remarks ?? '');

@@ -156,6 +156,8 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
                 // Swal.fire({ icon: 'error', title: 'Error', text: (errorResponse.message) ? errorResponse.message : 'Internal Server Error.'});
             }
             if( result.status === 409 ){
+                 toastr.error(errorResponse.message ?? '');
+                Swal.fire({ icon: 'error', title: 'Error', text: (errorResponse.message) ? errorResponse.message : 'Internal Server Error.'});
 
             }
 
@@ -204,7 +206,7 @@ const resetFormValues = (params) => {
 /**
  * SweetAlert confirmation
  */
-const  swalConfirmAction =(message, callback) => {
+const  swalConfirmation =(message, callback) => {
     Swal.fire({
         text: message,
         icon: 'warning',

@@ -77,6 +77,10 @@ class QcSlip extends Model
     {
         return $this->hasOne(EQcValidationProcess::class, 'qc_slips_id',  'id')->where('deleted_at');
     }
+    public function e_eng_validation_process()
+    {
+        return $this->hasOne(EEngValidationProcess::class, 'qc_slips_id',  'id')->where('deleted_at');
+    }
     public function f_qc_validation()
     {
         return $this->hasOne(FQcValidation::class, 'qc_slips_id',  'id')->where('deleted_at');
