@@ -35,7 +35,7 @@
                         <p>User list</p>
                     </a>
                 </li>
-                
+
                 <li class="nav-item has-treeview">
                     <a href="{{ route('insp_skill_chart_setting') }}"  class="nav-link">
                         <i class="nav-icon fas fa-cogs"></i>
@@ -151,7 +151,8 @@
                 @endif
 
                 <li class="nav-item has-treeview">
-                    <a href="{{ route('qualification_certification') }}" class="nav-link">
+                    {{-- <a href="{{ route('qualification_certification') }}" class="nav-link"> --}}
+                    <a href="#" class="nav-link">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Qualification / Certification</p>
                     </a>
