@@ -71,7 +71,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Application Locale Configuration
+    | Application Locale Configuratio
     |--------------------------------------------------------------------------
     |
     | The application locale determines the default locale that will be used

@@ -32,7 +32,7 @@ class QcSlipRequest extends FormRequest
             'text_operator_product_line' => 'required',
             'text_certification_operator' => 'required|array',
             'transfer_flexibility' => [
-                Rule::requiredIf(in_array(213, (array) $this->input('text_certification_operator'))),
+                Rule::requiredIf(in_array(214, (array) $this->input('text_certification_operator'))),
             ],
 
             
