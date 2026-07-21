@@ -25,7 +25,7 @@ class ListOfCertPersonnelController extends Controller
         // return $request->all();
         $qcslips = QcSlip::with([
             'product_line_details',
-            'op_approver_details'
+            'op_approvers'
         ])
         ->whereNull('deleted_at')
         ->where('status', 'OK')
