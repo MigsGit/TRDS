@@ -1,8 +1,19 @@
 /node_modules
+<<<<<<< HEAD
 /public/hot
 /public/storage
 /storage
 /vendor
+=======
+/public
+public
+/public/hot
+/public/storage
+/storage
+storage
+/vendor
+vendor
+>>>>>>> origin/4x
 .env
 .env.backup
 .phpunit.result.cache

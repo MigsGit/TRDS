@@ -13,6 +13,10 @@ use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\InspSkillChartSettingController;
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/4x
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;

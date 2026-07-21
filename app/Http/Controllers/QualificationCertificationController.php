@@ -62,6 +62,606 @@ class QualificationCertificationController extends Controller
         }
         return collect((array) $value)->filter()->join($separator);
     }
+<<<<<<< HEAD
+=======
+
+    public function saveOperApprovers($params){
+        try {
+            OpApprover::insert($params);
+            DB::commit();
+            return [
+                'is_success' => 'true'
+            ];
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    public function saveFormSendEmail($params){
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $rapidxEmpNo =  session('global_user');
+            $to = '';
+            $cc = '';
+            foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
+                $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
+            }
+            //Send to Approver Attention To | CC is exclude the FQCVVO TO QCAPP Last Approver
+            $collectTo = collect($arrTo)->map(function($rowEmpNo){
+                return [
+                    'email' => $rowEmpNo['email'],
+                    'fullName' => $rowEmpNo['fullName'],
+                ];
+            });
+            if($params['approval_status'] != 'FQCVVO'){
+
+                foreach (explode(' | ',$params['update_data']['alert_prod_cc_sec']) as $key => $valueRowEmpNo) {
+                    $arrCc[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
+                }
+                $collectCc = collect($arrCc)->map(function($rowEmpNo){
+
+                    return [
+                        'email' => $rowEmpNo['email'],
+                        'fullName' => $rowEmpNo['fullName'],
+                    ];
+                });
+                $cc = $collectCc->pluck('email')->join(',');
+
+            }
+
+            $to = $collectTo->pluck('email')->join(',');
+            // $from =$currentSession['email'] ?? '';
+            // $from_name = $currentSession['fullName'];
+            $opApprover =  OpApprover::insert($params['update_data']);
+            $emailParams = [
+                'qc_slips_id' => $params['qc_slips_id']
+            ];
+            $message = $this->commonController->emailMsg($emailParams);
+            $from = 'issinfoservice@pricon.ph';
+            // $from_name = 'issinfoservice@pricon.ph';
+            $subject = "FOR YOUR APPROVAL : TRDS - Qualification Certification";
+            $rapidxEmpNo =  session('global_user');
+            $emailData = [
+                "to" =>$to,
+                // "to" =>"mrronquez@pricon.ph",
+                "cc" =>$cc,
+                // "cc" =>"",
+                "bcc" =>"mclegaspi@pricon.ph",
+                "from" => $from,
+                "from_name" => $from_name ?? "TRDS Auto Email",
+                "subject" =>$subject,
+                "message" =>  $message,
+                "attachment_filename" => "",
+                "attachment" => "",
+                "send_date_time" => now(),
+                "date_time_sent" => "",
+                "date_created" => now(),
+                // "created_by" => session('rapidx_username'),
+                "created_by" => $rapidxEmpNo->name,
+                "system_name" => "rapidx_TRDS",
+            ];
+            //TODO: SEND email
+            DB::commit();
+            $this->commonController->sendEmail($emailData);
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+    public function updateApproval(Request $request){
+        try {
+            // return 'true';
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $qcSlip = QcSlip::
+            where('id',$request->qcSlipsId)
+            ->whereNull('deleted_at')
+            // ->get();
+            ->update([
+                'status' => $request->decision,
+                'approval_status' => $request->decision,
+                'appproval_at' => now()
+            ]);
+             $operToApprovers = [
+                "decision_status"  => 'APP',
+             ];
+            $opApprover =  OpApprover::where('qc_slips_id',$request->qcSlipsId)->where('decision_status','PEN')
+            // ->get();
+            ->update($operToApprovers);
+            //TODO: Email to Created By if Approved
+            DB::commit();
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+    public function saveFirstTakeInsSequence(Request $request){
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $columnMap = [
+                'firstTakeInsSequence'        => 'first_take_ins_sequence',
+                'firstTakeInsAssessmentResult'=> 'first_take_ins_assessment_result',
+                'secondTakeInsSequence'       => 'second_take_ins_sequence',
+                'secondTakeInsAssessmentResult'=> 'second_take_ins_assessment_result',
+            ];
+            $column = $columnMap[$request->input('category')] ?? null;
+            if (!$column) {
+                return response()->json(['is_success' => 'false', 'message' => 'Invalid category.']);
+            }
+            $arrData = [$column => $this->getSafe($request, 'value')];
+            QcSlipEmployee::
+            where('qc_slips_id',$request->qcSlipsId)
+            ->where('id',$request->qcSlipEmployeesId)
+            ->whereNull('deleted_at')
+            // ->get();
+            ->update($arrData);
+            DB::commit();
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+    public function getQcSlipsById(Request $request){ //nmodify
+
+        try {
+            $qcSlip = QcSlip::with(
+                'op_approvers',
+                'qc_slip_employees.system_one_hris_subcon',
+                'qc_slip_employees.get_station_from',
+                'qc_slip_employees.get_station_to',
+                'qc_slip_employees',
+                'qc_reason_certification',
+                'a_oper_prod_training_orientation',
+                'b_op_engg_section_training_orientation',
+                'c_qc_certification',
+                'd_ppd_certification_completion',
+                'e_qc_validation_process',
+                'f_qc_validation',
+            )
+            ->where('id',$request->qcSlipsId)
+            ->whereNull('deleted_at')
+            ->first();
+             // Helper closure to cleanly explode piped string values into trimmed arrays
+            $explodePipedString = function ($value) {
+                if (is_null($value) || trim($value) === '') {
+                    return [];
+                }
+                return array_map('trim', explode('|', $value));
+            };
+
+            $rawOperApprovedConfirmedBy =  collect(explode('|', $qcSlip->oper_approved_confirmed_by))
+                ->map(function($id) {
+                    return trim($id);
+                })
+            ->filter()
+            ->values()
+            ->all();
+             $employeeOperApprovedConfirmedBy = SystemOneHrisSubcon::whereIn('EmpNo', $rawOperApprovedConfirmedBy)
+                ->get(['EmpNo', 'empname']) // Fetch only needed columns
+                ->keyBy('EmpNo') // Key the collection by EmpNo for O(1) lookup speed
+                ->toArray();
+			$arrOperApprovedConfirmedBy = [];
+            foreach($employeeOperApprovedConfirmedBy as $key => $value){
+				$array_data 				= array();
+				$array_data['id'] 		= $value['EmpNo'];
+				$array_data['name'] 		= $value['empname'];
+				$arrOperApprovedConfirmedBy[]			= $array_data;
+			}
+            $rawReasonsString = $qcSlip->qc_reason_certification->reason_of_certification ?? '';
+            $rawAOperProdTrainingOrientation = $qcSlip->a_oper_prod_training_orientation->traning_items ?? '';
+            $rawBOpEnggSectionTrainingOrientation = $qcSlip->b_op_engg_section_training_orientation->traning_items ?? '';
+            $rawReasonTransferFlexibility = $qcSlip->qc_reason_certification->transfer_flexibility ?? '';
+
+            $rawReasonsStringCollection =  collect(explode('|', $rawReasonsString))
+                ->map(function($id) {
+                    return trim($id);
+                })
+            ->filter()
+            ->values()
+            ->all();
+
+             if($rawBOpEnggSectionTrainingOrientation != ''){
+                $rawBOpEnggSectionTrainingOrientationCollection =  collect(explode('|', $rawBOpEnggSectionTrainingOrientation))
+                ->map(function($id) {
+                    return trim($id);
+                })
+                ->filter()
+                ->values()
+                ->all();
+            }
+            if($rawAOperProdTrainingOrientation != ''){
+                 $rawAOperProdTrainingOrientationCollection =  collect(explode('|', $rawAOperProdTrainingOrientation))
+                ->map(function($id) {
+                    return trim($id);
+                })
+                ->filter()
+                ->values()
+                ->all();
+            }
+            if($rawReasonTransferFlexibility != ''){
+                 $rawReasonTransferFlexibilityCollection =  collect(explode('|', $rawReasonTransferFlexibility))
+                ->map(function($id) {
+                    return trim($id);
+                })
+                ->filter()
+                ->values()
+                ->all();
+            }
+            $rawPayload = collect($qcSlip->op_approvers)->groupBy('approval_status')->toArray();
+            $approversCollection = collect($qcSlip)->groupBy('approval_status')->toArray();
+            // 2. Step One: Parse and collect ALL unique EmpNo values across all status groups
+            $allEmployeeNumbers = [];
+            foreach ($rawPayload as $status => $items) {
+                foreach ($items as $item) {
+                    $itemArray = (array) $item;
+
+                    // Collect from all possible employee fields
+                    $firstApprovers = $explodePipedString($itemArray['first_approver'] ?? null);
+                    $secondApprovers = $explodePipedString($itemArray['second_approver'] ?? null);
+                    $alerts = $explodePipedString($itemArray['alert_prod_sec'] ?? null);
+
+                    $allEmployeeNumbers = array_merge($allEmployeeNumbers, $firstApprovers, $secondApprovers, $alerts);
+                }
+            }
+
+            // Filter to keep only unique, non-empty employee numbers
+            $uniqueEmployeeNumbers = array_unique(array_filter($allEmployeeNumbers));
+
+            // 3. Step Two: Bulk fetch employee details from your HRIS table in ONE query
+            // This maps 'EmpNo' to their corresponding database columns (e.g., 'First_Name', 'Last_Name', or 'Full_Name')
+            $employeeDbMap = SystemOneHrisSubcon::whereIn('EmpNo', $uniqueEmployeeNumbers)
+                ->get(['EmpNo', 'empname']) // Fetch only needed columns
+                ->keyBy('EmpNo') // Key the collection by EmpNo for O(1) lookup speed
+                ->toArray();
+
+            // 4. Step Three: Map the data payload and inject matching Select2 structured object lists
+            $processedData = collect($rawPayload)->map(function ($items) use ($explodePipedString, $employeeDbMap) {
+            return collect($items)->map(function ($item) use ($explodePipedString, $employeeDbMap) {
+                    $itemArray = (array) $item;
+
+                    // Explode the fields
+                    $firstExploded  = $explodePipedString($itemArray['first_approver'] ?? null);
+                    $firstExploded2  = $explodePipedString($itemArray['first_approver_2'] ?? null);
+                    $firstExploded3  = $explodePipedString($itemArray['first_approver_3'] ?? null);
+                    $secondExploded = $explodePipedString($itemArray['second_approver'] ?? null);
+                    $secondExploded2 = $explodePipedString($itemArray['second_approver_2'] ?? null);
+                    $secondExploded3 = $explodePipedString($itemArray['second_approver_3'] ?? null);
+                    $alertsExploded = $explodePipedString($itemArray['alert_prod_sec'] ?? null);
+
+
+
+                    // Helper closure to build Select2 formatting: [{id: "R144", name: "John Doe"}]
+                    $mapToSelect2Structure = function ($empNoArray) use ($employeeDbMap) {
+                        return array_map(function ($empNo) use ($employeeDbMap) {
+                            $cleanEmpNo = trim($empNo);
+
+                            // Look up details from our pre-fetched database map
+                            $employeeInfo = $employeeDbMap[$cleanEmpNo] ?? null;
+
+                            // Fallback to the EmpNo if the record is not found in the HRIS table
+                            $displayName = $cleanEmpNo;
+                            if ($employeeInfo) {
+                                // Adjust these keys based on your actual SystemOneHrisSubcon column names
+                                $displayName = $employeeInfo['empname'];
+                            }
+
+                            return [
+                                'id' => $cleanEmpNo,
+                                'name' => trim($displayName)
+                            ];
+                        }, $empNoArray);
+                    };
+
+                    // Map and attach the completed objects directly to the output array keys
+                    $itemArray['first_approver_exploded']  = $mapToSelect2Structure($firstExploded);
+                    $itemArray['first_approver2_exploded']  = $mapToSelect2Structure($firstExploded2);
+                    $itemArray['first_approver3_exploded']  = $mapToSelect2Structure($firstExploded3);
+                    $itemArray['second_approver_exploded'] = $mapToSelect2Structure($secondExploded);
+                    $itemArray['second_approver2_exploded'] = $mapToSelect2Structure($secondExploded2);
+                    $itemArray['second_approver3_exploded'] = $mapToSelect2Structure($secondExploded3);
+                    $itemArray['alert_prod_sec_exploded']  = $mapToSelect2Structure($alertsExploded);
+
+                    return $itemArray;
+                });
+            });
+
+
+            // $qcSlipReasons = collect($qcSlip);
+            return response()->json([
+                'is_success' => 'true',
+                'qcSlip' => $qcSlip,
+                'rawOperApprovedConfirmedBy' => $arrOperApprovedConfirmedBy,
+                'rawReasonsStringCollection' => $rawReasonsStringCollection,
+                'rawBEnggTrainingItemsCollection' => $rawBOpEnggSectionTrainingOrientationCollection ?? '',
+                'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection ?? '',
+                'rawReasonTransferFlexibility' => $rawReasonTransferFlexibilityCollection ?? '',
+                'approversCollection' => $processedData,
+            ]);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    public function load1stQcValidation(Request $request){
+        try {
+           $qcSlipEmployee = QcSlipEmployee::with('system_one_subcon_emp_info','system_one_hris_emp_info')
+            ->where('qc_slips_id',$request->qcSlipsId)
+            ->where('station_to',2)
+            ->whereNull('deleted_at')
+            ->get([
+                'employee_no',
+                'id',
+                'qc_slips_id',
+                'station_to',
+                'first_take_ins_sequence',
+                'first_take_ins_assessment_result',
+            ]);
+            return DataTables($qcSlipEmployee)
+            ->addColumn('employee_name',function ($row){
+                $pricon = $row->system_one_hris_emp_info->EmpName ?? '';
+                $subcon = $row->system_one_subcon_emp_info->EmpName ?? '';
+                $employee_name = $pricon != '' ? $pricon : $subcon;
+                $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$employee_name.' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->addColumn('first_take_ins_sequence',function ($row){
+                $isExist = $row->first_take_ins_sequence ?? '';
+                $cSelected = $isExist === 'YES' ? 'selected' : '';
+                $xSelected = $isExist === 'NO' ? 'selected' : '';
+                $naSelected = $isExist === 'N/A' ? 'selected' : '';
+                // second_take_ins_sequence
+                // second_take_ins_assessment_result
+                $result = '';
+                $result .= '<center>
+                    <select qc-slip-employees-id="'.$row->id.'" qc-slips-id="'.$row->qc_slips_id.'" class="form-control select2bs4 first_take_ins_sequence" style="width: 100%;" name="first_take_ins_sequence" id="first_take_ins_sequence" >
+                        <option value="N/A" '.$cSelected.'>N/A</option>
+                        <option value="YES" '.$xSelected.'>YES</option>
+                        <option value="NO" '.$naSelected.'>NO</option>
+                    </select>';
+                $result .= '</center>';
+                return $result;
+            })
+            ->addColumn('first_take_ins_assessment_result',function ($row){
+                $isExist = $row->first_take_ins_assessment_result ?? '';
+                // $isSelected = $isExist != '' ? 'selected' : '';
+                $cSelected = $isExist === 'PASSED' ? 'selected' : '';
+                $xSelected = $isExist === 'FAILED' ? 'selected' : '';
+                $naSelected = $isExist === 'N/A' ? 'selected' : '';
+                $result = '';
+                $result .= '
+                    <select qc-slip-employees-id="'.$row->id.'" qc-slips-id="'.$row->qc_slips_id.'" class="form-control select2bs4 first_take_ins_assessment_result" style="width: 100%;" name="first_take_ins_assessment_result" id="first_take_ins_assessment_result">
+                        <option value="N/A" '.$naSelected.'>N/A</option>
+                        <option value="PASSED" '.$cSelected.'>PASSED</option>
+                        <option value="FAILED" '.$xSelected.'>FAILED</option>
+                    </select>';
+                $result .= '';
+                return $result;
+            })
+            ->rawColumns(['employee_name','first_take_ins_sequence','first_take_ins_assessment_result'])
+            ->make(true);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    public function load2ndQcValidation(Request $request){
+        try {
+            $qcSlipEmployee = QcSlipEmployee::with('system_one_subcon_emp_info','system_one_hris_emp_info')
+            ->where('qc_slips_id',$request->qcSlipsId)
+            ->where('station_to',2)
+            ->whereNull('deleted_at')
+            ->get([
+                'employee_no',
+                'id',
+                'qc_slips_id',
+                'station_to',
+                'second_take_ins_sequence',
+                'second_take_ins_assessment_result',
+            ]);
+            return DataTables($qcSlipEmployee)
+            ->addColumn('employee_name',function ($row){
+                $pricon = $row->system_one_hris_emp_info->EmpName ?? '';
+                $subcon = $row->system_one_subcon_emp_info->EmpName ?? '';
+                $employee_name = $pricon != '' ? $pricon : $subcon;
+                $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$employee_name.' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->addColumn('second_take_ins_sequence',function ($row){
+                $isExist = $row->second_take_ins_sequence ?? '';
+                $cSelected = $isExist === 'YES' ? 'selected' : '';
+                $xSelected = $isExist === 'NO' ? 'selected' : '';
+                $naSelected = $isExist === 'N/A' ? 'selected' : '';
+                $result = '';
+                $result .= '<center>
+                    <select qc-slip-employees-id="'.$row->id.'" qc-slips-id="'.$row->qc_slips_id.'" class="form-control select2bs4 second_take_ins_sequence" style="width: 100%;" name="second_take_ins_sequence" id="second_take_ins_sequence" >
+                        <option value="N/A" '.$cSelected.'>N/A</option>
+                        <option value="YES" '.$xSelected.'>YES</option>
+                        <option value="NO" '.$naSelected.'>NO</option>
+                    </select>';
+                $result .= '</center>';
+                return $result;
+            })
+            ->addColumn('second_take_ins_assessment_result',function ($row){
+                $isExist = $row->second_take_ins_assessment_result ?? '';
+                // $isSelected = $isExist != '' ? 'selected' : '';
+                $cSelected = $isExist === 'PASSED' ? 'selected' : '';
+                $xSelected = $isExist === 'FAILED' ? 'selected' : '';
+                $naSelected = $isExist === 'N/A' ? 'selected' : '';
+                $result = '';
+                $result .= '
+                    <select qc-slip-employees-id="'.$row->id.'" qc-slips-id="'.$row->qc_slips_id.'" class="form-control select2bs4 second_take_ins_assessment_result" style="width: 100%;" name="second_take_ins_assessment_result" id="second_take_ins_assessment_result">
+                        <option value="N/A" '.$naSelected.'>N/A</option>
+                        <option value="PASSED" '.$cSelected.'>PASSED</option>
+                        <option value="FAILED" '.$xSelected.'>FAILED</option>
+                    </select>';
+                $result .= '';
+                return $result;
+            })
+            ->rawColumns(['employee_name','second_take_ins_sequence','second_take_ins_assessment_result'])
+            ->make(true);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    public function loadQcSlip(Request $request){
+    //newStatus
+    $qcSlips = QcSlip::with('product_line','op_approvers','op_approvers_pending','system_one_hris_subcon')
+        ->whereNull('deleted_at')
+        ->get();
+        // Convert to a raw array for database handling
+        $allEmpIdsTo= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
+            ->flatten()                              // Flatten into a single layer of OpApprover models
+            ->pluck('alert_prod_sec')               // Pull out all the pipe-separated strings
+            ->filter()                               // Remove null or empty entries
+            ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
+                return array_map('trim', explode('|', $item));
+            })
+            ->unique()                               // Drop duplicates
+            ->values()                               // Re-index array keys
+            ->all();                                 // Convert to a raw array for database handling
+        $allEmpIdsCc= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
+            ->flatten()                              // Flatten into a single layer of OpApprover models
+            ->pluck('alert_prod_cc_sec')               // Pull out all the pipe-separated strings
+            ->filter()                               // Remove null or empty entries
+            ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
+                return array_map('trim', explode('|', $item));
+            })
+            ->unique()                               // Drop duplicates
+            ->values()                               // Re-index array keys
+            ->all();                                 // Convert to a raw array for database handling
+
+        // 3. Fetch all matching names from HRIS into a quick-lookup map array
+        $arrHrisSubconEmpNo = array_merge($allEmpIdsTo,$allEmpIdsCc);
+        $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', $arrHrisSubconEmpNo)
+            ->get()
+            ->pluck('empname', 'EmpNo');
+        try {
+        return DataTables($qcSlips)
+            ->addColumn('rawAction',function ($row) use ($request){
+                $result = '';
+                $result .= '<center>';
+                $result .= '<button class="btn btn-sm btn-outline-primary" type="button" qc-slips-id="'.$row->id.'" id="btnGetQcSlipsId"><i class="fa-solid fa fa-edit"></i></button> </br></br>';
+                $result .= '<button class="btn btn-sm btn-outline-info" type="button" qc-slips-id="'.$row->id.'" id="btnViewQcSlipsId"><i class="fa-solid fa fa-eye"></i></button>';
+                $result .= '</center>';
+                return $result;
+            })
+            ->addColumn('rawStatus', function ($row) use ($hrisSubcon) {
+                $current = $row->op_approvers_pending ?? [];
+                $approvalStatus = $row->approval_status;
+                $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
+
+                $resultCurrentApprover = '';
+
+                if (count($current) > 0) {
+                    // Get THIS row's own emp IDs from alert_prod_sec (pipe-separated)
+                    $empIdsTo = collect($current)
+                        ->pluck('alert_prod_sec')
+                        ->filter()
+                        ->flatMap(function ($item) {
+                            return array_map('trim', explode('|', $item));
+                        })
+                        ->unique();
+                    $empIdsCc = collect($current)
+                        ->pluck('alert_prod_cc_sec')
+                        ->filter()
+                        ->flatMap(function ($item) {
+                            return array_map('trim', explode('|', $item));
+                        })
+                        ->unique();
+                    // Map emp IDs -> names using the lookup, drop unmatched
+                    $currentApproverTo = $empIdsTo
+                        ->map(function ($empId) use ($hrisSubcon) {
+                            return $hrisSubcon[$empId] ?? null;
+                        })
+                        ->filter()
+                        ->join(' | ');
+                    $currentApproverCc = $empIdsCc
+                        ->map(function ($empId) use ($hrisSubcon) {
+                            return $hrisSubcon[$empId] ?? null;
+                        })
+                        ->filter()
+                        ->join(' | ');
+                //    return $empIdsCc = array_merge($empIdsTo,$empIdsCc);
+
+                    if ($currentApproverTo !== '') {
+                        $resultCurrentApprover = '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApproverTo.' | '.$currentApproverCc.' </span></br></br>';
+                    }
+                }
+
+                return '<center><br>'
+                    . $resultCurrentApprover
+                    . '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> '.$getApprovalStatus['statusName'].' </span>'
+                    . '</center></br>';
+            })
+            ->addColumn('trained_by',function ($row){
+                $personInCharge = $row->rapid_x_user->name ?? '';
+                // $personInCharge = $row;
+              return  $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$personInCharge.' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->addColumn('certified_by',function ($row){
+                // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
+                // $personInCharge = $row;
+              return  $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$personInCharge.' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->addColumn('created_by',function ($row){
+                $personInCharge = $row->system_one_hris_subcon[0]['empname'] ?? '';
+                // $personInCharge = $row;
+                $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$personInCharge.' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->addColumn('created_at',function ($row){
+                // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
+                // $personInCharge = $row;
+                $result = '';
+                $result .= '<center>';
+                $result .= '<span> '.$row->created_at->format('F j, Y').' </span>';
+                $result .= '<br>';
+                $result .= '</br>';
+                return $result;
+            })
+            ->rawColumns(['rawAction','rawStatus','created_by','created_at'])
+            ->make(true);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function updateOperApprovers($params){
+        try {
+            DB::commit();
+            return [
+                'is_success' => 'true'
+            ];
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+>>>>>>> origin/4x
     public function saveQualificationCertificationOper(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');
