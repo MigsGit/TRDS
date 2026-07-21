@@ -35,6 +35,13 @@
                         <p>User list</p>
                     </a>
                 </li>
+                
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('insp_skill_chart_setting') }}"  class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Inspector Skill Chart Settings</p>
+                    </a>
+                </li>
 
                 <li class="nav-header font-weight-bold">Modules</li>
                 {{-- <li class="nav-item has-treeview">
@@ -83,14 +90,21 @@
                         </li>
                     </ul>
                 </li>
+                {{-- http://rapidx/TRDSv2_attendance/ --}}
                 @if ( in_array(7,explode(',', $globalUser->user_modules_id)) )
-                    <li class="nav-item has-treeview">
+                    <li class="nav-item">
                         <a href="{{ route('training_attendance') }}"  class="nav-link">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Training Attendance  </p>
+                            <i class="fas fa-users"></i>
+                            <p>Training Attendance Summary   </p>
                         </a>
                     </li>
                 @endif
+                 <li class="nav-item">
+                     <a href="http://rapidx/TRDSv2_attendance/"  class="nav-link">
+                        <i class="fas fa-user"></i>
+                        <p>Training Attendance  </p>
+                    </a>
+                </li>
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
                         <i class="fas fa-cogs"></i>
@@ -122,18 +136,19 @@
                 </li>
 
                 <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>Personal Skill Matrix </p>
+                    <a href="{{ route('personnel_skill_matrix') }}"  class="nav-link">
+                        <i class="fas fa-blind"></i>
+                        <p>Personnel Skill Matrix</p>
                     </a>
                 </li>
-
-                <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-list-alt"></i>
-                        <p> Training Endorsement </p>
-                    </a>
-                </li>
+                @if ( in_array(16,explode(',', $globalUser->user_modules_id)) )
+                    <li class="nav-item has-treeview">
+                        <a href="{{ route('training_endorsement') }}"  class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>Training Endorsement </p>
+                        </a>
+                    </li>
+                @endif
 
                 <li class="nav-item has-treeview">
                     <a href="{{ route('qualification_certification') }}" class="nav-link">
@@ -141,6 +156,16 @@
                         <p>Qualification / Certification</p>
                     </a>
                 </li>
+
+                <li class="nav-header font-weight-bold">Export</li>
+                <li class="nav-item has-treeview">
+                    <a id="btnListCertPersonnel" class="nav-link">
+                        <i class="fas fa-file-excel"></i>
+                        <p>List of Certified Personnel</p>
+                    </a>
+                </li>
+
+
 
             </ul>
         </nav>

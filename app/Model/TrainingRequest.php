@@ -37,4 +37,5 @@ class TrainingRequest extends Model
         return $this->hasMany(TrainingRequestDetails::class, 'training_request_id', 'id');
     }
 
+
 }

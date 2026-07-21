@@ -1830,7 +1830,6 @@
                 qcSlipsId: qcSlipsId,
             };
             getQcSlipsById(params);
-            console.log('btnGetQcSlipsId clicked');
 
         });
         $(table.operator).on('click', '#btnViewQcSlipsId','tr',function (e) {
