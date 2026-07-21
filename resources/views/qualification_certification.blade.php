@@ -673,7 +673,7 @@
 
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
-                                                    <label class="" for="">Qualified by NMODI:</label>
+                                                    <label class="" for="">Qualified by:</label>
                                                         <select class="form-control select2bs4" style="width: 100%;" id="text_1st_qualifiedby_es_oper" name="text_1st_qualifiedby_es_oper[]" placeholder="Enter Employee Number" multiple>
                                                         </select>
                                                 </div>
@@ -1601,8 +1601,8 @@
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
                                     <button type="submit" class="btn btn-success" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Save</button>
 
-                                    <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button>
-                                    <button type="button" class="btn btn-success" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> Approved</button>
+                                    {{-- <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button> --}}
+                                    <button type="button" class="btn btn-success" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
                                 </div>
                         </form>
 
@@ -1657,7 +1657,7 @@
                     decision : decision,
                     qcSlipsId : qcSlipsId
                 }
-                swalConfirmAction('Are you sure you want to DISAPPROVED this request?', function () {
+                swalConfirmation('Are you sure you want to DISAPPROVED this request?', function () {
                     updateApproval(params);
                 });
         });
@@ -1669,7 +1669,7 @@
                 decision : decision,
                 qcSlipsId : qcSlipsId
             }
-            swalConfirmAction('Are you sure you want to APPROVED this request?', function () {
+            swalConfirmation('Are you sure you want to APPROVED this request?', function () {
                 updateApproval(params);
             });
         });
@@ -1850,7 +1850,7 @@
                 ? selectedValue
                 : selectedValue.toString().split(',');
 
-            const targetIDs = ['213', '216'];
+            const targetIDs = ['214', '216'];
 
             const hasValue = valuesArray.some(val => targetIDs.includes(val.trim()));
 
@@ -1865,7 +1865,7 @@
                 ? selectedValue
                 : selectedValue.toString().split(',');
 
-            const targetIDs = ['213', '216'];
+            const targetIDs = ['214', '216'];
 
             const hasValue = valuesArray.some(val => targetIDs.includes(val.trim()));
 
@@ -1909,7 +1909,7 @@
                     dataTable.operator.draw();
                     $('#modalCreateCQForm').modal('hide');
                     $('#modalSendEmail').modal('hide');
-                    // form.formSubmitOper[0].reset();
+                    form.formSubmitOper[0].reset();
                 }
             },$form);
          }
@@ -1924,7 +1924,7 @@
             Swal.fire({
             title: 'Are you sure you want to save this request?',
             // html: 'This will allow you to add employees who will not be endorsed for this training endorsement.<br> <em style="font-size: 1rem;">You can specify the reason for not endorsing each employee.</em>',
-            html: '<em style="font-size: 1rem;">The next Approver is QC Supervisor Approver</em>',
+            html: '',
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Yes, proceed',
