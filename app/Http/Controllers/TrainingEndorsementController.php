@@ -512,9 +512,15 @@ class TrainingEndorsementController extends Controller
             'training_request_details.hr_memo_details',
             'training_request_details.employee_exam_details' => function($query) use ($ctrl_number) {
                 $query->where('training_request_ctrl_no', $ctrl_number);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
+
             },
             'training_request_details.employee_exam_details.exam_result_details_info' => function($query) {
                 $query->where('exam_result_status', 1);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
+
             }
         ])
         ->where('ctrl_number', $request->training_req_ctrl)

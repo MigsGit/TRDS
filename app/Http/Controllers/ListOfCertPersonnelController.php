@@ -23,16 +23,17 @@ class ListOfCertPersonnelController extends Controller
 
     public function exportListCertPersonnel(Request $request){
         // return $request->all();
-        $qcslips = QcSlip::with([
+        $personel = QcSlip::with([
             'product_line_details',
-            'op_approver_details'
+            'op_approvers'
         ])
         ->whereNull('deleted_at')
         ->where('status', 'OK')
         ->where('section_category', $request->section)
         ->where('product_line', $request->product_line)
-        ->get();
+        ->get()
+        ->groupBy('position_category');
 
-        return response()->json(['qcslips' => $qcslips]);
+        return response()->json(['qcslips' => $personel]);
     }
 }
