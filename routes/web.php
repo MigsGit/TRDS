@@ -13,9 +13,6 @@ use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\InspSkillChartSettingController;
-use App\Http\Controllers\PersonnelSkillMatrixController;
-use App\Http\Controllers\ExamTitleController;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
