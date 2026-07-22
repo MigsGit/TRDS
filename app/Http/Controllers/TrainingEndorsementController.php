@@ -738,7 +738,7 @@ class TrainingEndorsementController extends Controller
                             else{
                                 $attemptCount = $exam->attempt ?? 1;
                                 $formatter = new \NumberFormatter('en_US', \NumberFormatter::ORDINAL);
-                                $appendRemarks = "on " . $formatter->format($attemptCount) . " attempt";
+                                $appendRemarks = "on " . $formatter->format($attemptCount) . " take";
                             }
                             
 
