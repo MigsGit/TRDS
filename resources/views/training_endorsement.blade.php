@@ -251,8 +251,10 @@
                         {{-- <textarea class="form-control" id="handsOnRemarks" name="hands_on_remarks" rows="3" placeholder="Enter remarks..."></textarea> --}}
                         <select name="hands_on_remarks" id="handsOnRemarks" class="form-control">
                             <option value="" selected disabled>--Select--</option>
-                            <option value="Passed">Passed</option>
-                            <option value="Failed">Failed</option>
+                            <option >Passed on 1st take</option>
+                            <option >Passed on 2nd take</option>
+                            <option >Passed on 3rd take</option>
+                            <option >Failed</option>
                         </select>
                     </div>
                     <div class="form-group">
