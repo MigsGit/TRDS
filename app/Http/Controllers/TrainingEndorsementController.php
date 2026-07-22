@@ -745,7 +745,7 @@ class TrainingEndorsementController extends Controller
                             $rating = $exam->rating ? $exam->rating . '%' : '';
 
                             if(is_null($exam->attempt)){
-                                $appendRemarks = "on 1st attempt";
+                                $appendRemarks = "on 1st take";
                             }
                             else{
                                 $attemptCount = $exam->attempt ?? 1;
