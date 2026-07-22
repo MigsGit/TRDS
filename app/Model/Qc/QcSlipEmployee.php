@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 class QcSlipEmployee extends Model
 {
     use HasFactory;
-
+    protected $appends = ['employee_info'];
     /**
      * Get the user associated with the QcSlipEmployee
      *
@@ -43,6 +43,12 @@ class QcSlipEmployee extends Model
     public function get_station_to()
     {
        return $this->dropdown_master_detail('station_to');
+    }
+
+    public function getEmployeeInfoAttribute() // Chris
+    {
+        // Returns subcon if present; otherwise falls back to hris
+        return $this->system_one_subcon_emp_info ?? $this->system_one_hris_emp_info;
     }
 
 
