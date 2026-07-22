@@ -1596,13 +1596,13 @@
                                     </select>
                                     <label for="" class="mt-1">QC Supervisor</label>
                                 </div>
-                                <div class="modal-footer justify-content-between">
+                                <div class="modal-footer justify-content-end">
 
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
-                                    <button type="submit" class="btn btn-success" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Save</button>
+                                    <button type="button" class="btn btn-secondary operSave" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
+                                    <button type="submit" class="btn btn-success operSave" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Save</button>
 
                                     {{-- <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button> --}}
-                                    <button type="button" class="btn btn-success" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
+                                    <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
                                 </div>
                         </form>
 
@@ -1675,6 +1675,9 @@
         });
 
          $(document).on('click', '#btnCreateCQForm',function (e) {
+            initOperEmpModal();
+            // operEmpArray = [];
+            $('#tbl_certified_list_operator tbody').empty();
             form.formSubmitOper[0].reset();
              initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
@@ -1697,6 +1700,8 @@
             ],6);
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
+            $('.operSave').removeClass('d-none');
+            $('.operApproved').addClass('d-none');
         });
         dataTable.operator = $(table.operator).DataTable({
             "processing" : true,

@@ -26,12 +26,12 @@
     // HOW TO EXECUTE IT FOR YOUR TWO TABLES:
     // ==========================================
 
-
     const getApprovalStatusToggle = (params) => {
         let approvalStatus = params.approval_status;
             $('.btn-link').removeClass('show');
             $('#collapseOneOper').removeClass('show');
-
+            $('.operSave').removeClass('d-none');
+            $('.operApproved').addClass('d-none');
             if(approvalStatus ==='APRODTO'){
                 $('#collapseOneOper').addClass('show');
             }
@@ -56,10 +56,11 @@
 
             }
             if(approvalStatus ==='QCAPP'){
-                $('#operDisapproved').removeClass('d-none');
-                $('#operApproved').removeClass('d-none');
-                $('#operClosed').addClass('d-none');
-                $('#operSave').addClass('d-none');
+                // $('#operDisapproved').removeClass('d-none');
+                // $('#operApproved').removeClass('d-none');
+                $('.operSave').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+
             }
             if(approvalStatus ==='OK'){
                 $('#operDisapproved').addClass('d-none');
@@ -360,8 +361,6 @@
             params.comboId.val(null).trigger('change');
         }
     }
-
-
     const fnGetSelect2Value = (params) =>  {
         params.comboId.select2({
             data : params.dataValue,
@@ -389,7 +388,6 @@
     ========================================================= */
 
     // In-memory array that holds employees staged in the modal
-    operEmpArray = [];
 
     /**
      * Initialise the modal:
@@ -817,7 +815,6 @@
 
             // ==== Toggle Collapse based on approval status
             getApprovalStatusToggle({ 
-                approval_status: currentStatus,
                 approval_status: currentStatus,
              });
             // ==== Get All Approvers / Validated by/ Mentored by
