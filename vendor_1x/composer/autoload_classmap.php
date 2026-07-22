@@ -58,7 +58,6 @@ return array(
     'App\\Http\\Requests\\EEngValidationProcessRequest' => $baseDir . '/app/Http/Requests/EEngValidationProcessRequest.php',
     'App\\Http\\Requests\\EQcValidationProcessRequest' => $baseDir . '/app/Http/Requests/EQcValidationProcessRequest.php',
     'App\\Http\\Requests\\FQcValidationRequest' => $baseDir . '/app/Http/Requests/FQcValidationRequest.php',
-    'App\\Http\\Requests\\MachineOperatorRequest' => $baseDir . '/app/Http/Requests/MachineOperatorRequest.php',
     'App\\Http\\Requests\\QcSlipEmployeeRequest' => $baseDir . '/app/Http/Requests/QcSlipEmployeeRequest.php',
     'App\\Http\\Requests\\QcSlipRequest' => $baseDir . '/app/Http/Requests/QcSlipRequest.php',
     'App\\Http\\Requests\\SendEmailRequest' => $baseDir . '/app/Http/Requests/SendEmailRequest.php',

@@ -157,7 +157,6 @@ class QualificationCertificationController extends Controller
                 "created_by" => $rapidxEmpNo->name,
                 "system_name" => "rapidx_TRDS",
             ];
-            //TODO: SEND email
             DB::commit();
             $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);

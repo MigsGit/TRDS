@@ -550,7 +550,6 @@ class ComposerStaticInit77aad732574aa2f3dac627d1f443ae07
         'App\\Http\\Requests\\EEngValidationProcessRequest' => __DIR__ . '/../..' . '/app/Http/Requests/EEngValidationProcessRequest.php',
         'App\\Http\\Requests\\EQcValidationProcessRequest' => __DIR__ . '/../..' . '/app/Http/Requests/EQcValidationProcessRequest.php',
         'App\\Http\\Requests\\FQcValidationRequest' => __DIR__ . '/../..' . '/app/Http/Requests/FQcValidationRequest.php',
-        'App\\Http\\Requests\\MachineOperatorRequest' => __DIR__ . '/../..' . '/app/Http/Requests/MachineOperatorRequest.php',
         'App\\Http\\Requests\\QcSlipEmployeeRequest' => __DIR__ . '/../..' . '/app/Http/Requests/QcSlipEmployeeRequest.php',
         'App\\Http\\Requests\\QcSlipRequest' => __DIR__ . '/../..' . '/app/Http/Requests/QcSlipRequest.php',
         'App\\Http\\Requests\\SendEmailRequest' => __DIR__ . '/../..' . '/app/Http/Requests/SendEmailRequest.php',
