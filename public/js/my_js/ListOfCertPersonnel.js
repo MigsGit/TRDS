@@ -22,8 +22,8 @@ $(document).ready(function () {
                 let seriesOption = "";
 
                 sectionOption += `<option value="" selected disabled>Select Section</option>`;
-                prodLineOption += `<option value="" selected disabled>Select Section</option>`;
-                seriesOption += `<option value="" selected disabled>Select Section</option>`;
+                prodLineOption += `<option value="" selected disabled>Select Product Line</option>`;
+                seriesOption += `<option value="" selected disabled>Select Series</option>`;
                 section.forEach(function(item) {
                     sectionOption += `<option value="${item}">${item}</option>`;
                 });
