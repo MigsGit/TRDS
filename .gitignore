@@ -1,5 +1,4 @@
 /node_modules
-/public
 /public/hot
 /public/storage
 /storage
@@ -13,4 +12,3 @@ npm-debug.log
 yarn-error.log
 .composer-lock
 .vscode
-/vendor2x
