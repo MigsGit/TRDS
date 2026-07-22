@@ -28,7 +28,7 @@ class BOpEnggSectionTrainingOrientationRequest extends FormRequest
             'text_obs_first_result_es_oper' => ['required'],
             'text_first_sample_es_oper' => ['required','int','min:1'],
             'text_first_ok_es_oper' => ['required','int','min:1'],
-            'text_first_ng_es_oper' => ['required','int','min:1'],
+            'text_first_ng_es_oper' => ['required','int','min:0'],
              'engg_orientation_docs' => ['required'],
              'text_1st_qualifiedby_es_oper' => ['required'],
              'text_qc_1st_date_es_oper' => ['required'],

@@ -11,6 +11,7 @@ use App\Http\Requests\DPpdCertificationCompletionRequest;
 use App\Http\Requests\EEngValidationProcessRequest;
 use App\Http\Requests\EQcValidationProcessRequest;
 use App\Http\Requests\FQcValidationRequest;
+use App\Http\Requests\MachineOperatorRequest;
 use App\Http\Requests\QcSlipEmployeeRequest;
 use App\Http\Requests\QcSlipRequest;
 use App\Http\Requests\SendEmailRequest;
@@ -79,45 +80,63 @@ class QualificationCertificationController extends Controller
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
             $rapidxEmpNo =  session('global_user');
-            $to = '';
-            $cc = '';
-            foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
-                $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
-            }
-            //Send to Approver Attention To | CC is exclude the FQCVVO TO QCAPP Last Approver
-            $collectTo = collect($arrTo)->map(function($rowEmpNo){
-                return [
-                    'email' => $rowEmpNo['email'],
-                    'fullName' => $rowEmpNo['fullName'],
-                ];
-            });
-            if($params['approval_status'] != 'FQCVVO'){
-
-                foreach (explode(' | ',$params['update_data']['alert_prod_cc_sec']) as $key => $valueRowEmpNo) {
-                    $arrCc[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
-                }
-                $collectCc = collect($arrCc)->map(function($rowEmpNo){
-
-                    return [
-                        'email' => $rowEmpNo['email'],
-                        'fullName' => $rowEmpNo['fullName'],
-                    ];
-                });
-                $cc = $collectCc->pluck('email')->join(',');
-
-            }
-
-            $to = $collectTo->pluck('email')->join(',');
             // $from =$currentSession['email'] ?? '';
             // $from_name = $currentSession['fullName'];
-            $opApprover =  OpApprover::insert($params['update_data']);
-            $emailParams = [
+           $emailParams = [
                 'qc_slips_id' => $params['qc_slips_id']
             ];
-            $message = $this->commonController->emailMsg($emailParams);
+            $to = '';
+            $cc = '';
+            if($params['approval_status'] === 'QCAPP'){
+                $qcSlip = QcSlip::
+                where('id' , $params['qc_slips_id'])
+                ->whereNull('deleted_at')
+                ->first('created_by');
+                foreach (explode(' | ',$qcSlip->created_by) as $key => $valueRowEmpNo) {
+                    $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
+                }
+                $collectTo = collect($arrTo)->map(function($rowEmpNo){
+                    return [
+                        'email' => $rowEmpNo['email'],
+                        'fullName' => $rowEmpNo['name'],
+                    ];
+                });
+                $to = $collectTo;
+                $subject = "APPROVED: TRDS - Qualification Certification";
+            }else{
+                $opApprover =  OpApprover::insert($params['update_data']);
+               
+                foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
+                    $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
+                }
+                //Send to Approver Attention To | CC is exclude the FQCVVO TO QCAPP Last Approver
+                $collectTo = collect($arrTo)->map(function($rowEmpNo){
+                    return [
+                        'email' => $rowEmpNo['email'],
+                        'fullName' => $rowEmpNo['name'],
+                    ];
+                });
+                if($params['approval_status'] != 'FQCVVO'){
+
+                    foreach (explode(' | ',$params['update_data']['alert_prod_cc_sec']) as $key => $valueRowEmpNo) {
+                        $arrCc[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
+                    }
+                    $collectCc = collect($arrCc)->map(function($rowEmpNo){
+
+                        return [
+                            'email' => $rowEmpNo['email'],
+                            'fullName' => $rowEmpNo['name'],
+                        ];
+                    });
+                    $cc = $collectCc->pluck('email')->join(',');
+
+                }
+                $to = $collectTo->pluck('email')->join(',');
+                $subject = "FOR YOUR APPROVAL : TRDS - Qualification Certification";
+            }
             $from = 'issinfoservice@pricon.ph';
             // $from_name = 'issinfoservice@pricon.ph';
-            $subject = "FOR YOUR APPROVAL : TRDS - Qualification Certification";
+            $message = $this->commonController->emailMsg($emailParams);
             $rapidxEmpNo =  session('global_user');
             $emailData = [
                 "to" =>$to,
@@ -138,7 +157,6 @@ class QualificationCertificationController extends Controller
                 "created_by" => $rapidxEmpNo->name,
                 "system_name" => "rapidx_TRDS",
             ];
-            //TODO: SEND email
             DB::commit();
             $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
@@ -149,7 +167,6 @@ class QualificationCertificationController extends Controller
     }
     public function updateApproval(Request $request){
         try {
-            // return 'true';
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
             $qcSlip = QcSlip::
@@ -168,7 +185,14 @@ class QualificationCertificationController extends Controller
             // ->get();
             ->update($operToApprovers);
             //TODO: Email to Created By if Approved
+
+            $emailParams = [
+                'qc_slips_id' => $request->qcSlipsId,
+                'update_data'=> [],
+                'approval_status'=> 'QCAPP',
+            ];
             DB::commit();
+            $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -669,7 +693,7 @@ class QualificationCertificationController extends Controller
             $date = now()->toDateString();
             $time = now()->format('H:i:s');
             $qcSlipId = $request->qc_slips_id ?? '';
-            // $qcSlipId = 2;
+            $isMachineOperatorExists = 0;
             $section = 'QC';
             $select_section = $request->text_select_section;
             $select_position = $request->text_select_position;
@@ -680,6 +704,7 @@ class QualificationCertificationController extends Controller
             $params = [
                 'section' => $section,
                 'selectSection' => $select_section,
+                'positionCategory' => $select_position,
             ];
             $generateControlNumber = $this->generateControlNumber($params);
             if(blank($qcSlipId) || $qcSlipId === ""){ //ADD
@@ -723,18 +748,15 @@ class QualificationCertificationController extends Controller
                 QcSlipEmployee::insert($collectOperatorEmployees);
                 $qcSlipEmployeeCount = QcSlipEmployee::where('qc_slips_id',$qcSlipId)->count();
                 if ($qcSlipEmployeeCount === 0) {
-                    return response()->json(['is_success' => 'false','message'=>"Please Add the Employee Details"],500);
+                    return response()->json(409);
 
                 }
                 //STATUS PB
                 $currentApprovalStatus = 'APRODTO';
                 $operToApprovers =  [];
-
-                //$this->saveOperApprovers($operPreparedByApprovers);
             }
             if(filled($qcSlipId)){ //UPDATE
-               $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
-
+                $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
                $currentApprovalStatus = $qcSlipDetails->approval_status;
                 if($qcSlipDetails->approval_status != 'FQCVVO'){
                     $validatedData = app(SendEmailRequest::class)->validateResolved();
@@ -806,7 +828,9 @@ class QualificationCertificationController extends Controller
                     ];
                 }
                 if($qcSlipDetails->approval_status === 'CQCC'){
+                    $isMachineOperatorExists = QcSlipEmployee::where("qc_slips_id",$qcSlipId)->where('station_to',4)->count();
                     $validatedData = app(CQcCertificationRequest::class)->validateResolved();
+                    //   "qc_slips_id"               => $qcSlipId,
                     $cQcCertification = [
                         "qc_slips_id"               => $qcSlipId,
                         "obs_first_result_qcs_oper"  => $this->getSafe($request, 'text_obs_first_result_qcs_oper'),
@@ -874,6 +898,11 @@ class QualificationCertificationController extends Controller
 
                 }
                 if($qcSlipDetails->approval_status ==='EQCVP'){
+                  $isMachineOperatorExists = QcSlipEmployee::where("qc_slips_id",$qcSlipId)->where('station_to',4)->count();
+              
+                    if($isMachineOperatorExists > 0 ){
+                        $validatedData = app(MachineOperatorRequest::class)->validateResolved();
+                    }
                     $validatedData = app(EQcValidationProcessRequest::class)->validateResolved();
                     $eQcValidationProcess = [
                         "qc_slips_id"            => $qcSlipId,
@@ -913,17 +942,17 @@ class QualificationCertificationController extends Controller
                         "first_approver"   => $this->joinSafe($request, 'text_validated1_qcvvo_oper'),
                         "first_date"       => $this->getSafe($request, 'text_date1_qcvvo_oper'),
                         "first_time"       => '',
-                        "first_status"     => $this->getSafe($request, 'text_obs_first_result_es_oper'),
+                        "first_status"     => '',
                         "first_remarks"    => '',
 
                         "second_approver"  => $this->joinSafe($request, 'text_validated2_qcvvo_oper'),
                         "second_date"      => $this->getSafe($request, 'text_date2_qcvvo_oper'),
                         "second_time"      => '',
-                        "second_status"    => $this->getSafe($request, 'text_oa_2nd_result_es_oper'),
+                        "second_status"    =>  '',
                         "second_remarks"   => '',
                     ];
                     FQcValidation::insert($fQcValidationVisualOperator);
-                    DB::commit();
+                    // DB::commit();
                 }
             }
             //=== Update the Operator Approvers based on the Current Status
@@ -937,6 +966,7 @@ class QualificationCertificationController extends Controller
                 'qcSlipsId' => $qcSlipId,
                 'approval_status'=> $currentApprovalStatus,
                 'selectedSection'=> $request->text_select_section,
+                'isMachineOperatorExists'=> $isMachineOperatorExists,
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
             if($currentApprovalStatus === 'FQCVVO'){ //FQCVVO to QCAPP - Final Approver QC Supervisor
@@ -971,8 +1001,6 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-
-
     public function index(Request $request){
         return 'true' ;
         try {
@@ -1092,6 +1120,7 @@ class QualificationCertificationController extends Controller
     }
     public function changeApprovalStatus($params){
         $selectedSection = str_contains($params['selectedSection'], 'PPD');
+         $isMachineOperatorExists = $params['isMachineOperatorExists'];
         switch (true) {
             case ($params['approval_status'] === 'PB'):
                 $newStatus = 'APRODTO';
@@ -1107,9 +1136,13 @@ class QualificationCertificationController extends Controller
                 $newStatus = 'CQCC';
                 $statusName = 'C Qc Certification';
                 break;
-            case ($params['approval_status'] === 'CQCC' && $selectedSection != 1):
+            case ($params['approval_status'] === 'CQCC' && $selectedSection != 1 && $isMachineOperatorExists > 0): //For Machine Operator Only
                 $newStatus = 'EENGVP';
                 $statusName = 'E Engineering Validation Process';
+                break;
+            case ($params['approval_status'] === 'CQCC'  && $selectedSection != 1 && $isMachineOperatorExists === 0): // QC Validation Process
+                $newStatus = 'EQCVP';
+                $statusName = 'E Qc Validation Process';
                 break;
             case ($params['approval_status'] === 'CQCC' && $selectedSection):
                 $newStatus = 'DPPDONLY';
@@ -1128,12 +1161,16 @@ class QualificationCertificationController extends Controller
             //     $statusName = 'D QC Update';
             //     break;
 
-            case ($params['approval_status'] === 'DPPDONLY'):
-                $newStatus = 'EENGVP';
+            case ($params['approval_status'] === 'DPPDONLY' && $isMachineOperatorExists === 0): // QC Validation Pr
+                $newStatus = 'EENGVP'; //For Machine Operator Only
                 $statusName = 'E Engineering Validation Process';
                 break;
+            case ($params['approval_status'] === 'DPPDONLY' && $isMachineOperatorExists > 0): // QC Validation Pr
+                $newStatus = 'EQCVP';  // QC Validation Process
+                $statusName = 'E Qc Validation Process';
+                break;
             case ($params['approval_status'] === 'EENGVP'):
-                $newStatus = 'EQCVP';
+                $newStatus = 'EQCVP';  // QC Validation Process  
                 $statusName = 'E Qc Validation Process';
                 break;
             case ($params['approval_status'] === 'EQCVP'):
@@ -1199,6 +1236,7 @@ class QualificationCertificationController extends Controller
         //Systemon HRIS / Subcon
 
         $qcSlip = QcSlip::orderBy('id','desc')->whereYear('created_at',now())
+        ->where('position_category',$params['positionCategory'])
         ->whereNull('deleted_at')
         ->limit(1)->get(['control_no']);
 
@@ -1210,45 +1248,6 @@ class QualificationCertificationController extends Controller
 
         }else{
             $currentCtrlNo = $params['section']."-".$params['selectSection']."-".date('m').date('y').'-001';
-        }
-        return [
-            'currentCtrlNo' => $currentCtrlNo
-        ];
-        $rapidx_user = DB::connection('mysql_rapidx')
-        ->select(" SELECT department_group
-            FROM departments
-            WHERE department_id = '".session('rapidx_department_id')."'
-        ");
-        $hris_data = DB::connection('mysql_systemone_hris')
-        ->select("SELECT Department,Division,Section FROM vw_employeeinfo WHERE EmpNo = '".session('rapidx_employee_number')."'");
-        $subcon_data = DB::connection('mysql_systemone_subcon')
-        ->select("SELECT Department,Division,Section FROM vw_employeeinfo WHERE EmpNo = '".session('rapidx_employee_number')."'");
-        if(count($hris_data) > 0 && count($rapidx_user)> 0){
-            $vwEmployeeinfo =  $hris_data;
-            $filteredSection = str_replace("'", "", $this->getFilteredSection($vwEmployeeinfo[0]->Department));
-            $division =($rapidx_user[0]->department_group == "PPS" || $rapidx_user[0]->department_group == "PPD") ? "PPD" : (($rapidx_user[0]->department_group == "LOG" || $rapidx_user[0]->department_group == "ISS" || $rapidx_user[0]->department_group == "FIN" ) ? "ADMIN" :
-            $rapidx_user[0]->department_group);
-        }
-        if(count($subcon_data) > 0 && count($rapidx_user) > 0){
-            $vwEmployeeinfo =  $subcon_data;
-            $filteredSection = str_replace("'", "", $this->getFilteredSection($vwEmployeeinfo[0]->Department));
-            $division = ($rapidx_user[0]->department_group == "PPS" || $rapidx_user[0]->department_group == "PPD") ? "PPD" : (($rapidx_user[0]->department_group == "LOG" || $rapidx_user[0]->department_group == "ISS" || $rapidx_user[0]->department_group == "FIN")  ? "ADMIN" :
-            $rapidx_user[0]->department_group);
-        }
-        // Check if the Created At & App No / Division / Material Category is exisiting
-        // Example:TS-ADMIN-LOG-PCH-25-01-001
-        $ecr = Ecr::orderBy('id','desc')->whereYear('created_at',now())
-            ->whereNull('deleted_at')
-            ->limit(1)->get(['ecr_no']);
-        //If not exist reset the ecr to 1 ???
-        if(count( $ecr ) != 0){
-            $currentCtrlNo = explode('-',$ecr[0]->ecr_no);
-            $arrCtrNo		 	= end($currentCtrlNo);
-            $series 	 	= str_pad(($arrCtrNo+1),3,"0",STR_PAD_LEFT);
-            $currentCtrlNo = $division."-".$filteredSection."-".date('m').date('y').'-'.$series;
-
-        }else{
-            $currentCtrlNo = $division."-".$filteredSection."-".date('m').date('y').'-001';
         }
         return [
             'currentCtrlNo' => $currentCtrlNo

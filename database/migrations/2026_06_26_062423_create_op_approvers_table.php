@@ -19,7 +19,7 @@ class CreateOpApproversTable extends Migration
             ->constrained('qc_slips')
             ->cascadeOnDelete()->comment('reference from qc_slips_id');
             $table->string('approval_status')->default('PB')->default('APRODTO-A Production Training Orientation | BENGGTQ- B Engineer Training Qualification | CQCC-C Qc Certification | DPPDONLY-D PPD Update | EQCVP-E Qc Validation Process | FQCVVO-F Qc Validation Visual Operator | QCAPP-QC Supervisor Approval | OK-CLOSED');
-            $table->string('decision_status')->default('-')->comment('PEN-Pending | APP-APPROVED | DIS-DISAPPROVED');
+            $table->string('decision_status')->default('PEN')->comment('PEN-Pending | APP-APPROVED | DIS-DISAPPROVED');
             $table->longText('first_approver')->nullable()->comment('A-Validatedby | B-Qualifiedby | C-Certifiedby | D-Prodn | E-ENG QC Validatedby | F-QC Validated by')->nullable();
             $table->longText('first_approver_2')->nullable();
             $table->date('first_date')->nullable();
@@ -36,7 +36,7 @@ class CreateOpApproversTable extends Migration
             $table->longText('second_time')->nullable();
             $table->string('second_status')->default('-')->comment('PEN-Pending | PA-PASSED | FA-FAILED')->nullable();
             $table->string('second_status_2')->default('-')->comment('EVQC Status | PEN-Pending | PA-PASSED | FA-FAILED')->nullable();
-            $table->longText('second_remarks');
+            $table->longText('second_remarks')->nullable();
             $table->longText('second_approver_3')->comment('D- QC Certified')->nullable();
             $table->longText('alert_prod_sec');
             $table->longText('alert_prod_cc_sec');

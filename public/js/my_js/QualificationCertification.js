@@ -26,12 +26,12 @@
     // HOW TO EXECUTE IT FOR YOUR TWO TABLES:
     // ==========================================
 
-
     const getApprovalStatusToggle = (params) => {
         let approvalStatus = params.approval_status;
             $('.btn-link').removeClass('show');
             $('#collapseOneOper').removeClass('show');
-
+            $('.operSave').removeClass('d-none');
+            $('.operApproved').addClass('d-none');
             if(approvalStatus ==='APRODTO'){
                 $('#collapseOneOper').addClass('show');
             }
@@ -56,10 +56,11 @@
 
             }
             if(approvalStatus ==='QCAPP'){
-                $('#operDisapproved').removeClass('d-none');
-                $('#operApproved').removeClass('d-none');
-                $('#operClosed').addClass('d-none');
-                $('#operSave').addClass('d-none');
+                // $('#operDisapproved').removeClass('d-none');
+                // $('#operApproved').removeClass('d-none');
+                $('.operSave').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+
             }
             if(approvalStatus ==='OK'){
                 $('#operDisapproved').addClass('d-none');
@@ -360,8 +361,6 @@
             params.comboId.val(null).trigger('change');
         }
     }
-
-
     const fnGetSelect2Value = (params) =>  {
         params.comboId.select2({
             data : params.dataValue,
@@ -389,7 +388,6 @@
     ========================================================= */
 
     // In-memory array that holds employees staged in the modal
-    operEmpArray = [];
 
     /**
      * Initialise the modal:
@@ -414,7 +412,7 @@
      * Add the currently selected employee + stations as one row
      * in the staging table.
      */
-    const addOperEmpToTable = () => {
+    const addOperEmpToTable = () => { //nmodify
         const $empSelect    = $('#text_oper_emp_number');
         const $stationFrom  = $('#text_oper_station_from');
         const $stationTo    = $('#text_oper_station_to');
@@ -427,23 +425,32 @@
         const stTo    = $stationTo.val();
         const stToText = $stationTo.find('option:selected').text().trim();
         const optRemarks = $optRemarks.val();
-
         // --- validation ---
-        if (!empId) {
+        if (empId.length === 0) {
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select an Employee.' });
             return;
         }
-        if (!stFrom) {
+        if (stFrom.length === 0) {
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select Station (From).' });
             return;
         }
-        if (!stTo) {
+        if (stTo.length === 0) {
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select Station (To).' });
             return;
         }
 
-        // Prevent duplicates inside the staging table
-        const alreadyStaged = operEmpArray.some(e => e.empId === empId);
+        const normalize = (val) => {
+            if (val && typeof val === 'object') {
+                // Most common cases: String wrapper object, or {value: ...} style object
+                if ('value' in val) return String(val.value).trim();
+                return String(val).trim(); // falls back to toString(), e.g. new String("R131") -> "R131"
+            }
+            return String(val ?? '').trim();
+        };
+
+        const targetId = normalize(empId);
+        const alreadyStaged = operEmpArray.some(e => normalize(e.empId) === targetId);
+
         if (alreadyStaged) {
             Swal.fire({ icon: 'info', title: 'Duplicate', text: 'This employee is already in the list.' });
             return;
@@ -473,16 +480,14 @@
 
         // Reset combos for the next entry
         $empSelect.val(null).trigger('change');
-        // $stationFrom.val(null).trigger('change');
-        // $stationFrom.val(null).trigger('change');
-        // $stationTo.val(null).trigger('change');
     }
 
     /**
      * Move all staged employees into the main certification table
      * (tbl_certified_list_operator) and close the modal.
      */
-    const addSelectedOperEmpToMain = () => {
+    const addSelectedOperEmpToMain = () => { //nmodify
+
         if (operEmpArray.length === 0) {
             Swal.fire({ icon: 'warning', title: 'No Employees', text: 'Please add at least one employee first.' });
             return;
@@ -491,8 +496,18 @@
         operEmpArray.forEach(function(entry) {
             // Prevent the same employee appearing twice in the main table
             let alreadyInMain = false;
+            const normalize = (val) => {
+                if (val && typeof val === 'object') {
+                    // Most common cases: String wrapper object, or {value: ...} style object
+                    if ('value' in val) return String(val.value).trim();
+                    return String(val).trim(); // falls back to toString(), e.g. new String("R131") -> "R131"
+                }
+                return String(val ?? '').trim();
+            };
+
+            const targetId = normalize(entry.empId);
             $('#tbl_certified_list_operator tbody tr').each(function() {
-                if ($(this).data('empid') === entry.empId) {
+                if ($(this).data('empid') === targetId) {
                     alreadyInMain = true;
                 }
             });
@@ -544,7 +559,7 @@
      * Best Practice: Populates the main table and synchronizes state during an Edit AJAX request.
      * @param {Array} qcSlipEmployees - The response payload array containing employee details
      */
-    const populateEditOperEmpTable = (qcSlipEmployees,approvalStatus) => {
+    const populateEditOperEmpTable = (qcSlipEmployees,approvalStatus) => { //nmodify
         // 1. Clear the main table to prevent old leftovers
         const $mainTableBody = $('#tbl_certified_list_operator tbody');
         $mainTableBody.empty();
@@ -799,7 +814,9 @@
             $('#approval_status').val(currentStatus);
 
             // ==== Toggle Collapse based on approval status
-            getApprovalStatusToggle({ approval_status: currentStatus });
+            getApprovalStatusToggle({ 
+                approval_status: currentStatus,
+             });
             // ==== Get All Approvers / Validated by/ Mentored by
             let paramsGetEmpNo = {
                 response : response,
@@ -834,13 +851,15 @@
                 3,
                 editSelectionsMap3
             );
-            // let editSelectionsMap6 = {};
-            // editSelectionsMap6['#transfer_flexibility'] = response.rawReasonTransferFlexibility;
-            // initDropdownMasterDetailsByFkidCombos(
-            //     ['#transfer_flexibility'],
-            //     6,
-            //     editSelectionsMap6
-            // );
+            // ==== Flexibility
+            const transferFlexibility = '#transfer_flexibility';
+            let editSelectionsMap6 = {};
+            editSelectionsMap6[transferFlexibility] = response.rawReasonsStringCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [transferFlexibility],
+                6,
+                editSelectionsMap6
+            );
             // ==== A PROD
             // Safe access: optional chaining prevents "Cannot read properties of undefined" if API shape changes
             const aProdData = response?.approversCollection?.APRODTO?.[0] ?? null;
@@ -864,10 +883,15 @@
             });
             // Guard: validate aProdData exists and has properties before reading from it
             if (aProdData && typeof aProdData === 'object') {
-                const approverFirstDate  = aProdData.first_date  ?? '';
-                const approverFirstTime  = aProdData.first_time  ?? '';
-                const approverSecondDate = aProdData.second_date ?? '';
-                const approverSecondTime = aProdData.second_time ?? '';
+                const approverFirstStatus  = aProdData?.first_status  ?? '';
+                const approverSecondStatus  = aProdData?.second_status  ?? '';
+                const approverFirstDate  = aProdData?.first_date  ?? '';
+                const approverFirstTime  = aProdData?.first_time  ?? '';
+                const approverSecondDate = aProdData?.second_date ?? '';
+                const approverSecondTime = aProdData?.second_time ?? '';
+
+                form.formSubmitOper.find('#text_first_a_prod_result').val(approverFirstStatus).trigger('change');
+                form.formSubmitOper.find('#text_second_a_prod_result').val(approverSecondStatus).trigger('change');
                 form.formSubmitOper.find('#text_first_date_oper').val(approverFirstDate);
                 form.formSubmitOper.find('#text_first_time_oper').val(approverFirstTime);
                 form.formSubmitOper.find('#text_second_date_oper').val(approverSecondDate);
@@ -981,9 +1005,9 @@
             if(vpesOper != ""){
                 form.formSubmitOper.find('#text_vpes_oper_1').prop('checked', true);
             }
-            // form.formSubmitOper.find('#text_vpes_oper').val(eQcValidationProcess?.engg_vpes_oper ?? '').trigger('change');
-            // form.formSubmitOper.find('#text_first_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
-            // form.formSubmitOper.find('#text_second_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_vpes_oper').val(eQcValidationProcess?.engg_vpes_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_first_result_vpes_oper').val(eEngvpData?.first_status ?? '').trigger('change');
+            form.formSubmitOper.find('#text_second_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
             form.formSubmitOper.find('#text_1st_date_vpes_oper').val(eEngvpData?.first_date ?? '');
             form.formSubmitOper.find('#text_2nd_date_vpes_oper').val(eEngvpData?.second_date ?? '');
             form.formSubmitOper.find('#text_remarks_vpes_oper').val(eEngvpData?.first_remarks ?? '');
@@ -1041,12 +1065,23 @@
     });
 
     // Remove row from staging table
-    $(document).on('click', '.btnRemoveOperEmpRow', () => {
-        idx = $(this).data('index');
+    // $(document).on('click', '.btnRemoveOperEmpRow', () => { //nmodifys
+    //     idx = $(this).data('index');
+    //     operEmpArray.splice(idx, 1);
+    //     $(this).closest('tr').remove();
+    //     // Re-index remaining rows
+    //     $('#tbl_oper_add_emp tbody tr').each(function(i) {
+    //         $(this).attr('data-index', i);
+    //         $(this).find('.btnRemoveOperEmpRow').attr('data-index', i);
+    //     });
+    // });
+    $(document).on('click', '.btnRemoveOperEmpRow', function () {
+        const idx = $(this).data('index');
         operEmpArray.splice(idx, 1);
         $(this).closest('tr').remove();
+
         // Re-index remaining rows
-        $('#tbl_oper_add_emp tbody tr').each(function(i) {
+        $('#tbl_oper_add_emp tbody tr').each(function (i) {
             $(this).attr('data-index', i);
             $(this).find('.btnRemoveOperEmpRow').attr('data-index', i);
         });
@@ -1060,5 +1095,6 @@
     // Remove row from the main certification table
     $(document).on('click', '.btnRemoveOperEmpMain', () => {
         $(this).closest('tr').remove();
+        //  nmodifys
     });
 // });

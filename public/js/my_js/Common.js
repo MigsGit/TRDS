@@ -133,9 +133,9 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
             Swal.close();
             fn(result);
             $('#modal-loading').modal('hide');
-            if(elFormId !=null){
-                elFormId[0].reset();
-            }
+            // if(elFormId !=null){
+            //     elFormId[0].reset();
+            // }
 
         },
         error: function (result) {
@@ -156,9 +156,9 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
                 // Swal.fire({ icon: 'error', title: 'Error', text: (errorResponse.message) ? errorResponse.message : 'Internal Server Error.'});
             }
             if( result.status === 409 ){
-
+                toastr.error(errorResponse.message ?? '');
+                Swal.fire({ icon: 'error', title: 'Error', text: (errorResponse.message) ? errorResponse.message : 'Internal Server Error.'});
             }
-
             if( result.status === 422 ){
                 Swal.fire({ icon: 'error', title: 'Error', text: ('Please check the required fields.')});
                 toastr.error(errorResponse.message);
@@ -168,6 +168,9 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
                 errorHandler(errorResponse.errors['text_alert_prod_sec'], $('#text_alert_prod_sec'));
                 errorHandler(errorResponse.errors['text_alert_prod_cc_sec'], $('#text_alert_prod_cc_sec'));
                 errorHandler(errorResponse.errors['text_qcs_station_1st_oper'], $('#text_qcs_station_1st_oper'));
+
+
+                // text_qcs_station_1st_oper checkbox
             }
 
         }

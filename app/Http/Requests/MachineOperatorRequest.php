@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FQcValidationRequest extends FormRequest
+class MachineOperatorRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +24,9 @@ class FQcValidationRequest extends FormRequest
     public function rules()
     {
         return [
-            'text_refdocno_input_qcvvo_oper' => 'required',
-            'text_validated1_qcvvo_oper' => 'required',
-            'text_date1_qcvvo_oper' => 'required',
-            // 'text_refdocno_input_qcvvo_oper_2' => 'required',
+            'text_first_result_vpes_oper_2' => ['required'],
+            'text_1st_validatedby_vpes_oper_2' => ['required'],
+            'text_1st_date_vpes_oper_2' => ['required'],
         ];
     }
 }

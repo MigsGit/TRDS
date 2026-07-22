@@ -110,21 +110,27 @@ class CommonController extends Controller
     }
     public function getEmailByRapidxUserId($empNo){
         try {
-        return    $user = RapidXUser::where('employee_number',$empNo)->first();
+         DB::beginTransaction();
+         $user = RapidXUser::where('employee_number',$empNo)->first();
             if (!$user) {
+                DB::rollback();
                 throw new \Exception('User not found. Please add to Rapidx User Module!');
             }
             if (!$user->email) {
+                DB::rollback();
                 throw new \Exception('User Email not found.  Please add to Rapidx User Module!');
             }
            return [
             'fullName' => $user->name,
             'email' => $user->email,
         ];
+        DB::commit();
         } catch (Exception $e) {
+            DB::rollback();
             throw $e;
         }
     }
+    
     public function emailMsg($params){
         $qcSlip = QcSlip::with('product_line','system_one_hris_subcon')->where('id',$params['qc_slips_id'])
         ->whereNull('deleted_at')
@@ -135,7 +141,11 @@ class CommonController extends Controller
         //     $header = "Your ECR has been approved";
         // }else{
             // }
-        $header = "Please see the Certification/Qualification for your update.";
+        if($qcSlip->approval_status === "QCAPP"){
+            $header = "Please see the Certification/Qualification for your update.";
+        }else{
+            $header = "Please see the APPROVED Certification/Qualification.";
+        }
         return $msg = '<!DOCTYPE html>
             <html>
                 <head>
@@ -233,4 +243,5 @@ class CommonController extends Controller
                 </body>
             </html>';
     }
+    
 }
