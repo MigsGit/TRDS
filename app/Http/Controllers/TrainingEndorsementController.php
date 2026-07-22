@@ -55,7 +55,11 @@ class TrainingEndorsementController extends Controller
             'hr_memo_details',
             'te_approval_details',
             'te_approval_details.approver_details',
-            'created_by_user_details'
+            'created_by_user_details',
+            'training_endorsement_employees' => function($query) {
+                $query->whereNull('deleted_at');
+            },
+            'training_endorsement_employees.training_request_details_info',
         ])
         ->whereNull('deleted_at')
         ->get();
@@ -72,6 +76,13 @@ class TrainingEndorsementController extends Controller
         }
 
         return DataTables::of($data)
+            ->addColumn('employee_names', function ($row) {
+                // Join names into a single string for rendering if needed
+                return $row->training_endorsement_employees
+                    ->pluck('training_request_details_info.name')
+                    ->filter()
+                    ->implode(', ');
+            })
             ->addColumn('action', function ($row) use($exploded_u_access) {
 
                 $approver_array = $row->te_approval_details->where('approval_type', 'approved_by')->whereNull('updated_at')->pluck('rapidx_id')->toArray();
@@ -191,6 +202,7 @@ class TrainingEndorsementController extends Controller
 
                 return $result;
             })
+            
             ->rawColumns(['action', 'raw_status', 'prepared_by', 'raw_checker', 'raw_approver'])
             ->make(true);
     }

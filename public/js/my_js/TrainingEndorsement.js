@@ -28,7 +28,13 @@ const trainingEndorsementTable = $('#tblTrainingEndorsement').DataTable({
         { data: 'training_request_details.ctrl_number'  },
         { data: 'prepared_by' },
         { data: 'raw_checker' },
-        { data: 'raw_approver' }
+        { data: 'raw_approver' },
+        { 
+            data: 'employee_names', 
+            name: 'employee_names', 
+            visible: false,   // Keeps it invisible in UI
+            searchable: true // Enables search requests to backend
+        },
     ]
 });
 
