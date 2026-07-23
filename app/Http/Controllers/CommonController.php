@@ -114,13 +114,22 @@ class CommonController extends Controller
          $user = RapidXUser::where('employee_number',$empNo)->first();
             if (!$user) {
                 DB::rollback();
-                throw new \Exception('User not found. Please add to Rapidx User Module!');
+                return [
+                    'is_success' => 'false',
+                    'message' => 'User not found. Please add to Rapidx User Module! '.$empNo.'',
+                ];
+                // throw new \Exception('User not found. Please add to Rapidx User Module!');
             }
             if (!$user->email) {
                 DB::rollback();
-                throw new \Exception('User Email not found.  Please add to Rapidx User Module!');
+                return [
+                    'is_success' => 'false',
+                    'message' => 'User Email not found.  Please add to Rapidx User Module! '.$empNo.'',
+                ];
             }
            return [
+            'is_success' => 'true',
+            'message' => 'true',
             'fullName' => $user->name,
             'email' => $user->email,
         ];
@@ -130,7 +139,7 @@ class CommonController extends Controller
             throw $e;
         }
     }
-    
+
     public function emailMsg($params){
         $qcSlip = QcSlip::with('product_line','system_one_hris_subcon')->where('id',$params['qc_slips_id'])
         ->whereNull('deleted_at')
@@ -243,5 +252,5 @@ class CommonController extends Controller
                 </body>
             </html>';
     }
-    
+
 }

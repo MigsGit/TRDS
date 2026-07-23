@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Model\Qc;
 
 use App\Model\SystemOneHrisEmpInfo;
 use App\Model\SystemOneSubconEmpInfo;

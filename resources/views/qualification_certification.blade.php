@@ -150,12 +150,12 @@
                                     <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="text_select_position" id="text_select_position">
                                         <option value="" selected disabled>Select Position</option>
                                         <option value="Operator" selected>Operator</option>
-                                        <option value="MH">MH</option>
+                                        {{-- <option value="MH">MH</option>
                                         <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
                                         <option value="Engineer">Engineer</option>
                                         <option value="Planner">Planner</option>
-                                        <option value="Inspector">Inspector</option>
+                                        <option value="Inspector">Inspector</option> --}}
                                     </select>
                                 </div>
                             </div>

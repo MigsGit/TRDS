@@ -195,9 +195,19 @@ class TrainingAttendanceController extends Controller
                     ->make(true);
             }
                 // Get the "Expected" list of employees
-            $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
-            ->with(['training_attendance'])
-            ->get()->sortBy(function($detail) {
+        //   $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
+        //     ->with(['training_attendance','training_endorsement_employee'])
+        //     ->get()->sortBy(function($detail) {
+        //         return $detail->training_attendance['date'] ?? '0000-00-00';
+        //     });
+          $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
+            ->whereDoesntHave('training_endorsement_employee') // Ensures relation is NOT null in database
+            ->with([
+                'training_attendance',
+                'training_endorsement_employee'
+            ])
+            ->get()
+            ->sortBy(function($detail) {
                 return $detail->training_attendance['date'] ?? '0000-00-00';
             });
 

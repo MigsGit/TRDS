@@ -55,7 +55,11 @@ class TrainingEndorsementController extends Controller
             'hr_memo_details',
             'te_approval_details',
             'te_approval_details.approver_details',
-            'created_by_user_details'
+            'created_by_user_details',
+            'training_endorsement_employees' => function($query) {
+                $query->whereNull('deleted_at');
+            },
+            'training_endorsement_employees.training_request_details_info',
         ])
         ->whereNull('deleted_at')
         ->get();
@@ -72,6 +76,13 @@ class TrainingEndorsementController extends Controller
         }
 
         return DataTables::of($data)
+            ->addColumn('employee_names', function ($row) {
+                // Join names into a single string for rendering if needed
+                return $row->training_endorsement_employees
+                    ->pluck('training_request_details_info.name')
+                    ->filter()
+                    ->implode(', ');
+            })
             ->addColumn('action', function ($row) use($exploded_u_access) {
 
                 $approver_array = $row->te_approval_details->where('approval_type', 'approved_by')->whereNull('updated_at')->pluck('rapidx_id')->toArray();
@@ -191,6 +202,7 @@ class TrainingEndorsementController extends Controller
 
                 return $result;
             })
+            
             ->rawColumns(['action', 'raw_status', 'prepared_by', 'raw_checker', 'raw_approver'])
             ->make(true);
     }
@@ -308,12 +320,14 @@ class TrainingEndorsementController extends Controller
                     // 3. Process new image
                     if (isset($employee['hands_on_image']) && !empty($employee['hands_on_image'])) {
                         $filename = $employee['hands_on_file_name'] ?? '';
+                        // Get extension from filename or default to png
                         $extension = 'png';
                         if (!empty($filename) && str_contains($filename, '.')) {
                             $extension = pathinfo($filename, PATHINFO_EXTENSION);
                         }
                         $storageFilename = $te_emp_id . '.' . $extension;
 
+                        // Decode base64 image if needed
                         $imageData = $employee['hands_on_image'];
                         if (preg_match('/^data:image\/(png|jpg|jpeg);base64,/', $imageData)) {
                             $imageData = preg_replace('/^data:image\/(png|jpg|jpeg);base64,/', '', $imageData);
@@ -321,17 +335,23 @@ class TrainingEndorsementController extends Controller
                         }
                         Storage::put('public/hands_on_attachments/' . $storageFilename, $imageData);
 
-                        TrainingEndorsementEmployee::where('id', $te_emp_id)->update([
+                        $total_rating = "{$employee['hands_on_rating']}/{$employee['hands_on_total_rating']}";
+                        TrainingEndorsementEmployee::where('id', $te_emp_id)
+                        ->update([
                             'hands_on_filename'     => $filename,
-                            'hands_on_filename_ext' => $extension
+                            'hands_on_filename_ext' => $extension,
+                            'hands_on_rating'       => $total_rating,
+                            'hands_on_remarks'      => $employee['hands_on_remarks'] ?? null
                         ]);
                         
                     // 4. Retain old image (e.g., renaming 10.png to 12.png)
                     } elseif (isset($oldRecords[$empNo]) && !empty($oldRecords[$empNo]['hands_on_filename'])) {
                         
-                        $oldId        = $oldRecords[$empNo]['id'];                 // This is 10
+                        $oldId        = $oldRecords[$empNo]['id'];                              // This is 10
                         $oldExtension = $oldRecords[$empNo]['hands_on_filename_ext'] ?? 'png';
                         $oldFilename  = $oldRecords[$empNo]['hands_on_filename'];
+                        $oldRating    = $oldRecords[$empNo]['hands_on_rating'];
+                        $oldRemarks   = $oldRecords[$empNo]['hands_on_remarks'];
 
                         $oldStoragePath = 'public/hands_on_attachments/' . $oldId . '.' . $oldExtension;       // public/hands_on_attachments/10.png
                         $newStoragePath = 'public/hands_on_attachments/' . $te_emp_id . '.' . $oldExtension;   // public/hands_on_attachments/12.png
@@ -345,7 +365,10 @@ class TrainingEndorsementController extends Controller
                         // Save the original filename metadata into your new row (ID 12)
                         TrainingEndorsementEmployee::where('id', $te_emp_id)->update([
                             'hands_on_filename'     => $oldFilename,
-                            'hands_on_filename_ext' => $oldExtension
+                            'hands_on_filename_ext' => $oldExtension,
+                            'hands_on_rating'       => $oldRating,
+                            'hands_on_remarks'      => $oldRemarks
+
                         ]);
                     }
                 }
@@ -733,12 +756,12 @@ class TrainingEndorsementController extends Controller
                             $rating = $exam->rating ? $exam->rating . '%' : '';
 
                             if(is_null($exam->attempt)){
-                                $appendRemarks = "on 1st attempt";
+                                $appendRemarks = "on 1st take";
                             }
                             else{
                                 $attemptCount = $exam->attempt ?? 1;
                                 $formatter = new \NumberFormatter('en_US', \NumberFormatter::ORDINAL);
-                                $appendRemarks = "on " . $formatter->format($attemptCount) . " attempt";
+                                $appendRemarks = "on " . $formatter->format($attemptCount) . " take";
                             }
                             
 
