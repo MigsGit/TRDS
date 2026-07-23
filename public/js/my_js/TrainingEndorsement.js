@@ -329,6 +329,7 @@ formAddEndorsement.on('submit', function (e) {
         };
     });
 
+
     var formData = new FormData(this);
     formData.append('employees', JSON.stringify(employees));
 
