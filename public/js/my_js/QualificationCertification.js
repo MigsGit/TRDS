@@ -21,7 +21,6 @@
             checkbox.prop('checked', activeValues.includes(checkboxValue));
         });
     }
-
     // ==========================================
     // HOW TO EXECUTE IT FOR YOUR TWO TABLES:
     // ==========================================
@@ -393,7 +392,7 @@
      * Initialise the modal:
      *  - (re-)attach select2 to the employee combo
      *  - clear the staging table & array
-     */
+    */
     const initOperEmpModal = () => {
         getSystemOneEmployeeDetails($('#text_oper_emp_number'));
         operEmpArray = [];
@@ -553,8 +552,6 @@
         return employees;
     }
 
-    /* ---- Edit ---- */
-
     /**
      * Best Practice: Populates the main table and synchronizes state during an Edit AJAX request.
      * @param {Array} qcSlipEmployees - The response payload array containing employee details
@@ -566,7 +563,6 @@
 
         // 2. Loop through your incoming collection using jQuery $.each
         $.each(qcSlipEmployees, function(index, emp) {
-
             // Match your application's data-attribute structure
             const empId = emp.employee_no;
             const empName = emp.system_one_hris_subcon.empname ??''; // Use fallback if name is in relation
@@ -785,7 +781,7 @@
         params.combo.val(selected).trigger('change');
     }
 
-    // ---- Get Data
+    // ---- Get Data for Edit Operator
     const getQcSlipsById  = (params) => {
         let data = {
             qcSlipsId :  params.qcSlipsId
@@ -814,7 +810,7 @@
             $('#approval_status').val(currentStatus);
 
             // ==== Toggle Collapse based on approval status
-            getApprovalStatusToggle({ 
+            getApprovalStatusToggle({
                 approval_status: currentStatus,
              });
             // ==== Get All Approvers / Validated by/ Mentored by
@@ -1051,6 +1047,7 @@
 
         })
     }
+
 
     /* ---- Event bindings ---- */
 

@@ -119,12 +119,6 @@
 
                     <div class="modal-body">
                         <label for="">Select position and section you want to certify/qualify:</label>
-
-                        <!-- Edited 4-7-25 -->
-                        <input type="hidden" id="hidden_created_by_name" name="hidden_created_by_name">
-                        <input type="hidden" id="hidden_created_by_username" name="hidden_created_by_username" value="">
-                        <input type="hidden" id="hidden_created_by_email" name="hidden_created_by_email">
-
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -149,27 +143,21 @@
                                     <label for="text_select_position">Select Position</label>
                                     <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="text_select_position" id="text_select_position">
                                         <option value="" selected disabled>Select Position</option>
-                                        <option value="Operator" selected>Operator</option>
+                                        <option value="Operator">Operator</option>
                                         <option value="MH">MH</option>
-                                        <option value="Technician">Technician</option>
+                                        <option value="Inspector" selected>Inspector</option>
+                                        {{-- <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
                                         <option value="Engineer">Engineer</option>
                                         <option value="Planner">Planner</option>
-                                        <option value="Inspector">Inspector</option>
+                                        --}}
                                     </select>
                                 </div>
                             </div>
                         </div>
-
+                        {{-- GLOBAL INPUTS --}}
                         <hr style="height: 5px; background-color: black; border: none;">
-
-                        <!-- FORMAT 5 Operator -->
-                        <div class="d-none" id="div_Oper">
-                            <form  id="formSubmitOper" >
-                            @csrf
-                                <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
-
-                                <div class="col-md-3 d-none">
+                          <div class="col-md-3 d-none">
                                     <label for="">QC Slip Id:</label>
                                     <input class="form-control" type="text" class="form-control" id="qc_slips_id" name="qc_slips_id" placeholder="Auto Generated" readonly>
                                 </div>
@@ -180,9 +168,7 @@
                                 <div class="row mb-5">
                                     <div class="col-md-3">
                                         <label for="">Control No.:</label>
-                                        {{-- <input class="form-control" type="hidden" class="form-control d-none" id="textconno_new_operator" name="textconno_new_operator" placeholder="Select section to generate Control No." readonly> --}}
                                         <input class="form-control" type="text" class="form-control" id="textconno_new_operator" name="textconno_new_operator" placeholder="Auto Generated" readonly>
-                                       {{--  <input class="form-control" type="hidden" class="form-control" id="textconno_operator" name="textconno_operator" readonly> --}}
                                     </div>
 
                                     <div class="col-md-3">
@@ -239,6 +225,80 @@
                                         </select>
                                     </div>
                                 </div>
+                        <hr style="height: 5px; background-color: black; border: none;">
+                        <!-- FORMAT 5 Operator -->
+                        <div class="d-none" id="div_Oper">
+                            <form  id="formSubmitOper" >
+                            @csrf
+                                <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
+                                {{-- <div class="col-md-3 d-none">
+                                    <label for="">QC Slip Id:</label>
+                                    <input class="form-control" type="text" class="form-control" id="qc_slips_id" name="qc_slips_id" placeholder="Auto Generated" readonly>
+                                </div>
+                                <div class="col-md-3  d-none">
+                                    <label for="">Approval Status:</label>
+                                    <input class="form-control" type="text" class="form-control" id="approval_status" name="approval_status" placeholder="Auto Generated" readonly>
+                                </div>
+                                <div class="row mb-5">
+                                    <div class="col-md-3">
+                                        <label for="">Control No.:</label>
+                                        <input class="form-control" type="text" class="form-control" id="textconno_new_operator" name="textconno_new_operator" placeholder="Auto Generated" readonly>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="">Production Section:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="text_section_operator" id="text_section_operator">
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="">Series Name:</label>
+                                        <input class="form-control" type="text" id="text_series_operator" name="text_series_operator" placeholder="Enter series name here">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="">Product Line:</label>
+                                         <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_line">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-2 mb-5">
+                                    <div class="col-md-12">
+                                        <button type="button" class="btn btn-primary" id="btnEmployeeOperator" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa fa-user-plus me-3"></i>Add Employee</button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive mt-3 mb-5">
+                                    <table id="tbl_certified_list_operator" class="table table-bordered table-hover nowrap">
+                                        <thead class="table-primary">
+                                            <tr>
+                                                <th>Action</th>
+                                                <th>Employee No.</th>
+                                                <th>Employee Name</th>
+                                                <th>Station From</th>
+                                                <th>Station To</th>
+                                                <th>Remarks</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row mb-5">
+                                    <div class="col-md-12">
+                                        <label for="">Reason for Certification:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="text_certification_operator[]" id="text_certification_operator" multiple>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-5 div-transfer-flexibility d-none">
+                                    <div class="col-md-12">
+                                        <label for="">Lateral Transfer Flexibility:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="transfer_flexibility[]" id="transfer_flexibility" multiple>
+
+                                        </select>
+                                    </div>
+                                </div> --}}
 
                                 <!-- **************************************************************      APRODTO          ************************************************************************************************* -->
 
@@ -1587,9 +1647,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <hr style="height: 5px; background-color: black; border: none;">
-
                                 <div class="col-md-6 nmodify3">
                                     <label for="">Approved / Confirmed by:</label>
                                      <select class="form-control select2bs4" style="width: 100%;" name="text_oper_approved_confirmed_by[]" id="text_oper_approved_confirmed_by" multiple>
@@ -1604,8 +1661,9 @@
                                     {{-- <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button> --}}
                                     <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
                                 </div>
-                        </form>
-
+                            </form>
+                            @include('qualification_certification.modal_qualification_certification_mh')
+                            @include('qualification_certification.modal_qualification_certification_inspector')
                         </div>
                     </div>
                 </div>
@@ -1624,6 +1682,7 @@
         operEmpArray = [];
         form = {
             formSubmitOper: $('#formSubmitOper'),
+            formSubmitMh: $('#formSubmit_MH'),
         };
         dataTable = {
             operator: '',
@@ -1674,35 +1733,6 @@
             });
         });
 
-         $(document).on('click', '#btnCreateCQForm',function (e) {
-            initOperEmpModal();
-            // operEmpArray = [];
-            $('#tbl_certified_list_operator tbody').empty();
-            form.formSubmitOper[0].reset();
-             initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-            ],1);
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_operator_product_line',
-            ],2);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_certification_operator',
-            ],3);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_ps_oper',
-            ],4);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_es_oper',
-            ],5);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#transfer_flexibility',
-            ],6);
-            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
-            $('.operSave').removeClass('d-none');
-            $('.operApproved').addClass('d-none');
-        });
         dataTable.operator = $(table.operator).DataTable({
             "processing" : true,
             "serverSide" : true,
@@ -1877,11 +1907,9 @@
             $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
          });
 
-         const saveFormOper = ($form) => {
-
+        const saveFormOper = ($form) => {
             // 1. Serialize standard form inputs into an array
             // console.log('saveFormOper called',$form[0]);
-            // return;
             var formArray = $form.serializeArray();
 
             // 2. Push extra custom field values manually
@@ -1914,16 +1942,16 @@
                     dataTable.operator.draw();
                     $('#modalCreateCQForm').modal('hide');
                     $('#modalSendEmail').modal('hide');
-                    form.formSubmitOper[0].reset();
+                    $form[0].reset();
                 }
             },$form);
-         }
-         $('#formSendEmail').click(function (e) {
+        }
+        $('#formSendEmail').click(function (e) {
             e.preventDefault();
             var $form = $('#formSubmitOper,#formSubmitOper');
             saveFormOper($form);
         });
-        $(document).on('submit', '#formSubmitOper, #formSubmitOper', function (e) {
+        $(document).on('submit', '#formSubmitOper', function (e) {
             e.preventDefault();
             var $form = $(this);
             Swal.fire({
@@ -1935,24 +1963,87 @@
             confirmButtonText: 'Yes, proceed',
             cancelButtonText: 'Cancel'
         }).then(function (result) {
-            if (result.isConfirmed) {
-                if($('#approval_status').val() === "FQCVVO"){
-                    //TODO: Swal fire
-                    saveFormOper($form);
-                }else{
-                    $('#modalSendEmail').modal();
+                if (result.isConfirmed) {
+                    if($('#approval_status').val() === "FQCVVO"){
+                        saveFormOper($form);
+                    }else{
+                        $('#modalSendEmail').modal();
+                    }
                 }
-            }
+            });  
         });
-
+        // #formSubmit_MH, 
+        $(document).on('submit', '#formSubmit_Ins',  function (e) {
+            e.preventDefault(); 
+            var $form = $(this);
+            alert('formSubmitMh')
         });
+       
+        const selectOperatorValidation = () => {
+            $('#div_Oper').removeClass('d-none');
+            form.formSubmitOper[0].reset();
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_operator_product_line',
+            ],2);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_ps_oper',
+            ],4);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_es_oper',
+            ],5);
+            
+            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            $('#btnEmployeeOperator').prop('disabled',false);
+            $('.operSave').removeClass('d-none');
+            $('.operApproved').addClass('d-none');
+        }
+        const selectInspectorValidation = () => {
+            $('#divInspector').removeClass('d-none');
+            
+            form.formSubmitMh[0].reset();
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_ps_oper',
+            ],4);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_es_oper',
+            ],5);
+            
+            form.formSubmitMh.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            $('#btnEmployeeOperator').prop('disabled',false);
+            $('.operSave').removeClass('d-none');
+            $('.operApproved').addClass('d-none');
+        }
 
         var $positionSelect = $('#text_select_position');
-        var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper');
+        var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved');
 
         function togglePositionSection(position) {
+            initOperEmpModal();
+            $('#tbl_certified_list_operator tbody').empty();
             $positionSections.addClass('d-none');
+            // text_operator_product_line
+            // text_series_operator
+            // text_certification_operator
+            // transfer_flexibility
 
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_operator_product_line',
+            ],2);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_certification_operator',
+            ],3);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#transfer_flexibility',
+            ],6);
             switch (position) {
                 case 'MH':
                     $('#divMH').removeClass('d-none');
@@ -1966,10 +2057,10 @@
                     $('#divSEP').removeClass('d-none');
                     break;
                 case 'Inspector':
-                    $('#divInspector').removeClass('d-none');
+                    selectInspectorValidation();
                     break;
                 case 'Operator':
-                    $('#div_Oper').removeClass('d-none');
+                    selectOperatorValidation();
                     break;
             }
         }

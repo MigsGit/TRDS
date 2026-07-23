@@ -105,7 +105,7 @@ class QualificationCertificationController extends Controller
                 $subject = "APPROVED: TRDS - Qualification Certification";
             }else{
                 $opApprover =  OpApprover::insert($params['update_data']);
-               
+
                 foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
                     $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
                 }
@@ -748,7 +748,10 @@ class QualificationCertificationController extends Controller
                 QcSlipEmployee::insert($collectOperatorEmployees);
                 $qcSlipEmployeeCount = QcSlipEmployee::where('qc_slips_id',$qcSlipId)->count();
                 if ($qcSlipEmployeeCount === 0) {
-                    return response()->json(409);
+                    return response()->json([
+                        'is_success' => 'true',
+                        'message' => 'Please Add Employee Details Above!'
+                    ],409);
 
                 }
                 //STATUS PB
@@ -899,7 +902,7 @@ class QualificationCertificationController extends Controller
                 }
                 if($qcSlipDetails->approval_status ==='EQCVP'){
                   $isMachineOperatorExists = QcSlipEmployee::where("qc_slips_id",$qcSlipId)->where('station_to',4)->count();
-              
+
                     if($isMachineOperatorExists > 0 ){
                         $validatedData = app(MachineOperatorRequest::class)->validateResolved();
                     }
@@ -1170,7 +1173,7 @@ class QualificationCertificationController extends Controller
                 $statusName = 'E Qc Validation Process';
                 break;
             case ($params['approval_status'] === 'EENGVP'):
-                $newStatus = 'EQCVP';  // QC Validation Process  
+                $newStatus = 'EQCVP';  // QC Validation Process
                 $statusName = 'E Qc Validation Process';
                 break;
             case ($params['approval_status'] === 'EQCVP'):
