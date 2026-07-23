@@ -1946,11 +1946,11 @@
                 }
             },$form);
         }
-        $('#formSendEmail').click(function (e) {
-            e.preventDefault();
-            var $form = $('#formSubmitOper,#formSubmitOper');
-            saveFormOper($form);
-        });
+        // $('#formSendEmail').click(function (e) {
+        //     e.preventDefault();
+        //     var $form = $('#formSubmitOper,#formSubmitOper');
+        //     saveFormOper($form);
+        // });
         $(document).on('submit', '#formSubmitOper', function (e) {
             e.preventDefault();
             var $form = $(this);
@@ -1976,7 +1976,43 @@
         $(document).on('submit', '#formSubmit_Ins',  function (e) {
             e.preventDefault(); 
             var $form = $(this);
-            alert('formSubmitMh')
+            // 1. Serialize standard form inputs into an array
+            // console.log('saveFormOper called',$form[0]);
+            var formArray = $form.serializeArray();
+
+            // 2. Push extra custom field values manually
+            formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
+            formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
+            formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
+            formArray.push({ name: 'text_select_section', value: $('#select_section').val() });
+
+            // 3. Process the array into a clean key-value object map
+            var data = {};
+            $.each(formArray, function(i, field) {
+                if (data[field.name] !== undefined) {
+                    if (!Array.isArray(data[field.name])) {
+                        data[field.name] = [data[field.name]];
+                    }
+                    data[field.name].push(field.value);
+                } else {
+                    data[field.name] = field.value;
+                }
+            },$form[0]);
+
+            // 4. Safely pull your dynamic table data array
+            data.operator_employees = (typeof getOperEmpTableData === 'function')
+                ? getOperEmpTableData()
+                : [];
+            call_ajax_serialize(data,{},'save_qualification_certification_oper', function(response){
+                if (response.is_success === 'true') {
+                    // Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Inspector form saved.' });
+                    dataTable.inspector.draw();
+                    // $('#modalCreateCQForm').modal('hide');
+                    // $('#modalSendEmail').modal('hide');
+                    // $form[0].reset();
+                }
+            },$form);
+            
         });
        
         const selectOperatorValidation = () => {
