@@ -60,6 +60,7 @@
                                                 <th>Status</th>
                                                 <th>Category</th>
                                                 <th>Exam Title</th>
+                                                <th>Description</th>
                                                 <th>Exam Instruction</th>
                                                 <th>Purpose</th>
                                                 <th>Department</th>
@@ -352,6 +353,7 @@
                         },
                     },
                     { "data" : "exam_title"},
+                    { "data" : "description"},
                     { "data" : "exam_instruction"},
                     { "data" : "purpose"},
                     { "data" : "department"},
@@ -389,16 +391,8 @@
                     { data: 'action' },
                     { data: 'exam_taken' },
                     { data: 'date_examination' },
-                    { data: 'exam_result_info',
-                            render: function (data) {
-                                return data ? data.employee_no : 'No Data';
-                            }
-                    },
-                    { data: 'exam_result_info',
-                            render: function (data) {
-                                return data ? data.employee_name : 'No Data';
-                            }
-                    },
+                    { data: 'employee_no'   },
+                    { data: 'employee_name' },
                     { data: 'score' },
                     { data: 'remark' },
                     { data: 'rating' }

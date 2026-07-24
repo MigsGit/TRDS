@@ -145,6 +145,7 @@ const CreateUpdateQuestionnaire = () => {
                 alert('Saving failed!');
             }else{
                 $('#modalCreateUpdateQuestionnaire').modal('hide');
+                $('.reset').val('');
                 toastr.success('Saved!');
                 dataQuestionnaire.draw();
             }
@@ -276,6 +277,7 @@ const CreateUpdateQuestionnaireDetails = () => {
                 $('#identificationEssay').empty();
                 $('#multipleGrid').empty();
                 $('#formCreateUpdateQuestionnaireDetails')[0].reset();
+                $('.reset').val('');
                 toastr.success('Saved!');
                 dataQuestionnaireDetails.draw();
             }
