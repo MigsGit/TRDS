@@ -151,8 +151,12 @@
                     </a>
                 </li>
 
-               g --}}
-
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('ETR') }}" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>ETR</p>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div><!-- Sidebar -->
