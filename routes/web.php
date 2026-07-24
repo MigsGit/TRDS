@@ -12,8 +12,6 @@ use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PersonnelSkillMatrixController;
-use App\Http\Controllers\ExamTitleController;
 use App\Http\Controllers\ETRController;
 use App\Http\Controllers\InspSkillChartSettingController;
 
