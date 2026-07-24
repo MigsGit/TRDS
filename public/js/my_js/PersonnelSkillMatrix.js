@@ -5,7 +5,10 @@ $(document).ready(function() {
     const subconEmployee = $('#tblSubconEmployees');
     const updateEmpInfoModalId = $('#updateEmpInfoModalId');
     const viewEmpInfoModalId = $('#viewEmpInfoModalId');
-    
+    const btnChooseFileToExport = $('#btnChooseFileToExport');
+    const chooseExportReportModal = $('#chooseExportReportId');
+    const exportSkillMatrix = $('#btnGenerateVisualMatrix');
+
 
 
     const directEmployeeTable = directEmployee.DataTable({
@@ -47,6 +50,8 @@ $(document).ready(function() {
     const employeeTrainingsTable = $('#tblEmployeeTrainings').DataTable({
         processing: true,
         serverSide: true,
+        autoWidth: true,
+        responsive: true,
         ajax: {
             url: 'get_employee_trainings',
             type: 'GET',
@@ -59,22 +64,23 @@ $(document).ready(function() {
                 $('#lblPassed').text(json.passed);
                 $('#lblComplied').text(json.complied);
                 $('#lblFailed').text(json.failed);
-                $('#lblHandsOn').text(json.handsOn);
                 $('#lblTotal').text(json.total);
 
                 return json.data;
             }
         },
         columns: [
-            { data: 'trainingDate' },
-            { data: 'Title' },
-            { data: 'Objective' },
-            { data: 'Trainor' },
-            { data: 'Result' },
-            { data: 'Venue' },
-            { data: 'Mechanics' },
-            { data: 'TypeTraining' },
-            { data: 'Remarks' }
+            { data: 'trainingDate'},
+            { data: 'title'},
+            { data: 'seriesName'},
+            { data: 'station'},
+            { data: 'detailedStation'},
+            { data: 'objective' },
+            { data: 'trainor' },
+            { data: 'result' },
+            { data: 'trainingVenue' },
+            // { data: 'mechanics' },
+            { data: 'typeOfTraining' },
         ]
     });
 
@@ -89,6 +95,14 @@ $(document).ready(function() {
         const empNo = $(this).data('empno');
         viewEmpInfoModalId.modal('show');
         viewDirectEmployeeInfo(empNo);
+        currentEmpNo = empNo;
+        employeeTrainingsTable.ajax.reload();
+    });
+
+      $('#tblSubconEmployees').on('click', '.btnViewSubconEmpInfo', function () {
+        const empNo = $(this).data('empno');
+        viewEmpInfoModalId.modal('show');
+        viewSubconEmpInfo(empNo);
         currentEmpNo = empNo;
         employeeTrainingsTable.ajax.reload();
     });
@@ -142,7 +156,7 @@ $(document).ready(function() {
                 $('#viewDivision').val(response.Division);
                 $('#viewDateHired').val(response.DateHired);
                 $('#viewEmploymentStatus').val(response.EmpStatus);
-                
+
             },
             error: function (xhr, status, error) {
                 console.error('Error fetching employee info:', error);
@@ -166,6 +180,33 @@ $(document).ready(function() {
                 $('#position').val(response.Position);
                 $('#section').val(response.Section);
                 $('#dateHired').val(response.DateHired);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching employee info:', error);
+            }
+        });
+    }
+
+    function viewSubconEmpInfo(empNo) {
+        $.ajax({
+            url: 'view_subcon_employee_info',
+            method: 'GET',
+            data: { id: empNo },
+            success: function (response) {
+                console.log(response);
+                let middleName = response.MiddleName
+                    ? response.MiddleName.charAt(0).toUpperCase() + '.'
+                    : '';
+                let empFullName = response.FirstName + ' ' + middleName + ' ' + response.LastName;
+                $('#viewEmpNo').val(response.EmpNo);
+                $('#viewEmpName').val(empFullName);
+                $('#viewPosition').val(response.Position);
+                $('#viewSection').val(response.Section);
+                $('#viewDepartment').val(response.Department);
+                $('#viewDivision').val(response.Division);
+                $('#viewDateHired').val(response.DateHired);
+                $('#viewEmploymentStatus').val(response.EmpStatus);
+
             },
             error: function (xhr, status, error) {
                 console.error('Error fetching employee info:', error);
@@ -197,6 +238,19 @@ $(document).ready(function() {
             .removeClass('text-dark')
             .addClass('text-white');
     });
+
+    btnChooseFileToExport.on('click', function () {
+        console.log('clicked');
+        chooseExportReportModal.modal('show');
+    });
+
+    exportSkillMatrix.on('click', function(){
+        console.log('exportClicked');
+    });
+
+
+
+
 
 });
 

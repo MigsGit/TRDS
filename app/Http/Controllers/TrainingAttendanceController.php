@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Http\Requests\TrainingAttendanceRequest;
 use App\Model\TrainingAttendance;
+use App\Model\TrainingEndorsement;
 use App\Model\TrainingRequest;
 use App\Model\TrainingRequestDetails;
 use App\Model\User;
@@ -181,11 +182,257 @@ class TrainingAttendanceController extends Controller
             throw $e;
         }
     }
+    public function view_training_attendance_request_details_rev1(Request $request){
+        $fromDate = $request->fromDate ?? '';
+        $toDate = $request->toDate ?? '';
+        if($fromDate === '' || $toDate  === ''){
+        return datatables()->of(collect([]))
+        ->with([
+            'totalAbsent'  => 0,
+            'totalPresent' => 0,
+            // 'error'        => 'Invalid date range provided.'
+        ])
+        ->make(true);
+    }
+        // Fallback to today if empty/null, then parse safely
+        $startDate = !empty($fromDate) ? Carbon::parse($fromDate)->startOfDay() : now()->startOfDay();
+        $endDate   = !empty($toDate)   ? Carbon::parse($toDate)->endOfDay()   : now()->endOfDay();
+
+        // Ensure start date is never after end date to prevent empty/flipped periods
+        if ($startDate->gt($endDate)) {
+            $startDate = $endDate->copy();
+        }
+
+        $trainingId = $request->trainingAttendanceRequest;
+        // 1. Fetch training details with eager-loaded nested relationship
+        $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
+    ->with([
+        'training_attendance' => function ($query) use ($fromDate, $toDate) {
+            $query->whereBetween('date', [$fromDate, $toDate]);
+        },
+        'training_endorsement_employee.training_endorsement' // Eager load parent endorsement table
+    ])
+    ->get();
+
+
+// 2. Build the date range
+$period = CarbonPeriod::create($startDate, $endDate);
+
+// 3. Map over each date in the period x each employee
+$allRows = collect($period)->flatMap(function ($date) use ($employees) {
+    $currentDate = $date->toDateString();
+
+    return $employees->map(function ($emp) use ($currentDate) {
+        // Safe attendance lookup
+        $attendances = collect($emp->training_attendance);
+        $attendance = $attendances->first(function ($item) use ($currentDate) {
+            $itemDate = is_array($item) ? ($item['date'] ?? null) : ($item->date ?? null);
+            return $itemDate ? Carbon::parse($itemDate)->toDateString() === $currentDate : false;
+        });
+
+        // Safe check for endorsement date via nested relation: training_endorsement_employee -> training_endorsement
+        $endorsements = collect($emp->training_endorsement_employee);
+        $hasEndorsementOnDate = $endorsements->contains(function ($endorsementEmp) use ($currentDate) {
+            $parentEndorsement = is_array($endorsementEmp)
+                ? ($endorsementEmp['training_endorsement'] ?? null)
+                : ($endorsementEmp->training_endorsement ?? null);
+
+            if (!$parentEndorsement) {
+                return false;
+            }
+
+            $eDate = is_array($parentEndorsement)
+                ? ($parentEndorsement['date'] ?? null)
+                : ($parentEndorsement->date ?? null);
+
+            return $eDate ? Carbon::parse($eDate)->toDateString() === $currentDate : false;
+        });
+
+        // Skip employee on this specific date if endorsed
+        if ($hasEndorsementOnDate) {
+            return null;
+        }
+
+        // Extract attendance attributes safely
+        $timeIn  = is_array($attendance) ? ($attendance['time_in'] ?? '') : ($attendance->time_in ?? '');
+        $timeOut = is_array($attendance) ? ($attendance['time_out'] ?? '') : ($attendance->time_out ?? '');
+        $attId   = is_array($attendance) ? ($attendance['id'] ?? '') : ($attendance->id ?? '');
+        $status  = is_array($attendance) ? ($attendance['status'] ?? 'ABSENT') : ($attendance->status ?? 'ABSENT');
+        $remarks = is_array($attendance) ? ($attendance['remarks'] ?? '') : ($attendance->remarks ?? '');
+
+        // Calculate total duration
+        $duration = 'NO RECORD';
+        if (!empty($timeIn) && !empty($timeOut)) {
+            $in  = Carbon::parse($timeIn);
+            $out = Carbon::parse($timeOut);
+            $duration = $in->diff($out)->format('%H hours');
+        }
+
+        // Action Button
+        $button = '<center><div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
+                        <i class="fa fa-cog"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <button class="dropdown-item aEditAttendance" type="button" attendance-id="' . $attId . '" attendance-details-id="' . $emp->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalTrainingAttendance" data-keyboard="false">Edit</button>
+                    </div>
+                </div></center>';
+
+        return [
+            'emp_no'         => $emp->emp_no,
+            'name'           => $emp->name,
+            'date'           => $currentDate,
+            'training_hours' => $duration,
+            'time_in'        => $timeIn ?: null,
+            'time_out'       => $timeOut ?: null,
+            'status'         => $status ?: 'ABSENT',
+            'action'         => $button,
+            'remarks'        => $remarks,
+        ];
+    })->filter(); // Excludes null values where an endorsement match occurred
+})->sortByDesc('date');
+
+// 4. Totals for DataTables response
+$absentCount  = $allRows->where('status', 'ABSENT')->count();
+$presentCount = $allRows->where('status', 'PRESENT')->count();
+
+return datatables()->of($allRows)
+    ->with([
+        'totalAbsent'  => $absentCount,
+        'totalPresent' => $presentCount
+    ])
+    ->make(true);
+    }
+
+    public function view_training_attendance_request_details_rev2(Request $request){
+        try {
+            date_default_timezone_set('Asia/Manila');
+
+            $fromDate   = Carbon::parse($request->fromDate)->startOfDay();
+            $toDate     = Carbon::parse($request->toDate)->startOfDay();
+            $trainingId = $request->trainingAttendanceRequest;
+
+            if (blank($fromDate) || blank($toDate) || blank($trainingId)) {
+                return datatables()->of(collect([]))
+                    ->with([
+                        'totalAbsent'  => 0,
+                        'totalPresent' => 0
+                    ])
+                    ->make(true);
+            }
+
+            // 1. Fetch all employees without a global endorsement filter.
+            //    Scope training_attendance to the requested date range to avoid loading
+            //    unnecessary records. Eager-load the full endorsement chain to prevent N+1.
+             $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
+                ->with([
+                    'training_attendance' => function ($query) use ($fromDate, $toDate) {
+                        $query->whereBetween('date', [$fromDate, $toDate]);
+                    },
+                    'training_endorsement_employee.training_endorsement_training_request_id'
+                ])
+                ->get();
+
+            // 2. Build the date range
+            // $period = CarbonPeriod::create($fromDate, $toDate);
+            // 2. Create period (use 1 day intervals explicitly)
+            $period = CarbonPeriod::create($fromDate, '1 day', $toDate);
+            // 3. Generate rows: employee x day matrix with dynamic endorsement exclusion
+            return $allRows = collect($period)->flatMap(function ($date) use ($employees) {
+                $currentDate = $date->format('Y-m-d');
+                // $currentDate = $date->toDateString();
+
+                return $employees->map(function ($emp) use ($currentDate) {
+                    // Endorsement exclusion: if any linked training_endorsement has a date
+                    // on or before $currentDate, omit this employee for this day and beyond.
+                    return $eDate= $emp->training_endorsement_employee->training_endorsement_training_request_id->date ?? null ;
+                    return $eDate  <= $currentDate;
+
+                    // return $currentDate;
+                   return $isEndorsedByDate = collect($emp->training_endorsement_employee)
+                        ->map(function ($endorsementEmp) use ($currentDate) {
+                            // return $endorsementEmp;
+                        return $parentEndorsement = $endorsementEmp->training_endorsement_training_request_id ?? null;
+
+                            if (!$parentEndorsement) {
+                                return false;
+                            }
+
+                            $eDate = $parentEndorsement->date ?? null;
+
+                            return $eDate && Carbon::parse($eDate)->toDateString() <= $currentDate;
+                        });
+
+                    if ($isEndorsedByDate) {
+                        return null;
+                    }
+    // echo json_encode($isEndorsedByDate);
+
+                    // Safe attendance lookup for this specific date
+                    $attendance = collect($emp->training_attendance)->first(function ($item) use ($currentDate) {
+                        return ($item->date ?? null) && Carbon::parse($item->date)->toDateString() === $currentDate;
+                    });
+
+                    $time_in     = $attendance->time_in ?? '';
+                    $time_out    = $attendance->time_out ?? '';
+                    $attendanceId = $attendance->id ?? '';
+
+                    $duration = 'NO RECORD';
+                    if ($time_in !== '' && $time_out !== '') {
+                        $in  = Carbon::parse($time_in);
+                        $out = Carbon::parse($time_out);
+                        $duration = $in->diff($out)->format('%H hours');
+                    }
+
+                    $button = '<center><div class="btn-group">
+                                <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
+                                <i class="fa fa-cog"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">';
+                    $button .= '<button class="dropdown-item aEditAttendance" type="button" attendance-id="' . $attendanceId . '" attendance-details-id="' . $emp->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalTrainingAttendance" data-keyboard="false">Edit</button>';
+                    $button .= '</div>
+                            </div></center>';
+
+                    return [
+                        'emp_no'         => $emp->emp_no,
+                        'name'           => $emp->name,
+                        'date'           => $currentDate,
+                        'isEndorsedByDate'           => $isEndorsedByDate,
+                        'training_hours' => $duration,
+                        'time_in'        => $attendance->time_in ?? null,
+                        'time_out'       => $attendance->time_out ?? null,
+                        'status'         => $attendance->status ?? 'ABSENT',
+                        'action'         => $button,
+                        'remarks'        => $attendance->remarks ?? '',
+                    ];
+                })->filter(); // Remove null rows (endorsed employees excluded for this date)
+            })->sortByDesc('date');
+// exit;
+            // 4. Calculate totals for DataTables response
+            $absentCount  = $allRows->where('status', 'ABSENT')->count();
+            $presentCount = $allRows->where('status', 'PRESENT')->count();
+
+            return datatables()->of($allRows)
+                ->with([
+                    'totalAbsent'  => $absentCount,
+                    'totalPresent' => $presentCount
+                ])
+                ->make(true);
+
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
     public function view_training_attendance_request_details(Request $request){
         try {
+
+            $trainingId = $request->trainingAttendanceRequest;
             $fromDate = $request->fromDate;
             $toDate = $request->toDate;
-            $trainingId = $request->trainingAttendanceRequest;
+            // $trainingEndorsement = TrainingEndorsement::where('training_request_id',$trainingId)->first('date');
+            // $trainingEndorsementDate = $trainingEndorsement->date ?? '';
+            // $trainingEndorsementDateValid =$trainingEndorsementDate <= $toDateSelected;
+            // $toDate = $trainingEndorsementDate != '' ? $trainingEndorsementDate : $toDateSelected;
             if ( blank($fromDate) || blank($toDate) || blank($trainingId) ) {
                 return datatables()->of(collect([]))
                     ->with([
@@ -200,6 +447,18 @@ class TrainingAttendanceController extends Controller
             ->get()->sortBy(function($detail) {
                 return $detail->training_attendance['date'] ?? '0000-00-00';
             });
+            //THe TO date will be based on Training Endorsement Date
+
+            // $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
+            // ->whereDoesntHave('training_endorsement_employee') // Ensures relation is NOT null in database
+            // ->with([
+            //     'training_attendance',
+            //     'training_endorsement_employee'
+            // ])
+            // ->get()
+            // ->sortBy(function($detail) {
+            //     return $detail->training_attendance['date'] ?? '0000-00-00';
+            // });
 
             //Create the date range
             $period = CarbonPeriod::create($fromDate, $toDate);
@@ -269,6 +528,7 @@ class TrainingAttendanceController extends Controller
             throw $e;
         }
     }
+
 
     public function get_training_attendance_by_id(Request $request){
         try {

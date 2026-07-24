@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class QcReasonCertification extends Model
 {
-    use HasFactory;
+    
 }
