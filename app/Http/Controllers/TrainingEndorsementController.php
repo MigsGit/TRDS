@@ -916,7 +916,7 @@ class TrainingEndorsementController extends Controller
             DB::rollback();
             return response()->json([
                 'result' => false,
-                'message' => 'An error occurred while processing your request.'
+                'message' => 'An error occurred while processing your request.'. $e->getMessage()
             ]);
         }
     }
