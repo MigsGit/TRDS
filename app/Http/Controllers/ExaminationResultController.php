@@ -83,7 +83,7 @@ class ExaminationResultController extends Controller
             if($exam_result_detail->exam_result_status == 0){
                 $result .= '<button type="button" class="btn btn-warning btn-sm text-center actionEmployeeExamResult" exam_result_details-id="' . $exam_result_detail->id . '" data-toggle="modal" data-target="#modalEmployeeExamResult" title="Exam Results"><i class="fa fa-list-ul"></i> Details</button>';
             }else{
-                $result .= '<a  href="view_pdf/' . $exam_result_detail->id . '" target="_blank"
+                $result .= '<a  href="view_pdf_examination_result/' . $exam_result_detail->id . '" target="_blank"
                                 class="btn btn-dark btn-sm"
                                 target="_blank"
                                 title="View Exam Results">
@@ -144,17 +144,19 @@ class ExaminationResultController extends Controller
             return $result;
         })
 
-        ->addColumn('status', function($exam_result_detail){
+        ->addColumn('employee_no', function($exam_result_detail){
             $result = "";
-            if($exam_result_detail->status == 0){
-                $result .= '<center><span class="badge badge-pill badge-success">Active</span></center>';
-            }else{
-                $result .= '<center><span class="badge badge-pill badge-danger">Inactive</span></center>';
-            }
+            $result .= '<center>' . $exam_result_detail->exam_result_info->employee_no . '</center>';
             return $result;
         })
 
-        ->rawColumns(['action', 'exam_taken', 'status'])
+        ->addColumn('employee_name', function($exam_result_detail){
+            $result = "";
+            $result .= '<center>' . $exam_result_detail->exam_result_info->employee_name . '</center>';
+            return $result;
+        })
+
+        ->rawColumns(['action', 'exam_taken', 'employee_no', 'employee_name'])
         ->make(true);
     }
 
@@ -183,7 +185,7 @@ class ExaminationResultController extends Controller
         return response()->json($exam_result_details);
     }
 
-    public function viewPdf($id){
+    public function viewPdfExaminationResult($id){
         $exam_result_detail =
             ExamResultDetails::with(['exam_result_info'])
                 ->where('id', $id)
