@@ -42,6 +42,7 @@
             border: none;
             border-collapse: collapse;
             margin-bottom: 15px;
+            page-break-inside: avoid;
         }
         .dates-table td {
             border: none;
@@ -51,26 +52,64 @@
             font-weight: bold;
             width: 320px;
         }
+        
+        /* Main Employee Table */
         .emp-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            table-layout: fixed;
         }
-        .emp-table th, .emp-table td {
+        .emp-table thead {
+            display: table-header-group; /* Ensures headers repeat nicely on new pages */
+        }
+        .emp-table tr {
+            page-break-inside: avoid !important; /* Prevents Dompdf from splitting employee rows */
+        }
+        .emp-table th, .emp-table > tbody > tr > td {
             border: 1px solid #000;
-            padding: 5px 6px;
+            padding: 5px;
             text-align: center;
             vertical-align: middle;
+            word-wrap: break-word;
         }
         .emp-table th {
             background-color: #d4edda;
             font-size: 10px;
         }
         .emp-table td {
-            font-size: 10px;
+            font-size: 9px;
         }
+        
+        /* Seamless Inner Exam Table for multi-exam alignment */
+        .inner-exam-cell {
+            padding: 0 !important;
+            vertical-align: top !important;
+        }
+        .inner-exam-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .inner-exam-table td {
+            border: none;
+            border-bottom: 1px solid #000;
+            border-right: 1px solid #000;
+            padding: 5px;
+            text-align: center;
+            font-size: 9px;
+            vertical-align: middle;
+            word-wrap: break-word;
+        }
+        .inner-exam-table tr:last-child td {
+            border-bottom: none; /* Prevents double border at bottom */
+        }
+        .inner-exam-table td:last-child {
+            border-right: none; /* Prevents double border on right side */
+        }
+
         .text-left {
-            text-align: left;
+            text-align: left !important;
         }
         .badge-passed {
             color: #155724;
@@ -79,6 +118,14 @@
         .badge-failed {
             color: #721c24;
             font-weight: bold;
+        }
+
+        .signatory-table {
+            width: 100%;
+            border: none;
+            border-collapse: collapse;
+            page-break-inside: avoid;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -91,14 +138,6 @@
             <td class="label">Document #</td>
             <td>: {{ $endorsement->ctrl_no ?? '' }}</td>
         </tr>
-        {{-- <tr>
-            <td class="label">To</td>
-            <td>: {{ $to ?? '' }}</td>
-        </tr>
-        <tr>
-            <td class="label">Attn</td>
-            <td>: {{ $attn ?? '' }}</td>
-        </tr> --}}
         <tr>
             <td class="label">Subject</td>
             <td>: Technical Training Result and Endorsement</td>
@@ -139,6 +178,18 @@
     </table>
 
     <table class="emp-table">
+        <colgroup>
+            <col style="width: 4%;">  <!-- No. -->
+            <col style="width: 10%;"> <!-- Date Hired -->
+            <col style="width: 11%;"> <!-- Emp No. -->
+            <col style="width: 16%;"> <!-- Name -->
+            <col style="width: 17%;"> <!-- Pos/Dept/Sec -->
+            <col style="width: 16%;"> <!-- Exam Title -->
+            <col style="width: 6%;">  <!-- Score -->
+            <col style="width: 6%;">  <!-- Rating -->
+            <col style="width: 7%;">  <!-- Remarks -->
+            <col style="width: 7%;">  <!-- Immediate Superior -->
+        </colgroup>
         <thead>
             <tr>
                 <th rowspan="2">No.</th>
@@ -162,48 +213,48 @@
                 @php
                     $exams = $employee['exams'] ?? [];
                     $examCount = count($exams);
-                    $rowSpan = $examCount > 0 ? $examCount : 1;
                 @endphp
+                <tr>
+                    <td>{{ $rowNum }}</td>
+                    <td>{{ $employee['date_hired'] ?? '' }}</td>
+                    <td>{{ $employee['emp_no'] ?? '' }}</td>
+                    <td class="text-left">{{ $employee['name'] ?? '' }}</td>
+                    <td>{{ $employee['position'] ?? '' }}</td>
+                    
+                    <!-- Inner Container for Exams -->
+                    <td colspan="4" class="inner-exam-cell">
+                        @if($examCount > 0)
+                            <table class="inner-exam-table">
+                                <colgroup>
+                                    <col style="width: 45.7%;"> <!-- Title -->
+                                    <col style="width: 17.1%;"> <!-- Score -->
+                                    <col style="width: 17.1%;"> <!-- Rating -->
+                                    <col style="width: 20.1%;"> <!-- Remarks -->
+                                </colgroup>
+                                @foreach($exams as $exam)
+                                    <tr>
+                                        <td>{{ $exam['title'] ?? '' }}</td>
+                                        <td>{{ $exam['score'] ?? '' }}</td>
+                                        <td>{{ $exam['rating'] ?? '' }}</td>
+                                        <td class="{{ str_contains(strtolower($exam['remark'] ?? ''), 'passed') ? 'badge-passed' : 'badge-failed' }}">
+                                            {{ $exam['remark'] ?? '' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </table>
+                        @else
+                            <div style="padding: 5px;">No exam records</div>
+                        @endif
+                    </td>
 
-                @if($examCount > 0)
-                    @foreach($exams as $index => $exam)
-                        <tr>
-                            @if($index === 0)
-                                <td rowspan="{{ $rowSpan }}">{{ $rowNum }}</td>
-                                <td rowspan="{{ $rowSpan }}">{{ $employee['date_hired'] ?? '' }}</td>
-                                <td rowspan="{{ $rowSpan }}">{{ $employee['emp_no'] ?? '' }}</td>
-                                <td rowspan="{{ $rowSpan }}" class="text-left">{{ $employee['name'] ?? '' }}</td>
-                                <td rowspan="{{ $rowSpan }}">{{ $employee['position'] ?? '' }}</td>
-                            @endif
-                            <td>{{ $exam['title'] ?? '' }}</td>
-                            <td>{{ $exam['score'] ?? '' }}</td>
-                            <td>{{ $exam['rating'] ?? '' }}</td>
-                            {{-- <td class="{{ strtolower($exam['remark'] ?? '') === 'passed' ? 'badge-passed' : 'badge-failed' }}"> --}}
-                            <td class="{{ str_contains(strtolower($exam['remark'] ?? ''), 'passed') ? 'badge-passed' : 'badge-failed' }}">
-                                {{ $exam['remark'] ?? '' }}
-                            </td>
-                            @if($index === 0)
-                                <td rowspan="{{ $rowSpan }}">{{ $employee['immediate_superior'] ?? '' }}</td>
-                            @endif
-                        </tr>
-                    @endforeach
-                @else
-                    <tr>
-                        <td>{{ $rowNum }}</td>
-                        <td>{{ $employee['date_hired'] ?? '' }}</td>
-                        <td>{{ $employee['emp_no'] ?? '' }}</td>
-                        <td class="text-left">{{ $employee['name'] ?? '' }}</td>
-                        <td>{{ $employee['position'] ?? '' }}</td>
-                        <td colspan="4">No exam records</td>
-                        <td>{{ $employee['immediate_superior'] ?? '' }}</td>
-                    </tr>
-                @endif
-
+                    <td>{{ $employee['immediate_superior'] ?? '' }}</td>
+                </tr>
                 @php $rowNum++; @endphp
             @endforeach
         </tbody>
     </table>
-    <table class="dates-table">
+
+    <table class="dates-table" style="margin-top: 15px;">
         <tr>
             <td class="label">Employees will not be endorsed:</td>
         </tr>
@@ -215,14 +266,12 @@
     </table>
 
     {{-- Signatory Section --}}
-
     @php
         $checkedBy = $endorsement->te_approval_details->where('approval_type', 'checked_by') ?? collect();
         $approvedBy = $endorsement->te_approval_details->where('approval_type', 'approved_by') ?? collect();
     @endphp
 
-    <br>
-    <table style="width:100%; border:none; border-collapse: collapse; page-break-inside: avoid;">
+    <table class="signatory-table">
         <tr>
             <td style="width:33%; text-align:center; padding-bottom: 10px; font-weight: bold;">
                 Prepared by:
@@ -290,16 +339,8 @@
             </td>
         </tr>
     </table>
-    
-    
-    {{-- @foreach($employees as $employee)
-        @if(!empty($employee['attachment']))
-            <div style="page-break-before: always;">
-                <p style="font-weight: bold; font-size: 12px; margin-bottom: 10px;">{{ $employee['name'] ?? '' }} - Hands-On Attachment:</p>
-                <img src="{{ $employee['attachment'] }}" alt="" style="width:100%; max-height:700px; object-fit:contain; display:block; border:1px solid #ccc;">
-            </div>
-        @endif
-    @endforeach --}}
+
+    {{-- Attachment Section --}}
     @foreach($employees as $employee)
         @if(!empty($employee['attachment']))
             <div style="page-break-inside: avoid; margin-top: 20px;">
@@ -310,8 +351,6 @@
             </div>
         @endif
     @endforeach
-
-
 
 </body>
 </html>
