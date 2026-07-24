@@ -59,7 +59,8 @@ class HrMemoExaminationController extends Controller
 
             try{
                 $process_array = array(
-                    'examination_name' => $request->exam_name
+                    'examination_name' => $request->exam_name,
+                    'objective' => $request->objective
                 );
 
                 if(isset($request->id)){ // EDIT
