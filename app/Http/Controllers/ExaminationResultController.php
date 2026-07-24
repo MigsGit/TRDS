@@ -30,19 +30,20 @@ class ExaminationResultController extends Controller
         ->addColumn('action', function($exam_result){
             $result =   '<center>';
 
-            if($exam_result->status == 0){
-                $result .=  '<div class="btn-group">';
-                $result .=  '   <button type="button" class="btn btn-dark dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">';
-                $result .=  '   <i class="fa fa-cog"></i>';
-                $result .=  '</button>';
-                $result .=  '<div class="dropdown-menu dropdown-menu-right">';
-                $result .=  '   <button type="button" class="btn text-center dropdown-item actionQuestionnaireDetailsForExamResult" questionnaire-id="' . $exam_result->id . '" questionnaire-revision="' . $exam_result->revision . '" questionnaire-exam_title="' . $exam_result->exam_title . '" data-toggle="modal" data-target="#modalExamResult" title="Exam Results"><i class="fa fa-list-ul"></i> Details</button>';
-                $result .=  '   <button type="button" class="btn text-center dropdown-item actionChangeQuestionnaireStatusForExamResult" questionnaire-id="' . $exam_result->id . '" status="1" data-toggle="modal" data-target="#modalChangeQuestionnaireStatus" title="Deactivate Questionnaire"><i class="fa fa-ban"></i> Inactive</button>';
-                $result .=  '</button>';
-            }else{
-                $result .= '<button type="button" class="btn btn-warning btn-sm text-center actionChangeQuestionnaireStatusForExamResult" questionnaire-id="' . $exam_result->id . '" status="0" data-toggle="modal" data-target="#modalChangeQuestionnaireStatus" title="Activate Questionnaire"><i class="fas fa-redo"></i></button>';
-            }
+            // if($exam_result->status == 0){
+            //     $result .=  '<div class="btn-group">';
+            //     $result .=  '   <button type="button" class="btn btn-dark dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">';
+            //     $result .=  '   <i class="fa fa-cog"></i>';
+            //     $result .=  '</button>';
+            //     $result .=  '<div class="dropdown-menu dropdown-menu-right">';
+            //     $result .=  '   <button type="button" class="btn text-center dropdown-item actionQuestionnaireDetailsForExamResult" questionnaire-id="' . $exam_result->id . '" questionnaire-revision="' . $exam_result->revision . '" questionnaire-exam_title="' . $exam_result->exam_title . '" data-toggle="modal" data-target="#modalExamResult" title="Exam Results"><i class="fa fa-list-ul"></i> Details</button>';
+            //     $result .=  '   <button type="button" class="btn text-center dropdown-item actionChangeQuestionnaireStatusForExamResult" questionnaire-id="' . $exam_result->id . '" status="1" data-toggle="modal" data-target="#modalChangeQuestionnaireStatus" title="Deactivate Questionnaire"><i class="fa fa-ban"></i> Inactive</button>';
+            //     $result .=  '</button>';
+            // }else{
+            //     $result .= '<button type="button" class="btn btn-warning btn-sm text-center actionChangeQuestionnaireStatusForExamResult" questionnaire-id="' . $exam_result->id . '" status="0" data-toggle="modal" data-target="#modalChangeQuestionnaireStatus" title="Activate Questionnaire"><i class="fas fa-redo"></i></button>';
+            // }
 
+            $result .= '<button type="button" class="btn btn-dark btn-sm actionQuestionnaireDetailsForExamResult" questionnaire-id="' . $exam_result->id . '" questionnaire-revision="' . $exam_result->revision . '" questionnaire-exam_title="' . $exam_result->exam_title . '" data-toggle="modal" data-target="#modalExamResult" title="Exam Results"><i class="fa fa-list-ul"></i> Details</button>';
             $result .= '</center>';
             return $result;
         })

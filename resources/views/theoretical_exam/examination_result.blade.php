@@ -5,6 +5,13 @@
 @section('content_page')
 
     <style>
+        table.table thead th{
+            text-align: center;
+            vertical-align: middle;
+        }
+        table.table tbody td{
+            vertical-align: middle;
+        }
         .exam-scroll-container {
             max-height: 80vh;
             overflow-y: auto;
@@ -361,6 +368,12 @@
                     { "data" : "product_line"},
                     { "data" : "passing_score"}
                 ],
+                columnDefs: [
+                    {
+                        targets: 0, // Action column
+                        className: 'text-nowrap'
+                    }
+                ]
             });
 
             $(document).on('click', '.actionQuestionnaireDetailsForExamResult', function() {
@@ -393,7 +406,15 @@
                     { data: 'date_examination' },
                     { data: 'employee_no'   },
                     { data: 'employee_name' },
-                    { data: 'score' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            const score = Number(row.score) || 0;
+                            const essayScore = Number(row.identification_essay_score) || 0;
+
+                            return score + essayScore;
+                        }
+                    },
                     { data: 'remark' },
                     { data: 'rating' }
                 ]
