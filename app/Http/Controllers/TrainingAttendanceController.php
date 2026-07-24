@@ -407,7 +407,6 @@ return datatables()->of($allRows)
                     ];
                 })->filter(); // Remove null rows (endorsed employees excluded for this date)
             })->sortByDesc('date');
-// exit;
             // 4. Calculate totals for DataTables response
             $absentCount  = $allRows->where('status', 'ABSENT')->count();
             $presentCount = $allRows->where('status', 'PRESENT')->count();
