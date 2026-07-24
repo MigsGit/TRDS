@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
+date_default_timezone_set('Asia/Manila');
 
 class TrainingEndorsementController extends Controller
 {
