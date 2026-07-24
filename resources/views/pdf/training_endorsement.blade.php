@@ -301,7 +301,8 @@
             <td style="width:33%; text-align:center; vertical-align: top; padding: 0 10px;">
                 @foreach($checkedBy as $checker)
                     <div style="display: block; text-align: center; margin-bottom: 15px;">
-                        @if ($endorsement->status > 2)
+                        {{-- @if ($endorsement->status > 2) --}}
+                        @if ( $checker->updated_at != null)
                             <img src="http://rapidx/RapidX_E-Signature/{{ $checker->approver_details->employee_number.'.png' }}" 
                                 alt="Signature" 
                                 style="width:80px; height:auto; display:block; margin: 0 auto -20px auto;">
@@ -318,7 +319,8 @@
             <td style="width:33%; text-align:center; vertical-align: top; padding: 0 10px;">
                 @foreach($approvedBy as $approver)
                     <div style="display: block; text-align: center; margin-bottom: 15px;">
-                        @if ($endorsement->status == 3)
+                        {{-- @if ($endorsement->status == 3) --}}
+                        @if ($approver->updated_at != null)
                             <img src="http://rapidx/RapidX_E-Signature/{{ $approver->approver_details->employee_number.'.png' }}" 
                                 alt="Signature" 
                                 style="width:80px; height:auto; display:block; margin: 0 auto -20px auto;">
