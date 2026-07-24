@@ -14,8 +14,8 @@ class TrainingEndorsementEmployee extends Model
     public function training_request_details_info(){
         return $this->hasOne(TrainingRequestDetails::class, 'id', 'training_request_detail_id');
     }
-    public function training_endorsement(){
-        return $this->hasOne(TrainingEndorsement::class, 'id', 'training_request_id')->whereNull('deleted_at');
+    public function training_endorsement_training_request_id(){
+        return $this->belongsTo(TrainingEndorsement::class, 'training_endorsement_id', 'id')->whereNull('deleted_at');
     }
 
 }

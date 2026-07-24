@@ -181,7 +181,7 @@ class TrainingAttendanceController extends Controller
             throw $e;
         }
     }
-    public function view_training_attendance_request_details(Request $request){
+    public function view_training_attendance_request_details_rev1(Request $request){
         $fromDate = $request->fromDate ?? '';
         $toDate = $request->toDate ?? '';
         if($fromDate === '' || $toDate  === ''){
@@ -302,101 +302,165 @@ return datatables()->of($allRows)
     ])
     ->make(true);
     }
-    public function view_training_attendance_request_details_test(Request $request){
+    public function view_training_attendance_request_details(Request $request){
         try {
-            $fromDate = $request->fromDate;
-            $toDate = $request->toDate;
+            // --- Diagnostic 1: Log raw request values to confirm type and value ---
+            // Suspected root cause: frontend may send an ISO8601 string
+            // ("2026-07-06T00:00:00.000000Z") or, if a date-range picker posts a
+            // single field, an array. Both cases are handled below.
+            \Log::debug('[attendance] raw request input', [
+                'fromDate'   => $request->fromDate,
+                'fromDate_type' => gettype($request->fromDate),
+                'toDate'     => $request->toDate,
+                'toDate_type'   => gettype($request->toDate),
+                'trainingId' => $request->trainingAttendanceRequest,
+            ]);
+            // Uncomment to halt and dump directly to browser for quick inspection:
+            // dd(['fromDate' => $request->fromDate, 'toDate' => $request->toDate]);
+
+            // Guard: if the frontend sends a date-range as an array, take the first
+            // element (start) and last element (end) rather than crashing Carbon::parse.
+            $rawFrom = is_array($request->fromDate) ? ($request->fromDate[0] ?? '') : $request->fromDate;
+            $rawTo   = is_array($request->toDate)   ? ($request->toDate[0]   ?? '') : $request->toDate;
+
+            // Normalize any format (ISO8601, Y-m-d, etc.) to a plain Y-m-d string.
+            // Carbon::parse handles "2026-07-06T00:00:00.000000Z" correctly.
+            $fromDate   = filled($rawFrom) ? Carbon::parse($rawFrom)->format('Y-m-d') : '';
+            $toDate     = filled($rawTo)   ? Carbon::parse($rawTo)->format('Y-m-d')   : '';
             $trainingId = $request->trainingAttendanceRequest;
-            if ( blank($fromDate) || blank($toDate) || blank($trainingId) ) {
+
+            if (blank($fromDate) || blank($toDate) || blank($trainingId)) {
                 return datatables()->of(collect([]))
-                    ->with([
-                        'totalAbsent' => 0,
-                        'totalPresent' => 0
-                    ])
+                    ->with(['totalAbsent' => 0, 'totalPresent' => 0])
                     ->make(true);
             }
-                // Get the "Expected" list of employees
-        //   $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
-        //     ->with(['training_attendance','training_endorsement_employee'])
-        //     ->get()->sortBy(function($detail) {
-        //         return $detail->training_attendance['date'] ?? '0000-00-00';
-        //     });
+
+            // --- Diagnostic 2: Confirm chronological order ---
+            // CarbonPeriod will produce an empty set if start > end.
+            \Log::debug('[attendance] parsed dates', [
+                'fromDate'       => $fromDate,
+                'toDate'         => $toDate,
+                'from_before_to' => ($fromDate <= $toDate) ? 'YES (correct)' : 'NO — period will be empty!',
+            ]);
+
+            // Auto-correct reversed dates instead of silently returning nothing.
+            if ($fromDate > $toDate) {
+                [$fromDate, $toDate] = [$toDate, $fromDate];
+            }
+
+            // 1. Fetch all employees — no global endorsement filter.
+            //    Scope attendance to the date window. Eager-load the full endorsement
+            //    chain: training_endorsement_employee → training_endorsement.
             $employees = TrainingRequestDetails::where('training_request_id', $trainingId)
-            ->whereDoesntHave('training_endorsement_employee') // Ensures relation is NOT null in database
-            ->with([
-                'training_attendance',
-                'training_endorsement_employee'
-            ])
-            ->get()
-            ->sortBy(function($detail) {
-                return $detail->training_attendance['date'] ?? '0000-00-00';
-            });
+                ->with([
+                    'training_attendance' => function ($query) use ($fromDate, $toDate) {
+                        $query->whereBetween('date', [$fromDate, $toDate]);
+                    },
+                    'training_endorsement_employee.training_endorsement',
+                ])
+                ->get();
 
-            //Create the date range
-            $period = CarbonPeriod::create($fromDate, $toDate);
+            // --- Diagnostic 3: CarbonPeriod wrapped in try/catch ---
+            // An ISO8601 string with microseconds can throw InvalidFormatException
+            // inside certain Carbon versions; this surfaces the error instead of
+            // silently producing an empty period.
+            try {
+                $period = CarbonPeriod::create($fromDate, '1 day', $toDate);
+            } catch (\Exception $periodEx) {
+                \Log::error('[attendance] CarbonPeriod::create() failed', [
+                    'fromDate' => $fromDate,
+                    'toDate'   => $toDate,
+                    'error'    => $periodEx->getMessage(),
+                ]);
+                return datatables()->of(collect([]))
+                    ->with(['totalAbsent' => 0, 'totalPresent' => 0])
+                    ->make(true);
+            }
 
-            //Generate all rows (Employees x Days)
+            \Log::debug('[attendance] CarbonPeriod', [
+                'start'      => $period->getStartDate()->toDateString(),
+                'end'        => $period->getEndDate()->toDateString(),
+                'day_count'  => iterator_count(clone $period),
+                'emp_count'  => $employees->count(),
+            ]);
+
+            // 2. Employee × day matrix — each flatMap iteration MUST return an
+            //    iterable (the mapped employee rows), never a scalar or $date itself.
             $allRows = collect($period)->flatMap(function ($date) use ($employees) {
                 $currentDate = $date->toDateString();
 
+                // map() produces one row per employee; filter() drops nulls (endorsed).
                 return $employees->map(function ($emp) use ($currentDate) {
-                    // Find specific attendance for this employee on this day
-                    // We use optional() or collect() to prevent "contains on null" errors
+
+                    // Endorsement exclusion: if any training_endorsement linked to this
+                    // employee has a date on or before $currentDate, omit them for this
+                    // day and all subsequent days.
+                    $isEndorsedByDate = collect($emp->training_endorsement_employee)
+                        ->contains(function ($endorsementEmp) use ($currentDate) {
+                            $parentEndorsement = $endorsementEmp->training_endorsement ?? null;
+
+                            if (!$parentEndorsement) {
+                                return false;
+                            }
+
+                            $eDate = $parentEndorsement->date ?? null;
+
+                            return $eDate && Carbon::parse($eDate)->toDateString() <= $currentDate;
+                        });
+
+                    if ($isEndorsedByDate) {
+                        return null;
+                    }
+
+                    // Attendance lookup for this specific date
                     $attendance = collect($emp->training_attendance)->first(function ($item) use ($currentDate) {
-                        return Carbon::parse($item->date)->toDateString() == $currentDate;
+                        return ($item->date ?? null) && Carbon::parse($item->date)->toDateString() === $currentDate;
                     });
 
-                    $time_in =$attendance->time_in ?? '';
-                    $time_out =$attendance->time_out ?? '';
-                    $attendanceId =$attendance->id ?? '';
+                    $time_in      = $attendance->time_in  ?? '';
+                    $time_out     = $attendance->time_out ?? '';
+                    $attendanceId = $attendance->id       ?? '';
+
                     $duration = 'NO RECORD';
-                    if($time_in !='' && $time_out !=''){
-                        $in = Carbon::parse($attendance->time_in);
-                        $out = Carbon::parse($attendance->time_out);
-
-
-                        //Get Total Minutes (Best for precise payroll)
-                        $totalMinutes = $out->diffInMinutes($in);
-
-                        //Get Hours as a Decimal (e.g., 8.5 hours)
-                        $decimalHours = number_format($totalMinutes / 60, 2);
-
-                        //Get Human Readable (e.g., "8 hours 30 minutes")
+                    if ($time_in !== '' && $time_out !== '') {
+                        $in  = Carbon::parse($time_in);
+                        $out = Carbon::parse($time_out);
                         $duration = $in->diff($out)->format('%H hours');
                     }
-                    $button = '<center><div class="btn-group">
-                                <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">
-                                <i class="fa fa-cog"></i>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">';
-                    $button .= '<button class="dropdown-item aEditAttendance" type="button" attendance-id="' . $attendanceId . '" attendance-details-id="' . $emp->id. '"style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalTrainingAttendance" data-keyboard="false">Edit</button>';
-                    $button .= '</div>
-                            </div></center>';
+
+                    $button  = '<center><div class="btn-group">';
+                    $button .= '<button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Action">';
+                    $button .= '<i class="fa fa-cog"></i></button>';
+                    $button .= '<div class="dropdown-menu dropdown-menu-right">';
+                    $button .= '<button class="dropdown-item aEditAttendance" type="button" attendance-id="' . $attendanceId . '" attendance-details-id="' . $emp->id . '" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalTrainingAttendance" data-keyboard="false">Edit</button>';
+                    $button .= '</div></div></center>';
+
                     return [
-                        'emp_no'   => $emp->emp_no,
-                        'name'     => $emp->name,
-                        'date'     => $currentDate,
-                        'training_hours'     => $duration,
-                        'time_in'     => $attendance->time_in ?? NULL,
-                        'time_out'     => $attendance->time_out ?? NULL,
-                        'status'   => $attendance->status ?? 'ABSENT',
-                        'action'   => $button,
-                        'remarks'   => $attendance->remarks ?? '',
+                        'emp_no'         => $emp->emp_no,
+                        'name'           => $emp->name,
+                        'date'           => $currentDate,
+                        'training_hours' => $duration,
+                        'time_in'        => $attendance->time_in  ?? null,
+                        'time_out'       => $attendance->time_out ?? null,
+                        'status'         => $attendance->status   ?? 'ABSENT',
+                        'action'         => $button,
+                        'remarks'        => $attendance->remarks  ?? '',
                     ];
-                });
-            })->sortBy([
-                ['date', 'desc'],
-            ]);
-            // Calculate the total absent count from the generated rows
-            $absentCount = $allRows->where('status', 'ABSENT')->count();
+                })->filter(); // Remove nulls (endorsed employees excluded for this date)
+            })->sortByDesc('date');
+
+            // 3. Totals
+            $absentCount  = $allRows->where('status', 'ABSENT')->count();
             $presentCount = $allRows->where('status', 'PRESENT')->count();
+
             return datatables()->of($allRows)
-            ->with([
-                'totalAbsent' => $absentCount,
-                'totalPresent' => $presentCount
-            ])
-            ->make(true);
-        } catch (Exception $e) {
+                ->with([
+                    'totalAbsent'  => $absentCount,
+                    'totalPresent' => $presentCount,
+                ])
+                ->make(true);
+
+        } catch (\Exception $e) {
             throw $e;
         }
     }
