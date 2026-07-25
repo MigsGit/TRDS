@@ -236,8 +236,8 @@ class QuestionnairesController extends Controller
             ->where('logdel', 0)
             ->firstOrFail();
 
-        $pdf = Pdf::loadView('theoretical_exam.questionnaire_pdf_1x', [
-        // $pdf = Pdf::loadView('theoretical_exam.questionnaire_pdf', [
+        // $pdf = Pdf::loadView('theoretical_exam.questionnaire_pdf_1x', [
+        $pdf = Pdf::loadView('theoretical_exam.questionnaire_pdf', [
             'questionnaire' => $questionnaire_detail
         ]);
 
@@ -246,7 +246,6 @@ class QuestionnairesController extends Controller
             'questionnaire_' . $questionnaire_detail->id . '.pdf'
         );
     }
-
 
     // ===========================================================================================================================================================
     // ================================================================= Questionnaire Details ===================================================================
