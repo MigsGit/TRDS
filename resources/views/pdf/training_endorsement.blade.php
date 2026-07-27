@@ -173,7 +173,7 @@
         </tr>
         <tr>
             <td class="label">Operations Training Unit endorsement to requestor:</td>
-            <td>{{ $endorsement_to_requestor_date ?? '' }}</td>
+            <td>{{ $date_endorsement_to_requestor ?? '' }}</td>
         </tr>
     </table>
 

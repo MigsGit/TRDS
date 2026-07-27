@@ -702,6 +702,10 @@ class TrainingEndorsementController extends Controller
             'created_by_user_details',
             'created_by_user_details.employee_info',
             'training_request_details',
+            'training_request_details.training_request_details',
+            'training_request_details.training_request_details.training_attendance' => function($query) use ($tr_ctrl_no) {
+                $query->whereNull('deleted_at');
+            },
             'hr_memo_details',
             'te_approval_details',
             'te_approval_details.approver_details',
@@ -728,6 +732,14 @@ class TrainingEndorsementController extends Controller
         ])
         ->where('id', $request->id)
         ->first();
+
+        $collectEndorsementToRequestorDate = collect($data->training_request_details->training_request_details ?? [])
+        ->flatMap(function ($detail) {
+            return $detail->training_attendance;
+        })
+        ->max('date');
+
+        $dateEndorsementToRequestor = $collectEndorsementToRequestorDate ? Carbon::parse($collectEndorsementToRequestorDate)->format('F d, Y') : null;
 
         if (!$data) {
             abort(404, 'Endorsement not found.');
@@ -891,7 +903,6 @@ class TrainingEndorsementController extends Controller
             }
         }
 
-        // return $employees;
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,
@@ -904,6 +915,7 @@ class TrainingEndorsementController extends Controller
             'endorsement_to_requestor_date' => $endorsementDate,
             'employees'                     => $employees,
             'employees_will_not_endorse'    => $employees_will_not_endorse,
+            'date_endorsement_to_requestor'    => $dateEndorsementToRequestor,
         ]);
 
         $pdf->setPaper('A4', 'landscape');
