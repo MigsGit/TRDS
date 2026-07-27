@@ -794,6 +794,7 @@
             let bOpEnggSectionTrainingOrientation = data.b_op_engg_section_training_orientation;
             let cQcCertification = data.c_qc_certification;
             let opApprovers = data.op_approvers;
+            let positionCategory = data.position_category;
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             const approvalStatus = data.appproval_status ?? '';
             populateEditOperEmpTable(data.qc_slip_employees,approvalStatus);
@@ -820,13 +821,17 @@
             getEmployeeDetailsByEmpNoSelect2(paramsGetEmpNo);
 
             // ==== QC Slip
+            // text_section_operator
+            // text_series_operator
+            // text_operator_product_line
+            // text_certification_operator
+            // transfer_flexibility
 
-            form.formSubmitOper.find('#qc_slips_id').val(data.id);
-            form.formSubmitOper.find('#textconno_new_operator').val(data.control_no);
-            $('#text_select_position').val(data.position_category);
-            form.formSubmitOper.find('#text_section_operator').val(data.section)
-            form.formSubmitOper.find('#text_series_operator').val(data.series_name);
-            $('#text_select_position').val(data.position_category).trigger('change');
+            $('#qc_slips_id').val(data.id);
+            $('#textconno_new_operator').val(data.control_no);
+            $('#text_section_operator').val(data.section)
+            $('#text_series_operator').val(data.series_name);
+            $('#text_select_position').val(positionCategory).trigger('change');
             $('#select_section').val(data.section_category).trigger('change');
 
             const arrProductLine = Array.isArray(data.product_line) ? data.product_line : [data.product_line];
@@ -856,6 +861,12 @@
                 6,
                 editSelectionsMap6
             );
+
+            if(positionCategory){
+                
+                $('#modalCreateCQForm').modal();
+                return;
+            }
             // ==== A PROD
             // Safe access: optional chaining prevents "Cannot read properties of undefined" if API shape changes
             const aProdData = response?.approversCollection?.APRODTO?.[0] ?? null;

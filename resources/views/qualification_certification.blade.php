@@ -82,7 +82,9 @@
                                                                 <th>Status</th>
                                                                 <th>Ctrl No. / Doc No.</th>
                                                                 <th>Series Name</th>
-                                                                <th>Approvers</th>
+                                                                <th>Created by</th>
+                                                                <th>Section</th>
+                                                                <th>Position</th>
                                                                 <th>Date Filed</th>
                                                                 <!-- <th>Qualified by</th> -->
                                                                 {{-- <th>Certified by</th> --}}
@@ -158,7 +160,7 @@
                         {{-- GLOBAL INPUTS --}}
                         <hr style="height: 5px; background-color: black; border: none;">
                           <div class="col-md-3 d-none">
-                                    <label for="">QC Slip Id:</label>
+                                <label for="">QC Slip Id:</label>
                                     <input class="form-control" type="text" class="form-control" id="qc_slips_id" name="qc_slips_id" placeholder="Auto Generated" readonly>
                                 </div>
                                 <div class="col-md-3  d-none">
@@ -1646,13 +1648,14 @@
                                         </div>
                                         </div>
                                     </div>
+                                    <div class="col-md-6 nmodify3">
+                                        <label for="">Approved / Confirmed by:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="text_oper_approved_confirmed_by[]" id="text_oper_approved_confirmed_by" multiple>
+                                        </select>
+                                        <label for="" class="mt-1">QC Supervisor</label>
+                                    </div>
                                 </div>
-                                <div class="col-md-6 nmodify3">
-                                    <label for="">Approved / Confirmed by:</label>
-                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oper_approved_confirmed_by[]" id="text_oper_approved_confirmed_by" multiple>
-                                    </select>
-                                    <label for="" class="mt-1">QC Supervisor</label>
-                                </div>
+
                                 <div class="modal-footer justify-content-end">
 
                                     <button type="button" class="btn btn-secondary operSave" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
@@ -1683,6 +1686,7 @@
         form = {
             formSubmitOper: $('#formSubmitOper'),
             formSubmitMh: $('#formSubmit_MH'),
+            formSubmitInspector: $('#formSubmit_Ins'),
         };
         dataTable = {
             operator: '',
@@ -1755,8 +1759,8 @@
                 { "data" : "control_no" },
                 { "data" : "series_name" },
                 { "data" : "created_by" },
-                // { "data" : "certified_by" },
-                // { "data" : "approved_conformed_by" },
+                { "data" : "section_category" },
+                { "data" : "position_category" },
                 { "data" : "created_at" },
             ],
 
@@ -1907,9 +1911,10 @@
             $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
          });
 
-        const saveFormOper = ($form) => {
+        const saveFormOper = ($forms = null) => {
             // 1. Serialize standard form inputs into an array
             // console.log('saveFormOper called',$form[0]);
+            var $form = form.formSubmitOper ?? $forms;
             var formArray = $form.serializeArray();
 
             // 2. Push extra custom field values manually
@@ -1946,11 +1951,33 @@
                 }
             },$form);
         }
-        // $('#formSendEmail').click(function (e) {
-        //     e.preventDefault();
-        //     var $form = $('#formSubmitOper,#formSubmitOper');
-        //     saveFormOper($form);
-        // });
+        $('#formSendEmail').click(function (e) {
+            e.preventDefault();
+            let position = $('#text_select_position').val();
+               switch (position) {
+                case 'MH':
+                    $('#divMH').removeClass('d-none');
+                    break;
+                case 'Technician':
+                    $('#divTechnian').removeClass('d-none');
+                    break;
+                case 'Supervisor':
+                case 'Engineer':
+                case 'Planner':
+                    $('#divSEP').removeClass('d-none');
+                    break;
+                case 'Inspector':
+                    alert('here')
+                     saveInspectorDetails();
+                    break;
+                case 'Operator':
+                    saveFormOper();
+                    break;
+                default:
+                    alert('Unknown position selected. Please select a valid position.');
+                    break;
+            }
+        });
         $(document).on('submit', '#formSubmitOper', function (e) {
             e.preventDefault();
             var $form = $(this);
@@ -1970,21 +1997,26 @@
                         $('#modalSendEmail').modal();
                     }
                 }
-            });  
+            });
         });
-        // #formSubmit_MH, 
-        $(document).on('submit', '#formSubmit_Ins',  function (e) {
-            e.preventDefault(); 
-            var $form = $(this);
+        const saveInspectorDetails = ($forms = null) => {
             // 1. Serialize standard form inputs into an array
-            // console.log('saveFormOper called',$form[0]);
+            var $form = form.formSubmitInspector ?? $forms;
             var formArray = $form.serializeArray();
 
             // 2. Push extra custom field values manually
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
             formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
-            formArray.push({ name: 'text_select_section', value: $('#select_section').val() });
+            formArray.push({ name: 'select_section', value: $('#select_section').val() });
+            formArray.push({ name: 'text_select_section', value: $('#text_select_section').val() });
+//Insert to Operator
+            formArray.push({ name: 'qc_slips_id', value: $('#qc_slips_id').val() });
+            formArray.push({ name: 'text_section_operator', value: $('#text_section_operator').val() });
+            formArray.push({ name: 'text_series_operator', value: $('#text_series_operator').val() });
+            formArray.push({ name: 'text_operator_product_line', value: $('#text_operator_product_line').val() });
+            formArray.push({ name: 'text_certification_operator', value: $('#text_certification_operator').val() });
+            formArray.push({ name: 'transfer_flexibility', value: $('#transfer_flexibility').val() });
 
             // 3. Process the array into a clean key-value object map
             var data = {};
@@ -2012,9 +2044,14 @@
                     // $form[0].reset();
                 }
             },$form);
-            
+        }
+        // #formSubmit_MH,
+        $(document).on('submit', '#formSubmit_Ins',  function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            $('#modalSendEmail').modal();
         });
-       
+
         const selectOperatorValidation = () => {
             $('#div_Oper').removeClass('d-none');
             form.formSubmitOper[0].reset();
@@ -2031,7 +2068,7 @@
             initDropdownMasterDetailsByFkidCombos([
                     '#text_training_orientation_es_oper',
             ],5);
-            
+
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
             $('.operSave').removeClass('d-none');
@@ -2039,20 +2076,20 @@
         }
         const selectInspectorValidation = () => {
             $('#divInspector').removeClass('d-none');
-            
+
             form.formSubmitMh[0].reset();
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
             ],1);
-            
+
             initDropdownMasterDetailsByFkidCombos([
                     '#text_training_orientation_ps_oper',
             ],4);
             initDropdownMasterDetailsByFkidCombos([
                     '#text_training_orientation_es_oper',
             ],5);
-            
+
             form.formSubmitMh.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
             $('.operSave').removeClass('d-none');
@@ -2156,6 +2193,15 @@
             '#text_validated2_qcvvo_oper',
             //APPROVED BY
             '#text_oper_approved_confirmed_by',
+            //Inspector
+            '#text_certified_inspector',
+            '#text_mentored',
+            '#text_sec2_certified_inspector',
+            '#text_vpqcs_validated1_inspector',
+            '#text_vpqcs_validated2_inspector',
+            '#text_sec3_approved_inspector',
+            '#text_alert_qctq_sec_insp',
+            '#text_alert_qctq_cc_sec_insp',
 
         ]);
         // initSelectPassFail([

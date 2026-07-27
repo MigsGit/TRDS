@@ -581,16 +581,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="ms-3" for="">Trained and Qualified by:</label>
-                            <input class="form-control" type="text" id="text_certified_inspector" name="text_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
-                            <datalist id="list_display_empno"></datalist>
-
-                            <input type="hidden" id="text_certified_inspector_username" name="text_certified_inspector_username">
-                            <input type="hidden" id="text_certified_inspector_email" name="text_certified_inspector_email">
+                            <select class="form-control select2bs4" style="width: 100%;" id="text_certified_inspector" name="text_certified_inspector"></select>
                         </div>
                         <div class="col-md-6">
                             <label class="ms-3" for="">Mentored by:</label>
-                            <input class="form-control" type="text" id="text_mentored" name="text_mentored" list="list_display_empno" placeholder="Select Mentored by">
-                            <datalist id="list_display_empno"></datalist>
+                            <select class="form-control select2bs4" style="width: 100%;" id="text_mentored" name="text_mentored"></select>
                         </div>
                     </div>
 
@@ -630,29 +625,13 @@
                         <!-- QCTQ Section: To -->
                         <div class="col-md-3">
                             <label for="text_alert_qctq_sec_insp">Send Email Alert to:</label>
-                            <div id="selectedQctqAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                            <input class="form-control" type="text"
-                                    id="text_alert_qctq_sec_insp"
-                                    name="text_alert_qctq_sec_insp"
-                                    list="list_display_empno"
-                                    placeholder="Send email to">
-                            <datalist id="list_display_empno"></datalist>
-                            <input type="hidden" id="text_alert_qctq_sec_insp_username" name="text_alert_qctq_sec_insp_username">
-                            <input type="hidden" id="text_alert_qctq_sec_insp_email" name="text_alert_qctq_sec_insp_email">
+                            <select class="form-control select2bs4" style="width: 100%;" id="text_alert_qctq_sec_insp" name="text_alert_qctq_sec_insp"></select>
                         </div>
 
                         <!-- QCTQ Section: CC -->
                         <div class="col-md-3">
                             <label for="text_alert_qctq_cc_sec_insp">Add cc:</label>
-                            <div id="selectedQctqAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                            <input class="form-control" type="text"
-                                    id="text_alert_qctq_cc_sec_insp"
-                                    name="text_alert_qctq_cc_sec_insp"
-                                    list="list_display_empno"
-                                    placeholder="Cc">
-                            <datalist id="list_display_empno"></datalist>
-                            <input type="hidden" id="text_alert_qctq_cc_sec_insp_username" name="text_alert_qctq_cc_sec_insp_username">
-                            <input type="hidden" id="text_alert_qctq_cc_sec_insp_email" name="text_alert_qctq_cc_sec_insp_email">
+                            <select class="form-control select2bs4" style="width: 100%;" id="text_alert_qctq_cc_sec_insp" name="text_alert_qctq_cc_sec_insp"></select>
                         </div>
                     </div>
 
@@ -858,11 +837,7 @@
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <label for="">Certified by:</label>
-                                <input class="form-control" type="text" id="text_sec2_certified_inspector" name="text_sec2_certified_inspector" list="list_display_empno" placeholder="Select Certified by">
-                                <datalist id="list_display_empno"></datalist>
-
-                                <input type="hidden" id="text_sec2_certified_inspector_username" name="text_sec2_certified_inspector_username">
-                                <input type="hidden" id="text_sec2_certified_inspector_email" name="text_sec2_certified_inspector_email">
+                                <select class="form-control select2bs4" style="width: 100%;" id="text_sec2_certified_inspector" name="text_sec2_certified_inspector"></select>
                             </div>
                         </div>
 
@@ -968,20 +943,12 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="ms-3" for="">Validated by:</label>
-                            <input class="form-control" type="text" id="text_vpqcs_validated1_inspector" name="text_vpqcs_validated1_inspector" list="list_display_empno" placeholder="Select Validated by">
-                            <datalist id="list_display_empno"></datalist>
-
-                            <input type="hidden" id="text_vpqcs_validated1_inspector_username" name="text_vpqcs_validated1_inspector_username">
-                            <input type="hidden" id="text_vpqcs_validated1_inspector_email" name="text_vpqcs_validated1_inspector_email">
+                            <select class="form-control select2bs4" style="width: 100%;" id="text_vpqcs_validated1_inspector" name="text_vpqcs_validated1_inspector"></select>
                         </div>
 
                         <div class="col-md-6">
                             <label class="ms-3" for="">Validated by: <span style="font-size: 0.9em;">(after re-orientation)</span></label>
-                            <input class="form-control" type="text" id="text_vpqcs_validated2_inspector" name="text_vpqcs_validated2_inspector" list="list_display_empno" placeholder="Select Certified by">
-                            <datalist id="list_display_empno"></datalist>
-
-                            <input type="hidden" id="text_vpqcs_validated2_inspector_username" name="text_vpqcs_validated2_inspector_username">
-                            <input type="hidden" id="text_vpqcs_validated2_inspector_email" name="text_vpqcs_validated2_inspector_email">
+                            <select class="form-control select2bs4" style="width: 100%;" id="text_vpqcs_validated2_inspector" name="text_vpqcs_validated2_inspector"></select>
                         </div>
                     </div>
 
@@ -1027,11 +994,7 @@
         <div class="row mb-5">
             <div class="col-md-6">
                 <label for="">Approved by:</label>
-                <input class="form-control" type="text" id="text_sec3_approved_inspector" name="text_sec3_approved_inspector" list="list_display_empno" placeholder="Select Approved by">
-                <datalist id="list_display_empno"></datalist>
-
-                <input type="hidden" id="text_sec3_approved_inspector_userame" name="text_sec3_approved_inspector_userame">
-                <input type="hidden" id="text_sec3_approved_inspector_email" name="text_sec3_approved_inspector_email">
+                <select class="form-control select2bs4" style="width: 100%;" id="text_sec3_approved_inspector" name="text_sec3_approved_inspector"></select>
             </div>
             <div class="col-md-6"></div>
         </div>
