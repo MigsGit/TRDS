@@ -891,7 +891,7 @@ class TrainingEndorsementController extends Controller
             }
         }
 
-        return $employees;
+        // return $employees;
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,
