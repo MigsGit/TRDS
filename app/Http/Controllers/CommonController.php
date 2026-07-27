@@ -15,6 +15,23 @@ class CommonController extends Controller
     public function getApprovalStatus($approvalStatus){
         try {
              switch ($approvalStatus) {
+                //INSPECTOR
+                case 'ALQCTQ':
+                    $newStatus = 'ALQCTQ';
+                    $statusName = 'A LINE QUALITY CONTROL SECTION (Training and Qualification)';
+                    $spanColor = 'bg-danger';
+                    break;
+                case 'BLQCTC':
+                    $newStatus = 'BLQCTC';
+                    $statusName = 'B LINE QUALITY CONTROL SECTION (Certification)';
+                    $spanColor = 'bg-danger';
+                    break;
+                case 'CLQCOQC':
+                    $newStatus = 'CLQCOQC';
+                    $statusName = 'C VALIDATION PROCESS: QUALITY CONTROL SECTION <> OQC only';
+                    $spanColor = 'bg-danger';
+                    break;
+                //OPERATOR
                 case 'PB':
                     $approvalStatus = 'APRODTO';
                     $statusName = 'PREPARED BY';

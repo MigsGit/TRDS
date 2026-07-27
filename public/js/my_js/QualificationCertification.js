@@ -559,8 +559,9 @@
     const populateEditOperEmpTable = (qcSlipEmployees,approvalStatus) => { //nmodify
         // 1. Clear the main table to prevent old leftovers
         const $mainTableBody = $('#tbl_certified_list_operator tbody');
-        $mainTableBody.empty();
+        console.log($mainTableBody);
 
+        $mainTableBody.empty();
         // 2. Loop through your incoming collection using jQuery $.each
         $.each(qcSlipEmployees, function(index, emp) {
             // Match your application's data-attribute structure
@@ -863,7 +864,7 @@
             );
 
             if(positionCategory){
-                
+
                 $('#modalCreateCQForm').modal();
                 return;
             }

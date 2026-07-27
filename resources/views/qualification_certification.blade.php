@@ -1655,7 +1655,6 @@
                                         <label for="" class="mt-1">QC Supervisor</label>
                                     </div>
                                 </div>
-
                                 <div class="modal-footer justify-content-end">
 
                                     <button type="button" class="btn btn-secondary operSave" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
@@ -1967,8 +1966,7 @@
                     $('#divSEP').removeClass('d-none');
                     break;
                 case 'Inspector':
-                    alert('here')
-                     saveInspectorDetails();
+                    saveInspectorDetails();
                     break;
                 case 'Operator':
                     saveFormOper();
