@@ -31,6 +31,11 @@ class CommonController extends Controller
                     $statusName = 'C VALIDATION PROCESS: QUALITY CONTROL SECTION <> OQC only';
                     $spanColor = 'bg-danger';
                     break;
+                case 'LQCHEADAPP':
+                    $newStatus = 'LQCHEADAPP';
+                    $statusName = 'LQC HEAD APPROVAL';
+                    $spanColor = 'bg-danger';
+                    break;
                 //OPERATOR
                 case 'PB':
                     $approvalStatus = 'APRODTO';
@@ -88,8 +93,8 @@ class CommonController extends Controller
                     $statusName = 'F Qc Validation Visual Operator';
                     $spanColor = 'bg-danger';
                     break;
-                case 'QCAPP':
-                    $approvalStatus = 'QCAPP'; //QC Supervisor Appoval
+                case 'OPERQCAPP':
+                    $approvalStatus = 'OPERQCAPP'; //QC Supervisor Appoval
                     $statusName = 'QC Supervisor Approval';
                     $spanColor = 'bg-danger';
                     break;

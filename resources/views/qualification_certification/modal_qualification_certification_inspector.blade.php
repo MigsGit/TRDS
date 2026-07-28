@@ -889,24 +889,21 @@
 
                     <div class="row">
                         <div class="col-md-6">
+                            {{-- nmodify6 --}}
+
                             <div class="form-check ms-5">
                                 <input class="form-check-input" type="checkbox" id="text_ref_docno_inspector" name="text_ref_docno_inspector[]" value="Work Instruction Document" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
                                 <label class="fs-5  " for="text_ref_docno_inspector" style="font-weight: normal;">1. Work Instruction Document</label>
                             </div>
                         </div>
 
-                        <div class="col-md-1">
-                            <div class="form-check ms-5">
-                                <input class="form-check-input" type="checkbox" id="text_ins_seq_ins_yes" name="text_ins_seq_inspector" value="Yes" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                <label class="fs-5  " for="text_ins_seq_ins_yes" style="font-weight: normal;">Yes</label>
-                            </div>
-                        </div>
 
-                        <div class="col-md-2">
-                            <div class="form-check ms-5">
-                                <input class="form-check-input" type="checkbox" id="text_ins_seq_ins_no" name="text_ins_seq_inspector" value="No" style="width: 1.2rem; height: 1.2rem; border: 2px solid black; accent-color: #007bff;">
-                                <label class="fs-5  " for="text_ins_seq_ins_no" style="font-weight: normal;">No</label>
-                            </div>
+                        <div class="col-md-1">
+                              <select class="form-control select2bs4" style="width: 100%;" name="text_ins_seq_inspector" id="text_ins_seq_inspector">
+                                <option value="" selected disabled>Select Result</option>
+                                <option value="YES">YES</option>
+                                <option value="NO">NO</option>
+                            </select>
                         </div>
                     </div>
 
@@ -1040,8 +1037,8 @@
         </div>
 
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
-            <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
+            <button type="button" class="btn btn-secondary btnSaveInspector" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
+            <button type="submit" class="btn btn-success btnSaveInspector" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>Insp Save</button>
         </div>
 
     </form>

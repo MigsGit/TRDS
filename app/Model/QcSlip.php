@@ -21,7 +21,10 @@ class QcSlip extends Model
     use HasFactory;
 
     protected $fillable = [
-        'status'
+        'status',
+        'status',
+        'approval_status',
+        'appproval_at',
     ];
     // public function product_line()
     // {

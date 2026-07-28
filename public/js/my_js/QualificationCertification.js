@@ -26,11 +26,19 @@
     // ==========================================
 
     const getApprovalStatusToggle = (params) => {
-        let approvalStatus = params.approval_status;
-            $('.btn-link').removeClass('show');
-            $('#collapseOneOper').removeClass('show');
-            $('.operSave').removeClass('d-none');
+        let approvalStatus = params.approvalStatus;
+        let positionCategory = params.positionCategory;
+            $('.operSave').addClass('d-none');
             $('.operApproved').addClass('d-none');
+            $('.btnSaveInspector').addClass('d-none');
+            if(positionCategory === 'Operator'){
+                $('.btn-link').removeClass('show');
+                $('#collapseOneOper').removeClass('show');
+                $('.operSave').removeClass('d-none');
+            }
+            if(positionCategory === 'Inspector'){
+                $('.btnSaveInspector').removeClass('d-none');
+            }
             if(approvalStatus ==='APRODTO'){
                 $('#collapseOneOper').addClass('show');
             }
@@ -53,13 +61,11 @@
             if(approvalStatus ==='FQCVVO'){
                 $('#collapseSevenOper').addClass('show');
 
-            }
-            if(approvalStatus ==='QCAPP'){
-                // $('#operDisapproved').removeClass('d-none');
-                // $('#operApproved').removeClass('d-none');
+            } //LQCHEADAPP
+            if(approvalStatus ==='OPERQCAPP' || approvalStatus ==='LQCHEADAPP'){
+                $('.btnSaveInspector').addClass('d-none');
                 $('.operSave').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
-
             }
             if(approvalStatus ==='OK'){
                 $('#operDisapproved').addClass('d-none');
@@ -68,6 +74,47 @@
                 $('#operSave').addClass('d-none');
             }
     }
+    const togglePositionSectiontest = (position) => {
+            initOperEmpModal();
+            $('#tbl_certified_list_operator tbody').empty();
+            $positionSections.addClass('d-none');
+            // text_operator_product_line
+            // text_series_operator
+            // text_certification_operator
+            // transfer_flexibility
+
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_operator_product_line',
+            ],2);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_certification_operator',
+            ],3);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#transfer_flexibility',
+            ],6);
+            $('.operSave').addClass('d-none');
+            $('.operApproved').addClass('d-none');
+            $('.btnSaveInspector').addClass('d-none');
+            switch (position) {
+                case 'MH':
+                    $('#divMH').removeClass('d-none');
+                    break;
+                case 'Technician':
+                    $('#divTechnian').removeClass('d-none');
+                    break;
+                case 'Supervisor':
+                case 'Engineer':
+                case 'Planner':
+                    $('#divSEP').removeClass('d-none');
+                    break;
+                case 'Inspector':
+                    selectInspectorValidation();
+                    break;
+                case 'Operator':
+                    selectOperatorValidation();
+                    break;
+            }
+        }
     const saveFirstTakeInsSequence = (params) =>{
         let data = {
             qcSlipsId : params.qcSlipsId,
@@ -644,7 +691,7 @@
         const fQcvvoFirst  = approversCollection?.FQCVVO?.[0]?.first_approver_exploded  ?? [];
         const fQcvvoSecond = approversCollection?.FQCVVO?.[0]?.second_approver_exploded ?? [];
 
-        const qCappApprover = approversCollection?.QCAPP?.[0]?.oper_approved_confirmed_by ?? [];
+        const qCappApprover = approversCollection?.OPERQCAPP?.[0]?.oper_approved_confirmed_by ?? [];
 
         // 1. Map them to a standard format Select2 expects: {id, text}
         const mappedOperApprovedConfirmedBy = operApprovedConfirmedBy.map(emp => ({ id: emp.id, text: emp.name }));
@@ -795,7 +842,6 @@
             let bOpEnggSectionTrainingOrientation = data.b_op_engg_section_training_orientation;
             let cQcCertification = data.c_qc_certification;
             let opApprovers = data.op_approvers;
-            let positionCategory = data.position_category;
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             const approvalStatus = data.appproval_status ?? '';
             populateEditOperEmpTable(data.qc_slip_employees,approvalStatus);
@@ -804,16 +850,18 @@
             dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
             dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
             let currentStatus = data.approval_status ??'';
+            let positionCategory = data.position_category ??   '';
 
-            $('#operDisapproved').addClass('d-none');
-            $('#operApproved').addClass('d-none');
-            $('#operClosed').removeClass('d-none');
-            $('#operSave').removeClass('d-none');
+            // $('#operDisapproved').addClass('d-none');
+            // $('#operApproved').addClass('d-none');
+            // $('#operClosed').removeClass('d-none');
+            // $('#operSave').removeClass('d-none');
             $('#approval_status').val(currentStatus);
 
             // ==== Toggle Collapse based on approval status
             getApprovalStatusToggle({
-                approval_status: currentStatus,
+                approvalStatus: currentStatus,
+                positionCategory : positionCategory,
              });
             // ==== Get All Approvers / Validated by/ Mentored by
             let paramsGetEmpNo = {

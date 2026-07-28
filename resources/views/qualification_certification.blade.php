@@ -1658,14 +1658,17 @@
                                 <div class="modal-footer justify-content-end">
 
                                     <button type="button" class="btn btn-secondary operSave" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
-                                    <button type="submit" class="btn btn-success operSave" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Save</button>
+                                    <button type="submit" class="btn btn-success operSave" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Oper Save</button>
 
                                     {{-- <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button> --}}
-                                    <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
+                                    {{-- <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button> --}}
                                 </div>
                             </form>
                             @include('qualification_certification.modal_qualification_certification_mh')
                             @include('qualification_certification.modal_qualification_certification_inspector')
+                            <div class="modal-footer justify-content-end operApproved">
+                                <button type="button" class="btn btn-success" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1712,6 +1715,19 @@
                 }
             });
         }
+        // $('#btnCreateCQForm').click(function (e) { 
+        //     e.preventDefault();
+        //     let operParams = {
+        //         frmId : form.formSubmitOper
+        //     }
+        //     let insParams = {
+        //         frmId : form.formSubmitInspector
+        //     }
+        //     alert('dsad')
+        //     resetFormValues(operParams);
+        //     resetFormValues(insParams);
+        // });
+
         $('#operDisapproved').click(function (e) {
                 let qcSlipsId = $('#qc_slips_id').val();
                 let decision = 'DIS';
@@ -1798,10 +1814,10 @@
                 { "data" : "second_take_ins_assessment_result","name":"second_take_ins_assessment_result", orderable: false, searchable: false  },
             ],
         });
-        $('#operDisapproved').addClass('d-none');
-        $('#operApproved').addClass('d-none');
-        $('#operClosed').removeClass('d-none');
-        $('#operSave').removeClass('d-none');
+        // $('#operDisapproved').addClass('d-none');
+        // $('#operApproved').addClass('d-none');
+        // $('#operClosed').removeClass('d-none');
+        // $('#operSave').removeClass('d-none');
 
         //  Best Practice: Event Delegation with correct object scoping
         $(document).on('click', '.btnRemoveOperEmpMain', function() {
@@ -2051,6 +2067,13 @@
         });
 
         const selectOperatorValidation = () => {
+            let approvalStatus = $('#approval_status').val();
+             if(approvalStatus === 'OPERQCAPP'){
+                $('.operApproved').removeClass('d-none');
+            }else{
+                $('.operSave').removeClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
             $('#div_Oper').removeClass('d-none');
             form.formSubmitOper[0].reset();
             initDropdownMasterDetailsByFkidCombos([
@@ -2069,13 +2092,18 @@
 
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
-            $('.operSave').removeClass('d-none');
-            $('.operApproved').addClass('d-none');
+  
         }
         const selectInspectorValidation = () => {
-            $('#divInspector').removeClass('d-none');
-
-            form.formSubmitMh[0].reset();
+            let approvalStatus = $('#approval_status').val();
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.operApproved').removeClass('d-none');
+            }else{
+                $('.operApproved').addClass('d-none');
+                $('.btnSaveInspector').removeClass('d-none');
+            }
+        $('#divInspector').removeClass('d-none');
+            form.formSubmitInspector[0].reset();
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
@@ -2090,14 +2118,19 @@
 
             form.formSubmitMh.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
-            $('.operSave').removeClass('d-none');
-            $('.operApproved').addClass('d-none');
         }
 
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved');
+        
+        
+        $positionSelect.on('change', function () {
+           togglePositionSection($(this).val());
+        });
 
-        function togglePositionSection(position) {
+      
+
+        const togglePositionSection = (position) => {
             initOperEmpModal();
             $('#tbl_certified_list_operator tbody').empty();
             $positionSections.addClass('d-none');
@@ -2115,6 +2148,9 @@
             initDropdownMasterDetailsByFkidCombos([
                     '#transfer_flexibility',
             ],6);
+            $('.operSave').addClass('d-none');
+            $('.operApproved').addClass('d-none');
+            $('.btnSaveInspector').addClass('d-none');
             switch (position) {
                 case 'MH':
                     $('#divMH').removeClass('d-none');
@@ -2134,13 +2170,11 @@
                     selectOperatorValidation();
                     break;
             }
+            
         }
 
-        $positionSelect.on('change', function () {
-            togglePositionSection($(this).val());
-        });
 
-        togglePositionSection($positionSelect.val());
+        // togglePositionSection($positionSelect.val());
 
         initDivDeptSecCombos([
                 '#text_section_operator',

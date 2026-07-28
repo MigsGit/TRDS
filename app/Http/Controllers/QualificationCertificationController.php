@@ -16,6 +16,8 @@ use App\Http\Requests\MachineOperatorRequest;
 use App\Http\Requests\QcSlipEmployeeRequest;
 use App\Http\Requests\QcSlipRequest;
 use App\Http\Requests\SendEmailRequest;
+use App\Model\BLqcCertification;
+use App\Model\CLqcOqcValidation;
 use App\Model\DropdownMaster;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
@@ -143,11 +145,12 @@ class QualificationCertificationController extends Controller
             $currentPositionCategory = $qcSlipDetails->position_category;
             //OPERATOR PROCESS
             if($currentPositionCategory === 'Inspector'){
-                $qcModelApprover = QcLqcApprover::class;
                 $currentApprovalStatus= 'ALQCTQ'; //LINE QUALITY CONTROL SECTION (Training and Qualification)
+                $qcModelApprover = QcLqcApprover::class;
                 $operToApprovers = [];
                 if(filled($qcSlipId)){ //UPDATE {
                     // return 'true';
+                    $currentApprovalStatus = $qcSlipDetails->approval_status;
                     if($qcSlipDetails->approval_status === 'ALQCTQ'){
                         $qcSlipDetails->update([
                             'status' => 'FORAPP'
@@ -175,37 +178,40 @@ class QualificationCertificationController extends Controller
                     }
                     if($qcSlipDetails->approval_status === 'BLQCTC'){
                         $bLqcCertification = [
+                            'qc_slips_id' => $qcSlipId,
                             'result_input1_inspector' => $this->getSafe($request, 'text_result_input1_inspector'),
                             'hands_on_inspector' => $this->joinSafe($request, 'text_hands_on_inspector'),
                             'hands_on_ins_3' => $this->getSafe($request, 'text_hands_on_ins_3'),
                         ];
+                        BLqcCertification::insert($bLqcCertification);
                         $operToApprovers = [
-                            // Sec 2 – Theoretical Exam
+                            'decision_status'   => 'APP',
+                            'first_approver'   => $this->joinSafe($request, 'text_sec2_certified_inspector'),
+                            'first_date'       => $this->getSafe($request, 'text_sec2_date_inspector'),
+                            'first_time'       => $this->getSafe($request, 'text_sec2_time_inspector'),
                             'first_status'      => $this->getSafe($request, 'text_sel_result1_inspector'),
                             'first_remarks'     => $this->getSafe($request, 'text_result_input1_inspector'),
                             'first_status_2'    => $this->getSafe($request, 'text_sel_result2_inspector'),
+                            
                             'second_remarks'    => $this->getSafe($request, 'text_result_input2_inspector'),
-                            // Sec 2 – Hands-on / Certification
                             'second_status'     => $this->getSafe($request, 'text_sec2_result_inspector'),
-                            'second_approver'   => $this->joinSafe($request, 'text_sec2_certified_inspector'),
-                            'second_date'       => $this->getSafe($request, 'text_sec2_date_inspector'),
-                            'second_time'       => $this->getSafe($request, 'text_sec2_time_inspector'),
                         ];
                     }
                     if($qcSlipDetails->approval_status === 'CLQCOQC'){
                         $cLqcOnly = [
-                            'text_ref_docno_input_inspector' => $this->getSafe($request, 'ref_docno_input_inspector'),
-                            'hands_on_inspector' => $this->joinSafe($request, 'hands_on_inspector'),
+                            'qc_slips_id' => $qcSlipId,
+                            'ref_docno_input_inspector' => $this->getSafe($request, 'text_ref_docno_input_inspector'),
+                            'ins_seq_inspector' => $this->joinSafe($request, 'text_ins_seq_inspector'),
                         ];
+                        CLqcOqcValidation::insert($cLqcOnly);
                         $operToApprovers = [
-                            // // Sec 3 – VPQCS
+                            'decision_status'   => 'APP',
                             'first_status'   => $this->getSafe($request, 'text_vpqcs_result1_inspector'),
                             'first_approver'  => $this->joinSafe($request, 'text_vpqcs_validated1_inspector'),
                             'first_date'      => $this->getSafe($request, 'text_vpqcs_date1_inspector'),
                             'second_approver' => $this->joinSafe($request, 'text_vpqcs_validated2_inspector'),
                             'second_date'     => $this->getSafe($request, 'text_vpqcs_date2_inspector'),
                         ];  
-                        // 'second_approver_2' => $this->joinSafe($request, 'text_sec3_approved_inspector'),
                     }
                 }
             }
@@ -463,8 +469,6 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-
-
     public function saveOperApprovers($params){
         try {
             OpApprover::insert($params);
@@ -482,7 +486,7 @@ class QualificationCertificationController extends Controller
             DB::beginTransaction();
             // return $params;
             $rapidxEmpNo =  session('global_user');
-            $qcModelApprover = $params['qcModelApprover'];
+            $qcModelApprover = $params['qcModelApprover'] ?? '';
             // $from =$currentSession['email'] ?? '';
             // $from_name = $currentSession['fullName'];
             $emailParams = [
@@ -490,7 +494,8 @@ class QualificationCertificationController extends Controller
             ];
             $to = '';
             $cc = '';
-            if($params['approval_status'] === 'QCAPP'){
+            //FINAL APPROVAL
+            if($params['approval_status'] === 'OK'){
                 $qcSlip = QcSlip::
                 where('id' , $params['qc_slips_id'])
                 ->whereNull('deleted_at')
@@ -572,28 +577,39 @@ class QualificationCertificationController extends Controller
             DB::beginTransaction();
             $qcSlip = QcSlip::
             where('id',$request->qcSlipsId)
-            ->whereNull('deleted_at')
-            // ->get();
-            ->update([
+            ->whereNull('deleted_at')->first();
+            
+            $qcSlip->update([
                 'status' => $request->decision,
                 'approval_status' => $request->decision,
                 'appproval_at' => now()
             ]);
-             $operToApprovers = [
+            
+            if($qcSlip->position_category === 'Operator'){
+                $qcModel = OpApprover::class;
+            }
+            if($qcSlip->position_category === 'Inspector'){
+                $qcModel = QcLqcApprover::class;
+            }
+           $operToApprovers = [
                 "decision_status"  => 'APP',
-             ];
-            $opApprover =  OpApprover::where('qc_slips_id',$request->qcSlipsId)->where('decision_status','PEN')
-            // ->get();
+            ];
+              
+            $opApprover = $qcModel::where('qc_slips_id',$request->qcSlipsId)->where('decision_status','PEN')
             ->update($operToApprovers);
+           
             //TODO: Email to Created By if Approved
 
+            $approvalStatus = $qcSlip->approval_status;
+            
             $emailParams = [
                 'qc_slips_id' => $request->qcSlipsId,
                 'update_data'=> [],
-                'approval_status'=> 'QCAPP',
+                'approval_status'=> $approvalStatus,
             ];
-            DB::commit();
-            $this->saveFormSendEmail($emailParams);
+     
+            // DB::commit();
+            return $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -1219,8 +1235,8 @@ class QualificationCertificationController extends Controller
                     $statusName = 'C VALIDATION PROCESS: QUALITY CONTROL SECTION <> OQC only';
                     break;
                 case ($params['approval_status'] === 'CLQCOQC'):
-                    $newStatus = 'DLQCAPP';
-                    $statusName = 'For QC Head Approval';
+                    $newStatus = 'LQCHEADAPP';
+                    $statusName = 'For LQC Head Approval';
                     break;
                 default:
                     $newStatus = 'N/A';
@@ -1288,7 +1304,7 @@ class QualificationCertificationController extends Controller
                     break;
 
                 case ($params['approval_status'] === 'FQCVVO'):
-                    $newStatus = 'QCAPP'; // QC Supervisor Approval
+                    $newStatus = 'OPERQCAPP'; // QC Supervisor Approval
                     $statusName = 'CLOSED';
                     break;
 
