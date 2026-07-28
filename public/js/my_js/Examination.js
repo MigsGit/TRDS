@@ -278,7 +278,7 @@ const LinkForIdAndRevision = (linkIdRevision) => {
                     revision: getQuestionnaireDetails.revision,
                     category: getQuestionnaireDetails.category || '',
                     exam_title: getQuestionnaireDetails.exam_title || '',
-                    exam_description: getQuestionnaireDetails.description || '',
+                    description: getQuestionnaireDetails.description || '',
                     exam_instruction: getQuestionnaireDetails.exam_instruction || '',
                     purpose: getQuestionnaireDetails.purpose || '',
                     department: getQuestionnaireDetails.department || '',
