@@ -87,7 +87,7 @@ class QualificationCertificationController extends Controller
             ];
             $to = '';
             $cc = '';
-            if($params['approval_status'] === 'QCAPP'){
+            if($params['approval_status'] === 'OK'){
                 $qcSlip = QcSlip::
                 where('id' , $params['qc_slips_id'])
                 ->whereNull('deleted_at')
@@ -150,7 +150,7 @@ class QualificationCertificationController extends Controller
             // $from_name = 'issinfoservice@pricon.ph';
             $message = $this->commonController->emailMsg($emailParams);
             $rapidxEmpNo =  session('global_user');
-           return $emailData = [
+            $emailData = [
                 "to" =>$to,
                 // "to" =>"mrronquez@pricon.ph",
                 "cc" =>$cc,

@@ -215,11 +215,11 @@ class TrainingAttendanceController extends Controller
     ->get();
 
 
-// 2. Build the date range
-$period = CarbonPeriod::create($startDate, $endDate);
+    // 2. Build the date range
+    $period = CarbonPeriod::create($startDate, $endDate);
 
-// 3. Map over each date in the period x each employee
-$allRows = collect($period)->flatMap(function ($date) use ($employees) {
+    // 3. Map over each date in the period x each employee
+    $allRows = collect($period)->flatMap(function ($date) use ($employees) {
     $currentDate = $date->toDateString();
 
     return $employees->map(function ($emp) use ($currentDate) {
