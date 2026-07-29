@@ -306,6 +306,69 @@ class UserController extends Controller
 
         return response()->json(['userCollection' => $userCollection]);
     }
+    public function getSystemOneEmployeeDetails(Request $request){ //nmodify
+
+        $search = $request->input('search');
+    $page = $request->input('page', 1);
+    $perPage = 20; // Load 20 results at a time
+
+    if (empty($search)) {
+        return response()->json(['results' => [], 'pagination' => ['more' => false]]);
+    }
+
+    // 1. Query the regular HRIS connection
+    $hrisQuery = DB::connection('mysql_systemone')
+        ->table('vw_employeeinfo')
+        ->where('EmpNo', 'LIKE', "%{$search}%")
+        ->orWhere('EmpName', 'LIKE', "%{$search}%")
+        ->select('EmpNo as id', DB::raw("CONCAT(EmpNo, ' - ', EmpName) as text"));
+
+    // 2. Query the Subcontractor connection
+    $subconQuery = DB::connection('mysql_subcon')
+        ->table('vw_employeeinfo')
+        ->where('EmpNo', 'LIKE', "%{$search}%")
+        ->orWhere('EmpName', 'LIKE', "%{$search}%")
+        ->select('EmpNo as id', DB::raw("CONCAT(EmpNo, ' - ', EmpName) as text"));
+
+    // 3. Combine them in memory safely using get() 
+    // (Fast because 'LIKE' filter narrows 20k down to just a few matches)
+    $hrisResults = $hrisQuery->get();
+    $subconResults = $subconQuery->get();
+
+    $mergedResults = $hrisResults->concat($subconResults)->unique('id');
+
+    // 4. Manually slice the results for pagination based on the requested page
+    $totalCount = $mergedResults->count();
+    $offset = ($page - 1) * $perPage;
+    
+    // Slice only the 20 items needed for the current scroll page
+    $paginatedResults = $mergedResults->slice($offset, $perPage)->values();
+
+    // 5. Check if there are more items left to stream to Select2
+    $morePages = ($offset + $perPage) < $totalCount;
+
+    return response()->json([
+        'results'    => $paginatedResults,
+        'pagination' => [
+            'more' => $morePages
+        ]
+    ]);
+
+        // // 1. Fetch data from both connections (returns plain arrays)
+        // $hrisData = DB::connection('mysql_systemone')
+        //     ->select("SELECT EmpNo, EmpName, Department, Division, Section FROM vw_employeeinfo");
+
+        // $subconData = DB::connection('mysql_subcon')
+        //     ->select("SELECT EmpNo, EmpName, Department, Division, Section FROM vw_employeeinfo");
+
+        // // 2. Convert to collections and merge them completely
+        // $mergedCollection = collect($hrisData)->concat($subconData);
+
+        // // 3. (Optional) If you want to ensure there are no duplicate EmpNo's between lists
+        // $finalData = $mergedCollection->unique('EmpNo')->values();
+
+        // return response()->json(['userCollection' => $finalData]);
+    }
 
     // Get User By Batch
     public function get_user_by_batch(Request $request){
