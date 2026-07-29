@@ -15,12 +15,14 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithDrawings;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
 {
     private $styles = [];
-
-    public function __construct(){
+    protected $processStationDetails;
+    
+    public function __construct($processStationDetails, $group){
         $this->styles = [
             'yellowFill'      => $this->getFillBuilder('FFFF00'),
             'lightYellowFill' => $this->getFillBuilder('FFFFCC'),
@@ -58,13 +60,18 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
                 ],
             ]
         ];
+
+        $this->processStationDetails = $processStationDetails;
+        $this->sectionGroup = $group;
+        // dd($this->sectionGroup);
     }
 
     /**
     * @return \Illuminate\Support\Collection
     */
     public function collection(){
-        return collect();
+        // dd($this->processStationDetails);
+        return $this->processStationDetails;
     }
 
     public function startCell(): string{
@@ -99,7 +106,363 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
         $sheet->getStyle($range)->applyFromArray($applied_style);
     }
 
-    private function generateHeader($sheet,$titleRow1,$titleRow2,$titleRow3,$totalRow1,$totalRow2,$totalRow3,$totalRow4,$legendRow1,$legendRow2,$legendRow3,$legendRow4,$legendRow5){
+    private function generateSkillCategory($sheet, $currentColumn, $category, $lastEmployeeRow){
+        $totalColumns = 0;
+
+        $totalProductLines = array_sum(
+            array_map(function ($process) {
+                $count = count($process['product_lines']);
+                return $count > 0 ? $count : 1;
+            }, $category['processes'])
+        );
+
+        $totalColumns += $totalProductLines;
+
+        $endColumn = $currentColumn + $totalColumns - 1;
+
+        //SKILL CATEGORY
+        $sheet->mergeCells(Coordinate::stringFromColumnIndex($currentColumn) . '3:'. Coordinate::stringFromColumnIndex($endColumn) . '3');
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '3', $category['name']);
+
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($currentColumn) .'3:'. Coordinate::stringFromColumnIndex($endColumn) .'3', [ 'yellowFill', ]);
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($currentColumn) .'3:'. Coordinate::stringFromColumnIndex($endColumn) .'5', [ 'borderThin', ]);
+        $this->applyStyles($sheet, "A6:".Coordinate::stringFromColumnIndex($endColumn).$lastEmployeeRow, ['borderThin', 'alignCenter']); //borders for skill category data
+
+        $header2ColorFillIndex = 0;
+        $header3ColorFillIndex = 0;
+
+        $header2ColorFill = ['grayFill','orangeFill','greenFill','blueFill','blueFill'];
+        $header3ColorFill = ['lightGrayFill','lightOrangeFill','lightGreenFill'];
+
+        foreach ($category['processes'] as $process_per_cat){
+
+            $count = count($process_per_cat['product_lines']);
+
+            // No product lines
+            if ($count === 0) {
+                $column = Coordinate::stringFromColumnIndex($currentColumn);
+
+                $sheet->mergeCells($column . '4:' . $column . '5');
+                $sheet->setCellValue($column . '4', $process_per_cat['name']);
+
+                if($category['name'] == 'PROCESS / SYSTEM SKILLS'){
+                    $this->applyStyles($sheet, $column.'4', [$header2ColorFill[$header2ColorFillIndex], ]);
+                }
+
+                $currentColumn++;
+                continue;
+            }
+            
+            // Has product lines
+            $start = $currentColumn;
+            $end = $currentColumn + $count - 1;
+
+            //FILL PROCESSES
+            $sheet->mergeCells(Coordinate::stringFromColumnIndex($start) . '4:' . Coordinate::stringFromColumnIndex($end) . '4');
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($start) . '4', $process_per_cat['name']);
+            
+            if($category['name'] == 'PROCESS / SYSTEM SKILLS'){
+                $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($start).'4:'.Coordinate::stringFromColumnIndex($end).'4', [$header2ColorFill[$header2ColorFillIndex], ]);
+            }
+
+            // $this->applyStyles($sheet, 'A1:A2', [ 'fontSmallBold', ]);
+
+            //FILL PRODUCT LINES (sub column of process stations)
+            foreach ($process_per_cat['product_lines'] as $productLine) {
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '5', $productLine);
+
+                if($category['name'] == 'PROCESS / SYSTEM SKILLS'){
+                    $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($currentColumn).'5', [ $header3ColorFill[$header3ColorFillIndex], 'fontSmall', 'alignCenter' ]);
+                }
+                
+                $currentColumn++;
+            }
+            
+            $header2ColorFillIndex++;
+            $header3ColorFillIndex++;
+        }
+
+        return $currentColumn;
+    }
+
+    private function generateSkillLegend($sheet, $currentColumn, $lastEmployeeRow){
+        //FILL SKILL LEGEND
+        $headerStartColumn = $currentColumn;
+        $headerEndColumn = $headerStartColumn + 3;
+        // $header2StartColumn = $currentColumn;
+
+        // Header Row 1
+        $sheet->mergeCells(Coordinate::stringFromColumnIndex($headerStartColumn) .'3:'.Coordinate::stringFromColumnIndex($headerEndColumn) .'4');
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($headerStartColumn) . '3', 'Total number of skills of QC Inspectors (in terms of skill legend)');
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($headerStartColumn) .'3:'.Coordinate::stringFromColumnIndex($headerEndColumn) .'4', [ 'yellowFill', ]);
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($headerStartColumn) .'5:'.Coordinate::stringFromColumnIndex($headerEndColumn) .'5', [ 'lightYellowFill', ]);
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($headerStartColumn) .'3:'.Coordinate::stringFromColumnIndex($headerEndColumn) .'5', [ 'borderThin',]);
+
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($headerStartColumn).'6:'.Coordinate::stringFromColumnIndex($headerEndColumn).$lastEmployeeRow, ['borderThin', 'alignCenter']); //borders for skill category data
+
+        // Header Row 2
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '5', '1');
+        
+        $currentColumn++;
+
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '5', '2');
+        $currentColumn++;
+
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '5', '3');
+        $currentColumn++;
+
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '5', '4');
+        $currentColumn++;
+
+        // $column = Coordinate::stringFromColumnIndex($currentColumn);
+        
+        $totalSkillsQcColumns = [
+            'AB','AC','AD','AE',
+            // 'AQ','AR','AS','AT'
+        ];
+
+        for ($i = 1; $i <= 4; $i++) {
+            $column = Coordinate::stringFromColumnIndex($currentColumn);
+            // Header Row 2
+            $sheet->setCellValue(($column + $i) . '5', '1');
+
+            
+            $currentColumn++;
+            
+            $sheet->setCellValue("{$column}{$row}", "=COUNTIF(H{$row}:Z{$row},\"{$count}\")");
+
+            $count++;
+
+            if ($count > 4) {
+                $count = 1;
+            }
+        }
+
+        return $currentColumn;
+    }
+    
+    private function generateOtherProcessSkills($sheet, $currentColumn, $sectionGroup, $lastEmployeeRow){
+        //STATIC SECTIONS
+        $sections = [
+            'TS', 
+            'CN',
+            'PPD',
+            'YF'
+        ];
+
+        //FILL OTHER PROCESS SKILLS
+        $header1StartColumn = $currentColumn;
+        $header1EndColumn = $header1StartColumn + 8;
+        $header2StartColumn1 = $currentColumn;
+        $header2EndColumn1 = $header2StartColumn1 + 2;
+        $header2StartColumn2 = $header2EndColumn1 + 1;
+        $header2EndColumn2 = $header2StartColumn2 + 2;
+        $header2StartColumn3 = $header2EndColumn2 + 1;
+        $header2EndColumn3 = $header2StartColumn3 + 2;
+
+        // Header Row 1
+        $sheet->mergeCells(Coordinate::stringFromColumnIndex($header1StartColumn) .'3:'.Coordinate::stringFromColumnIndex($header1EndColumn) .'3');
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($header1StartColumn) . '3', 'OTHER PROCESS / SYSTEM SKILLS');
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($header1StartColumn) .'3:'.Coordinate::stringFromColumnIndex($header1EndColumn) .'3', [ 'yellowFill', ]);
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($header1StartColumn) .'3:'.Coordinate::stringFromColumnIndex($header1EndColumn) .'5', [ 'borderThin', ]);
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($header1StartColumn).'6:'.Coordinate::stringFromColumnIndex($header1EndColumn).$lastEmployeeRow, ['borderThin', 'alignCenter']); //borders for skill category data
+
+        // Header Row 2
+        $sheet->mergeCells(Coordinate::stringFromColumnIndex($header2StartColumn1) .'4:'.Coordinate::stringFromColumnIndex($header2EndColumn1) .'4');
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($header2StartColumn1) . '4', 'IQC');
+
+        $sheet->mergeCells(Coordinate::stringFromColumnIndex($header2StartColumn2) .'4:'.Coordinate::stringFromColumnIndex($header2EndColumn2) .'4');
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($header2StartColumn2) . '4', 'IPQC');
+
+        $sheet->mergeCells(Coordinate::stringFromColumnIndex($header2StartColumn3) .'4:'.Coordinate::stringFromColumnIndex($header2EndColumn3) .'4');
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($header2StartColumn3) . '4', 'OQC');
+
+        // Header Row 3
+        for ($i = 0; $i < 3; $i++) { 
+            foreach ($sections as $section) {
+                if ($section === $sectionGroup) {
+                    continue;
+                }
+
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '5', $section);
+                $currentColumn++;
+            }
+        }
+
+        return $currentColumn;
+    }
+    
+    private function generateOtherSkillLegend($sheet, $currentColumn, $lastEmployeeRow){
+        //FILL SKILL LEGEND
+        $headerStartColumn = $currentColumn;
+        $headerEndColumn = $headerStartColumn + 3;
+
+        // Header Row 1
+        $sheet->mergeCells(Coordinate::stringFromColumnIndex($headerStartColumn) .'3:'.Coordinate::stringFromColumnIndex($headerEndColumn) .'4');
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($headerStartColumn) . '3', 'Total number of skills of QC Inspectors on other process (in terms of skill legend)');
+
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($headerStartColumn) .'3:'.Coordinate::stringFromColumnIndex($headerEndColumn) .'4', [ 'yellowFill', ]);
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($headerStartColumn) .'5:'.Coordinate::stringFromColumnIndex($headerEndColumn) .'5', [ 'lightYellowFill', ]);
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($headerStartColumn) .'3:'.Coordinate::stringFromColumnIndex($headerEndColumn) .'5', [ 'borderThin', ]);
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($headerStartColumn).'6:'.Coordinate::stringFromColumnIndex($headerEndColumn).$lastEmployeeRow, ['borderThin', 'alignCenter']); //borders for skill category data
+
+        // Header Row 2
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '5', '1');
+        $currentColumn++;
+
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '5', '2');
+        $currentColumn++;
+
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '5', '3');
+        $currentColumn++;
+
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '5', '4');
+        $currentColumn++;
+
+        return $currentColumn;
+    }
+
+    private function generateSkillCategorySummary($sheet, $currentColumn, $lastEmployeeRow, $category){
+        $currentRow = $lastEmployeeRow + 1;
+
+        $headerRow1 = $currentRow + 1;
+        $headerRow2 = $currentRow + 2;
+        $headerRow3 = $currentRow + 3;
+
+        $totalColumns = 0;
+
+        $totalProductLines = array_sum(
+            array_map(function ($process) {
+                $count = count($process['product_lines']);
+                return $count > 0 ? $count : 1;
+            }, $category['processes'])
+        );
+
+        $totalColumns += $totalProductLines;
+
+        $endColumn = $currentColumn + $totalColumns - 1;
+
+        //SKILL CATEGORY
+        $sheet->mergeCells(Coordinate::stringFromColumnIndex($currentColumn) . $headerRow1 .':'. Coordinate::stringFromColumnIndex($endColumn) . $headerRow1);
+        $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . $headerRow1, $category['name']);
+
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($currentColumn) . $headerRow1 .':'. Coordinate::stringFromColumnIndex($endColumn) . $headerRow1, [ 'yellowFill', 'borderThin' ]);
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($currentColumn) . $headerRow1 .':'. Coordinate::stringFromColumnIndex($endColumn) . $headerRow2, [ 'fontSmallBold', 'alignCenter', 'borderThin' ]);
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($currentColumn) . $headerRow3 .':'. Coordinate::stringFromColumnIndex($endColumn) . $headerRow3, [ 'fontSmall', 'borderThin', 'alignCenter' ]);
+        $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($currentColumn) . ($headerRow3 + 1) .':'.Coordinate::stringFromColumnIndex($endColumn) . ($headerRow3 + 4), ['borderThin', 'alignCenter']); //borders for skill category summary
+
+
+        $header2ColorFillIndex = 0;
+        $header3ColorFillIndex = 0;
+        
+        $header2ColorFill = ['grayFill','orangeFill','greenFill','blueFill','blueFill'];
+        $header3ColorFill = ['lightGrayFill','lightOrangeFill','lightGreenFill'];
+
+        foreach ($category['processes'] as $process_per_cat) {
+            $count = count($process_per_cat['product_lines']);
+
+            // No product lines
+            if ($count === 0) {
+                $column = Coordinate::stringFromColumnIndex($currentColumn);
+
+                $sheet->mergeCells($column . $headerRow2 .':'. $column . $headerRow3);
+                $sheet->setCellValue($column . $headerRow2, $process_per_cat['name']);
+
+                if($category['name'] == 'PROCESS / SYSTEM SKILLS'){
+                    $this->applyStyles($sheet, $column.$headerRow2, [ $header2ColorFill[$header2ColorFillIndex] ]);
+                }
+
+                $currentColumn++;
+                continue;
+            }
+            
+            // Has product lines
+            $start = $currentColumn;
+            $end = $currentColumn + $count - 1;
+
+            //FILL PROCESSES
+            $sheet->mergeCells(Coordinate::stringFromColumnIndex($start) . $headerRow2 .':' . Coordinate::stringFromColumnIndex($end) . $headerRow2);
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($start) . $headerRow2, $process_per_cat['name']);
+
+            if($category['name'] == 'PROCESS / SYSTEM SKILLS'){
+                $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($start). $headerRow2 .':'.Coordinate::stringFromColumnIndex($end).$headerRow2, [ $header2ColorFill[$header2ColorFillIndex] ]);
+            }
+
+            //FILL PRODUCT LINES (sub column of process stations)
+            foreach ($process_per_cat['product_lines'] as $productLine) {
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . $headerRow3, $productLine);
+
+                if($category['name'] == 'PROCESS / SYSTEM SKILLS'){
+                    $this->applyStyles($sheet, Coordinate::stringFromColumnIndex($currentColumn) .$headerRow3, [ $header3ColorFill[$header3ColorFillIndex], 'fontSmall' ]);
+                }
+                
+                $currentColumn++;
+            }
+
+            $header2ColorFillIndex++;
+            $header3ColorFillIndex++;
+        }
+
+        return $currentColumn;
+    }
+
+    private function generateHeader($sheet,$titleRow1,$titleRow2,$titleRow3,$totalRow1,$totalRow2,$totalRow3,$totalRow4,$legendRow1,$legendRow2,$legendRow3,$legendRow4,$legendRow5,$processStationDetails,$sectionGroup,$lastEmployeeRow){
+        /*
+        |--------------------------------------------------------------------------
+        | DYNAMIC HEADER
+        |--------------------------------------------------------------------------
+        */
+
+        $processSystemSkills = collect($this->processStationDetails)
+            ->firstWhere('name', 'PROCESS / SYSTEM SKILLS');
+
+        $machineOperationSkills = collect($this->processStationDetails)
+            ->firstWhere('name', 'MACHINE OPERATION SKILLS');
+
+        $qcCoreTools = collect($this->processStationDetails)
+            ->firstWhere('name', 'QC & CORE TOOLS');
+
+        $currentColumn = 8; // H
+
+        if ($processSystemSkills) {
+            $currentColumn = $this->generateSkillCategory(
+                $sheet,
+                $currentColumn,
+                $processSystemSkills,
+                $lastEmployeeRow
+            );
+        }
+
+        if ($machineOperationSkills) {
+            $currentColumn = $this->generateSkillCategory(
+                $sheet,
+                $currentColumn,
+                $machineOperationSkills,
+                $lastEmployeeRow
+            );
+        }
+
+        if ($qcCoreTools) {
+            $currentColumn = $this->generateSkillCategory(
+                $sheet,
+                $currentColumn,
+                $qcCoreTools,
+                $lastEmployeeRow
+            );
+        }
+
+        $currentColumn += 1; // blank separator
+
+        $currentColumn = $this->generateSkillLegend($sheet, $currentColumn, $lastEmployeeRow);
+
+        $currentColumn += 1; // blank separator
+
+        $currentColumn = $this->generateOtherProcessSkills($sheet, $currentColumn, $sectionGroup, $lastEmployeeRow);
+
+        $currentColumn += 1; // blank separator
+
+        $currentColumn = $this->generateOtherSkillLegend($sheet, $currentColumn, $lastEmployeeRow);
+
         /*
         |--------------------------------------------------------------------------
         | Report Title
@@ -136,75 +499,6 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
         $sheet->mergeCells('G3:G5');
         $sheet->setCellValue('G3', 'Present Allocation');
 
-        $sheet->mergeCells('H3:Q3');
-        $sheet->setCellValue('H3', 'PROCESS / SYSTEM SKILLS');
-
-        $sheet->mergeCells('R3:V3');
-        $sheet->setCellValue('R3', 'MACHINE OPERATION SKILLS');
-
-        $sheet->mergeCells('W3:Z3');
-        $sheet->setCellValue('W3', 'QC & CORE TOOLS');
-
-        $sheet->mergeCells('AB3:AE4');
-        $sheet->setCellValue('AB3', 'Total number of skills of QC Inspectors (in terms of skill legend)');
-
-        $sheet->mergeCells('AG3:AO3');
-        $sheet->setCellValue('AG3', 'OTHER PROCESS / SYSTEM SKILLS');
-
-        $sheet->mergeCells('AQ3:AT4');
-        $sheet->setCellValue('AQ3', 'Total number of skills of QC Inspectors on other process (in terms of skill legend) ');
-
-        /*
-        |--------------------------------------------------------------------------
-        | Header Row 2
-        |--------------------------------------------------------------------------
-        */
-
-        $sheet->mergeCells('H4:I4');
-        $sheet->setCellValue('H4', 'IQC');
-
-        $sheet->mergeCells('J4:L4');
-        $sheet->setCellValue('J4', 'IPQC');
-
-        $sheet->mergeCells('M4:O4');
-        $sheet->setCellValue('M4', 'OQC');
-
-        $sheet->mergeCells('P4:P5');
-        $sheet->setCellValue('P4', 'QS');
-
-        $sheet->mergeCells('Q4:Q5');
-        $sheet->setCellValue('Q4', 'TU');
-
-        $sheet->mergeCells('R4:S4');
-        $sheet->setCellValue('R4', 'Burn-in Socket');
-
-        $sheet->mergeCells('T4:U4');
-        $sheet->setCellValue('T4', 'Test Socket');
-
-        $sheet->mergeCells('V4:V5');
-        $sheet->setCellValue('V4', 'NEXIV');
-
-        $sheet->mergeCells('W4:W5');
-        $sheet->setCellValue('W4', 'Basic QC Tools');
-
-        $sheet->mergeCells('X4:X5');
-        $sheet->setCellValue('X4', 'SPC');
-
-        $sheet->mergeCells('Y4:Y5');
-        $sheet->setCellValue('Y4', 'MSA');
-
-        $sheet->mergeCells('Z4:Z5');
-        $sheet->setCellValue('Z4', 'FMEA');
-
-        $sheet->mergeCells('AG4:AI4');
-        $sheet->setCellValue('AG4', 'IQC');
-
-        $sheet->mergeCells('AJ4:AL4');
-        $sheet->setCellValue('AJ4', 'IPQC');
-
-        $sheet->mergeCells('AM4:AO4');
-        $sheet->setCellValue('AM4', 'OQC');
-
         /*
         |--------------------------------------------------------------------------
         | Header Row 3
@@ -213,122 +507,7 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
 
         $sheet->setCellValue('E5', 'Years');
         $sheet->setCellValue('F5', 'Months');
-
-        $sheet->setCellValue('H5', 'Appearance');
-        $sheet->setCellValue('I5', 'Dimension');
-
-        $sheet->setCellValue('J5', 'BGA-FP');
-        $sheet->setCellValue('K5', 'BGA-LGA');
-        $sheet->setCellValue('L5', 'QFP-TSOP');
-
-        $sheet->setCellValue('M5', 'Appearance');
-        $sheet->setCellValue('N5', 'Dimension (COC)');
-        $sheet->setCellValue('O5', 'Packing');
-
-        $sheet->setCellValue('R5', 'Holding Force');
-        $sheet->setCellValue('S5', 'Contact Force');
-
-        $sheet->setCellValue('T5', 'Contact Force');
-        $sheet->setCellValue('U5', 'Actuation Force');
-
-        $sheet->setCellValue('AB5', '1');
-        $sheet->setCellValue('AC5', '2');
-        $sheet->setCellValue('AD5', '3');
-        $sheet->setCellValue('AE5', '4');
-
-        $sheet->setCellValue('AG5', 'CN');
-        $sheet->setCellValue('AH5', 'PPD');
-        $sheet->setCellValue('AI5', 'YF');
-
-        $sheet->setCellValue('AJ5', 'CN');
-        $sheet->setCellValue('AK5', 'PPD');
-        $sheet->setCellValue('AL5', 'YF');
-
-        $sheet->setCellValue('AM5', 'CN');
-        $sheet->setCellValue('AN5', 'PPD');
-        $sheet->setCellValue('AO5', 'YF');
-
-        $sheet->setCellValue('AQ5', '1');
-        $sheet->setCellValue('AR5', '2');
-        $sheet->setCellValue('AS5', '3');
-        $sheet->setCellValue('AT5', '4');
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUMMARY Row 1
-        |--------------------------------------------------------------------------
-        */
-            
-        $sheet->mergeCells("H{$titleRow1}:Q{$titleRow1}");
-        $sheet->setCellValue("H{$titleRow1}", "PROCESS / SYSTEM SKILLS");
         
-        $sheet->mergeCells("R{$titleRow1}:V{$titleRow1}");
-        $sheet->setCellValue("R{$titleRow1}", "MACHINE OPERATION SKILLS");
-
-        $sheet->mergeCells("W{$titleRow1}:Z{$titleRow1}");
-        $sheet->setCellValue("W{$titleRow1}", "QC & CORE TOOLS");
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUMMARY Row 2
-        |--------------------------------------------------------------------------
-        */
-
-        $sheet->mergeCells("H{$titleRow2}:I{$titleRow2}");
-        $sheet->setCellValue("H{$titleRow2}", "IQC");
-
-        $sheet->mergeCells("J{$titleRow2}:L{$titleRow2}");
-        $sheet->setCellValue("J{$titleRow2}", "IPQC");
-
-        $sheet->mergeCells("M{$titleRow2}:O{$titleRow2}");
-        $sheet->setCellValue("M{$titleRow2}", "OQC");
-        
-        $sheet->mergeCells("P{$titleRow2}:P{$titleRow3}");
-        $sheet->setCellValue("P{$titleRow2}", "QS");
-
-        $sheet->mergeCells("Q{$titleRow2}:Q{$titleRow3}");
-        $sheet->setCellValue("Q{$titleRow2}", "TU");
-
-        $sheet->mergeCells("R{$titleRow2}:S{$titleRow2}");
-        $sheet->setCellValue("R{$titleRow2}", "Burn-in Socket");
-
-        $sheet->mergeCells("T{$titleRow2}:U{$titleRow2}");
-        $sheet->setCellValue("T{$titleRow2}", "Test Socket");
-
-        $sheet->mergeCells("V{$titleRow2}:V{$titleRow3}");
-        $sheet->setCellValue("V{$titleRow2}", "NEXIV");
-        
-        $sheet->mergeCells("W{$titleRow2}:W{$titleRow3}");
-        $sheet->setCellValue("W{$titleRow2}", "Basic QC Tools");
-
-        $sheet->mergeCells("X{$titleRow2}:X{$titleRow3}");
-        $sheet->setCellValue("X{$titleRow2}", "SPC");
-
-        $sheet->mergeCells("Y{$titleRow2}:Y{$titleRow3}");
-        $sheet->setCellValue("Y{$titleRow2}", "MSA");
-
-        $sheet->mergeCells("Z{$titleRow2}:Z{$titleRow3}");
-        $sheet->setCellValue("Z{$titleRow2}", "FMEA");
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUMMARY Row 3
-        |--------------------------------------------------------------------------
-        */
-
-        $sheet->setCellValue("H{$titleRow3}", 'Appearance');
-        $sheet->setCellValue("I{$titleRow3}", 'Dimension');
-        $sheet->setCellValue("J{$titleRow3}", 'BGA-FP');
-        $sheet->setCellValue("K{$titleRow3}", 'BGA-LGA');
-        $sheet->setCellValue("L{$titleRow3}", 'QFP-TSOP');
-        $sheet->setCellValue("M{$titleRow3}", 'Appearance');
-        $sheet->setCellValue("N{$titleRow3}", 'Dimension (COC)');
-        $sheet->setCellValue("O{$titleRow3}", 'Packing');
-        $sheet->setCellValue("R{$titleRow3}", 'Holding Force');
-        $sheet->setCellValue("S{$titleRow3}", 'Contact Force');
-        $sheet->setCellValue("T{$titleRow3}", 'Contact Force');
-        $sheet->setCellValue("U{$titleRow3}", 'Actuation Force');
-
         /*
         |--------------------------------------------------------------------------
         | SUMMARY Row 4 TO 7
@@ -372,47 +551,46 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
     private function applyAllStyle($sheet,$titleRow1,$titleRow2,$titleRow3,$totalRow1,$totalRow2,$totalRow3,$totalRow4,$legendRow1,$legendRow2,$legendRow3,$legendRow4,$legendRow5,$lastEmployeeRow){
         //Headers
         $this->applyStyles($sheet, 'A1:A2', [ 'fontSmallBold', ]);
-        $this->applyStyles($sheet, 'A3:AO2', [ 'fontSmallBold', 'alignCenter', ]);
-        $this->applyStyles($sheet, 'A3:AT5', [ 'fontSmallBold','alignCenter', ]);
-        $this->applyStyles($sheet, 'A3:Z5', [ 'borderThin', ]);
-        $this->applyStyles($sheet, 'AB3:AE5', [ 'borderThin',]);
-        $this->applyStyles($sheet, 'AG3:AO5', [ 'borderThin', ]);
-        $this->applyStyles($sheet, 'AQ3:AT5', [ 'borderThin', ]);
-        $this->applyStyles($sheet, 'H3:Z3', [ 'yellowFill', ]);
-        $this->applyStyles($sheet, 'AB3:AE4', [ 'yellowFill', ]);
-        $this->applyStyles($sheet, 'AG3:AO3', [ 'yellowFill', ]);
-        $this->applyStyles($sheet, 'AQ3:AT4', [ 'yellowFill', ]);
-        $this->applyStyles($sheet, 'H4:I4', [ 'grayFill', ]);
-        $this->applyStyles($sheet, 'H5:I5', [ 'lightGrayFill', 'fontSmall' ]);
-        $this->applyStyles($sheet, 'J4:L4', [ 'orangeFill', ]);
-        $this->applyStyles($sheet, 'J5:L5', [ 'lightOrangeFill', 'fontSmall' ]);
-        $this->applyStyles($sheet, 'M4:O4', [ 'greenFill', ]);
-        $this->applyStyles($sheet, 'M5:O5', [ 'lightGreenFill', 'fontSmall']);
-        $this->applyStyles($sheet, 'P4:Q5', [ 'blueFill', ]);
-        $this->applyStyles($sheet, 'AB5:AE5', [ 'lightYellowFill', ]);
-        $this->applyStyles($sheet, 'AQ5:AT5', [ 'lightYellowFill', ]);
-        $this->applyStyles($sheet, 'R5:U5', [ 'fontSmall']);
-        $this->applyStyles($sheet, 'AG5:AO5', [ 'fontSmall']);
-        $this->applyStyles($sheet, "A6:Z{$lastEmployeeRow}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
-        $this->applyStyles($sheet, "AB6:AE{$lastEmployeeRow}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
-        $this->applyStyles($sheet, "AG6:AO{$lastEmployeeRow}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
-        $this->applyStyles($sheet, "AQ6:AT{$lastEmployeeRow}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
+        $this->applyStyles($sheet, 'A3:CC3', [ 'fontSmallBold', 'alignCenter', ]); //Extended Column until CC 
+        $this->applyStyles($sheet, 'A3:G5', [ 'fontSmallBold','alignCenter', 'borderThin' ]);
+        $this->applyStyles($sheet, 'H3:CC4', [ 'fontSmallBold','alignCenter', ]); //Extended Column until CC 
+        $this->applyStyles($sheet, 'H5:CC5', [ 'fontSmall','alignCenter', ]); //Extended Column until CC 
+        // $this->applyStyles($sheet, 'H3:Z3', [ 'yellowFill', ]);
+        // $this->applyStyles($sheet, 'AB3:AE4', [ 'yellowFill', ]);
+        // $this->applyStyles($sheet, 'AG3:AO3', [ 'yellowFill', ]);
+        // $this->applyStyles($sheet, 'AQ3:AT4', [ 'yellowFill', ]);
+        // $this->applyStyles($sheet, 'H4:I4', [ 'grayFill', ]);
+        // $this->applyStyles($sheet, 'H5:I5', [ 'lightGrayFill', 'fontSmall' ]);
+        // $this->applyStyles($sheet, 'J4:L4', [ 'orangeFill', ]);
+        // $this->applyStyles($sheet, 'J5:L5', [ 'lightOrangeFill', 'fontSmall' ]);
+        // $this->applyStyles($sheet, 'M4:O4', [ 'greenFill', ]);
+        // $this->applyStyles($sheet, 'M5:O5', [ 'lightGreenFill', 'fontSmall']);
+        // $this->applyStyles($sheet, 'P4:Q5', [ 'blueFill', ]);
+        // $this->applyStyles($sheet, 'AB5:AE5', [ 'lightYellowFill', ]);
+        // $this->applyStyles($sheet, 'AQ5:AT5', [ 'lightYellowFill', ]);
+        // $this->applyStyles($sheet, 'R5:U5', [ 'fontSmall']);
+        // $this->applyStyles($sheet, 'AG5:AO5', [ 'fontSmall']);
+        // $this->applyStyles($sheet, "A6:Z{$lastEmployeeRow}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
+        // $this->applyStyles($sheet, "AB6:AE{$lastEmployeeRow}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
+        // $this->applyStyles($sheet, "AG6:AO{$lastEmployeeRow}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
+        // $this->applyStyles($sheet, "AQ6:AT{$lastEmployeeRow}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
 
         //Summary
-        $this->applyStyles($sheet, "H{$titleRow1}:Z{$titleRow1}", [ 'yellowFill', 'fontSmallBold', 'alignCenter', 'borderThin' ]);
-        $this->applyStyles($sheet, "H{$titleRow2}:Z{$titleRow2}", [ 'fontSmallBold', 'alignCenter', 'borderThin' ]);
-        $this->applyStyles($sheet, "H{$titleRow2}:I{$titleRow2}", [ 'grayFill']);
-        $this->applyStyles($sheet, "J{$titleRow2}:L{$titleRow2}", [ 'orangeFill']);
-        $this->applyStyles($sheet, "M{$titleRow2}:O{$titleRow2}", [ 'greenFill']);
-        $this->applyStyles($sheet, "P{$titleRow2}:Q{$titleRow3}", [ 'blueFill', 'borderThin']);
-        $this->applyStyles($sheet, "H{$titleRow3}:I{$titleRow3}", [ 'lightGrayFill', 'fontSmall', 'alignCenter', 'borderThin' ]);
-        $this->applyStyles($sheet, "J{$titleRow3}:L{$titleRow3}", [ 'lightOrangeFill', 'fontSmall', 'alignCenter', 'borderThin' ]);
-        $this->applyStyles($sheet, "M{$titleRow3}:O{$titleRow3}", [ 'lightGreenFill', 'fontSmall', 'alignCenter', 'borderThin' ]);
-        $this->applyStyles($sheet, "R{$titleRow3}:U{$titleRow3}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
-        $this->applyStyles($sheet, "V{$titleRow2}:Z{$totalRow3}", [ 'borderThin' ]);
         $this->applyStyles($sheet, "E{$totalRow1}:F{$totalRow4}", [ 'yellowFill', 'fontSmallBold', 'alignCenter', 'borderThin' ]);
         $this->applyStyles($sheet, "G{$totalRow1}:G{$totalRow4}", [ 'yellowFill', 'fontSmall', 'alignCenter', 'borderThin' ]);
-        $this->applyStyles($sheet, "H{$totalRow1}:Z{$totalRow4}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
+
+        // $this->applyStyles($sheet, "H{$titleRow1}:Z{$titleRow1}", [ 'yellowFill', 'fontSmallBold', 'alignCenter', 'borderThin' ]);
+        // $this->applyStyles($sheet, "H{$titleRow2}:Z{$titleRow2}", [ 'fontSmallBold', 'alignCenter', 'borderThin' ]);
+        // $this->applyStyles($sheet, "H{$titleRow2}:I{$titleRow2}", [ 'grayFill']);
+        // $this->applyStyles($sheet, "J{$titleRow2}:L{$titleRow2}", [ 'orangeFill']);
+        // $this->applyStyles($sheet, "M{$titleRow2}:O{$titleRow2}", [ 'greenFill']);
+        // $this->applyStyles($sheet, "P{$titleRow2}:Q{$titleRow3}", [ 'blueFill', 'borderThin']);
+        // $this->applyStyles($sheet, "H{$titleRow3}:I{$titleRow3}", [ 'lightGrayFill', 'fontSmall', 'alignCenter', 'borderThin' ]);
+        // $this->applyStyles($sheet, "J{$titleRow3}:L{$titleRow3}", [ 'lightOrangeFill', 'fontSmall', 'alignCenter', 'borderThin' ]);
+        // $this->applyStyles($sheet, "M{$titleRow3}:O{$titleRow3}", [ 'lightGreenFill', 'fontSmall', 'alignCenter', 'borderThin' ]);
+        // $this->applyStyles($sheet, "R{$titleRow3}:U{$titleRow3}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
+        // $this->applyStyles($sheet, "V{$titleRow2}:Z{$totalRow3}", [ 'borderThin' ]);
+        // $this->applyStyles($sheet, "H{$totalRow1}:Z{$totalRow4}", [ 'fontSmall', 'alignCenter', 'borderThin' ]);
 
         //Legend
         $this->applyStyles($sheet, "E{$legendRow1}", ['fontSmallBold']);
@@ -494,6 +672,10 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
     public function registerEvents(): array{
         return [
             AfterSheet::class => function (AfterSheet $event) {
+
+                $processStationDetails = $this->processStationDetails;
+                $sectionGroup = $this->sectionGroup;
+
                 $sheet = $event->sheet->getDelegate();
 
                 $sheet->freezePane('A6');
@@ -536,37 +718,85 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
                         'emp_no' => '100006',
                         'name' => 'Rose Garcia',
                     ],
+                    [
+                        'emp_no' => '100001',
+                        'name' => 'Juan Dela Cruz',
+                    ],
+                    [
+                        'emp_no' => '100002',
+                        'name' => 'Maria Santos',
+                    ],
+                    [
+                        'emp_no' => '100003',
+                        'name' => 'Pedro Reyes',
+                    ],
+                    [
+                        'emp_no' => '100004',
+                        'name' => 'Ana Cruz',
+                    ],
+                    [
+                        'emp_no' => '100005',
+                        'name' => 'Mark Lopez',
+                    ],
+                    [
+                        'emp_no' => '100006',
+                        'name' => 'Rose Garcia',
+                    ],
                 ];
 
                 $row = 6; //Default row to start filling employee data
                 $no = 1;  //Default number to start filling employee data
-                
-                foreach ($employees as $employee) {
-                    $totalSkillsQcColumns = [
-                        'AB','AC','AD','AE',
-                        'AQ','AR','AS','AT'
-                    ];
 
+                foreach ($employees as $employee) {
                     $count = 1;
 
                     $sheet->setCellValue("A{$row}", $no++);
                     $sheet->setCellValue("B{$row}", $employee['emp_no']);
                     $sheet->setCellValue("C{$row}", $employee['name']);
 
-                    foreach ($totalSkillsQcColumns as $column) {
-                        $sheet->setCellValue("{$column}{$row}", "=COUNTIF(H{$row}:Z{$row},\"{$count}\")");
-
-                        $count++;
-
-                        if ($count > 4) {
-                            $count = 1;
-                        }
-                    }
-
                     $row++;
                 }
  
                 $lastEmployeeRow = $row - 1; // Row of the last employee data row
+
+                $processSystemSkills = collect($this->processStationDetails)
+                    ->firstWhere('name', 'PROCESS / SYSTEM SKILLS');
+
+                $machineOperationSkills = collect($this->processStationDetails)
+                    ->firstWhere('name', 'MACHINE OPERATION SKILLS');
+
+                $qcCoreTools = collect($this->processStationDetails)
+                    ->firstWhere('name', 'QC & CORE TOOLS');
+
+                $currentColumn = 8; // H
+
+                if ($processSystemSkills) {
+                    $currentColumn = $this->generateSkillCategorySummary(
+                        $sheet,
+                        $currentColumn,
+                        $lastEmployeeRow,
+                        $processSystemSkills
+                    );
+                }
+
+                if ($machineOperationSkills) {
+                    $currentColumn = $this->generateSkillCategorySummary(
+                        $sheet,
+                        $currentColumn,
+                        $lastEmployeeRow,
+                        $machineOperationSkills
+                    );
+                }
+
+                if ($qcCoreTools) {
+                    $currentColumn = $this->generateSkillCategorySummary(
+                        $sheet,
+                        $currentColumn,
+                        $lastEmployeeRow,
+                        $qcCoreTools
+                    );
+                }
+
                 $blankRow = $row; // Row after the last employee data row
 
                 $titleRow1 = $blankRow + 1; // Row for the summary title row 1
@@ -598,7 +828,7 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
                     $sheet->setCellValue("{$column}{$totalRow4}", "=COUNTIF({$column}6:{$column}{$lastEmployeeRow},\"4\")");
                 }
 
-                $this->generateHeader($sheet,$titleRow1,$titleRow2,$titleRow3,$totalRow1,$totalRow2,$totalRow3,$totalRow4,$legendRow1,$legendRow2,$legendRow3,$legendRow4,$legendRow5);
+                $this->generateHeader($sheet,$titleRow1,$titleRow2,$titleRow3,$totalRow1,$totalRow2,$totalRow3,$totalRow4,$legendRow1,$legendRow2,$legendRow3,$legendRow4,$legendRow5,$processStationDetails,$sectionGroup,$lastEmployeeRow);
                 $this->applyAllStyle($sheet,$titleRow1,$titleRow2,$titleRow3,$totalRow1,$totalRow2,$totalRow3,$totalRow4,$legendRow1,$legendRow2,$legendRow3,$legendRow4,$legendRow5,$lastEmployeeRow);
                 $this->setColumnWidths($sheet);
                 $this->setRowHeights($sheet,$titleRow1,$titleRow2,$titleRow3); 

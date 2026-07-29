@@ -35,11 +35,41 @@ class HrMemoController extends Controller
         // return $globalUser;
         $user_access = explode(',', $globalUser->user_modules_id);
 
-        $hr_memo_details = HrMemo::with(['prepared_by_info', 'received_by_info', 'noted_by_info', 'email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
+        $hr_memo_details = HrMemo::with([
+            'prepared_by_info',
+            'received_by_info',
+            'noted_by_info',
+            'email_recipients.rapidx_user',
+            'trainee_details.emp_exam_details.exam_info',
+            'trainee_details.hris_emp_info',
+            'trainee_details.subcon_emp_info',
+            ])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
 
+        // return $hr_memo_details;
+        
+        // foreach($hr_memo_details as $memo_detail){
+        //     foreach($memo_detail->trainee_details as $td){
+        //         if ($td->employment_type == 1) {
+        //             // HRIS employee
+        //             $td->load(['hris_emp_info' => function ($q) {
+        //                 $q->select(
+        //                     'vw_employeeinfo.*',
+        //                 );
+        //             }]);
+        //         } else {
+        //             // Subcon employee
+        //             $td->load(['subcon_emp_info' => function ($q) {
+        //                 $q->select(
+        //                     'vw_employeeinfo.*',
+        //                 );
+        //             }]);
+        //         }
+        //     }
+        // }
+        
         return DataTables::of($hr_memo_details)
         ->addColumn('action', function($hr_memo_details) use ($user_access, $globalUser){
-            $result = "";
+            $result = "";   
             $result .= "<center>";
 
             $canApproveHR  = $globalUser->rapidx_emp_id == $hr_memo_details->noted_by || $globalUser->user_level_id == 1; //Noted By Person & SuperAdmin Userlevel only is allowed
@@ -89,6 +119,21 @@ class HrMemoController extends Controller
             }
 
             $result .= "</center>";
+            return $result;
+        })
+        ->addColumn('trainee_names', function($hr_memo_details){
+            
+            $trainee_names = [];
+
+            foreach($hr_memo_details->trainee_details as $td){
+                if ($td->employment_type == 1) {
+                    $trainee_names[] = $td->hris_emp_info->EmpName;
+                } else {
+                    $trainee_names[] = $td->subcon_emp_info->EmpName;
+                }
+            }
+
+            $result = implode(', ', $trainee_names);
             return $result;
         })
         ->addColumn('status_label', function($hr_memo_details){
@@ -181,7 +226,7 @@ class HrMemoController extends Controller
 
             return $result;
         })
-        ->rawColumns(['action', 'reason_label', 'status_label', 'prepared_by_label', 'received_by_label']) // Specify the columns that contain HTML
+        ->rawColumns(['action', 'trainee_names','reason_label', 'status_label', 'prepared_by_label', 'received_by_label']) // Specify the columns that contain HTML
         ->make(true);
     }
 
