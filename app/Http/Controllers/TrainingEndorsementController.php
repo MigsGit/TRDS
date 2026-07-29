@@ -50,7 +50,6 @@ class TrainingEndorsementController extends Controller
 
     public function getTrainingEndorsements(Request $request)
     {
-
         $rapidxEmpNo =  session('global_user');
         $ecr = TrainingEndorsement::with([
             'training_request_details',
