@@ -329,7 +329,7 @@
                 "processing" : false,
                 "serverSide" : true,
                 "responsive": true,
-                "order": [[3, "asc"],[3, "asc"]],
+                "order": [[4, "asc"]],
                 "language": {
                     "info": "Showing _START_ to _END_ of _TOTAL_ Exam Result",
                     "lengthMenu": "Show _MENU_ Exam Result",

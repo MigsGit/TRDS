@@ -51,21 +51,21 @@ class TrainingEndorsementController extends Controller
     public function getTrainingEndorsements(Request $request)
     {
 
-        $data = TrainingEndorsement::with([
+        $rapidxEmpNo =  session('global_user');
+        $ecr = TrainingEndorsement::with([
             'training_request_details',
             'hr_memo_details',
-            'te_approval_details',
+            'te_approval_details_pending',
             'te_approval_details.approver_details',
             'created_by_user_details',
             'training_endorsement_employees' => function($query) {
                 $query->whereNull('deleted_at');
             },
             'training_endorsement_employees.training_request_details_info',
-        ])
-        ->whereNull('deleted_at')
-        ->get();
+        ]);
 
-        // return $_SESSION['rapidx_user_id'];
+
+        // return $_SESSION['rapidx_user_id']; te_approval_details
         $user_access = User::with(['user_access_module'])
         ->where('rapidx_emp_id', $_SESSION['rapidx_user_id'])->first();
 
@@ -73,8 +73,14 @@ class TrainingEndorsementController extends Controller
         $exploded_u_access = explode(',', $user_access->user_access_module->user_modules_id);
 
         if($request->status != ''){
-           $data = $data->where('status', $request->status);
+           $ecr->where('status', $request->status);
+        }else{
+            $ecr->whereHas('te_approval_details_pending',function($query) use ($rapidxEmpNo){
+                // Pending Approval
+                $query->where('rapidx_id',$rapidxEmpNo->rapidx_emp_id);
+            });
         }
+        $data = $ecr;
 
         return DataTables::of($data)
             ->addColumn('employee_names', function ($row) {

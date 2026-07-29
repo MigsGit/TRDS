@@ -684,7 +684,7 @@
                 "processing" : false,
                 "serverSide" : true,
                 "responsive": true,
-                "order": [[1, "asc"],[3, "asc"]],
+                "order": [[1, "asc"],[4, "asc"]],
                 "language": {
                     "info": "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
                     "lengthMenu": "Show _MENU_ Questionnaire Record",

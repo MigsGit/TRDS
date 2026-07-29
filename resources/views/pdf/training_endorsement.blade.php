@@ -52,7 +52,7 @@
             font-weight: bold;
             width: 320px;
         }
-        
+
         /* Main Employee Table */
         .emp-table {
             width: 100%;
@@ -80,7 +80,7 @@
         .emp-table td {
             font-size: 9px;
         }
-        
+
         /* Seamless Inner Exam Table for multi-exam alignment */
         .inner-exam-cell {
             padding: 0 !important;
@@ -220,7 +220,7 @@
                     <td>{{ $employee['emp_no'] ?? '' }}</td>
                     <td class="text-left">{{ $employee['name'] ?? '' }}</td>
                     <td>{{ $employee['position'] ?? '' }}</td>
-                    
+
                     <!-- Inner Container for Exams -->
                     <td colspan="4" class="inner-exam-cell">
                         @if($examCount > 0)
@@ -283,12 +283,12 @@
                 Approved by:
             </td>
         </tr>
-        
+
         <tr>
             <td style="width:33%; text-align:center; vertical-align: top; padding: 0 10px;">
                 @if ($endorsement->status > 0)
-                    <img src="http://rapidx/RapidX_E-Signature/{{ $endorsement->created_by_user_details->employee_number.'.png' }}" 
-                        alt="Signature" 
+                    <img src="http://rapidx/RapidX_E-Signature/{{ $endorsement->created_by_user_details->employee_number.'.png' }}"
+                        alt="Signature"
                         style="width:80px; height:auto; display:block; margin: 0 auto -20px auto;">
                 @endif
                 <span style="display:block; font-weight: bold;">
@@ -297,14 +297,14 @@
                     Trainer Inspector
                 </span>
             </td>
-            
+
             <td style="width:33%; text-align:center; vertical-align: top; padding: 0 10px;">
                 @foreach($checkedBy as $checker)
                     <div style="display: block; text-align: center; margin-bottom: 15px;">
                         {{-- @if ($endorsement->status > 2) --}}
                         @if ( $checker->updated_at != null)
-                            <img src="http://rapidx/RapidX_E-Signature/{{ $checker->approver_details->employee_number.'.png' }}" 
-                                alt="Signature" 
+                            <img src="http://rapidx/RapidX_E-Signature/{{ $checker->approver_details->employee_number.'.png' }}"
+                                alt="Signature"
                                 style="width:80px; height:auto; display:block; margin: 0 auto -20px auto;">
                         @endif
                         <span style="display:block; font-weight: bold;">
@@ -315,15 +315,15 @@
                     </div>
                 @endforeach
             </td>
-            
+
             <td style="width:33%; text-align:center; vertical-align: top; padding: 0 10px;">
                 @foreach($approvedBy as $approver)
                     <div style="display: block; text-align: center; margin-bottom: 15px;">
                         {{-- @if ($endorsement->status == 3) --}}
                         @if ($approver->updated_at != null)
-                            <img src="http://rapidx/RapidX_E-Signature/{{ $approver->approver_details->employee_number.'.png' }}" 
-                                alt="Signature" 
-                                style="width:80px; height:auto; display:block; margin: 0 auto -20px auto;">
+                            <img src="http://rapidx/RapidX_E-Signature/{{ $approver->approver_details->employee_number.'.png' }}"
+                                alt="Signature"
+                                style="width:80px; height:auto; display:block; margin: 0 auto -20px auto; padding-bottom: 10px;">
                         @endif
                         <span style="display:block; font-weight: bold;">
                             {{ $approver->approver_details->name ?? '' }}
