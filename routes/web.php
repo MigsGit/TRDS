@@ -210,6 +210,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_process_station_by_id', 'getProcessStationById')->name('get_process_station_by_id');
         Route::post('/update_process_station_status', 'updateProcessStationStatus')->name('update_process_station_status');
         Route::get('/get_process_stations', 'getProcessStations')->name('get_process_stations');
+        Route::get('/get_process_count_per_category', 'getProcessCountPerCategory')->name('get_process_count_per_category');
     });
 
     // USER CONTROLLER
