@@ -7,6 +7,7 @@ use App\Model\DropdownMasterDetail;
 use App\Model\SystemOneHrisEmpInfo;
 use App\Model\SystemOneHrisSubcon;
 use App\Model\SystemOneSubconEmpInfo;
+use App\Model\QcSlip;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -43,6 +44,11 @@ class QcSlipEmployee extends Model
     public function get_station_to()
     {
        return $this->dropdown_master_detail('station_to');
+    }
+
+    public function qcSlip()
+    {
+        return $this->belongsTo(QcSlip::class, 'qc_slips_id');
     }
 
 
