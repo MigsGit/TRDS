@@ -1694,14 +1694,13 @@
             operator: '',
             fvi_operator: '',
             tbl_fvi_operator_2: '',
+            training_items: '',
         };
         table = {
            operator: '#tbl_operator',
            fvi_operator: '#tbl_fvi_operator',
            tbl_fvi_operator_2: '#tbl_fvi_operator_2',
         };
-
-
         const updateApproval = (params) => {
             let data = {
                 decision : params.decision,
@@ -1715,18 +1714,6 @@
                 }
             });
         }
-        // $('#btnCreateCQForm').click(function (e) { 
-        //     e.preventDefault();
-        //     let operParams = {
-        //         frmId : form.formSubmitOper
-        //     }
-        //     let insParams = {
-        //         frmId : form.formSubmitInspector
-        //     }
-        //     alert('dsad')
-        //     resetFormValues(operParams);
-        //     resetFormValues(insParams);
-        // });
 
         $('#operDisapproved').click(function (e) {
                 let qcSlipsId = $('#qc_slips_id').val();
@@ -1813,6 +1800,30 @@
                 { "data" : "second_take_ins_sequence","name":"second_take_ins_sequence",orderable: false, searchable: false  },
                 { "data" : "second_take_ins_assessment_result","name":"second_take_ins_assessment_result", orderable: false, searchable: false  },
             ],
+        });
+        dataTable.training_items = $('#tblTrainingItems').DataTable({
+            processing: true,
+            serverSide: true,
+            paging: false,         // Display all matrix items in one view
+            searching: false,      // Matrix layout does not require search bar
+            info: false,
+            ordering: false,
+            ajax: {
+                url: "load_qc_lqc_training_items_by_qc_slip_id",
+                type: "GET",
+                data: function (params) {
+                    params.qc_slips_id = $('#qc_slips_id').val()??'';
+                }
+            },
+            columns: [
+                { data: 'item_name', name: 'item_name' },
+                { data: 'day_1', name: 'day_1', className: 'text-center' },
+                { data: 'day_2', name: 'day_2', className: 'text-center' },
+                { data: 'day_3', name: 'day_3', className: 'text-center' },
+                { data: 'day_4', name: 'day_4', className: 'text-center' },
+                { data: 'day_5', name: 'day_5', className: 'text-center' },
+                { data: 'remarks', name: 'remarks' }
+            ]
         });
         // $('#operDisapproved').addClass('d-none');
         // $('#operApproved').addClass('d-none');
@@ -2023,8 +2034,7 @@
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
             formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
             formArray.push({ name: 'select_section', value: $('#select_section').val() });
-            formArray.push({ name: 'text_select_section', value: $('#text_select_section').val() });
-//Insert to Operator
+            formArray.push({ name: 'text_select_section', value: $('#text_select_section').val() });//Insert to Operator
             formArray.push({ name: 'qc_slips_id', value: $('#qc_slips_id').val() });
             formArray.push({ name: 'text_section_operator', value: $('#text_section_operator').val() });
             formArray.push({ name: 'text_series_operator', value: $('#text_series_operator').val() });
@@ -2059,21 +2069,23 @@
                 }
             },$form);
         }
-        // #formSubmit_MH,
+        // #formSubmit_MH, btnCreateCQForm
         $(document).on('submit', '#formSubmit_Ins',  function (e) {
             e.preventDefault();
             var $form = $(this);
             $('#modalSendEmail').modal();
         });
-
         const selectOperatorValidation = () => {
             let approvalStatus = $('#approval_status').val();
-             if(approvalStatus === 'OPERQCAPP'){
+             if(approvalStatus === 'OPERQCAPP' || approvalStatus === 'LQCHEADAPP'){
+                // alert('true')
                 $('.operApproved').removeClass('d-none');
             }else{
-                $('.operSave').removeClass('d-none');
+                // alert('false')
                 $('.operApproved').addClass('d-none');
+                $('.btnSaveInspector').removeClass('d-none');
             }
+            $('.operSave').removeClass('d-none');
             $('#div_Oper').removeClass('d-none');
             form.formSubmitOper[0].reset();
             initDropdownMasterDetailsByFkidCombos([
@@ -2092,7 +2104,7 @@
 
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
-  
+
         }
         const selectInspectorValidation = () => {
             let approvalStatus = $('#approval_status').val();
@@ -2119,17 +2131,16 @@
             form.formSubmitMh.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
         }
-
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved');
-        
-        
+        // $positionSelect.click(function () {
+        //     alert('click');
+        // }).on('change', function () {
+        //    togglePositionSection($(this).val());
+        // });
         $positionSelect.on('change', function () {
            togglePositionSection($(this).val());
         });
-
-      
-
         const togglePositionSection = (position) => {
             initOperEmpModal();
             $('#tbl_certified_list_operator tbody').empty();
@@ -2170,17 +2181,11 @@
                     selectOperatorValidation();
                     break;
             }
-            
+
         }
-
-
-        // togglePositionSection($positionSelect.val());
-
         initDivDeptSecCombos([
                 '#text_section_operator',
         ]);
-
-
         const initSelectPassFail = (comboSelectors) => {
 
             comboSelectors.forEach(function(selector) {
@@ -2245,6 +2250,47 @@
         // Delete a row from the FVI table
         $(document).on('click', '#tbl_fvi_operator .btn-delete-fvi-row', function () {
             $(this).closest('tr').remove();
+        });
+        $('#btnSaveMatrix').on('click', function () {
+            let matrixData = [];
+            $('#tblTrainingItems tbody tr').each(function () {
+                let row = $(this);
+                let itemId = row.find('.input-remark').attr('data-item-id');
+                if (itemId) {
+                    let dayResults = {};
+                    row.find('.input-result').each(function () {
+                        let dayNum = $(this).data('day');
+                        dayResults['day_' + dayNum] = $(this).val();
+                    });
+
+                    matrixData.push({
+                        training_item_id: itemId,
+                        day_results: dayResults,
+                        remark: row.find('.input-remark').val()
+                    });
+                }
+            });
+            console.log('matrixData', matrixData);
+            
+            $.ajax({
+                url: "save_qc_lqc_training_items_by_qc_slip_id",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    qc_slips_id: $('#qc_slips_id').val(),
+                    matrix: matrixData,
+                },
+                success: function (response) {
+                    alert('Training items saved successfully!');
+                    // $('#tblTrainingItems').DataTable().ajax.reload(null, false);
+                }
+            });
+        });
+        $('#btnCreateCQForm').click(function (e) { 
+            e.preventDefault();
+            let categoryPosition = $('#text_select_position').val();
+            dataTable.training_items.draw();
+            togglePositionSection(categoryPosition);
         });
     });
 

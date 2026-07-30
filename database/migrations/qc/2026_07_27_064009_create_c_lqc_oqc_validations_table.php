@@ -16,8 +16,12 @@ class CreateCLqcOqcValidationsTable extends Migration
         Schema::create('c_lqc_oqc_validations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('qc_slips_id')->constrained('qc_slips')->cascadeOnDelete()->comment('reference from qc_slips_id');
-            $table->longText('ref_docno_input_inspector');
-            $table->longText('ins_seq_inspector');
+            $table->foreignId('dropdown_master_details_id_training_item_id')
+                  ->constrained('training_items')
+                  ->cascadeOnDelete();
+            $table->unsignedTinyInteger('day_number'); // 1, 2, 3, 4, 5
+            $table->longText('result')->nullable(); // Typed input (e.g. "OK", "NG", "Passed")
+            $table->longText('item_remark')->nullable(); // Overall row remark
             $table->softDeletes();
             $table->timestamps();
         });

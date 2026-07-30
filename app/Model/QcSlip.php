@@ -2,13 +2,17 @@
 
 namespace App\Model;
 
+use App\Model\Qc\BLqcCertification;
+use App\Model\Qc\CLqcOqcValidation;
 use App\Model\DropdownMasterDetail;
+use App\Model\Qc\ALqcTrainingQualification;
 use App\Model\Qc\AOperProdTrainingOrientation;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
 use App\Model\Qc\CQcCertification;
 use App\Model\Qc\DPpdCertificationCompletion;
 use App\Model\Qc\EQcValidationProcess;
 use App\Model\Qc\FQcValidation;
+use App\Model\Qc\QcLqcApprover;
 use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\Model\RapidXUser;
@@ -40,9 +44,19 @@ class QcSlip extends Model
     }
     public function op_approvers_pending()
     {
-        return $this->hasMany(OpApprover::class, 'qc_slips_id', 'id')
+        return $this->hasOne(OpApprover::class, 'qc_slips_id', 'id')
         ->where('decision_status','PEN')
         ->whereNull('deleted_at');
+    }
+    public function qc_lqc_approvers_pending()
+    {
+        return $this->hasOne(QcLqcApprover::class, 'qc_slips_id', 'id')
+        ->where('decision_status','PEN')
+        ->whereNull('deleted_at');
+    }
+    public function qc_lqc_approvers()
+    {
+        return $this->hasMany(QcLqcApprover::class, 'qc_slips_id', 'id')->whereNull('deleted_at');
     }
     public function qc_slip_employees()
     {
@@ -64,6 +78,7 @@ class QcSlip extends Model
     {
         return $this->hasOne(AOperProdTrainingOrientation::class, 'qc_slips_id',  'id')->where('deleted_at');
     }
+    
     public function b_op_engg_section_training_orientation()
     {
         return $this->hasOne(BOpEnggSectionTrainingOrientation::class, 'qc_slips_id',  'id')->where('deleted_at');
@@ -84,5 +99,20 @@ class QcSlip extends Model
     {
         return $this->hasOne(FQcValidation::class, 'qc_slips_id',  'id')->where('deleted_at');
     }
+
+    //INSPECTOR
+    public function a_lqc_training_qualification()
+    {
+        return $this->hasOne(ALqcTrainingQualification::class, 'qc_slips_id',  'id')->where('deleted_at');
+    }
+    public function b_lqc_certification()
+    {
+        return $this->hasOne(BLqcCertification::class, 'qc_slips_id',  'id')->where('deleted_at');
+    }
+    // public function c_lqc_oqc_validation()
+    // {
+    //     return $this->hasOne(CLqcOqcValidation::class, 'qc_slips_id',  'id')->where('deleted_at');
+    // }
+
 
 }

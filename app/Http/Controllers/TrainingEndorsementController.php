@@ -27,7 +27,6 @@ class TrainingEndorsementController extends Controller
     public function __construct( CommonController $CommonController) {
         $this->CommonController = $CommonController;
     }
-
      /**
      * Insert approval record for endorsement
      *

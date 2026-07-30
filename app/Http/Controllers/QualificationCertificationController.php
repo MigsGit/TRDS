@@ -16,13 +16,14 @@ use App\Http\Requests\MachineOperatorRequest;
 use App\Http\Requests\QcSlipEmployeeRequest;
 use App\Http\Requests\QcSlipRequest;
 use App\Http\Requests\SendEmailRequest;
-use App\Model\BLqcCertification;
-use App\Model\CLqcOqcValidation;
 use App\Model\DropdownMaster;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
 use App\Model\Qc\AOperProdTrainingOrientation;
+use App\Model\Qc\BLqcCertification;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
+use App\Model\Qc\CLqcOqcValidation;
+use App\Model\Qc\CLqcTrainingItemResult;
 use App\Model\Qc\CQcCertification;
 use App\Model\Qc\DPpdCertificationCompletion;
 use App\Model\Qc\EQcValidationProcess;
@@ -69,6 +70,49 @@ class QualificationCertificationController extends Controller
         return collect((array) $value)->filter()->join($separator);
     }
 
+    public function saveQcLqcTrainingItemsByQcSlipId(Request $request){
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+            $qcSlipsId = $request->input('qc_slips_id');
+            $matrixData = $request->input('matrix', []);
+            foreach ($matrixData as $row) {
+                $itemId = $row['training_item_id'];
+                $remark = $row['remark'] ?? null;
+                $dayResults = $row['day_results'] ?? [];
+
+                // Save results for each day (1 to 5)
+                foreach ($dayResults as $dayKey => $resultValue) {
+                    // Extract integer day number (e.g., 'day_1' -> 1)
+                    $dayNumber = (int) str_replace('day_', '', $dayKey);
+
+                    if ($dayNumber >= 1 && $dayNumber <= 5) {
+                        CLqcTrainingItemResult::updateOrCreate(
+                            [
+                                'qc_slips_id'      => $qcSlipsId,
+                                'training_item_id' => $itemId,
+                                'day_number'       => $dayNumber,
+                            ],
+                            [
+                                'result'      => $resultValue,
+                                'item_remark' => $remark,
+                            ]
+                        );
+                    }
+                }
+            }
+
+            DB::commit();
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Training items matrix saved successfully!'
+            ]);
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
     public function saveQualificationCertificationOper(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');
@@ -143,8 +187,8 @@ class QualificationCertificationController extends Controller
             //UPDATE OPERATOR APPROVAL STATUS
             $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
             $currentPositionCategory = $qcSlipDetails->position_category;
-            //OPERATOR PROCESS
-            if($currentPositionCategory === 'Inspector'){
+            //Inspector PROCESS
+            if($currentPositionCategory === 'Inspector'){ //ADD
                 $currentApprovalStatus= 'ALQCTQ'; //LINE QUALITY CONTROL SECTION (Training and Qualification)
                 $qcModelApprover = QcLqcApprover::class;
                 $operToApprovers = [];
@@ -192,30 +236,37 @@ class QualificationCertificationController extends Controller
                             'first_status'      => $this->getSafe($request, 'text_sel_result1_inspector'),
                             'first_remarks'     => $this->getSafe($request, 'text_result_input1_inspector'),
                             'first_status_2'    => $this->getSafe($request, 'text_sel_result2_inspector'),
-                            
+
                             'second_remarks'    => $this->getSafe($request, 'text_result_input2_inspector'),
                             'second_status'     => $this->getSafe($request, 'text_sec2_result_inspector'),
                         ];
                     }
                     if($qcSlipDetails->approval_status === 'CLQCOQC'){
-                        $cLqcOnly = [
-                            'qc_slips_id' => $qcSlipId,
-                            'ref_docno_input_inspector' => $this->getSafe($request, 'text_ref_docno_input_inspector'),
-                            'ins_seq_inspector' => $this->joinSafe($request, 'text_ins_seq_inspector'),
-                        ];
-                        CLqcOqcValidation::insert($cLqcOnly);
+                        // $cLqcOnly = [
+                        //     'qc_slips_id' => $qcSlipId,
+                        //     'ref_docno_input_inspector' => $this->getSafe($request, 'text_ref_docno_input_inspector'),
+                        //     'ins_seq_inspector' => $this->joinSafe($request, 'text_ins_seq_inspector'),
+                        // ];
+                        $countCLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId)->count();
+                        if($countCLqcTrainingItemResult === 0 ){
+                            return response()->json(['is_success' => 'false', "message" => "Please input the C Inspector Training / Certification And Validation Slip"],409);
+                        }
+                        // CLqcOqcValidation::insert($cLqcOnly);
+
                         $operToApprovers = [
                             'decision_status'   => 'APP',
-                            'first_status'   => $this->getSafe($request, 'text_vpqcs_result1_inspector'),
-                            'first_approver'  => $this->joinSafe($request, 'text_vpqcs_validated1_inspector'),
-                            'first_date'      => $this->getSafe($request, 'text_vpqcs_date1_inspector'),
-                            'second_approver' => $this->joinSafe($request, 'text_vpqcs_validated2_inspector'),
-                            'second_date'     => $this->getSafe($request, 'text_vpqcs_date2_inspector'),
-                        ];  
+                        //     'first_status'   => $this->getSafe($request, 'text_vpqcs_result1_inspector'),
+                        //     'first_approver'  => $this->joinSafe($request, 'text_vpqcs_validated1_inspector'),
+                        //     'first_date'      => $this->getSafe($request, 'text_vpqcs_date1_inspector'),
+                        //     'second_approver' => $this->joinSafe($request, 'text_vpqcs_validated2_inspector'),
+                        //     'second_date'     => $this->getSafe($request, 'text_vpqcs_date2_inspector'),
+                        ];
                     }
                 }
+
             }
-            if($currentPositionCategory === 'Operator'){
+            //OPERATOR PROCESS
+            if($currentPositionCategory === 'Operator'){  //ADD
                 $currentApprovalStatus = 'APRODTO';
                 $qcModelApprover = OpApprover::class;
                 if(filled($qcSlipId)){ //UPDATE OPERATOR DETAILS
@@ -578,13 +629,13 @@ class QualificationCertificationController extends Controller
             $qcSlip = QcSlip::
             where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')->first();
-            
+
             $qcSlip->update([
                 'status' => $request->decision,
                 'approval_status' => $request->decision,
                 'appproval_at' => now()
             ]);
-            
+
             if($qcSlip->position_category === 'Operator'){
                 $qcModel = OpApprover::class;
             }
@@ -594,21 +645,21 @@ class QualificationCertificationController extends Controller
            $operToApprovers = [
                 "decision_status"  => 'APP',
             ];
-              
+
             $opApprover = $qcModel::where('qc_slips_id',$request->qcSlipsId)->where('decision_status','PEN')
             ->update($operToApprovers);
-           
+
             //TODO: Email to Created By if Approved
 
             $approvalStatus = $qcSlip->approval_status;
-            
+
             $emailParams = [
                 'qc_slips_id' => $request->qcSlipsId,
                 'update_data'=> [],
                 'approval_status'=> $approvalStatus,
             ];
-     
-            // DB::commit();
+
+            DB::commit();
             return $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
@@ -647,7 +698,11 @@ class QualificationCertificationController extends Controller
     public function getQcSlipsById(Request $request){ //nmodify
 
         try {
-            $qcSlip = QcSlip::with(
+            $qcSlipPosition = QcSlip::
+            where('id',$request->qcSlipsId)
+            ->whereNull('deleted_at')
+            ->first('position_category');
+            $arrRelation = [
                 'op_approvers',
                 'qc_slip_employees.system_one_hris_subcon',
                 'qc_slip_employees.get_station_from',
@@ -660,7 +715,8 @@ class QualificationCertificationController extends Controller
                 'd_ppd_certification_completion',
                 'e_qc_validation_process',
                 'f_qc_validation',
-            )
+            ];
+            $qcSlip = QcSlip::with($arrRelation)
             ->where('id',$request->qcSlipsId)
             ->whereNull('deleted_at')
             ->first();
@@ -672,55 +728,8 @@ class QualificationCertificationController extends Controller
                 return array_map('trim', explode('|', $value));
             };
 
-            $rawOperApprovedConfirmedBy =  collect(explode('|', $qcSlip->oper_approved_confirmed_by))
-                ->map(function($id) {
-                    return trim($id);
-                })
-            ->filter()
-            ->values()
-            ->all();
-             $employeeOperApprovedConfirmedBy = SystemOneHrisSubcon::whereIn('EmpNo', $rawOperApprovedConfirmedBy)
-                ->get(['EmpNo', 'empname']) // Fetch only needed columns
-                ->keyBy('EmpNo') // Key the collection by EmpNo for O(1) lookup speed
-                ->toArray();
-			$arrOperApprovedConfirmedBy = [];
-            foreach($employeeOperApprovedConfirmedBy as $key => $value){
-				$array_data 				= array();
-				$array_data['id'] 		= $value['EmpNo'];
-				$array_data['name'] 		= $value['empname'];
-				$arrOperApprovedConfirmedBy[]			= $array_data;
-			}
             $rawReasonsString = $qcSlip->qc_reason_certification->reason_of_certification ?? '';
-            $rawAOperProdTrainingOrientation = $qcSlip->a_oper_prod_training_orientation->traning_items ?? '';
-            $rawBOpEnggSectionTrainingOrientation = $qcSlip->b_op_engg_section_training_orientation->traning_items ?? '';
             $rawReasonTransferFlexibility = $qcSlip->qc_reason_certification->transfer_flexibility ?? '';
-
-            $rawReasonsStringCollection =  collect(explode('|', $rawReasonsString))
-                ->map(function($id) {
-                    return trim($id);
-                })
-            ->filter()
-            ->values()
-            ->all();
-
-             if($rawBOpEnggSectionTrainingOrientation != ''){
-                $rawBOpEnggSectionTrainingOrientationCollection =  collect(explode('|', $rawBOpEnggSectionTrainingOrientation))
-                ->map(function($id) {
-                    return trim($id);
-                })
-                ->filter()
-                ->values()
-                ->all();
-            }
-            if($rawAOperProdTrainingOrientation != ''){
-                 $rawAOperProdTrainingOrientationCollection =  collect(explode('|', $rawAOperProdTrainingOrientation))
-                ->map(function($id) {
-                    return trim($id);
-                })
-                ->filter()
-                ->values()
-                ->all();
-            }
             if($rawReasonTransferFlexibility != ''){
                  $rawReasonTransferFlexibilityCollection =  collect(explode('|', $rawReasonTransferFlexibility))
                 ->map(function($id) {
@@ -730,7 +739,101 @@ class QualificationCertificationController extends Controller
                 ->values()
                 ->all();
             }
-            $rawPayload = collect($qcSlip->op_approvers)->groupBy('approval_status')->toArray();
+            $rawReasonsStringCollection =  collect(explode('|', $rawReasonsString))
+                ->map(function($id) {
+                    return trim($id);
+                })
+            ->filter()
+            ->values()
+            ->all();
+
+            if($qcSlipPosition->position_category === 'Inspector'){
+                $arrRelation = [
+                    'qc_lqc_approvers',
+                    'qc_slip_employees.system_one_hris_subcon',
+                    'qc_slip_employees.get_station_from',
+                    'qc_slip_employees.get_station_to',
+                    'qc_slip_employees',
+                    'qc_reason_certification',
+                    'a_lqc_training_qualification',
+                    'b_lqc_certification',
+                    // 'c_lqc_oqc_validation',
+                ];
+                $qcSlip = QcSlip::with($arrRelation)
+                ->where('id',$request->qcSlipsId)
+                ->whereNull('deleted_at')
+                ->first();
+                $arrApprovers = $qcSlip->qc_lqc_approvers;
+                $json = [
+                    'is_success' => 'true',
+                    'qcSlip' => $qcSlip,
+                    'rawOperApprovedConfirmedBy' => $arrOperApprovedConfirmedBy ?? [],
+                    'rawReasonsStringCollection' => $rawReasonsStringCollection,
+                    'rawBEnggTrainingItemsCollection' => $rawBOpEnggSectionTrainingOrientationCollection ?? '',
+                    'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection ?? '',
+                    'rawReasonTransferFlexibility' => $rawReasonTransferFlexibilityCollection ?? '',
+
+                ];
+            }
+            if($qcSlipPosition->position_category === 'Operator'){
+                //OPERATOR
+                $rawOperApprovedConfirmedBy =  collect(explode('|', $qcSlip->oper_approved_confirmed_by))
+                    ->map(function($id) {
+                        return trim($id);
+                    })
+                ->filter()
+                ->values()
+                ->all();
+
+                $employeeOperApprovedConfirmedBy = SystemOneHrisSubcon::whereIn('EmpNo', $rawOperApprovedConfirmedBy)
+                    ->get(['EmpNo', 'empname']) // Fetch only needed columns
+                    ->keyBy('EmpNo') // Key the collection by EmpNo for O(1) lookup speed
+                    ->toArray();
+                $arrOperApprovedConfirmedBy = [];
+                foreach($employeeOperApprovedConfirmedBy as $key => $value){
+                    $array_data 				= array();
+                    $array_data['id'] 		= $value['EmpNo'];
+                    $array_data['name'] 		= $value['empname'];
+                    $arrOperApprovedConfirmedBy[]			= $array_data;
+                }
+                $rawAOperProdTrainingOrientation = $qcSlip->a_oper_prod_training_orientation->traning_items ?? '';
+                $rawBOpEnggSectionTrainingOrientation = $qcSlip->b_op_engg_section_training_orientation->traning_items ?? '';
+
+
+                if($rawBOpEnggSectionTrainingOrientation != ''){
+                    $rawBOpEnggSectionTrainingOrientationCollection =  collect(explode('|', $rawBOpEnggSectionTrainingOrientation))
+                    ->map(function($id) {
+                        return trim($id);
+                    })
+                    ->filter()
+                    ->values()
+                    ->all();
+                }
+                if($rawAOperProdTrainingOrientation != ''){
+                    $rawAOperProdTrainingOrientationCollection =  collect(explode('|', $rawAOperProdTrainingOrientation))
+                    ->map(function($id) {
+                        return trim($id);
+                    })
+                    ->filter()
+                    ->values()
+                    ->all();
+                }
+
+                // $qcSlipReasons = collect($qcSlip);
+                $json = [
+                    'is_success' => 'true',
+                    'qcSlip' => $qcSlip,
+                    'rawOperApprovedConfirmedBy' => $arrOperApprovedConfirmedBy,
+                    'rawReasonsStringCollection' => $rawReasonsStringCollection,
+                    'rawBEnggTrainingItemsCollection' => $rawBOpEnggSectionTrainingOrientationCollection ?? [],
+                    'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection ?? [],
+                    'rawReasonTransferFlexibility' => $rawReasonTransferFlexibilityCollection ?? [],
+                ];
+                $arrApprovers = $qcSlip->op_approvers;
+            }
+
+
+            $rawPayload = collect($arrApprovers)->groupBy('approval_status')->toArray();
             $approversCollection = collect($qcSlip)->groupBy('approval_status')->toArray();
             // 2. Step One: Parse and collect ALL unique EmpNo values across all status groups
             $allEmployeeNumbers = [];
@@ -748,7 +851,7 @@ class QualificationCertificationController extends Controller
             }
 
             // Filter to keep only unique, non-empty employee numbers
-            $uniqueEmployeeNumbers = array_unique(array_filter($allEmployeeNumbers));
+         $uniqueEmployeeNumbers = array_unique(array_filter($allEmployeeNumbers));
 
             // 3. Step Two: Bulk fetch employee details from your HRIS table in ONE query
             // This maps 'EmpNo' to their corresponding database columns (e.g., 'First_Name', 'Last_Name', or 'Full_Name')
@@ -759,37 +862,37 @@ class QualificationCertificationController extends Controller
 
             // 4. Step Three: Map the data payload and inject matching Select2 structured object lists
             $processedData = collect($rawPayload)->map(function ($items) use ($explodePipedString, $employeeDbMap) {
-            return collect($items)->map(function ($item) use ($explodePipedString, $employeeDbMap) {
-                    $itemArray = (array) $item;
+                return collect($items)->map(function ($item) use ($explodePipedString, $employeeDbMap) {
+                        $itemArray = (array) $item;
 
-                    // Explode the fields
-                    $firstExploded  = $explodePipedString($itemArray['first_approver'] ?? null);
-                    $firstExploded2  = $explodePipedString($itemArray['first_approver_2'] ?? null);
-                    $firstExploded3  = $explodePipedString($itemArray['first_approver_3'] ?? null);
-                    $secondExploded = $explodePipedString($itemArray['second_approver'] ?? null);
-                    $secondExploded2 = $explodePipedString($itemArray['second_approver_2'] ?? null);
-                    $secondExploded3 = $explodePipedString($itemArray['second_approver_3'] ?? null);
-                    $alertsExploded = $explodePipedString($itemArray['alert_prod_sec'] ?? null);
+                        // Explode the fields
+                        $firstExploded  = $explodePipedString($itemArray['first_approver'] ?? null);
+                        $firstExploded2  = $explodePipedString($itemArray['first_approver_2'] ?? null);
+                        $firstExploded3  = $explodePipedString($itemArray['first_approver_3'] ?? null);
+                        $secondExploded = $explodePipedString($itemArray['second_approver'] ?? null);
+                        $secondExploded2 = $explodePipedString($itemArray['second_approver_2'] ?? null);
+                        $secondExploded3 = $explodePipedString($itemArray['second_approver_3'] ?? null);
+                        $alertsExploded = $explodePipedString($itemArray['alert_prod_sec'] ?? null);
 
 
 
-                    // Helper closure to build Select2 formatting: [{id: "R144", name: "John Doe"}]
-                    $mapToSelect2Structure = function ($empNoArray) use ($employeeDbMap) {
-                        return array_map(function ($empNo) use ($employeeDbMap) {
-                            $cleanEmpNo = trim($empNo);
+                        // Helper closure to build Select2 formatting: [{id: "R144", name: "John Doe"}]
+                        $mapToSelect2Structure = function ($empNoArray) use ($employeeDbMap) {
+                            return array_map(function ($empNo) use ($employeeDbMap) {
+                                $cleanEmpNo = trim($empNo);
 
-                            // Look up details from our pre-fetched database map
-                            $employeeInfo = $employeeDbMap[$cleanEmpNo] ?? null;
+                                // Look up details from our pre-fetched database map
+                                $employeeInfo = $employeeDbMap[$cleanEmpNo] ?? null;
 
-                            // Fallback to the EmpNo if the record is not found in the HRIS table
-                            $displayName = $cleanEmpNo;
-                            if ($employeeInfo) {
-                                // Adjust these keys based on your actual SystemOneHrisSubcon column names
-                                $displayName = $employeeInfo['empname'];
-                            }
+                                // Fallback to the EmpNo if the record is not found in the HRIS table
+                                $displayName = $cleanEmpNo;
+                                if ($employeeInfo) {
+                                    // Adjust these keys based on your actual SystemOneHrisSubcon column names
+                                    $displayName = $employeeInfo['empname'];
+                                }
 
-                            return [
-                                'id' => $cleanEmpNo,
+                                return [
+                                    'id' => $cleanEmpNo,
                                 'name' => trim($displayName)
                             ];
                         }, $empNoArray);
@@ -807,22 +910,85 @@ class QualificationCertificationController extends Controller
                     return $itemArray;
                 });
             });
-
-
-            // $qcSlipReasons = collect($qcSlip);
-            return response()->json([
-                'is_success' => 'true',
-                'qcSlip' => $qcSlip,
-                'rawOperApprovedConfirmedBy' => $arrOperApprovedConfirmedBy,
-                'rawReasonsStringCollection' => $rawReasonsStringCollection,
-                'rawBEnggTrainingItemsCollection' => $rawBOpEnggSectionTrainingOrientationCollection ?? '',
-                'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection ?? '',
-                'rawReasonTransferFlexibility' => $rawReasonTransferFlexibilityCollection ?? '',
-                'approversCollection' => $processedData,
-            ]);
+            $arrApproversCollection =  [
+                 'approversCollection' => $processedData ?? [],
+            ];
+            return response()->json(array_merge( $json,$arrApproversCollection));
         } catch (Exception $e) {
             throw $e;
         }
+    }
+    public function loadQcLqcTrainingItemsByQcSlipId(Request $request){
+        // return 'true'; CLqcTrainingItemResult
+        $qcSlipsId = $request->qc_slips_id;
+        // Fetch all master training items along with existing results for this specific training
+       $items = DropdownMasterDetail::with(['c_lqc_training_item_results' => function ($query) use ($qcSlipsId) {
+            $query->where('qc_slips_id', $qcSlipsId);
+        }])
+        ->where('dropdown_masters_id', 1)
+        ->orderBy('id', 'asc')
+        ->get();
+        $data = $items->map(function ($item) {
+            // Collect existing results keyed by day_number (1, 2, 3, 4, 5)
+            $resultsByDay = $item->c_lqc_training_item_results->keyBy('day_number');
+
+            return [
+                'id'           => $item->id,
+                'item_name'    => $item->dropdown_masters_details, // e.g. "1) Systems and Procedure"
+                'day_1_result' => $resultsByDay->get(1)->result ?? '',
+                'day_1_id'     => $resultsByDay->get(1)->id ?? '',
+                'day_2_result' => $resultsByDay->get(2)->result ?? '',
+                'day_2_id'     => $resultsByDay->get(2)->id ?? '',
+                'day_3_result' => $resultsByDay->get(3)->result ?? '',
+                'day_3_id'     => $resultsByDay->get(3)->id ?? '',
+                'day_4_result' => $resultsByDay->get(4)->result ?? '',
+                'day_4_id'     => $resultsByDay->get(4)->id ?? '',
+                'day_5_result' => $resultsByDay->get(5)->result ?? '',
+                'day_5_id'     => $resultsByDay->get(5)->id ?? '',
+                'item_remark'  => $item->c_lqc_training_item_results->first()->item_remark ?? '', // General row remark
+            ];
+        });
+        return datatables()->of($data)
+        ->editColumn('item_name', function ($row) {
+            return '<strong>' . e($row['item_name']) . '</strong>';
+        })
+        ->addColumn('day_1', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="1"
+                        value="' . e($row['day_1_result']) . '">';
+        })
+        ->addColumn('day_2', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="2"
+                        value="' . e($row['day_2_result']) . '">';
+        })
+        ->addColumn('day_3', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="3"
+                        value="' . e($row['day_3_result']) . '">';
+        })
+        ->addColumn('day_4', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="4"
+                        value="' . e($row['day_4_result']) . '">';
+        })
+        ->addColumn('day_5', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="5"
+                        value="' . e($row['day_5_result']) . '">';
+        })
+        ->addColumn('remarks', function ($row) {
+            return '<input type="text" class="form-control form-control-sm input-remark"
+                        data-item-id="' . $row['id'] . '"
+                        value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
+        })
+        ->rawColumns(['item_name', 'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
+        ->make(true);
     }
     public function load1stQcValidation(Request $request){
         try {
@@ -953,8 +1119,13 @@ class QualificationCertificationController extends Controller
         }
     }
     public function loadQcSlip(Request $request){
-    //newStatus
-    $qcSlips = QcSlip::with('product_line','op_approvers','op_approvers_pending','system_one_hris_subcon')
+       $qcSlips = QcSlip::with(
+            'product_line',
+            'op_approvers',
+            'op_approvers_pending',
+            'system_one_hris_subcon',
+            'qc_lqc_approvers_pending',
+        )
         ->whereNull('deleted_at')
         ->orderBy('id','DESC')
         ->get();
@@ -996,28 +1167,40 @@ class QualificationCertificationController extends Controller
                 return $result;
             })
             ->addColumn('rawStatus', function ($row) use ($hrisSubcon) {
-                $current = $row->op_approvers_pending ?? [];
+
                 $approvalStatus = $row->approval_status;
+                $positionCategory = $row->position_category;
+                $current = [];
+                if($positionCategory === 'Operator'){
+                    $current = $row->op_approvers_pending ?? [];
+                }else{
+                    $current = $row->qc_lqc_approvers_pending ?? [];
+                }
+
                 $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
 
                 $resultCurrentApprover = '';
 
-                if (count($current) > 0) {
+                if (filled($current)) {
                     // Get THIS row's own emp IDs from alert_prod_sec (pipe-separated)
-                    $empIdsTo = collect($current)
+                      // Option B: Using Collection Pipeline (Wrap $current in array brackets)
+                    $empIdsTo = collect([$current]) // Wrap in brackets so pluck works on a collection list
                         ->pluck('alert_prod_sec')
                         ->filter()
                         ->flatMap(function ($item) {
-                            return array_map('trim', explode('|', $item));
+                            // Use preg_split to match '|', spaces, or both safely
+                            return preg_split('/\s*\|\s*/', trim($item));
                         })
-                        ->unique();
-                    $empIdsCc = collect($current)
+                        ->values();
+                        $empIdsCc = 
+                        collect([$current]) // Wrap in brackets so pluck works on a collection list
                         ->pluck('alert_prod_cc_sec')
                         ->filter()
                         ->flatMap(function ($item) {
-                            return array_map('trim', explode('|', $item));
+                            // Use preg_split to match '|', spaces, or both safely
+                            return preg_split('/\s*\|\s*/', trim($item));
                         })
-                        ->unique();
+                        ->values();
                     // Map emp IDs -> names using the lookup, drop unmatched
                     $currentApproverTo = $empIdsTo
                         ->map(function ($empId) use ($hrisSubcon) {
@@ -1332,9 +1515,13 @@ class QualificationCertificationController extends Controller
                 ->select('Section')
                 ->distinct()
                 ->orderBy('Section')
-                ->pluck('Section');
-
-            return response()->json(['is_success' => 'true', 'section' => $section]);
+                ->pluck('Section')->toArray();
+                $customDivision = [
+                    'PPD Grinding',
+                    'PPD-TS Molding',
+                ];
+            $arrMerge = array_merge($section,$customDivision);
+            return response()->json(['is_success' => 'true', 'section' => $arrMerge]);
         } catch (Exception $e) {
             throw $e;
         }
@@ -1358,7 +1545,8 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-    public function generateControlNumber($params){
+    public function generateControlNumber($params)
+    {
         date_default_timezone_set('Asia/Manila');
         //Systemon HRIS / Subcon
 
