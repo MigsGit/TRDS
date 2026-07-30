@@ -239,6 +239,23 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/view_subcon_employee_info', 'viewSubconEmployeeInfo')->name('view_subcon_employee_info');
         Route::get('/view_direct_employee_info', 'viewDirectEmployeeInfo')->name('view_direct_employee_info');
         Route::get('/get_employee_trainings', 'getEmployeeTrainings')->name('get_employee_trainings');
+        Route::get('/export_skill_map_pdf', 'exportSkillMapPdf')->name('export_skill_map_pdf');
+        // Route::get('/test-pdf', function () {
+        //     dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
+        // });
+Route::get('/test-pdf', function () {
+    try {
+        require_once base_path('vendor/barryvdh/laravel-dompdf/src/Facade/Pdf.php');
+
+        dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
+    } catch (\Throwable $e) {
+        dd(
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine()
+        );
+    }
+});
 
     });
 

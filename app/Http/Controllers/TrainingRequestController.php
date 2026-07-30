@@ -407,7 +407,7 @@ class TrainingRequestController extends Controller
 
             Mail::send('mail.new_training_request_notification', $data, function ($message) use ($recipientEmail, $recipientName, $bccEmail) {
                 $message->to($recipientEmail, $recipientName);
-                $message->cc(['kcalcantara@pricon.ph, cnpoblete@pricon.ph']);
+                $message->cc(['kcalcantara@pricon.ph', 'cnpoblete@pricon.ph']);
                     if ($bccEmail) {
                         $message->bcc($bccEmail);
                     }
