@@ -94,6 +94,37 @@ const GetSystemOneHrisSection = (element) => {
     ajaxRequest(ajaxGetSystemOneHrisSection);
 };
 
+const GetExamTitle = (element) => {
+    const ajaxGetExamTitle = {
+        url: 'get_exam_title',
+        method: 'GET',
+
+        successCallback: (response) => {
+            const examTitle = response || [];
+            let result = '';
+
+            if (examTitle.length > 0) {
+                result += '<option value="" disabled selected>Select Exam Title</option>';
+
+                examTitle.forEach(item => {
+                    const title = item?.exam_title ?? 'No Exam Title';
+                    result += `<option value="${title}">${title}</option>`;
+                });
+            } else {
+                result = '<option value="" disabled selected>Not found</option>';
+            }
+
+            element.html(result);
+        },
+
+        errorCallback: () => {
+            element.html('<option value="" disabled selected>Reload Again</option>');
+        }
+    };
+
+    ajaxRequest(ajaxGetExamTitle);
+};
+
 const CreateUpdateQuestionnaire = () => {
     let formData = $('#formCreateUpdateQuestionnaire').serialize();
 
@@ -114,6 +145,7 @@ const CreateUpdateQuestionnaire = () => {
                 alert('Saving failed!');
             }else{
                 $('#modalCreateUpdateQuestionnaire').modal('hide');
+                $('.reset').val('');
                 toastr.success('Saved!');
                 dataQuestionnaire.draw();
             }
@@ -145,7 +177,8 @@ const GetQuestionnaireById = (questionnaireId) => {
 
             $('#slctQuestionnaireCategory').val(getQuestionnaireData[0].category);
             $('#nmbrQuestionnairePassingScore').val(getQuestionnaireData[0].passing_score);
-            $('#txtQuestionnaireTitle').val(getQuestionnaireData[0].exam_title);
+            $('#slctQuestionnaireExamTitle').val(getQuestionnaireData[0].exam_title).trigger('change');
+            $('#txtQuestionnaireDescription').val(getQuestionnaireData[0].description);
             $('#txtQuestionnaireInstruction').val(getQuestionnaireData[0].exam_instruction);
             $('#txtQuestionnairePurpose').val(getQuestionnaireData[0].purpose);
             $('#slctQuestionnaireDepartment').val(getQuestionnaireData[0].department).trigger('change');
@@ -244,6 +277,7 @@ const CreateUpdateQuestionnaireDetails = () => {
                 $('#identificationEssay').empty();
                 $('#multipleGrid').empty();
                 $('#formCreateUpdateQuestionnaireDetails')[0].reset();
+                $('.reset').val('');
                 toastr.success('Saved!');
                 dataQuestionnaireDetails.draw();
             }
@@ -347,7 +381,7 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
                     for(let i = 1; i < choices.length; i++){
                         $('#btnAddChoice').click();
                     }
-// question1_option3 answer_choices_question
+                    // question1_option3 answer_choices_question
                     $('.divChoices .input-group').each(function(index){
                         let choiceValue = choices[index];
 

@@ -5,6 +5,13 @@
 @section('content_page')
 
     <style>
+        table.table thead th{
+            text-align: center;
+            vertical-align: middle;
+        }
+        table.table tbody td{
+            vertical-align: middle;
+        }
         .exam-scroll-container {
             max-height: 80vh;
             overflow-y: auto;
@@ -60,6 +67,7 @@
                                                 <th>Status</th>
                                                 <th>Category</th>
                                                 <th>Exam Title</th>
+                                                <th>Description</th>
                                                 <th>Exam Instruction</th>
                                                 <th>Purpose</th>
                                                 <th>Department</th>
@@ -278,6 +286,31 @@
         </div>
     </div>
 
+    <!-- Change Exam Result Status Modal End -->
+    <div class="modal fade" id="modalChangeExamResultStatus">
+        <div class="modal-dialog">
+            <div class="modal-content modal-md">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="h4ChangeExamResultStatusTitle"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" id="formChangeExamResultStatus">
+                    @csrf
+                    <div class="modal-body">
+                    <label id="lblChangeExamResultStatusLabel"></label>
+                    <input type="hidden" name="exam_result_details_id" id="txtChangeExamResultStatusId" placeholder="Exam Result Details Id">
+                    <input type="hidden" name="status" id="txtChangeExamResultStatus" placeholder="Status">
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <button type="submit" id="btnChangeExamResultStatus" class="btn btn-dark"><i id="iBtnChangeExamResultStatusIcon" class="fa fa-check"></i> Yes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><!-- Change Exam Result Status Modal End -->
 @endsection
 
 
@@ -296,7 +329,7 @@
                 "processing" : false,
                 "serverSide" : true,
                 "responsive": true,
-                "order": [[3, "asc"],[3, "asc"]],
+                "order": [[4, "asc"]],
                 "language": {
                     "info": "Showing _START_ to _END_ of _TOTAL_ Exam Result",
                     "lengthMenu": "Show _MENU_ Exam Result",
@@ -327,6 +360,7 @@
                         },
                     },
                     { "data" : "exam_title"},
+                    { "data" : "description"},
                     { "data" : "exam_instruction"},
                     { "data" : "purpose"},
                     { "data" : "department"},
@@ -334,6 +368,12 @@
                     { "data" : "product_line"},
                     { "data" : "passing_score"}
                 ],
+                columnDefs: [
+                    {
+                        targets: 0, // Action column
+                        className: 'text-nowrap'
+                    }
+                ]
             });
 
             $(document).on('click', '.actionQuestionnaireDetailsForExamResult', function() {
@@ -364,9 +404,17 @@
                     { data: 'action' },
                     { data: 'exam_taken' },
                     { data: 'date_examination' },
-                    { data: 'exam_result_info.employee_no' },
-                    { data: 'exam_result_info.employee_name' },
-                    { data: 'score' },
+                    { data: 'employee_no'   },
+                    { data: 'employee_name' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            const score = Number(row.score) || 0;
+                            const essayScore = Number(row.identification_essay_score) || 0;
+
+                            return score + essayScore;
+                        }
+                    },
                     { data: 'remark' },
                     { data: 'rating' }
                 ]
@@ -415,15 +463,39 @@
             $(document).on('click', '.actionChangeExaminationDate',function(e){
                 e.preventDefault();
 
-                examinationResultDetailsId = $(this).attr('examinationResultDetails-id');
-                examinationDate = $(this).attr('examinationResultDetails-examination_date');
-                $("#txtExaminationResultDetailId").val(examinationResultDetailsId);
+                examResultDetailsId = $(this).attr('examinationResultDetails-id');
+                let examinationDate = $(this).attr('examinationResultDetails-examination_date');
+                $("#txtExaminationResultDetailId").val(examResultDetailsId);
                 $("#examinationDate").val(examinationDate);
             });
 
             $("#formChangeExaminationDate").submit(function(event){
                 event.preventDefault();
                 UpdateExaminationDate();
+            });
+
+            $(document).on('click', '.actionChangeExamResultStatus',function(e){
+                e.preventDefault();
+
+                let examResultDetailsStatus = $(this).attr('status');
+                examResultDetailsId     = $(this).attr('examinationResultDetails-id');
+
+                $("#txtChangeExamResultStatusId").val(examResultDetailsId);
+                $("#txtChangeExamResultStatus").val(examResultDetailsStatus);
+
+                if(examResultDetailsStatus == 0){
+                    $("#lblChangeExamResultStatusLabel").text('Are you sure to activate?');
+                    $("#h4ChangeExamResultStatusTitle").html('<i class="fa fa-question-circle"></i> Activate Exam Result Details');
+                }else{
+                    $("#lblChangeExamResultStatusLabel").text('Are you sure to delete?');
+                    $("#h4ChangeExamResultStatusTitle").html('<i class="fa fa-question-circle"></i> Delete Exam Result Details');
+                }
+            });
+
+
+            $("#formChangeExamResultStatus").submit(function(event){
+                event.preventDefault();
+                ChangeExaminationResultStatus();
             });
         });
     </script>

@@ -36,6 +36,13 @@
                     </a>
                 </li>
 
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('insp_skill_chart_setting') }}"  class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Inspector Skill Chart Settings</p>
+                    </a>
+                </li>
+
                 <li class="nav-header font-weight-bold">Modules</li>
                 {{-- <li class="nav-item has-treeview">
                     <a href="{{ route('hr_memo') }}" class="nav-link">
@@ -142,7 +149,6 @@
                         </a>
                     </li>
                 @endif
-              
 
                 <li class="nav-item has-treeview">
                     <a href="{{ route('qualification_certification') }}" class="nav-link">
@@ -150,6 +156,22 @@
                         <p>Qualification / Certification</p>
                     </a>
                 </li>
+
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('ETR') }}" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>ETR</p>
+                    </a>
+                </li>
+                <li class="nav-header font-weight-bold">Export</li>
+                <li class="nav-item has-treeview">
+                    <a id="btnListCertPersonnel" class="nav-link">
+                        <i class="fas fa-file-excel"></i>
+                        <p>List of Certified Personnel</p>
+                    </a>
+                </li>
+
+
 
             </ul>
         </nav>

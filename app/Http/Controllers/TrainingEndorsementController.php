@@ -19,12 +19,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-
+date_default_timezone_set('Asia/Manila');
 
 class TrainingEndorsementController extends Controller
 {
     protected $CommonController;
-    
+
     public function __construct( CommonController $CommonController) {
         $this->CommonController = $CommonController;
     }
@@ -50,29 +50,45 @@ class TrainingEndorsementController extends Controller
 
     public function getTrainingEndorsements(Request $request)
     {
-        
-        $data = TrainingEndorsement::with([
+        $rapidxEmpNo =  session('global_user');
+        $ecr = TrainingEndorsement::with([
             'training_request_details',
             'hr_memo_details',
-            'te_approval_details',
+            'te_approval_details_pending',
             'te_approval_details.approver_details',
-            'created_by_user_details'
-        ])
-        ->whereNull('deleted_at')
-        ->get();
-        
-        // return $_SESSION['rapidx_user_id'];
+            'created_by_user_details',
+            'training_endorsement_employees' => function($query) {
+                $query->whereNull('deleted_at');
+            },
+            'training_endorsement_employees.training_request_details_info',
+        ]);
+
+
+        // return $_SESSION['rapidx_user_id']; te_approval_details
         $user_access = User::with(['user_access_module'])
         ->where('rapidx_emp_id', $_SESSION['rapidx_user_id'])->first();
 
         // $exploded_u_access = 17 for approver
         $exploded_u_access = explode(',', $user_access->user_access_module->user_modules_id);
-        
+
         if($request->status != ''){
-           $data = $data->where('status', $request->status);
+           $ecr->where('status', $request->status);
+        }else{
+            $ecr->whereHas('te_approval_details_pending',function($query) use ($rapidxEmpNo){
+                // Pending Approval
+                $query->where('rapidx_id',$rapidxEmpNo->rapidx_emp_id);
+            });
         }
+        $data = $ecr;
 
         return DataTables::of($data)
+            ->addColumn('employee_names', function ($row) {
+                // Join names into a single string for rendering if needed
+                return $row->training_endorsement_employees
+                    ->pluck('training_request_details_info.name')
+                    ->filter()
+                    ->implode(', ');
+            })
             ->addColumn('action', function ($row) use($exploded_u_access) {
 
                 $approver_array = $row->te_approval_details->where('approval_type', 'approved_by')->whereNull('updated_at')->pluck('rapidx_id')->toArray();
@@ -80,7 +96,7 @@ class TrainingEndorsementController extends Controller
                 $result = "";
                 $result .= '<center>';
                 $result .= '<button class="btn btn-sm mr-1 btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>';
-                    
+
                 if($row->created_by == $_SESSION['rapidx_user_id'] && $row->status != 3){
                     $result .= '<button class="btn btn-sm mr-1 btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>';
                     $result .= '<button class="btn btn-sm mr-1 btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>';
@@ -192,6 +208,7 @@ class TrainingEndorsementController extends Controller
 
                 return $result;
             })
+
             ->rawColumns(['action', 'raw_status', 'prepared_by', 'raw_checker', 'raw_approver'])
             ->make(true);
     }
@@ -292,7 +309,7 @@ class TrainingEndorsementController extends Controller
                 foreach($list_of_employee as $employee){
                     $empNo = $employee['emp_no'];
                     $filename = "";
-                    
+
                     $array_endorsement_employee = [
                         'training_endorsement_id'    => $data['endorsement_id'],
                         'training_request_detail_id' => $employee['tr_details_id'],
@@ -309,12 +326,14 @@ class TrainingEndorsementController extends Controller
                     // 3. Process new image
                     if (isset($employee['hands_on_image']) && !empty($employee['hands_on_image'])) {
                         $filename = $employee['hands_on_file_name'] ?? '';
+                        // Get extension from filename or default to png
                         $extension = 'png';
                         if (!empty($filename) && str_contains($filename, '.')) {
                             $extension = pathinfo($filename, PATHINFO_EXTENSION);
                         }
                         $storageFilename = $te_emp_id . '.' . $extension;
 
+                        // Decode base64 image if needed
                         $imageData = $employee['hands_on_image'];
                         if (preg_match('/^data:image\/(png|jpg|jpeg);base64,/', $imageData)) {
                             $imageData = preg_replace('/^data:image\/(png|jpg|jpeg);base64,/', '', $imageData);
@@ -322,17 +341,23 @@ class TrainingEndorsementController extends Controller
                         }
                         Storage::put('public/hands_on_attachments/' . $storageFilename, $imageData);
 
-                        TrainingEndorsementEmployee::where('id', $te_emp_id)->update([
+                        $total_rating = "{$employee['hands_on_rating']}/{$employee['hands_on_total_rating']}";
+                        TrainingEndorsementEmployee::where('id', $te_emp_id)
+                        ->update([
                             'hands_on_filename'     => $filename,
-                            'hands_on_filename_ext' => $extension
+                            'hands_on_filename_ext' => $extension,
+                            'hands_on_rating'       => $total_rating,
+                            'hands_on_remarks'      => $employee['hands_on_remarks'] ?? null
                         ]);
-                        
+
                     // 4. Retain old image (e.g., renaming 10.png to 12.png)
                     } elseif (isset($oldRecords[$empNo]) && !empty($oldRecords[$empNo]['hands_on_filename'])) {
-                        
-                        $oldId        = $oldRecords[$empNo]['id'];                 // This is 10
+
+                        $oldId        = $oldRecords[$empNo]['id'];                              // This is 10
                         $oldExtension = $oldRecords[$empNo]['hands_on_filename_ext'] ?? 'png';
                         $oldFilename  = $oldRecords[$empNo]['hands_on_filename'];
+                        $oldRating    = $oldRecords[$empNo]['hands_on_rating'];
+                        $oldRemarks   = $oldRecords[$empNo]['hands_on_remarks'];
 
                         $oldStoragePath = 'public/hands_on_attachments/' . $oldId . '.' . $oldExtension;       // public/hands_on_attachments/10.png
                         $newStoragePath = 'public/hands_on_attachments/' . $te_emp_id . '.' . $oldExtension;   // public/hands_on_attachments/12.png
@@ -346,7 +371,10 @@ class TrainingEndorsementController extends Controller
                         // Save the original filename metadata into your new row (ID 12)
                         TrainingEndorsementEmployee::where('id', $te_emp_id)->update([
                             'hands_on_filename'     => $oldFilename,
-                            'hands_on_filename_ext' => $oldExtension
+                            'hands_on_filename_ext' => $oldExtension,
+                            'hands_on_rating'       => $oldRating,
+                            'hands_on_remarks'      => $oldRemarks
+
                         ]);
                     }
                 }
@@ -430,7 +458,7 @@ class TrainingEndorsementController extends Controller
             DB::rollback();
             return $e->getMessage();
         }
-        
+
     }
 
     public function deleteTrainingEndorsement(Request $request)
@@ -499,7 +527,7 @@ class TrainingEndorsementController extends Controller
         $ctrl_number = $request->training_req_ctrl;
 
         // // Get training_request_detail_ids already in training_endorsement_employees
-       
+
             // 'training_request_details' => function($query) {
             //     $query->whereNotIn('id', function($sub) {
             //         $sub->select('training_request_detail_id')
@@ -513,9 +541,15 @@ class TrainingEndorsementController extends Controller
             'training_request_details.hr_memo_details',
             'training_request_details.employee_exam_details' => function($query) use ($ctrl_number) {
                 $query->where('training_request_ctrl_no', $ctrl_number);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
+
             },
             'training_request_details.employee_exam_details.exam_result_details_info' => function($query) {
                 $query->where('exam_result_status', 1);
+                $query->where('status', 0);
+                $query->where('logdel', 0);
+
             }
         ])
         ->where('ctrl_number', $request->training_req_ctrl)
@@ -552,7 +586,7 @@ class TrainingEndorsementController extends Controller
         // Properly replace the original details with the filtered collection using setRelation
         $trainingRequest->setRelation('training_request_details', $filtered_details);
 
-        
+
         if(!$trainingRequest){
             return response()->json([
                 'result' => false,
@@ -582,16 +616,37 @@ class TrainingEndorsementController extends Controller
 
     public function generateControlNumber()
     {
+        // $prefix = 'TUE';
+        // $year = date('y'); // last two digits of year
+        // $month = date('m');  // month, two digits
+
+        // // Count existing endorsements for today
+        // $count = TrainingEndorsement::count() + 1;
+        // $countPadded = str_pad($count, 4, '0', STR_PAD_LEFT);
+
+        // $controlNumber = "{$prefix}-{$year}{$month}-{$countPadded}";
+        // return $controlNumber;
+
         $prefix = 'TUE';
-        $year = date('y'); // last two digits of year
-        $month = date('m');  // month, two digits
+        $yearMonth = date('ym'); // e.g., '2607'
+        $formattedPrefix = "{$prefix}-{$yearMonth}-";
 
-        // Count existing endorsements for today
-        $count = TrainingEndorsement::count() + 1;
-        $countPadded = str_pad($count, 4, '0', STR_PAD_LEFT);
+        // Lock rows starting with "TUE-2607-" to prevent concurrent reads
+        $latest = TrainingEndorsement::where('ctrl_no', 'LIKE', "{$formattedPrefix}%")
+            ->lockForUpdate()
+            ->orderByRaw('CAST(RIGHT(ctrl_no, 4) AS UNSIGNED) DESC')
+            ->value('ctrl_no');
 
-        $controlNumber = "{$prefix}-{$year}{$month}-{$countPadded}";
-        return $controlNumber;
+        if ($latest) {
+            // Extract the last 4 digits and increment
+            $lastNumber = (int) substr($latest, -4);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            // First record for this month
+            $nextNumber = 1;
+        }
+
+        return $formattedPrefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     public function getEmployeesForNotEndorsed(Request $request)
@@ -602,12 +657,12 @@ class TrainingEndorsementController extends Controller
 
         return DataTables::of($tr_details)
         ->addColumn('action', function ($row) use ($request) {
-            $result = '';            
-            $result .= '<center>';            
-            $result .= '<button class="btn btn-sm btn-danger btnAddEmployeeForNotEndorsed" 
-                        data-emp-no="' . $row->emp_no . '"  
-                        data-te-id="' . $request->training_endorsement_id . '"  
-                        data-tr-id="' . $row->id . '"  
+            $result = '';
+            $result .= '<center>';
+            $result .= '<button class="btn btn-sm btn-danger btnAddEmployeeForNotEndorsed"
+                        data-emp-no="' . $row->emp_no . '"
+                        data-te-id="' . $request->training_endorsement_id . '"
+                        data-tr-id="' . $row->id . '"
                         title="Add Employee for Not Endorsed"><i class="fa fa-plus"></i></button>';
             $result .= '</center>';
             return $result;
@@ -615,7 +670,7 @@ class TrainingEndorsementController extends Controller
         ->rawColumns(['action'])
         ->make(true);
     }
-    
+
     public function addNotEndorsedEmp(Request $request){
         DB::beginTransaction();
         try{
@@ -652,6 +707,10 @@ class TrainingEndorsementController extends Controller
             'created_by_user_details',
             'created_by_user_details.employee_info',
             'training_request_details',
+            'training_request_details.training_request_details',
+            'training_request_details.training_request_details.training_attendance' => function($query) use ($tr_ctrl_no) {
+                $query->whereNull('deleted_at');
+            },
             'hr_memo_details',
             'te_approval_details',
             'te_approval_details.approver_details',
@@ -670,18 +729,27 @@ class TrainingEndorsementController extends Controller
             },
             'training_endorsement_employees.training_request_details_info.employee_exam_details.exam_result_details_info' => function($query) {
                 $query->where('exam_result_status', 1);
+                $query->where('remark', 'Passed');
                 $query->where('status', 0);
                 $query->where('logdel', 0);
+                // $query->orderBy('id', 'desc');
             }
         ])
         ->where('id', $request->id)
         ->first();
 
+        $collectEndorsementToRequestorDate = collect($data->training_request_details->training_request_details ?? [])
+        ->flatMap(function ($detail) {
+            return $detail->training_attendance;
+        })
+        ->max('date');
+
+        $dateEndorsementToRequestor = $collectEndorsementToRequestorDate ? Carbon::parse($collectEndorsementToRequestorDate)->format('F d, Y') : null;
+
         if (!$data) {
             abort(404, 'Endorsement not found.');
         }
 
-        // return $data;
         // Build employees array for the PDF
         $employees = [];
         $employees_will_not_endorse = [];
@@ -691,37 +759,68 @@ class TrainingEndorsementController extends Controller
             if (!$detail) continue;
 
             $exams = [];
-            if ($detail->employee_exam_details && $detail->employee_exam_details->count() > 0) {
-                foreach ($detail->employee_exam_details as $examResult) {
-                    $examDetail = $examResult->exam_result_details_info;
+            // if ($detail->employee_exam_details && $detail->employee_exam_details->count() > 0) {
+            if ($detail->employee_exam_details ) {
+                // foreach ($detail->employee_exam_details as $examResult) {
+                    $examDetail = $detail->employee_exam_details->exam_result_details_info;
                     $examTitle = '';
                     $score = '';
                     $rating = '';
                     $remark = '';
 
                     if ($examDetail) {
+                        foreach ($examDetail as $exam) {
+
                         // Parse questionnaire JSON for exam_title
-                        if ($examDetail->questionnaire) {
-                            $questionnaire = is_string($examDetail->questionnaire)
-                                ? json_decode($examDetail->questionnaire, true)
-                                : $examDetail->questionnaire;
-                        $examTitle = $questionnaire['exam_title'] ?? '';
+                            // if ($examDetail->questionnaire) {
+                            //     $questionnaire = is_string($examDetail->questionnaire)
+                            //         ? json_decode($examDetail->questionnaire, true)
+                            //         : $examDetail->questionnaire;
+                            //     $examTitle = $questionnaire['exam_title'] ?? '';
+                            // }
+                            $examResult = json_decode($exam->exam_result, true);
+                            if ($exam->questionnaire) {
+                                $questionnaire = is_string($exam->questionnaire)
+                                    ? json_decode($exam->questionnaire, true)
+                                    : $exam->questionnaire;
+                                $examTitle = $questionnaire['exam_title'] ?? '';
+                            }
+
+                            $totalScore = ($exam->score ?? 0) + ($exam->identification_essay_score ?? 0);
+                            // $totalItems = $questionnaire['total_items'] ?? $questionnaire['total_points'] ?? '';
+                            $totalItems = $exam->total_items ?? $exam->total_points ?? '';
+                            // $score = $totalItems ? $totalScore . '/' . $totalItems : $totalScore;
+                            // $score = $totalScore . '/' . ($examResult['summary']['total_score'] ?? '');
+                            $score = $totalScore . '/' . ($examResult['summary']['total_points'] ?? ''); // chris eto yung tama. push mo nalang
+                            // dd($examResult['summary']['total_score']);
+                            // $rating = $exam->rating ?? '';
+                            $rating = $exam->rating ? $exam->rating . '%' : '';
+
+                            if(is_null($exam->attempt)){
+                                $appendRemarks = "on 1st take";
+                            }
+                            else{
+                                $attemptCount = $exam->attempt ?? 1;
+                                $formatter = new \NumberFormatter('en_US', \NumberFormatter::ORDINAL);
+                                $appendRemarks = "on " . $formatter->format($attemptCount) . " take";
+                            }
+
+
+                            // $remark = $exam->remark ?? '';
+                            $remark = ($exam->remark ?? '') . ' ' . $appendRemarks;
+
+                            $exams[] = [
+                                'title'  => $examTitle,
+                                'score'  => $score,
+                                'rating' => $rating,
+                                'remark' => $remark,
+                            ];
                         }
 
-                        $totalScore = ($examDetail->score ?? 0) + ($examDetail->identification_essay_score ?? 0);
-                        $totalItems = $questionnaire['total_items'] ?? $questionnaire['total_points'] ?? '';
-                        $score = $totalItems ? $totalScore . '/' . $totalItems : $totalScore;
-                        $rating = $examDetail->rating ?? '';
-                        $remark = $examDetail->remark ?? '';
                     }
 
-                    $exams[] = [
-                        'title'  => $examTitle,
-                        'score'  => $score,
-                        'rating' => $rating,
-                        'remark' => $remark,
-                    ];
-                }
+
+                // }
             }
 
             $posDeptSec = implode(' / ', array_filter([
@@ -744,13 +843,13 @@ class TrainingEndorsementController extends Controller
                 $rating = round($percentage) . '%';
 
                 $exams[] = [
-                    'title'  => "MAG PLATE MEASUREMENT",
+                    'title'  => "Mag Plate Measurement",
                     'score'  => $emp->hands_on_rating ?? '',
                     'rating' => $rating ?? '0%',
                     'remark' => $emp->hands_on_remarks ?? '',
                 ];
             }
-            
+
             if($emp->will_endorse == 1){
                 $employees_will_not_endorse[] = [
                     'date_hired'          => $detail->date_hired ?? '',
@@ -774,7 +873,7 @@ class TrainingEndorsementController extends Controller
                     'attachment'          => $emp->hands_on_filename ? asset('public/storage/hands_on_attachments/' . $emp->id . '.' . $emp->hands_on_filename_ext) : '',
                 ];
             }
-           
+
         }
 
         $attnEmails = $data->mail_cc ?? '';
@@ -809,7 +908,6 @@ class TrainingEndorsementController extends Controller
             }
         }
 
-        // return $data;
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,
@@ -822,6 +920,7 @@ class TrainingEndorsementController extends Controller
             'endorsement_to_requestor_date' => $endorsementDate,
             'employees'                     => $employees,
             'employees_will_not_endorse'    => $employees_will_not_endorse,
+            'date_endorsement_to_requestor'    => $dateEndorsementToRequestor,
         ]);
 
         $pdf->setPaper('A4', 'landscape');
@@ -846,9 +945,9 @@ class TrainingEndorsementController extends Controller
             ])->where('id', $request->id)->first();
 
             $this->CommonController->sendEmailTrainingEndorsement($details, 1);
-            
+
             DB::commit();
-            
+
             return response()->json([
                 'result' => true,
                 'message' => 'Endorsement approval proceeded successfully.'
@@ -857,7 +956,7 @@ class TrainingEndorsementController extends Controller
             DB::rollback();
             return response()->json([
                 'result' => false,
-                'message' => 'An error occurred while processing your request.'
+                'message' => 'An error occurred while processing your request.'. $e->getMessage()
             ]);
         }
     }
@@ -925,7 +1024,7 @@ class TrainingEndorsementController extends Controller
     public function disapproveEndorsement(Request $request){
         DB::beginTransaction();
         try{
-            
+
             $approval_type = $request->approval_type; // 'checker' or 'approver'
             TrainingEndorsement::where('id', $request->id)
             ->update([
