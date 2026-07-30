@@ -246,6 +246,7 @@ $(document).ready(function() {
 
     exportSkillMatrix.on('click', function(){
         console.log('exportClicked');
+         window.location.href = 'export_skill_map_pdf';
     });
 
 
