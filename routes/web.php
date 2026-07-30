@@ -286,18 +286,19 @@ Route::middleware('checkSession')->group(function(){
         // Route::get('/test-pdf', function () {
         //     dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
         // });
-Route::get('/test-pdf', function () {
-    try {
-        require_once base_path('vendor/barryvdh/laravel-dompdf/src/Facade/Pdf.php');
+    Route::get('/test-pdf', function () {
+        try {
+            require_once base_path('vendor/barryvdh/laravel-dompdf/src/Facade/Pdf.php');
 
-        dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
-    } catch (\Throwable $e) {
-        dd(
-            $e->getMessage(),
-            $e->getFile(),
-            $e->getLine()
-        );
-    }
+            dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
+        } catch (\Throwable $e) {
+            dd(
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            );
+        }
+    });
 });
 
     Route::controller(ETRController::class)->group(function () {
