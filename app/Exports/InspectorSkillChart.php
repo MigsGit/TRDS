@@ -66,9 +66,9 @@ class InspectorSkillChart implements WithMultipleSheets{
                     $group = null;
             }
 
-            if (!isset($availableSheets[$sheet])) {
-                continue;
-            }
+            // if (!isset($availableSheets[$sheet])) {
+            //     continue;
+            // }
 
             $categories = $this->processStationDetails
             ->where('section', $sheet)
@@ -87,8 +87,9 @@ class InspectorSkillChart implements WithMultipleSheets{
             })
             ->values();   
 
-            $class = $availableSheets[$sheet];
-            $sheets[] = new $class($categories, $group);
+            // $class = $availableSheets[$sheet];
+            // $class = TSF1[$sheet];
+            $sheets[] = new TSF1($categories, $group, $sheet);
         }
 
         return $sheets;

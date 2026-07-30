@@ -13,6 +13,7 @@ use App\Model\Hr\HrMemoTraineeDetails;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
 use App\Exports\InspectorSkillChart;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -697,5 +698,12 @@ class HrMemoController extends Controller
             new InspectorSkillChart($selectedSheets),
             'QC Inspectors Skill Chart.xlsx'
         );
+    }
+
+    public function viewEmpSkillCardPdf()
+    {
+        $pdf = PDF::loadView('view_skill_card_pdf', compact(''))->setPaper('A4', 'portrait');
+
+        return $pdf->stream();
     }
 }
