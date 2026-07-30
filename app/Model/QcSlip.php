@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 class QcSlip extends Model
 {
     use HasFactory;
+    protected $table = 'qc_slips';
 
     protected $fillable = [
         'status'
@@ -80,6 +81,11 @@ class QcSlip extends Model
     public function f_qc_validation()
     {
         return $this->hasOne(FQcValidation::class, 'qc_slips_id',  'id')->where('deleted_at');
+    }
+
+    public function productLine()
+    {
+        return $this->belongsTo(DropdownMasterDetail::class, 'product_line', 'id');
     }
 
 }
