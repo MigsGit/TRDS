@@ -201,6 +201,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/send_hr_memo_mail', 'sendHrMemoMail')->name('send_hr_memo_mail');
         Route::get('/get_trainor_dropdown_details', 'getTrainorDropdownDetails')->name('get_trainor_dropdown_details');
         Route::get('/export_inspector_skill_chart', 'exportInspectorSkillChart')->name('export_inspector_skill_chart');
+        Route::get('/view_emp_skill_card_pdf', 'viewEmpSkillCardPdf')->name('viewEmpSkillCardPdf');
     });
 
     // =======================================================================================================
@@ -284,26 +285,22 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_employee_trainings', 'getEmployeeTrainings')->name('get_employee_trainings');
         Route::get('/export_skill_map_pdf', 'exportSkillMapPdf')->name('export_skill_map_pdf');
         // Route::get('/test-pdf', function () {
-            //     dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
-            // });
-        Route::get('/get_product_line', 'getProductLine')->name('get_product_line');
-        Route::get('/get_employee_position', 'getEmployeePosition')->name('get_employee_position');
-        Route::get('/get_employees', 'getEmployees')->name('get_employees');
+        //     dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
+        // });
+    Route::get('/test-pdf', function () {
+        try {
+            require_once base_path('vendor/barryvdh/laravel-dompdf/src/Facade/Pdf.php');
 
-        Route::get('/test-pdf', function () {
-            try {
-                require_once base_path('vendor/barryvdh/laravel-dompdf/src/Facade/Pdf.php');
-
-                dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
-            } catch (\Throwable $e) {
-                dd(
-                    $e->getMessage(),
-                    $e->getFile(),
-                    $e->getLine()
-                );
-            }
-        });
+            dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
+        } catch (\Throwable $e) {
+            dd(
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            );
+        }
     });
+});
 
     Route::controller(ETRController::class)->group(function () {
         Route::get('view_employee_training_record', 'viewEmployeeTrainingRecord');
