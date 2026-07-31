@@ -42,6 +42,7 @@ class QuestionnairesController extends Controller
                 }
 
                 $result .=  '       <button type="button" class="btn text-center dropdown-item actionUpdateQuestionnaire" questionnaire-id="' . $questionnaire->id . '" data-toggle="modal" data-target="#modalCreateUpdateQuestionnaire" title="Update Questionnaire"><i class="fa fa-edit"></i> Update</button>';
+                $result .=  '       <button type="button" class="btn text-center dropdown-item actionCopyQuestionnaire" questionnaire-id="' . $questionnaire->id . '" data-toggle="modal" data-target="#modalCopyQuestionnaire" title="Copy Questionnaire"><i class="fa fa-copy"></i>&nbsp;  Copy&emsp;</button>';
                 $result .=  '       <button type="button" class="btn text-center dropdown-item actionQuestionnaireDetails" questionnaire-id="' . $questionnaire->id . '" questionnaire-revision="' . $questionnaire->revision . '" questionnaire-exam_title="' . $questionnaire->exam_title . '" questionnaire-description="' . $questionnaire->description . '" data-toggle="modal" data-target="#modalQuestionnaireDetails" title="Questionnaire Details"><i class="fa fa-list-ul"></i> Details</button>';
                 $result .=  '       <button type="button" class="btn text-center dropdown-item actionChangeQuestionnaireStatus" questionnaire-id="' . $questionnaire->id . '" status="1" data-toggle="modal" data-target="#modalChangeQuestionnaireStatus" title="Deactivate Questionnaire"><i class="fa fa-ban"></i> Inactive</button>';
                 $result .=  '   </div>';

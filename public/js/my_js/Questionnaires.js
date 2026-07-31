@@ -395,6 +395,7 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
                                 .trigger('change');
                         }
                     });
+                    $('.chkAnswer').prop('disabled', false);
                     break;
 
                 case 1:

@@ -642,6 +642,7 @@
                     console.log('Form reset');
                 });
 
+                $('.chkAnswer').prop('disabled', true);
 
                 $('#txtAttachment').addClass('d-none')
                 $('#fileAttachment').removeClass('d-none')
