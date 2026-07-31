@@ -137,6 +137,8 @@ Route::middleware('checkSession')->group(function(){
         Route::get('get_questionnaire_by_id', 'getQuestionnaireById');
         Route::post('change_questionnaire_status', 'changeQuestionnaireStatus');
         Route::get('/view_pdf_questionnaire/{id}', 'viewPdfQuestionnaire');
+        Route::get('copy_preview', 'copyPreview');
+        Route::post('copy_questionnaire', 'copyQuestionnaire');
 
         // Questionnaires details routes
         Route::get('view_questionnaire_details', 'viewQuestionnaireDetails');

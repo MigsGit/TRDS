@@ -245,6 +245,60 @@ const ChangeQuestionnaireStatus = (questionnaireId) => {
     ajaxRequest(ajaxGetQuestionnaireStatus);
 };
 
+function CopyQuestionnaire(id, description){
+    $.ajax({
+        url: 'copy_questionnaire',
+        type: 'POST',
+        data: {
+            questionnaire_id: id,
+            description: description,
+            _token: csrfToken
+        },
+
+        beforeSend:function(){
+            Swal.fire({
+                title: 'Copying...',
+                text: 'Please wait while copying questionnaire.',
+                allowOutsideClick: false,
+                didOpen:()=>{
+                    Swal.showLoading();
+                }
+            });
+        },
+
+        success:function(response){
+            if(response.success){
+                Swal.fire(
+                    'Success',
+                    response.message,
+                    'success'
+                ).then(()=>{
+                    location.reload();
+                });
+            }else{
+                Swal.fire(
+                    'Error',
+                    response.message,
+                    'error'
+                );
+            }
+        },
+
+        error:function(xhr){
+            let message = 'Copy failed.';
+
+            if(xhr.responseJSON && xhr.responseJSON.message){
+                message = xhr.responseJSON.message;
+            }
+
+            Swal.fire(
+                'Error',
+                message,
+                'error'
+            );
+        }
+    });
+}
 // =================================================================================================================================
 // ===================================================== QUESTIONNAIRE DETAILS =====================================================
 // =================================================================================================================================
