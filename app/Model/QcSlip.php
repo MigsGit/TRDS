@@ -12,6 +12,7 @@ use App\Model\Qc\FQcValidation;
 use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\Model\RapidXUser;
+use App\Model\Qc\OpApprover;
 use App\OpApprover;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,10 @@ class QcSlip extends Model
     protected $fillable = [
         'status'
     ];
+    public function product_line_details() // Chris
+    {
+        return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');
+    }
     // public function product_line()
     // {
     //     return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');

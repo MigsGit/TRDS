@@ -2333,7 +2333,7 @@
                                             <!-- ------------------------------------------------ -->
 
                                             <p class="ms-4">TRAINING ITEMS :</p>
-
+{{-- start --}}
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <div class="form-check ms-5">
@@ -2900,7 +2900,7 @@
                                                     <div class="form-check ms-2"></div>
                                                 </div>
                                             </div>
-
+{{-- ennd --}}
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label class="ms-3" for="">Trained and Qualified by:</label>
@@ -4727,9 +4727,6 @@
                                             </div>
 
                                             <label for="">Note: NG Injection process shall be taken from first lot output</label>
-
-                                            <!-- ------------------------------------------------ -->
-
                                         </div>
                                         </div>
                                     </div>

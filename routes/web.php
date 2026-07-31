@@ -1,16 +1,19 @@
 <?php
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\ExaminationResultController;
+use App\Http\Controllers\ExamTitleController;
 use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
+use App\Http\Controllers\ListOfCertPersonnelController;
+use App\Http\Controllers\PersonnelSkillMatrixController;
 use App\Http\Controllers\QualificationCertificationController;
 use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PersonnelSkillMatrixController;
-use App\Http\Controllers\ExamTitleController;
+use App\Http\Controllers\ETRController;
+use App\Http\Controllers\InspSkillChartSettingController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -34,6 +37,10 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/user_master', function () {
         return view('user');
     })->name('user_master');
+
+    Route::get('/insp_skill_chart_setting', function () {
+        return view('inspector_skill_chart_settings');
+    })->name('insp_skill_chart_setting');
 
     Route::get('/hr_memo_exam', function () {
         return view('hr_memo_examination');
@@ -107,9 +114,16 @@ Route::middleware('checkSession')->group(function(){
     Route::controller(QualificationCertificationController::class)->group(function () {
         // Questionnaires main routes
         Route::post('save_qualification_certification_oper', 'saveQualificationCertificationOper');
+        Route::post('save_form_send_email', 'saveFormSendEmail');
+        Route::post('save_first_take_ins_sequence', 'saveFirstTakeInsSequence');
+        Route::post('update_approval', 'updateApproval');
 
+        Route::get('load_qc_slip', 'loadQcSlip');
         Route::get('get_div_dept_sec', 'getDivDeptSec');
         Route::get('get_dropdown_master_details_by_fkid', 'getDropdownMasterDetailsByFkid');
+        Route::get('get_qc_slips_by_id', 'getQcSlipsById');
+        Route::get('load1st_qc_validation', 'load1stQcValidation');
+        Route::get('load2nd_qc_validation', 'load2ndQcValidation');
     });
 
     Route::controller(QuestionnairesController::class)->group(function () {
@@ -122,6 +136,7 @@ Route::middleware('checkSession')->group(function(){
         Route::post('create_update_questionnaire', 'createUpdateQuestionnaire');
         Route::get('get_questionnaire_by_id', 'getQuestionnaireById');
         Route::post('change_questionnaire_status', 'changeQuestionnaireStatus');
+        Route::get('/view_pdf_questionnaire/{id}', 'viewPdfQuestionnaire');
 
         // Questionnaires details routes
         Route::get('view_questionnaire_details', 'viewQuestionnaireDetails');
@@ -149,17 +164,17 @@ Route::middleware('checkSession')->group(function(){
         Route::get('get_employee_exam_result_by_id', 'getEmployeeExamResultById');
         Route::post('update_exam_score_for_employee', 'updateExamScoreForEmployee');
 
-        Route::get('/view_pdf/{id}', 'viewPdf');
+        Route::get('/view_pdf_examination_result/{id}', 'viewPdfExaminationResult');
         Route::post('update_examination_date', 'updateExaminationDate');
         Route::post('update_examination_date', 'updateExaminationDate');
         Route::post('change_exam_result_status', 'changeExamResultStatus');
-        });
+    });
 
-        Route::controller(ExamTitleController::class)->group(function () {
-            Route::get('view_exam_title', 'viewExamTitle');
-            Route::post('create_update_exam_title', 'createUpdateExamTitle');
-            Route::get('get_exam_title_by_id', 'getExamTitleById');
-            Route::post('change_exam_title_status', 'changeExamTitleStatus');
+    Route::controller(ExamTitleController::class)->group(function () {
+        Route::get('view_exam_title', 'viewExamTitle');
+        Route::post('create_update_exam_title', 'createUpdateExamTitle');
+        Route::get('get_exam_title_by_id', 'getExamTitleById');
+        Route::post('change_exam_title_status', 'changeExamTitleStatus');
     });
 
     // =======================================================================================================
@@ -186,6 +201,17 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/send_hr_memo_mail', 'sendHrMemoMail')->name('send_hr_memo_mail');
         Route::get('/get_trainor_dropdown_details', 'getTrainorDropdownDetails')->name('get_trainor_dropdown_details');
         Route::get('/export_inspector_skill_chart', 'exportInspectorSkillChart')->name('export_inspector_skill_chart');
+        Route::get('/view_emp_skill_card_pdf', 'viewEmpSkillCardPdf')->name('viewEmpSkillCardPdf');
+    });
+
+    // =======================================================================================================
+    Route::controller(InspSkillChartSettingController::class)->group(function () {
+        Route::get('/view_process_stations', 'viewProcessStationsInfo')->name('view_process_stations');
+        Route::post('/add_process_station', 'addProcessStationInfo')->name('add_process_station');
+        Route::get('/get_process_station_by_id', 'getProcessStationById')->name('get_process_station_by_id');
+        Route::post('/update_process_station_status', 'updateProcessStationStatus')->name('update_process_station_status');
+        Route::get('/get_process_stations', 'getProcessStations')->name('get_process_stations');
+        Route::get('/get_process_count_per_category', 'getProcessCountPerCategory')->name('get_process_count_per_category');
     });
 
     // USER CONTROLLER
@@ -249,7 +275,6 @@ Route::middleware('checkSession')->group(function(){
     });
 
     Route::controller(PersonnelSkillMatrixController::class)->group(function () {
-
         //TRAINING REQUEST
         Route::get('/get_direct_employees', 'getDirectEmployees')->name('get_direct_employees');
         Route::get('/get_subcon_employees', 'getSubconEmployees')->name('get_subcon_employees');
@@ -262,20 +287,20 @@ Route::middleware('checkSession')->group(function(){
         // Route::get('/test-pdf', function () {
         //     dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
         // });
-Route::get('/test-pdf', function () {
-    try {
-        require_once base_path('vendor/barryvdh/laravel-dompdf/src/Facade/Pdf.php');
-
-        dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
-    } catch (\Throwable $e) {
-        dd(
-            $e->getMessage(),
-            $e->getFile(),
-            $e->getLine()
-        );
-    }
+        Route::get('/get_product_line', 'getProductLine')->name('get_product_line');
+        Route::get('/get_employee_position', 'getEmployeePosition')->name('get_employee_position');
+        Route::get('/get_employees', 'getEmployees')->name('get_employees');
 });
 
+    Route::controller(ETRController::class)->group(function () {
+        Route::get('view_employee_training_record', 'viewEmployeeTrainingRecord');
+        Route::get('get_systemone_employee_training_details', 'getSystemoneEmployeeTrainingDetails');
+        // Route::post('create_update_exam_title', 'createUpdateExamTitle');
+        // Route::post('change_exam_title_status', 'changeExamTitleStatus');
+    });
+    Route::controller(ListOfCertPersonnelController::class)->group(function(){
+        Route::get('/get_dropdown_select_certpersonnel', 'getDropdownSelectCertPersonnel')->name('get_dropdown_select_certpersonnel');
+        Route::get('/export_list_cert_personnel', 'exportListCertPersonnel')->name('export_list_cert_personnel');
     });
 
 

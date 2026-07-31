@@ -11,6 +11,9 @@ use App\Model\Hr\HrMemoTraineeDetails;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
 use Yajra\DataTables\Facades\DataTables;
 use App\Model\QcSlip;
+use App\Model\Qc\QcSlipEmployee;
+use App\Model\DropdownMasterDetail;
+use App\Model\DropdownMaster;
 use Barryvdh\DomPDF\Facade;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -259,6 +262,7 @@ class PersonnelSkillMatrixController extends Controller
                         return '<span class="badge badge-secondary">N/A</span>';
                 }
             }
+
             
             switch ((int) $row->result) {
                 case 1:
@@ -299,6 +303,137 @@ class PersonnelSkillMatrixController extends Controller
         ->make(true);
     }
 
+    public function getProductLine()
+    {
+        return QcSlip::with('product_line_details')
+            ->where('status', 'OK')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => optional($item->product_line_details)->id,
+                    'product_line' => optional($item->product_line_details)->dropdown_masters_details,
+                ];
+            })
+            ->filter(function ($item) {
+                return !empty($item['product_line']);
+            })
+            ->unique('id')
+            ->values();
+    }
+
+    public function getEmployeePosition(){
+         return QcSlip::where('status', 'OK')
+        ->select('position_category')
+        ->distinct()
+        ->get();
+
+    }
+
+    public function getEmployees(Request $request)
+    {
+        $employees = QcSlipEmployee::with([
+            'system_one_hris_emp_info',
+            'system_one_subcon_emp_info'
+        ])
+        ->whereHas('qcSlip', function ($q) use ($request) {
+            $q->where('status', 'OK')
+            ->where('product_line', $request->product_line)
+            ->where('position_category', $request->position);
+        })
+        ->get()
+        ->map(function ($employee) {
+
+            $emp = $employee->system_one_hris_emp_info
+                ?? $employee->system_one_subcon_emp_info;
+
+            return [
+                'EmpNo'   => optional($emp)->EmpNo,
+                'EmpName' => optional($emp)->EmpName,
+                'dateHired' => optional($emp)->DateHired,
+            ];
+        })
+        ->unique('EmpNo')
+        ->values();
+
+        return response()->json($employees);
+    }
+
+     public function exportSkillMapPdf(Request $request)
+    {
+        $productLineId = $request->product_line;
+        // dd($request->position);
+        $position = strtoupper($request->position);
+
+        $productLine = DropdownMasterDetail::where('id', $productLineId)
+        ->value('dropdown_masters_details');
+
+        $productStation = DropdownMasterDetail::whereHas('dropdown_master', function ($q) use ($position) {
+            $q->where('dropdown_masters', 'Stations')
+            ->where('category', $position);
+        })
+        ->where('dropdown_masters_details', '!=', 'N/A')
+        ->select('id', 'dropdown_masters_details')
+        ->get();
+
+        // return ($productStation);
+
+        $employees = json_decode($request->employees, true);
+
+        $employees = collect(json_decode($request->employees, true))
+        ->map(function ($employee) use ($productLineId) {
+
+            $details = explode('|', $employee['empNo']);
+            $empNo = $details[0] ?? '';
+
+            $records = QcSlipEmployee::where('employee_no', $empNo)
+                ->whereHas('qcSlip', function ($q) use ($productLineId) {
+                    $q->where('product_line', $productLineId)
+                    ->where('status', 'OK');
+                })
+                ->get();
+
+            // Count records per station
+            $assemblyCount = $records->where('station_to', 3)->count(); // Assembly Process
+            $visualCount   = $records->where('station_to', 2)->count(); // Visual Inspection
+            $partPrepCount     = $records->where('station_to', 1)->count(); // Parts Prep
+            $machineCount  = $records->where('station_to', 4)->count(); // Machine Operation
+
+
+            return [
+                'empNo'      => $empNo,
+                'empName'    => $details[1] ?? '',
+                'dateHired'  => $details[2] ?? '',
+
+                'stations' => [
+                    1 => $this->levelImage($partPrepCount),
+                    2 => $this->levelImage($visualCount),
+                    3 => $this->levelImage($assemblyCount),
+                    4 => $this->levelImage($machineCount),
+                ],
+
+
+            ];
+        })
+        ->toArray();
+
+        $pdf = Pdf::loadView('pdf.skill_map', [
+            'productLine' => $productLine,
+            'employees'   => $employees,
+            'productStation' => $productStation,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream('skill_matrix.pdf');
+    }
+
+    private function levelImage($count)
+    {
+        if ($count <= 0) return 'level0.png';
+        if ($count == 1) return 'level1.png';
+        if ($count == 2) return 'level2.png';
+        if ($count == 3) return 'level3.png';
+
+        return 'level4.png';
+    }
      public function exportSkillMapPdf()
     {
         $pdf = Pdf::loadView('pdf.skill_map')

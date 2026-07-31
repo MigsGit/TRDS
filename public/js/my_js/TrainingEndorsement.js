@@ -28,7 +28,13 @@ const trainingEndorsementTable = $('#tblTrainingEndorsement').DataTable({
         { data: 'training_request_details.ctrl_number'  },
         { data: 'prepared_by' },
         { data: 'raw_checker' },
-        { data: 'raw_approver' }
+        { data: 'raw_approver' },
+        {
+            data: 'employee_names',
+            name: 'employee_names',
+            visible: false,   // Keeps it invisible in UI
+            searchable: true // Enables search requests to backend
+        },
     ]
 });
 
@@ -71,7 +77,7 @@ $(document).on('click', '.btnViewEndorsement', function () {
     $.ajax({
         url: 'get_training_endorsement_by_id',
         method: 'GET',
-        data: { 
+        data: {
             id: id,
             tr_ctrl_no: trCtrlNo
         },
@@ -79,7 +85,7 @@ $(document).on('click', '.btnViewEndorsement', function () {
             $('#btnExportEndorsement').prop('hidden', false);
             $('#selectApprovedBy').val('').trigger('change');
             $('#selectCheckedBy').val('').trigger('change');
-        },  
+        },
         success: function (response) {
             if (response.result) {
                 let data = response.data;
@@ -95,13 +101,13 @@ $(document).on('click', '.btnViewEndorsement', function () {
                 console.log(data.approved_by);
                 $('#selectApprovedBy').val(data.approved_by).trigger('change');
                 $('#selectCheckedBy').val(data.checked_by).trigger('change');
-                
+
                 $('#attn').prop('disabled', true);
                 $('#trainingReqCtrl').prop('disabled', true);
                 $('#btnSubmitEndorsement').hide();
                 $('#selectApprovedBy').prop('disabled', true);
                 $('#selectCheckedBy').prop('disabled', true);
-                
+
                 endorsementEmpList = data.training_endorsement_employees || [];
 
                 var rows =  endorsementEmpList.map(function(detail) {
@@ -124,7 +130,7 @@ $(document).on('click', '.btnViewEndorsement', function () {
                         return;
                     }
                     if (Array.isArray(emp.training_request_details_info.employee_exam_details.exam_result_details_info) && emp.training_request_details_info.employee_exam_details.exam_result_details_info.length > 0) {
-                        
+
                         ratings = emp.training_request_details_info.employee_exam_details.exam_result_details_info.map(function(exam) {
                             return exam.rating !== undefined && exam.rating !== null
                                 ? exam.rating
@@ -172,7 +178,7 @@ $(document).on('click', '.btnViewEndorsement', function () {
                         statusHtml = '<span class="badge badge-danger">Not Endorsed</span>';
                     }
 
-                   
+
                     return Object.assign({
                         action: '--',
                         status: statusHtml,
@@ -188,7 +194,7 @@ $(document).on('click', '.btnViewEndorsement', function () {
                         training_endorsement_employee_id: emp.id || ''
                     });
                 });
-                
+
                 // Load employees into modal table
                 endorsementEmployeeTable.clear().rows.add(rows).draw();
 
@@ -323,6 +329,7 @@ formAddEndorsement.on('submit', function (e) {
         };
     });
 
+
     var formData = new FormData(this);
     formData.append('employees', JSON.stringify(employees));
 
@@ -416,7 +423,7 @@ $('#trainingReqCtrl').on('keyup', function (e) {
             console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
         }
     });
-    
+
 
     if(e.key === 'Enter'){
         e.preventDefault();
@@ -569,10 +576,10 @@ $('#trainingReqCtrl').on('keyup', function (e) {
                 });
                 endorsementEmployeeTable.clear().rows.add(rows).draw();
                 // Set row background for failed/no exam on draw
-                
+
                 applyCustomFailedRowBg();
 
-                
+
             },
             error: function(xhr, status, error){
                 console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
@@ -660,7 +667,7 @@ $('#handsOnImage').on('change', function () {
         $('#handsOnPreview').hide();
         return;
     }
-    var reader = new FileReader(); 
+    var reader = new FileReader();
     reader.onload = function (e) {
         $('#handsOnPreviewImg').attr('src', e.target.result);
         $('#handsOnPreview').show();
@@ -679,7 +686,7 @@ $('#btnSaveHandsOn').on('click', function () {
     }
     var rowIdx = parseInt($('#handsOnRowIndex').val());
     var rowData = endorsementEmployeeTable.row(rowIdx).data();
-    
+
     var reader = new FileReader();
     reader.onload = function (e) {
         rowData.hands_on_image = e.target.result;
@@ -736,7 +743,7 @@ $(document).on('click', '.btnViewHandsOnAttachment', function () {
 });
 
 $('#btnExportEndorsement').on('click', function(){
-     const id = $('#endorsementId').val();
+    const id = $('#endorsementId').val();
     const trCtrlNo = $('#trainingReqCtrl').val();
     if (!id || !trCtrlNo) {
         toastr.error('Something went wrong. Please try again.');
@@ -840,7 +847,7 @@ $(document).on('click', '.btnEditEndorsement', function(){
     $.ajax({
         url: 'get_training_endorsement_by_id',
         method: 'GET',
-        data: { 
+        data: {
             id: id,
             tr_ctrl_no: trCtrlNo
         },
@@ -848,7 +855,7 @@ $(document).on('click', '.btnEditEndorsement', function(){
             $('#btnExportEndorsement').prop('hidden', false);
             $('#selectApprovedBy').val('').trigger('change');
             $('#selectCheckedBy').val('').trigger('change');
-        },  
+        },
         success: function (response) {
             if (response.result) {
                 let data = response.data;
@@ -864,13 +871,13 @@ $(document).on('click', '.btnEditEndorsement', function(){
                 $('#attn').val(attn).trigger('change');
                 $('#selectApprovedBy').val(data.approved_by).trigger('change');
                 $('#selectCheckedBy').val(data.checked_by).trigger('change');
-                
+
                 $('#attn').prop('readonly', false);
                 $('#trainingReqCtrl').prop('readonly', true);
                 $('#btnSubmitEndorsement').show();
                 $('#selectApprovedBy').prop('readonly', false);
                 $('#selectCheckedBy').prop('readv conly', false);
-                
+
                 // Get job function from dynamic training request details block
                 let trJobFunctions = data.training_request_details ? data.training_request_details.job_function : null;
                 endorsementEmpList = data.training_endorsement_employees || [];
@@ -916,7 +923,7 @@ $(document).on('click', '.btnEditEndorsement', function(){
                                 ? exam.questionnaire
                                 : null;
                         }).filter(function(q) { return q !== null; });
-                        
+
                         var parsedQuestionnaires = questionnaireArr.map(function(q) {
                             if (typeof q === 'string') {
                                 try {
@@ -928,12 +935,12 @@ $(document).on('click', '.btnEditEndorsement', function(){
                             return q;
                         }).filter(function(q) { return q !== null; });
                         questionnaire = JSON.stringify(parsedQuestionnaires);
-                        
+
                         try {
                             const qArr = JSON.parse(questionnaire);
                             if (Array.isArray(qArr) && qArr.length > 0) {
                                 hasExam = true;
-                                examTitles = qArr.map(q => q && q.exam_title ? q.exam_title : '').filter(Boolean).join(' | ');
+                                examTitles = qArr.map(q => q && q.description ? q.description : '').filter(Boolean).join(' | ');
                             }
                         } catch (e) {
                             examTitles = '';
@@ -1003,7 +1010,7 @@ $(document).on('click', '.btnEditEndorsement', function(){
                         training_endorsement_employee_id: emp.id || ''
                     });
                 });
-                
+
                 // Load employees into modal table
                 endorsementEmployeeTable.clear().rows.add(rows).draw();
 
@@ -1133,7 +1140,7 @@ function drawEmployeeForNotEndorsed(training_endorsement_id, trId){
 }
 
 function addNotEndorsedEmployee(empNo, teId, trId, remarks){
-    
+
     $.ajax({
         type: "POST",
         url: "add_not_endorsed_emp",

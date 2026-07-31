@@ -1,4 +1,4 @@
-@php 
+@php
     $layout = 'layouts.super_user_layout';
     $session = session('global_user');
     $exploded_u_access = explode(',', $session->user_modules_id);
@@ -48,7 +48,7 @@
                                             <option value="3">Approved</option>
                                         </select>
                                     @endif
-                                    
+
                                     <button class="btn btn-primary btn-sm ms-auto" id="btnShowModalAddEndorsement">
                                         <i class="fa fa-plus fa-md me-2"></i> Add Endorsement
                                     </button>
@@ -141,7 +141,7 @@
                                     <input type="text" class="form-control" name="endorsement_date" value="<?= date('Y-m-d') ?>" id="endorsementDate" readonly>
                                 </div>
                             </div>
-                           
+
                         </div>
 
                         <!-- Employee DataTable -->
@@ -240,9 +240,9 @@
                         <label for="handsOnRating">Rating</label>
                         <div class="d-flex align-items-center">
                             <input type="number" class="form-control w-50" id="handsOnRating" name="hands_on_rating" min="0" value="30" placeholder="Score">
-                            
+
                             <span class="mx-2 font-weight-bold">/</span>
-                            
+
                             <input type="number" class="form-control w-50" id="handsOnTotalRating" name="hands_on_total_rating" min="0" value="30" placeholder="Total">
                         </div>
                     </div>
@@ -251,8 +251,12 @@
                         {{-- <textarea class="form-control" id="handsOnRemarks" name="hands_on_remarks" rows="3" placeholder="Enter remarks..."></textarea> --}}
                         <select name="hands_on_remarks" id="handsOnRemarks" class="form-control">
                             <option value="" selected disabled>--Select--</option>
-                            <option value="Passed">Passed</option>
-                            <option value="Failed">Failed</option>
+                            <option value="Passed on 1st take">Passed on 1st take</option>
+                            <option value="Passed on 2nd take">Passed on 2nd take</option>
+                            <option value="Passed on 3rd take">Passed on 3rd take</option>
+                            <option value="Failed on 1st take">Failed on 1st take</option>
+                            <option value="Failed on 2nd take">Failed on 2nd take</option>
+                            <option value="Failed on 3rd take">Failed on 3rd take</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -304,7 +308,7 @@
             </div>
         </div>
     </div>
-    
+
 
 @endsection
 
@@ -316,7 +320,7 @@
             $(this).select2({
                 theme: 'bootstrap-5',
                 dropdownParent: $(this).closest('.modal'),
-                
+
             });
         });
     });
@@ -335,8 +339,8 @@
         $('#endorsementId').val('');
         endorsementEmployeeTable.clear().draw();
     });
-    
-    
+
+
     getCheckedByUsers();
     getApprovedByUsers();
     getAllEmail();

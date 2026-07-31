@@ -92,6 +92,7 @@ function initHrMemoApprovalTable($table, url = 'view_hr_memo') {
         fixedHeader: true,
         columns: [
             { data: 'action', orderable: false, searchable: false },
+            { data: 'trainee_names', visible: false, searchable: true},
             { data: 'status_label' },
             { data: 'document_no' },    // customize this per hr_memo_approval
             { data: 'date_filed' },    // customize this per hr_memo_approval
@@ -128,6 +129,14 @@ function initTraineeDetailsTable($table1) {
                     return actionButtons;
                 }
             },
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.settings._iDisplayStart + meta.row + 1;
+                }
+            },
             { data: "emp_no" },
             { data: "emp_name" },
             { data: "position" },
@@ -145,6 +154,14 @@ function initTraineeDetailsTable($table1) {
 function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetails, $tableTD, $modalTD, $formTD, $addButtonTD, $addButtonExam, $tableExam){
     let traineeDetailsArray = [];
     let traineeIdCounter = 1;
+
+    // dtTraineeDetails.on('order.dt search.dt draw.dt', function () {
+    //     let i = 1;
+
+    //     dtTraineeDetails.cells(null, 0, { search: 'applied', order: 'applied' }).every(function () {
+    //         this.data(i++);
+    //     });
+    // }).draw();
 
     // initial check (on page load)
     // updateRemoveButtons($tableTD);
@@ -190,10 +207,10 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         const defaultExamRow = `
             <tr class="data-row" data-checkbox-id=''>
                 <td>
-                    <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" required></select>
+                    <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" id="title" required></select>
                 </td>
                 <td>
-                    <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" required></textarea>
+                    <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" readonly></textarea>
                 </td>
                 <td>
                     <select class="form-control form-control-md" name="result[]" id="result" required>
@@ -244,6 +261,19 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
                 $formTD.find('#prodAllocation').val(emp_details.Section);
             }
         });
+    });
+
+    // old code commented Clark 07/27/2026
+    // Handle exam selection
+    // $tableExam.on('change', '.selectExamTitle', function (e) {
+    //     let objective = $tableExam.find('option:selected').data('objective');
+    //     $tableExam.find('#objective').val(objective);
+    // });
+
+    $tableExam.on('change', '.selectExamTitle', function () {
+        const $row = $(this).closest('tr');
+        const objective = $(this).find('option:selected').data('objective');
+        $row.find('#objective').val(objective);
     });
 
     $addButtonExam.on('click', function () {
@@ -447,10 +477,10 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             let rowExams = `
                 <tr class="data-row" data-checkbox-id=''>
                     <td>
-                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" required></select>
+                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" id="title" required></select>
                     </td>
                     <td>
-                        <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" required></textarea>
+                        <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" readonly></textarea>
                     </td>
                     <td>
                         <select class="form-control form-control-md" name="result[]" id="result" required>
@@ -513,7 +543,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             let rowExams = `
                 <tr class="data-row" data-checkbox-id=''>
                     <td>
-                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" disabled></select>
+                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" id="title" disabled></select>
                     </td>
                     <td>
                         <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" disabled></textarea>
@@ -655,10 +685,16 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         }
     });
 
+    //Inspector Skill Chart
     $('#btnShowExportReportModal').on('click', function (){
         const $formExport = $('#exportInspectorSkillChart');
         $formExport[0].reset();
         $('#modalExportReport').modal('show');
+    });
+
+    //Employee Skill Card
+    $('#btnShowExportPDFModal').on('click', function (){
+        window.open(`view_emp_skill_card_pdf`, '_blank');
     });
 }
 
@@ -807,6 +843,8 @@ function getExaminations(cboElement, examId = null, mode = null){
             result = '<option value="" disabled selected>--Loading--</option>';
         },
         success: function (response) {
+            // console.log('response:', response);
+
             if(response.length > 0){
                     result = '<option value="" disabled selected> Select Examination </option>';
 
@@ -815,12 +853,15 @@ function getExaminations(cboElement, examId = null, mode = null){
                 }
 
                 for (let di = 0; di < response.length; di++) {
-                    result += '<option value="' + response[di]['id'] + '">' + response[di]['examination_name'] + '</option>';
+                    result += '<option value="' + response[di]['id'] + '" data-objective="' + response[di]['objective'] + '">' + response[di]['examination_name'] + '</option>';
                 }
             }else{
                 result = '<option value="0" selected disabled> -- No record found -- </option>';
             }
             cboElement.html(result);
+
+            // console.log('Inserted HTML:', cboElement.html());
+
             if(examId != null){
                 cboElement.val(examId).trigger('change');
             }

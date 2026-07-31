@@ -13,6 +13,7 @@ use App\Model\Hr\HrMemoTraineeDetails;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
 use App\Exports\InspectorSkillChart;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,15 +31,46 @@ class HrMemoController extends Controller
     }
 
     public function viewHrMemoInfo(Request $request){
+        date_default_timezone_set('Asia/Manila');
         $globalUser = session('global_user');
         // return $globalUser;
         $user_access = explode(',', $globalUser->user_modules_id);
 
-        $hr_memo_details = HrMemo::with(['prepared_by_info', 'received_by_info', 'noted_by_info', 'email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
+        $hr_memo_details = HrMemo::with([
+            'prepared_by_info',
+            'received_by_info',
+            'noted_by_info',
+            'email_recipients.rapidx_user',
+            'trainee_details.emp_exam_details.exam_info',
+            'trainee_details.hris_emp_info',
+            'trainee_details.subcon_emp_info',
+            ])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
 
+        // return $hr_memo_details;
+        
+        // foreach($hr_memo_details as $memo_detail){
+        //     foreach($memo_detail->trainee_details as $td){
+        //         if ($td->employment_type == 1) {
+        //             // HRIS employee
+        //             $td->load(['hris_emp_info' => function ($q) {
+        //                 $q->select(
+        //                     'vw_employeeinfo.*',
+        //                 );
+        //             }]);
+        //         } else {
+        //             // Subcon employee
+        //             $td->load(['subcon_emp_info' => function ($q) {
+        //                 $q->select(
+        //                     'vw_employeeinfo.*',
+        //                 );
+        //             }]);
+        //         }
+        //     }
+        // }
+        
         return DataTables::of($hr_memo_details)
         ->addColumn('action', function($hr_memo_details) use ($user_access, $globalUser){
-            $result = "";
+            $result = "";   
             $result .= "<center>";
 
             $canApproveHR  = $globalUser->rapidx_emp_id == $hr_memo_details->noted_by || $globalUser->user_level_id == 1; //Noted By Person & SuperAdmin Userlevel only is allowed
@@ -88,6 +120,21 @@ class HrMemoController extends Controller
             }
 
             $result .= "</center>";
+            return $result;
+        })
+        ->addColumn('trainee_names', function($hr_memo_details){
+            
+            $trainee_names = [];
+
+            foreach($hr_memo_details->trainee_details as $td){
+                if ($td->employment_type == 1) {
+                    $trainee_names[] = $td->hris_emp_info->EmpName;
+                } else {
+                    $trainee_names[] = $td->subcon_emp_info->EmpName;
+                }
+            }
+
+            $result = implode(', ', $trainee_names);
             return $result;
         })
         ->addColumn('status_label', function($hr_memo_details){
@@ -156,8 +203,20 @@ class HrMemoController extends Controller
         ->addColumn('received_by_label', function($hr_memo_details){
             $received_by_name = $hr_memo_details->received_by_info->name ?? 'Not Yet Received';
             $received_date = !empty($hr_memo_details->received_date) ? date('M j, Y h:i:s A', strtotime($hr_memo_details->received_date)) : '---';
-            $received_status = !empty($hr_memo_details->received_date) ? 'Received' : 'Pending';
-            $badge_status = !empty($hr_memo_details->received_date) ? 'badge-success' : 'badge-secondary';
+
+            if($hr_memo_details->status < 5){
+                $received_status = 'N/A';
+                $badge_status = 'badge-secondary';
+            }else if($hr_memo_details->status >= 5 && $hr_memo_details->status <= 6){
+                $received_status = !empty($hr_memo_details->received_date) ? 'Received' : 'Pending';
+                $badge_status = !empty($hr_memo_details->received_date) ? 'badge-success' : 'badge-warning';
+            }else{
+                $received_status = 'Disapproved';
+                $badge_status = 'badge-danger';
+            }
+
+            // $received_status = !empty($hr_memo_details->received_date) ? 'Received' : 'Pending';
+            // $badge_status = !empty($hr_memo_details->received_date) ? 'badge-success' : 'badge-secondary';
                 
             $result = "
                 <center>
@@ -168,7 +227,7 @@ class HrMemoController extends Controller
 
             return $result;
         })
-        ->rawColumns(['action', 'reason_label', 'status_label', 'prepared_by_label', 'received_by_label']) // Specify the columns that contain HTML
+        ->rawColumns(['action', 'trainee_names','reason_label', 'status_label', 'prepared_by_label', 'received_by_label']) // Specify the columns that contain HTML
         ->make(true);
     }
 
@@ -314,6 +373,8 @@ class HrMemoController extends Controller
     }
 
     public function addHrMemoInfo(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
         $validation = array(
             'subject' => 'required',
             'from' => 'required',
@@ -637,5 +698,12 @@ class HrMemoController extends Controller
             new InspectorSkillChart($selectedSheets),
             'QC Inspectors Skill Chart.xlsx'
         );
+    }
+
+    public function viewEmpSkillCardPdf()
+    {
+        $pdf = PDF::loadView('view_skill_card_pdf', compact(''))->setPaper('A4', 'portrait');
+
+        return $pdf->stream();
     }
 }
