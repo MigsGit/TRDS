@@ -263,7 +263,7 @@ class PersonnelSkillMatrixController extends Controller
                 }
             }
 
-            
+
             switch ((int) $row->result) {
                 case 1:
                     return '<span class="badge badge-success">Passed</span>';
@@ -358,7 +358,7 @@ class PersonnelSkillMatrixController extends Controller
         return response()->json($employees);
     }
 
-     public function exportSkillMapPdf(Request $request)
+    public function exportSkillMapPdf(Request $request)
     {
         $productLineId = $request->product_line;
         // dd($request->position);
@@ -433,12 +433,5 @@ class PersonnelSkillMatrixController extends Controller
         if ($count == 3) return 'level3.png';
 
         return 'level4.png';
-    }
-     public function exportSkillMapPdf()
-    {
-        $pdf = Pdf::loadView('pdf.skill_map')
-        ->setPaper('a4', 'landscape');
-
-        return $pdf->stream('skill_matrix.pdf');
     }
 }
