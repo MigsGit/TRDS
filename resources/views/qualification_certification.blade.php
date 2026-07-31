@@ -68,6 +68,17 @@
                                                             <x-section-select name="select_mh_sort_by_section" id="select_mh_sort_by_section" />
                                                         </div>
                                                     </div>
+                                                    <div class="row mt-2 mb-2">
+                                                        <div class="col-md-3">
+                                                            <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="select_access" id="select_access">
+                                                                <option value="" selected disabled>Select Position</option>
+                                                                <option value="ALL">SELECT ALL</option>
+                                                                <option value="FORAPP">PENDING</option>
+                                                                <option value="OK">CLOSED</option>
+                                                                <option value="MYAPPROVAL">FOR MY APPROVAL</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
 
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <h6 class="text-secondary" id="exam_label_mh"></h6>
@@ -1825,12 +1836,28 @@
                 { data: 'remarks', name: 'remarks' }
             ]
         });
-        // $('#operDisapproved').addClass('d-none');
-        // $('#operApproved').addClass('d-none');
-        // $('#operClosed').removeClass('d-none');
-        // $('#operSave').removeClass('d-none');
 
-        //  Best Practice: Event Delegation with correct object scoping
+        // Pre-fill Day 1–5 date inputs in the #tblTrainingItems header from server response
+        dataTable.training_items.on('xhr', function () {
+            var json = dataTable.training_items.ajax.json();
+            if (json && json.headerDates) {
+                $.each(json.headerDates, function (dayNumber, dateValue) {
+                    $('#tblTrainingItems').closest('.table-responsive')
+                        .find('.header-date-input[data-day="' + dayNumber + '"]')
+                        .val(dateValue || '');
+                });
+            }
+        });
+
+        //
+
+
+        $('#select_mh_sort_by_section, #select_access').on('change', function () {
+            let selectSortBySection = $('#select_mh_sort_by_section').val();
+            let selectAccess = $('#select_access').val();
+            dataTable.operator.ajax.url("load_qc_slip?selectMhSortBySection="+selectSortBySection+"&selectAccess="+selectAccess).draw();
+        });
+        // Best Practice: Event Delegation with correct object scoping
         $(document).on('click', '.btnRemoveOperEmpMain', function() {
             $(this).closest('tr').remove();
         });
@@ -2265,28 +2292,38 @@
 
                     matrixData.push({
                         training_item_id: itemId,
-                        day_results: dayResults,
-                        remark: row.find('.input-remark').val()
+                        day_results:      dayResults,
+                        remark:           row.find('.input-remark').val(),
+                        sub_description:  row.find('.input-sub-desc').val() ?? null,
                     });
                 }
             });
-            console.log('matrixData', matrixData);
-            
+            // Collect header dates keyed as day_dates[day_N]
+            let dayDates = {};
+            $('#tblTrainingItems').closest('.table-responsive')
+                .find('.header-date-input').each(function () {
+                    dayDates['day_' + $(this).data('day')] = $(this).val();
+                });
+            //     console.log('dayDates',dayDates);
+            // return;
+
             $.ajax({
-                url: "save_qc_lqc_training_items_by_qc_slip_id",
+                url:  "save_qc_lqc_training_items_by_qc_slip_id",
                 type: "POST",
                 data: {
-                    _token: "{{ csrf_token() }}",
+                    _token:     "{{ csrf_token() }}",
                     qc_slips_id: $('#qc_slips_id').val(),
-                    matrix: matrixData,
+                    matrix:     matrixData,
+                    day_dates:  dayDates,
                 },
                 success: function (response) {
-                    alert('Training items saved successfully!');
-                    // $('#tblTrainingItems').DataTable().ajax.reload(null, false);
+                    if (response.is_success === 'true') {
+                        Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Training items saved.' });
+                    }
                 }
             });
         });
-        $('#btnCreateCQForm').click(function (e) { 
+        $('#btnCreateCQForm').click(function (e) {
             e.preventDefault();
             let categoryPosition = $('#text_select_position').val();
             dataTable.training_items.draw();

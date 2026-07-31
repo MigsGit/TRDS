@@ -1453,11 +1453,11 @@
                                     <th rowspan="2" class="align-middle" style="width: 20%;">Remarks</th>
                                 </tr>
                                 <tr>
-                                    <th style="width: 11%;">Day 1<br><input type="date" class="form-control form-control-sm mt-1 header-date-input" data-day="1"></th>
-                                    <th style="width: 11%;">Day 2<br><input type="date" class="form-control form-control-sm mt-1 header-date-input" data-day="2"></th>
-                                    <th style="width: 11%;">Day 3<br><input type="date" class="form-control form-control-sm mt-1 header-date-input" data-day="3"></th>
-                                    <th style="width: 11%;">Day 4<br><input type="date" class="form-control form-control-sm mt-1 header-date-input" data-day="4"></th>
-                                    <th style="width: 11%;">Day 5<br><input type="date" class="form-control form-control-sm mt-1 header-date-input" data-day="5"></th>
+                                    <th style="width: 11%;">Day 1<br><small class="text-muted" id="lbl_day1_date">Date: --</small></th>
+                                    <th style="width: 11%;">Day 2<br><small class="text-muted" id="lbl_day2_date">Date: --</small></th>
+                                    <th style="width: 11%;">Day 3<br><small class="text-muted" id="lbl_day3_date">Date: --</small></th>
+                                    <th style="width: 11%;">Day 4<br><small class="text-muted" id="lbl_day4_date">Date: --</small></th>
+                                    <th style="width: 11%;">Day 5<br><small class="text-muted" id="lbl_day5_date">Date: --</small></th>
                                 </tr>
                             </thead>
                             <tbody>

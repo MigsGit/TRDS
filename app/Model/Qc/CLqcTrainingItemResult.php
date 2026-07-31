@@ -18,9 +18,11 @@ class CLqcTrainingItemResult extends Model
     protected $fillable =[
         'qc_slips_id',
         'training_item_id',
-        'day_number',
+        'day_number',   
         'result',
         'item_remark',
+        'sub_description',
+        'date',
     ];
 
     public function dropdown_master_details()

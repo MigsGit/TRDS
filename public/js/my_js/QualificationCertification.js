@@ -986,16 +986,16 @@
                 form.formSubmitInspector.find('#text_time_inspector').val(alqctq?.first_time ?? '');
 
                 const blqctc = approversCollection?.BLQCTC?.[0]  ?? nullform.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData?.first_status ?? '').trigger('change');
-                    form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData?.second_status ?? '').trigger('change');
-                    form.formSubmitOper.find('#text_1st_disapproval_qcs_oper').val(cQcData?.first_remarks ?? '');
-                    form.formSubmitOper.find('#text_2nd_disapproval_qcs_oper').val(cQcData?.second_remarks ?? '');
-                    form.formSubmitOper.find('#text_1st_date_qcs_oper').val(cQcData?.first_date ?? '');
-                    form.formSubmitOper.find('#text_1st_time_qcs_oper').val(cQcData?.first_time ?? '');
-                    form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData?.second_date ?? '');
-                    form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData?.second_time ?? '');
+                    // form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData?.second_status ?? '').trigger('change');
+                    // form.formSubmitOper.find('#text_1st_disapproval_qcs_oper').val(cQcData?.first_remarks ?? '');
+                    // form.formSubmitOper.find('#text_2nd_disapproval_qcs_oper').val(cQcData?.second_remarks ?? '');
+                    // form.formSubmitOper.find('#text_1st_date_qcs_oper').val(cQcData?.first_date ?? '');
+                    // form.formSubmitOper.find('#text_1st_time_qcs_oper').val(cQcData?.first_time ?? '');
+                    // form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData?.second_date ?? '');
+                    // form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData?.second_time ?? '');
                 form.formSubmitInspector.find('#text_sec2_date_inspector').val(blqctc?.first_date ?? '');
                 form.formSubmitInspector.find('#text_sec2_time_inspector').val(blqctc?.first_time ?? '');
-                
+
                 // const lqcheadapp = approversCollection?.LQCHEADAPP?.[0]  ?? null;
             }
             if(positionCategory === 'Operator'){
