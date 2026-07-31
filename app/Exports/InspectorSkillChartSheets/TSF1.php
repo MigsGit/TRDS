@@ -21,8 +21,10 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
 {
     private $styles = [];
     protected $processStationDetails;
+    protected $sectionGroup;
+    protected $sectionName;
     
-    public function __construct($processStationDetails, $group){
+    public function __construct($processStationDetails, $group, $sheet){
         $this->styles = [
             'yellowFill'      => $this->getFillBuilder('FFFF00'),
             'lightYellowFill' => $this->getFillBuilder('FFFFCC'),
@@ -63,7 +65,7 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
 
         $this->processStationDetails = $processStationDetails;
         $this->sectionGroup = $group;
-        // dd($this->sectionGroup);
+        $this->sectionName = $sheet;
     }
 
     /**
@@ -79,7 +81,7 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
     }
 
     public function title(): string{
-        return 'TS-F1';
+        return $this->sectionName;
     }
 
     private function getFillBuilder($color){
@@ -189,6 +191,7 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
         //FILL SKILL LEGEND
         $headerStartColumn = $currentColumn;
         $headerEndColumn = $headerStartColumn + 3;
+        $currentRow = 6;
         // $header2StartColumn = $currentColumn;
 
         // Header Row 1
@@ -213,30 +216,6 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
 
         $sheet->setCellValue(Coordinate::stringFromColumnIndex($currentColumn) . '5', '4');
         $currentColumn++;
-
-        // $column = Coordinate::stringFromColumnIndex($currentColumn);
-        
-        $totalSkillsQcColumns = [
-            'AB','AC','AD','AE',
-            // 'AQ','AR','AS','AT'
-        ];
-
-        for ($i = 1; $i <= 4; $i++) {
-            $column = Coordinate::stringFromColumnIndex($currentColumn);
-            // Header Row 2
-            $sheet->setCellValue(($column + $i) . '5', '1');
-
-            
-            $currentColumn++;
-            
-            $sheet->setCellValue("{$column}{$row}", "=COUNTIF(H{$row}:Z{$row},\"{$count}\")");
-
-            $count++;
-
-            if ($count > 4) {
-                $count = 1;
-            }
-        }
 
         return $currentColumn;
     }
@@ -754,6 +733,19 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
                     $sheet->setCellValue("B{$row}", $employee['emp_no']);
                     $sheet->setCellValue("C{$row}", $employee['name']);
 
+                    // for ($i = 1; $i <= 4; $i++) {
+                    //     // Header Row 2
+                    //     $sheet->setCellValue( Coordinate::stringFromColumnIndex($currentColumn + $i) . '5', $i);
+                    //     $sheet->setCellValue( Coordinate::stringFromColumnIndex($currentColumn + $i).{$row}, "=COUNTIF("Coordinate::stringFromColumnIndex($currentColumn + $i).{$row}.":".Coordinate::stringFromColumnIndex($currentColumn + $i).{$row},\"{$i}\")");
+
+                    //     $currentColumn++;
+                    //     // $count++;
+
+                    //     // if ($count > 4) {
+                    //     //     $count = 1;
+                    //     // }
+                    // }
+
                     $row++;
                 }
  
@@ -814,19 +806,20 @@ class TSF1 implements FromCollection, WithTitle, WithEvents, WithCustomStartCell
                 $legendRow4 = $totalRow4 + 6; // Row for the total row after the summary title row
                 $legendRow5 = $totalRow4 + 7; // Row for the total row after the summary title row
 
-                $totalCertifiedQcSkillColumns = [
-                    'H','I','J','K','L',
-                    'M','N','O','P','Q',
-                    'R','S','T','U','V',
-                    'W','X','Y','Z'
-                ];
+                //comment for now
+                // $totalCertifiedQcSkillColumns = [
+                //     'H','I','J','K','L',
+                //     'M','N','O','P','Q',
+                //     'R','S','T','U','V',
+                //     'W','X','Y','Z'
+                // ];
 
-                foreach ($totalCertifiedQcSkillColumns as $column) {
-                    $sheet->setCellValue("{$column}{$totalRow1}", "=COUNTIF({$column}6:{$column}{$lastEmployeeRow},\"1\")");
-                    $sheet->setCellValue("{$column}{$totalRow2}", "=COUNTIF({$column}6:{$column}{$lastEmployeeRow},\"2\")");
-                    $sheet->setCellValue("{$column}{$totalRow3}", "=COUNTIF({$column}6:{$column}{$lastEmployeeRow},\"3\")");
-                    $sheet->setCellValue("{$column}{$totalRow4}", "=COUNTIF({$column}6:{$column}{$lastEmployeeRow},\"4\")");
-                }
+                // foreach ($totalCertifiedQcSkillColumns as $column) {
+                //     $sheet->setCellValue("{$column}{$totalRow1}", "=COUNTIF({$column}6:{$column}{$lastEmployeeRow},\"1\")");
+                //     $sheet->setCellValue("{$column}{$totalRow2}", "=COUNTIF({$column}6:{$column}{$lastEmployeeRow},\"2\")");
+                //     $sheet->setCellValue("{$column}{$totalRow3}", "=COUNTIF({$column}6:{$column}{$lastEmployeeRow},\"3\")");
+                //     $sheet->setCellValue("{$column}{$totalRow4}", "=COUNTIF({$column}6:{$column}{$lastEmployeeRow},\"4\")");
+                // }
 
                 $this->generateHeader($sheet,$titleRow1,$titleRow2,$titleRow3,$totalRow1,$totalRow2,$totalRow3,$totalRow4,$legendRow1,$legendRow2,$legendRow3,$legendRow4,$legendRow5,$processStationDetails,$sectionGroup,$lastEmployeeRow);
                 $this->applyAllStyle($sheet,$titleRow1,$titleRow2,$titleRow3,$totalRow1,$totalRow2,$totalRow3,$totalRow4,$legendRow1,$legendRow2,$legendRow3,$legendRow4,$legendRow5,$lastEmployeeRow);

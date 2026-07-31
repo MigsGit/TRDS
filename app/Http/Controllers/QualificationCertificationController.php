@@ -1224,8 +1224,12 @@ class QualificationCertificationController extends Controller
                 ->select('Section')
                 ->distinct()
                 ->orderBy('Section')
-                ->pluck('Section');
-
+                ->pluck('Section')->toArray();
+                $customDivision = [
+                    'PPD Grinding',
+                    'PPD-TS Molding',
+                ];
+            $arrMerge = array_merge($section,$customDivision);
             return response()->json(['is_success' => 'true', 'section' => $section]);
         } catch (Exception $e) {
             throw $e;
