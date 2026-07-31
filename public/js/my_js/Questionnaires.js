@@ -197,7 +197,7 @@ const GetQuestionnaireById = (questionnaireId) => {
 const ChangeQuestionnaireStatus = (questionnaireId) => {
     let formData = $('#formChangeQuestionnaireStatus').serialize() + '&questionnaireId' + questionnaireId;
 
-    const ajaxGetQuestionnaireById = {
+    const ajaxGetQuestionnaireStatus = {
         url: "change_questionnaire_status",
         method: "POST",
         data: formData,
@@ -242,7 +242,7 @@ const ChangeQuestionnaireStatus = (questionnaireId) => {
         }
     };
 
-    ajaxRequest(ajaxGetQuestionnaireById);
+    ajaxRequest(ajaxGetQuestionnaireStatus);
 };
 
 // =================================================================================================================================
@@ -387,7 +387,7 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
 
                         $(this).find("input[name='choices[]']").val(choiceValue);
 
-                        let answerArr = typeof answer === 'string' ? answer.split(',') : [];
+                        let answerArr = typeof answer === 'string' ? answer.split(' || ') : [];
                         if(answerArr.includes(choiceValue)){
                             $(this)
                                 .find('.chkAnswer')

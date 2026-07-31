@@ -271,7 +271,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/view_training_attendance_summary', 'view_training_attendance_summary');
         Route::get('/view_training_attendance', 'view_training_attendance');
         Route::get('/view_training_attendance_request_details', 'view_training_attendance_request_details');
-        Route::get('/get_training_attendance_by_id', 'get_training_attendance_by_id');
+        Route::get('/get_training_attendance_by_id', 'getget_employee_trainings_training_attendance_by_id');
     });
 
     Route::controller(PersonnelSkillMatrixController::class)->group(function () {
