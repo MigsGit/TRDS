@@ -324,6 +324,7 @@
         let dataEmployeeTrainingRecord
         let dataTRDSSummary
         let getEmployeeTrainingRecordId = '';
+        let getEmployeeNoForTrdsSummary = '';
 
         $(document).ready(function () {
             $('.get-employee-info').select2({
@@ -351,6 +352,7 @@
             $('.get-employee-info').on('select2:select', function (e) {
                 const data = e.params.data;
                 console.log(data);
+                console.log('employeeNo',data.employeeNo);
 
                 $('#displayEmployeeName').text(data.text);
                 $('#displayPosition').text(data.position);
@@ -372,6 +374,7 @@
                 }
 
                 getEmployeeTrainingRecordId = data.id
+                getEmployeeNoForTrdsSummary = data.employeeNo;
                 dataEmployeeTrainingRecord.draw();
                 dataTRDSSummary.draw();
             });
@@ -416,21 +419,21 @@
             //     "ajax" : {
             //         url: "view_trds_summary",
             //         data: function (d) {
-            //             d.getEmployeeTrainingRecordId = getEmployeeTrainingRecordId;
+            //             d.getEmployeeNoForTrdsSummary = getEmployeeNoForTrdsSummary;
             //         }
             //     },
             //     "columns": [
-            //         { data: "date", defaultContent: "-" },
-            //         { data: "employee_training_record_info.Title", defaultContent: "-" },
-            //         { data: "employee_training_record_info.Objective", defaultContent: "-" },
-            //         { data: "employee_training_record_info.Trainor", defaultContent: "-" },
-            //         { data: "Result" },
-            //         { data: "employee_training_record_info.Venue", defaultContent: "-" },
-            //         { data: "employee_training_record_info.Mechanics", defaultContent: "-" },
-            //         { data: "employee_training_record_info.TypeTraining", defaultContent: "-" },
-            //         { data: "Remarks"},
-            //         { data: "Remarks"},
-            //         { data: "Remarks"}
+            //         { data: 'trainingDate'},
+            //         { data: 'title'},
+            //         { data: 'seriesName'},
+            //         { data: 'station'},
+            //         { data: 'detailedStation'},
+            //         { data: 'objective' },
+            //         { data: 'trainor' },
+            //         { data: 'result' },
+            //         { data: 'trainingVenue' },
+            //         { data: 'typeOfTraining' },
+            //         { data: 'training_remarks' },
             //     ]
             // });
         });
