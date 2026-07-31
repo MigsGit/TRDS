@@ -13,6 +13,7 @@ use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\Model\RapidXUser;
 use App\Model\Qc\OpApprover;
+use App\OpApprover;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,6 +29,10 @@ class QcSlip extends Model
     {
         return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');
     }
+    // public function product_line()
+    // {
+    //     return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');
+    // }
     public function system_one_hris_subcon()
     {
         return $this->hasMany(SystemOneHrisSubcon::class, 'EmpNo',  'created_by');
