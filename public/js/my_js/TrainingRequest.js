@@ -470,7 +470,7 @@ $(document).ready(function() {
             // data: { id: id },
             success: function(response) {
                 // Handle the response as needed
-                console.log(response);
+                // console.log(response);
                 const $select = $('#selectSectionHead');
                 $select.empty();
                 $select.append('<option value="" disabled selected>Select Conformance User</option>');
