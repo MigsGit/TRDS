@@ -44,6 +44,7 @@
             /* border-radius: 24px; */
             opacity: .95;
         }
+
     </style>
     <div class="content-wrapper">
         <section class="content-header">
@@ -920,6 +921,89 @@
                 }
 
                 saveRowOrder(rows);
+            });
+
+            $(document).on('click', '.actionCopyQuestionnaire', function(e){
+                e.preventDefault();
+
+                let questionnaireId = $(this).attr('questionnaire-id');
+                let getQuestionnaireDescription = $(this).attr('questionnaire-description');
+                $.ajax({
+                    url: 'copy_preview',
+                    type: 'GET',
+
+                    data: {
+                        questionnaire_id: questionnaireId,
+                        _token: csrfToken
+                    },
+
+                    success:function(response){
+                        let questionnaire = response.data;
+                        Swal.fire({
+                            title: '📝 Copy Questionnaire',
+                            width: '600px',
+                            customClass: {
+                                popup: 'copy-questionnaire-popup',
+                                title: 'copy-questionnaire-title',
+                                confirmButton: 'copy-confirm-btn',
+                                cancelButton: 'copy-cancel-btn'
+                            },
+
+                            html: `
+                                <div class="text-start">
+
+                                    <div class="current-description-box">
+                                        <label>
+                                            <strong>Current Description</strong>
+                                        </label>
+
+                                        <div class="description-preview">
+                                            ${getQuestionnaireDescription}
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-3">
+                                        <label for="description" class="form-label">
+                                            <strong>New Description</strong>
+                                        </label>
+
+                                        <textarea
+                                            id="description"
+                                            class="form-control copy-textarea"
+                                            rows="3"
+                                            placeholder="Enter new questionnaire description..."
+                                        ></textarea>
+                                    </div>
+
+                                </div>
+                            `,
+
+                            showCancelButton: true,
+                            confirmButtonText: '📋 Copy',
+                            cancelButtonText: 'Cancel',
+                            focusConfirm: false,
+
+                            preConfirm:()=>{
+                                let value = $('#description').val().trim();
+                                if(!value){
+                                    Swal.showValidationMessage(
+                                        'Description is required'
+                                    );
+                                    return false;
+                                }
+
+                                return value;
+                            }
+                        }).then(result=>{
+                            if(result.isConfirmed){
+                                CopyQuestionnaire(
+                                    questionnaire.id,
+                                    result.value
+                                );
+                            }
+                        });
+                    }
+                });
             });
 
             // //===============================================================================================
