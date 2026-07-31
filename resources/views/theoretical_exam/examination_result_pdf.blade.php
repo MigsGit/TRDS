@@ -126,7 +126,7 @@
             @case(0)
                 @foreach($question['answer_choices_question'] as $item)
                     @php
-                        $userAnswers = array_map('trim', explode(',', $item['user_answer'] ?? ''));
+                        $userAnswers = array_map('trim', explode(' || ', $item['user_answer'] ?? ''));
                     @endphp
 
                     @foreach($item['choices'] as $choice)
