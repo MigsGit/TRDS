@@ -48,9 +48,11 @@
                                         <thead>
                                             <tr>
                                                 <th style="width: 10%;">Action</th>
-                                                <th style="width: 20%;">Section</th>
+                                                <th style="width: 5%;">Section</th>
+                                                <th style="width: 20%;">Skill Category</th>
+                                                <th style="width: 5%;">Process Order</th>
                                                 <th style="width: 20%;">Process / Station</th>
-                                                <th style="width: 60%;">Product Line/s</th>
+                                                <th style="width: 30%;">Product Line/s</th>
                                                 <th style="width: 10%;">Status</th>
                                             </tr>
                                         </thead>
@@ -75,7 +77,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-plus"></i> Add/Edit Process / Station Info</h4>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> Add/Edit Process Station Info</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -103,18 +105,83 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Process / Station</label>
+                                    <label>Skill Category</label> 
+                                    <!-- <input type="text" class="form-control" name="process_station" id="processStation" placeholder="Enter Process Station" required> -->
+                                
+                                    <select class="form-control select2bs5" name="skill_category" id="skillCategory" required>
+                                        <option value="" disabled selected>Select Skill Category</option>
+                                        <option value="PROCESS / SYSTEM SKILLS">Process / System Skills</option>
+                                        <option value="MACHINE OPERATION SKILLS">Machine Operation Skills</option>
+                                        <option value="QC & CORE TOOLS">QC & Core tools</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Process Order Per Category</label>
+                                    <input type="number" class="form-control" name="process_order" id="processOrder" placeholder="Enter Process Order Per Category" readonly>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Process / Station</label> 
+                                    <!-- <input type="text" class="form-control" name="process_station" id="processStation" placeholder="Enter Process Station" required> -->
+                                
                                     <select class="form-control select2bs5" name="process_station" id="processStation" required>
                                         <option value="" disabled selected>Select One</option>
                                         <option value="IQC">IQC</option>
                                         <option value="IPQC">IPQC</option>
                                         <option value="OQC">OQC</option>
+                                        <option value="QS">QS</option>
+                                        <option value="TU">TU</option>
+                                        <option value="Burn-in Socket">Burn-in Socket</option>
+                                        <option value="Test Socket">Test Socket</option>
+                                        <option value="NEXIV">NEXIV</option>
+                                        <option value="QV PAK Operation">QV PAK Operation</option>
+                                        <option value="XRF">XRF</option>
+                                        <option value="Impedance">Impedance</option>
+                                        <option value="Basic QC Tools">Basic QC Tools</option>
+                                        <option value="SPC">SPC</option>
+                                        <option value="MSA">MSA</option>
+                                        <option value="FMEA">FMEA</option>
                                     </select>
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Product Line</label>
-                                    <input type="text" class="form-control" name="product_line" id="productLine" placeholder="Enter Product Line" required>
+                                    <label>Product Line (Select In-order)</label>
+                                    <!-- <input type="text" class="form-control" name="product_line" id="productLine" placeholder="Enter Product Line" required> -->
+
+                                    <select class="form-control select2bs5" name="product_line[]" id="productLine" multiple required>
+                                        <option value="" disabled selected>Select One</option>
+                                        <option value="N/A" disabled>Not Applicable</option>
+                                        <option value="Appearance">Appearance</option>
+                                        <option value="Dimension">Dimension</option>
+                                        <option value="BGA-FP">BGA-FP</option>
+                                        <option value="BGA-LGA">BGA-LGA</option>
+                                        <option value="QFP-TSOP">QFP-TSOP</option>
+                                        <option value="Dimension (COC)">Dimension (COC)</option>
+                                        <option value="Packing">Packing</option>
+                                        <option value="Holding Force">Holding Force</option>
+                                        <option value="Contact Force">Contact Force</option>
+                                        <option value="Actuation Force">Actuation Force</option>
+                                        <option value="Probe Pin">Probe Pin</option>
+                                        <option value="Card Connectors">Card Connectors</option>
+                                        <option value="TC/DC Connectors">TC/DC Connectors</option>
+                                        <option value="Flexicon Connectors">Flexicon Connectors</option>
+                                        <option value="Battery Connectors">Battery Connectors</option>
+                                        <option value="Molding Connectors">Molding Connectors</option>
+                                        <option value="Stamping">Stamping</option>
+                                        <option value="Burn-In Memory Socket">Burn-In Memory Socket</option>
+                                        <option value="Burn-In Other Socket">Burn-In Other Socket</option>
+                                        <option value="Burn-In Other Socket (Probe)">Burn-In Other Socket (Probe)</option>
+                                        <option value="Connector Type">Connector Type</option>
+                                        <option value="Adapter Type">Adapter Type</option>
+                                        <option value="Straight Type">Straight Type</option>
+                                        <option value="Stiffener Type">Stiffener Type</option>
+                                        <option value="Tape Type">Tape Type</option>
+                                    </select>
+
+                                    <label>
+                                        <input type="checkbox" id="naProductLineCheckbox" name="product_line" value="N/A"> Not Applicable
+                                    </label>
                                 </div>
                                 
                             </div>

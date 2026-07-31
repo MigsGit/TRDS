@@ -201,6 +201,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/send_hr_memo_mail', 'sendHrMemoMail')->name('send_hr_memo_mail');
         Route::get('/get_trainor_dropdown_details', 'getTrainorDropdownDetails')->name('get_trainor_dropdown_details');
         Route::get('/export_inspector_skill_chart', 'exportInspectorSkillChart')->name('export_inspector_skill_chart');
+        Route::get('/view_emp_skill_card_pdf', 'viewEmpSkillCardPdf')->name('viewEmpSkillCardPdf');
     });
 
     // =======================================================================================================
@@ -210,6 +211,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_process_station_by_id', 'getProcessStationById')->name('get_process_station_by_id');
         Route::post('/update_process_station_status', 'updateProcessStationStatus')->name('update_process_station_status');
         Route::get('/get_process_stations', 'getProcessStations')->name('get_process_stations');
+        Route::get('/get_process_count_per_category', 'getProcessCountPerCategory')->name('get_process_count_per_category');
     });
 
     // USER CONTROLLER
@@ -281,7 +283,14 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/view_subcon_employee_info', 'viewSubconEmployeeInfo')->name('view_subcon_employee_info');
         Route::get('/view_direct_employee_info', 'viewDirectEmployeeInfo')->name('view_direct_employee_info');
         Route::get('/get_employee_trainings', 'getEmployeeTrainings')->name('get_employee_trainings');
-    });
+        Route::get('/export_skill_map_pdf', 'exportSkillMapPdf')->name('export_skill_map_pdf');
+        // Route::get('/test-pdf', function () {
+        //     dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
+        // });
+        Route::get('/get_product_line', 'getProductLine')->name('get_product_line');
+        Route::get('/get_employee_position', 'getEmployeePosition')->name('get_employee_position');
+        Route::get('/get_employees', 'getEmployees')->name('get_employees');
+});
 
     Route::controller(ETRController::class)->group(function () {
         Route::get('view_employee_training_record', 'viewEmployeeTrainingRecord');

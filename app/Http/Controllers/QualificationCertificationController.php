@@ -87,7 +87,7 @@ class QualificationCertificationController extends Controller
             ];
             $to = '';
             $cc = '';
-            if($params['approval_status'] === 'QCAPP'){
+            if($params['approval_status'] === 'OK'){
                 $qcSlip = QcSlip::
                 where('id' , $params['qc_slips_id'])
                 ->whereNull('deleted_at')
@@ -150,7 +150,7 @@ class QualificationCertificationController extends Controller
             // $from_name = 'issinfoservice@pricon.ph';
             $message = $this->commonController->emailMsg($emailParams);
             $rapidxEmpNo =  session('global_user');
-           return $emailData = [
+            $emailData = [
                 "to" =>$to,
                 // "to" =>"mrronquez@pricon.ph",
                 "cc" =>$cc,
@@ -919,7 +919,7 @@ class QualificationCertificationController extends Controller
                   $isMachineOperatorExists = QcSlipEmployee::where("qc_slips_id",$qcSlipId)->where('station_to',4)->count();
 
                     if($isMachineOperatorExists > 0 ){
-                        $validatedData = app(MachineOperatorRequest::class)->validateResolved();
+                        // $validatedData = app(MachineOperatorRequest::class)->validateResolved();
                     }
                     $validatedData = app(EQcValidationProcessRequest::class)->validateResolved();
                     $eQcValidationProcess = [
@@ -1224,9 +1224,13 @@ class QualificationCertificationController extends Controller
                 ->select('Section')
                 ->distinct()
                 ->orderBy('Section')
-                ->pluck('Section');
-
-            return response()->json(['is_success' => 'true', 'section' => $section]);
+                ->pluck('Section')->toArray();
+                $customDivision = [
+                    'PPD Grinding',
+                    'PPD-TS Molding',
+                ];
+            $arrMerge = array_merge($section,$customDivision);
+            return response()->json(['is_success' => 'true', 'section' => $arrMerge]);
         } catch (Exception $e) {
             throw $e;
         }

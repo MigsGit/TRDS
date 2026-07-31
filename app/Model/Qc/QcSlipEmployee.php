@@ -7,13 +7,14 @@ use App\Model\DropdownMasterDetail;
 use App\Model\SystemOneHrisEmpInfo;
 use App\Model\SystemOneHrisSubcon;
 use App\Model\SystemOneSubconEmpInfo;
+use App\Model\QcSlip;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class QcSlipEmployee extends Model
 {
     use HasFactory;
-    protected $appends = ['employee_info'];
+
     /**
      * Get the user associated with the QcSlipEmployee
      *
@@ -45,10 +46,9 @@ class QcSlipEmployee extends Model
        return $this->dropdown_master_detail('station_to');
     }
 
-    public function getEmployeeInfoAttribute() // Chris
+    public function qcSlip()
     {
-        // Returns subcon if present; otherwise falls back to hris
-        return $this->system_one_subcon_emp_info ?? $this->system_one_hris_emp_info;
+        return $this->belongsTo(QcSlip::class, 'qc_slips_id');
     }
 
 

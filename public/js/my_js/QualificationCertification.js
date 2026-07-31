@@ -814,7 +814,7 @@
             $('#approval_status').val(currentStatus);
 
             // ==== Toggle Collapse based on approval status
-            getApprovalStatusToggle({ 
+            getApprovalStatusToggle({
                 approval_status: currentStatus,
              });
             // ==== Get All Approvers / Validated by/ Mentored by

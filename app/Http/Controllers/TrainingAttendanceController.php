@@ -215,11 +215,11 @@ class TrainingAttendanceController extends Controller
     ->get();
 
 
-// 2. Build the date range
-$period = CarbonPeriod::create($startDate, $endDate);
+    // 2. Build the date range
+    $period = CarbonPeriod::create($startDate, $endDate);
 
-// 3. Map over each date in the period x each employee
-$allRows = collect($period)->flatMap(function ($date) use ($employees) {
+    // 3. Map over each date in the period x each employee
+    $allRows = collect($period)->flatMap(function ($date) use ($employees) {
     $currentDate = $date->toDateString();
 
     return $employees->map(function ($emp) use ($currentDate) {
@@ -407,7 +407,6 @@ return datatables()->of($allRows)
                     ];
                 })->filter(); // Remove null rows (endorsed employees excluded for this date)
             })->sortByDesc('date');
-// exit;
             // 4. Calculate totals for DataTables response
             $absentCount  = $allRows->where('status', 'ABSENT')->count();
             $presentCount = $allRows->where('status', 'PRESENT')->count();
