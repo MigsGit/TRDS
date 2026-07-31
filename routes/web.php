@@ -286,8 +286,8 @@ Route::middleware('checkSession')->group(function(){
     Route::controller(ETRController::class)->group(function () {
         Route::get('view_employee_training_record', 'viewEmployeeTrainingRecord');
         Route::get('get_systemone_employee_training_details', 'getSystemoneEmployeeTrainingDetails');
-        // Route::post('create_update_exam_title', 'createUpdateExamTitle');
-        // Route::post('change_exam_title_status', 'changeExamTitleStatus');
+
+        // Route::get('view_trds_summary', 'viewTRDSSummary');
     });
     Route::controller(ListOfCertPersonnelController::class)->group(function(){
         Route::get('/get_dropdown_select_certpersonnel', 'getDropdownSelectCertPersonnel')->name('get_dropdown_select_certpersonnel');
