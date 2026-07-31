@@ -13,9 +13,9 @@ use App\Model\SystemOneSubconEmpInfo;
 class ETRController extends Controller
 {
     public function viewEmployeeTrainingRecord(Request $request){
-        $etr_records = 
+        $etr_records =
             SystemOneHrisTrainee::with([
-                'employee_training_record_info' 
+                'employee_training_record_info'
             ])
             ->where('fkEmployee', $request->getEmployeeTrainingRecordId)
             ->where('logdel', 0)
@@ -26,14 +26,16 @@ class ETRController extends Controller
 
         // return $etr_records;
         return DataTables::of($etr_records)
-        ->addColumn('action', function($etr_record){
-            $result =   '<center>';
-            $result .= '<button type="button" class="btn btn-warning btn-sm text-center actionChangeETRStatus" etr-id="' . $etr_record->id . '" status="0" data-toggle="modal" data-target="#modalChangeETRStatus" title="Activate ETR"><i class="fas fa-redo"></i></button>';
+        ->addColumn('date', function($trds_record){
+            $result =  '<center>';
+            $result .= $trds_record->employee_training_record_info->PeriodFrom ?? "-";
+            $result .= '<br>';
+            $result .= $trds_record->employee_training_record_info->PeriodTo ?? "-";
             $result .= '</center>';
             return $result;
         })
 
-        ->rawColumns(['action'])
+        ->rawColumns(['date'])
         ->make(true);
     }
 
@@ -61,4 +63,30 @@ class ETRController extends Controller
         return response()->json($employees);
     }
 
+    // public function viewTRDSSummary(Request $request){
+    //     $trds_summary =
+    //         SystemOneHrisTrainee::with([
+    //             'employee_training_record_info'
+    //         ])
+    //         ->where('fkEmployee', $request->getEmployeeTrainingRecordId)
+    //         ->where('logdel', 0)
+    //         ->whereHas('employee_training_record_info', function ($query) {
+    //             $query->where('logdel', '!=', '1');
+    //         })
+    //         ->get();
+
+    //     // return $trds_summary;
+    //     return DataTables::of($trds_summary)
+    //     ->addColumn('date', function($trds_record){
+    //         $result =  '<center>';
+    //         $result .= $trds_record->employee_training_record_info->PeriodFrom ?? "-";
+    //         $result .= '<br>';
+    //         $result .= $trds_record->employee_training_record_info->PeriodTo ?? "-";
+    //         $result .= '</center>';
+    //         return $result;
+    //     })
+
+    //     ->rawColumns(['date'])
+    //     ->make(true);
+    // }
 }
