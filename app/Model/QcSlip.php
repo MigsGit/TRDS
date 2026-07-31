@@ -13,7 +13,6 @@ use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\Model\RapidXUser;
 use App\Model\Qc\OpApprover;
-use App\OpApprover;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
