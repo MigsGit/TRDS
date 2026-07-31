@@ -115,7 +115,7 @@ td.legend-title{
 <body>
 
 @php
-    $chunks = collect($employees)->chunk(7); // 7 rows per page
+    $chunks = collect($employees)->chunk(9); // 9 rows per page
 @endphp
 
 @foreach($chunks as $pageIndex => $page)
