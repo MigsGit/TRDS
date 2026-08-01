@@ -127,9 +127,10 @@ class QualificationCertificationController extends Controller
             $qcSlipId              = $this->getSafe($request, 'qc_slips_id', '');
             $isMachineOperatorExists = 0;
             $staticQc              = 'QC';
-            $select_section            = $this->getSafe($request, 'select_section', 'TSF1');
-            $select_section_production = $this->getSafe($request, 'text_select_section', 'Assembly');
+            $select_section            = $this->getSafe($request, 'select_section', '');
+            $select_section_production = $this->getSafe($request, 'text_select_section', '');
             $select_position           = $this->getSafe($request, 'text_select_position', '');
+            $text_date_of_transfer           = $this->getSafe($request, 'text_date_of_transfer', '');
             $selectedSection = str_contains($select_section, 'PPD');
             $params = [
                 'section' => $staticQc,
@@ -145,128 +146,118 @@ class QualificationCertificationController extends Controller
                     'section_category' =>  $select_section,
                     'position_category' =>  $select_position,
                     'section' =>  $select_section_production,
+                    'date_of_transfer' =>  $text_date_of_transfer,
                     'series_name' =>  $this->getSafe($request, 'text_series_operator'),
                     'product_line' =>  $this->joinSafe($request, 'text_operator_product_line'),
                     'created_by' =>  $rapidxEmpNo->rapidx_emp_no,
                     'created_at' =>  now(),
                 ];
-                // $qcSlipId = 100;
-                $qcSlipId = QcSlip::insertGetId($saveQcSlip);
-                $reasonOfCertification =  [
-                    'qc_slips_id' => $qcSlipId,
-                    'reason_of_certification' =>  $this->joinSafe($request, 'text_certification_operator'),
-                    'transfer_flexibility' => $this->joinSafe($request, 'transfer_flexibility'),
-                    'others' => $this->getSafe($request, 'others'),
-                    'created_at' =>  now(),
-                ];
+                $qcSlipGetId = QcSlip::insertGetId($saveQcSlip);
 
-                 QcReasonCertification::insert($reasonOfCertification);
+                QcReasonCertification::updateOrCreate(
+                    ['qc_slips_id' => $qcSlipGetId],
+                    [
+                        'reason_of_certification' => $this->joinSafe($request, 'text_certification_operator'),
+                        'transfer_flexibility'     => $this->joinSafe($request, 'transfer_flexibility'),
+                        'others'                   => $this->getSafe($request, 'others'),
+                    ]
+                );
 
-                $collectOperatorEmployees = collect($request->operator_employees)->map(function($rowOperatorEmployees)use ($qcSlipId){
+                $collectOperatorEmployees = collect($request->operator_employees)->map(function($rowOperatorEmployees) use ($qcSlipGetId) {
                     return [
-                            'qc_slips_id' => $qcSlipId,
-                            'employee_no' => $rowOperatorEmployees['empId'],
-                            'station_from' => $rowOperatorEmployees['stFrom'],
-                            'station_to' => $rowOperatorEmployees['stTo'],
-                            'remarks' => $rowOperatorEmployees['optRemarks'],
-                            'created_at' =>  now(),
+                        'qc_slips_id'  => $qcSlipGetId,
+                        'employee_no'  => $rowOperatorEmployees['empId'],
+                        'station_from' => $rowOperatorEmployees['stFrom'],
+                        'station_to'   => $rowOperatorEmployees['stTo'],
+                        'remarks'      => $rowOperatorEmployees['optRemarks'],
+                        'created_at'   => now(),
                     ];
-                })
-                ->values()
-                ->all();
+                })->values()->all();
 
-                QcSlipEmployee::insert($collectOperatorEmployees);
-                $qcSlipEmployeeCount = QcSlipEmployee::where('qc_slips_id',$qcSlipId)->count();
+                foreach ($collectOperatorEmployees as $empRow) {
+                    QcSlipEmployee::updateOrCreate(
+                        ['qc_slips_id' => $empRow['qc_slips_id'], 'employee_no' => $empRow['employee_no']],
+                        $empRow
+                    );
+                }
+
+                $qcSlipEmployeeCount = QcSlipEmployee::where('qc_slips_id', $qcSlipGetId)->count();
                 if ($qcSlipEmployeeCount === 0) {
                     return response()->json([
                         'is_success' => 'true',
                         'message' => 'Please Add Employee Details Above!'
-                    ],409);
-
+                    ], 409);
                 }
                 //STATUS PB
-                $operToApprovers =  [];
+                $operToApprovers = [];
+                $qcSlipId = $qcSlipGetId;
             }
+
             //UPDATE OPERATOR APPROVAL STATUS
             $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
             $currentPositionCategory = $qcSlipDetails->position_category;
             //Inspector PROCESS
             if($currentPositionCategory === 'Inspector'){ //ADD
-                $currentApprovalStatus= 'ALQCTQ'; //LINE QUALITY CONTROL SECTION (Training and Qualification)
                 $qcModelApprover = QcLqcApprover::class;
                 $operToApprovers = [];
                 if(filled($qcSlipId)){ //UPDATE {
-                    // return 'true';
                     $currentApprovalStatus = $qcSlipDetails->approval_status;
-                    if($qcSlipDetails->approval_status === 'ALQCTQ'){
-                        $qcSlipDetails->update([
-                            'status' => 'FORAPP'
-                        ]);
-                        $validatedData = app(ALqcTrainingQualificationRequest::class)->validateResolved();
+                    $qcSlipDetails->update([
+                        'status' => 'FORAPP'
+                    ]);
+                    $validatedData = app(ALqcTrainingQualificationRequest::class)->validateResolved();
 
-                        $aLqcTrainingQuali = [
-                            "qc_slips_id"              => $qcSlipId,
+                    ALqcTrainingQualification::updateOrCreate(
+                        ['qc_slips_id' => $qcSlipId],
+                        [
                             'training_orientation_inspector' => $this->joinSafe($request, 'text_training_orientation_inspector'),
-                            // 'traning_items' => $this->joinSafe($request, 'text_training_orientation_ps_oper'),
-                            'training_orientation_ins_4' => $this->getSafe($request, 'text_training_orientation_ins_4'),//A
-                            'training_orientation_ins_13' => $this->getSafe($request, 'text_training_orientation_ins_13'),//B
-                            'training_orientation_ins_21' => $this->getSafe($request, 'text_training_orientation_ins_21'),//C
-                            'training_orientation_ins_54' => $this->getSafe($request, 'text_training_orientation_ins_54'),//P
-                        ];
-                        ALqcTrainingQualification::insert($aLqcTrainingQuali);
-                        $operToApprovers = [
-                            'decision_status'   => 'APP',
-                            // Sec 1 – Training & Qualification
-                            'first_approver'    => $this->joinSafe($request, 'text_certified_inspector'),
-                            'first_approver_2'  => $this->joinSafe($request, 'text_mentored'),
-                            'first_date'        => $this->getSafe($request, 'text_date_inspector'),
-                            'first_time'        => $this->getSafe($request, 'text_time_inspector'),
-                        ];
-                    }
-                    if($qcSlipDetails->approval_status === 'BLQCTC'){
-                        $bLqcCertification = [
-                            'qc_slips_id' => $qcSlipId,
+                            'training_orientation_ins_4'     => $this->getSafe($request, 'text_training_orientation_ins_4'),
+                            'training_orientation_ins_13'    => $this->getSafe($request, 'text_training_orientation_ins_13'),
+                            'training_orientation_ins_21'    => $this->getSafe($request, 'text_training_orientation_ins_21'),
+                            'training_orientation_ins_54'    => $this->getSafe($request, 'text_training_orientation_ins_54'),
+                        ]
+                    );
+
+                    $qcModelApprover::updateOrCreate(
+                        ['qc_slips_id' => $qcSlipId, 'approval_status' => 'ALQCTQ'],
+                        [
+                            'decision_status' => 'APP',
+                            'first_approver'  => $this->joinSafe($request, 'text_certified_inspector'),
+                            'first_approver_2'=> $this->joinSafe($request, 'text_mentored'),
+                            'first_date'      => $this->getSafe($request, 'text_date_inspector'),
+                            'first_time'      => $this->getSafe($request, 'text_time_inspector'),
+                        ]
+                    );
+
+                    BLqcCertification::updateOrCreate(
+                        ['qc_slips_id' => $qcSlipId],
+                        [
                             'result_input1_inspector' => $this->getSafe($request, 'text_result_input1_inspector'),
-                            'hands_on_inspector' => $this->joinSafe($request, 'text_hands_on_inspector'),
-                            'hands_on_ins_3' => $this->getSafe($request, 'text_hands_on_ins_3'),
-                        ];
-                        BLqcCertification::insert($bLqcCertification);
-                        $operToApprovers = [
-                            'decision_status'   => 'APP',
-                            'first_approver'   => $this->joinSafe($request, 'text_sec2_certified_inspector'),
-                            'first_date'       => $this->getSafe($request, 'text_sec2_date_inspector'),
-                            'first_time'       => $this->getSafe($request, 'text_sec2_time_inspector'),
-                            'first_status'      => $this->getSafe($request, 'text_sel_result1_inspector'),
-                            'first_remarks'     => $this->getSafe($request, 'text_result_input1_inspector'),
-                            'first_status_2'    => $this->getSafe($request, 'text_sel_result2_inspector'),
+                            'hands_on_inspector'      => $this->joinSafe($request, 'text_hands_on_inspector'),
+                            'hands_on_ins_3'          => $this->getSafe($request, 'text_hands_on_ins_3'),
+                        ]
+                    );
 
-                            'second_remarks'    => $this->getSafe($request, 'text_result_input2_inspector'),
-                            'second_status'     => $this->getSafe($request, 'text_sec2_result_inspector'),
-                        ];
-                    }
-                    if($qcSlipDetails->approval_status === 'CLQCOQC'){
-                        // $cLqcOnly = [
-                        //     'qc_slips_id' => $qcSlipId,
-                        //     'ref_docno_input_inspector' => $this->getSafe($request, 'text_ref_docno_input_inspector'),
-                        //     'ins_seq_inspector' => $this->joinSafe($request, 'text_ins_seq_inspector'),
-                        // ];
-                        $countCLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId)->count();
-                        if($countCLqcTrainingItemResult === 0 ){
-                            return response()->json(['is_success' => 'false', "message" => "Please input the C Inspector Training / Certification And Validation Slip"],409);
-                        }
-                        // CLqcOqcValidation::insert($cLqcOnly);
+                    $qcModelApprover::updateOrCreate(
+                        ['qc_slips_id' => $qcSlipId, 'approval_status' => 'BLQCTC'],
+                        [
+                            'decision_status' => 'APP',
+                            'first_approver'  => $this->joinSafe($request, 'text_sec2_certified_inspector'),
+                            'first_date'      => $this->getSafe($request, 'text_sec2_date_inspector'),
+                            'first_time'      => $this->getSafe($request, 'text_sec2_time_inspector'),
+                            'first_status'    => $this->getSafe($request, 'text_sel_result1_inspector'),
+                            'first_remarks'   => $this->getSafe($request, 'text_result_input1_inspector'),
+                            'first_status_2'  => $this->getSafe($request, 'text_sel_result2_inspector'),
+                            'second_remarks'  => $this->getSafe($request, 'text_result_input2_inspector'),
+                            'second_status'   => $this->getSafe($request, 'text_sec2_result_inspector'),
+                        ]
+                    );
 
-                        $operToApprovers = [
-                            'decision_status'   => 'APP',
-                        //     'first_status'   => $this->getSafe($request, 'text_vpqcs_result1_inspector'),
-                        //     'first_approver'  => $this->joinSafe($request, 'text_vpqcs_validated1_inspector'),
-                        //     'first_date'      => $this->getSafe($request, 'text_vpqcs_date1_inspector'),
-                        //     'second_approver' => $this->joinSafe($request, 'text_vpqcs_validated2_inspector'),
-                        //     'second_date'     => $this->getSafe($request, 'text_vpqcs_date2_inspector'),
-                        ];
+                    $countCLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId)->count();
+                    if($countCLqcTrainingItemResult === 0 ){
+                        return response()->json(['is_success' => 'false', "message" => "Please input the C Inspector Training / Certification And Validation Slip"],409);
                     }
                 }
-
             }
             //OPERATOR PROCESS
             if($currentPositionCategory === 'Operator'){  //ADD
@@ -278,20 +269,21 @@ class QualificationCertificationController extends Controller
                         $validatedData = app(SendEmailRequest::class)->validateResolved();
                     }
                     if($qcSlipDetails->approval_status === 'APRODTO'){
-                        // $currentApprovalStatus = $qcSlipDetails->approval_status;
                         $qcSlipDetails->update([
                             'status' => 'FORAPP'
                         ]);
                         $validatedData = app(AOperProdTrainingOrientationRequest::class)->validateResolved();
-                        $aOperProdTrainingOrientations = [
-                            "qc_slips_id"              => $qcSlipId,
-                            'traning_items'            => $this->joinSafe($request, 'text_training_orientation_ps_oper'),
-                            'defect_escalation'        => $this->joinSafe($request, 'defect_escalation'),
-                            'production_abnormality'   => $this->joinSafe($request, 'production_abnormality'),
-                            'engg_tq_orientation_docs' => $this->joinSafe($request, 'engg_tq_orientation_docs'),
-                            'orientation_docs'         => $this->joinSafe($request, 'orientation_docs'),
-                            'created_at'               => now(),
-                        ];
+
+                        AOperProdTrainingOrientation::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId],
+                            [
+                                'traning_items'            => $this->joinSafe($request, 'text_training_orientation_ps_oper'),
+                                'defect_escalation'        => $this->joinSafe($request, 'defect_escalation'),
+                                'production_abnormality'   => $this->joinSafe($request, 'production_abnormality'),
+                                'engg_tq_orientation_docs' => $this->joinSafe($request, 'engg_tq_orientation_docs'),
+                                'orientation_docs'         => $this->joinSafe($request, 'orientation_docs'),
+                            ]
+                        );
 
                         $operToApprovers = [
                             "decision_status"  => 'APP',
@@ -301,85 +293,85 @@ class QualificationCertificationController extends Controller
                             'first_time'       => $this->getSafe($request, 'text_first_time_oper'),
                             'first_status'     => $this->getSafe($request, 'text_first_a_prod_result'),
                             'first_remarks'    => '',
-
-                            'second_approver'   => $this->joinSafe($request, 'text_second_trainedby_oper'),
-                            'second_approver_2' => $this->joinSafe($request, 'text_second_mentoredby_oper'),
-                            'second_date'       => $this->getSafe($request, 'text_second_date_oper'),
-                            'second_time'       => $this->getSafe($request, 'text_second_time_oper'),
-                            'second_status'     => $this->getSafe($request, 'text_second_a_prod_result'),
-                            'second_remarks'    => '',
+                            'second_approver'  => $this->joinSafe($request, 'text_second_trainedby_oper'),
+                            'second_approver_2'=> $this->joinSafe($request, 'text_second_mentoredby_oper'),
+                            'second_date'      => $this->getSafe($request, 'text_second_date_oper'),
+                            'second_time'      => $this->getSafe($request, 'text_second_time_oper'),
+                            'second_status'    => $this->getSafe($request, 'text_second_a_prod_result'),
+                            'second_remarks'   => '',
                         ];
-                        AOperProdTrainingOrientation::insert($aOperProdTrainingOrientations);
                     }
-                    // $currentApprovalStatus = $qcSlipDetails->approval_status;
                     if($qcSlipDetails->approval_status === 'BENGGTQ'){
                         $validatedData = app(BOpEnggSectionTrainingOrientationRequest::class)->validateResolved();
-                        $bEnggTqDetails = [
-                            "qc_slips_id"               => $qcSlipId,
-                            "traning_items"             => $this->joinSafe($request, 'text_training_orientation_es_oper'),
-                            "engg_orientation_docs"     => $this->joinSafe($request, 'engg_orientation_docs'),
-                            "obs_first_result_es_oper"  => $this->getSafe($request, 'text_obs_first_result_es_oper'),
-                            "first_sample_es_oper"      => $this->getSafe($request, 'text_first_sample_es_oper'),
-                            "first_ok_es_oper"          => $this->getSafe($request, 'text_first_ok_es_oper'),
-                            "first_ng_es_oper"          => $this->getSafe($request, 'text_first_ng_es_oper'),
-                            "obs_second_result_es_oper" => $this->getSafe($request, 'text_obs_second_result_es_oper'),
-                            "second_sample_es_oper"     => $this->getSafe($request, 'text_second_sample_es_oper'),
-                            "second_ok_es_oper"         => $this->getSafe($request, 'text_second_ok_es_oper'),
-                            "second_ng_es_oper"         => $this->getSafe($request, 'text_second_ng_es_oper'),
-                        ];
-                        BOpEnggSectionTrainingOrientation::insert($bEnggTqDetails);
-                        $operToApprovers = [
-                            "decision_status"  => 'APP',
-                            "first_approver"   => $this->joinSafe($request, 'text_1st_qualifiedby_es_oper'),
-                            "first_date"       => $this->getSafe($request, 'text_qc_1st_date_es_oper'),
-                            "first_time"       => $this->getSafe($request, 'text_qc_1st_time_es_oper'),
-                            "first_status"     => $this->getSafe($request, 'text_oa_1st_result_es_oper'),
-                            "first_remarks"    => $this->getSafe($request, 'text_1st_disqualification_es_oper'),
 
-                            "second_approver"  => $this->joinSafe($request, 'text_2nd_qualifiedby_es_oper'),
-                            "second_date"      => $this->getSafe($request, 'text_qc_2nd_date_es_oper'),
-                            "second_time"      => $this->getSafe($request, 'text_qc_2nd_time_es_oper'),
-                            "second_status"    => $this->getSafe($request, 'text_oa_2nd_result_es_oper'),
-                            "second_remarks"   => $this->getSafe($request, 'text_2nd_disqualification_es_oper'),
+                        BOpEnggSectionTrainingOrientation::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId],
+                            [
+                                'traning_items'             => $this->joinSafe($request, 'text_training_orientation_es_oper'),
+                                'engg_orientation_docs'     => $this->joinSafe($request, 'engg_orientation_docs'),
+                                'obs_first_result_es_oper'  => $this->getSafe($request, 'text_obs_first_result_es_oper'),
+                                'first_sample_es_oper'      => $this->getSafe($request, 'text_first_sample_es_oper'),
+                                'first_ok_es_oper'          => $this->getSafe($request, 'text_first_ok_es_oper'),
+                                'first_ng_es_oper'          => $this->getSafe($request, 'text_first_ng_es_oper'),
+                                'obs_second_result_es_oper' => $this->getSafe($request, 'text_obs_second_result_es_oper'),
+                                'second_sample_es_oper'     => $this->getSafe($request, 'text_second_sample_es_oper'),
+                                'second_ok_es_oper'         => $this->getSafe($request, 'text_second_ok_es_oper'),
+                                'second_ng_es_oper'         => $this->getSafe($request, 'text_second_ng_es_oper'),
+                            ]
+                        );
+
+                        $operToApprovers = [
+                            "decision_status" => 'APP',
+                            "first_approver"  => $this->joinSafe($request, 'text_1st_qualifiedby_es_oper'),
+                            "first_date"      => $this->getSafe($request, 'text_qc_1st_date_es_oper'),
+                            "first_time"      => $this->getSafe($request, 'text_qc_1st_time_es_oper'),
+                            "first_status"    => $this->getSafe($request, 'text_oa_1st_result_es_oper'),
+                            "first_remarks"   => $this->getSafe($request, 'text_1st_disqualification_es_oper'),
+                            "second_approver" => $this->joinSafe($request, 'text_2nd_qualifiedby_es_oper'),
+                            "second_date"     => $this->getSafe($request, 'text_qc_2nd_date_es_oper'),
+                            "second_time"     => $this->getSafe($request, 'text_qc_2nd_time_es_oper'),
+                            "second_status"   => $this->getSafe($request, 'text_oa_2nd_result_es_oper'),
+                            "second_remarks"  => $this->getSafe($request, 'text_2nd_disqualification_es_oper'),
                         ];
                     }
                     if($qcSlipDetails->approval_status === 'CQCC'){
                         $isMachineOperatorExists = QcSlipEmployee::where("qc_slips_id",$qcSlipId)->where('station_to',4)->count();
                         $validatedData = app(CQcCertificationRequest::class)->validateResolved();
-                        //   "qc_slips_id"               => $qcSlipId,
-                        $cQcCertification = [
-                            "qc_slips_id"               => $qcSlipId,
-                            "obs_first_result_qcs_oper"  => $this->getSafe($request, 'text_obs_first_result_qcs_oper'),
-                            "obs_second_result_qcs_oper" => $this->getSafe($request, 'text_obs_second_result_qcs_oper'),
-                            "first_sample_qcs_oper"     => $this->getSafe($request, 'text_first_sample_qcs_oper'),
-                            "second_sample_qcs_oper"    => $this->getSafe($request, 'text_second_sample_qcs_oper'),
-                            "first_ok_qcs_oper"         => $this->getSafe($request, 'text_first_ok_qcs_oper'),
-                            "first_ng_qcs_oper"         => $this->getSafe($request, 'text_first_ng_qcs_oper'),
-                            "second_ok_qcs_oper"        => $this->getSafe($request, 'text_second_ok_qcs_oper'),
-                            "second_ng_qcs_oper"        => $this->getSafe($request, 'text_second_ng_qcs_oper'),
-                            'updated_by'                => $rapidxEmpNo->rapidx_emp_no,
-                            "qcs_station_1st_oper"      => $this->joinSafe($request, 'text_qcs_station_1st_oper'),
-                            "qcs_station_2nd_oper"      => $this->joinSafe($request, 'text_qcs_station_2nd_oper'),
-                        ];
-                        $arrFinalApprover = [
-                            "oper_approved_confirmed_by" => $this->joinSafe($request, 'text_oper_approved_confirmed_by'),
-                        ];
-                        QcSlip::where('id',$qcSlipId)->update($arrFinalApprover);
-                        CQcCertification::insert($cQcCertification);
-                        $operToApprovers = [
-                            "decision_status"  => 'APP',
-                            "first_approver"   => $this->joinSafe($request, 'text_1st_certifiedby_qcs_oper'),
-                            "first_date"       => $this->getSafe($request, 'text_1st_date_qcs_oper'),
-                            "first_time"       => $this->getSafe($request, 'text_1st_time_qcs_oper'),
-                            "first_status"     => $this->getSafe($request, 'text_oa_1st_result_qcs_oper'),
-                            "first_remarks"    => $this->getSafe($request, 'text_1st_disapproval_qcs_oper'),
-                            "second_approver"  => $this->joinSafe($request, 'text_2nd_certifiedby_qcs_oper'),
-                            "second_date"      => $this->getSafe($request, 'text_2nd_date_qcs_oper'),
-                            "second_time"      => $this->getSafe($request, 'text_2nd_time_qcs_oper'),
-                            "second_status"    => $this->getSafe($request, 'text_oa_2nd_result_qcs_oper'),
-                            "second_remarks"   => $this->getSafe($request, 'text_2nd_disapproval_qcs_oper'),
-                        ];
 
+                        QcSlip::where('id', $qcSlipId)->update([
+                            'oper_approved_confirmed_by' => $this->joinSafe($request, 'text_oper_approved_confirmed_by'),
+                        ]);
+
+                        CQcCertification::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId],
+                            [
+                                'obs_first_result_qcs_oper'  => $this->getSafe($request, 'text_obs_first_result_qcs_oper'),
+                                'obs_second_result_qcs_oper' => $this->getSafe($request, 'text_obs_second_result_qcs_oper'),
+                                'first_sample_qcs_oper'      => $this->getSafe($request, 'text_first_sample_qcs_oper'),
+                                'second_sample_qcs_oper'     => $this->getSafe($request, 'text_second_sample_qcs_oper'),
+                                'first_ok_qcs_oper'          => $this->getSafe($request, 'text_first_ok_qcs_oper'),
+                                'first_ng_qcs_oper'          => $this->getSafe($request, 'text_first_ng_qcs_oper'),
+                                'second_ok_qcs_oper'         => $this->getSafe($request, 'text_second_ok_qcs_oper'),
+                                'second_ng_qcs_oper'         => $this->getSafe($request, 'text_second_ng_qcs_oper'),
+                                'updated_by'                 => $rapidxEmpNo->rapidx_emp_no,
+                                'qcs_station_1st_oper'       => $this->joinSafe($request, 'text_qcs_station_1st_oper'),
+                                'qcs_station_2nd_oper'       => $this->joinSafe($request, 'text_qcs_station_2nd_oper'),
+                            ]
+                        );
+
+                        $operToApprovers = [
+                            "decision_status" => 'APP',
+                            "first_approver"  => $this->joinSafe($request, 'text_1st_certifiedby_qcs_oper'),
+                            "first_date"      => $this->getSafe($request, 'text_1st_date_qcs_oper'),
+                            "first_time"      => $this->getSafe($request, 'text_1st_time_qcs_oper'),
+                            "first_status"    => $this->getSafe($request, 'text_oa_1st_result_qcs_oper'),
+                            "first_remarks"   => $this->getSafe($request, 'text_1st_disapproval_qcs_oper'),
+                            "second_approver" => $this->joinSafe($request, 'text_2nd_certifiedby_qcs_oper'),
+                            "second_date"     => $this->getSafe($request, 'text_2nd_date_qcs_oper'),
+                            "second_time"     => $this->getSafe($request, 'text_2nd_time_qcs_oper'),
+                            "second_status"   => $this->getSafe($request, 'text_oa_2nd_result_qcs_oper'),
+                            "second_remarks"  => $this->getSafe($request, 'text_2nd_disapproval_qcs_oper'),
+                        ];
                     }
                     if($selectedSection && $qcSlipDetails->approval_status === "DPPDONLY"){
                         $validatedData = app(DPpdCertificationCompletionRequest::class)->validateResolved();
@@ -388,20 +380,22 @@ class QualificationCertificationController extends Controller
                             'request' => $request->all()
                         ];
                         DB::commit();
-                        $dPppdOnly=  $this->dPpdProcessOnly($ppdParams);
+                        $dPppdOnly = $this->dPpdProcessOnly($ppdParams);
                         if($dPppdOnly === 'false'){
                             return response()->json(['is_success' => 'true']);
                         }
                     }
                     if($qcSlipDetails->approval_status === 'EENGVP'){
                         $validatedData = app(EEngValidationProcessRequest::class)->validateResolved();
-                        $eEngVp = [
-                            'qc_slips_id'               => $qcSlipId,
-                            'engg_application_vpes_oper'=> $this->getSafe($request, 'text_application_vpes_oper'),
-                            'engg_vpes_oper'            => $this->getSafe($request, 'text_vpes_oper'),
-                        ];
-                        EQcValidationProcess::insert($eEngVp);
-                        // EQcValidationProcess::where('qc_slips_id',$qcSlipId)->update($eEngVp);
+
+                        EQcValidationProcess::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId],
+                            [
+                                'engg_application_vpes_oper' => $this->getSafe($request, 'text_application_vpes_oper'),
+                                'engg_vpes_oper'             => $this->getSafe($request, 'text_vpes_oper'),
+                            ]
+                        );
+
                         $operToApprovers = [
                             'first_approver'  => $this->joinSafe($request, 'text_1st_validatedby_vpes_oper'),
                             'second_approver' => $this->joinSafe($request, 'text_2nd_validatedby_vpes_oper'),
@@ -411,21 +405,23 @@ class QualificationCertificationController extends Controller
                             'second_status'   => $this->getSafe($request, 'text_second_result_vpes_oper'),
                             'second_date'     => $this->getSafe($request, 'text_2nd_date_vpes_oper'),
                         ];
-
                     }
-                    if($qcSlipDetails->approval_status ==='EQCVP'){
-                    $isMachineOperatorExists = QcSlipEmployee::where("qc_slips_id",$qcSlipId)->where('station_to',4)->count();
+                    if($qcSlipDetails->approval_status === 'EQCVP'){
+                        $isMachineOperatorExists = QcSlipEmployee::where("qc_slips_id",$qcSlipId)->where('station_to',4)->count();
 
                         if($isMachineOperatorExists > 0 ){
                             $validatedData = app(MachineOperatorRequest::class)->validateResolved();
                         }
                         $validatedData = app(EQcValidationProcessRequest::class)->validateResolved();
-                        $eQcValidationProcess = [
-                            "qc_slips_id"            => $qcSlipId,
-                            "vpqcs_oper"             => $this->getSafe($request, 'text_vpqcs_oper'),
-                            "application_vpqcs_oper" => $this->getSafe($request, 'text_application_vpqcs_oper'),
-                        ];
-                        EQcValidationProcess::where('qc_slips_id',$qcSlipId)->update($eQcValidationProcess);
+
+                        EQcValidationProcess::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId],
+                            [
+                                'vpqcs_oper'             => $this->getSafe($request, 'text_vpqcs_oper'),
+                                'application_vpqcs_oper' => $this->getSafe($request, 'text_application_vpqcs_oper'),
+                            ]
+                        );
+
                         $operToApprovers = [
                             "decision_status"   => 'APP',
                             "first_status"      => $this->getSafe($request, 'text_first_result_vpqcs_oper'),
@@ -446,40 +442,41 @@ class QualificationCertificationController extends Controller
                             "second_remarks"    => $this->getSafe($request, 'text_remarks_vpes_oper_2'),
                         ];
                     }
-                    if($qcSlipDetails->approval_status ==='FQCVVO'){
+                    if($qcSlipDetails->approval_status === 'FQCVVO'){
                         app(FQcValidationRequest::class)->validateResolved();
-                        $fQcValidationVisualOperator = [
-                            "qc_slips_id" => $qcSlipId,
-                            'refdocno_input_qcvvo_oper' => $this->getSafe($request, 'text_refdocno_input_qcvvo_oper'),
-                            'refdocno_input_qcvvo_oper_2' => $this->getSafe($request, 'text_refdocno_input_qcvvo_oper_2'),
-                        ];
-                        $operToApprovers = [
-                            "decision_status"  => 'APP',
-                            "first_approver"   => $this->joinSafe($request, 'text_validated1_qcvvo_oper'),
-                            "first_date"       => $this->getSafe($request, 'text_date1_qcvvo_oper'),
-                            "first_time"       => '',
-                            "first_status"     => '',
-                            "first_remarks"    => '',
 
-                            "second_approver"  => $this->joinSafe($request, 'text_validated2_qcvvo_oper'),
-                            "second_date"      => $this->getSafe($request, 'text_date2_qcvvo_oper'),
-                            "second_time"      => '',
-                            "second_status"    =>  '',
-                            "second_remarks"   => '',
+                        FQcValidation::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId],
+                            [
+                                'refdocno_input_qcvvo_oper'   => $this->getSafe($request, 'text_refdocno_input_qcvvo_oper'),
+                                'refdocno_input_qcvvo_oper_2' => $this->getSafe($request, 'text_refdocno_input_qcvvo_oper_2'),
+                            ]
+                        );
+
+                        $operToApprovers = [
+                            "decision_status" => 'APP',
+                            "first_approver"  => $this->joinSafe($request, 'text_validated1_qcvvo_oper'),
+                            "first_date"      => $this->getSafe($request, 'text_date1_qcvvo_oper'),
+                            "first_time"      => '',
+                            "first_status"    => '',
+                            "first_remarks"   => '',
+                            "second_approver" => $this->joinSafe($request, 'text_validated2_qcvvo_oper'),
+                            "second_date"     => $this->getSafe($request, 'text_date2_qcvvo_oper'),
+                            "second_time"     => '',
+                            "second_status"   => '',
+                            "second_remarks"  => '',
                         ];
-                        FQcValidation::insert($fQcValidationVisualOperator);
-                        // DB::commit();
                     }
                     //=== Update the Operator Approvers based on the Current Status
                 }
+                if($currentApprovalStatus != "DPPDONLY"){ //OPERATOR
+                    $qcModelApprover::where('qc_slips_id', $qcSlipId)
+                        ->where('approval_status', $currentApprovalStatus)
+                        ->update($operToApprovers);
+                }
             }
 
-            if($currentApprovalStatus != "DPPDONLY"){
-            // return $qcModelApprover;
-                $qcModelApprover::where('qc_slips_id',$qcSlipId)->where('approval_status',$currentApprovalStatus)
-                // ->get();
-                ->update($operToApprovers);
-            }
+
             //=== Update the Approval Status and Insert the new Approval Status and Emails to the Next Approvers
             $changeApprovalStatusParams = [
                 'qcSlipsId' => $qcSlipId,
@@ -489,7 +486,7 @@ class QualificationCertificationController extends Controller
                 'isMachineOperatorExists'=> $isMachineOperatorExists,
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
-            if($currentApprovalStatus === 'FQCVVO'){ //FQCVVO to QCAPP - Final Approver QC Supervisor
+            if($currentApprovalStatus === 'FQCVVO'){ //OPERATOR FQCVVO to QCAPP Status - Final Approver QC Supervisor
                 $emailParams = [ //FOR QC
                     'qc_slips_id' => $qcSlipId,
                     'update_data'=> [
@@ -523,6 +520,7 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
+
     public function saveOperApprovers($params){
         try {
             OpApprover::insert($params);
@@ -548,7 +546,7 @@ class QualificationCertificationController extends Controller
             ];
             $to = '';
             $cc = '';
-            //FINAL APPROVAL
+            //FINAL APPROVAL OPERATOR, INSPECTOR
             if($params['approval_status'] === 'OK'){
                 $qcSlip = QcSlip::
                 where('id' , $params['qc_slips_id'])
@@ -557,7 +555,7 @@ class QualificationCertificationController extends Controller
                 foreach (explode(' | ',$qcSlip->created_by) as $key => $valueRowEmpNo) {
                     $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
                 }
-             $collectTo = collect($arrTo)->map(function($rowEmpNo){
+                $collectTo = collect($arrTo)->map(function($rowEmpNo){
                     return [
                         'email' => $rowEmpNo['email'],
                         'fullName' => $rowEmpNo['fullName'],
@@ -589,7 +587,6 @@ class QualificationCertificationController extends Controller
                         ];
                     });
                     $cc = $collectCc->pluck('email')->join(',');
-
                 }
                 $to = $collectTo->pluck('email')->join(',');
                 $subject = "FOR YOUR APPROVAL : TRDS - Qualification Certification";
@@ -1148,19 +1145,19 @@ class QualificationCertificationController extends Controller
             );
 
 
-          
-            if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
-                $data->where('section_category',$selectMhSortBySection);
-            }
-            if(filled($selectAccess) && $selectAccess != 'ALL'){
-                $data->where('status',$selectAccess);
-            }
-            if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
-                $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
-                    $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
-                    $query->orWhere('alert_prod_cc_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
-                });
-            }
+
+            // if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
+            //     $data->where('section_category',$selectMhSortBySection);
+            // }
+            // if(filled($selectAccess) && $selectAccess != 'ALL'){
+            //     $data->where('status',$selectAccess);
+            // }
+            // if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
+            //     $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
+            //         $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
+            //         $query->orWhere('alert_prod_cc_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
+            //     });
+            // }
             $data->whereNull('deleted_at');
             $data->orderBy('id','DESC');
             $qcSlips = $data->get();
@@ -1442,18 +1439,6 @@ class QualificationCertificationController extends Controller
         if($params['selectPosition'] === 'Inspector'){
              switch (true) {
                 case ($params['approval_status'] === 'PB'):
-                    $newStatus = 'ALQCTQ';
-                    $statusName = 'A LINE QUALITY CONTROL SECTION (Training and Qualification)';
-                    break;
-                case ($params['approval_status'] === 'ALQCTQ'):
-                    $newStatus = 'BLQCTC';
-                    $statusName = 'B LINE QUALITY CONTROL SECTION (Certification)';
-                    break;
-                case ($params['approval_status'] === 'BLQCTC'):
-                    $newStatus = 'CLQCOQC';
-                    $statusName = 'C VALIDATION PROCESS: QUALITY CONTROL SECTION <> OQC only';
-                    break;
-                case ($params['approval_status'] === 'CLQCOQC'):
                     $newStatus = 'LQCHEADAPP';
                     $statusName = 'For LQC Head Approval';
                     break;
@@ -1542,6 +1527,7 @@ class QualificationCertificationController extends Controller
           "newStatus" => $newStatus
         ];
     }
+
     public function getDivDeptSec(Request $request){
 
         try {

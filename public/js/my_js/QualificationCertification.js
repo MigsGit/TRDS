@@ -612,11 +612,10 @@
         $.each(qcSlipEmployees, function(index, emp) {
             // Match your application's data-attribute structure
             const empId = emp.employee_no;
-            const empName = emp.system_one_hris_subcon.empname ??''; // Use fallback if name is in relation
+            const empName = emp.system_one_hris_subcon?.empname ?? ''; // Use fallback if name is in relation
             const stFrom = emp.get_station_from?.dropdown_masters_details ??'';
             const stTo = emp.get_station_to?.dropdown_masters_details ?? '';
             const remarks = emp.remarks || '';
-
             let remove =``;
             if(approvalStatus === 'APRODTO'){
                 remove += ` <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpMain">
@@ -897,8 +896,8 @@
 
             //OPER
             let aLqcTrainingQualification = data.a_lqc_training_qualification ?? [];
-            let bLqcCertifications = data.b_lqc_certifications ?? [];
-            let cLqcOqcValidations = data.c_lqc_oqc_validations ?? [];
+            let bLqcCertifications = data.b_lqc_certification ?? [];
+            let cLqcOqcValidations = data.c_lqc_oqc_validation ?? [];
 
             let aOperProdTrainingOrientation = data.a_oper_prod_training_orientation ?? [];
             let bOpEnggSectionTrainingOrientation = data.b_op_engg_section_training_orientation ?? [];
@@ -906,9 +905,7 @@
             let opApprovers = data.op_approvers?? [];
 
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            const approvalStatus = data.appproval_status ?? '';
-
-            populateEditOperEmpTable(data.qc_slip_employees,approvalStatus);
+            const approvalStatus = data.approval_status ?? '';
 
             $('#btnEmployeeOperator').prop('disabled', approvalStatus === 'APRODTO' ? false : true);
             dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
@@ -936,6 +933,8 @@
             $('#text_series_operator').val(data.series_name);
             $('#text_select_position').val(positionCategory).trigger('change');
             $('#select_section').val(data.section_category).trigger('change');
+
+            populateEditOperEmpTable(data.qc_slip_employees, approvalStatus);
 
             const arrProductLine = Array.isArray(data.product_line) ? data.product_line : [data.product_line];
             const productLine = '#text_operator_product_line';
@@ -970,7 +969,7 @@
                 form.formSubmitInspector.find('#text_training_orientation_ins_4').val(aLqcTrainingQualification?.training_orientation_ins_4);
                 form.formSubmitInspector.find('#text_training_orientation_ins_13').val(aLqcTrainingQualification?.training_orientation_ins_13);
                 form.formSubmitInspector.find('#text_training_orientation_ins_21').val(aLqcTrainingQualification?.training_orientation_ins_21);
-                form.formSubmitInspector.find('#text_training_orientation_ins_54').val(aLqcTrainingQualification?.training_orientation_ins_54);
+                form.formSubmitInspector.find('#text_training_orientation_ins_54').val(aLqcTrainingQualification?.training_orientationns_54);
                 dataTable.training_items.ajax.url(`load_qc_lqc_training_items_by_qc_slip_id?qcSlipsId=${data.id}`).draw();
 
                 syncCheckboxesWithDb('text_training_orientation_inspector', trainingOrientationInspector,form.formSubmitInspector);
@@ -983,20 +982,24 @@
                 const alqctq = approversCollection?.ALQCTQ?.[0] ?? null;
 
                 form.formSubmitInspector.find('#text_date_inspector').val(alqctq?.first_date ?? '');
-                form.formSubmitInspector.find('#text_time_inspector').val(alqctq?.first_time ?? '');
+                form.formSubmitInspector.find('#text_date_inspector').val(alqctq?.first_date ?? '');
+                
+                //B
+                const handsOnInspector = bLqcCertifications?.hands_on_inspector;
+                const blqctc = approversCollection?.BLQCTC?.[0]  ?? null; 
+                form.formSubmitInspector.find('#result_input1_inspector').val(bLqcCertifications?.result_input1_inspector ?? '');
 
-                const blqctc = approversCollection?.BLQCTC?.[0]  ?? nullform.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData?.first_status ?? '').trigger('change');
-                    // form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData?.second_status ?? '').trigger('change');
-                    // form.formSubmitOper.find('#text_1st_disapproval_qcs_oper').val(cQcData?.first_remarks ?? '');
-                    // form.formSubmitOper.find('#text_2nd_disapproval_qcs_oper').val(cQcData?.second_remarks ?? '');
-                    // form.formSubmitOper.find('#text_1st_date_qcs_oper').val(cQcData?.first_date ?? '');
-                    // form.formSubmitOper.find('#text_1st_time_qcs_oper').val(cQcData?.first_time ?? '');
-                    // form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData?.second_date ?? '');
-                    // form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData?.second_time ?? '');
+                form.formSubmitInspector.find('#text_sel_result1_inspector').val(blqctc?.first_status ?? '').trigger('change');
+                form.formSubmitInspector.find('#text_sel_result2_inspector').val(blqctc?.second_status ?? '').trigger('change');
+                form.formSubmitInspector.find('#text_result_input1_inspector').val(blqctc?.first_remarks ?? '');
+                form.formSubmitInspector.find('#text_result_input2_inspector').val(blqctc?.second_remarks ?? '');
                 form.formSubmitInspector.find('#text_sec2_date_inspector').val(blqctc?.first_date ?? '');
                 form.formSubmitInspector.find('#text_sec2_time_inspector').val(blqctc?.first_time ?? '');
+                console.log('handsOnInspector',bLqcCertifications);
+                syncCheckboxesWithDb('text_hands_on_inspector', handsOnInspector,form.formSubmitInspector);
 
-                // const lqcheadapp = approversCollection?.LQCHEADAPP?.[0]  ?? null;
+                
+                // const lqcheadapp = approversCollection?.LQCHEADAPP?.[0]  ?? null; //employee
             }
             if(positionCategory === 'Operator'){
                 // ==== Get All Approvers / Validated by/ Mentored by

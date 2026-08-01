@@ -1188,7 +1188,7 @@
                             <input type="hidden" id="text_alert_qctq_cc_sec_insp_email" name="text_alert_qctq_cc_sec_insp_email">
                         </div>
                     </div> -->
-
+{{--
                     <div class="row mb-2">
                         <div class="col-md-6"></div>
                         <!-- QCTQ Section: To -->
@@ -1201,7 +1201,7 @@
                         <div class="col-md-3">
                             <label for="text_alert_qctq_cc_sec_insp">Add cc:</label>
                             <select class="form-control select2bs4" style="width: 100%;" id="text_alert_qctq_cc_sec_insp" name="text_alert_qctq_cc_sec_insp"></select>
-                        </div>
+                        </div> --}}
                     </div>
 
                     <!-- ------------------------------------------------ -->
@@ -1442,7 +1442,7 @@
                 <div id="collapseThreeInsp" class="accordion-collapse collapse" data-parent="#accordionExampleInsp">
                 <div class="accordion-body">
                     {{-- nmodify --}}
-                         <button type="button" class="btn btn-success" id="btnSaveMatrix"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SaveMatrix</button>
+                         <button type="button" class="btn btn-success" id="btnSaveMatrix"><i class="fa-solid fa fa-save me-2" style="color: white"></i>SaveMatrix</button>
                     <hr>
                     <div class="table-responsive">
                         <table id="tblTrainingItems" class="table table-bordered table-hover align-middle nowrap w-100">

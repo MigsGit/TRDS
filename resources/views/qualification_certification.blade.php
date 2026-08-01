@@ -61,8 +61,6 @@
                                         <div class="tab-pane fade show active" id="operator" role="tabpanel" aria-labelledby="for-checking-tab">
                                             <div class="card shadow-sm border-0">
                                                 <div class="card-body overflow-auto">
-
-                                                    <!-- Edited 4-24-25 -->
                                                     <div class="row mt-2 mb-2">
                                                         <div class="col-md-3">
                                                             <x-section-select name="select_mh_sort_by_section" id="select_mh_sort_by_section" />
@@ -71,7 +69,7 @@
                                                     <div class="row mt-2 mb-2">
                                                         <div class="col-md-3">
                                                             <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="select_access" id="select_access">
-                                                                <option value="" selected disabled>Select Position</option>
+                                                                <option value="" selected disabled>Select Status</option>
                                                                 <option value="ALL">SELECT ALL</option>
                                                                 <option value="FORAPP">PENDING</option>
                                                                 <option value="OK">CLOSED</option>
@@ -157,9 +155,11 @@
                                     <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="text_select_position" id="text_select_position">
                                         <option value="" selected disabled>Select Position</option>
                                         <option value="Operator">Operator</option>
-                                        <option value="MH">MH</option>
                                         <option value="Inspector" selected>Inspector</option>
-                                        {{-- <option value="Technician">Technician</option>
+
+                                        {{--
+                                         <option value="MH">MH</option>
+                                        <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
                                         <option value="Engineer">Engineer</option>
                                         <option value="Planner">Planner</option>
@@ -191,14 +191,19 @@
                                     </div>
 
                                     <div class="col-md-3">
-                                        <label for="">Series Name:</label>
+                                        <label for="" id="seriesDesignation">Series Name:</label>
                                         <input class="form-control" type="text" id="text_series_operator" name="text_series_operator" placeholder="Enter series name here">
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" id="productLine">
                                         <label for="">Product Line:</label>
                                          <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_line">
                                         </select>
+                                    </div>
+
+                                    <div class="col-md-3" id="dateOfTransfer">
+                                        <label for="">Date of Transfer:</label>
+                                         <input type="date" class="form-control" style="width: 100%;" name="text_date_of_transfer" id="text_date_of_transfer">
                                     </div>
                                 </div>
                                 <div class="row mt-2 mb-5">
@@ -2087,20 +2092,21 @@
                 ? getOperEmpTableData()
                 : [];
             call_ajax_serialize(data,{},'save_qualification_certification_oper', function(response){
-                if (response.is_success === 'true') {
-                    // Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Inspector form saved.' });
-                    dataTable.inspector.draw();
-                    // $('#modalCreateCQForm').modal('hide');
-                    // $('#modalSendEmail').modal('hide');
-                    // $form[0].reset();
-                }
+                // if (response.is_success === 'true') {
+                    Swal.fire({ icon: 'success', title: 'Saved'});
+                    dataTable.operator.draw();
+                    $('#modalCreateCQForm').modal('hide');
+                    $('#modalSendEmail').modal('hide');
+                    $form[0].reset();
+                // }
             },$form);
         }
         // #formSubmit_MH, btnCreateCQForm
         $(document).on('submit', '#formSubmit_Ins',  function (e) {
             e.preventDefault();
             var $form = $(this);
-            $('#modalSendEmail').modal();
+            saveInspectorDetails();
+            // $('#modalSendEmail').modal();
         });
         const selectOperatorValidation = () => {
             let approvalStatus = $('#approval_status').val();
@@ -2128,7 +2134,9 @@
             initDropdownMasterDetailsByFkidCombos([
                     '#text_training_orientation_es_oper',
             ],5);
-
+            $('#seriesDesignation').text('Series Name');
+            $('#productLine').removeClass('d-none');
+            $('#dateOfTransfer').addClass('d-none');
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
 
@@ -2141,12 +2149,12 @@
                 $('.operApproved').addClass('d-none');
                 $('.btnSaveInspector').removeClass('d-none');
             }
-        $('#divInspector').removeClass('d-none');
+            $('#divInspector').removeClass('d-none');
             form.formSubmitInspector[0].reset();
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],1);
+            ],7);
 
             initDropdownMasterDetailsByFkidCombos([
                     '#text_training_orientation_ps_oper',
@@ -2154,6 +2162,9 @@
             initDropdownMasterDetailsByFkidCombos([
                     '#text_training_orientation_es_oper',
             ],5);
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').addClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
 
             form.formSubmitMh.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);

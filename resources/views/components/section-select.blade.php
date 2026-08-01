@@ -1,7 +1,7 @@
 @props([
     'name',
     'id',
-    'label' => 'Sort by section:',
+    'label' => '',
 ])
 
 @php
