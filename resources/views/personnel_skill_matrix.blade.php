@@ -146,9 +146,10 @@
 
                                 <div class="card-body">
                                     <div class="text-center mb-3">
-                                        {{-- <img src="images/default-user.png"
-                                            class="img-thumbnail rounded"
-                                            style="width:150px;height:180px;object-fit:cover;"> --}}
+                                        {{ asset('images/default-user.png') }}
+                                        <img src="{{ asset('images/default-user') }}"
+                                        class="img-thumbnail rounded"
+                                        style="width:150px;height:180px;object-fit:cover;">
                                     </div>
 
                                     <div class="form-group row">
