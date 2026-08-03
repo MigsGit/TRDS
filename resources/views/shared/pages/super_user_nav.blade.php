@@ -137,7 +137,7 @@
 
                 <li class="nav-item has-treeview">
                     <a href="{{ route('personnel_skill_matrix') }}"  class="nav-link">
-                        <i class="fas fa-blind"></i>
+                        <i class="fas fa-chart-line"></i>
                         <p>Personnel Skill Matrix</p>
                     </a>
                 </li>
@@ -170,9 +170,6 @@
                         <p>List of Certified Personnel</p>
                     </a>
                 </li>
-
-
-
             </ul>
         </nav>
     </div><!-- Sidebar -->
