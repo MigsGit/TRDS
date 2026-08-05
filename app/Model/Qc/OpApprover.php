@@ -10,6 +10,33 @@ use Illuminate\Database\Eloquent\Model;
 class OpApprover extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'qc_slips_id',
+        'approval_status',
+        'decision_status',
+        'alert_prod_sec',
+        'alert_prod_cc_sec',
+        'first_approver',
+        'first_approver_2',
+        'first_approver_3',
+        'first_date',
+        'first_time',
+        'first_status',
+        'first_status_2',
+        'first_remarks',
+        'first_date_2',
+        'second_approver',
+        'second_approver_2',
+        'second_approver_3',
+        'second_date',
+        'second_time',
+        'second_status',
+        'second_status_2',
+        'second_remarks',
+        'second_date_2',
+        'oper_approved_confirmed_by',
+    ];
     public function system_one_subcon_emp_info()
     {
         return $this->hasOne(SystemOneSubconEmpInfo::class, 'EmpNo', 'employee_no');

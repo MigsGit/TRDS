@@ -5,24 +5,19 @@
 ])
 
 @php
-    $sectionOptions = [
-        ['value' => '', 'label' => 'Select Section', 'disabled' => true, 'selected' => true],
+    $statusOptions = [
+        ['value' => '', 'label' => 'Select Status', 'disabled' => true, 'selected' => true],
         ['value' => 'ALL', 'label' => 'Display All'],
-        ['value' => 'TSF1', 'label' => 'TS-F1'],
-        ['value' => 'TSF3', 'label' => 'TS-F3'],
-        ['value' => 'CN', 'label' => 'CN'],
-        ['value' => 'CNF3', 'label' => 'CN-F3'],
-        ['value' => 'PPDCN', 'label' => 'PPD-CN'],
-        ['value' => 'PPDTS', 'label' => 'PPD-TS'],
-        ['value' => 'PPDF3', 'label' => 'PPD-F3'],
-        ['value' => 'YF', 'label' => 'YF'],
+        ['value' => 'FORAPP', 'label' => 'PENDING'],
+        ['value' => 'OK', 'label' => 'CLOSED'],
+        // ['value' => 'MYAPPROVAL', 'label' => 'FOR MY APPROVAL'],
     ];
 @endphp
 
 <div class="form-group">
     <label for="{{ $id }}">{{ $label }}</label>
     <select class="form-control select2bs4" style="width: 100%;" name="{{ $name }}" id="{{ $id }}">
-        @foreach ($sectionOptions as $option)
+        @foreach ($statusOptions as $option)
             <option
                 value="{{ $option['value'] }}"
                 @if (!empty($option['disabled'])) disabled @endif
