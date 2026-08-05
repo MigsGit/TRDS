@@ -119,10 +119,16 @@
                 $("#iBtnAddUserIcon").addClass('fa fa-check');
             },
             error: function(data, xhr, status){
-                toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
-                $("#iBtnAddUserIcon").removeClass('fa fa-spinner fa-pulse');
+                     $("#iBtnAddUserIcon").removeClass('fa fa-spinner fa-pulse');
                 $("#btnAddUser").removeAttr('disabled');
                 $("#iBtnAddUserIcon").addClass('fa fa-check');
+                if( data.status === 422 ){
+                    Swal.fire({ icon: 'error', title: 'Error', text: ('Please check the required fields.')});
+                    toastr.error(data.responseJSON.message);
+                    errorHandler(errorResponse.errors['user_level_id'], $('#selAddUserLevel'))return;
+                }
+                toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+
             }
         });
     }
@@ -630,7 +636,7 @@
                     selAddUserLevel
                     $('#selAddUserLevel').val('');
                 }
-                // $('#systemoneEmpId').val(response['empInfo'][0]['pkid']);
+                $('#systemoneEmpId').val(response['empInfo'][0]['pkid']);
                 $('#txtAddfirstName').val(response['empInfo'][0]['FirstName']);
                 $('#txtAddMiddleName').val(response['empInfo'][0]['MiddleName']);
                 $('#txtAddLastName').val(response['empInfo'][0]['LastName']);

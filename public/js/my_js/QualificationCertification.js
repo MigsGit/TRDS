@@ -426,6 +426,10 @@
         const stToText = $stationTo.find('option:selected').text().trim();
         const optRemarks = $optRemarks.val();
         // --- validation ---
+        if (empId.length > 1) {
+            Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please Add 1 Employee Per Station.' });
+            return;
+        }
         if (empId.length === 0) {
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select an Employee.' });
             return;

@@ -977,7 +977,6 @@ class QualificationCertificationController extends Controller
                     // DB::commit();
                 }
             }
-
             //=== Update the Operator Approvers based on the Current Status
             if($currentApprovalStatus != "DPPDONLY"){
                 $opApprover =  OpApprover::where('qc_slips_id',$qcSlipId)->where('approval_status',$currentApprovalStatus)
