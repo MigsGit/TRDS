@@ -618,7 +618,7 @@ class QualificationCertificationController extends Controller
             // $from_name = 'issinfoservice@pricon.ph';
             $message = $this->commonController->emailMsg($emailParams);
             $rapidxEmpNo =  session('global_user');
-            return $emailData = [
+            $emailData = [
                 "to" =>$to,
                 // "to" =>"mrronquez@pricon.ph",
                 "cc" =>$cc,
@@ -638,7 +638,7 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             DB::commit();
-            // $this->commonController->sendEmail($emailData);
+            $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -683,7 +683,7 @@ class QualificationCertificationController extends Controller
             ];
 
             DB::commit();
-            return $this->saveFormSendEmail($emailParams);
+            $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
