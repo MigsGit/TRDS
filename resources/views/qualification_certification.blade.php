@@ -1680,7 +1680,7 @@
                                 <div class="modal-footer justify-content-end">
 
                                     <button type="button" class="btn btn-secondary operSave" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
-                                    <button type="submit" class="btn btn-success operSave" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Oper Save</button>
+                                    <button type="submit" class="btn btn-success operSave" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Save Operator</button>
 
                                     {{-- <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button> --}}
                                     {{-- <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button> --}}

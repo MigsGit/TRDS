@@ -1519,11 +1519,11 @@
                 </div>
             </div>
         </div>
-        
+
 
         <div class="modal-footer inspectorSave">
             <button type="button" class="btn btn-secondary btnSaveInspector" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
-            <button type="submit" class="btn btn-success btnSaveInspector" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>Insp Save</button>
+            <button type="submit" class="btn btn-success btnSaveInspector" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>Save Inspector</button>
         </div>
 
     </form>

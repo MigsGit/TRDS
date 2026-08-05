@@ -539,7 +539,6 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-
     public function saveOperApprovers($params){
         try {
             OpApprover::insert($params);
@@ -1284,17 +1283,17 @@ class QualificationCertificationController extends Controller
                             return $hrisSubcon[$empId] ?? null;
                         })
                         ->filter()
-                        ->join(' | ');
+                        ->join(' <br> ');
                     $currentApproverCc = $empIdsCc
                         ->map(function ($empId) use ($hrisSubcon) {
                             return $hrisSubcon[$empId] ?? null;
                         })
                         ->filter()
-                        ->join(' | ');
+                        ->join(' <br> ');
                 //    return $empIdsCc = array_merge($empIdsTo,$empIdsCc);
 
                     if ($currentApproverTo !== '') {
-                        $resultCurrentApprover = '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApproverTo.' <br> '.$currentApproverCc.' </span></></br>';
+                        $resultCurrentApprover = '<span class="badge '.$getApprovalStatus['spanColor'].'">'.$currentApproverTo.' <br> '.$currentApproverCc.' </span></b></br>';
                     }
                 }
 
