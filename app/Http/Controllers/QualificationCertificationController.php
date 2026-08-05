@@ -104,7 +104,7 @@ class QualificationCertificationController extends Controller
                         'fullName' => $rowEmpNo['name'],
                     ];
                 });
-                $to = $collectTo;
+                $to = $collectTo->pluck('email')->join(',');
                 $subject = "APPROVED: TRDS - Qualification Certification";
             }else{
 
