@@ -569,9 +569,9 @@
             }
        });
     }
- 
 
-  
+
+
     function getSystemOneEmployeeDetailstest(cboElement,userId=null){
         let result = '<option value="">N/A</option>';
         $.ajax({
@@ -583,7 +583,7 @@
                 cboElement.html(result);
             },
             success: function(JsonObject){
-           
+
                 let userCollection = JsonObject['userCollection'];
                 result = '';
                 if(userCollection.length > 0){
@@ -621,7 +621,7 @@
             },
             dataType: "json",
             success: function (response) {
-                console.log();
+                console.log(response);
                 if(response['empInfo'].length == 0){
                     let params = {
                         frmId : $('#formAddUser')
@@ -630,7 +630,7 @@
                     selAddUserLevel
                     $('#selAddUserLevel').val('');
                 }
-                $('#systemoneEmpId').val(response['empInfo'][0]['pkid']);
+                // $('#systemoneEmpId').val(response['empInfo'][0]['pkid']);
                 $('#txtAddfirstName').val(response['empInfo'][0]['FirstName']);
                 $('#txtAddMiddleName').val(response['empInfo'][0]['MiddleName']);
                 $('#txtAddLastName').val(response['empInfo'][0]['LastName']);
@@ -687,6 +687,6 @@
 
         })
     }
-   
-    
+
+
 // });

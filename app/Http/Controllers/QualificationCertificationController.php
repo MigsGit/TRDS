@@ -949,7 +949,11 @@ class QualificationCertificationController extends Controller
                     ];
                 }
                 if($qcSlipDetails->approval_status ==='FQCVVO'){
-                    app(FQcValidationRequest::class)->validateResolved();
+                    $isMachineOperatorExists = QcSlipEmployee::where("qc_slips_id",$qcSlipId)->where('station_to',2)->count();
+
+                    if($isMachineOperatorExists > 0 ){
+                        app(FQcValidationRequest::class)->validateResolved();
+                    }
                     $fQcValidationVisualOperator = [
                         "qc_slips_id" => $qcSlipId,
                         'refdocno_input_qcvvo_oper' => $this->getSafe($request, 'text_refdocno_input_qcvvo_oper'),
