@@ -18,13 +18,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 
-
-Route::middleware('checkSession')->group(function(){
-
-    Route::get('/', function () {
+ Route::get('/', function () {
         return view('blank');
     })->name('blank');
+return;
+Route::middleware('checkSession')->group(function(){
 
+   
     Route::get('/training_attendance', function () {
         return view('training_attendance');
     })->name('training_attendance');

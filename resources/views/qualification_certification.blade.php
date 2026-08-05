@@ -162,13 +162,12 @@
                                         <option value="" selected disabled>Select Position</option>
                                         <option value="Operator">Operator</option>
                                         <option value="Inspector" selected>Inspector</option>
-                           
+                                        {{-- <option value="Technician">Technician</option>
+                                        <option value="Supervisor">Supervisor</option>
+                                        <option value="Engineer">Engineer</option>
+                                        <option value="Planner">Planner</option>
                                         <option value="Inspector">Inspector</option> --}}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        {{-- GLOBAL INPUTS --}}
+   {{-- GLOBAL INPUTS --}}
                         <hr style="height: 5px; background-color: black; border: none;">
                           <div class="col-md-3 d-none">
                                 <label for="">QC Slip Id:</label>

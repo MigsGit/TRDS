@@ -12,7 +12,4 @@ npm-debug.log
 yarn-error.log
 .composer-lock
 .vscode
-<<<<<<< HEAD
-/vendor
-=======
->>>>>>> cb76cc488b9e72ef66f4a7fca7216e7563d22673
+/vendor_1x
