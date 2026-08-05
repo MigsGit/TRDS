@@ -71,6 +71,14 @@ class QualificationCertificationController extends Controller
         return collect((array) $value)->filter()->join($separator);
     }
 
+    public function getCurrentApprover(Request $request){
+        return 'true' ;
+        try {
+            return response()->json(['is_success' => 'true']);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
     public function saveQcLqcTrainingItemsByQcSlipId(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');

@@ -31,10 +31,10 @@ class ALqcTrainingQualificationRequest extends FormRequest
             // 'text_training_orientation_ins_21'     => ['nullable', 'string', 'max:255'],
             // 'text_training_orientation_ins_54'     => ['nullable', 'string', 'max:255'],
             // // ── Sec 1 · Approvers ────────────────────────────────────────────────
-            'text_certified_inspector'             => ['required', 'string'],
-            'text_mentored'                        => ['required', 'string'],
-            'text_date_inspector'                  => ['required', 'date'],
-            'text_time_inspector'                  => ['required', 'string'],
+            'text_certified_inspector'             => ['required'],
+            'text_mentored'                        => ['required'],
+            'text_date_inspector'                  => ['required'],
+            'text_time_inspector'                  => ['required'],
             // // ── Sec 2 · Theoretical Exam ─────────────────────────────────────────
             // 'text_result_input1_inspector'         => ['nullable', 'string', 'max:50'],
             // 'text_sel_result1_inspector'           => ['nullable', 'in:PASSED,FAILED'],
