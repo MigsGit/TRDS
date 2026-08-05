@@ -15,6 +15,18 @@ class QcSlipEmployee extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'qc_slips_id',
+        'employee_no',
+        'station_from',
+        'station_to',
+        'remarks',
+        'first_take_ins_sequence',
+        'first_take_ins_assessment_result',
+        'second_take_ins_sequence',
+        'second_take_ins_assessment_result',
+    ];
+
     /**
      * Get the user associated with the QcSlipEmployee
      *

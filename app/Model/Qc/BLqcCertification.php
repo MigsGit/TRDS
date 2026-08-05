@@ -5,13 +5,12 @@ namespace App\Model\Qc;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FQcValidation extends Model
+class BLqcCertification extends Model
 {
-    use HasFactory;
-
-    protected $fillable = [
+    protected $fillable = [ 
         'qc_slips_id',
-        'refdocno_input_qcvvo_oper',
-        'refdocno_input_qcvvo_oper_2',
+        'result_input1_inspector',
+        'hands_on_inspector',
+        'hands_on_ins_3',
     ];
 }

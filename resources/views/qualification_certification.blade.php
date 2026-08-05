@@ -61,13 +61,28 @@
                                         <div class="tab-pane fade show active" id="operator" role="tabpanel" aria-labelledby="for-checking-tab">
                                             <div class="card shadow-sm border-0">
                                                 <div class="card-body overflow-auto">
-
-                                                    <!-- Edited 4-24-25 -->
                                                     <div class="row mt-2 mb-2">
+                                                        <div class="col-md-3">
+                                                            <x-position-select name="select_position" id="select_position" />
+                                                        </div>
                                                         <div class="col-md-3">
                                                             <x-section-select name="select_mh_sort_by_section" id="select_mh_sort_by_section" />
                                                         </div>
+                                                        <div class="col-md-3">
+                                                            <x-status-select name="select_access" id="select_access" />
+                                                        </div>
                                                     </div>
+                                                    {{-- <div class="row mt-2 mb-2">
+                                                        <div class="col-md-3">
+                                                            <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="select_access" id="select_access">
+                                                                <option value="" selected disabled>Select Status</option>
+                                                                <option value="ALL">SELECT ALL</option>
+                                                                <option value="FORAPP">PENDING</option>
+                                                                <option value="OK">CLOSED</option>
+                                                                <option value="MYAPPROVAL">FOR MY APPROVAL</option>
+                                                            </select>
+                                                        </div>
+                                                    </div> --}}
 
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <h6 class="text-secondary" id="exam_label_mh"></h6>
@@ -82,7 +97,9 @@
                                                                 <th>Status</th>
                                                                 <th>Ctrl No. / Doc No.</th>
                                                                 <th>Series Name</th>
-                                                                <th>Approvers</th>
+                                                                <th>Created by</th>
+                                                                <th>Section</th>
+                                                                <th>Position</th>
                                                                 <th>Date Filed</th>
                                                                 <!-- <th>Qualified by</th> -->
                                                                 {{-- <th>Certified by</th> --}}
@@ -119,18 +136,12 @@
 
                     <div class="modal-body">
                         <label for="">Select position and section you want to certify/qualify:</label>
-
-                        <!-- Edited 4-7-25 -->
-                        <input type="hidden" id="hidden_created_by_name" name="hidden_created_by_name">
-                        <input type="hidden" id="hidden_created_by_username" name="hidden_created_by_username" value="">
-                        <input type="hidden" id="hidden_created_by_email" name="hidden_created_by_email">
-
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="text_select_position">Select Section</label>
-                                {{-- <x-section-select name="select_section" id="select_section" label="Select Section" /> --}}
-                                    <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="select_section" id="select_section">
+                                    {{-- <label for="text_select_position">Select Section</label> --}}
+                                    <x-section-select name="select_section" id="select_section" label="Select Section" />
+                                    {{-- <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="select_section" id="select_section">
                                         <option value="" selected disabled>Select Position</option>
                                         <option value="TSF1" selected>TS-F1</option>
                                         <option value="TSF3">TS-F3</option>
@@ -140,7 +151,7 @@
                                         <option value="PPDTS">PPD-TS</option>
                                         <option value="PPDF3">PPD-F3</option>
                                         <option value="YF">YF</option>
-                                    </select>
+                                    </select> --}}
                                 </div>
                             </div>
 
@@ -149,27 +160,102 @@
                                     <label for="text_select_position">Select Position</label>
                                     <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="text_select_position" id="text_select_position">
                                         <option value="" selected disabled>Select Position</option>
-                                        <option value="Operator" selected>Operator</option>
-                                        {{-- <option value="MH">MH</option>
+                                        <option value="Operator">Operator</option>
+                                        <option value="Inspector" selected>Inspector</option>
+
+                                        {{--
+                                         <option value="MH">MH</option>
                                         <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
                                         <option value="Engineer">Engineer</option>
                                         <option value="Planner">Planner</option>
-                                        <option value="Inspector">Inspector</option> --}}
+                                        --}}
                                     </select>
                                 </div>
                             </div>
                         </div>
-
+                        {{-- GLOBAL INPUTS --}}
                         <hr style="height: 5px; background-color: black; border: none;">
+                          <div class="col-md-3 d-none">
+                                <label for="">QC Slip Id:</label>
+                                    <input class="form-control" type="text" class="form-control" id="qc_slips_id" name="qc_slips_id" placeholder="Auto Generated" readonly>
+                                </div>
+                                <div class="col-md-3  d-none">
+                                    <label for="">Approval Status:</label>
+                                    <input class="form-control" type="text" class="form-control" id="approval_status" name="approval_status" placeholder="Auto Generated" readonly>
+                                </div>
+                                <div class="row mb-5">
+                                    <div class="col-md-3">
+                                        <label for="">Control No.:</label>
+                                        <input class="form-control" type="text" class="form-control" id="textconno_new_operator" name="textconno_new_operator" placeholder="Auto Generated" readonly>
+                                    </div>
 
+                                    <div class="col-md-3">
+                                        <label for="">Production Section:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="text_section_operator" id="text_section_operator">
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="" id="seriesDesignation">Series Name:</label>
+                                        <input class="form-control" type="text" id="text_series_operator" name="text_series_operator" placeholder="Enter series name here">
+                                    </div>
+
+                                    <div class="col-md-3" id="productLine">
+                                        <label for="">Product Line:</label>
+                                         <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_line">
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3" id="dateOfTransfer">
+                                        <label for="">Date of Transfer:</label>
+                                         <input type="date" class="form-control" style="width: 100%;" name="text_date_of_transfer" id="text_date_of_transfer">
+                                    </div>
+                                </div>
+                                <div class="row mt-2 mb-5">
+                                    <div class="col-md-12">
+                                        <button type="button" class="btn btn-primary" id="btnEmployeeOperator" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa fa-user-plus me-3"></i>Add Employee</button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive mt-3 mb-5">
+                                    <table id="tbl_certified_list_operator" class="table table-bordered table-hover nowrap">
+                                        <thead class="table-primary">
+                                            <tr>
+                                                <th>Action</th>
+                                                <th>Employee No.</th>
+                                                <th>Employee Name</th>
+                                                <th>Station From</th>
+                                                <th>Station To</th>
+                                                <th>Remarks</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row mb-5">
+                                    <div class="col-md-12">
+                                        <label for="">Reason for Certification:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="text_certification_operator[]" id="text_certification_operator" multiple>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-5 div-transfer-flexibility d-none">
+                                    <div class="col-md-12">
+                                        <label for="">Lateral Transfer Flexibility:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="transfer_flexibility[]" id="transfer_flexibility" multiple>
+
+                                        </select>
+                                    </div>
+                                </div>
+                        <hr style="height: 5px; background-color: black; border: none;">
                         <!-- FORMAT 5 Operator -->
                         <div class="d-none" id="div_Oper">
                             <form  id="formSubmitOper" >
                             @csrf
                                 <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
-
-                                <div class="col-md-3 d-none">
+                                {{-- <div class="col-md-3 d-none">
                                     <label for="">QC Slip Id:</label>
                                     <input class="form-control" type="text" class="form-control" id="qc_slips_id" name="qc_slips_id" placeholder="Auto Generated" readonly>
                                 </div>
@@ -180,9 +266,7 @@
                                 <div class="row mb-5">
                                     <div class="col-md-3">
                                         <label for="">Control No.:</label>
-                                        {{-- <input class="form-control" type="hidden" class="form-control d-none" id="textconno_new_operator" name="textconno_new_operator" placeholder="Select section to generate Control No." readonly> --}}
                                         <input class="form-control" type="text" class="form-control" id="textconno_new_operator" name="textconno_new_operator" placeholder="Auto Generated" readonly>
-                                       {{--  <input class="form-control" type="hidden" class="form-control" id="textconno_operator" name="textconno_operator" readonly> --}}
                                     </div>
 
                                     <div class="col-md-3">
@@ -238,7 +322,7 @@
 
                                         </select>
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <!-- **************************************************************      APRODTO          ************************************************************************************************* -->
 
@@ -1586,37 +1670,37 @@
                                         </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <hr style="height: 5px; background-color: black; border: none;">
-
-                                <div class="col-md-6 nmodify3">
-                                    <label for="">Approved / Confirmed by:</label>
-                                     <select class="form-control select2bs4" style="width: 100%;" name="text_oper_approved_confirmed_by[]" id="text_oper_approved_confirmed_by" multiple>
-                                    </select>
-                                    <label for="" class="mt-1">QC Supervisor</label>
+                                    <div class="col-md-6 nmodify3">
+                                        <label for="">Approved / Confirmed by:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="text_oper_approved_confirmed_by[]" id="text_oper_approved_confirmed_by" multiple>
+                                        </select>
+                                        <label for="" class="mt-1">QC Supervisor</label>
+                                    </div>
                                 </div>
                                 <div class="modal-footer justify-content-end">
 
                                     <button type="button" class="btn btn-secondary operSave" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
-                                    <button type="submit" class="btn btn-success operSave" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Save</button>
+                                    <button type="submit" class="btn btn-success operSave" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Oper Save</button>
 
                                     {{-- <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button> --}}
-                                    <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
+                                    {{-- <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button> --}}
                                 </div>
-                        </form>
-
+                            </form>
+                            @include('qualification_certification.modal_qualification_certification_mh')
+                            @include('qualification_certification.modal_qualification_certification_inspector')
+                            <div class="modal-footer justify-content-end operApproved">
+                                <button type="button" class="btn btn-success" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-
         @include('components.operator_prodn_training_orientation')
     </div>
 </div>
 @endsection
+
 
 @section('js_content')
     <script type="text/javascript">
@@ -1624,19 +1708,20 @@
         operEmpArray = [];
         form = {
             formSubmitOper: $('#formSubmitOper'),
+            formSubmitMh: $('#formSubmit_MH'),
+            formSubmitInspector: $('#formSubmit_Ins'),
         };
         dataTable = {
             operator: '',
             fvi_operator: '',
             tbl_fvi_operator_2: '',
+            training_items: '',
         };
         table = {
            operator: '#tbl_operator',
            fvi_operator: '#tbl_fvi_operator',
            tbl_fvi_operator_2: '#tbl_fvi_operator_2',
         };
-
-
         const updateApproval = (params) => {
             let data = {
                 decision : params.decision,
@@ -1650,6 +1735,7 @@
                 }
             });
         }
+
         $('#operDisapproved').click(function (e) {
                 let qcSlipsId = $('#qc_slips_id').val();
                 let decision = 'DIS';
@@ -1674,35 +1760,6 @@
             });
         });
 
-         $(document).on('click', '#btnCreateCQForm',function (e) {
-            initOperEmpModal();
-            // operEmpArray = [];
-            $('#tbl_certified_list_operator tbody').empty();
-            form.formSubmitOper[0].reset();
-             initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-            ],1);
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_operator_product_line',
-            ],2);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_certification_operator',
-            ],3);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_ps_oper',
-            ],4);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_es_oper',
-            ],5);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#transfer_flexibility',
-            ],6);
-            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
-            $('.operSave').removeClass('d-none');
-            $('.operApproved').addClass('d-none');
-        });
         dataTable.operator = $(table.operator).DataTable({
             "processing" : true,
             "serverSide" : true,
@@ -1725,8 +1782,8 @@
                 { "data" : "control_no" },
                 { "data" : "series_name" },
                 { "data" : "created_by" },
-                // { "data" : "certified_by" },
-                // { "data" : "approved_conformed_by" },
+                { "data" : "section_category" },
+                { "data" : "position_category" },
                 { "data" : "created_at" },
             ],
 
@@ -1765,12 +1822,60 @@
                 { "data" : "second_take_ins_assessment_result","name":"second_take_ins_assessment_result", orderable: false, searchable: false  },
             ],
         });
-        $('#operDisapproved').addClass('d-none');
-        $('#operApproved').addClass('d-none');
-        $('#operClosed').removeClass('d-none');
-        $('#operSave').removeClass('d-none');
+        dataTable.training_items = $('#tblTrainingItems').DataTable({
+            processing: true,
+            serverSide: true,
+            paging: false,         // Display all matrix items in one view
+            searching: false,      // Matrix layout does not require search bar
+            info: false,
+            ordering: false,
+            ajax: {
+                url: "load_qc_lqc_training_items_by_qc_slip_id",
+                type: "GET",
+                data: function (params) {
+                    params.qc_slips_id = $('#qc_slips_id').val()??'';
+                }
+            },
+            columns: [
+                { data: 'item_name', name: 'item_name' },
+                { data: 'day_1', name: 'day_1', className: 'text-center' },
+                { data: 'day_2', name: 'day_2', className: 'text-center' },
+                { data: 'day_3', name: 'day_3', className: 'text-center' },
+                { data: 'day_4', name: 'day_4', className: 'text-center' },
+                { data: 'day_5', name: 'day_5', className: 'text-center' },
+                { data: 'remarks', name: 'remarks' }
+            ]
+        });
+        // Pre-fill Day 1–5 date inputs in the #tblTrainingItems header from server response
+        dataTable.training_items.on('xhr', function () {
+            var json = dataTable.training_items.ajax.json();
+            if (json && json.headerDates) {
+                $.each(json.headerDates, function (dayNumber, dateValue) {
+                    $('#tblTrainingItems').closest('.table-responsive')
+                        .find('.header-date-input[data-day="' + dayNumber + '"]')
+                        .val(dateValue || '');
+                });
+            }
+        });
 
-        //  Best Practice: Event Delegation with correct object scoping
+        $('#select_position').change(function (e) {
+            e.preventDefault();
+            $('#select_access').val('').trigger('change');
+            $('#select_mh_sort_by_section').val('').trigger('change');
+            let selectSortBySection = $('#select_mh_sort_by_section').val();
+            let selectAccess = $('#select_access').val();
+            let selectPosition = $(this).val();
+            dataTable.operator.ajax.url("load_qc_slip?selectMhSortBySection="+selectSortBySection+"&selectAccess="+selectAccess+"&selectPosition="+selectPosition).draw();
+        });
+
+        $('#select_mh_sort_by_section, #select_access').on('change', function () {
+            let selectSortBySection = $('#select_mh_sort_by_section').val();
+            let selectAccess = $('#select_access').val();
+            let selectPosition = $('#select_position').val();
+            dataTable.operator.ajax.url("load_qc_slip?selectMhSortBySection="+selectSortBySection+"&selectAccess="+selectAccess+"&selectPosition="+selectPosition).draw();
+
+        });
+        // Best Practice: Event Delegation with correct object scoping
         $(document).on('click', '.btnRemoveOperEmpMain', function() {
             $(this).closest('tr').remove();
         });
@@ -1877,18 +1982,33 @@
             $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
          });
 
-         const saveFormOper = ($form) => {
-
+        const saveFormOper = ($forms = null) => {
             // 1. Serialize standard form inputs into an array
             // console.log('saveFormOper called',$form[0]);
-            // return;
+            var $form = form.formSubmitOper ?? $forms;
             var formArray = $form.serializeArray();
+
+            // 2. Push extra custom field values manually
+            // formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
+            // formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
+            // formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
+            // formArray.push({ name: 'text_select_section', value: $('#select_section').val() });
 
             // 2. Push extra custom field values manually
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
             formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
-            formArray.push({ name: 'text_select_section', value: $('#select_section').val() });
+
+            formArray.push({ name: 'select_section', value: $('#select_section').val() });
+            formArray.push({ name: 'text_select_section', value: $('#text_select_section').val() });//Insert to Operator
+            formArray.push({ name: 'qc_slips_id', value: $('#qc_slips_id').val() });
+            formArray.push({ name: 'text_section_operator', value: $('#text_section_operator').val() });
+            formArray.push({ name: 'text_series_operator', value: $('#text_series_operator').val() });
+            formArray.push({ name: 'text_operator_product_line', value: $('#text_operator_product_line').val() });
+            // formArray.push({ name: 'text_date_of_transfer', value: $('#text_date_of_transfer').val() });
+            formArray.push({ name: 'text_certification_operator', value: $('#text_certification_operator').val() });
+            formArray.push({ name: 'transfer_flexibility', value: $('#transfer_flexibility').val() });
+
 
             // 3. Process the array into a clean key-value object map
             var data = {};
@@ -1914,16 +2034,37 @@
                     dataTable.operator.draw();
                     $('#modalCreateCQForm').modal('hide');
                     $('#modalSendEmail').modal('hide');
-                    form.formSubmitOper[0].reset();
+                    $form[0].reset();
                 }
             },$form);
-         }
-         $('#formSendEmail').click(function (e) {
+        }
+        $('#formSendEmail').click(function (e) {
             e.preventDefault();
-            var $form = $('#formSubmitOper,#formSubmitOper');
-            saveFormOper($form);
+            let position = $('#text_select_position').val();
+               switch (position) {
+                case 'MH':
+                    $('#divMH').removeClass('d-none');
+                    break;
+                case 'Technician':
+                    $('#divTechnian').removeClass('d-none');
+                    break;
+                case 'Supervisor':
+                case 'Engineer':
+                case 'Planner':
+                    $('#divSEP').removeClass('d-none');
+                    break;
+                case 'Inspector':
+                    saveInspectorDetails();
+                    break;
+                case 'Operator':
+                    saveFormOper();
+                    break;
+                default:
+                    alert('Unknown position selected. Please select a valid position.');
+                    break;
+            }
         });
-        $(document).on('submit', '#formSubmitOper, #formSubmitOper', function (e) {
+        $(document).on('submit', '#formSubmitOper', function (e) {
             e.preventDefault();
             var $form = $(this);
             Swal.fire({
@@ -1935,24 +2076,196 @@
             confirmButtonText: 'Yes, proceed',
             cancelButtonText: 'Cancel'
         }).then(function (result) {
-            if (result.isConfirmed) {
-                if($('#approval_status').val() === "FQCVVO"){
-                    //TODO: Swal fire
-                    saveFormOper($form);
-                }else{
-                    $('#modalSendEmail').modal();
+                if (result.isConfirmed) {
+                    if($('#approval_status').val() === "FQCVVO"){
+                        saveFormOper($form);
+                    }else{
+                        $('#modalSendEmail').modal();
+                    }
                 }
+            });
+        });
+        const saveInspectorDetails = ($forms = null) => {
+            // 1. Serialize standard form inputs into an array
+            var $form = form.formSubmitInspector ?? $forms;
+            var formArray = $form.serializeArray();
+
+            // 2. Push extra custom field values manually
+            formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
+            formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
+            formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
+
+            formArray.push({ name: 'select_section', value: $('#select_section').val() });
+            formArray.push({ name: 'text_select_section', value: $('#text_select_section').val() });//Insert to Operator
+            formArray.push({ name: 'qc_slips_id', value: $('#qc_slips_id').val() });
+            formArray.push({ name: 'text_section_operator', value: $('#text_section_operator').val() });
+            formArray.push({ name: 'text_series_operator', value: $('#text_series_operator').val() });
+            formArray.push({ name: 'text_operator_product_line', value: $('#text_operator_product_line').val() });
+            formArray.push({ name: 'text_date_of_transfer', value: $('#text_date_of_transfer').val() });
+            formArray.push({ name: 'text_certification_operator', value: $('#text_certification_operator').val() });
+            formArray.push({ name: 'transfer_flexibility', value: $('#transfer_flexibility').val() });
+
+            // 3. Process the array into a clean key-value object map
+            var data = {};
+            $.each(formArray, function(i, field) {
+                if (data[field.name] !== undefined) {
+                    if (!Array.isArray(data[field.name])) {
+                        data[field.name] = [data[field.name]];
+                    }
+                    data[field.name].push(field.value);
+                } else {
+                    data[field.name] = field.value;
+                }
+            },$form[0]);
+
+            // 4. Safely pull your dynamic table data array
+            data.operator_employees = (typeof getOperEmpTableData === 'function')
+                ? getOperEmpTableData()
+                : [];
+            call_ajax_serialize(data,{},'save_qualification_certification_oper', function(response){
+                // if (response.is_success === 'true') {
+                    Swal.fire({ icon: 'success', title: 'Saved'});
+                    dataTable.operator.draw();
+                    $('#modalCreateCQForm').modal('hide');
+                    $('#modalSendEmail').modal('hide');
+                    $form[0].reset();
+                // }
+            },$form);
+        }
+        // #formSubmit_MH, btnCreateCQForm
+        $(document).on('submit', '#formSubmit_Ins',  function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            $('#modalSendEmail').modal();
+            // Swal.fire({
+            //     title: 'Are you sure you want to save this request?',
+            //     // html: 'This will allow you to add employees who will not be endorsed for this training endorsement.<br> <em style="font-size: 1rem;">You can specify the reason for not endorsing each employee.</em>',
+            //     html: '',
+            //     icon: 'question',
+            //     showCancelButton: true,
+            //     confirmButtonText: 'Yes, proceed',
+            //     cancelButtonText: 'Cancel'
+            // }).then(function (result) {
+            //         if (result.isConfirmed) {
+                        // if($('#approval_status').val() === "LQCHEADAPP"){
+                        //     saveInspectorDetails($form);
+                        // }else{
+                        // }
+            //         }
+            //     });
+            // });
+        });
+
+        const selectOperatorValidation = () => {
+            let approvalStatus = $('#approval_status').val();
+            let params = {
+                approvalStatus: approvalStatus,
+                positionCategory: $('#text_select_position').val(),
             }
-        });
+            getApprovalStatusToggle(params)
 
-        });
+            // if(approvalStatus === 'OPERQCAPP' || approvalStatus === 'LQCHEADAPP'){
+            //     // alert('true')
+            //     $('.operApproved').removeClass('d-none');
+            // }else{
+            //     // alert('false')
+            //     $('.operApproved').addClass('d-none');
+            //     $('.btnSaveInspector').removeClass('d-none');
+            // }
+            // $('.operSave').removeClass('d-none');
+            // $('#div_Oper').removeClass('d-none');
+            form.formSubmitOper[0].reset();
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_operator_product_line',
+            ],2);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_ps_oper',
+            ],4);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_es_oper',
+            ],5);
+            $('#seriesDesignation').text('Series Name');
+            $('#productLine').removeClass('d-none');
+            $('#dateOfTransfer').addClass('d-none');
+            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            $('#btnEmployeeOperator').prop('disabled',false);
 
+        }
+        const selectInspectorValidation = () => {
+            let approvalStatus = $('#approval_status').val();
+            let params = {
+                approvalStatus: approvalStatus,
+                positionCategory: $('#text_select_position').val(),
+            }
+            getApprovalStatusToggle(params)
+            // if(approvalStatus === 'LQCHEADAPP'){
+            //     $('.operApproved').removeClass('d-none');
+            // }else{
+            //     $('.operApproved').addClass('d-none');
+            //     $('.btnSaveInspector').removeClass('d-none');
+            // }
+            // $('#divInspector').removeClass('d-none');
+            form.formSubmitInspector[0].reset();
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],7);
+
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_ps_oper',
+            ],4);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_es_oper',
+            ],5);
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').addClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+
+            form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            $('#btnEmployeeOperator').prop('disabled',false);
+        }
         var $positionSelect = $('#text_select_position');
-        var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper');
+        var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
 
-        function togglePositionSection(position) {
+        // $positionSelect.click(function () {
+        //     alert('click');
+        // }).on('change', function () {
+        //    togglePositionSection($(this).val());
+        // });
+        $positionSelect.on('change', function () {
+            let params = {
+                approvalStatus: $('#approval_status').val(),
+                positionCategory: $(this).val(),
+            }
+            getApprovalStatusToggle(params)
+        });
+        const togglePositionSection = (position) => {
+            initOperEmpModal();
+            $('#tbl_certified_list_operator tbody').empty();
             $positionSections.addClass('d-none');
+            // text_operator_product_line
+            // text_series_operator
+            // text_certification_operator
+            // transfer_flexibility
 
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_operator_product_line',
+            ],2);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_certification_operator',
+            ],3);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#transfer_flexibility',
+            ],6);
+
+            // $('.inspectorSave').addClass('d-none');
+            // $('.operSave').addClass('d-none');
+            // $('.operApproved').addClass('d-none');
+            // $('.btnSaveInspector').addClass('d-none');
             switch (position) {
                 case 'MH':
                     $('#divMH').removeClass('d-none');
@@ -1966,25 +2279,17 @@
                     $('#divSEP').removeClass('d-none');
                     break;
                 case 'Inspector':
-                    $('#divInspector').removeClass('d-none');
+                    selectInspectorValidation();
                     break;
                 case 'Operator':
-                    $('#div_Oper').removeClass('d-none');
+                    selectOperatorValidation();
                     break;
             }
+
         }
-
-        $positionSelect.on('change', function () {
-            togglePositionSection($(this).val());
-        });
-
-        togglePositionSection($positionSelect.val());
-
         initDivDeptSecCombos([
                 '#text_section_operator',
         ]);
-
-
         const initSelectPassFail = (comboSelectors) => {
 
             comboSelectors.forEach(function(selector) {
@@ -2029,6 +2334,15 @@
             '#text_validated2_qcvvo_oper',
             //APPROVED BY
             '#text_oper_approved_confirmed_by',
+            //Inspector
+            '#text_certified_inspector',
+            '#text_mentored',
+            '#text_sec2_certified_inspector',
+            '#text_vpqcs_validated1_inspector',
+            '#text_vpqcs_validated2_inspector',
+            '#text_sec3_approved_inspector',
+            '#text_alert_qctq_sec_insp',
+            '#text_alert_qctq_cc_sec_insp',
 
         ]);
         // initSelectPassFail([
@@ -2040,6 +2354,57 @@
         // Delete a row from the FVI table
         $(document).on('click', '#tbl_fvi_operator .btn-delete-fvi-row', function () {
             $(this).closest('tr').remove();
+        });
+        $('#btnSaveMatrix').on('click', function () {
+            let matrixData = [];
+            $('#tblTrainingItems tbody tr').each(function () {
+                let row = $(this);
+                let itemId = row.find('.input-remark').attr('data-item-id');
+                if (itemId) {
+                    let dayResults = {};
+                    row.find('.input-result').each(function () {
+                        let dayNum = $(this).data('day');
+                        dayResults['day_' + dayNum] = $(this).val();
+                    });
+
+                    matrixData.push({
+                        training_item_id: itemId,
+                        day_results:      dayResults,
+                        remark:           row.find('.input-remark').val(),
+                        sub_description:  row.find('.input-sub-desc').val() ?? null,
+                    });
+                }
+            });
+            // Collect header dates keyed as day_dates[day_N]
+            let dayDates = {};
+            $('#tblTrainingItems').closest('.table-responsive')
+                .find('.header-date-input').each(function () {
+                    dayDates['day_' + $(this).data('day')] = $(this).val();
+                });
+            //     console.log('dayDates',dayDates);
+            // return;
+
+            $.ajax({
+                url:  "save_qc_lqc_training_items_by_qc_slip_id",
+                type: "POST",
+                data: {
+                    _token:     "{{ csrf_token() }}",
+                    qc_slips_id: $('#qc_slips_id').val(),
+                    matrix:     matrixData,
+                    day_dates:  dayDates,
+                },
+                success: function (response) {
+                    if (response.is_success === 'true') {
+                        Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Training items saved.' });
+                    }
+                }
+            });
+        });
+        $('#btnCreateCQForm').click(function (e) {
+            e.preventDefault();
+            let categoryPosition = $('#text_select_position').val();
+            dataTable.training_items.draw();
+            togglePositionSection(categoryPosition);
         });
     });
 

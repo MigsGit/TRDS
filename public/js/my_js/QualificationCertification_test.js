@@ -1,19 +1,18 @@
-// $(document).ready(function () {
+$(document).ready(function () {
     /**
      * Synchronizes a group of checkboxes with a piped string value from the database.
      * @param {string} nameAttribute - The HTML name attribute of the checkbox group.
      * @param {string} rawDbValue - The piped string from your database (e.g., "Visual | Assembly").
      */
-    function syncCheckboxesWithDb(nameAttribute, rawDbValue,$comboId=form.formSubmitOper) {
+    function syncCheckboxesWithDb(nameAttribute, rawDbValue) {
         // 1. Explode and clean your database values into an array of clean strings
         // If the database value is null/empty, fall back to an empty array
         const activeValues = rawDbValue
             ? rawDbValue.split('|').map(item => item.trim())
             : [];
-        console.log('Active Values:', activeValues);
 
         // 2. Query all checkboxes with that specific name attribute inside your form container
-        $comboId.find(`input[type="checkbox"][name="${nameAttribute}"]`).each(function() {
+        form.formSubmitOper.find(`input[type="checkbox"][name="${nameAttribute}"]`).each(function() {
             const checkbox = $(this);
             const checkboxValue = checkbox.val(); // e.g., "Visual", "Assembly", "Others"
 
@@ -27,124 +26,48 @@
     // ==========================================
 
     const getApprovalStatusToggle = (params) => {
-        let approvalStatus = params.approvalStatus;
-        let positionCategory = params.positionCategory;
-        console.log();
-
-            $('.inspectorSave').addClass('d-none');
-            $('.operSave').addClass('d-none');
+        let approvalStatus = params.approval_status;
+            $('.btn-link').removeClass('show');
+            $('#collapseOneOper').removeClass('show');
+            $('.operSave').removeClass('d-none');
             $('.operApproved').addClass('d-none');
-            $('.btnSaveInspector').addClass('d-none')
-            $('#div_Oper').addClass('d-none');
-            $('#divInspector').addClass('d-none');
-            if(positionCategory === 'Operator'){
-                $('#div_Oper').removeClass('d-none');
-                $('.btn-link').removeClass('show');
-                $('#collapseOneOper').removeClass('show');
-                $('.operSave').removeClass('d-none');
-                if(approvalStatus ==='APRODTO'){
-                    $('#collapseOneOper').addClass('show');
-                }
-                if(approvalStatus ==='BENGGTQ'){
-                    $('#collapseTwoOper').addClass('show');
-                }
-                if(approvalStatus ==='CQCC'){
-                    $('#collapseThreeOper').addClass('show');
-
-                }
-                if(approvalStatus ==='DPPDONLY'){
-                    $('#collapseFourOper').addClass('show');
-                }
-                if(approvalStatus ==='ENGVP'){
-                    $('#collapseFiveOper').addClass('show');
-                }
-                if(approvalStatus ==='EQCVP'){
-                    $('#collapseSixOper').addClass('show');
-                }
-                if(approvalStatus ==='FQCVVO'){
-                    $('#collapseSevenOper').addClass('show');
-
-                } //LQCHEADAPP
-                if(approvalStatus ==='QCAPP'){
-                    $('.btnSaveInspector').addClass('d-none');
-                    $('.operSave').addClass('d-none');
-                    // $('.inspectorSave').addClass('d-none');
-                    $('.operApproved').removeClass('d-none');
-                }
-                if(approvalStatus ==='OK'){
-                    // $('#operDisapproved').addClass('d-none');
-                    $('.operApproved').addClass('d-none');
-                    // $('#operClosed').addClass('d-none');
-                    $('.operSave').addClass('d-none');
-                    // $('.inspectorSave').addClass('d-none');
-                }
+            if(approvalStatus ==='APRODTO'){
+                $('#collapseOneOper').addClass('show');
             }
-            if(positionCategory === 'Inspector'){
-                $('#divInspector').removeClass('d-none');
-                $('.btnSaveInspector').removeClass('d-none');
-                // $('.inspectorSave').removeClass('d-none')
-                if(approvalStatus !='LQCHEADAPP'){
-                    $('.inspectorSave').removeClass('d-none')
-                }
-
-                if( approvalStatus ==='LQCHEADAPP'){
-                    $('.btnSaveInspector').addClass('d-none');
-                    $('.operSave').addClass('d-none');
-                    // $('.inspectorSave').addClass('d-none');
-                    $('.operApproved').removeClass('d-none');
-                }
-                if(approvalStatus ==='OK'){
-                    // $('#operDisapproved').addClass('d-none');
-                    $('.operApproved').addClass('d-none');
-                    // $('#operClosed').addClass('d-none');
-                    $('.operSave').addClass('d-none');
-                    // $('.inspectorSave').addClass('d-none');
-                }
+            if(approvalStatus ==='BENGGTQ'){
+                $('#collapseTwoOper').addClass('show');
             }
+            if(approvalStatus ==='CQCC'){
+                $('#collapseThreeOper').addClass('show');
 
+            }
+            if(approvalStatus ==='DPPDONLY'){
+                $('#collapseFourOper').addClass('show');
+            }
+            if(approvalStatus ==='ENGVP'){
+                $('#collapseFiveOper').addClass('show');
+            }
+            if(approvalStatus ==='EQCVP'){
+                $('#collapseSixOper').addClass('show');
+            }
+            if(approvalStatus ==='FQCVVO'){
+                $('#collapseSevenOper').addClass('show');
+
+            }
+            if(approvalStatus ==='QCAPP'){
+                // $('#operDisapproved').removeClass('d-none');
+                // $('#operApproved').removeClass('d-none');
+                $('.operSave').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+
+            }
+            if(approvalStatus ==='OK'){
+                $('#operDisapproved').addClass('d-none');
+                $('#operApproved').addClass('d-none');
+                $('#operClosed').addClass('d-none');
+                $('#operSave').addClass('d-none');
+            }
     }
-    const togglePositionSectiontest = (position) => {
-            initOperEmpModal();
-            $('#tbl_certified_list_operator tbody').empty();
-            $positionSections.addClass('d-none');
-            // text_operator_product_line
-            // text_series_operator
-            // text_certification_operator
-            // transfer_flexibility
-
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_operator_product_line',
-            ],2);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_certification_operator',
-            ],3);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#transfer_flexibility',
-            ],6);
-            // $('.inspectorSave').addClass('d-none');
-            $('.operSave').addClass('d-none');
-            $('.operApproved').addClass('d-none');
-            $('.btnSaveInspector').addClass('d-none');
-            switch (position) {
-                case 'MH':
-                    $('#divMH').removeClass('d-none');
-                    break;
-                case 'Technician':
-                    $('#divTechnian').removeClass('d-none');
-                    break;
-                case 'Supervisor':
-                case 'Engineer':
-                case 'Planner':
-                    $('#divSEP').removeClass('d-none');
-                    break;
-                case 'Inspector':
-                    selectInspectorValidation();
-                    break;
-                case 'Operator':
-                    selectOperatorValidation();
-                    break;
-            }
-        }
     const saveFirstTakeInsSequence = (params) =>{
         let data = {
             qcSlipsId : params.qcSlipsId,
@@ -174,18 +97,18 @@
             fnGetSelect2Value(paramsGetSelect2Value)
         });
     }
-    // const selectPassFail = (comboId) => {
-    //     let data = [
-    //             { id : 'PASSED', text : 'PASSED' },
-    //             { id : 'FAILED', text : 'FAILED' }  ,
-    //     ]
-    //     let paramsGetSelect2Value = {
-    //         comboId : comboId,
-    //         dataValue : data
-    //     }
+    const selectPassFail = (comboId) => {
+        let data = [
+                { id : 'PASSED', text : 'PASSED' },
+                { id : 'FAILED', text : 'FAILED' }  ,
+        ]
+        let paramsGetSelect2Value = {
+            comboId : comboId,
+            dataValue : data
+        }
 
-    //     fnGetSelect2Value(paramsGetSelect2Value)
-    // }
+        fnGetSelect2Value(paramsGetSelect2Value)
+    }
 
     const initDropdownMasterDetailsByFkidCombos = (comboSelectors,dropdownMastersId,specificValues ={}) => {
         comboSelectors.forEach(function(selector) {
@@ -221,6 +144,8 @@
      * Initialize multiple AJAX employee dropdowns with optional pre-selected user objects
     */
     const initGetSystemOneEmployeeDetailsCombos = (comboSelectors, selectedValuesMap = {}) => {
+        console.log('selectedValuesMap', selectedValuesMap);
+
         comboSelectors.forEach(function(selector) {
             // Fetch the pre-selected employee objects specifically for this selector
             const preSelectedEmployees = selectedValuesMap[selector] || []; // Expected array: [{id: 'R152', text: 'John Doe'}, ...]
@@ -500,10 +425,6 @@
         const stToText = $stationTo.find('option:selected').text().trim();
         const optRemarks = $optRemarks.val();
         // --- validation ---
-        if (empId.length > 1) {
-            Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please Add 1 Employee Per Station.' });
-            return;
-        }
         if (empId.length === 0) {
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select an Employee.' });
             return;
@@ -638,17 +559,17 @@
     const populateEditOperEmpTable = (qcSlipEmployees,approvalStatus) => { //nmodify
         // 1. Clear the main table to prevent old leftovers
         const $mainTableBody = $('#tbl_certified_list_operator tbody');
-        console.log($mainTableBody);
-
         $mainTableBody.empty();
+
         // 2. Loop through your incoming collection using jQuery $.each
         $.each(qcSlipEmployees, function(index, emp) {
             // Match your application's data-attribute structure
             const empId = emp.employee_no;
-            const empName = emp.system_one_hris_subcon?.empname ?? ''; // Use fallback if name is in relation
+            const empName = emp.system_one_hris_subcon.empname ??''; // Use fallback if name is in relation
             const stFrom = emp.get_station_from?.dropdown_masters_details ??'';
             const stTo = emp.get_station_to?.dropdown_masters_details ?? '';
             const remarks = emp.remarks || '';
+
             let remove =``;
             if(approvalStatus === 'APRODTO'){
                 remove += ` <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpMain">
@@ -730,6 +651,7 @@
         const mappedaProdToFirstMentoredBy = aProdToFirstMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedaProdToSecond = aProdToSecond.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedaProdToSecondMentoredBy = aProdToSecondMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
+        console.log('mappedaProdToFirstMentoredBy222',mappedaProdToFirstMentoredBy);
 
         const mappedbEnggTqFirst= bEnggTqFirst.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedbEnggTqSecond = bEnggTqSecond.map(emp => ({ id: emp.id, text: emp.name }));
@@ -832,65 +754,7 @@
         );
     }
 
-    const getEmployeeDetailsByEmpNoSelect2Inpsector = (params) => {
-        let response = params.response;
-        // Safe access: optional chaining prevents crash if approversCollection is missing from response
-        const approversCollection = response?.approversCollection ?? null;
-        // console.log('approversCollection', approversCollection);
-        // return;
-        // Guard: exit early if the entire approvers collection is absent
-        if (!approversCollection || typeof approversCollection !== 'object') {
-            return;
-        }
-
-        const alqctq = approversCollection?.ALQCTQ?.[0] ?? null;
-        const blqctc = approversCollection?.BLQCTC?.[0]  ?? null;
-        const lqcheadapp = approversCollection?.LQCHEADAPP?.[0]  ?? null;
-
-        // const operApprovedConfirmedBy = rawOperApprovedConfirmedBy   ?? [];
-        const alqctqToFirst            = alqctq?.first_approver_exploded   ?? [];
-        const alqctqToFirstMentoredBy  = alqctq?.first_approver2_exploded  ?? [];
-
-        const blqctcToFirst = blqctc?.first_approver_exploded  ?? [];
-
-        const lqcheadappToFirst  = lqcheadapp?.alert_prod_sec_exploded  ?? [];
-
-
-        // 1. Map them to a standard format Select2 expects: {id, text}
-        // const mappedOperApprovedConfirmedBy = operApprovedConfirmedBy.map(emp => ({ id: emp.id, text: emp.name }));
-        const mappedAlqctqToFirst = alqctqToFirst.map(emp => ({ id: emp.id, text: emp.name }));
-        const mappedAlqctqToFirstMentoredBy = alqctqToFirstMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
-
-        const mappedbBlqctcFirst= blqctcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
-
-        const mappedLqcAppFirst = lqcheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
-
-        // 2. Assign those formatted arrays to their target selectors inside the map
-        let editSelectionsMap = {};
-        //A
-        editSelectionsMap['#text_certified_inspector'] = mappedAlqctqToFirst;
-        editSelectionsMap['#text_mentored'] = mappedAlqctqToFirstMentoredBy;
-
-        editSelectionsMap['#text_sec2_certified_inspector'] = mappedbBlqctcFirst;
-
-        editSelectionsMap['#text_sec3_approved_inspector'] = mappedLqcAppFirst;
-
-        // 3. Initialize all employee selectors simultaneously
-        initGetSystemOneEmployeeDetailsCombos(
-            [
-                //A
-                '#text_certified_inspector',
-                '#text_mentored',
-
-                '#text_sec2_certified_inspector',
-
-                '#text_sec3_approved_inspector',
-            ],
-            editSelectionsMap
-        );
-    }
-
-    function checkCheckboxesFromColumn(rawString, prefix = 'chk',$comboId) {
+    function checkCheckboxesFromColumn(rawString, prefix = 'chk') {
         if (!rawString || rawString.trim() === '') return;
 
         // Explode by '|' and trim whitespace
@@ -904,8 +768,7 @@
             let checkboxSelector = `#${prefix}_${formattedId}`;
 
             // Find and check the element
-
-            $comboId.find(checkboxSelector).prop('checked', true);
+            form.formSubmitOper.find(checkboxSelector).prop('checked', true);
         });
     }
     function select2Value(params) {
@@ -917,6 +780,7 @@
 
         params.combo.val(selected).trigger('change');
     }
+
     // ---- Get Data for Edit Operator
     const getQcSlipsById  = (params) => {
         let data = {
@@ -926,49 +790,44 @@
             let data = response.qcSlip;
             let qcSlipEmployeeData = response.qcSlipEmployee;
             let qcReasonCertification = data.qc_reason_certification;
-
-            //OPER
-            let aLqcTrainingQualification = data.a_lqc_training_qualification ?? [];
-            let bLqcCertifications = data.b_lqc_certification ?? [];
-            let cLqcOqcValidations = data.c_lqc_oqc_validation ?? [];
-
-            let aOperProdTrainingOrientation = data.a_oper_prod_training_orientation ?? [];
-            let bOpEnggSectionTrainingOrientation = data.b_op_engg_section_training_orientation ?? [];
-            let cQcCertification = data.c_qc_certification ?? [];
-            let opApprovers = data.op_approvers?? [];
-
+            let aOperProdTrainingOrientation = data.a_oper_prod_training_orientation;
+            let bOpEnggSectionTrainingOrientation = data.b_op_engg_section_training_orientation;
+            let cQcCertification = data.c_qc_certification;
+            let opApprovers = data.op_approvers;
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            const approvalStatus = data.approval_status ?? '';
+            const approvalStatus = data.appproval_status ?? '';
+            populateEditOperEmpTable(data.qc_slip_employees,approvalStatus);
 
             $('#btnEmployeeOperator').prop('disabled', approvalStatus === 'APRODTO' ? false : true);
             dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
             dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
             let currentStatus = data.approval_status ??'';
-            let positionCategory = data.position_category ??   '';
 
-            // $('#operDisapproved').addClass('d-none');
-            // $('#operApproved').addClass('d-none');
-            // $('#operClosed').removeClass('d-none');
-            // $('#operSave').removeClass('d-none');
+            $('#operDisapproved').addClass('d-none');
+            $('#operApproved').addClass('d-none');
+            $('#operClosed').removeClass('d-none');
+            $('#operSave').removeClass('d-none');
             $('#approval_status').val(currentStatus);
 
             // ==== Toggle Collapse based on approval status
             getApprovalStatusToggle({
-                approvalStatus: currentStatus,
-                positionCategory : positionCategory,
+                approval_status: currentStatus,
              });
+            // ==== Get All Approvers / Validated by/ Mentored by
+            let paramsGetEmpNo = {
+                response : response,
+            };
+            getEmployeeDetailsByEmpNoSelect2(paramsGetEmpNo);
 
+            // ==== QC Slip
 
-            // ==== QC Slip Details
-            $('#qc_slips_id').val(data.id);
-            $('#textconno_new_operator').val(data.control_no);
-            $('#text_section_operator').val(data.section).trigger('change');
-            $('#text_date_of_transfer').val(data?.date_of_transfer);
-            $('#text_series_operator').val(data.series_name);
-            $('#text_select_position').val(positionCategory).trigger('change');
+            form.formSubmitOper.find('#qc_slips_id').val(data.id);
+            form.formSubmitOper.find('#textconno_new_operator').val(data.control_no);
+            $('#text_select_position').val(data.position_category);
+            form.formSubmitOper.find('#text_section_operator').val(data.section)
+            form.formSubmitOper.find('#text_series_operator').val(data.series_name);
+            $('#text_select_position').val(data.position_category).trigger('change');
             $('#select_section').val(data.section_category).trigger('change');
-
-            populateEditOperEmpTable(data.qc_slip_employees, approvalStatus);
 
             const arrProductLine = Array.isArray(data.product_line) ? data.product_line : [data.product_line];
             const productLine = '#text_operator_product_line';
@@ -997,243 +856,198 @@
                 6,
                 editSelectionsMap6
             );
+            // ==== A PROD
+            // Safe access: optional chaining prevents "Cannot read properties of undefined" if API shape changes
+            const aProdData = response?.approversCollection?.APRODTO?.[0] ?? null;
+            const arraProdTrainingItems = Array.isArray(response.rawAOperProdTrainingOrientationCollection) ? response.rawAOperProdTrainingOrientationCollection : [response.rawAOperProdTrainingOrientationCollection];
+            const aProdTrainingItems = '#text_training_orientation_ps_oper';
+            let editSelectionsMap4 = {};
+            editSelectionsMap4[aProdTrainingItems] = arraProdTrainingItems;
+            initDropdownMasterDetailsByFkidCombos(
+                [aProdTrainingItems],
+                4,
+                editSelectionsMap4
+            );
+            let defectParams =
+            select2Value({
+                combo : form.formSubmitOper.find('#defect_escalation'),
+                value : aOperProdTrainingOrientation?.defect_escalation,
+            });
+            select2Value({
+                combo : form.formSubmitOper.find('#production_abnormality'),
+                value : aOperProdTrainingOrientation?.production_abnormality,
+            });
+            // Guard: validate aProdData exists and has properties before reading from it
+            if (aProdData && typeof aProdData === 'object') {
+                const approverFirstStatus  = aProdData?.first_status  ?? '';
+                const approverSecondStatus  = aProdData?.second_status  ?? '';
+                const approverFirstDate  = aProdData?.first_date  ?? '';
+                const approverFirstTime  = aProdData?.first_time  ?? '';
+                const approverSecondDate = aProdData?.second_date ?? '';
+                const approverSecondTime = aProdData?.second_time ?? '';
 
-            if(positionCategory === 'Inspector'){
-                const trainingOrientationInspector = aLqcTrainingQualification?.training_orientation_inspector;
-                form.formSubmitInspector.find('#text_training_orientation_ins_4').val(aLqcTrainingQualification?.training_orientation_ins_4);
-                form.formSubmitInspector.find('#text_training_orientation_ins_13').val(aLqcTrainingQualification?.training_orientation_ins_13);
-                form.formSubmitInspector.find('#text_training_orientation_ins_21').val(aLqcTrainingQualification?.training_orientation_ins_21);
-                form.formSubmitInspector.find('#text_training_orientation_ins_54').val(aLqcTrainingQualification?.training_orientationns_54);
-                dataTable.training_items.ajax.url(`load_qc_lqc_training_items_by_qc_slip_id?qcSlipsId=${data.id}`).draw();
-
-                syncCheckboxesWithDb('text_training_orientation_inspector', trainingOrientationInspector,form.formSubmitInspector);
-
-                let paramsGetEmpNo = {
-                    response : response,
-                };
-                getEmployeeDetailsByEmpNoSelect2Inpsector(paramsGetEmpNo);
-                const approversCollection = response?.approversCollection ?? null;
-                const alqctq = approversCollection?.ALQCTQ?.[0] ?? null;
-
-                form.formSubmitInspector.find('#text_date_inspector').val(alqctq?.first_date ?? '');
-                form.formSubmitInspector.find('#text_time_inspector').val(alqctq?.first_time ?? '');
-
-                //B
-                const handsOnInspector = bLqcCertifications?.hands_on_inspector;
-                const blqctc = approversCollection?.BLQCTC?.[0]  ?? null;
-                form.formSubmitInspector.find('#result_input1_inspector').val(bLqcCertifications?.result_input1_inspector ?? '');
-
-                form.formSubmitInspector.find('#text_sel_result1_inspector').val(blqctc?.first_status ?? '').trigger('change');
-                form.formSubmitInspector.find('#text_sec2_result_inspector').val(blqctc?.first_status_2 ?? '').trigger('change');
-                form.formSubmitInspector.find('#text_sel_result2_inspector').val(blqctc?.second_status ?? '').trigger('change');
-                form.formSubmitInspector.find('#text_result_input1_inspector').val(blqctc?.first_remarks ?? '');
-                form.formSubmitInspector.find('#text_result_input2_inspector').val(blqctc?.second_remarks ?? '');
-                form.formSubmitInspector.find('#text_sec2_date_inspector').val(blqctc?.first_date ?? '');
-                form.formSubmitInspector.find('#text_sec2_time_inspector').val(blqctc?.first_time ?? '');
-                console.log('handsOnInspector',bLqcCertifications);
-                syncCheckboxesWithDb('text_hands_on_inspector', handsOnInspector,form.formSubmitInspector);
-
-
-                // const lqcheadapp = approversCollection?.LQCHEADAPP?.[0]  ?? null; //employee
+                form.formSubmitOper.find('#text_first_a_prod_result').val(approverFirstStatus).trigger('change');
+                form.formSubmitOper.find('#text_second_a_prod_result').val(approverSecondStatus).trigger('change');
+                form.formSubmitOper.find('#text_first_date_oper').val(approverFirstDate);
+                form.formSubmitOper.find('#text_first_time_oper').val(approverFirstTime);
+                form.formSubmitOper.find('#text_second_date_oper').val(approverSecondDate);
+                form.formSubmitOper.find('#text_second_time_oper').val(approverSecondTime);
             }
-            if(positionCategory === 'Operator'){
-                // ==== Get All Approvers / Validated by/ Mentored by
-                let paramsGetEmpNo = {
-                    response : response,
-                };
-                getEmployeeDetailsByEmpNoSelect2(paramsGetEmpNo);
-                // ==== OPERATOR
-                // Safe access: optional chaining prevents "Cannot read properties of undefined" if API shape changes
-                const aProdData = response?.approversCollection?.APRODTO?.[0] ?? null;
-                const arraProdTrainingItems = Array.isArray(response.rawAOperProdTrainingOrientationCollection) ? response.rawAOperProdTrainingOrientationCollection : [response.rawAOperProdTrainingOrientationCollection];
-                const aProdTrainingItems = '#text_training_orientation_ps_oper';
-                let editSelectionsMap4 = {};
-                editSelectionsMap4[aProdTrainingItems] = arraProdTrainingItems;
-                initDropdownMasterDetailsByFkidCombos(
-                    [aProdTrainingItems],
-                    4,
-                    editSelectionsMap4
-                );
-                let defectParams =
-                select2Value({
-                    combo : form.formSubmitOper.find('#defect_escalation'),
-                    value : aOperProdTrainingOrientation?.defect_escalation,
-                });
-                select2Value({
-                    combo : form.formSubmitOper.find('#production_abnormality'),
-                    value : aOperProdTrainingOrientation?.production_abnormality,
-                });
-                // Guard: validate aProdData exists and has properties before reading from it
-                if (aProdData && typeof aProdData === 'object') {
-                    const approverFirstStatus  = aProdData?.first_status  ?? '';
-                    const approverSecondStatus  = aProdData?.second_status  ?? '';
-                    const approverFirstDate  = aProdData?.first_date  ?? '';
-                    const approverFirstTime  = aProdData?.first_time  ?? '';
-                    const approverSecondDate = aProdData?.second_date ?? '';
-                    const approverSecondTime = aProdData?.second_time ?? '';
 
-                    form.formSubmitOper.find('#text_first_a_prod_result').val(approverFirstStatus).trigger('change');
-                    form.formSubmitOper.find('#text_second_a_prod_result').val(approverSecondStatus).trigger('change');
-                    form.formSubmitOper.find('#text_first_date_oper').val(approverFirstDate);
-                    form.formSubmitOper.find('#text_first_time_oper').val(approverFirstTime);
-                    form.formSubmitOper.find('#text_second_date_oper').val(approverSecondDate);
-                    form.formSubmitOper.find('#text_second_time_oper').val(approverSecondTime);
-                }
+            // 1. Let's say this is your raw string from the database response
+            const orientationDocs = aOperProdTrainingOrientation?.orientation_docs;
+            const enggTqOrientationDocs = aOperProdTrainingOrientation?.engg_tq_orientation_docs;
+            // 2. Uncheck ALL checkboxes in the form first to have a clean state
+            form.formSubmitOper.find('input[type="checkbox"]').prop('checked', false);
+            // 3. Check ALL checkboxes in the form based on the orientation docs or
+            checkCheckboxesFromColumn(orientationDocs,'chk');
+            checkCheckboxesFromColumn(enggTqOrientationDocs,'chk');
+            checkCheckboxesFromColumn(enggTqOrientationDocs,'chk');
 
-                // 1. Let's say this is your raw string from the database response
-                const orientationDocs = aOperProdTrainingOrientation?.orientation_docs;
-                const enggTqOrientationDocs = aOperProdTrainingOrientation?.engg_tq_orientation_docs;
-                // 2. Uncheck ALL checkboxes in the form first to have a clean state
-                form.formSubmitOper.find('input[type="checkbox"]').prop('checked', false);
-                // 3. Check ALL checkboxes in the form based on the orientation docs or
-                checkCheckboxesFromColumn(orientationDocs,'chk',form.formSubmitOper);
-                checkCheckboxesFromColumn(enggTqOrientationDocs,'chk',form.formSubmitOper);
-                checkCheckboxesFromColumn(enggTqOrientationDocs,'chk',form.formSubmitOper);
+            //=== B ENGG
+            const aEnggData = response?.approversCollection?.BENGGTQ?.[0] ?? null;
+            //  initDropdownMasterDetailsByFkidCombos([
+            //         '#transfer_flexibility',
+            //         '#text_training_orientation_es_oper',
+            // ],5);
 
-                //=== B ENGG
-                const aEnggData = response?.approversCollection?.BENGGTQ?.[0] ?? null;
-                //  initDropdownMasterDetailsByFkidCombos([
-                //         '#transfer_flexibility',
-                //         '#text_training_orientation_es_oper',
-                // ],5);
+            const arraBEnggTrainingItems = Array.isArray( response.rawBEnggTrainingItemsCollection) ?  response.rawBEnggTrainingItemsCollection : [ response.rawBEnggTrainingItemsCollection];
+            console.log('rawBEnggTrainingItemsCollection',arraBEnggTrainingItems  );
 
-                const arraBEnggTrainingItems = Array.isArray( response.rawBEnggTrainingItemsCollection) ?  response.rawBEnggTrainingItemsCollection : [ response.rawBEnggTrainingItemsCollection];
-                console.log('rawBEnggTrainingItemsCollection',arraBEnggTrainingItems  );
+            const aBEnggTrainingItems = '#text_training_orientation_es_oper';
+            let editSelectionsMap5 = {};
+            editSelectionsMap5[aBEnggTrainingItems] =  response.rawBEnggTrainingItemsCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [aBEnggTrainingItems],
+                5,
+                editSelectionsMap5
+            );
+            checkCheckboxesFromColumn(bOpEnggSectionTrainingOrientation?.engg_orientation_docs,'chk');
 
-                const aBEnggTrainingItems = '#text_training_orientation_es_oper';
-                let editSelectionsMap5 = {};
-                editSelectionsMap5[aBEnggTrainingItems] =  response.rawBEnggTrainingItemsCollection;
-                initDropdownMasterDetailsByFkidCombos(
-                    [aBEnggTrainingItems],
-                    5,
-                    editSelectionsMap5
-                );
-                checkCheckboxesFromColumn(bOpEnggSectionTrainingOrientation?.engg_orientation_docs,'chk',form.formSubmitOper);
-
-                form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper);
-                form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
-                form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ok_es_oper);
-                form.formSubmitOper.find('#text_first_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
-                form.formSubmitOper.find('#text_oa_1st_result_es_oper').val(bOpEnggSectionTrainingOrientation?.oa_1st_result_es_oper);
-                // form.formSubmitOper.find('#text_first_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
+            form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper);
+            form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
+            form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ok_es_oper);
+            form.formSubmitOper.find('#text_first_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
+            form.formSubmitOper.find('#text_oa_1st_result_es_oper').val(bOpEnggSectionTrainingOrientation?.oa_1st_result_es_oper);
+            // form.formSubmitOper.find('#text_first_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
 
 
-                form.formSubmitOper.find('#text_obs_second_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_second_result_es_oper);
-                form.formSubmitOper.find('#text_second_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.second_sample_es_oper);
-                form.formSubmitOper.find('#text_second_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ok_es_oper);
-                form.formSubmitOper.find('#text_second_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ng_es_oper);
-                if (aEnggData && typeof aEnggData === 'object') {
-                    form.formSubmitOper.find('#text_1st_disqualification_es_oper').val(aEnggData?.first_remarks ?? '');
-                    form.formSubmitOper.find('#text_2nd_disqualification_es_oper').val(aEnggData?.second_remarks ?? '');
-                    form.formSubmitOper.find('#text_qc_1st_date_es_oper').val(aEnggData?.first_date ?? '');
-                    form.formSubmitOper.find('#text_qc_1st_time_es_oper').val(aEnggData?.first_time ?? '');
-                    form.formSubmitOper.find('#text_qc_2nd_date_es_oper').val(aEnggData?.second_date ?? '');
-                    form.formSubmitOper.find('#text_qc_2nd_time_es_oper').val(aEnggData?.second_time ?? '');
-                }
-                // ==== C QC Certification
-                const cQcData = response?.approversCollection?.CQCC?.[0] ?? null;
-                form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcCertification?.obs_first_result_qcs_oper ?? '').trigger('change');
-                form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcCertification?.first_sample_qcs_oper ?? '').trigger('change');
-                form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcCertification?.first_ok_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcCertification?.first_ng_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcCertification?.obs_second_result_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcCertification?.second_ok_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcCertification?.second_sample_qcs_oper ?? '');
-                form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcCertification?.second_ng_qcs_oper ?? '');
+            form.formSubmitOper.find('#text_obs_second_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_second_result_es_oper);
+            form.formSubmitOper.find('#text_second_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.second_sample_es_oper);
+            form.formSubmitOper.find('#text_second_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ok_es_oper);
+            form.formSubmitOper.find('#text_second_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ng_es_oper);
+            if (aEnggData && typeof aEnggData === 'object') {
+                form.formSubmitOper.find('#text_1st_disqualification_es_oper').val(aEnggData?.first_remarks ?? '');
+                form.formSubmitOper.find('#text_2nd_disqualification_es_oper').val(aEnggData?.second_remarks ?? '');
+                form.formSubmitOper.find('#text_qc_1st_date_es_oper').val(aEnggData?.first_date ?? '');
+                form.formSubmitOper.find('#text_qc_1st_time_es_oper').val(aEnggData?.first_time ?? '');
+                form.formSubmitOper.find('#text_qc_2nd_date_es_oper').val(aEnggData?.second_date ?? '');
+                form.formSubmitOper.find('#text_qc_2nd_time_es_oper').val(aEnggData?.second_time ?? '');
+            }
+            // ==== C QC Certification
+            const cQcData = response?.approversCollection?.CQCC?.[0] ?? null;
+            form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcCertification?.obs_first_result_qcs_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcCertification?.first_sample_qcs_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcCertification?.first_ok_qcs_oper ?? '');
+            form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcCertification?.first_ng_qcs_oper ?? '');
+            form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcCertification?.obs_second_result_qcs_oper ?? '');
+            form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcCertification?.second_ok_qcs_oper ?? '');
+            form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcCertification?.second_sample_qcs_oper ?? '');
+            form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcCertification?.second_ng_qcs_oper ?? '');
 
-                // Execute for the first table (1st Oper)
-                syncCheckboxesWithDb('text_qcs_station_1st_oper', cQcCertification?.qcs_station_1st_oper);
-                // Execute for the second table (2nd Oper)
-                syncCheckboxesWithDb('text_qcs_station_2nd_oper', cQcCertification?.qcs_station_2nd_oper);
-                if (cQcData && typeof cQcData === 'object') {
 
-                    form.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData?.first_status ?? '').trigger('change');
-                    form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData?.second_status ?? '').trigger('change');
-                    form.formSubmitOper.find('#text_1st_disapproval_qcs_oper').val(cQcData?.first_remarks ?? '');
-                    form.formSubmitOper.find('#text_2nd_disapproval_qcs_oper').val(cQcData?.second_remarks ?? '');
-                    form.formSubmitOper.find('#text_1st_date_qcs_oper').val(cQcData?.first_date ?? '');
-                    form.formSubmitOper.find('#text_1st_time_qcs_oper').val(cQcData?.first_time ?? '');
-                    form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData?.second_date ?? '');
-                    form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData?.second_time ?? '');
-                }
+            // Execute for the first table (1st Oper)
+            syncCheckboxesWithDb('text_qcs_station_1st_oper', cQcCertification?.qcs_station_1st_oper);
+            // Execute for the second table (2nd Oper)
+            syncCheckboxesWithDb('text_qcs_station_2nd_oper', cQcCertification?.qcs_station_2nd_oper);
+            if (cQcData && typeof cQcData === 'object') {
 
-                // D PPD ONLY Process
-                const dPpdOnly = response?.approversCollection?.DPPDONLY?.[0] ?? null;
-                const dPpdCertificationCompletion = data.d_ppd_certification_completion;
-                if (dPpdOnly && typeof dPpdOnly === 'object') {
-                    form.formSubmitOper.find('#text_lot_1st_sample_peqcs_oper').val(dPpdCertificationCompletion?.lot_1st_sample_peqcs_oper ?? '');
+                form.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData?.first_status ?? '').trigger('change');
+                form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData?.second_status ?? '').trigger('change');
+                form.formSubmitOper.find('#text_1st_disapproval_qcs_oper').val(cQcData?.first_remarks ?? '');
+                form.formSubmitOper.find('#text_2nd_disapproval_qcs_oper').val(cQcData?.second_remarks ?? '');
+                form.formSubmitOper.find('#text_1st_date_qcs_oper').val(cQcData?.first_date ?? '');
+                form.formSubmitOper.find('#text_1st_time_qcs_oper').val(cQcData?.first_time ?? '');
+                form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData?.second_date ?? '');
+                form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData?.second_time ?? '');
+            }
 
-                    form.formSubmitOper.find('#text_1st_injected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_injected_ng_peqcs_oper'] ?? '');
-                    form.formSubmitOper.find('#1st_detected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_detected_ng_peqcs_oper'] ?? '');
-                    form.formSubmitOper.find('#text_1st_detected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_detected_ng_peqcs_oper'] ?? '');form.formSubmitOper.find('#text_2nd_sample_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_sample_peqcs_oper'] ?? '');
-                    form.formSubmitOper.find('#2nd_sample_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_sample_peqcs_oper'] ?? '');
-                    form.formSubmitOper.find('#text_2nd_injected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_injected_ng_peqcs_oper'] ?? '');
-                    form.formSubmitOper.find('#text_2nd_detected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_detected_ng_peqcs_oper'] ?? '');
-                    form.formSubmitOper.find('#text_oa_1st_result_peqcs_oper').val(dPpdOnly?.first_status ?? '').trigger('change');
-                    form.formSubmitOper.find('#text_oa_2nd_result_peqcs_oper').val(dPpdOnly?.second_status ?? '').trigger('change');
-                    form.formSubmitOper.find('#text_oa_1st_result_peqcs_oper').val(dPpdOnly?.first_remarks ?? '');
-                    form.formSubmitOper.find('#text_oa_2nd_result_peqcs_oper').val(dPpdOnly?.second_remarks ?? '');
-                    form.formSubmitOper.find('#text_1st_date_peqcs_oper').val(dPpdOnly?.first_date ?? '');
-                    form.formSubmitOper.find('#text_1st_time_peqcs_oper').val(dPpdOnly?.first_time ?? '');
-                    form.formSubmitOper.find('#text_2nd_date_peqcs_oper').val(dPpdOnly?.second_date ?? '');
-                    form.formSubmitOper.find('#text_2nd_time_peqcs_oper').val(dPpdOnly?.second_time ?? '');
-                }
-                // E ENGG Validation Process
-                const eQcValidationProcess = data.e_qc_validation_process;
-                const eEngvpData = response?.approversCollection?.EENGVP?.[0] ?? null;
-                form.formSubmitOper.find('#text_application_vpes_oper').val(eQcValidationProcess?.engg_application_vpes_oper ?? '').trigger('change');
-                let vpesOper = eQcValidationProcess?.engg_vpes_oper ?? '';
-                if(vpesOper != ""){
-                    form.formSubmitOper.find('#text_vpes_oper_1').prop('checked', true);
-                }
-                form.formSubmitOper.find('#text_vpes_oper').val(eQcValidationProcess?.engg_vpes_oper ?? '').trigger('change');
-                form.formSubmitOper.find('#text_first_result_vpes_oper').val(eEngvpData?.first_status ?? '').trigger('change');
-                form.formSubmitOper.find('#text_second_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
-                form.formSubmitOper.find('#text_1st_date_vpes_oper').val(eEngvpData?.first_date ?? '');
-                form.formSubmitOper.find('#text_2nd_date_vpes_oper').val(eEngvpData?.second_date ?? '');
-                form.formSubmitOper.find('#text_remarks_vpes_oper').val(eEngvpData?.first_remarks ?? '');
+            // D PPD ONLY Process
+            const dPpdOnly = response?.approversCollection?.DPPDONLY?.[0] ?? null;
+            const dPpdCertificationCompletion = data.d_ppd_certification_completion;
+            if (dPpdOnly && typeof dPpdOnly === 'object') {
+                 form.formSubmitOper.find('#text_lot_1st_sample_peqcs_oper').val(dPpdCertificationCompletion?.lot_1st_sample_peqcs_oper ?? '');
 
-                //E Qc Validation Process
-                const eQcvpData = response?.approversCollection?.EQCVP?.[0] ?? null;
+                form.formSubmitOper.find('#text_1st_injected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_injected_ng_peqcs_oper'] ?? '');
+                form.formSubmitOper.find('#1st_detected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_detected_ng_peqcs_oper'] ?? '');
+                form.formSubmitOper.find('#text_1st_detected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_detected_ng_peqcs_oper'] ?? '');form.formSubmitOper.find('#text_2nd_sample_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_sample_peqcs_oper'] ?? '');
+                form.formSubmitOper.find('#2nd_sample_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_sample_peqcs_oper'] ?? '');
+                form.formSubmitOper.find('#text_2nd_injected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_injected_ng_peqcs_oper'] ?? '');
+                form.formSubmitOper.find('#text_2nd_detected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_detected_ng_peqcs_oper'] ?? '');
+                form.formSubmitOper.find('#text_oa_1st_result_peqcs_oper').val(dPpdOnly?.first_status ?? '').trigger('change');
+                form.formSubmitOper.find('#text_oa_2nd_result_peqcs_oper').val(dPpdOnly?.second_status ?? '').trigger('change');
+                form.formSubmitOper.find('#text_oa_1st_result_peqcs_oper').val(dPpdOnly?.first_remarks ?? '');
+                form.formSubmitOper.find('#text_oa_2nd_result_peqcs_oper').val(dPpdOnly?.second_remarks ?? '');
+                form.formSubmitOper.find('#text_1st_date_peqcs_oper').val(dPpdOnly?.first_date ?? '');
+                form.formSubmitOper.find('#text_1st_time_peqcs_oper').val(dPpdOnly?.first_time ?? '');
+                form.formSubmitOper.find('#text_2nd_date_peqcs_oper').val(dPpdOnly?.second_date ?? '');
+                form.formSubmitOper.find('#text_2nd_time_peqcs_oper').val(dPpdOnly?.second_time ?? '');
+            }
+            // E ENGG Validation Process
+            const eQcValidationProcess = data.e_qc_validation_process;
+            const eEngvpData = response?.approversCollection?.EENGVP?.[0] ?? null;
+            form.formSubmitOper.find('#text_application_vpes_oper').val(eQcValidationProcess?.engg_application_vpes_oper ?? '').trigger('change');
+            let vpesOper = eQcValidationProcess?.engg_vpes_oper ?? '';
+            if(vpesOper != ""){
+                form.formSubmitOper.find('#text_vpes_oper_1').prop('checked', true);
+            }
+            form.formSubmitOper.find('#text_vpes_oper').val(eQcValidationProcess?.engg_vpes_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_first_result_vpes_oper').val(eEngvpData?.first_status ?? '').trigger('change');
+            form.formSubmitOper.find('#text_second_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_1st_date_vpes_oper').val(eEngvpData?.first_date ?? '');
+            form.formSubmitOper.find('#text_2nd_date_vpes_oper').val(eEngvpData?.second_date ?? '');
+            form.formSubmitOper.find('#text_remarks_vpes_oper').val(eEngvpData?.first_remarks ?? '');
 
-                form.formSubmitOper.find('#text_vpqcs_oper').val(eQcValidationProcess?.vpqcs_oper ?? '').trigger('change');
-                form.formSubmitOper.find('#text_application_vpqcs_oper').val(eQcValidationProcess?.application_vpqcs_oper ?? '').trigger('change');
+            //E Qc Validation Process
+            const eQcvpData = response?.approversCollection?.EQCVP?.[0] ?? null;
 
-                form.formSubmitOper.find('#text_first_result_vpqcs_oper').val(eQcvpData?.first_status ?? '').trigger('change');
-                form.formSubmitOper.find('#text_first_result_vpes_oper_2').val(eQcvpData?.first_status_2 ?? '').trigger('change');
-                form.formSubmitOper.find('#text_second_result_vpqcs_oper').val(eQcvpData?.second_status ?? '').trigger('change');
-                form.formSubmitOper.find('#text_second_result_vpes_oper_2').val(eQcvpData?.second_status_2 ?? '').trigger('change');
-                form.formSubmitOper.find('#text_remarks_vpqcs_oper').val(eQcvpData?.first_remarks ?? '');
-                form.formSubmitOper.find('#text_remarks_vpes_oper_2').val(eQcvpData?.second_remarks ?? '');
-                form.formSubmitOper.find('#text_1st_date_vpqcs_oper').val(eQcvpData?.first_date ?? '');
-                form.formSubmitOper.find('#text_1st_date_vpes_oper_2').val(eQcvpData?.first_date_2 ?? '');
-                form.formSubmitOper.find('#text_2nd_date_vpqcs_oper').val(eQcvpData?.second_date ?? '');
-                form.formSubmitOper.find('#text_2nd_date_vpes_oper_2').val(eQcvpData?.second_date_2 ?? '');
+            form.formSubmitOper.find('#text_vpqcs_oper').val(eQcValidationProcess?.vpqcs_oper ?? '').trigger('change');
+            form.formSubmitOper.find('#text_application_vpqcs_oper').val(eQcValidationProcess?.application_vpqcs_oper ?? '').trigger('change');
 
-                //F QC Validation
-                const fQcVvo = response?.approversCollection?.FQCVVO?.[0] ?? {};
-                const fQcValidation = data.f_qc_validation ?? {};
+            form.formSubmitOper.find('#text_first_result_vpqcs_oper').val(eQcvpData?.first_status ?? '').trigger('change');
+            form.formSubmitOper.find('#text_first_result_vpes_oper_2').val(eQcvpData?.first_status_2 ?? '').trigger('change');
+            form.formSubmitOper.find('#text_second_result_vpqcs_oper').val(eQcvpData?.second_status ?? '').trigger('change');
+            form.formSubmitOper.find('#text_second_result_vpes_oper_2').val(eQcvpData?.second_status_2 ?? '').trigger('change');
+            form.formSubmitOper.find('#text_remarks_vpqcs_oper').val(eQcvpData?.first_remarks ?? '');
+            form.formSubmitOper.find('#text_remarks_vpes_oper_2').val(eQcvpData?.second_remarks ?? '');
+            form.formSubmitOper.find('#text_1st_date_vpqcs_oper').val(eQcvpData?.first_date ?? '');
+            form.formSubmitOper.find('#text_1st_date_vpes_oper_2').val(eQcvpData?.first_date_2 ?? '');
+            form.formSubmitOper.find('#text_2nd_date_vpqcs_oper').val(eQcvpData?.second_date ?? '');
+            form.formSubmitOper.find('#text_2nd_date_vpes_oper_2').val(eQcvpData?.second_date_2 ?? '');
 
-                form.formSubmitOper.find('#text_date1_qcvvo_oper').val(fQcVvo.first_date ?? '');
-                form.formSubmitOper.find('#text_date2_qcvvo_oper').val(fQcVvo.second_date ?? '');
+            //F QC Validation
+            const fQcVvo = response?.approversCollection?.FQCVVO?.[0] ?? {};
+            const fQcValidation = data.f_qc_validation ?? {};
 
-                let refdocnoInputQcvvoOper = fQcValidation?.refdocno_input_qcvvo_oper ?? '';
-                let refdocnoInputQcvvoOper2 = fQcValidation?.refdocno_input_qcvvo_oper_2 ?? '';
-                form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper').val(refdocnoInputQcvvoOper);
-                form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper_2').val(refdocnoInputQcvvoOper2);
-                if(refdocnoInputQcvvoOper != ""){
-                    form.formSubmitOper.find('#text_refdoc_qcvvo_oper').prop('checked', true);
-                }
-                if(refdocnoInputQcvvoOper2 != ""){
-                    form.formSubmitOper.find('#text_refdoc_qcvvo_oper_2').prop('checked', true);
-                }
+            form.formSubmitOper.find('#text_date1_qcvvo_oper').val(fQcVvo.first_date ?? '');
+            form.formSubmitOper.find('#text_date2_qcvvo_oper').val(fQcVvo.second_date ?? '');
 
+            let refdocnoInputQcvvoOper = fQcValidation?.refdocno_input_qcvvo_oper ?? '';
+            let refdocnoInputQcvvoOper2 = fQcValidation?.refdocno_input_qcvvo_oper_2 ?? '';
+            form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper').val(refdocnoInputQcvvoOper);
+            form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper_2').val(refdocnoInputQcvvoOper2);
+            if(refdocnoInputQcvvoOper != ""){
+                form.formSubmitOper.find('#text_refdoc_qcvvo_oper').prop('checked', true);
+            }
+            if(refdocnoInputQcvvoOper2 != ""){
+                form.formSubmitOper.find('#text_refdoc_qcvvo_oper_2').prop('checked', true);
             }
 
             $('#modalCreateCQForm').modal();
 
         })
     }
+    
 
     /* ---- Event bindings ---- */
 
@@ -1280,4 +1094,4 @@
         $(this).closest('tr').remove();
         //  nmodifys
     });
-// });
+});
