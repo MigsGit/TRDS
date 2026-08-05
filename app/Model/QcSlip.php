@@ -30,10 +30,10 @@ class QcSlip extends Model
         'approval_status',
         'appproval_at',
     ];
-    // public function product_line()
-    // {
-    //     return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');
-    // }
+    public function product_line_details() // Chris
+    {
+        return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');
+    }
     public function system_one_hris_subcon()
     {
         return $this->hasMany(SystemOneHrisSubcon::class, 'EmpNo',  'created_by');

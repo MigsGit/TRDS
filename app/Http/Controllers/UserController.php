@@ -58,7 +58,7 @@ class UserController extends Controller
                 ->get();
 
         return DataTables::of($users)
-            
+
             ->addColumn('label1', function($user){
                 $result = "";
 
@@ -316,33 +316,33 @@ class UserController extends Controller
         return response()->json(['results' => [], 'pagination' => ['more' => false]]);
     }
 
-    // 1. Query the regular HRIS connection
-    $hrisQuery = DB::connection('mysql_systemone')
-        ->table('vw_employeeinfo')
+    //1. Query the regular HRIS connection
+    $hrisQuery = DB::connection('mysql_hris_subcon')
+        ->table('vw_pmi_subcon_hris_rapidx')
         ->where('EmpNo', 'LIKE', "%{$search}%")
         ->orWhere('EmpName', 'LIKE', "%{$search}%")
         ->select('EmpNo as id', DB::raw("CONCAT(EmpNo, ' - ', EmpName) as text"));
 
     // 2. Query the Subcontractor connection
-    $subconQuery = DB::connection('mysql_subcon')
-        ->table('vw_employeeinfo')
-        ->where('EmpNo', 'LIKE', "%{$search}%")
-        ->orWhere('EmpName', 'LIKE', "%{$search}%")
-        ->select('EmpNo as id', DB::raw("CONCAT(EmpNo, ' - ', EmpName) as text"));
+    // $subconQuery = DB::connection('mysql_subcon')
+    //     ->table('vw_employeeinfo')
+    //     ->where('EmpNo', 'LIKE', "%{$search}%")
+    //     ->orWhere('EmpName', 'LIKE', "%{$search}%")
+    //     ->select('EmpNo as id', DB::raw("CONCAT(EmpNo, ' - ', EmpName) as text"));
 
-    // 3. Combine them in memory safely using get() 
+    // 3. Combine them in memory safely using get()
     // (Fast because 'LIKE' filter narrows 20k down to just a few matches)
     $hrisResults = $hrisQuery->get();
-    $subconResults = $subconQuery->get();
+    // $subconResults = $subconQuery->get();
 
-    $mergedResults = $hrisResults->concat($subconResults)->unique('id');
+    // $mergedResults = $hrisResults->concat($subconResults)->unique('id');
 
     // 4. Manually slice the results for pagination based on the requested page
-    $totalCount = $mergedResults->count();
+    $totalCount = $hrisResults->count();
     $offset = ($page - 1) * $perPage;
-    
+
     // Slice only the 20 items needed for the current scroll page
-    $paginatedResults = $mergedResults->slice($offset, $perPage)->values();
+    $paginatedResults = $hrisResults->slice($offset, $perPage)->values();
 
     // 5. Check if there are more items left to stream to Select2
     $morePages = ($offset + $perPage) < $totalCount;

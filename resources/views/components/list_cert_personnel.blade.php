@@ -15,18 +15,20 @@
                             <select class="form-control" id="selCertPersonnelSection"></select>
                         </div>
                     </div>
-                    {{-- <div class="col-12">
-                        <div class="form-group">
-                            <label>Series:</label>
-                            <select class="form-control" id="selCertPersonnelSeries"></select>
-                        </div>
-                    </div> --}}
                     <div class="col-12">
-                        <div class="form-group">
+                        <div class="form-group mb-2">
                             <label>Product Line:</label>
                             <select class="form-control" id="selCertPersonnelProductLine"></select>
                         </div>
                     </div>
+                </div>
+
+                <!-- Added Note -->
+                <div class="alert alert-info border-0 shadow-sm mt-3 py-2 px-3 mb-0" role="alert">
+                    <small>
+                        <i class="fas fa-info-circle mr-1"></i>
+                        <strong>Note:</strong> All dropdown options are synced with the <strong>Qualification & Certification</strong> module. If a required selection is not listed, please add it in that module first.
+                    </small>
                 </div>
             </div>
             <div class="modal-footer justify-content-between">
