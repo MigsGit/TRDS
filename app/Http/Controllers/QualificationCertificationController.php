@@ -220,7 +220,7 @@ class QualificationCertificationController extends Controller
                     ];
                     ALqcTrainingQualification::updateOrCreate(
                     $arrQcSlipId,$aLqcTrainingQuali);
-                    
+
                     $operToApprovers = [
                         "qc_slips_id"   => $qcSlipId,
                         'approval_status' => 'ALQCTQ',
@@ -238,9 +238,9 @@ class QualificationCertificationController extends Controller
                         'qc_slips_id' => $qcSlipId,
                         'result_input1_inspector' => $this->getSafe($request, 'text_result_input1_inspector'),
                         'hands_on_inspector'      => $this->joinSafe($request, 'text_hands_on_inspector'),
-                        'hands_on_ins_3'          => $this->getSafe($request, 'text_hands_on_ins_3'), 
+                        'hands_on_ins_3'          => $this->getSafe($request, 'text_hands_on_ins_3'),
                     ];
-                    
+
                     BLqcCertification::updateOrCreate(
                     $arrQcSlipId,$bLqcCertification);
                     $qcModelApprover::updateOrCreate(
@@ -253,7 +253,7 @@ class QualificationCertificationController extends Controller
                             'first_date'      => $this->getSafe($request, 'text_sec2_date_inspector'),
                             'first_time'      => $this->getSafe($request, 'text_sec2_time_inspector'),
                             'first_status'    => $this->getSafe($request, 'text_sel_result1_inspector'),
-                            'first_status_2'   => $this->getSafe($request, 'text_sec2_result_inspector'), 
+                            'first_status_2'   => $this->getSafe($request, 'text_sec2_result_inspector'),
                             'first_remarks'   => $this->getSafe($request, 'text_result_input1_inspector'),
                             'second_status'  => $this->getSafe($request, 'text_sel_result2_inspector'),
                             'second_remarks'  => $this->getSafe($request, 'text_result_input2_inspector'),
@@ -503,8 +503,8 @@ class QualificationCertificationController extends Controller
                 'isMachineOperatorExists'=> $isMachineOperatorExists,
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
-            
-            
+
+
             if($currentApprovalStatus === 'FQCVVO'){ //OPERATOR FQCVVO to QCAPP Status - Final Approver QC Supervisor
                 $emailParams = [ //FOR QC
                     'qc_slips_id' => $qcSlipId,
@@ -618,7 +618,7 @@ class QualificationCertificationController extends Controller
             // $from_name = 'issinfoservice@pricon.ph';
             $message = $this->commonController->emailMsg($emailParams);
             $rapidxEmpNo =  session('global_user');
-            return $emailData = [
+            $emailData = [
                 "to" =>$to,
                 // "to" =>"mrronquez@pricon.ph",
                 "cc" =>$cc,
@@ -638,7 +638,7 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             DB::commit();
-            // $this->commonController->sendEmail($emailData);
+            $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -683,7 +683,7 @@ class QualificationCertificationController extends Controller
             ];
 
             DB::commit();
-            return $this->saveFormSendEmail($emailParams);
+            $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -1443,36 +1443,6 @@ class QualificationCertificationController extends Controller
                     'isChangeStatus' => 'false' //Change E Status
             ];
             //NULLABLE TABLE D , CHANGE THE VALIDATION TO OP APPROVER , CREATE NEW DATABASE FOR E ENGG
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
-    public function index1(Request $request){
-        return $eQcValidationProcess =  [
-            //2nd day
-            "vpqcs_oper" => $request->text_vpqcs_oper, //CHECKBOX
-            "first_status" =>  $request->text_first_result_vpqcs_oper,//PASSED
-            "first_approver"=>  collect($request->text_1st_validatedby_vpqcs_oper)->join(' | '), //R152 - 2trainedby
-            "first_date" =>  $request->text_1st_date_vpqcs_oper,
-
-            "second_status" =>  $request->text_second_result_vpqcs_oper,
-            "text_2nd_validatedby_vpqcs_oper"=> collect($request->text_2nd_validatedby_vpqcs_oper)->join(' | '),//R152 - 2trainedby
-            "second_date" =>  $request->text_2nd_date_vpqcs_oper,
-            "first_remarks" =>  $request->text_remarks_vpqcs_oper,
-
-            //3rd day
-            "text_vpqcs_oper_1_1" =>  $request->text_vpqcs_oper_1_1, //CHECKBOX
-            "first_status_2" =>  $request->text_first_result_vpes_oper_2, //PASSED
-            "first_approver_2"=>  collect($request->text_1st_validatedby_vpes_oper_2)->join(' | '),//R152 - 2trainedby
-            "first_date_2" =>  $request->text_1st_date_vpes_oper_2,
-            "text_application_vpqcs_oper" =>  $request->text_application_vpqcs_oper, //DROPDOWN
-            "second_status_2" =>  $request->text_second_result_vpes_oper_2, //PASSED
-            "second_approver_2"=> collect($request->text_2nd_validatedby_vpes_oper_2)->join(' | '),//R152 - 2trainedby
-            "second_date_2" =>  $request->text_2nd_date_vpes_oper_2,
-            "text_remarks_vpes_oper_2" =>  $request->text_remarks_vpes_oper_2,
-        ];
-        try {
-            return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             throw $e;
         }
