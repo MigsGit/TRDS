@@ -24,7 +24,12 @@ class BLqcCertificationRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'text_result_input1_inspector'=> ['required'],
+            'text_hands_on_inspector'=> ['required'],
+            'text_sec2_result_inspector'=> ['required'],
+            'text_sec2_certified_inspector'=> ['required'],
+            'text_sec2_date_inspector'=> ['required'],
+            'text_sec2_time_inspector'=> ['required'],
         ];
     }
 }

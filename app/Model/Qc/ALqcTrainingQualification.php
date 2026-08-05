@@ -16,5 +16,6 @@ class ALqcTrainingQualification extends Model
         'training_orientation_ins_13',
         'training_orientation_ins_21',
         'training_orientation_ins_54',
+
     ];
 }

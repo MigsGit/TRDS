@@ -1988,10 +1988,26 @@
             var formArray = $form.serializeArray();
 
             // 2. Push extra custom field values manually
+            // formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
+            // formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
+            // formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
+            // formArray.push({ name: 'text_select_section', value: $('#select_section').val() });
+
+            // 2. Push extra custom field values manually
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
             formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
-            formArray.push({ name: 'text_select_section', value: $('#select_section').val() });
+            
+            formArray.push({ name: 'select_section', value: $('#select_section').val() });
+            formArray.push({ name: 'text_select_section', value: $('#text_select_section').val() });//Insert to Operator
+            formArray.push({ name: 'qc_slips_id', value: $('#qc_slips_id').val() });
+            formArray.push({ name: 'text_section_operator', value: $('#text_section_operator').val() });
+            formArray.push({ name: 'text_series_operator', value: $('#text_series_operator').val() });
+            formArray.push({ name: 'text_operator_product_line', value: $('#text_operator_product_line').val() });
+            // formArray.push({ name: 'text_date_of_transfer', value: $('#text_date_of_transfer').val() });
+            formArray.push({ name: 'text_certification_operator', value: $('#text_certification_operator').val() });
+            formArray.push({ name: 'transfer_flexibility', value: $('#transfer_flexibility').val() });
+
 
             // 3. Process the array into a clean key-value object map
             var data = {};
@@ -2077,12 +2093,14 @@
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
             formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
+            
             formArray.push({ name: 'select_section', value: $('#select_section').val() });
             formArray.push({ name: 'text_select_section', value: $('#text_select_section').val() });//Insert to Operator
             formArray.push({ name: 'qc_slips_id', value: $('#qc_slips_id').val() });
             formArray.push({ name: 'text_section_operator', value: $('#text_section_operator').val() });
             formArray.push({ name: 'text_series_operator', value: $('#text_series_operator').val() });
             formArray.push({ name: 'text_operator_product_line', value: $('#text_operator_product_line').val() });
+            formArray.push({ name: 'text_date_of_transfer', value: $('#text_date_of_transfer').val() });
             formArray.push({ name: 'text_certification_operator', value: $('#text_certification_operator').val() });
             formArray.push({ name: 'transfer_flexibility', value: $('#transfer_flexibility').val() });
 
@@ -2117,21 +2135,44 @@
         $(document).on('submit', '#formSubmit_Ins',  function (e) {
             e.preventDefault();
             var $form = $(this);
-            saveInspectorDetails();
-            // $('#modalSendEmail').modal();
+            $('#modalSendEmail').modal();
+            // Swal.fire({
+            //     title: 'Are you sure you want to save this request?',
+            //     // html: 'This will allow you to add employees who will not be endorsed for this training endorsement.<br> <em style="font-size: 1rem;">You can specify the reason for not endorsing each employee.</em>',
+            //     html: '',
+            //     icon: 'question',
+            //     showCancelButton: true,
+            //     confirmButtonText: 'Yes, proceed',
+            //     cancelButtonText: 'Cancel'
+            // }).then(function (result) {
+            //         if (result.isConfirmed) {
+                        // if($('#approval_status').val() === "LQCHEADAPP"){
+                        //     saveInspectorDetails($form);
+                        // }else{
+                        // }
+            //         }
+            //     });
+            // });
         });
+     
         const selectOperatorValidation = () => {
             let approvalStatus = $('#approval_status').val();
-             if(approvalStatus === 'OPERQCAPP' || approvalStatus === 'LQCHEADAPP'){
-                // alert('true')
-                $('.operApproved').removeClass('d-none');
-            }else{
-                // alert('false')
-                $('.operApproved').addClass('d-none');
-                $('.btnSaveInspector').removeClass('d-none');
+            let params = {
+                approvalStatus: approvalStatus,
+                positionCategory: $('#text_select_position').val(),
             }
-            $('.operSave').removeClass('d-none');
-            $('#div_Oper').removeClass('d-none');
+            getApprovalStatusToggle(params) 
+               
+            // if(approvalStatus === 'OPERQCAPP' || approvalStatus === 'LQCHEADAPP'){
+            //     // alert('true')
+            //     $('.operApproved').removeClass('d-none');
+            // }else{
+            //     // alert('false')
+            //     $('.operApproved').addClass('d-none');
+            //     $('.btnSaveInspector').removeClass('d-none');
+            // }
+            // $('.operSave').removeClass('d-none');
+            // $('#div_Oper').removeClass('d-none');
             form.formSubmitOper[0].reset();
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
@@ -2155,13 +2196,18 @@
         }
         const selectInspectorValidation = () => {
             let approvalStatus = $('#approval_status').val();
-            if(approvalStatus === 'LQCHEADAPP'){
-                $('.operApproved').removeClass('d-none');
-            }else{
-                $('.operApproved').addClass('d-none');
-                $('.btnSaveInspector').removeClass('d-none');
+            let params = {
+                approvalStatus: approvalStatus,
+                positionCategory: $('#text_select_position').val(),
             }
-            $('#divInspector').removeClass('d-none');
+            getApprovalStatusToggle(params)
+            // if(approvalStatus === 'LQCHEADAPP'){
+            //     $('.operApproved').removeClass('d-none');
+            // }else{
+            //     $('.operApproved').addClass('d-none');
+            //     $('.btnSaveInspector').removeClass('d-none');
+            // }
+            // $('#divInspector').removeClass('d-none');
             form.formSubmitInspector[0].reset();
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
@@ -2178,18 +2224,23 @@
             $('#productLine').addClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
 
-            form.formSubmitMh.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
         }
         var $positionSelect = $('#text_select_position');
-        var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved');
+        var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
+
         // $positionSelect.click(function () {
         //     alert('click');
         // }).on('change', function () {
         //    togglePositionSection($(this).val());
         // });
         $positionSelect.on('change', function () {
-           togglePositionSection($(this).val());
+            let params = {
+                approvalStatus: $('#approval_status').val(),
+                positionCategory: $(this).val(),
+            }
+            getApprovalStatusToggle(params)
         });
         const togglePositionSection = (position) => {
             initOperEmpModal();
@@ -2209,9 +2260,11 @@
             initDropdownMasterDetailsByFkidCombos([
                     '#transfer_flexibility',
             ],6);
-            $('.operSave').addClass('d-none');
-            $('.operApproved').addClass('d-none');
-            $('.btnSaveInspector').addClass('d-none');
+            
+            // $('.inspectorSave').addClass('d-none');
+            // $('.operSave').addClass('d-none');
+            // $('.operApproved').addClass('d-none');
+            // $('.btnSaveInspector').addClass('d-none');
             switch (position) {
                 case 'MH':
                     $('#divMH').removeClass('d-none');

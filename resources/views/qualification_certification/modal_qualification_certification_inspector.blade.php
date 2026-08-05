@@ -1441,7 +1441,7 @@
                 </h2>
                 <div id="collapseThreeInsp" class="accordion-collapse collapse" data-parent="#accordionExampleInsp">
                 <div class="card-body">
-                    <div class="row>
+                    <div class="row">
                           <button  style="float: right !important;" type="button" class="btn btn-success" id="btnSaveMatrix"><i class="fa-solid fa fa-save me-2" style="color: white"></i> SaveMatrix</button>
                     </div>
 

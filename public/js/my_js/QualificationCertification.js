@@ -29,51 +29,79 @@
     const getApprovalStatusToggle = (params) => {
         let approvalStatus = params.approvalStatus;
         let positionCategory = params.positionCategory;
+        console.log();
+        
+            $('.inspectorSave').addClass('d-none');
             $('.operSave').addClass('d-none');
             $('.operApproved').addClass('d-none');
-            $('.btnSaveInspector').addClass('d-none');
+            $('.btnSaveInspector').addClass('d-none')
+            $('#div_Oper').addClass('d-none');
+            $('#divInspector').addClass('d-none');
             if(positionCategory === 'Operator'){
+                $('#div_Oper').removeClass('d-none');
                 $('.btn-link').removeClass('show');
                 $('#collapseOneOper').removeClass('show');
                 $('.operSave').removeClass('d-none');
+                if(approvalStatus ==='APRODTO'){
+                    $('#collapseOneOper').addClass('show');
+                }
+                if(approvalStatus ==='BENGGTQ'){
+                    $('#collapseTwoOper').addClass('show');
+                }
+                if(approvalStatus ==='CQCC'){
+                    $('#collapseThreeOper').addClass('show');
+
+                }
+                if(approvalStatus ==='DPPDONLY'){
+                    $('#collapseFourOper').addClass('show');
+                }
+                if(approvalStatus ==='ENGVP'){
+                    $('#collapseFiveOper').addClass('show');
+                }
+                if(approvalStatus ==='EQCVP'){
+                    $('#collapseSixOper').addClass('show');
+                }
+                if(approvalStatus ==='FQCVVO'){
+                    $('#collapseSevenOper').addClass('show');
+
+                } //LQCHEADAPP
+                if(approvalStatus ==='QCAPP'){
+                    $('.btnSaveInspector').addClass('d-none');
+                    $('.operSave').addClass('d-none');
+                    // $('.inspectorSave').addClass('d-none');
+                    $('.operApproved').removeClass('d-none');
+                }
+                if(approvalStatus ==='OK'){
+                    // $('#operDisapproved').addClass('d-none');
+                    $('.operApproved').addClass('d-none');
+                    // $('#operClosed').addClass('d-none');
+                    $('.operSave').addClass('d-none');
+                    // $('.inspectorSave').addClass('d-none');
+                }
             }
             if(positionCategory === 'Inspector'){
+                $('#divInspector').removeClass('d-none');
                 $('.btnSaveInspector').removeClass('d-none');
-            }
-            if(approvalStatus ==='APRODTO'){
-                $('#collapseOneOper').addClass('show');
-            }
-            if(approvalStatus ==='BENGGTQ'){
-                $('#collapseTwoOper').addClass('show');
-            }
-            if(approvalStatus ==='CQCC'){
-                $('#collapseThreeOper').addClass('show');
+                // $('.inspectorSave').removeClass('d-none')
+                if(approvalStatus !='LQCHEADAPP'){
+                    $('.inspectorSave').removeClass('d-none')
+                }
 
+                if( approvalStatus ==='LQCHEADAPP'){
+                    $('.btnSaveInspector').addClass('d-none');
+                    $('.operSave').addClass('d-none');
+                    // $('.inspectorSave').addClass('d-none');
+                    $('.operApproved').removeClass('d-none');
+                }
+                if(approvalStatus ==='OK'){
+                    // $('#operDisapproved').addClass('d-none');
+                    $('.operApproved').addClass('d-none');
+                    // $('#operClosed').addClass('d-none');
+                    $('.operSave').addClass('d-none');
+                    // $('.inspectorSave').addClass('d-none');
+                }
             }
-            if(approvalStatus ==='DPPDONLY'){
-                $('#collapseFourOper').addClass('show');
-            }
-            if(approvalStatus ==='ENGVP'){
-                $('#collapseFiveOper').addClass('show');
-            }
-            if(approvalStatus ==='EQCVP'){
-                $('#collapseSixOper').addClass('show');
-            }
-            if(approvalStatus ==='FQCVVO'){
-                $('#collapseSevenOper').addClass('show');
-
-            } //LQCHEADAPP
-            if(approvalStatus ==='OPERQCAPP' || approvalStatus ==='LQCHEADAPP'){
-                $('.btnSaveInspector').addClass('d-none');
-                $('.operSave').addClass('d-none');
-                $('.operApproved').removeClass('d-none');
-            }
-            if(approvalStatus ==='OK'){
-                // $('#operDisapproved').addClass('d-none');
-                $('.operApproved').addClass('d-none');
-                // $('#operClosed').addClass('d-none');
-                $('.operSave').addClass('d-none');
-            }
+          
     }
     const togglePositionSectiontest = (position) => {
             initOperEmpModal();
@@ -93,6 +121,7 @@
             initDropdownMasterDetailsByFkidCombos([
                     '#transfer_flexibility',
             ],6);
+            // $('.inspectorSave').addClass('d-none');
             $('.operSave').addClass('d-none');
             $('.operApproved').addClass('d-none');
             $('.btnSaveInspector').addClass('d-none');
@@ -689,7 +718,7 @@
         const fQcvvoFirst  = approversCollection?.FQCVVO?.[0]?.first_approver_exploded  ?? [];
         const fQcvvoSecond = approversCollection?.FQCVVO?.[0]?.second_approver_exploded ?? [];
 
-        const qCappApprover = approversCollection?.OPERQCAPP?.[0]?.oper_approved_confirmed_by ?? [];
+        const qCappApprover = approversCollection?.QCAPP?.[0]?.oper_approved_confirmed_by ?? [];
 
         // 1. Map them to a standard format Select2 expects: {id, text}
         const mappedOperApprovedConfirmedBy = operApprovedConfirmedBy.map(emp => ({ id: emp.id, text: emp.name }));
@@ -930,6 +959,7 @@
             $('#qc_slips_id').val(data.id);
             $('#textconno_new_operator').val(data.control_no);
             $('#text_section_operator').val(data.section).trigger('change');
+            $('#text_date_of_transfer').val(data?.date_of_transfer);
             $('#text_series_operator').val(data.series_name);
             $('#text_select_position').val(positionCategory).trigger('change');
             $('#select_section').val(data.section_category).trigger('change');
@@ -982,14 +1012,15 @@
                 const alqctq = approversCollection?.ALQCTQ?.[0] ?? null;
 
                 form.formSubmitInspector.find('#text_date_inspector').val(alqctq?.first_date ?? '');
-                form.formSubmitInspector.find('#text_date_inspector').val(alqctq?.first_date ?? '');
-
+                form.formSubmitInspector.find('#text_time_inspector').val(alqctq?.first_time ?? '');
+   
                 //B
                 const handsOnInspector = bLqcCertifications?.hands_on_inspector;
                 const blqctc = approversCollection?.BLQCTC?.[0]  ?? null;
                 form.formSubmitInspector.find('#result_input1_inspector').val(bLqcCertifications?.result_input1_inspector ?? '');
 
                 form.formSubmitInspector.find('#text_sel_result1_inspector').val(blqctc?.first_status ?? '').trigger('change');
+                form.formSubmitInspector.find('#text_sec2_result_inspector').val(blqctc?.first_status_2 ?? '').trigger('change');
                 form.formSubmitInspector.find('#text_sel_result2_inspector').val(blqctc?.second_status ?? '').trigger('change');
                 form.formSubmitInspector.find('#text_result_input1_inspector').val(blqctc?.first_remarks ?? '');
                 form.formSubmitInspector.find('#text_result_input2_inspector').val(blqctc?.second_remarks ?? '');

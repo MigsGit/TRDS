@@ -502,7 +502,7 @@ class CommonController extends Controller
                     break;
 
                 case ($params['approval_status'] === 'FQCVVO'):
-                    $newStatus = 'OPERQCAPP'; // QC Supervisor Approval
+                    $newStatus = 'QCAPP'; // QC Supervisor Approval
                     $statusName = 'CLOSED';
                     break;
 
@@ -604,8 +604,8 @@ class CommonController extends Controller
                     $statusName = 'F Qc Validation Visual Operator';
                     $spanColor = 'bg-danger';
                     break;
-                case 'OPERQCAPP':
-                    $approvalStatus = 'OPERQCAPP'; //QC Supervisor Appoval
+                case 'QCAPP':
+                    $approvalStatus = 'QCAPP'; //QC Supervisor Appoval
                     $statusName = 'QC Supervisor Approval';
                     $spanColor = 'bg-danger';
                     break;
