@@ -422,13 +422,13 @@ const ExamSubmission = () => {
                     }
 
                     let correctAnswer = qDetail.answer_choices_question[0]?.answer || null;
-                    let isCorrect = null;
+                    let isCorrect = false;
 
-                    if (qDetail.type === 'Identification') {
-                        isCorrect = (userAnswer !== null && correctAnswer !== null) &&
-                            String(userAnswer).trim().toLowerCase() === String(correctAnswer).trim().toLowerCase();
-                        if (isCorrect) totalScore += qDetail.points;
-                    }
+                    // if (qDetail.type === 'Identification') {
+                    //     isCorrect = (userAnswer !== null && correctAnswer !== null) &&
+                    //         String(userAnswer).trim().toLowerCase() === String(correctAnswer).trim().toLowerCase();
+                    //     if (isCorrect) totalScore += qDetail.points;
+                    // }
 
                     totalPoints += qDetail.points;
 
