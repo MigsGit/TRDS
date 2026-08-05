@@ -1696,8 +1696,6 @@
                 </div>
             </div>
         </div>
-
-
         @include('components.operator_prodn_training_orientation')
     </div>
 </div>
@@ -1861,16 +1859,20 @@
 
         $('#select_position').change(function (e) { 
             e.preventDefault();
-            let selectSortBySection = $('#select_mh_sort_by_section').val('');
-            let selectAccess = $('#select_access').val('');
-            let selectPosition = $('#select_position').val();
+            $('#select_access').val('').trigger('change');
+            $('#select_mh_sort_by_section').val('').trigger('change');
+            let selectSortBySection = $('#select_mh_sort_by_section').val();
+            let selectAccess = $('#select_access').val();
+            let selectPosition = $(this).val();
             dataTable.operator.ajax.url("load_qc_slip?selectMhSortBySection="+selectSortBySection+"&selectAccess="+selectAccess+"&selectPosition="+selectPosition).draw();
         });
 
         $('#select_mh_sort_by_section, #select_access').on('change', function () {
             let selectSortBySection = $('#select_mh_sort_by_section').val();
             let selectAccess = $('#select_access').val();
-            dataTable.operator.ajax.url("load_qc_slip?selectMhSortBySection="+selectSortBySection+"&selectAccess="+selectAccess).draw();
+            let selectPosition = $('#select_position').val();
+            dataTable.operator.ajax.url("load_qc_slip?selectMhSortBySection="+selectSortBySection+"&selectAccess="+selectAccess+"&selectPosition="+selectPosition).draw();
+
         });
         // Best Practice: Event Delegation with correct object scoping
         $(document).on('click', '.btnRemoveOperEmpMain', function() {

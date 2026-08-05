@@ -1131,6 +1131,7 @@ class QualificationCertificationController extends Controller
         try {
             $selectAccess = $request->selectAccess;
             $selectMhSortBySection = $request->selectMhSortBySection;
+            $selectPosition = $request->selectPosition;
             $rapidxEmpNo           = session('global_user');
             $data = QcSlip::with(
                 'product_line',
@@ -1141,23 +1142,48 @@ class QualificationCertificationController extends Controller
             );
 
 
+            if(filled($selectPosition) && $selectPosition != 'ALL'){
+                $data->where('position_category',$selectPosition);
+            }
 
-            // if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
-            //     $data->where('section_category',$selectMhSortBySection);
-            // }
-            // if(filled($selectAccess) && $selectAccess != 'ALL'){
-            //     $data->where('status',$selectAccess);
-            // }
-            // if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
-            //     $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
-            //         $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
-            //         $query->orWhere('alert_prod_cc_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
-            //     });
-            // }
+            if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
+                $data->where('section_category',$selectMhSortBySection);
+            }
+            if(filled($selectAccess)){
+                $selectedAccess = [
+                    'PB',
+                    'FORAPP',
+                    'OK',
+                ];
+                if($selectAccess === 'ALL'){
+                    $selectedAccess = [
+                        'PB',
+                        'FORAPP',
+                        'OK',
+                    ];
+                }
+                if($selectAccess === 'FORAPP'){
+                    $selectedAccess = [
+                        'FORAPP',
+                    ];
+                }
+                if($selectAccess === 'OK'){
+                    $selectedAccess = [
+                        'OK',
+                    ];
+                }
+                $data->whereIn('status',$selectedAccess);
+            }
+            if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
+                $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
+                $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
+                    $query->orWhere('alert_prod_cc_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
+                });
+            }
             $data->whereNull('deleted_at');
             $data->orderBy('id','DESC');
+            $qclixx = $data;
             $qcSlips = $data->get();
-
             // Convert to a raw array for database handling
             $allEmpIdsTo= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
                 ->flatten()                              // Flatten into a single layer of OpApprover models
