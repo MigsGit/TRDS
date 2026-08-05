@@ -63,10 +63,16 @@
                                                 <div class="card-body overflow-auto">
                                                     <div class="row mt-2 mb-2">
                                                         <div class="col-md-3">
+                                                            <x-position-select name="select_position" id="select_position" />
+                                                        </div>
+                                                        <div class="col-md-3">
                                                             <x-section-select name="select_mh_sort_by_section" id="select_mh_sort_by_section" />
                                                         </div>
+                                                        <div class="col-md-3">
+                                                            <x-status-select name="select_access" id="select_access" />
+                                                        </div>
                                                     </div>
-                                                    <div class="row mt-2 mb-2">
+                                                    {{-- <div class="row mt-2 mb-2">
                                                         <div class="col-md-3">
                                                             <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="select_access" id="select_access">
                                                                 <option value="" selected disabled>Select Status</option>
@@ -76,7 +82,7 @@
                                                                 <option value="MYAPPROVAL">FOR MY APPROVAL</option>
                                                             </select>
                                                         </div>
-                                                    </div>
+                                                    </div> --}}
 
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <h6 class="text-secondary" id="exam_label_mh"></h6>
@@ -133,9 +139,9 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="text_select_position">Select Section</label>
-                                {{-- <x-section-select name="select_section" id="select_section" label="Select Section" /> --}}
-                                    <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="select_section" id="select_section">
+                                    {{-- <label for="text_select_position">Select Section</label> --}}
+                                    <x-section-select name="select_section" id="select_section" label="Select Section" />
+                                    {{-- <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="select_section" id="select_section">
                                         <option value="" selected disabled>Select Position</option>
                                         <option value="TSF1" selected>TS-F1</option>
                                         <option value="TSF3">TS-F3</option>
@@ -145,7 +151,7 @@
                                         <option value="PPDTS">PPD-TS</option>
                                         <option value="PPDF3">PPD-F3</option>
                                         <option value="YF">YF</option>
-                                    </select>
+                                    </select> --}}
                                 </div>
                             </div>
 
@@ -1841,7 +1847,6 @@
                 { data: 'remarks', name: 'remarks' }
             ]
         });
-
         // Pre-fill Day 1–5 date inputs in the #tblTrainingItems header from server response
         dataTable.training_items.on('xhr', function () {
             var json = dataTable.training_items.ajax.json();
@@ -1854,8 +1859,13 @@
             }
         });
 
-        //
-
+        $('#select_position').change(function (e) { 
+            e.preventDefault();
+            let selectSortBySection = $('#select_mh_sort_by_section').val('');
+            let selectAccess = $('#select_access').val('');
+            let selectPosition = $('#select_position').val();
+            dataTable.operator.ajax.url("load_qc_slip?selectMhSortBySection="+selectSortBySection+"&selectAccess="+selectAccess+"&selectPosition="+selectPosition).draw();
+        });
 
         $('#select_mh_sort_by_section, #select_access').on('change', function () {
             let selectSortBySection = $('#select_mh_sort_by_section').val();

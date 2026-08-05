@@ -200,40 +200,39 @@ class QualificationCertificationController extends Controller
                 $operToApprovers = [];
                 if(filled($qcSlipId)){ //UPDATE {
                     $currentApprovalStatus = $qcSlipDetails->approval_status;
-                        $qcSlipDetails->update([
-                            'status' => 'FORAPP'
-                        ]);
-                        $validatedData = app(ALqcTrainingQualificationRequest::class)->validateResolved();
-                        $arrQcSlipId = ["qc_slips_id"  => $qcSlipId];
-                        $aLqcTrainingQuali = [
-                            "qc_slips_id"   => $qcSlipId,
-                            'training_orientation_inspector' => $this->joinSafe($request, 'text_training_orientation_inspector'), 
-                            'training_orientation_ins_4' => $this->getSafe($request, 'text_training_orientation_ins_4'),//A
-                            'training_orientation_ins_13' => $this->getSafe($request, 'text_training_orientation_ins_13'),//B
-                            'training_orientation_ins_21' => $this->getSafe($request, 'text_training_orientation_ins_21'),//C
-                            'training_orientation_ins_54' => $this->getSafe($request, 'text_training_orientation_ins_54'),//P
-                        ];
-                        ALqcTrainingQualification::updateOrCreate(
-                        $arrQcSlipId,$aLqcTrainingQuali);
-                         $operToApprovers = [
-                            "qc_slips_id"   => $qcSlipId,
+                    $qcSlipDetails->update([
+                        'status' => 'FORAPP'
+                    ]);
+                    $validatedData = app(ALqcTrainingQualificationRequest::class)->validateResolved();
+                    $arrQcSlipId = ["qc_slips_id"  => $qcSlipId];
+                    $aLqcTrainingQuali = [
+                        "qc_slips_id"   => $qcSlipId,
+                        'training_orientation_inspector' => $this->joinSafe($request, 'text_training_orientation_inspector'),
+                        'training_orientation_ins_4' => $this->getSafe($request, 'text_training_orientation_ins_4'),//A
+                        'training_orientation_ins_13' => $this->getSafe($request, 'text_training_orientation_ins_13'),//B
+                        'training_orientation_ins_21' => $this->getSafe($request, 'text_training_orientation_ins_21'),//C
+                        'training_orientation_ins_54' => $this->getSafe($request, 'text_training_orientation_ins_54'),//P
+                    ];
+                    ALqcTrainingQualification::updateOrCreate(
+                    $arrQcSlipId,$aLqcTrainingQuali);
+                        $operToApprovers = [
+                        "qc_slips_id"   => $qcSlipId,
 
-                            'decision_status'   => 'APP',
-                            'approval_status' => 'ALQCTQ',
-                            // Sec 1 – Training & Qualification
-                            'first_approver'    => $this->joinSafe($request, 'text_certified_inspector'),
-                            'first_approver_2'  => $this->joinSafe($request, 'text_mentored'),
-                            'first_date'        => $this->getSafe($request, 'text_date_inspector'),
-                            'first_time'        => $this->getSafe($request, 'text_time_inspector'),
-                        ];
-                        $qcModelApprover::insert($operToApprovers);
-                        $bLqcCertification = [
-                            'qc_slips_id' => $qcSlipId,
-                            'result_input1_inspector' => $this->getSafe($request, 'text_result_input1_inspector'),
-                            'hands_on_inspector'      => $this->joinSafe($request, 'text_hands_on_inspector'),
-                            'hands_on_ins_3'          => $this->getSafe($request, 'text_hands_on_ins_3'),
-                        ]
-                    );
+                        'decision_status'   => 'APP',
+                        'approval_status' => 'ALQCTQ',
+                        // Sec 1 – Training & Qualification
+                        'first_approver'    => $this->joinSafe($request, 'text_certified_inspector'),
+                        'first_approver_2'  => $this->joinSafe($request, 'text_mentored'),
+                        'first_date'        => $this->getSafe($request, 'text_date_inspector'),
+                        'first_time'        => $this->getSafe($request, 'text_time_inspector'),
+                    ];
+                    $qcModelApprover::insert($operToApprovers);
+                    $bLqcCertification = [
+                        'qc_slips_id' => $qcSlipId,
+                        'result_input1_inspector' => $this->getSafe($request, 'text_result_input1_inspector'),
+                        'hands_on_inspector'      => $this->joinSafe($request, 'text_hands_on_inspector'),
+                        'hands_on_ins_3'          => $this->getSafe($request, 'text_hands_on_ins_3'),
+                    ];
 
                     $qcModelApprover::updateOrCreate(
                         ['qc_slips_id' => $qcSlipId, 'approval_status' => 'BLQCTC'],
@@ -558,7 +557,7 @@ class QualificationCertificationController extends Controller
                         'fullName' => $rowEmpNo['fullName'],
                     ];
                 });
-                $to = $collectTo;
+                $to = $collectTo->pluck('email')->join(',');
                 $subject = "APPROVED: TRDS - Qualification Certification";
             }else{
                 $opApprover =  $qcModelApprover::insert($params['update_data']);

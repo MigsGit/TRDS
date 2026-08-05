@@ -3,8 +3,8 @@
     <form id="formSubmit_Ins">
         <div class="accordion" id="accordionExampleInsp">
             <div class="accordion-item">
-                <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneInsp" aria-expanded="true" aria-controls="collapseOneInsp">
+                <h2 class="card-header">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOneInsp" aria-expanded="true" aria-controls="collapseOneInsp">
                     <h5>LINE QUALITY CONTROL SECTION (Training and Qualification)</h5>
                 </button>
                 </h2>
@@ -1210,13 +1210,13 @@
                 </div>
             </div>
             <div class="accordion-item">
-                <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoInsp" aria-expanded="false" aria-controls="collapseTwoInsp">
+                <h2 class="card-header">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoInsp" aria-expanded="false" aria-controls="collapseTwoInsp">
                     <h5>LINE QUALITY CONTROL SECTION (Certification)</h5>
                 </button>
                 </h2>
                 <div id="collapseTwoInsp" class="accordion-collapse collapse" data-parent="#accordionExampleInsp">
-                <div class="accordion-body">
+                <div class="card-body">
 
                     <!-- ------------------------------------------------ -->
 
@@ -1434,15 +1434,17 @@
                 </div>
             </div>
             <div class="accordion-item">
-                <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeInsp" aria-expanded="false" aria-controls="collapseThreeInsp">
+                <h2 class="card-header">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThreeInsp" aria-expanded="false" aria-controls="collapseThreeInsp">
                     <h5>INSPECTOR TRAINING / CERTIFICATION AND VALIDATION SLIP</h5>
                 </button>
                 </h2>
                 <div id="collapseThreeInsp" class="accordion-collapse collapse" data-parent="#accordionExampleInsp">
-                <div class="accordion-body">
-                    {{-- nmodify --}}
-                         <button type="button" class="btn btn-success" id="btnSaveMatrix"><i class="fa-solid fa fa-save me-2" style="color: white"></i>SaveMatrix</button>
+                <div class="card-body">
+                    <div class="row>
+                          <button  style="float: right !important;" type="button" class="btn btn-success" id="btnSaveMatrix"><i class="fa-solid fa fa-save me-2" style="color: white"></i> SaveMatrix</button>
+                    </div>
+
                     <hr>
                     <div class="table-responsive">
                         <table id="tblTrainingItems" class="table table-bordered table-hover align-middle nowrap w-100">
@@ -1468,57 +1470,58 @@
                 </div>
                 </div>
             </div>
-        </div>
-                     <hr style="height: 5px; background-color: black; border: none;">
-        <div class="row mb-5">
-            <div class="col-md-6">
-                <label for="">Approved by:</label>
-                <select class="form-control select2bs4" style="width: 100%;" id="text_sec3_approved_inspector" name="text_sec3_approved_inspector"></select>
+             <hr style="height: 5px; background-color: black; border: none;">
+            <div class="row mb-5">
+                <div class="col-md-6">
+                    <label for="">Approved by:</label>
+                    <select class="form-control select2bs4" style="width: 100%;" id="text_sec3_approved_inspector" name="text_sec3_approved_inspector"></select>
+                </div>
+                <div class="col-md-6"></div>
             </div>
-            <div class="col-md-6"></div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="table-responsive">
-                    <table id="" class="table table-bordered nowrap">
-                        <thead class="table table-success">
-                            <tr>
-                                <th colspan="3">Validation and Certification Criteria</th>
-                            </tr>
-                        </thead>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="table-responsive">
+                        <table id="" class="table table-bordered nowrap">
+                            <thead class="table table-success">
+                                <tr>
+                                    <th colspan="3">Validation and Certification Criteria</th>
+                                </tr>
+                            </thead>
 
-                        <tbody class="text-center">
-                            <tr>
-                                <td>No.</td>
-                                <td>Rating</td>
-                                <td>Remarks</td>
-                            </tr>
+                            <tbody class="text-center">
+                                <tr>
+                                    <td>No.</td>
+                                    <td>Rating</td>
+                                    <td>Remarks</td>
+                                </tr>
 
-                            <tr>
-                                <td>3</td>
-                                <td>Passed</td>
-                                <td>Skilled, no supervision required, can lead and review work of others</td>
-                            </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Passed</td>
+                                    <td>Skilled, no supervision required, can lead and review work of others</td>
+                                </tr>
 
-                            <tr>
-                                <td>2</td>
-                                <td>Re-train</td>
-                                <td>Need to re-train by co-inspectors and re-certify by Supervisors</td>
-                            </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Re-train</td>
+                                    <td>Need to re-train by co-inspectors and re-certify by Supervisors</td>
+                                </tr>
 
-                            <tr>
-                                <td>1</td>
-                                <td>Failed</td>
-                                <td>Need to re-train by training unit re-certify by Supervisors</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Failed</td>
+                                    <td>Need to re-train by training unit re-certify by Supervisors</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
+        
 
-        <div class="modal-footer">
+        <div class="modal-footer inspectorSave">
             <button type="button" class="btn btn-secondary btnSaveInspector" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
             <button type="submit" class="btn btn-success btnSaveInspector" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>Insp Save</button>
         </div>

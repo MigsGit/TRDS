@@ -525,7 +525,7 @@ class CommonController extends Controller
     public function getApprovalStatus($approvalStatus){
         try {
              switch ($approvalStatus) {
-                //INSPECTOR
+                //==== INSPECTOR
                 case 'ALQCTQ':
                     $newStatus = 'ALQCTQ';
                     $statusName = 'A LINE QUALITY CONTROL SECTION (Training and Qualification)';
@@ -546,7 +546,8 @@ class CommonController extends Controller
                     $statusName = 'LQC HEAD APPROVAL';
                     $spanColor = 'bg-danger';
                     break;
-                //OPERATOR
+
+                // ==== OPERATOR
                 case 'PB':
                     $approvalStatus = 'APRODTO';
                     $statusName = 'PREPARED BY';

@@ -929,7 +929,7 @@
             // ==== QC Slip Details
             $('#qc_slips_id').val(data.id);
             $('#textconno_new_operator').val(data.control_no);
-            $('#text_section_operator').val(data.section)
+            $('#text_section_operator').val(data.section).trigger('change');
             $('#text_series_operator').val(data.series_name);
             $('#text_select_position').val(positionCategory).trigger('change');
             $('#select_section').val(data.section_category).trigger('change');
@@ -983,10 +983,10 @@
 
                 form.formSubmitInspector.find('#text_date_inspector').val(alqctq?.first_date ?? '');
                 form.formSubmitInspector.find('#text_date_inspector').val(alqctq?.first_date ?? '');
-                
+
                 //B
                 const handsOnInspector = bLqcCertifications?.hands_on_inspector;
-                const blqctc = approversCollection?.BLQCTC?.[0]  ?? null; 
+                const blqctc = approversCollection?.BLQCTC?.[0]  ?? null;
                 form.formSubmitInspector.find('#result_input1_inspector').val(bLqcCertifications?.result_input1_inspector ?? '');
 
                 form.formSubmitInspector.find('#text_sel_result1_inspector').val(blqctc?.first_status ?? '').trigger('change');
@@ -998,7 +998,7 @@
                 console.log('handsOnInspector',bLqcCertifications);
                 syncCheckboxesWithDb('text_hands_on_inspector', handsOnInspector,form.formSubmitInspector);
 
-                
+
                 // const lqcheadapp = approversCollection?.LQCHEADAPP?.[0]  ?? null; //employee
             }
             if(positionCategory === 'Operator'){
