@@ -26,90 +26,82 @@
     // HOW TO EXECUTE IT FOR YOUR TWO TABLES:
     // ==========================================
 
-    const getCurrentApprover = (params) => {
-        let data = {
-            'id': params.id,
-        }
-        call_ajax(data,'get_current_approver',function(response){
-            return 'true';
-            return 'false';
-        });
-    }
     const getApprovalStatusToggle = (params) => {
         let approvalStatus = params.approvalStatus;
         let positionCategory = params.positionCategory;
+        console.log();
         
-        $('.inspectorSave').addClass('d-none');
-        $('.operSave').addClass('d-none');
-        $('.operApproved').addClass('d-none');
-        $('.btnSaveInspector').addClass('d-none')
-        $('#div_Oper').addClass('d-none');
-        $('#divInspector').addClass('d-none');
-        if(positionCategory === 'Operator'){
-            $('#div_Oper').removeClass('d-none');
-            $('.btn-link').removeClass('show');
-            $('#collapseOneOper').removeClass('show');
-            $('.operSave').removeClass('d-none');
-            if(approvalStatus ==='APRODTO'){
-                $('#collapseOneOper').addClass('show');
-            }
-            if(approvalStatus ==='BENGGTQ'){
-                $('#collapseTwoOper').addClass('show');
-            }
-            if(approvalStatus ==='CQCC'){
-                $('#collapseThreeOper').addClass('show');
+            $('.inspectorSave').addClass('d-none');
+            $('.operSave').addClass('d-none');
+            $('.operApproved').addClass('d-none');
+            $('.btnSaveInspector').addClass('d-none')
+            $('#div_Oper').addClass('d-none');
+            $('#divInspector').addClass('d-none');
+            if(positionCategory === 'Operator'){
+                $('#div_Oper').removeClass('d-none');
+                $('.btn-link').removeClass('show');
+                $('#collapseOneOper').removeClass('show');
+                $('.operSave').removeClass('d-none');
+                if(approvalStatus ==='APRODTO'){
+                    $('#collapseOneOper').addClass('show');
+                }
+                if(approvalStatus ==='BENGGTQ'){
+                    $('#collapseTwoOper').addClass('show');
+                }
+                if(approvalStatus ==='CQCC'){
+                    $('#collapseThreeOper').addClass('show');
 
-            }
-            if(approvalStatus ==='DPPDONLY'){
-                $('#collapseFourOper').addClass('show');
-            }
-            if(approvalStatus ==='ENGVP'){
-                $('#collapseFiveOper').addClass('show');
-            }
-            if(approvalStatus ==='EQCVP'){
-                $('#collapseSixOper').addClass('show');
-            }
-            if(approvalStatus ==='FQCVVO'){
-                $('#collapseSevenOper').addClass('show');
+                }
+                if(approvalStatus ==='DPPDONLY'){
+                    $('#collapseFourOper').addClass('show');
+                }
+                if(approvalStatus ==='ENGVP'){
+                    $('#collapseFiveOper').addClass('show');
+                }
+                if(approvalStatus ==='EQCVP'){
+                    $('#collapseSixOper').addClass('show');
+                }
+                if(approvalStatus ==='FQCVVO'){
+                    $('#collapseSevenOper').addClass('show');
 
-            } //LQCHEADAPP
-            if(approvalStatus ==='QCAPP'){
-                $('.btnSaveInspector').addClass('d-none');
-                $('.operSave').addClass('d-none');
-                // $('.inspectorSave').addClass('d-none');
-                $('.operApproved').removeClass('d-none');
+                } //LQCHEADAPP
+                if(approvalStatus ==='QCAPP'){
+                    $('.btnSaveInspector').addClass('d-none');
+                    $('.operSave').addClass('d-none');
+                    // $('.inspectorSave').addClass('d-none');
+                    $('.operApproved').removeClass('d-none');
+                }
+                if(approvalStatus ==='OK'){
+                    // $('#operDisapproved').addClass('d-none');
+                    $('.operApproved').addClass('d-none');
+                    // $('#operClosed').addClass('d-none');
+                    $('.operSave').addClass('d-none');
+                    // $('.inspectorSave').addClass('d-none');
+                }
             }
-            if(approvalStatus ==='OK'){
-                // $('#operDisapproved').addClass('d-none');
-                $('.operApproved').addClass('d-none');
-                // $('#operClosed').addClass('d-none');
-                $('.operSave').addClass('d-none');
-                // $('.inspectorSave').addClass('d-none');
-            }
-        }
-        if(positionCategory === 'Inspector'){
-            $('#divInspector').removeClass('d-none');
-            $('.btnSaveInspector').removeClass('d-none');
-            // $('.inspectorSave').removeClass('d-none')
-            if(approvalStatus !='LQCHEADAPP'){
-                $('.inspectorSave').removeClass('d-none')
-            }
+            if(positionCategory === 'Inspector'){
+                $('#divInspector').removeClass('d-none');
+                $('.btnSaveInspector').removeClass('d-none');
+                // $('.inspectorSave').removeClass('d-none')
+                if(approvalStatus !='LQCHEADAPP'){
+                    $('.inspectorSave').removeClass('d-none')
+                }
 
-            if( approvalStatus ==='LQCHEADAPP'){
-                $('.btnSaveInspector').addClass('d-none');
-                $('.operSave').addClass('d-none');
-                // $('.inspectorSave').addClass('d-none');
-                $('.operApproved').removeClass('d-none');
+                if( approvalStatus ==='LQCHEADAPP'){
+                    $('.btnSaveInspector').addClass('d-none');
+                    $('.operSave').addClass('d-none');
+                    // $('.inspectorSave').addClass('d-none');
+                    $('.operApproved').removeClass('d-none');
+                }
+                if(approvalStatus ==='OK'){
+                    // $('#operDisapproved').addClass('d-none');
+                    $('.operApproved').addClass('d-none');
+                    // $('#operClosed').addClass('d-none');
+                    $('.operSave').addClass('d-none');
+                    // $('.inspectorSave').addClass('d-none');
+                }
             }
-            if(approvalStatus ==='OK'){
-                // $('#operDisapproved').addClass('d-none');
-                $('.operApproved').addClass('d-none');
-                // $('#operClosed').addClass('d-none');
-                $('.operSave').addClass('d-none');
-                // $('.inspectorSave').addClass('d-none');
-            }
-        }
-        
+          
     }
     const togglePositionSectiontest = (position) => {
             initOperEmpModal();

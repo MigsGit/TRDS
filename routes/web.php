@@ -18,13 +18,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 
- Route::get('/', function () {
-        return view('blank');
-    })->name('blank');
-return;
 Route::middleware('checkSession')->group(function(){
 
    
+    Route::get('/', function () {
+        return view('blank');
+    })->name('blank');
     Route::get('/training_attendance', function () {
         return view('training_attendance');
     })->name('training_attendance');
@@ -122,7 +121,6 @@ Route::middleware('checkSession')->group(function(){
 
         Route::get('load_qc_slip', 'loadQcSlip');
         Route::get('get_div_dept_sec', 'getDivDeptSec');
-        Route::get('get_current_approver', 'getCurrentApprover');
         Route::get('get_dropdown_master_details_by_fkid', 'getDropdownMasterDetailsByFkid');
         Route::get('get_qc_slips_by_id', 'getQcSlipsById');
         Route::get('load1st_qc_validation', 'load1stQcValidation');
