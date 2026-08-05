@@ -125,7 +125,8 @@
                 if( data.status === 422 ){
                     Swal.fire({ icon: 'error', title: 'Error', text: ('Please check the required fields.')});
                     toastr.error(data.responseJSON.message);
-                    errorHandler(errorResponse.errors['user_level_id'], $('#selAddUserLevel'))return;
+                    errorHandler(errorResponse.errors['user_level_id'], $('#selAddUserLevel'));
+                        return;
                 }
                 toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
 

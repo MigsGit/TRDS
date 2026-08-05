@@ -104,7 +104,7 @@ class QualificationCertificationController extends Controller
                         'fullName' => $rowEmpNo['name'],
                     ];
                 });
-                $to = $collectTo;
+                $to = $collectTo->pluck('email')->join(',');
                 $subject = "APPROVED: TRDS - Qualification Certification";
             }else{
 
@@ -727,7 +727,7 @@ class QualificationCertificationController extends Controller
                 $validatedData = app(QcSlipRequest::class)->validateResolved();
                 $saveQcSlip =  [
                     'control_no' =>  $generateControlNumber['currentCtrlNo'],
-                    'section_category' =>  $select_section,
+                'section_category' =>  $select_section,
                     'position_category' =>  $select_position,
                     'section' =>  $request->text_section_operator,
                     'series_name' =>  $request->text_series_operator,
