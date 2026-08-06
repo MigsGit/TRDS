@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOpApproversTable extends Migration
+class CreateQcLqcApproversTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateOpApproversTable extends Migration
      */
     public function up()
     {
-        Schema::create('op_approvers', function (Blueprint $table) {
+        Schema::create('qc_lqc_approvers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('qc_slips_id')
             ->constrained('qc_slips')
@@ -52,6 +52,6 @@ class CreateOpApproversTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('op_approvers');
+        Schema::dropIfExists('qc_lqc_approvers');
     }
 }

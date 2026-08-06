@@ -92,7 +92,7 @@ class ExaminationResultController extends Controller
                             </a>';
             }
 
-            if($rapidx_user_id == '211' || $rapidx_user_id == '965' || $rapidx_user_id == '973' || $rapidx_user_id == '976'){
+            if($rapidx_user_id == '211' || $rapidx_user_id == '965' || $rapidx_user_id == '973' || $rapidx_user_id == '976'|| $rapidx_user_id == '76'){
                 $result .= '<br>
                     <button
                         type="button"

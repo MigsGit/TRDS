@@ -146,7 +146,7 @@
 
                                 <div class="card-body">
                                     <div class="text-center mb-3">
-                                        {{ asset('images/default-user.png') }}
+                                        {{-- {{ asset('images/default-user.png') }} --}}
                                         <img src="{{ asset('images/default-user') }}"
                                         class="img-thumbnail rounded"
                                         style="width:150px;height:180px;object-fit:cover;">
@@ -253,7 +253,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-success">Save Changes</button>
+                    {{-- <button class="btn btn-success">Save Changes</button> --}}
                     <button class="btn btn-secondary"data-dismiss="modal">Close</button>
                 </div>
 

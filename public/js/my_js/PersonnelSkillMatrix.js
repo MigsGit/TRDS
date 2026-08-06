@@ -380,12 +380,11 @@ $(document).ready(function() {
         console.log($(this).val());                 // EmpNo
         console.log($(this).data('name'));          // EmpName
         console.log($(this).data('date-hired'));    // Date Hired
+        exportSkillMatrix.on('click', function(){
+            console.log('exportClicked');
+            window.location.href = 'export_skill_map_pdf';
+        });
     });
-
-
-
-
-
 });
 
 

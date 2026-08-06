@@ -263,6 +263,7 @@ class PersonnelSkillMatrixController extends Controller
                 }
             }
 
+
             switch ((int) $row->result) {
                 case 1:
                     return '<span class="badge badge-success">Passed</span>';
@@ -357,7 +358,7 @@ class PersonnelSkillMatrixController extends Controller
         return response()->json($employees);
     }
 
-     public function exportSkillMapPdf(Request $request)
+    public function exportSkillMapPdf(Request $request)
     {
         $productLineId = $request->product_line;
         // dd($request->position);

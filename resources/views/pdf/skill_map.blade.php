@@ -154,7 +154,7 @@ td.legend-title{
 
     <tr>
 
-        <td align="center">{{ ($pageIndex * 7) + $loop->iteration }}</td>
+        <td align="center">{{ ($pageIndex * 9) + $loop->iteration }}</td>
 
         <td>{{ $employee['empName'] }}</td>
 
