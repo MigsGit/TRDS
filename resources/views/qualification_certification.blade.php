@@ -5,7 +5,7 @@
 @section('content_page')
 @php
     $classificationTabs = [
-        ['key' => 'operator', 'label' => 'Operator', 'active' => true],
+        ['key' => 'operator', 'label' => 'Qualification Certification', 'active' => true],
     ];
 @endphp
 <style>
@@ -162,12 +162,19 @@
                                         <option value="" selected disabled>Select Position</option>
                                         <option value="Operator">Operator</option>
                                         <option value="Inspector" selected>Inspector</option>
-                                        {{-- <option value="Technician">Technician</option>
+
+                                        {{--
+                                         <option value="MH">MH</option>
+                                        <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
                                         <option value="Engineer">Engineer</option>
                                         <option value="Planner">Planner</option>
-                                        <option value="Inspector">Inspector</option> --}}
-   {{-- GLOBAL INPUTS --}}
+                                        --}}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- GLOBAL INPUTS --}}
                         <hr style="height: 5px; background-color: black; border: none;">
                           <div class="col-md-3 d-none">
                                 <label for="">QC Slip Id:</label>
@@ -1673,7 +1680,7 @@
                                 <div class="modal-footer justify-content-end">
 
                                     <button type="button" class="btn btn-secondary operSave" data-dismiss="modal" id="operClosed"><i class="fa-solid fa fa-xmark me-2" style="color: white"></i>Close</button>
-                                    <button type="submit" class="btn btn-success operSave" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Oper Save</button>
+                                    <button type="submit" class="btn btn-success operSave" id="operSave"><i class="fa-solid fa fa-save me-2" style="color: white"></i> Save Operator</button>
 
                                     {{-- <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button> --}}
                                     {{-- <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button> --}}
@@ -1693,6 +1700,7 @@
     </div>
 </div>
 @endsection
+
 
 @section('js_content')
     <script type="text/javascript">
@@ -1850,7 +1858,7 @@
             }
         });
 
-        $('#select_position').change(function (e) { 
+        $('#select_position').change(function (e) {
             e.preventDefault();
             $('#select_access').val('').trigger('change');
             $('#select_mh_sort_by_section').val('').trigger('change');
@@ -1990,7 +1998,7 @@
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
             formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
-            
+
             formArray.push({ name: 'select_section', value: $('#select_section').val() });
             formArray.push({ name: 'text_select_section', value: $('#text_select_section').val() });//Insert to Operator
             formArray.push({ name: 'qc_slips_id', value: $('#qc_slips_id').val() });
@@ -2086,7 +2094,7 @@
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
             formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
-            
+
             formArray.push({ name: 'select_section', value: $('#select_section').val() });
             formArray.push({ name: 'text_select_section', value: $('#text_select_section').val() });//Insert to Operator
             formArray.push({ name: 'qc_slips_id', value: $('#qc_slips_id').val() });
@@ -2147,15 +2155,15 @@
             //     });
             // });
         });
-     
+
         const selectOperatorValidation = () => {
             let approvalStatus = $('#approval_status').val();
             let params = {
                 approvalStatus: approvalStatus,
                 positionCategory: $('#text_select_position').val(),
             }
-            getApprovalStatusToggle(params) 
-               
+            getApprovalStatusToggle(params)
+
             // if(approvalStatus === 'OPERQCAPP' || approvalStatus === 'LQCHEADAPP'){
             //     // alert('true')
             //     $('.operApproved').removeClass('d-none');
@@ -2253,7 +2261,7 @@
             initDropdownMasterDetailsByFkidCombos([
                     '#transfer_flexibility',
             ],6);
-            
+
             // $('.inspectorSave').addClass('d-none');
             // $('.operSave').addClass('d-none');
             // $('.operApproved').addClass('d-none');

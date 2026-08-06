@@ -5,8 +5,8 @@ namespace App\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SystemoneEmployeeTraining extends Model
+class SystemOneHrisTraining extends Model
 {
-    protected $table = 'vw_training';
+    protected $table = 'tbl_Training';
     protected $connection = 'mysql_systemone';
 }
