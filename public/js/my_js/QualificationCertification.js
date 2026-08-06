@@ -37,7 +37,13 @@
             $('.btnSaveInspector').addClass('d-none')
             $('#div_Oper').addClass('d-none');
             $('#divInspector').addClass('d-none');
+            $('#text_date_of_transfer').addClass('d-none');
+            $('#productLine').addClass('d-none');
+            $('#seriesDesignation').text('Series');
+             $('#dateOfTransfer').addClass('d-none');
+
             if(positionCategory === 'Operator'){
+                $('#productLine').removeClass('d-none');
                 $('#div_Oper').removeClass('d-none');
                 $('.btn-link').removeClass('show');
                 $('#collapseOneOper').removeClass('show');
@@ -80,6 +86,9 @@
                 }
             }
             if(positionCategory === 'Inspector'){
+                $('#dateOfTransfer').removeClass('d-none');
+                $('#text_date_of_transfer').removeClass('d-none');
+                $('#seriesDesignation').text('Designation');
                 $('#divInspector').removeClass('d-none');
                 $('.btnSaveInspector').removeClass('d-none');
                 // $('.inspectorSave').removeClass('d-none')

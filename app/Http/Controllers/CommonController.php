@@ -735,15 +735,9 @@ class CommonController extends Controller
                                                 <div class="form-group row">
                                                     <label class="col-sm-12 col-form-label"><b>Section Name: </b><span class="text-black"> '.$qcSlip->section.' </span></label>
                                                 </div>
-
-                                                <div class="form-group row">
-                                                    <label class="col-sm-12 col-form-label"><b>Product Line : </b><span class="text-black"> '.$qcSlip->product_line.' </span></label>
-                                                </div>
-
                                                 <div class="form-group row">
                                                     <label class="col-sm-12 col-form-label"><b> Series Name : </b><span class="text-black"> '.$qcSlip->series_name.' </span></label>
                                                 </div>
-
                                                 <div class="form-group row">
                                                     <label class="col-sm-12 col-form-label"><b> Product Line : </b><span class="text-black"> '.$qcSlip->product_line.' </span></label>
                                                 </div>
@@ -795,7 +789,7 @@ class CommonController extends Controller
 
         $to = array();
         $cc = array();
-       
+
         switch($type){
             case 1:
                 $subject = "TRDS - Training Endorsement For Checker's Approval ({$details->ctrl_no})";
@@ -832,6 +826,6 @@ class CommonController extends Controller
             'cc' => $cc,
             'subject' => $subject
         ]);
-        
+
     }
 }
