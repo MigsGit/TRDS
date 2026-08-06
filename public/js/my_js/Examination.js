@@ -195,7 +195,7 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo, getexamT
                         };
                         break;
                     }
-    
+
                     if(exam.exam_result_status === 0){
                         alertConfig = {
                             title: 'Previous Exam Not Completed',
@@ -204,7 +204,7 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo, getexamT
                         };
                         break;
                     }
-    
+
                     if(exam.attempt === 1 && exam.rating < 70){
                         alertConfig = {
                             title: 'Exam Failed',
@@ -213,7 +213,7 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo, getexamT
                         };
                         break;
                     }
-    
+
                     if(exam.attempt === 2 && exam.rating < 90){
                         alertConfig = {
                             title: 'Exam Failed',
@@ -278,7 +278,7 @@ const LinkForIdAndRevision = (linkIdRevision) => {
                     revision: getQuestionnaireDetails.revision,
                     category: getQuestionnaireDetails.category || '',
                     exam_title: getQuestionnaireDetails.exam_title || '',
-                    exam_description: getQuestionnaireDetails.description || '',
+                    description: getQuestionnaireDetails.description || '',
                     exam_instruction: getQuestionnaireDetails.exam_instruction || '',
                     purpose: getQuestionnaireDetails.purpose || '',
                     department: getQuestionnaireDetails.department || '',
@@ -390,7 +390,7 @@ const ExamSubmission = () => {
                         $(`input[name="answers[${qId}][]"]:checked`).each(function() {
                             selectedValues.push($(this).val());
                         });
-                        userAnswer = selectedValues.length > 0 ? selectedValues.join(',') : null;
+                        userAnswer = selectedValues.length > 0 ? selectedValues.join(' || ') : null;
                     }else{
                         let checkedRadio = $(`input[name="answers[${qId}]"]:checked`);
                         userAnswer = checkedRadio.length > 0 ? checkedRadio.val() : null;
@@ -422,13 +422,13 @@ const ExamSubmission = () => {
                     }
 
                     let correctAnswer = qDetail.answer_choices_question[0]?.answer || null;
-                    let isCorrect = null;
+                    let isCorrect = false;
 
-                    if (qDetail.type === 'Identification') {
-                        isCorrect = (userAnswer !== null && correctAnswer !== null) &&
-                            String(userAnswer).trim().toLowerCase() === String(correctAnswer).trim().toLowerCase();
-                        if (isCorrect) totalScore += qDetail.points;
-                    }
+                    // if (qDetail.type === 'Identification') {
+                    //     isCorrect = (userAnswer !== null && correctAnswer !== null) &&
+                    //         String(userAnswer).trim().toLowerCase() === String(correctAnswer).trim().toLowerCase();
+                    //     if (isCorrect) totalScore += qDetail.points;
+                    // }
 
                     totalPoints += qDetail.points;
 

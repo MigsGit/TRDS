@@ -146,9 +146,10 @@
 
                                 <div class="card-body">
                                     <div class="text-center mb-3">
-                                        {{-- <img src="images/default-user.png"
-                                            class="img-thumbnail rounded"
-                                            style="width:150px;height:180px;object-fit:cover;"> --}}
+                                        {{-- {{ asset('images/default-user.png') }} --}}
+                                        <img src="{{ asset('images/default-user') }}"
+                                        class="img-thumbnail rounded"
+                                        style="width:150px;height:180px;object-fit:cover;">
                                     </div>
 
                                     <div class="form-group row">
@@ -252,7 +253,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-success">Save Changes</button>
+                    {{-- <button class="btn btn-success">Save Changes</button> --}}
                     <button class="btn btn-secondary"data-dismiss="modal">Close</button>
                 </div>
 
@@ -503,7 +504,29 @@
 
                 <!-- Body -->
                 <div class="modal-body">
+                        <div class="row">
+                            <div class="mb-4 col-sm-12">
+                                <label for="selectedProductLine" class="form-label me-2">Product Line</label>
+                                <div id="selectedProdLine" class="fs-5 mb-1"></div>
+                                <select name="product_line" id="selectedProductLine" class="form-control select2bs5" required></select>
+                            </div>
 
+                            <div class="mb-4 col-sm-12">
+                                <label for="selectedPosition" class="form-label me-2">Position</label>
+                                <div id="selectedPosition" class="fs-5 mb-1"></div>
+                                <select name="position" id="selectPosition" class="form-control select2bs5" required>
+                                    {{-- <option value="" selected="" disabled="">-- Select Position --</option>
+                                    <option value="1">Operator</option>
+                                    <option value="2">Inspector</option> --}}
+                                </select>
+                            </div>
+
+                            <div class="mb-4 col-sm-12">
+                                <label for="text_generate_empno" class="form-label me-2">Employee</label>
+                                <div id="selectedEmployee" class="fs-5 mb-1"></div>
+                                <select name="employee[]" id="selectEmployee" class="form-control select2bs5" multiple required></select>
+                            </div>
+                        </div>
                 </div>
 
                 <div class="modal-footer">

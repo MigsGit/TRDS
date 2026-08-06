@@ -44,6 +44,7 @@
             /* border-radius: 24px; */
             opacity: .95;
         }
+
     </style>
     <div class="content-wrapper">
         <section class="content-header">
@@ -191,7 +192,7 @@
                 <form method="post" id="formCreateUpdateQuestionnaire">
                     @csrf
                     <div class="modal-body">
-                        <input type="hidden" name="questionnaire_id" id="txtCreateUpdateQuestionnaireId">
+                        <input type="hidden" class="reset" name="questionnaire_id" id="txtCreateUpdateQuestionnaireId">
                         <div class="container-fluid">
                             <!-- Questionnaire Details -->
                             <div class="card card-outline card-primary">
@@ -293,11 +294,10 @@
                                         </div>
                                     </div>
 
-
                                     <!-- Instruction -->
                                     <div class="form-group mb-0">
                                         <label class="font-weight-bold">Instruction</label>
-                                        <textarea class="form-control" rows="3" id="txtQuestionnaireInstruction" name="questionnaire_instruction"></textarea>
+                                        <textarea class="form-control" rows="2" id="txtQuestionnaireInstruction" name="questionnaire_instruction"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -333,8 +333,8 @@
                     @csrf
                     <div class="modal-body">
                     <label id="lblChangeQuestionnaireStatusLabel"></label>
-                    <input type="hidden" name="questionnaire_id" id="txtChangeQuestionnaireStatusId" placeholder="Questionnaire Id">
-                    <input type="hidden" name="status" id="txtChangeQuestionnaireStatus" placeholder="Status">
+                    <input type="hidden" name="questionnaire_id" id="txtChangeQuestionnaireStatusId" placeholder="Questionnaire Id" value="">
+                    <input type="hidden" name="status" id="txtChangeQuestionnaireStatus" placeholder="Status" value="">
                     </div>
                     <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
@@ -358,8 +358,8 @@
                     </button>
                 </div>
                 <div class="card-body">
-                    <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsFkid">
-                    <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsRevision">
+                    <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsFkid" value="">
+                    <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsRevision" value="">
 
                     <h3><strong><center class="questionnaireTitle"></center></strong></h3>
                     <h3><strong><center class="questionnaireDescription"></center></strong></h3>
@@ -411,9 +411,9 @@
                 <form method="post" id="formCreateUpdateQuestionnaireDetails" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
-                        <input type="hidden" name="questionnaire_details_pkid" id="txtCreateUpdateQuestionnaireDetailsPkid">
-                        <input type="hidden" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsGetFkid">
-                        <input type="hidden" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsGetRevision">
+                        <input type="hidden" class="reset" name="questionnaire_details_pkid" id="txtCreateUpdateQuestionnaireDetailsPkid" value="">
+                        <input type="hidden" class="reset" name="questionnaire_details_fkid" id="txtCreateUpdateQuestionnaireDetailsGetFkid" value="">
+                        <input type="hidden" class="reset" name="questionnaire_details_revision" id="txtCreateUpdateQuestionnaireDetailsGetRevision" value="">
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -512,8 +512,8 @@
                     @csrf
                     <div class="modal-body">
                     <label id="lblChangeQuestionnaireDetailsStatusLabel"></label>
-                    <input type="hidden" name="questionnaire_id" id="txtChangeQuestionnaireDetailsStatusId" placeholder="Questionnaire Id">
-                    <input type="hidden" name="status" id="txtChangeQuestionnaireDetailsStatus" placeholder="Status">
+                    <input type="hidden" name="questionnaire_id" id="txtChangeQuestionnaireDetailsStatusId" placeholder="Questionnaire Id" value="">
+                    <input type="hidden" name="status" id="txtChangeQuestionnaireDetailsStatus" placeholder="Status" value="">
                     </div>
                     <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
@@ -548,7 +548,7 @@
                     @csrf
                     <!-- Modal Body -->
                     <div class="modal-body">
-                        <input type="hidden" name="exam_title_id" id="txtExamTitleId">
+                        <input type="hidden" name="exam_title_id" id="txtExamTitleId" value="">
 
                         <div class="form-group">
                             <label for="lblExamTitle" class="font-weight-bold">
@@ -594,8 +594,8 @@
                     @csrf
                     <div class="modal-body">
                     <label id="lblChangeExamTitleStatusLabel"></label>
-                    <input type="hidden" name="exam_title_id" id="txtChangeExamTitleStatusId" placeholder="Exam Title Id">
-                    <input type="hidden" name="status" id="txtChangeExamTitleStatus" placeholder="Status">
+                    <input type="hidden" name="exam_title_id" id="txtChangeExamTitleStatusId" placeholder="Exam Title Id" value="">
+                    <input type="hidden" name="status" id="txtChangeExamTitleStatus" placeholder="Status" value="">
                     </div>
                     <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
@@ -624,6 +624,8 @@
         let questionnaireDetailsId
         let dataTableExamTitle
         let isReordering = false;
+        let $table = $('#tableQuestionnaireDetails');
+        let csrfToken = $('meta[name="csrf-token"]').attr('content');
 
         $(document).ready(function () {
             $('.select2bs5').select2({
@@ -638,7 +640,10 @@
 
                 $(this).find('form').each(function () {
                     this.reset();
+                    console.log('Form reset');
                 });
+
+                $('.chkAnswer').prop('disabled', true);
 
                 $('#txtAttachment').addClass('d-none')
                 $('#fileAttachment').removeClass('d-none')
@@ -653,6 +658,17 @@
                 getSelectedAnswers = [];
             });
 
+            // auto resize the textareas
+            document.querySelectorAll("textarea").forEach(function (size) {
+                size.addEventListener("input", function () {
+                    var resize = window.getComputedStyle(this);
+                    // reset height to allow textarea to shrink again
+                    this.style.height = "auto";
+                    // when "box-sizing: border-box" we need to add vertical border size to scrollHeight
+                    this.style.height = (this.scrollHeight + parseInt(resize.getPropertyValue("border-top-width")) + parseInt(resize.getPropertyValue("border-bottom-width"))) + "px";
+                });
+            });
+
             // ===============================================================================================================================================
             // ================================================================ QUESTIONNAIRE ================================================================
             // ===============================================================================================================================================
@@ -665,11 +681,12 @@
                 e.preventDefault();
                 GetExamTitle($('.get-exam-title'))
             });
+
             dataQuestionnaire = $("#tableQuestionnaire").DataTable({
                 "processing" : false,
                 "serverSide" : true,
                 "responsive": true,
-                "order": [[1, "asc"],[3, "asc"]],
+                "order": [[1, "desc"],[4, "asc"]],
                 "language": {
                     "info": "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
                     "lengthMenu": "Show _MENU_ Questionnaire Record",
@@ -767,72 +784,7 @@
                 dataQuestionnaireDetails.draw();
             });
 
-            // dataQuestionnaireDetails = $("#tableQuestionnaireDetails").DataTable({
-            //     "processing": false,
-            //     "serverSide": true,
-            //     "responsive": true,
-            //     "order": [[ 3, "asc" ]],
-            //     "language": {
-            //         "info": "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
-            //         "lengthMenu": "Show _MENU_ Questionnaire Record",
-            //     },
-            //     "ajax": {
-            //         url: "view_questionnaire_details",
-            //         type: "GET",
-            //         data: function(data){
-            //             data.questionnaireId = questionnaireId;
-            //             data.questionnaireRevision = questionnaireRevision;
-            //         },
-            //         dataSrc: function(json){
-            //             let totalPoints = json.totalPoints
-            //             let passingScore = json.passingScore
-            //             $(".questionnaireScoreDisplay").text(totalPoints +' / '+ passingScore);
-
-            //             if(json.totalPoints >= json.passingScore){
-            //                 $('#buttonCreateQuestionnaireDetails').addClass('d-none');
-            //             }else{
-            //                 $('#buttonCreateQuestionnaireDetails').removeClass('d-none');
-            //             }
-            //             return json.data;
-            //         }
-            //     },
-            //     "columns": [
-            //         { "data": "action", orderable: false, searchable: false },
-            //         { "data": "status" },
-            //         {
-            //             "data": "category_type",
-            //             "defaultContent": 'N/A',
-            //             "name": 'Category',
-            //             "orderable": true,
-            //             "searchable": true,
-            //             "render": function (data, type, row) {
-            //                 switch (Number(row.category_type)) {
-            //                     case 0: return "CHOICES";
-            //                     case 1: return "TEXT";
-            //                     case 2: return "GRID";
-            //                     default: return "Unknown";
-            //                 }
-            //             }
-            //         },
-            //         { "data": "exam_no" },
-            //         { "data": "image" },
-            //         {
-            //             "data": "description",
-            //             "createdCell": function(td, cellData, rowData, row, col) {
-            //                 $(td).css({
-            //                     'white-space': 'normal',
-            //                     'word-break': 'break-word'
-            //                 });
-            //             }
-            //         },
-            //         { "data": "question" },
-            //         { "data": "choices" },
-            //         { "data": "answer" },
-            //         { "data": "points" }
-            //     ]
-            // });
-
-            dataQuestionnaireDetails = $("#tableQuestionnaireDetails").DataTable({
+            dataQuestionnaireDetails = $table.DataTable({
                 processing: false,
                 serverSide: true,
                 responsive: true,
@@ -845,40 +797,36 @@
                 order: [[3, "asc"]],
                 language: {
                     info: "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
-                    lengthMenu: "Show _MENU_ Questionnaire Record",
+                    lengthMenu: "Show _MENU_ Questionnaire Record"
                 },
                 ajax: {
                     url: "view_questionnaire_details",
                     type: "GET",
-                    data: function(data){
+                    data: function (data) {
                         data.questionnaireId = questionnaireId;
                         data.questionnaireRevision = questionnaireRevision;
                     },
-                    dataSrc: function(json){
-                        let totalPoints = json.totalPoints;
-                        let passingScore = json.passingScore;
+                    dataSrc: function (json) {
+                        const totalPoints = json.totalPoints;
+                        const passingScore = json.passingScore;
 
                         $(".questionnaireScoreDisplay")
                             .text(totalPoints + " / " + passingScore);
 
-                        if(totalPoints >= passingScore){
-                            $("#buttonCreateQuestionnaireDetails")
-                                .addClass("d-none");
-                        }else{
-                            $("#buttonCreateQuestionnaireDetails")
-                                .removeClass("d-none");
-                        }
+                        $("#buttonCreateQuestionnaireDetails")
+                            .toggleClass("d-none", totalPoints >= passingScore);
+
                         return json.data;
                     }
                 },
                 columns: [
-                    { data: "action", orderable:false, searchable:false },
-                    { data:"status" },
-                    {data:"category_type",
-                        defaultContent:"N/A",
-                        render:function(data,type,row){
+                    {   data: "action", orderable: false, searchable: false },
+                    {   data: "status" },
+                    {   data: "category_type",
+                        defaultContent: "N/A",
+                        render: function (data, type, row) {
 
-                            switch(Number(row.category_type)){
+                            switch (Number(row.category_type)) {
                                 case 0:
                                     return "CHOICES";
                                 case 1:
@@ -890,117 +838,346 @@
                             }
                         }
                     },
-                    { data:"exam_no", className:"reorder",
-                        render:function(data){
+                    {   data: "exam_no",
+                        className: "reorder",
+                        render: function (data) {
                             return '<span style="cursor:move;">' + data + '</span>';
                         }
                     },
-                    { data:"image"},
-                    { data:"description",
-                        createdCell:function(td){
+                    {   data: "image"   },
+                    {   data: "description",
+                        createdCell: function (td) {
                             $(td).css({
-                                whiteSpace:"normal",
-                                wordBreak:"break-word"
+                                whiteSpace: "normal",
+                                wordBreak: "break-word"
                             });
                         }
                     },
-                    { data:"question" },
-                    { data:"choices" },
-                    { data:"answer" },
-                    { data:"points" }
+                    {   data: "question" },
+                    {   data: "choices" },
+                    {   data: "answer" },
+                    {   data: "points" }
                 ]
             });
 
-            $('#tableQuestionnaireDetails').on('row-reorder-changed', function(e, nodes){
-                $(nodes).each(function(){
-                    $(this)
-                        .addClass('dt-rowReorder-moving')
-                        .delay(444)
-                        .queue(function(next){
-                            $(this).removeClass('dt-rowReorder-moving');
-                            next();
-                        });
-                });
-            });
+            function buildRows(diff){
+                return diff
+                    .filter(item => item.oldData !== item.newData)
+                    .map(item => {
 
-            $('#tableQuestionnaireDetails').on('row-reorder.dt', function (e, diff) {
-                // Prevent multiple requests
-                if (isReordering) {
-                    return;
-                }
+                        const row = dataQuestionnaireDetails.row(item.node);
+                        if(!row.any()){
+                            return null;
+                        }
 
-                // Ignore if nothing really changed
-                diff = diff.filter(function (item) {
-                    return item.oldData != item.newData;
-                });
+                        const rowData = row.data();
+                        if(!rowData){
+                            return null;
+                        }
 
-                if (!diff.length) {
-                    return;
-                }
+                        return{
+                            id: rowData.id,
+                            questionnaire_id: rowData.questionnaire_id,
+                            exam_no: item.newData
+                        };
+                    })
+                    .filter(Boolean);
+            }
 
-                let rows = [];
-
-                diff.forEach(function (item) {
-
-                    let row = dataQuestionnaireDetails.row(item.node);
-
-                    // Skip invalid rows
-                    if (!row.any()) {
-                        return;
-                    }
-
-                    let rowData = row.data();
-
-                    if (!rowData || typeof rowData.id === "undefined") {
-                        return;
-                    }
-
-                    rows.push({
-                        id: rowData.id,
-                        exam_no: item.newData
-                    });
-
-                });
-
-                if (!rows.length) {
-                    return;
-                }
-
+            function saveRowOrder(rows){
                 isReordering = true;
+                dataQuestionnaireDetails.rowReorder.disable();
+                $table.addClass("opacity-50");
                 $.ajax({
-                    url: "{{ route('reorder') }}",
+                    url: "reorder",
                     type: "POST",
                     data: {
-                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        _token: csrfToken,
                         rows: rows
-                    },
-                    beforeSend: function () {
-                        // Prevent another reorder while request is running
-                        isReordering = true;
+                    }
+                })
+                .done(function (response){
+                    console.log('done: ',response);
+                })
+                .fail(function (xhr){
+                    console.error('fail: ',xhr.responseText);
+                })
+                .always(function (){
+                    dataQuestionnaireDetails.ajax.reload(null, false);
+                    dataQuestionnaireDetails.rowReorder.enable();
+                    $table.removeClass("opacity-50");
+                    isReordering = false;
+                });
+            }
 
-                        // Disable drag
-                        dataQuestionnaireDetails.rowReorder.disable();
+            $table.on("row-reorder.dt", function (e, diff){
+                if(isReordering){
+                    return;
+                }
 
-                        // Optional: show processing
-                        $('#tableQuestionnaireDetails').addClass('opacity-50');
-                    },
-                    success: function (response) {
-                        console.log(response);
-                    },
-                    error: function (xhr) {
-                        console.log(xhr.responseText);
-                    },
-                    complete: function () {
-                        // Reload latest data without resetting page
-                        dataQuestionnaireDetails.ajax.reload(null, false);
+                const rows = buildRows(diff);
+                if(!rows.length){
+                    return;
+                }
 
-                        // Enable dragging again
-                        dataQuestionnaireDetails.rowReorder.enable();
+                saveRowOrder(rows);
+            });
 
-                        isReordering = false;
+            $(document).on('click', '.actionCopyQuestionnaire', function(e){
+                e.preventDefault();
+
+                let questionnaireId = $(this).attr('questionnaire-id');
+                let getQuestionnaireDescription = $(this).attr('questionnaire-description');
+                $.ajax({
+                    url: 'copy_preview',
+                    type: 'GET',
+
+                    data: {
+                        questionnaire_id: questionnaireId,
+                        _token: csrfToken
+                    },
+
+                    success:function(response){
+                        let questionnaire = response.data;
+                        Swal.fire({
+                            title: '📝 Copy Questionnaire',
+                            width: '600px',
+                            customClass: {
+                                popup: 'copy-questionnaire-popup',
+                                title: 'copy-questionnaire-title',
+                                confirmButton: 'copy-confirm-btn',
+                                cancelButton: 'copy-cancel-btn'
+                            },
+
+                            html: `
+                                <div class="text-start">
+
+                                    <div class="current-description-box">
+                                        <label>
+                                            <strong>Current Description</strong>
+                                        </label>
+
+                                        <div class="description-preview">
+                                            ${getQuestionnaireDescription}
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-3">
+                                        <label for="description" class="form-label">
+                                            <strong>New Description</strong>
+                                        </label>
+
+                                        <textarea
+                                            id="description"
+                                            class="form-control copy-textarea"
+                                            rows="3"
+                                            placeholder="Enter new questionnaire description..."
+                                        ></textarea>
+                                    </div>
+
+                                </div>
+                            `,
+
+                            showCancelButton: true,
+                            confirmButtonText: '📋 Copy',
+                            cancelButtonText: 'Cancel',
+                            focusConfirm: false,
+
+                            preConfirm:()=>{
+                                let value = $('#description').val().trim();
+                                if(!value){
+                                    Swal.showValidationMessage(
+                                        'Description is required'
+                                    );
+                                    return false;
+                                }
+
+                                return value;
+                            }
+                        }).then(result=>{
+                            if(result.isConfirmed){
+                                CopyQuestionnaire(
+                                    questionnaire.id,
+                                    result.value
+                                );
+                            }
+                        });
                     }
                 });
             });
+
+            // //===============================================================================================
+            // //===============================================================================================
+            // //===============================================================================================
+            // dataQuestionnaireDetails = $("#tableQuestionnaireDetails").DataTable({
+            //     processing: false,
+            //     serverSide: true,
+            //     responsive: true,
+            //     rowId: 'id',
+            //     rowReorder: {
+            //         dataSrc: 'exam_no',
+            //         selector: 'td.reorder',
+            //         update: false
+            //     },
+            //     order: [[3, "asc"]],
+            //     language: {
+            //         info: "Showing _START_ to _END_ of _TOTAL_ Questionnaire Record",
+            //         lengthMenu: "Show _MENU_ Questionnaire Record",
+            //     },
+            //     ajax: {
+            //         url: "view_questionnaire_details",
+            //         type: "GET",
+            //         data: function(data){
+            //             data.questionnaireId = questionnaireId;
+            //             data.questionnaireRevision = questionnaireRevision;
+            //         },
+            //         dataSrc: function(json){
+            //             let totalPoints = json.totalPoints;
+            //             let passingScore = json.passingScore;
+
+            //             $(".questionnaireScoreDisplay")
+            //                 .text(totalPoints + " / " + passingScore);
+
+            //             if(totalPoints >= passingScore){
+            //                 $("#buttonCreateQuestionnaireDetails")
+            //                     .addClass("d-none");
+            //             }else{
+            //                 $("#buttonCreateQuestionnaireDetails")
+            //                     .removeClass("d-none");
+            //             }
+            //             return json.data;
+            //         }
+            //     },
+            //     columns: [
+            //         { data: "action", orderable:false, searchable:false },
+            //         { data:"status" },
+            //         {data:"category_type",
+            //             defaultContent:"N/A",
+            //             render:function(data,type,row){
+
+            //                 switch(Number(row.category_type)){
+            //                     case 0:
+            //                         return "CHOICES";
+            //                     case 1:
+            //                         return "TEXT";
+            //                     case 2:
+            //                         return "GRID";
+            //                     default:
+            //                         return "Unknown";
+            //                 }
+            //             }
+            //         },
+            //         { data:"exam_no", className:"reorder",
+            //             render:function(data){
+            //                 return '<span style="cursor:move;">' + data + '</span>';
+            //             }
+            //         },
+            //         { data:"image"},
+            //         { data:"description",
+            //             createdCell:function(td){
+            //                 $(td).css({
+            //                     whiteSpace:"normal",
+            //                     wordBreak:"break-word"
+            //                 });
+            //             }
+            //         },
+            //         { data:"question" },
+            //         { data:"choices" },
+            //         { data:"answer" },
+            //         { data:"points" }
+            //     ]
+            // });
+
+            // $('#tableQuestionnaireDetails').on('row-reorder-changed', function(e, nodes){
+            //     $(nodes).each(function(){
+            //         $(this)
+            //             .addClass('dt-rowReorder-moving')
+            //             .delay(444)
+            //             .queue(function(next){
+            //                 $(this).removeClass('dt-rowReorder-moving');
+            //                 next();
+            //             });
+            //     });
+            // });
+
+            // $('#tableQuestionnaireDetails').on('row-reorder.dt', function (e, diff) {
+            //     // Prevent multiple requests
+            //     if (isReordering) {
+            //         return;
+            //     }
+
+            //     // Ignore if nothing really changed
+            //     diff = diff.filter(function (item) {
+            //         return item.oldData != item.newData;
+            //     });
+
+            //     if (!diff.length) {
+            //         return;
+            //     }
+
+            //     let rows = [];
+            //     diff.forEach(function (item) {
+            //         let row = dataQuestionnaireDetails.row(item.node);
+
+            //         // Skip invalid rows
+            //         if (!row.any()) {
+            //             return;
+            //         }
+
+            //         let rowData = row.data();
+            //         if (!rowData || typeof rowData.id === "undefined") {
+            //             return;
+            //         }
+
+            //         rows.push({
+            //             id: rowData.id,
+            //             exam_no: item.newData,
+            //             questionnaire_id: rowData.questionnaire_id
+            //         });
+            //     });
+
+            //     if (!rows.length) {
+            //         return;
+            //     }
+
+            //     isReordering = true;
+            //     $.ajax({
+            //         url: "reorder",
+            //         type: "POST",
+            //         data: {
+            //             _token: $('meta[name="csrf-token"]').attr('content'),
+            //             rows: rows
+            //         },
+            //         beforeSend: function () {
+            //             // Prevent another reorder while request is running
+            //             isReordering = true;
+
+            //             // Disable drag
+            //             dataQuestionnaireDetails.rowReorder.disable();
+
+            //             // Optional: show processing
+            //             $('#tableQuestionnaireDetails').addClass('opacity-50');
+            //         },
+            //         success: function (response) {
+            //             console.log(response);
+            //         },
+            //         error: function (xhr) {
+            //             console.log(xhr.responseText);
+            //         },
+            //         complete: function () {
+            //             // Reload latest data without resetting page
+            //             dataQuestionnaireDetails.ajax.reload(null, false);
+
+            //             // Enable dragging again
+            //             dataQuestionnaireDetails.rowReorder.enable();
+
+            //             isReordering = false;
+            //         }
+            //     });
+            // });
+            // //===============================================================================================
+            // //===============================================================================================
+            // //===============================================================================================
 
             $('#buttonCreateQuestionnaireDetails').click(function (e) {
                 e.preventDefault();
@@ -1055,7 +1232,7 @@
                 switch (typeOfQuestion) {
                     case '0':
                         console.log('CHOICES');
-                        html += '<input type="hidden" name="answer[]" id="choiceAnswerHidden">';
+                        html += '<input type="hidden" name="answer[]" id="choiceAnswerHidden" value="">';
                         html += '<div class="input-group-prepend w-25">'
                         html += '   <span class="input-group-text w-100"><strong>Question: &nbsp; </strong></span>'
                         html += '</div>'
@@ -1063,9 +1240,11 @@
                         html += '<div class="col-md-12 mt-3" style="border-top: 1px solid">'
                         html += '   <div class="form-group row mt-2">'
                         html += '       <label class="col-md-8 col-form-label">'
-                        html += '           Choices ( Select the correct answer )'
+                        html += '           Note: If a QUESTION is<br>'
+                        html += '               &emsp;* 1 point, users may select only one answer.<br>'
+                        html += '               &emsp;* more than 1 point, users may select multiple answers.'
                         html += '       </label>'
-                        html += '       <div class="col-md-4 text-right">'
+                        html += '       <div class="col-md-4 text-right mt-5">'
                         html += '           <button type="button" class="btn btn-dark btn-sm" id="btnAddChoice">'
                         html += '               <i class="fa fa-plus"></i> Add Choice'
                         html += '           </button>'
@@ -1074,10 +1253,10 @@
                         html += '           <div class="input-group input-group-md mb-3">'
                         html += '               <div class="input-group-prepend">'
                         html += '                   <span class="input-group-text">'
-                        html += '                       <input type="checkbox" class="chkAnswer" value="0">'
+                        html += '                       <input type="checkbox" class="chkAnswer" value="0" disabled>'
                         html += '                   </span>'
                         html += '               </div>'
-                        html += '               <input type="text" class="form-control" name="choices[]" placeholder="Option" required>'
+                        html += '               <input type="text" class="form-control changeChoices" name="choices[]" placeholder="Option" required>'
                         html += '               <input type="text" class="form-control txtAnswer" style="display:none;">'
                         html += '               <div class="input-group-append">'
                         html += '                   <button type="button" class="btn btn-danger btnRemoveChoice">'
@@ -1117,9 +1296,9 @@
 
                     case '2':
                         console.log('GRID');
-                        html += '<input type="hidden" name="questionnaire_question" id="questionnaireQuestionHidden">';
-                        html += '<input type="hidden" name="choices" id="gridChoicesHidden">';
-                        html += '<input type="hidden" name="answer" id="gridAnswerHidden">';
+                        html += '<input type="hidden" name="questionnaire_question" id="questionnaireQuestionHidden" value="">';
+                        html += '<input type="hidden" name="choices" id="gridChoicesHidden" value="">';
+                        html += '<input type="hidden" name="answer" id="gridAnswerHidden" value="">';
                         html += '<div class="input-group-prepend w-25">';
                         html += '   <span class="input-group-text w-100"><strong>Description: &nbsp;</strong></span>';
                         html += '</div>';
@@ -1174,23 +1353,28 @@
             $(document).on("click", "#btnAddChoice", function (e) {
                 e.preventDefault();
 
-                html = '';
-                html += '<div class="input-group input-group-md mb-3">';
-                html += '   <div class="input-group-prepend">';
-                html += '       <span class="input-group-text">';
-                html += '           <input type="checkbox" class="chkAnswer" value="0">';
-                html += '       </span>';
-                html += '   </div>';
-                html += '   <input type="text" class="form-control" name="choices[]" placeholder="Option" required>';
-                html += '   <input type="hidden" class="txtAnswer">';
-                html += '   <div class="input-group-append">';
-                html += '       <button type="button" class="btn btn-danger btnRemoveChoice">';
-                html += '           <i class="fa fa-trash"></i>';
-                html += '       </button>';
-                html += '   </div>';
-                html += '</div>';
+                if($("#nmbrQuestionnairePoints").val() == ""){
+                    alert("Please enter the points first!");
+                    return
+                }else{
+                    html = '';
+                    html += '<div class="input-group input-group-md mb-3">';
+                    html += '   <div class="input-group-prepend">';
+                    html += '       <span class="input-group-text">';
+                    html += '           <input type="checkbox" class="chkAnswer" value="0" disabled>';
+                    html += '       </span>';
+                    html += '   </div>';
+                    html += '   <input type="text" class="form-control" name="choices[]" placeholder="Option" required>';
+                    html += '   <input type="hidden" class="txtAnswer" value="">';
+                    html += '   <div class="input-group-append">';
+                    html += '       <button type="button" class="btn btn-danger btnRemoveChoice">';
+                    html += '           <i class="fa fa-trash"></i>';
+                    html += '       </button>';
+                    html += '   </div>';
+                    html += '</div>';
 
-                $(".divChoices").append(html);
+                    $(".divChoices").append(html);
+                }
             });
 
             $(document).on("click", ".btnRemoveChoice", function (e) {
@@ -1198,23 +1382,53 @@
                 $(this).closest(".input-group").remove();
             });
 
-            $(document).on("change", ".chkAnswer", function (e) {
-                e.preventDefault();
-
-                let groupContainer = $(this).closest(".divChoices");
+            function updateAnswers() {
                 let answers = [];
 
-                groupContainer.find(".input-group").each(function () {
-                    let checkbox = $(this).find(".chkAnswer");
-
-                    if (checkbox.is(":checked")) {
-                        let choiceText = $(this).find("input[name='choices[]']").val();
-                        answers.push(choiceText);
-                    }
+                $(".chkAnswer:checked").each(function (){
+                    answers.push($(this).closest(".input-group").find("input[name='choices[]']").val());
                 });
 
-                $('#choiceAnswerHidden').val(answers)
+                $('#choiceAnswerHidden').val(answers.join(" || "));
+            }
+
+            $(document).on("change", ".chkAnswer", function () {
+                if ($("#nmbrQuestionnairePoints").val() == "1") {
+                    $(".chkAnswer").not(this).prop("checked", false);
+                }
+
+                updateAnswers();
             });
+
+            $(document).on("input", "input[name='choices[]']", function () {
+                let $checkbox = $(this).closest(".input-group").find(".chkAnswer");
+
+                if($.trim($(this).val()) === ""){
+                    $checkbox.prop("checked", false).prop("disabled", true);
+                }else{
+                    $checkbox.prop("disabled", false).prop("checked", false);
+                }
+
+                updateAnswers();
+            });
+
+            // $(document).on("change", ".chkAnswer", function (e) {
+            //     e.preventDefault();
+
+            //     let groupContainer = $(this).closest(".divChoices");
+            //     let answers = [];
+
+            //     groupContainer.find(".input-group").each(function () {
+            //         let checkbox = $(this).find(".chkAnswer");
+
+            //         if (checkbox.is(":checked")) {
+            //             let choiceText = $(this).find("input[name='choices[]']").val();
+            //             answers.push(choiceText);
+            //         }
+            //     });
+
+            //     $('#choiceAnswerHidden').val(answers.join(" || "));
+            // });
 
             // ====================================================================================================
             // ============================================ FOR TEXT ==============================================

@@ -539,7 +539,6 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-
     public function saveOperApprovers($params){
         try {
             OpApprover::insert($params);
@@ -955,7 +954,7 @@ class QualificationCertificationController extends Controller
         $items = DropdownMasterDetail::with(['c_lqc_training_item_results' => function ($query) use ($qcSlipsId) {
             $query->where('qc_slips_id', $qcSlipsId);
         }])
-        ->where('dropdown_masters_id', 1)
+        ->where('dropdown_masters_id', 8)
         ->orderBy('id', 'asc')
         ->get();
 
@@ -979,7 +978,7 @@ class QualificationCertificationController extends Controller
         ->editColumn('item_name', function ($row) {
             $html = '<strong>' . e($row['item_name']) . '</strong>';
             $lower = strtolower($row['item_name']);
-            if (str_contains($lower, 'part prep') || str_contains($lower, 'visual inspection')) {
+            if (str_contains($lower, 'systems and procedure') || str_contains($lower, 'work instruction') || str_contains($lower,'point panel inspection guide')) {
                 $html .= '<br><input type="text" class="form-control form-control-sm mt-1 input-sub-desc"
                               data-item-id="' . $row['id'] . '"
                               placeholder="Details..."
@@ -1284,17 +1283,17 @@ class QualificationCertificationController extends Controller
                             return $hrisSubcon[$empId] ?? null;
                         })
                         ->filter()
-                        ->join(' | ');
+                        ->join(' <br> ');
                     $currentApproverCc = $empIdsCc
                         ->map(function ($empId) use ($hrisSubcon) {
                             return $hrisSubcon[$empId] ?? null;
                         })
                         ->filter()
-                        ->join(' | ');
+                        ->join(' <br> ');
                 //    return $empIdsCc = array_merge($empIdsTo,$empIdsCc);
 
                     if ($currentApproverTo !== '') {
-                        $resultCurrentApprover = '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> Current Approver: '.$currentApproverTo.' <br> '.$currentApproverCc.' </span></></br>';
+                        $resultCurrentApprover = '<span class="badge '.$getApprovalStatus['spanColor'].'">'.$currentApproverTo.' <br> '.$currentApproverCc.' </span></b></br>';
                     }
                 }
 
@@ -1449,7 +1448,7 @@ class QualificationCertificationController extends Controller
     }
     public function changeApprovalStatus($params){
         $selectedSection = str_contains($params['selectedSection'], 'PPD');
-         $isMachineOperatorExists = $params['isMachineOperatorExists'];
+        $isMachineOperatorExists = $params['isMachineOperatorExists'];
         if($params['selectPosition'] === 'Inspector'){
              switch (true) {
                 case ($params['approval_status'] === 'PB'):
@@ -1466,5 +1465,143 @@ class QualificationCertificationController extends Controller
                     break;
             }
         }
+        if($params['selectPosition'] === 'Operator'){
+            switch (true) {
+                case ($params['approval_status'] === 'PB'):
+                    $newStatus = 'APRODTO';
+                    $statusName = 'A Production Training Orientation';
+                    break;
+
+                case ($params['approval_status'] === 'APRODTO'):
+                    $newStatus = 'BENGGTQ';
+                    $statusName = 'B Engineer Training Qualification';
+                    break;
+
+                case ($params['approval_status'] === 'BENGGTQ'):
+                    $newStatus = 'CQCC';
+                    $statusName = 'C Qc Certification';
+                    break;
+                case ($params['approval_status'] === 'CQCC' && $selectedSection != 1 && $isMachineOperatorExists > 0): //For Machine Operator Only
+                    $newStatus = 'EENGVP';
+                    $statusName = 'E Engineering Validation Process';
+                    break;
+                case ($params['approval_status'] === 'CQCC'  && $selectedSection != 1 && $isMachineOperatorExists === 0): // QC Validation Process
+                    $newStatus = 'EQCVP';
+                    $statusName = 'E Qc Validation Process';
+                    break;
+                case ($params['approval_status'] === 'CQCC' && $selectedSection):
+                    $newStatus = 'DPPDONLY';
+                    $statusName = 'D PPD Production, Engg, QC Update';
+                    break;
+                // case ($params['approval_status'] === 'CQCC' && $selectedSection):
+                //     $newStatus = 'DPRDPPDONLY';
+                //     $statusName = 'D Production Update';
+                //     break;
+                // case ($params['approval_status'] === 'DPRDPPDONLY'):
+                //     $newStatus = 'EQCVP';
+                //     $statusName = 'D Engineering Update';
+                //     break;
+                // case ($params['approval_status'] === 'DENGGPPDONLY'):
+                //     $newStatus = 'DQCPPDONLY';
+                //     $statusName = 'D QC Update';
+                //     break;
+
+                case ($params['approval_status'] === 'DPPDONLY' && $isMachineOperatorExists === 0): // QC Validation Pr
+                    $newStatus = 'EENGVP'; //For Machine Operator Only
+                    $statusName = 'E Engineering Validation Process';
+                    break;
+                case ($params['approval_status'] === 'DPPDONLY' && $isMachineOperatorExists > 0): // QC Validation Pr
+                    $newStatus = 'EQCVP';  // QC Validation Process
+                    $statusName = 'E Qc Validation Process';
+                    break;
+                case ($params['approval_status'] === 'EENGVP'):
+                    $newStatus = 'EQCVP';  // QC Validation Process
+                    $statusName = 'E Qc Validation Process';
+                    break;
+                case ($params['approval_status'] === 'EQCVP'):
+                    $newStatus = 'FQCVVO';
+                    $statusName = 'F Qc Validation Visual Operator';
+                    break;
+
+                case ($params['approval_status'] === 'FQCVVO'):
+                    $newStatus = 'QCAPP'; // QC Supervisor Approval
+                    $statusName = 'CLOSED';
+                    break;
+
+                default:
+                    $newStatus = 'N/A';
+                    $statusName = 'N/A';
+                    break;
+            }
+        }
+
+
+        QcSlip::where('id',$params['qcSlipsId'])->update([
+            'approval_status'=> $newStatus
+        ]);
+        return [
+          "newStatus" => $newStatus
+        ];
+    }
+    public function getDivDeptSec(Request $request){
+        try {
+            $section = SystemHrisViewDivDeptSec::where('Division', '!=', '-')
+                ->where('Division', '!=', 'Administration')
+                ->whereNotNull('Section')
+                ->select('Section')
+                ->distinct()
+                ->orderBy('Section')
+                ->pluck('Section')->toArray();
+                $customDivision = [
+                    'PPD Grinding',
+                    'PPD-TS Molding',
+                ];
+            $arrMerge = array_merge($section,$customDivision);
+            return response()->json(['is_success' => 'true', 'section' => $arrMerge]);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+     public function getDropdownMasterDetailsByFkid(Request $request){
+
+        try {
+         $data = DropdownMasterDetail::
+            where('dropdown_masters_id', $request->dropdown_masters_id)
+            ->where('status',1)
+            ->get(['dropdown_masters_details','id']);
+            $masterDetails = collect($data)->map(function($rowMasterDetails){
+
+                   return [
+                        'id'=> $rowMasterDetails['id'],
+                        'text'=> $rowMasterDetails['dropdown_masters_details'],
+                    ];
+            });
+            return response()->json(['is_success' => 'true', 'data' => $masterDetails]);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    public function generateControlNumber($params){
+        date_default_timezone_set('Asia/Manila');
+        //Systemon HRIS / Subcon
+
+        $qcSlip = QcSlip::orderBy('id','desc')->whereYear('created_at',now())
+        ->where('position_category',$params['positionCategory'])
+        ->whereNull('deleted_at')
+        ->limit(1)->get(['control_no']);
+
+        if(count( $qcSlip ) != 0){
+            $currentCtrlNo = explode('-',$qcSlip[0]->control_no);
+            $arrCtrNo		 	= end($currentCtrlNo);
+            $series 	 	= str_pad(($arrCtrNo+1),3,"0",STR_PAD_LEFT);
+            $currentCtrlNo = $params['section']."-".$params['selectSection']."-".date('m').date('y').'-'.$series;
+
+        }else{
+            $currentCtrlNo = $params['section']."-".$params['selectSection']."-".date('m').date('y').'-001';
+        }
+        return [
+            'currentCtrlNo' => $currentCtrlNo
+        ];
     }
 }
+

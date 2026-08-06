@@ -30,14 +30,20 @@
         let approvalStatus = params.approvalStatus;
         let positionCategory = params.positionCategory;
         console.log();
-        
+
             $('.inspectorSave').addClass('d-none');
             $('.operSave').addClass('d-none');
             $('.operApproved').addClass('d-none');
             $('.btnSaveInspector').addClass('d-none')
             $('#div_Oper').addClass('d-none');
             $('#divInspector').addClass('d-none');
+            $('#text_date_of_transfer').addClass('d-none');
+            $('#productLine').addClass('d-none');
+            $('#seriesDesignation').text('Series');
+             $('#dateOfTransfer').addClass('d-none');
+
             if(positionCategory === 'Operator'){
+                $('#productLine').removeClass('d-none');
                 $('#div_Oper').removeClass('d-none');
                 $('.btn-link').removeClass('show');
                 $('#collapseOneOper').removeClass('show');
@@ -80,6 +86,9 @@
                 }
             }
             if(positionCategory === 'Inspector'){
+                $('#dateOfTransfer').removeClass('d-none');
+                $('#text_date_of_transfer').removeClass('d-none');
+                $('#seriesDesignation').text('Designation');
                 $('#divInspector').removeClass('d-none');
                 $('.btnSaveInspector').removeClass('d-none');
                 // $('.inspectorSave').removeClass('d-none')
@@ -101,7 +110,7 @@
                     // $('.inspectorSave').addClass('d-none');
                 }
             }
-          
+
     }
     const togglePositionSectiontest = (position) => {
             initOperEmpModal();
@@ -500,6 +509,10 @@
         const stToText = $stationTo.find('option:selected').text().trim();
         const optRemarks = $optRemarks.val();
         // --- validation ---
+        if (empId.length > 1) {
+            Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please Add 1 Employee Per Station.' });
+            return;
+        }
         if (empId.length === 0) {
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select an Employee.' });
             return;
@@ -1013,7 +1026,7 @@
 
                 form.formSubmitInspector.find('#text_date_inspector').val(alqctq?.first_date ?? '');
                 form.formSubmitInspector.find('#text_time_inspector').val(alqctq?.first_time ?? '');
-   
+
                 //B
                 const handsOnInspector = bLqcCertifications?.hands_on_inspector;
                 const blqctc = approversCollection?.BLQCTC?.[0]  ?? null;

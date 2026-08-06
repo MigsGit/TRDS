@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 class QcSlip extends Model
 {
     use HasFactory;
+    protected $table = 'qc_slips';
 
     protected $fillable = [
         'status',
@@ -34,6 +35,10 @@ class QcSlip extends Model
     {
         return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');
     }
+    // public function product_line()
+    // {
+    //     return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');
+    // }
     public function system_one_hris_subcon()
     {
         return $this->hasMany(SystemOneHrisSubcon::class, 'EmpNo',  'created_by');
@@ -78,7 +83,7 @@ class QcSlip extends Model
     {
         return $this->hasOne(AOperProdTrainingOrientation::class, 'qc_slips_id',  'id')->where('deleted_at');
     }
-    
+
     public function b_op_engg_section_training_orientation()
     {
         return $this->hasOne(BOpEnggSectionTrainingOrientation::class, 'qc_slips_id',  'id')->where('deleted_at');
@@ -100,6 +105,10 @@ class QcSlip extends Model
         return $this->hasOne(FQcValidation::class, 'qc_slips_id',  'id')->where('deleted_at');
     }
 
+    public function productLine()
+    {
+        return $this->belongsTo(DropdownMasterDetail::class, 'product_line', 'id');
+    }
     //INSPECTOR
     public function a_lqc_training_qualification()
     {
