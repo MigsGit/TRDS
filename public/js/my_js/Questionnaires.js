@@ -197,7 +197,7 @@ const GetQuestionnaireById = (questionnaireId) => {
 const ChangeQuestionnaireStatus = (questionnaireId) => {
     let formData = $('#formChangeQuestionnaireStatus').serialize() + '&questionnaireId' + questionnaireId;
 
-    const ajaxGetQuestionnaireById = {
+    const ajaxGetQuestionnaireStatus = {
         url: "change_questionnaire_status",
         method: "POST",
         data: formData,
@@ -242,9 +242,63 @@ const ChangeQuestionnaireStatus = (questionnaireId) => {
         }
     };
 
-    ajaxRequest(ajaxGetQuestionnaireById);
+    ajaxRequest(ajaxGetQuestionnaireStatus);
 };
 
+function CopyQuestionnaire(id, description){
+    $.ajax({
+        url: 'copy_questionnaire',
+        type: 'POST',
+        data: {
+            questionnaire_id: id,
+            description: description,
+            _token: csrfToken
+        },
+
+        beforeSend:function(){
+            Swal.fire({
+                title: 'Copying...',
+                text: 'Please wait while copying questionnaire.',
+                allowOutsideClick: false,
+                didOpen:()=>{
+                    Swal.showLoading();
+                }
+            });
+        },
+
+        success:function(response){
+            if(response.success){
+                Swal.fire(
+                    'Success',
+                    response.message,
+                    'success'
+                ).then(()=>{
+                    location.reload();
+                });
+            }else{
+                Swal.fire(
+                    'Error',
+                    response.message,
+                    'error'
+                );
+            }
+        },
+
+        error:function(xhr){
+            let message = 'Copy failed.';
+
+            if(xhr.responseJSON && xhr.responseJSON.message){
+                message = xhr.responseJSON.message;
+            }
+
+            Swal.fire(
+                'Error',
+                message,
+                'error'
+            );
+        }
+    });
+}
 // =================================================================================================================================
 // ===================================================== QUESTIONNAIRE DETAILS =====================================================
 // =================================================================================================================================
@@ -387,7 +441,7 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
 
                         $(this).find("input[name='choices[]']").val(choiceValue);
 
-                        let answerArr = typeof answer === 'string' ? answer.split(',') : [];
+                        let answerArr = typeof answer === 'string' ? answer.split(' || ') : [];
                         if(answerArr.includes(choiceValue)){
                             $(this)
                                 .find('.chkAnswer')
@@ -395,6 +449,7 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
                                 .trigger('change');
                         }
                     });
+                    $('.chkAnswer').prop('disabled', false);
                     break;
 
                 case 1:

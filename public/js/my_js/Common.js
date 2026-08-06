@@ -168,6 +168,10 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
                 errorHandler(errorResponse.errors['text_alert_prod_sec'], $('#text_alert_prod_sec'));
                 errorHandler(errorResponse.errors['text_alert_prod_cc_sec'], $('#text_alert_prod_cc_sec'));
                 errorHandler(errorResponse.errors['text_qcs_station_1st_oper'], $('#text_qcs_station_1st_oper'));
+                errorHandler(errorResponse.errors['text_series_operator'], $('#text_series_operator'));
+                // errorHandler(errorResponse.errors['text_section_operator'], $('#text_section_operator'));
+                errorHandler(errorResponse.errors['text_operator_product_line'], $('#text_operator_product_line'));
+                errorHandler(errorResponse.errors['text_certification_operator'], $('#text_certification_operator'));
 
 
                 // text_qcs_station_1st_oper checkbox
@@ -219,7 +223,7 @@ const  swalConfirmation =(message, callback) => {
 
 
 const handleValidatorErrors = (errors) => {
-    
+
     document.querySelectorAll('div input').forEach(function(input) {
         input.classList.remove('is-invalid');
     });

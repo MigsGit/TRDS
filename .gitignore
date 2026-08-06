@@ -3,6 +3,7 @@
 /public/storage
 /storage
 /vendor
+vendor
 .env
 .env.backup
 .phpunit.result.cache
@@ -12,3 +13,4 @@ npm-debug.log
 yarn-error.log
 .composer-lock
 .vscode
+/vendor_1x

@@ -43,6 +43,7 @@ class QuestionnairesController extends Controller
 
                 $result .=  '       <button type="button" class="btn text-center dropdown-item actionUpdateQuestionnaire" questionnaire-id="' . $questionnaire->id . '" data-toggle="modal" data-target="#modalCreateUpdateQuestionnaire" title="Update Questionnaire"><i class="fa fa-edit"></i> Update</button>';
                 $result .=  '       <button type="button" class="btn text-center dropdown-item actionQuestionnaireDetails" questionnaire-id="' . $questionnaire->id . '" questionnaire-revision="' . $questionnaire->revision . '" questionnaire-exam_title="' . $questionnaire->exam_title . '" questionnaire-description="' . $questionnaire->description . '" data-toggle="modal" data-target="#modalQuestionnaireDetails" title="Questionnaire Details"><i class="fa fa-list-ul"></i> Details</button>';
+                $result .=  '       <button type="button" class="btn text-center dropdown-item actionCopyQuestionnaire" questionnaire-id="' . $questionnaire->id . '" questionnaire-description="' . $questionnaire->description . '" title="Copy Questionnaire"><i class="fa fa-copy"></i>&nbsp;  Copy&emsp;</button>';
                 $result .=  '       <button type="button" class="btn text-center dropdown-item actionChangeQuestionnaireStatus" questionnaire-id="' . $questionnaire->id . '" status="1" data-toggle="modal" data-target="#modalChangeQuestionnaireStatus" title="Deactivate Questionnaire"><i class="fa fa-ban"></i> Inactive</button>';
                 $result .=  '   </div>';
                 $result .=  '</div>';
@@ -245,6 +246,90 @@ class QuestionnairesController extends Controller
         return $pdf->stream(
             'questionnaire_' . $questionnaire_detail->id . '.pdf'
         );
+    }
+
+    public function copyPreview(Request $request){
+        $request->validate([
+            'questionnaire_id' => 'required|integer'
+        ]);
+
+        $questionnaire = Questionnaires::with('questionnaire_details')
+            ->where('id', $request->questionnaire_id)
+            ->where('status', 0)
+            ->where('logdel', 0)
+            ->findOrFail($request->questionnaire_id);
+
+
+        return response()->json([
+            'data' => $questionnaire
+        ]);
+    }
+
+    public function copyQuestionnaire(Request $request){
+        $request->validate([
+            'questionnaire_id' => 'required|integer',
+            'description'      => 'required|string'
+        ]);
+
+        try {
+            $newQuestionnaire = DB::transaction(function () use ($request) {
+                // GET ORIGINAL QUESTIONNAIRE WITH DETAILS
+                $questionnaire = Questionnaires::with('questionnaire_details')
+                    ->where('id', $request->questionnaire_id)
+                    ->where('status', 0)
+                    ->where('logdel', 0)
+                    ->first();
+
+                if (!$questionnaire) {
+                    throw new \Exception('Questionnaire not found.');
+                }
+
+                /*
+                * COPY QUESTIONNAIRES TABLE
+                */
+                $newQuestionnaire = $questionnaire->replicate();
+                $newQuestionnaire->description = $request->description;
+                $newQuestionnaire->timestamps = false;
+                $newQuestionnaire->created_at = now();
+                $newQuestionnaire->updated_at = null;
+                $newQuestionnaire->save();
+
+                /*
+                * COPY QUESTIONNAIRE DETAILS TABLE
+                */
+                foreach ($questionnaire->questionnaire_details as $detail) {
+                    $newDetail = $detail->replicate();
+
+                    // connect to new questionnaire
+                    $newDetail->questionnaire_id = $newQuestionnaire->id;
+                    $newDetail->timestamps = false;
+                    $newDetail->created_at = now();
+                    $newDetail->updated_at = null;
+                    $newDetail->save();
+                }
+
+                return $newQuestionnaire;
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Questionnaire copied successfully.',
+                'id' => $newQuestionnaire->id
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Copy Questionnaire Error', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'questionnaire_id' => $request->questionnaire_id
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to copy questionnaire.'
+            ], 500);
+        }
     }
 
     // ===========================================================================================================================================================

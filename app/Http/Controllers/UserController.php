@@ -14,6 +14,7 @@ use App\Model\UserModule;
 use App\RapidXUser;
 use Auth;
 use DataTables;
+use App\Model\SystemOneSubconEmpInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -179,6 +180,7 @@ class UserController extends Controller
             $userRequestValidated = $userRequest->validated();
             $rapidxUserId = $userRequest->user_id;
             if(blank($rapidxUserId)){ //add
+
                 $userRequestValidated['created_at'] = now();
                 $userId = User::insertGetId(
                     $userRequestValidated
@@ -560,12 +562,23 @@ class UserController extends Controller
         $hris_data = DB::connection('mysql_systemone')
         ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
         $rapidxUser = RapidXUser::where('employee_number',$request->empId)->first();
+        //   $hris_data = SystemOneHrisSubcon::
+        // where('EmpNo', $request->empId)
+        // ->get();
         if(count($hris_data) > 0){
             return response()->json(['empInfo' => $hris_data, 'rapidxUser' => $rapidxUser]);
         }
         else{
-            $subcon_data = DB::connection('mysql_systemone')
-            ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
+              $subcon_data = SystemOneSubconEmpInfo::where('EmpStatus', 'Active')
+            ->where('EmpNo', $request->empId)
+            ->orderBy('DateHired', 'desc')
+            ->get();
+
+            // old code (Issue - No results returned.) - Boss Da
+            // return $subcon_data;
+            // $subcon_data = DB::connection('mysql_hris_subcon')
+            // ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
+
             return response()->json(['empInfo' => $subcon_data,'rapidxUser' => $rapidxUser]);
         }
 

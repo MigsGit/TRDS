@@ -217,7 +217,7 @@
                                 </h5>
                             </div>
 
-                            <div class="card-body">
+                            {{-- <div class="card-body">
                                 <div class="table-responsive">
                                     <table id="EmployeeTrainingRecord"
                                         class="table table-hover table-striped w-100 mb-0">
@@ -237,6 +237,79 @@
                                         <tbody></tbody>
                                     </table>
                                 </div>
+                            </div> --}}
+                            <div class="card-body">
+                                <!-- Tabs -->
+                                <ul class="nav nav-tabs" id="trainingTabs" role="tablist">
+                                    <li class="nav-item">
+                                        <button class="nav-link active"
+                                            id="trdsSummary-tab"
+                                            data-toggle="tab"
+                                            data-target="#trdsSummary"
+                                            type="button">
+                                            TRDS Summary
+                                        </button>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <button class="nav-link"
+                                            id="training-tab"
+                                            data-toggle="tab"
+                                            data-target="#training"
+                                            type="button">
+                                            Employee Training Record ( OLD FILES )
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <!-- Tab Content -->
+                                <div class="tab-content mt-3">
+                                    <!-- Tab 1 -->
+                                    <div class="tab-pane fade show active" id="trdsSummary">
+                                        <div class="table-responsive">
+                                            <table id="tableTrdsSummary"
+                                                class="table table-hover table-striped w-100 mb-0">
+                                                <thead>
+                                                    <tr class="text-center">
+                                                        <th>Date</th>
+                                                        <th>Training Title /<br> Reason for Certification</th>
+                                                        <th>Series Name / Family</th>
+                                                        <th>Station</th>
+                                                        <th>Detailed <br>Station</th>
+                                                        <th>Objective</th>
+                                                        <th>Trainor</th>
+                                                        <th>Result</th>
+                                                        <th>Venue</th>
+                                                        <th>Type of <br>Training</th>
+                                                        <th>Remarks</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tab 2 -->
+                                    <div class="tab-pane fade" id="training">
+                                        <div class="table-responsive">
+                                            <table id="tableEmployeeTrainingRecord"
+                                                class="table table-hover table-striped w-100 mb-0">
+                                                <thead>
+                                                    <tr class="text-center">
+                                                        <th>Date</th>
+                                                        <th>Title</th>
+                                                        <th>Objective</th>
+                                                        <th>Trainor</th>
+                                                        <th>Results</th>
+                                                        <th>Venue</th>
+                                                        <th>Mechanics</th>
+                                                        <th>Type of Training</th>
+                                                        <th>Remark</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -248,18 +321,16 @@
 
 @section('js_content')
     <script type="text/javascript">
-        let dataQuestionnaire
+        let dataEmployeeTrainingRecord
+        let dataTRDSSummary
         let getEmployeeTrainingRecordId = '';
+        let getEmployeeNoForTrdsSummary = '';
 
         $(document).ready(function () {
-            // ===============================================================================================================================================
-            // ================================================================ QUESTIONNAIRE ================================================================
-            // ===============================================================================================================================================
             $('.get-employee-info').select2({
                 theme: 'bootstrap-5',
                 placeholder: 'Search Employee',
                 minimumInputLength: 3,
-
                 ajax: {
                     transport: function (params, success, failure) {
                         GetEmployeeDetails(
@@ -278,10 +349,10 @@
                 }
             });
 
-            
             $('.get-employee-info').on('select2:select', function (e) {
                 const data = e.params.data;
                 console.log(data);
+                console.log('employeeNo',data.employeeNo);
 
                 $('#displayEmployeeName').text(data.text);
                 $('#displayPosition').text(data.position);
@@ -303,14 +374,16 @@
                 }
 
                 getEmployeeTrainingRecordId = data.id
-                dataQuestionnaire.draw();
+                getEmployeeNoForTrdsSummary = data.employeeNo;
+                dataEmployeeTrainingRecord.draw();
+                dataTRDSSummary.draw();
             });
-            
-            dataQuestionnaire = $("#EmployeeTrainingRecord").DataTable({
+
+            dataEmployeeTrainingRecord = $("#tableEmployeeTrainingRecord").DataTable({
                 "processing" : false,
                 "serverSide" : true,
                 "responsive": true,
-                "order": [[3, "asc"],[3, "asc"]],
+                "order": [[0, "desc"]],
                 "language": {
                     "info": "Showing _START_ to _END_ of _TOTAL_ Employee Training Record",
                     "lengthMenu": "Show _MENU_ Employee Training Record",
@@ -322,12 +395,7 @@
                     }
                 },
                 "columns": [
-                    { data: null,
-                        render: function (data, type, row) {
-                            return (row.employee_training_record_info?.PeriodFrom ?? "-") +
-                                " - " +
-                                (row.employee_training_record_info?.PeriodTo ?? "-");
-                        }   },
+                    { data: "date", defaultContent: "-" },
                     { data: "employee_training_record_info.Title", defaultContent: "-" },
                     { data: "employee_training_record_info.Objective", defaultContent: "-" },
                     { data: "employee_training_record_info.Trainor", defaultContent: "-" },
@@ -335,10 +403,39 @@
                     { data: "employee_training_record_info.Venue", defaultContent: "-" },
                     { data: "employee_training_record_info.Mechanics", defaultContent: "-" },
                     { data: "employee_training_record_info.TypeTraining", defaultContent: "-" },
-                    { data: "Remarks"
-                    }
+                    { data: "Remarks" }
                 ]
             });
+
+            // dataTRDSSummary = $("#tableTrdsSummary").DataTable({
+            //     "processing" : false,
+            //     "serverSide" : true,
+            //     "responsive": true,
+            //     "order": [[0, "desc"]],
+            //     "language": {
+            //         "info": "Showing _START_ to _END_ of _TOTAL_ TRDS Summary",
+            //         "lengthMenu": "Show _MENU_ TRDS Summary",
+            //     },
+            //     "ajax" : {
+            //         url: "view_trds_summary",
+            //         data: function (d) {
+            //             d.getEmployeeNoForTrdsSummary = getEmployeeNoForTrdsSummary;
+            //         }
+            //     },
+            //     "columns": [
+            //         { data: 'trainingDate'},
+            //         { data: 'title'},
+            //         { data: 'seriesName'},
+            //         { data: 'station'},
+            //         { data: 'detailedStation'},
+            //         { data: 'objective' },
+            //         { data: 'trainor' },
+            //         { data: 'result' },
+            //         { data: 'trainingVenue' },
+            //         { data: 'typeOfTraining' },
+            //         { data: 'training_remarks' },
+            //     ]
+            // });
         });
     </script>
 @endsection

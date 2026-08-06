@@ -685,10 +685,16 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         }
     });
 
+    //Inspector Skill Chart
     $('#btnShowExportReportModal').on('click', function (){
         const $formExport = $('#exportInspectorSkillChart');
         $formExport[0].reset();
         $('#modalExportReport').modal('show');
+    });
+
+    //Employee Skill Card
+    $('#btnShowExportPDFModal').on('click', function (){
+        window.open(`view_emp_skill_card_pdf`, '_blank');
     });
 }
 
