@@ -44,7 +44,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: false,
         autoWidth: false, // Disable default autoWidth
-        responsive: true, // Enable responsive behavior
+        responsive: false, // Enable responsive behavior
         ajax: {
             url: 'get_employee_list_by_memo_doc',
             type: 'GET',
@@ -400,11 +400,22 @@ $(document).ready(function() {
 
     });
 
-    $('#tblEmployeeListByMemoDoc').on('click', '.btnRemoveEmployeeFromMemoDoc', function(){
-        let table = $('#tblEmployeeListByMemoDoc').DataTable();
-        let row = $(this).closest('tr');
+   $('#tblEmployeeListByMemoDoc').on('click', '.btnRemoveEmployeeFromMemoDoc', function (e) {
+        e.preventDefault();
 
-        table.row(row).remove().draw(false); // no reload
+        const table = $('#tblEmployeeListByMemoDoc').DataTable();
+
+        let tr = $(this).closest('tr');
+        if (tr.hasClass('child')) {
+            tr = tr.prev();
+        }
+
+        const modalBody = $(this).closest('.modal-body');
+        const scrollTop = modalBody.scrollTop();
+
+        table.row(tr).remove().draw(false);
+
+        modalBody.scrollTop(scrollTop);
     });
 
 
