@@ -19,11 +19,8 @@ class TrainingRequestController extends Controller
 {
 
     public function getTrainingRequests(Request $request){
-        $trainingRequests = TrainingRequest::with(['section_head_user'])
-        ->where('logdel', 0)
-        ->get();
-
-        // return $trainingRequests;
+        $trainingRequests = TrainingRequest::with('section_head_user')
+        ->where('logdel', 0);
 
         $receiverUsers = User::with(['user_access_module'])
         ->whereHas('user_access_module', function ($query) {
@@ -38,15 +35,14 @@ class TrainingRequestController extends Controller
             })
             ->first();
 
-        if(!$tuHeadApproverUser){
-            $tuHeadApproverUser = null;
-        }else{
-            $tuHeadApproverUser->pluck('rapidx_emp_id');
-        }
-
         $receiverUsers->pluck('rapidx_emp_id');
 
         $filter = $request->filter;
+
+        // Default to TU Head Approval if the logged-in user is a TU Head
+        if ($tuHeadApproverUser && ($filter === null || $filter === '')) {
+            $filter = 2;
+        }
 
         if ($filter == 0) {
             $trainingRequests = $trainingRequests->where('status', 0); // For Conformance
@@ -57,6 +53,10 @@ class TrainingRequestController extends Controller
         }else{
             $trainingRequests = $trainingRequests->whereIn('status', [0, 1, 2,3]); // All
         }
+
+        $trainingRequests->orderByDesc('created_at');
+
+        // return $trainingRequests;
 
 
         return DataTables()->of($trainingRequests)
@@ -249,6 +249,7 @@ class TrainingRequestController extends Controller
                         <small class="text-muted">'.$time.'</small>
                     </div>';
         })
+
         ->rawColumns(['action', 'status', 'section_head_user','receiving', 'tu_head_approval','date_filed'])
         ->make(true);
     }
