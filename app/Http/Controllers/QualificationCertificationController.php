@@ -1495,7 +1495,7 @@ class QualificationCertificationController extends Controller
                     break;
             }
         }
-        if($params['selectPosition'] === 'Inspector'){
+        if($params['selectPosition'] === 'Operator'){
             switch (true) {
                 case ($params['approval_status'] === 'PB'):
                     $newStatus = 'APRODTO';
@@ -1591,6 +1591,47 @@ class QualificationCertificationController extends Controller
         } catch (Exception $e) {
             throw $e;
         }
+    }
+     public function getDropdownMasterDetailsByFkid(Request $request){
+
+        try {
+         $data = DropdownMasterDetail::
+            where('dropdown_masters_id', $request->dropdown_masters_id)
+            ->where('status',1)
+            ->get(['dropdown_masters_details','id']);
+            $masterDetails = collect($data)->map(function($rowMasterDetails){
+
+                   return [
+                        'id'=> $rowMasterDetails['id'],
+                        'text'=> $rowMasterDetails['dropdown_masters_details'],
+                    ];
+            });
+            return response()->json(['is_success' => 'true', 'data' => $masterDetails]);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    public function generateControlNumber($params){
+        date_default_timezone_set('Asia/Manila');
+        //Systemon HRIS / Subcon
+
+        $qcSlip = QcSlip::orderBy('id','desc')->whereYear('created_at',now())
+        ->where('position_category',$params['positionCategory'])
+        ->whereNull('deleted_at')
+        ->limit(1)->get(['control_no']);
+
+        if(count( $qcSlip ) != 0){
+            $currentCtrlNo = explode('-',$qcSlip[0]->control_no);
+            $arrCtrNo		 	= end($currentCtrlNo);
+            $series 	 	= str_pad(($arrCtrNo+1),3,"0",STR_PAD_LEFT);
+            $currentCtrlNo = $params['section']."-".$params['selectSection']."-".date('m').date('y').'-'.$series;
+
+        }else{
+            $currentCtrlNo = $params['section']."-".$params['selectSection']."-".date('m').date('y').'-001';
+        }
+        return [
+            'currentCtrlNo' => $currentCtrlNo
+        ];
     }
 }
 
