@@ -2163,37 +2163,6 @@
                 positionCategory: $('#text_select_position').val(),
             }
             getApprovalStatusToggle(params)
-
-            // if(approvalStatus === 'OPERQCAPP' || approvalStatus === 'LQCHEADAPP'){
-            //     // alert('true')
-            //     $('.operApproved').removeClass('d-none');
-            // }else{
-            //     // alert('false')
-            //     $('.operApproved').addClass('d-none');
-            //     $('.btnSaveInspector').removeClass('d-none');
-            // }
-            // $('.operSave').removeClass('d-none');
-            // $('#div_Oper').removeClass('d-none');
-            form.formSubmitOper[0].reset();
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-            ],1);
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_operator_product_line',
-            ],2);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_ps_oper',
-            ],4);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_es_oper',
-            ],5);
-            $('#seriesDesignation').text('Series Name');
-            $('#productLine').removeClass('d-none');
-            $('#dateOfTransfer').addClass('d-none');
-            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
-
         }
         const selectInspectorValidation = () => {
             let approvalStatus = $('#approval_status').val();
@@ -2202,31 +2171,6 @@
                 positionCategory: $('#text_select_position').val(),
             }
             getApprovalStatusToggle(params)
-            // if(approvalStatus === 'LQCHEADAPP'){
-            //     $('.operApproved').removeClass('d-none');
-            // }else{
-            //     $('.operApproved').addClass('d-none');
-            //     $('.btnSaveInspector').removeClass('d-none');
-            // }
-            // $('#divInspector').removeClass('d-none');
-            form.formSubmitInspector[0].reset();
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-            ],7);
-
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_ps_oper',
-            ],4);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_es_oper',
-            ],5);
-            $('#seriesDesignation').text('Designation');
-            $('#productLine').addClass('d-none');
-            $('#dateOfTransfer').removeClass('d-none');
-
-            form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
         }
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');

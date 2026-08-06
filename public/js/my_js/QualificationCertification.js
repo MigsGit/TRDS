@@ -42,6 +42,25 @@
             $('#seriesDesignation').text('Series');
              $('#dateOfTransfer').addClass('d-none');
 
+            form.formSubmitOper[0].reset();
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_operator_product_line',
+            ],2);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_ps_oper',
+            ],4);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_es_oper',
+            ],5);
+            $('#seriesDesignation').text('Series Name');
+            $('#productLine').removeClass('d-none');
+            $('#dateOfTransfer').addClass('d-none');
+            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            $('#btnEmployeeOperator').prop('disabled',false);
             if(positionCategory === 'Operator'){
                 $('#productLine').removeClass('d-none');
                 $('#div_Oper').removeClass('d-none');
@@ -92,6 +111,24 @@
                 $('#divInspector').removeClass('d-none');
                 $('.btnSaveInspector').removeClass('d-none');
                 // $('.inspectorSave').removeClass('d-none')
+                form.formSubmitInspector[0].reset();
+                initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_station_to',
+                    '#text_oper_station_from',
+                ],7);
+
+                initDropdownMasterDetailsByFkidCombos([
+                        '#text_training_orientation_ps_oper',
+                ],4);
+                initDropdownMasterDetailsByFkidCombos([
+                        '#text_training_orientation_es_oper',
+                ],5);
+                $('#seriesDesignation').text('Designation');
+                $('#productLine').addClass('d-none');
+                $('#dateOfTransfer').removeClass('d-none');
+
+                form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+                $('#btnEmployeeOperator').prop('disabled',false);
                 if(approvalStatus !='LQCHEADAPP'){
                     $('.inspectorSave').removeClass('d-none')
                 }

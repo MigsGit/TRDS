@@ -683,10 +683,10 @@ class CommonController extends Controller
         //     $header = "Your ECR has been approved";
         // }else{
             // }
-        if($qcSlip->approval_status === "QCAPP"){
-            $header = "Please see the Certification/Qualification for your update.";
-        }else{
+        if($qcSlip->approval_status === "OK"){
             $header = "Please see the APPROVED Certification/Qualification.";
+        }else{
+            $header = "Please see the Certification/Qualification for your update.";
         }
         return $msg = '<!DOCTYPE html>
             <html>
