@@ -39,7 +39,7 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
             // Map Approvers
             $approvers = collect($slip->op_approvers);
             switch ($this->category) {
-                case 'OPERATOR':
+                case 'Operator':
                     $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
                     $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
                     $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
