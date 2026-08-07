@@ -2,6 +2,11 @@
 @extends($layout)
 @section('title', 'Training Request')
 @section('content_page')
+<style>
+    .card-body {
+       max-height: 80vh; overflow-y: auto;
+    }
+</style>
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -69,68 +74,70 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="col-sm-12">
-                        <div class="form-group">
-                            <label>Ctrl No</label>
-                            <input type="text" class="form-control" name="trainingAttendanceCtrlNo" id="trainingAttendanceCtrlNo" readonly>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-3">
+                    <div class="card-body">
+                        <div class="col-sm-12">
                             <div class="form-group">
-                                <label>From</label>
-                                <input type="date" class="form-control" name="fromDate" id="fromDate" value="<?php echo date('Y-m-d'); ?>">
+                                <label>Ctrl No</label>
+                                <input type="text" class="form-control" name="trainingAttendanceCtrlNo" id="trainingAttendanceCtrlNo" readonly>
                             </div>
                         </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>To</label>
-                                <input type="date" class="form-control" name="toDate" id="toDate" value="<?php echo date('Y-m-d'); ?>">
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>Present Count</label>
-                                <input type="number" class="form-control" id="presentCount" readonly>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>Absent Count</label>
-                                <input type="number" class="form-control" id="absentCount" readonly>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label>From</label>
+                                    <input type="date" class="form-control" name="fromDate" id="fromDate" value="<?php echo date('Y-m-d'); ?>">
                                 </div>
-                        </div>
-                        {{-- <div class="col-sm-2">
-                            <div class="form-group">
-                                <label>Total Manhours</label>
-                                <input type="number" class="form-control" id="totalManHours" readonly>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label>To</label>
+                                    <input type="date" class="form-control" name="toDate" id="toDate" value="<?php echo date('Y-m-d'); ?>">
                                 </div>
-                        </div> --}}
-                    </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label>Present Count</label>
+                                    <input type="number" class="form-control" id="presentCount" readonly>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label>Absent Count</label>
+                                    <input type="number" class="form-control" id="absentCount" readonly>
+                                    </div>
+                            </div>
+                            {{-- <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label>Total Manhours</label>
+                                    <input type="number" class="form-control" id="totalManHours" readonly>
+                                    </div>
+                            </div> --}}
+                        </div>
 
-                    <table class="table table-sm table-bordered" id="tblTrainingAttendanceRequest" style="width: 100%;">
-                        <thead>
-                            <tr>
-                                <th>Status</th>
-                                <th>Employee No</th>
-                                <th>Name</th>
-                                <th>Date</th>
-                                <th>Time In</th>
-                                <th>Time Out</th>
-                                <th>Training Hours</th>
-                                <th>Reason/Remarks of Absence</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th colspan="6">Training Hours Total</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
-                    </table>
+                        <table class="table table-sm table-bordered" id="tblTrainingAttendanceRequest" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Employee No</th>
+                                    <th>Name</th>
+                                    <th>Date</th>
+                                    <th>Time In</th>
+                                    <th>Time Out</th>
+                                    <th>Training Hours</th>
+                                    <th>Reason/Remarks of Absence</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="6">Training Hours Total</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
             </div>
             <!-- /.modal-content -->

@@ -57,7 +57,6 @@ class QualificationCertificationController extends Controller
     {
         return $request->input($key) ?? $default;
     }
-
     /**
      * Safely collect an array/scalar request field and join items with $separator.
      * Returns $default when the field is absent, null, or empty.
@@ -70,7 +69,6 @@ class QualificationCertificationController extends Controller
         }
         return collect((array) $value)->filter()->join($separator);
     }
-
     public function saveQcLqcTrainingItemsByQcSlipId(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');
@@ -978,7 +976,7 @@ class QualificationCertificationController extends Controller
         ->editColumn('item_name', function ($row) {
             $html = '<strong>' . e($row['item_name']) . '</strong>';
             $lower = strtolower($row['item_name']);
-            if (str_contains($lower, 'systems and procedure') || str_contains($lower, 'work instruction') || str_contains($lower,'point panel inspection guide')) {
+            if (str_contains($lower, 'systems and procedure') || str_contains($lower, 'work instruction') || str_contains($lower,'point panel')) {
                 $html .= '<br><input type="text" class="form-control form-control-sm mt-1 input-sub-desc"
                               data-item-id="' . $row['id'] . '"
                               placeholder="Details..."

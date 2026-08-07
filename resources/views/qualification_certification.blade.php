@@ -162,11 +162,10 @@
                                     <select class="form-control select2bs4" style="width: 100%;" style="width: 100%" name="text_select_position" id="text_select_position">
                                         <option value="" selected disabled>Select Position</option>
                                         <option value="Operator">Operator</option>
-                                        <option value="Inspector" selected>Inspector</option>
-
+                                        <option value="Inspector">Inspector</option>
+                                        <option value="Technician" selected>Technician</option>
                                         {{--
                                          <option value="MH">MH</option>
-                                        <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
                                         <option value="Engineer">Engineer</option>
                                         <option value="Planner">Planner</option>
@@ -1687,8 +1686,13 @@
                                     {{-- <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button> --}}
                                 </div>
                             </form>
-                            @include('qualification_certification.modal_qualification_certification_mh')
-                            @include('qualification_certification.modal_qualification_certification_inspector')
+                            {{-- @include('qualification_certification.modal_qualification_certification_mh') --}}
+                            <div class="d-none" id="divInspector">
+                                @include('qualification_certification.modal_qualification_certification_inspector')
+                            </div>
+                            <div class="d-none" id="divTechnician">
+                                {{-- @include('qualification_certification.modal_qualification_certification_technician') --}}
+                            </div>
                             <div class="modal-footer justify-content-end operApproved">
                                 <button type="button" class="btn btn-success" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
                             </div>
@@ -2047,7 +2051,7 @@
                     $('#divMH').removeClass('d-none');
                     break;
                 case 'Technician':
-                    $('#divTechnian').removeClass('d-none');
+                    $('#divTechnician').removeClass('d-none');
                     break;
                 case 'Supervisor':
                 case 'Engineer':
@@ -2157,80 +2161,32 @@
             // });
         });
 
-        const selectOperatorValidation = () => {
-            let approvalStatus = $('#approval_status').val();
-            let params = {
-                approvalStatus: approvalStatus,
-                positionCategory: $('#text_select_position').val(),
-            }
-            getApprovalStatusToggle(params)
-
-            // if(approvalStatus === 'OPERQCAPP' || approvalStatus === 'LQCHEADAPP'){
-            //     // alert('true')
-            //     $('.operApproved').removeClass('d-none');
-            // }else{
-            //     // alert('false')
-            //     $('.operApproved').addClass('d-none');
-            //     $('.btnSaveInspector').removeClass('d-none');
-            // }
-            // $('.operSave').removeClass('d-none');
-            // $('#div_Oper').removeClass('d-none');
-            form.formSubmitOper[0].reset();
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-            ],1);
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_operator_product_line',
-            ],2);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_ps_oper',
-            ],4);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_es_oper',
-            ],5);
-            $('#seriesDesignation').text('Series Name');
-            $('#productLine').removeClass('d-none');
-            $('#dateOfTransfer').addClass('d-none');
-            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
-
-        }
-        const selectInspectorValidation = () => {
-            let approvalStatus = $('#approval_status').val();
-            let params = {
-                approvalStatus: approvalStatus,
-                positionCategory: $('#text_select_position').val(),
-            }
-            getApprovalStatusToggle(params)
-            // if(approvalStatus === 'LQCHEADAPP'){
-            //     $('.operApproved').removeClass('d-none');
-            // }else{
-            //     $('.operApproved').addClass('d-none');
-            //     $('.btnSaveInspector').removeClass('d-none');
-            // }
-            // $('#divInspector').removeClass('d-none');
-            form.formSubmitInspector[0].reset();
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-            ],7);
-
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_ps_oper',
-            ],4);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_es_oper',
-            ],5);
-            $('#seriesDesignation').text('Designation');
-            $('#productLine').addClass('d-none');
-            $('#dateOfTransfer').removeClass('d-none');
-
-            form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
-        }
+        // const selectOperatorValidation = () => {
+        //     let approvalStatus = $('#approval_status').val();
+        //     let params = {
+        //         approvalStatus: approvalStatus,
+        //         positionCategory: $('#text_select_position').val(),
+        //     }
+        //     getApprovalStatusToggle(params)
+        // }
+        // const selectInspectorValidation = () => {
+        //     let approvalStatus = $('#approval_status').val();
+        //     let params = {
+        //         approvalStatus: approvalStatus,
+        //         positionCategory: $('#text_select_position').val(),
+        //     }
+        //     getApprovalStatusToggle(params)
+        // }
+        // const selectInspectorValidation = () => {
+        //     let approvalStatus = $('#approval_status').val();
+        //     let params = {
+        //         approvalStatus: approvalStatus,
+        //         positionCategory: $('#text_select_position').val(),
+        //     }
+        //     getApprovalStatusToggle(params)
+        // }
         var $positionSelect = $('#text_select_position');
-        var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
+        var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
 
         // $positionSelect.click(function () {
         //     alert('click');
@@ -2262,30 +2218,35 @@
             initDropdownMasterDetailsByFkidCombos([
                     '#transfer_flexibility',
             ],6);
-
+            let approvalStatus = $('#approval_status').val();
+            let params = {
+                approvalStatus: approvalStatus,
+                positionCategory: $('#text_select_position').val(),
+            }
+            getApprovalStatusToggle(params)
             // $('.inspectorSave').addClass('d-none');
             // $('.operSave').addClass('d-none');
             // $('.operApproved').addClass('d-none');
             // $('.btnSaveInspector').addClass('d-none');
-            switch (position) {
-                case 'MH':
-                    $('#divMH').removeClass('d-none');
-                    break;
-                case 'Technician':
-                    $('#divTechnian').removeClass('d-none');
-                    break;
-                case 'Supervisor':
-                case 'Engineer':
-                case 'Planner':
-                    $('#divSEP').removeClass('d-none');
-                    break;
-                case 'Inspector':
-                    selectInspectorValidation();
-                    break;
-                case 'Operator':
-                    selectOperatorValidation();
-                    break;
-            }
+            // switch (position) {
+            //     case 'MH':
+            //         $('#divMH').removeClass('d-none');
+            //         break;
+            //     case 'Technician':
+            //         $('#divTechnician').removeClass('d-none');
+            //         break;
+            //     case 'Supervisor':
+            //     case 'Engineer':
+            //     case 'Planner':
+            //         $('#divSEP').removeClass('d-none');
+            //         break;
+            //     case 'Inspector':
+            //         selectInspectorValidation();
+            //         break;
+            //     case 'Operator':
+            //         selectOperatorValidation();
+            //         break;
+            // }
 
         }
         initDivDeptSecCombos([
