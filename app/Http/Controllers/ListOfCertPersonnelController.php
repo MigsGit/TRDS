@@ -21,70 +21,14 @@ class ListOfCertPersonnelController extends Controller
 
         $section = $qcslips->pluck('section_category')->unique()->values()->toArray();
         $series = $qcslips->pluck('series_name')->unique()->values()->toArray();
-
         $product_line = $qcslips->pluck('product_line_details')->unique()->values()->toArray();
+        $position = $qcslips->pluck('position_category')->unique()->values()->toArray();
 
 
-        return response()->json(['section' => $section, 'series' => $series, 'product_line' => $product_line, 'qcslips' => $qcslips]);
+        return response()->json(['section' => $section, 'series' => $series, 'product_line' => $product_line, 'qcslips' => $qcslips, 'position' => $position]);
     }
 
     public function exportListCertPersonnel(Request $request){
-    //     $personel = QcSlip::with([
-    //         'product_line_details',
-    //         'op_approvers',
-    //         'qc_slip_employees',
-    //         'qc_slip_employees.system_one_subcon_emp_info',
-    //         'qc_slip_employees.system_one_hris_emp_info',
-    //         // 'qc_slip_employees.system_one_hris_subcon',
-    //         'qc_slip_employees.get_station_to',
-    //         'qc_reason_certification'
-    //     ])
-    //     ->whereNull('deleted_at')
-    //     ->where('status', 'OK')
-    //     ->where('section_category', $request->section)
-    //     ->where('product_line', $request->product_line)
-    //     ->get()
-    //     ->groupBy('position_category');
-
-    //     // Getting the reason details for each slip in a single query to avoid N+1 problem
-    //     // Step 1: Add reason IDs as an array to each slip object in the group
-    //     $personel->transform(function ($group) {
-    //         return $group->map(function ($slip) {
-    //             $rawReasons = optional($slip->qc_reason_certification)->reason_of_certification;
-                
-    //             // Converts "211 | 212 | 213" to ["211", "212", "213"]
-    //             $slip->reason_of_certification_ids = $rawReasons 
-    //                 ? array_map('trim', explode('|', $rawReasons)) 
-    //                 : [];
-
-    //             return $slip;
-    //         });
-    //     });
-
-    //     // Step 2: Extract ALL unique IDs across all groups to run ONE efficient batch query
-    //     $allReasonIds = $personel->flatten(1)
-    //         ->pluck('reason_of_certification_ids')
-    //         ->flatten()
-    //         ->unique()
-    //         ->filter()
-    //         ->values();
-
-    //     // Execute your 2nd query (Replace `ReasonDetail` with your actual Model name)
-    //     $reasonDetails = DropdownMasterDetail::whereIn('id', $allReasonIds)->get();
-    //    // Step 3: Attach the queried details directly inside each slip object
-    //     $personel->transform(function ($group) use ($reasonDetails) {
-    //         return $group->map(function ($slip) use ($reasonDetails) {
-    //             $slip->reason_details = collect($slip->reason_of_certification_ids)
-    //                 ->map(function ($id) use ($reasonDetails) {
-    //                     return $reasonDetails->firstWhere('id', $id);
-    //                 })
-    //                 ->filter()
-    //                 ->values();
-
-    //             return $slip;
-    //         });
-    //     });
-
         // ==========================================
         // 1. QUERY QC SLIPS WITH RELATIONS
         // ==========================================
@@ -101,9 +45,10 @@ class ListOfCertPersonnelController extends Controller
             ->where('status', 'OK')
             ->where('section_category', $request->section)
             ->where('product_line', $request->product_line)
+            ->where('series_name', $request->series)
+            ->where('position_category', $request->position)
             ->get()
             ->groupBy('position_category');
-
         // ==========================================
         // 2. REASON OF CERTIFICATION BATCH QUERY
         // ==========================================
@@ -226,61 +171,6 @@ class ListOfCertPersonnelController extends Controller
             ];
         };
 
-        // ==========================================
-        // 5. LOOP AND MAP FINAL OUTPUT
-        // ==========================================
-        // return response()->json(['personel' => $personel]);
-        // foreach ($personel as $positionCategory => $slipsGroup) {
-        //     if ($personel->has('Operator')) {
-        //         foreach ($personel['Operator'] as $slip) {
-        //             $productLine = $slip->product_line_details->dropdown_masters_details ?? '';
-        //             // Map Approvers
-        //             $approvers = collect($slip->op_approvers);
-        //             $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
-        //             $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
-        //             $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
-
-
-        //             // Formatted approvers with SystemOneHrisSubcon models
-        //             $prod = $formatApprover($prodApp);
-        //             $eng  = $formatApprover($engApp);
-        //             $qc   = $formatApprover($qcApp);
-
-        //             $prodApp->formatted = $prod;
-        //             $engApp->formatted  = $eng;
-        //             $qcApp->formatted   = $qc;
-
-        //             // $prod['name'], $eng['name'], and $qc['name'] now hold an array 
-        //             // of SystemOneHrisSubcon models corresponding to the selected approvers.
-        //         }
-        //     }
-        //     if ($personel->has('Inspector')) {
-        //         foreach ($personel['Inspector'] as $slip) {
-        //             $productLine = $slip->product_line_details->dropdown_masters_details ?? '';
-
-        //             // Map Approvers
-        //             $approvers = collect($slip->op_approvers);
-
-        //             // $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
-        //             // $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
-        //             $qcApp   = $approvers->firstWhere('approval_status', 'ALQCTQ');
-
-
-        //             // Formatted approvers with SystemOneHrisSubcon models
-        //             // $prod = $formatApprover($prodApp);
-        //             // $eng  = $formatApprover($engApp);
-        //             $qc   = $formatApprover($qcApp);
-
-        //             // $prodApp->formatted = $prod;
-        //             // $engApp->formatted  = $eng;
-        //             $qcApp->formatted   = $qc;
-
-        //             // $prod['name'], $eng['name'], and $qc['name'] now hold an array 
-        //             // of SystemOneHrisSubcon models corresponding to the selected approvers.
-        //         }
-        //     }
-        // }
-
         $roleStatusMapping = [
             'Operator'  => ['APRODTO', 'BENGGTQ', 'CQCC'],
             'Inspector' => ['ALQCTQ'],
@@ -319,8 +209,11 @@ class ListOfCertPersonnelController extends Controller
 
         $prod_line = DropdownMasterDetail::where('id', $request->product_line)->first();
         $product_line = $prod_line->dropdown_masters_details ?? '';
-        $filename = "Certified_Personnel_List_{$request->section}_{$product_line}.xlsx";
+        $filename = "Certified_Personnel_List_{$request->position}_{$request->section}_{$product_line}_{$request->series}.xlsx";
         // return response()->json(['personel_toexport' => $personel]);
-        return Excel::download(new CertifiedPersonnelExport($personel), $filename);
+        if($personel->isEmpty()){
+            return view('errors.404', ['message' => 'No data found for the selected criteria. Please adjust your filters and try again.']);
+        }
+        return Excel::download(new CertifiedPersonnelExport($personel, $request->position), $filename);
     }
 }
