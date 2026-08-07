@@ -1,7 +1,7 @@
 <?php
 namespace App\Exports;
 
-use App\Exports\CertifiedPersonnelCategorySheetExport;
+use App\Exports\CertifiedPersonnelSheets\CertifiedPersonnelSheetExport;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 class CertifiedPersonnelExport implements WithMultipleSheets
@@ -26,7 +26,7 @@ class CertifiedPersonnelExport implements WithMultipleSheets
                 return strtoupper($key) === $category;
             }) ?? collect();
 
-            $sheets[] = new CertifiedPersonnelCategorySheetExport($category, $slips);
+            $sheets[] = new CertifiedPersonnelSheetExport($category, $slips);
         }
 
         return $sheets;
