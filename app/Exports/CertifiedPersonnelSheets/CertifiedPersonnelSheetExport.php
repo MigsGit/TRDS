@@ -1,5 +1,5 @@
 <?php
-namespace App\Exports;
+namespace App\Exports\CertifiedPersonnelSheets;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class CertifiedPersonnelCategorySheetExport implements FromView, WithTitle, ShouldAutoSize, WithStyles
+class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSize, WithStyles
 {
     protected $category;
     protected $qcSlips;
@@ -33,12 +33,36 @@ class CertifiedPersonnelCategorySheetExport implements FromView, WithTitle, Shou
         foreach ($this->qcSlips as $slip) {
             $productLine = $slip->product_line_details->dropdown_masters_details ?? '';
 
+            $prodApp = null;
+            $engApp  = null;
+            $qcApp   = null;
             // Map Approvers
             $approvers = collect($slip->op_approvers);
-
-            $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
-            $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
-            $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
+            switch ($this->category) {
+                case 'OPERATOR':
+                    $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
+                    $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
+                    $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
+                    break;
+                case 'INSPECTOR':
+                    $qcApp = $approvers->firstWhere('approval_status', 'ALQCTQ');
+                    break;
+                case 'OPTECH':
+                    // $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
+                    // $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
+                    // $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
+                    break;
+                case 'TECHNICIAN':
+                    // $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
+                    // $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
+                    // $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
+                    break;
+                default:
+                    // Default to OPERATOR approvers if category doesn't match
+                    // $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
+                    // $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
+                    // $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
+            }
 
             $formatApprover = function ($app) {
                 if (!$app) return ['name' => '', 'date' => ''];
