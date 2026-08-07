@@ -129,6 +129,7 @@
 
                 form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
                 $('#btnEmployeeOperator').prop('disabled',false);
+                
                 if(approvalStatus !='LQCHEADAPP'){
                     $('.inspectorSave').removeClass('d-none')
                 }
