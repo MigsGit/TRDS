@@ -27,25 +27,20 @@
     // ==========================================
 
     const getApprovalStatusToggle = (params) => {
-
         let approvalStatus = params.approvalStatus;
         let positionCategory = params.positionCategory;
         console.log();
 
-            $('#div_Oper').addClass('d-none');
             $('.inspectorSave').addClass('d-none');
             $('.operSave').addClass('d-none');
             $('.operApproved').addClass('d-none');
-            $('#seriesDesignation').text('Series');
-            $('#productLine').addClass('d-none');
-
+            $('.btnSaveInspector').addClass('d-none')
+            $('#div_Oper').addClass('d-none');
             $('#divInspector').addClass('d-none');
             $('#text_date_of_transfer').addClass('d-none');
-            $('#dateOfTransfer').addClass('d-none');
-            $('.btnSaveInspector').addClass('d-none');
-
-
-            $('#divTechnician').addClass('d-none');
+            $('#productLine').addClass('d-none');
+            $('#seriesDesignation').text('Series');
+             $('#dateOfTransfer').addClass('d-none');
 
             if(positionCategory === 'Operator'){
                 $('#productLine').removeClass('d-none');
@@ -53,25 +48,6 @@
                 $('.btn-link').removeClass('show');
                 $('#collapseOneOper').removeClass('show');
                 $('.operSave').removeClass('d-none');
-                form.formSubmitOper[0].reset();
-                initDropdownMasterDetailsByFkidCombos([
-                    '#text_oper_station_to',
-                    '#text_oper_station_from',
-                ],1);
-                initDropdownMasterDetailsByFkidCombos([
-                    '#text_operator_product_line',
-                ],2);
-                initDropdownMasterDetailsByFkidCombos([
-                        '#text_training_orientation_ps_oper',
-                ],4);
-                initDropdownMasterDetailsByFkidCombos([
-                        '#text_training_orientation_es_oper',
-                ],5);
-                $('#seriesDesignation').text('Series Name');
-                $('#productLine').removeClass('d-none');
-                $('#dateOfTransfer').addClass('d-none');
-                form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-                $('#btnEmployeeOperator').prop('disabled',false);
                 if(approvalStatus ==='APRODTO'){
                     $('#collapseOneOper').addClass('show');
                 }
@@ -109,34 +85,13 @@
                     // $('.inspectorSave').addClass('d-none');
                 }
             }
-            if(positionCategory === 'Technician'){
-
-                $('#divTechnician').removeClass('d-none');
-            }
             if(positionCategory === 'Inspector'){
                 $('#dateOfTransfer').removeClass('d-none');
                 $('#text_date_of_transfer').removeClass('d-none');
                 $('#seriesDesignation').text('Designation');
                 $('#divInspector').removeClass('d-none');
                 $('.btnSaveInspector').removeClass('d-none');
-                form.formSubmitInspector[0].reset();
-                initDropdownMasterDetailsByFkidCombos([
-                    '#text_oper_station_to',
-                    '#text_oper_station_from',
-                ],7);
-
-                initDropdownMasterDetailsByFkidCombos([
-                        '#text_training_orientation_ps_oper',
-                ],4);
-                initDropdownMasterDetailsByFkidCombos([
-                        '#text_training_orientation_es_oper',
-                ],5);
-                $('#seriesDesignation').text('Designation');
-                $('#productLine').addClass('d-none');
-                $('#dateOfTransfer').removeClass('d-none');
-
-                form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-                $('#btnEmployeeOperator').prop('disabled',false);
+                // $('.inspectorSave').removeClass('d-none')
                 if(approvalStatus !='LQCHEADAPP'){
                     $('.inspectorSave').removeClass('d-none')
                 }
@@ -184,7 +139,7 @@
                     $('#divMH').removeClass('d-none');
                     break;
                 case 'Technician':
-                    $('#divTechnician').removeClass('d-none');
+                    $('#divTechnian').removeClass('d-none');
                     break;
                 case 'Supervisor':
                 case 'Engineer':
