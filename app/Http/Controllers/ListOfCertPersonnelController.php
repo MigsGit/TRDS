@@ -18,6 +18,7 @@ class ListOfCertPersonnelController extends Controller
             'product_line_details'
         ])
         ->whereNull('deleted_at')->get();
+
         $section = $qcslips->pluck('section_category')->unique()->values()->toArray();
         $series = $qcslips->pluck('series_name')->unique()->values()->toArray();
 
@@ -102,8 +103,6 @@ class ListOfCertPersonnelController extends Controller
             ->where('product_line', $request->product_line)
             ->get()
             ->groupBy('position_category');
-
-        // $this->qcSlips = $personel;
 
         // ==========================================
         // 2. REASON OF CERTIFICATION BATCH QUERY
@@ -230,36 +229,98 @@ class ListOfCertPersonnelController extends Controller
         // ==========================================
         // 5. LOOP AND MAP FINAL OUTPUT
         // ==========================================
-        foreach ($personel as $positionCategory => $slipsGroup) {
-            foreach ($slipsGroup as $slip) {
-                $productLine = $slip->product_line_details->dropdown_masters_details ?? '';
+        // return response()->json(['personel' => $personel]);
+        // foreach ($personel as $positionCategory => $slipsGroup) {
+        //     if ($personel->has('Operator')) {
+        //         foreach ($personel['Operator'] as $slip) {
+        //             $productLine = $slip->product_line_details->dropdown_masters_details ?? '';
+        //             // Map Approvers
+        //             $approvers = collect($slip->op_approvers);
+        //             $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
+        //             $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
+        //             $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
 
-                // Map Approvers
-                $approvers = collect($slip->op_approvers);
 
-                $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
-                $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
-                $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
+        //             // Formatted approvers with SystemOneHrisSubcon models
+        //             $prod = $formatApprover($prodApp);
+        //             $eng  = $formatApprover($engApp);
+        //             $qc   = $formatApprover($qcApp);
+
+        //             $prodApp->formatted = $prod;
+        //             $engApp->formatted  = $eng;
+        //             $qcApp->formatted   = $qc;
+
+        //             // $prod['name'], $eng['name'], and $qc['name'] now hold an array 
+        //             // of SystemOneHrisSubcon models corresponding to the selected approvers.
+        //         }
+        //     }
+        //     if ($personel->has('Inspector')) {
+        //         foreach ($personel['Inspector'] as $slip) {
+        //             $productLine = $slip->product_line_details->dropdown_masters_details ?? '';
+
+        //             // Map Approvers
+        //             $approvers = collect($slip->op_approvers);
+
+        //             // $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
+        //             // $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
+        //             $qcApp   = $approvers->firstWhere('approval_status', 'ALQCTQ');
 
 
-                // Formatted approvers with SystemOneHrisSubcon models
-                $prod = $formatApprover($prodApp);
-                $eng  = $formatApprover($engApp);
-                $qc   = $formatApprover($qcApp);
+        //             // Formatted approvers with SystemOneHrisSubcon models
+        //             // $prod = $formatApprover($prodApp);
+        //             // $eng  = $formatApprover($engApp);
+        //             $qc   = $formatApprover($qcApp);
 
-                $prodApp->formatted = $prod;
-                $engApp->formatted  = $eng;
-                $qcApp->formatted   = $qc;
+        //             // $prodApp->formatted = $prod;
+        //             // $engApp->formatted  = $eng;
+        //             $qcApp->formatted   = $qc;
 
-                // $prod['name'], $eng['name'], and $qc['name'] now hold an array 
-                // of SystemOneHrisSubcon models corresponding to the selected approvers.
+        //             // $prod['name'], $eng['name'], and $qc['name'] now hold an array 
+        //             // of SystemOneHrisSubcon models corresponding to the selected approvers.
+        //         }
+        //     }
+        // }
+
+        $roleStatusMapping = [
+            'Operator'  => ['APRODTO', 'BENGGTQ', 'CQCC'],
+            'Inspector' => ['ALQCTQ'],
+        ];
+
+        foreach ($roleStatusMapping as $role => $statuses) {
+            if (!$personel->has($role)) {
+                continue;
+            }
+
+            foreach ($personel[$role] as $slip) {
+                // Single-pass indexing: group approvers by approval_status O(N) instead of multiple O(N) searches
+                $approversByStatus = [];
+                foreach ($slip->op_approvers ?? [] as $approver) {
+                    $status = is_object($approver) ? $approver->approval_status : ($approver['approval_status'] ?? null);
+                    if ($status) {
+                        $approversByStatus[$status] = $approver;
+                    }
+                }
+
+                // Safely format and attach to matching approvers
+                foreach ($statuses as $status) {
+                    if (isset($approversByStatus[$status])) {
+                        $approver = $approversByStatus[$status];
+                        $formatted = $formatApprover($approver);
+
+                        if (is_object($approver)) {
+                            $approver->formatted = $formatted;
+                        } else {
+                            $approver['formatted'] = $formatted;
+                        }
+                    }
+                }
             }
         }
 
         $prod_line = DropdownMasterDetail::where('id', $request->product_line)->first();
         $product_line = $prod_line->dropdown_masters_details ?? '';
         $filename = "Certified_Personnel_List_{$request->section}_{$product_line}.xlsx";
-        // return response()->json(['personel' => $personel]);
+        // return response()->json(['personel_toexport' => $personel]);
         return Excel::download(new CertifiedPersonnelExport($personel), $filename);
     }
 }

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 class QcSlipEmployee extends Model
 {
     use HasFactory;
+    protected $appends = ['employee_info'];
 
     protected $fillable = [
         'qc_slips_id',
@@ -26,6 +27,8 @@ class QcSlipEmployee extends Model
         'second_take_ins_sequence',
         'second_take_ins_assessment_result',
     ];
+
+    
 
     /**
      * Get the user associated with the QcSlipEmployee
@@ -62,6 +65,13 @@ class QcSlipEmployee extends Model
     {
         return $this->belongsTo(QcSlip::class, 'qc_slips_id');
     }
+    
+    public function getEmployeeInfoAttribute() // Chris
+    {
+        // Returns subcon if present; otherwise falls back to hris
+        return $this->system_one_subcon_emp_info ?? $this->system_one_hris_emp_info;
+    }
+
 
 
 }
