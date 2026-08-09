@@ -19,10 +19,10 @@ class ListOfCertPersonnelController extends Controller
         ])
         ->whereNull('deleted_at')->get();
 
-        $section = $qcslips->pluck('section_category')->unique()->values()->toArray();
-        $series = $qcslips->pluck('series_name')->unique()->values()->toArray();
-        $product_line = $qcslips->pluck('product_line_details')->unique()->values()->toArray();
-        $position = $qcslips->pluck('position_category')->unique()->values()->toArray();
+        $section = $qcslips->pluck('section_category')->filter()->unique()->values()->toArray();
+        $series = $qcslips->pluck('series_name')->filter()->unique()->values()->toArray();
+        $product_line = $qcslips->pluck('product_line_details')->filter()->unique()->values()->toArray();
+        $position = $qcslips->pluck('position_category')->filter()->unique()->values()->toArray();
 
 
         return response()->json(['section' => $section, 'series' => $series, 'product_line' => $product_line, 'qcslips' => $qcslips, 'position' => $position]);
