@@ -2038,53 +2038,6 @@
                 }
             },$form);
         }
-        $('#formSendEmail').click(function (e) {
-            e.preventDefault();
-            let position = $('#text_select_position').val();
-               switch (position) {
-                case 'MH':
-                    $('#divMH').removeClass('d-none');
-                    break;
-                case 'Technician':
-                    $('#divTechnian').removeClass('d-none');
-                    break;
-                case 'Supervisor':
-                case 'Engineer':
-                case 'Planner':
-                    $('#divSEP').removeClass('d-none');
-                    break;
-                case 'Inspector':
-                    saveInspectorDetails();
-                    break;
-                case 'Operator':
-                    saveFormOper();
-                    break;
-                default:
-                    alert('Unknown position selected. Please select a valid position.');
-                    break;
-            }
-        });
-        $(document).on('submit', '#formSubmitOper', function (e) {
-            e.preventDefault();
-            var $form = $(this);
-            Swal.fire({
-            title: 'Are you sure you want to save this request?',
-            // html: 'This will allow you to add employees who will not be endorsed for this training endorsement.<br> <em style="font-size: 1rem;">You can specify the reason for not endorsing each employee.</em>',
-            html: '',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, proceed',
-            cancelButtonText: 'Cancel'
-        }).then(function (result) {
-                if (result.isConfirmed) {
-                    if($('#approval_status').val() === "FQCVVO"){
-                        saveFormOper($form);
-                    }else{
-                        $('#modalSendEmail').modal();
-                    }
-                }
-            });
-        });
         const saveInspectorDetails = ($forms = null) => {
             // 1. Serialize standard form inputs into an array
             var $form = form.formSubmitInspector ?? $forms;
@@ -2132,6 +2085,56 @@
                 // }
             },$form);
         }
+
+        $('#formSendEmail').click(function (e) {
+            e.preventDefault();
+            let position = $('#text_select_position').val();
+               switch (position) {
+                case 'MH':
+                    $('#divMH').removeClass('d-none');
+                    break;
+                case 'Technician':
+                    $('#divTechnian').removeClass('d-none');
+                    break;
+                case 'Supervisor':
+                case 'Engineer':
+                case 'Planner':
+                    $('#divSEP').removeClass('d-none');
+                    break;
+                case 'Inspector':
+                    saveInspectorDetails();
+                    break;
+                case 'Operator':
+                    saveFormOper();
+                    break;
+                default:
+                    alert('Unknown position selected. Please select a valid position.');
+                    break;
+            }
+        });
+
+        $(document).on('submit', '#formSubmitOper', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            Swal.fire({
+            title: 'Are you sure you want to save this request?',
+            // html: 'This will allow you to add employees who will not be endorsed for this training endorsement.<br> <em style="font-size: 1rem;">You can specify the reason for not endorsing each employee.</em>',
+            html: '',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, proceed',
+            cancelButtonText: 'Cancel'
+        }).then(function (result) {
+                if (result.isConfirmed) {
+                    if($('#approval_status').val() === "FQCVVO"){
+                        saveFormOper($form);
+                    }else{
+                        $('#modalSendEmail').modal();
+                    }
+                }
+            });
+        });
+
         // #formSubmit_MH, btnCreateCQForm
         $(document).on('submit', '#formSubmit_Ins',  function (e) {
             e.preventDefault();
@@ -2174,12 +2177,7 @@
         }
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnian, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
-
-        // $positionSelect.click(function () {
-        //     alert('click');
-        // }).on('change', function () {
-        //    togglePositionSection($(this).val());
-        // });
+   
         $positionSelect.on('change', function () {
             let params = {
                 approvalStatus: $('#approval_status').val(),
@@ -2240,11 +2238,6 @@
                     selectPassFail($(selector));
             });
         }
-        // const initGetSystemOneEmployeeDetailsCombos = (comboSelectors) => {
-        //     comboSelectors.forEach(function(selector) {
-        //             getSystemOneEmployeeDetails($(selector));
-        //     });
-        // }
         initGetSystemOneEmployeeDetailsCombos([
             '#text_oper_emp_number',
             '#text_first_trainedby_oper',
@@ -2289,11 +2282,6 @@
             '#text_alert_qctq_cc_sec_insp',
 
         ]);
-        // initSelectPassFail([
-        //     '#text_oa_1st_result_es_oper',
-        //     '#text_obs_first_result_es_oper',
-        //     '#text_oa_2nd_result_es_oper',
-        // ]);
 
         // Delete a row from the FVI table
         $(document).on('click', '#tbl_fvi_operator .btn-delete-fvi-row', function () {
