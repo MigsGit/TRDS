@@ -1,5 +1,5 @@
  <!-- FORMAT 4 Inspector -->
-<div class="d-none" id="divInspector">
+
     <form id="formSubmit_Ins">
         <div class="accordion" id="accordionExampleInsp">
             <div class="accordion-item">
@@ -1202,7 +1202,6 @@
                             <label for="text_alert_qctq_cc_sec_insp">Add cc:</label>
                             <select class="form-control select2bs4" style="width: 100%;" id="text_alert_qctq_cc_sec_insp" name="text_alert_qctq_cc_sec_insp"></select>
                         </div> --}}
-                    </div>
 
                     <!-- ------------------------------------------------ -->
 
@@ -1528,4 +1527,3 @@
 
     </form>
 
-</div>

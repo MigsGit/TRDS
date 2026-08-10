@@ -111,6 +111,11 @@
                 }
             }
 
+            if(positionCategory === 'Technician'){
+                alert('Tech')
+                $('#divTechnician').removeClass('d-none');
+            }
+
     }
     const togglePositionSectiontest = (position) => {
             initOperEmpModal();
@@ -139,7 +144,7 @@
                     $('#divMH').removeClass('d-none');
                     break;
                 case 'Technician':
-                    $('#divTechnian').removeClass('d-none');
+                    $('#Technician').removeClass('d-none');
                     break;
                 case 'Supervisor':
                 case 'Engineer':
