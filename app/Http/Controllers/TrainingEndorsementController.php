@@ -166,8 +166,20 @@ class TrainingEndorsementController extends Controller
                     foreach($checker as $checker){
                         $format_updated_at = $checker['updated_at'] ? Carbon::parse($checker['updated_at'])->format('Y-m-d H:i:s') : null;
                         if($checker['updated_at'] != null){
-                            $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
-                            $result .= "<em >{$format_updated_at}</em><br>";
+                            if($row->status == 0 && !is_null($row->disapprove_remarks) && !is_null($row->disapprove_by)){
+                                if($row->disapprove_by == $checker['rapidx_id']){
+                                    $result .= "<span class='badge badge-danger mt-1'>{$checker['approver_details']['name']}</span><br>";
+                                    $result .= "<em >{$format_updated_at}</em><br>";
+                                }
+                                else{
+                                    $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
+                                    $result .= "<em >{$format_updated_at}</em><br>";
+                                }
+                            }
+                            else{
+                                $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
+                                $result .= "<em >{$format_updated_at}</em><br>";
+                            }
                         }
                         else{
                             $result .= "<span class='badge badge-warning mt-1'>{$checker['approver_details']['name']}</span><br>";
