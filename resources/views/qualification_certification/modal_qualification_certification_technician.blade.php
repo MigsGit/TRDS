@@ -1,83 +1,7 @@
 <form id="formSubmit_Tech">
     <h3 class="mt-5 mb-3 text-center">TECHNICIAN TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
 
-    <div class="row mb-5">
-        <div class="col-md-3">
-            <label for="">Control No.:</label>
-            <input class="form-control" type="hidden" class="form-control d-none" id="text_tech_new_conno" name="text_tech_new_conno" placeholder="Select section to generate Control No." readonly>
-            <input class="form-control" type="text" class="form-control" id="" name="text_tech_new_conno" placeholder="Auto Generated" readonly>
-            <input class="form-control" type="hidden" class="form-control" id="text_tech_conno" name="text_tech_conno" readonly>
-        </div>
-
-        <div class="col-md-3">
-            <label for="">Production Section:</label>
-            <input class="form-control" type="text" name="text_tech_section" id="text_tech_section" list="list_section" placeholder="Select Section">
-            <datalist id="list_section">
-
-            </datalist>
-        </div>
-
-        <div class="col-md-3">
-            <label for="">Station:</label>
-            <select class="form-control select2bs4" style="width: 100%;" name="text_tech_station" id="text_tech_station">
-                <option value="" selected disabled>Select station</option>
-                <option value="Process">Process</option>
-                <option value="Maintenance">Maintenance</option>
-                <option value="Equipment">Equipment</option>
-                <option value="Die-set">Die-set</option>
-            </select>
-        </div>
-
-        <div class="col-md-3">
-            <label for="">Product Line:</label>
-            <input class="form-control" type="text" id="text_tech_product_line" name="text_tech_product_line" placeholder="Enter product line here" list="list_prod_line">
-            <datalist id="list_prod_line"></datalist>
-        </div>
-    </div>
-
-    <div class="row mt-2 mb-5">
-        <div class="col-md-12">
-            <button type="button" class="btn btn-primary" data-target="#select_Employee_technician" data-toggle="modal"><i class="fa-solid fa-user-plus me-3"></i>Add Employee</button>
-        </div>
-    </div>
-
-    <div class="table-responsive mt-3 mb-5">
-        <table id="tbl_certified_list_Tech" class="table table-bordered table-hover nowrap">
-            <thead class="table-primary">
-                <tr>
-                    <th>Action</th>
-                    <th>Employee No.</th>
-                    <th>Employee Name</th>
-                    <th>From</th>
-                    <th>To</th>
-                </tr>
-            </thead>
-
-            <tbody>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="row mb-5">
-        <div class="col-md-12">
-            <label for="">Reason for Certification:</label>
-            <select class="form-control select2bs4" style="width: 100%;" name=text_tech_certification id="text_tech_certification">
-                <option value="" selected disabled>Select Reason</option>
-                <option value="Lateral transfer">1 Lateral transfer</option>
-                <option value="Flexibility">2 Flexibility</option>
-                <option value="Transfer to another station">3 Transfer to another station (E.g: final visual, insertion,IQC, IPQC, OQC, etc)</option>
-                <option value="Transfer to other production section">4 Transfer to other production section (E.g: TS,PPS,CN, YF)</option>
-                <option value="Transfer to other product line">5 Transfer to other product line (E.g: TS: BGA-FP, QFP; CN: FMS, PJS; YF: EOL, FOL; PPS: Molding CN, Molding TS, Grinding, Stamping; MH-WHS, MH-Prodn)</option>
-                <option value="New Product">6 New Product</option>
-                <option value="Re-certification from disqualification">7 Re-certification from disqualification</option>
-                <option value="Leave reached at least 1 month (ML/ VL/SL)">8 Leave reached at least 1 month (ML/ VL/SL)</option>
-                <option value="Company shutdown at least 1 month">9 Company shutdown at least 1 month</option>
-                <option value="Re-certification">10 Re-certification</option>
-            </select>
-        </div>
-    </div>
-
-    <hr style="height: 5px; background-color: black; border: none;">
+  
 
     <div class="accordion" id="accordionExampleTech">
         <div class="accordion-item">
@@ -648,8 +572,12 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="ms-3" for="">Certified by:</label>
-                            <input class="form-control" type="text" id="text_tech_es_1st_certified_by" name="text_tech_es_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
-                            <datalist id="list_display_empno"></datalist>
+                            <!-- original input replaced with select2 -->
+                            <!-- <input class="form-control" type="text" id="text_tech_es_1st_certified_by" name="text_tech_es_1st_certified_by" list="list_display_empno" placeholder="Select Certified by"> -->
+                            <!-- <datalist id="list_display_empno"></datalist> -->
+                            <select class="form-control select2bs4" style="width: 100%;" id="text_tech_es_1st_certified_by" name="text_tech_es_1st_certified_by">
+                                <option value="" selected disabled>Select Certified by</option>
+                            </select>
 
                             <input type="hidden" id="text_tech_es_1st_certified_by_username" name="text_tech_es_1st_certified_by_username">
                             <input type="hidden" id="text_tech_es_1st_certified_by_email" name="text_tech_es_1st_certified_by_email">
@@ -658,8 +586,12 @@
 
                         <div class="col-md-6">
                             <label class="ms-3" for="">Certified by:</label>
-                            <input class="form-control" type="text" id="text_tech_es_2nd_certified_by" name="text_tech_es_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
-                            <datalist id="list_display_empno"></datalist>
+                            <!-- original input replaced with select2 -->
+                            <!-- <input class="form-control" type="text" id="text_tech_es_2nd_certified_by" name="text_tech_es_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by"> -->
+                            <!-- <datalist id="list_display_empno"></datalist> -->
+                            <select class="form-control select2bs4" style="width: 100%;" id="text_tech_es_2nd_certified_by" name="text_tech_es_2nd_certified_by">
+                                <option value="" selected disabled>Select Certified by</option>
+                            </select>
 
                             <input type="hidden" id="text_tech_es_2nd_certified_by_username" name="text_tech_es_2nd_certified_by_username">
                             <input type="hidden" id="text_tech_es_2nd_certified_by_email" name="text_tech_es_2nd_certified_by_email">
@@ -735,8 +667,12 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="ms-3" for="">Certified by:</label>
-                                <input class="form-control" type="text" id="text_tech_qcs_1st_certified_by" name="text_tech_qcs_1st_certified_by" list="list_display_empno" placeholder="Select Certified by">
-                                <datalist id="list_display_empno"></datalist>
+                                <!-- original input replaced with select2 -->
+                                <!-- <input class="form-control" type="text" id="text_tech_qcs_1st_certified_by" name="text_tech_qcs_1st_certified_by" list="list_display_empno" placeholder="Select Certified by"> -->
+                                <!-- <datalist id="list_display_empno"></datalist> -->
+                                <select class="form-control select2bs4" style="width: 100%;" id="text_tech_qcs_1st_certified_by" name="text_tech_qcs_1st_certified_by">
+                                    <option value="" selected disabled>Select Certified by</option>
+                                </select>
 
                                 <input type="hidden" id="text_tech_qcs_1st_certified_by_username" name="text_tech_qcs_1st_certified_by_username">
                                 <input type="hidden" id="text_tech_qcs_1st_certified_by_email" name="text_tech_qcs_1st_certified_by_email">
@@ -744,8 +680,12 @@
 
                             <div class="col-md-6">
                                 <label class="ms-3" for="">Certified by:</label>
-                                <input class="form-control" type="text" id="text_tech_qcs_2nd_certified_by" name="text_tech_qcs_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by">
-                                <datalist id="list_display_empno"></datalist>
+                                <!-- original input replaced with select2 -->
+                                <!-- <input class="form-control" type="text" id="text_tech_qcs_2nd_certified_by" name="text_tech_qcs_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by"> -->
+                                <!-- <datalist id="list_display_empno"></datalist> -->
+                                <select class="form-control select2bs4" style="width: 100%;" id="text_tech_qcs_2nd_certified_by" name="text_tech_qcs_2nd_certified_by">
+                                    <option value="" selected disabled>Select Certified by</option>
+                                </select>
 
                                 <input type="hidden" id="text_tech_qcs_2nd_certified_by_username" name="text_tech_qcs_2nd_certified_by_username">
                                 <input type="hidden" id="text_tech_qcs_2nd_certified_by_email" name="text_tech_qcs_2nd_certified_by_email">
@@ -786,8 +726,12 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="">Approved by:</label>
-            <input class="form-control" type="text" id="text_tech_approved_by" name="text_tech_approved_by" list="list_display_empno" placeholder="Select Approved by">
-            <datalist id="list_display_empno"></datalist>
+            <!-- original input replaced with select2 -->
+            <!-- <input class="form-control" type="text" id="text_tech_approved_by" name="text_tech_approved_by" list="list_display_empno" placeholder="Select Approved by"> -->
+            <!-- <datalist id="list_display_empno"></datalist> -->
+            <select class="form-control select2bs4" style="width: 100%;" id="text_tech_approved_by" name="text_tech_approved_by">
+                <option value="" selected disabled>Select Approved by</option>
+            </select>
 
             <input type="hidden" id="text_tech_approved_by_username" name="text_tech_approved_by_username">
             <input type="hidden" id="text_tech_approved_by_email" name="text_tech_approved_by_email">
@@ -798,8 +742,9 @@
     <!-- <hr style="height: 1px; background-color: grey; border: none;"> -->
 
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
-        <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUBMIT</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>Close</button>
+        <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>Save Tech</button>
     </div>
 
 </form>
+

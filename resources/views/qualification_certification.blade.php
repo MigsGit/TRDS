@@ -123,7 +123,7 @@
                 </div>
             </div>
         </section>
-
+@include('components.operator_prodn_training_orientation')
         <!-- CREATE MODAL -->
     <div class="modal fade" id="modalCreateCQForm" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="createCQFormLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
