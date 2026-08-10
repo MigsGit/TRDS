@@ -123,7 +123,6 @@
                 </div>
             </div>
         </section>
-@include('components.operator_prodn_training_orientation')
         <!-- CREATE MODAL -->
     <div class="modal fade" id="modalCreateCQForm" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="createCQFormLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
@@ -193,8 +192,7 @@
                 </div>
             </div>
         </div>
-
-        {{-- end --}}
+    @include('components.operator_prodn_training_orientation')
     </div>
 </div>
 @endsection
@@ -219,6 +217,13 @@
            fvi_operator: '#tbl_fvi_operator',
            tbl_fvi_operator_2: '#tbl_fvi_operator_2',
         };
+        
+        $('#modalCreateCQForm').on('hidden.bs.modal', function () {
+            // resetFormValues({'frmId'  :   form.formSubmitOper})
+            // resetFormValues({'frmId'  :   form.formSubmitMh})
+            // resetFormValues({'frmId'  :   form.formSubmitInspector})
+        });
+
         const updateApproval = (params) => {
             let data = {
                 decision : params.decision,
@@ -484,13 +489,7 @@
             // console.log('saveFormOper called',$form[0]);
             var $form = form.formSubmitOper ?? $forms;
             var formArray = $form.serializeArray();
-
-            // 2. Push extra custom field values manually
-            // formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
-            // formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
-            // formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
-            // formArray.push({ name: 'text_select_section', value: $('#select_section').val() });
-
+            return;
             // 2. Push extra custom field values manually
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
@@ -535,6 +534,7 @@
                 }
             },$form);
         }
+        
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
             let position = $('#text_select_position').val();
@@ -560,6 +560,10 @@
                     alert('Unknown position selected. Please select a valid position.');
                     break;
             }
+        });
+        $(document).on('submit', '#formSubmit_Tech', function (e) {
+            var $form = $(this);
+            saveFormOper($form);
         });
         $(document).on('submit', '#formSubmitOper', function (e) {
             e.preventDefault();
@@ -839,6 +843,14 @@
             '#text_sec3_approved_inspector',
             '#text_alert_qctq_sec_insp',
             '#text_alert_qctq_cc_sec_insp',
+            //Tech
+            '#text_tech_trained_qualified_by',
+            '#text_tech_mentored_by',
+            '#text_tech_es_1st_certified_by',
+            '#text_tech_es_2nd_certified_by',
+            '#text_tech_qcs_1st_certified_by',
+            '#text_tech_qcs_2nd_take_result',
+            '#text_tech_approved_by',
 
         ]);
         // initSelectPassFail([

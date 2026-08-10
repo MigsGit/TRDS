@@ -121,6 +121,7 @@ class QualificationCertificationController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
+            return $request->all();
             $rapidxEmpNo           = session('global_user');
             $dateTime              = now();
             $date                  = now()->toDateString();
@@ -492,6 +493,62 @@ class QualificationCertificationController extends Controller
                         // ->get();
                         ->update($operToApprovers);
                     }
+                }
+            }
+            // TECHNICIAN PROCESS
+            if($currentPositionCategory === 'Technician'){
+                $qcModelApprover = OpApprover::class;
+                $operToApprovers = [];
+                if(filled($qcSlipId)){
+                    $currentApprovalStatus = $qcSlipDetails->approval_status;
+                    // $validatedData = app(SendEmailRequest::class)->validateResolved();
+                     //checkbox
+                     $aEngTq = [
+                        'es_tech_training_orientation'     => $this->joinSafe($request, 'text_es_tech_training_orientation'),
+                        'es_tech_training_orientation_14'     => $this->getSafe($request, 'text_es_tech_training_orientation_14'),
+                        'es_tech_training_orientation_15'     => $this->getSafe($request, 'text_es_tech_training_orientation_15'),
+                        'es_tech_training_orientation_16'     => $this->getSafe($request, 'text_es_tech_training_orientation_16')
+                     ];
+                    // Collect Technician training/certification inputs
+                return $operToApprovers = [
+                        "qc_slips_id" => $qcSlipId,
+                        'approval_status' => 'AENGTQ',
+                        'decision_status' => 'APP',
+
+                        // Engineering Section certification (first / second take)
+                      
+                        
+                        'first_approver'  => $this->joinSafe($request, 'text_tech_mentored_by'),
+                        'first_approver_2'=> $this->joinSafe($request, 'text_tech_trained_qualified_by'),
+                        'first_date'      => $this->getSafe($request, 'text_tech_es_1st_date'),
+                        'first_time'      => $this->getSafe($request, 'text_tech_es_1st_time'),
+                        
+                        'first_approver'  => $this->joinSafe($request, 'text_tech_es_1st_certified_by'),
+                        'first_status'    => $this->getSafe($request, 'text_tech_es_1st_take_result'),
+                        'second_approver' => $this->joinSafe($request, 'text_tech_es_2nd_certified_by'),
+                        'second_date'     => $this->getSafe($request, 'text_tech_es_2nd_date'),
+                        'second_time'     => $this->getSafe($request, 'text_tech_es_2nd_time'),
+                        'second_status'   => $this->getSafe($request, 'text_tech_es_2nd_take_result'),
+
+                        // QCS certification (first / second take)
+                        'third_approver'  => $this->joinSafe($request, 'text_tech_qcs_1st_certified_by'),
+                        'third_date'      => $this->getSafe($request, 'text_tech_qcs_1st_date'),
+                        'third_time'      => $this->getSafe($request, 'text_tech_qcs_1st_time'),
+                        'third_status'    => $this->getSafe($request, 'text_tech_qcs_1st_take_result'),
+
+                        'fourth_approver' => $this->joinSafe($request, 'text_tech_qcs_2nd_certified_by'),
+                        'fourth_date'     => $this->getSafe($request, 'text_tech_qcs_2nd_date'),
+                        'fourth_time'     => $this->getSafe($request, 'text_tech_qcs_2nd_time'),
+                        'fourth_status'   => $this->getSafe($request, 'text_tech_qcs_2nd_take_result'),
+
+                        // Approved by
+                        'approved_by'     => $this->joinSafe($request, 'text_tech_approved_by'),
+                    ];
+
+                    $qcModelApprover::updateOrCreate(
+                        ['qc_slips_id' => $qcSlipId, 'approval_status' => 'AENGTQ'],
+                        $operToApprovers
+                    );
                 }
             }
             //=== Update the Approval Status and Insert the new Approval Status and Emails to the Next Approvers

@@ -451,18 +451,16 @@
 
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="">Trained and Qualified by:</label>
-                            <input class="form-control" type="text" id="text_tech_trained_qualified_by" name="text_tech_trained_qualified_by" list="list_display_empno" placeholder="Select Trained and Qualified by">
-                            <datalist id="list_display_empno"></datalist>
-
-                            <input type="hidden" id="text_tech_trained_qualified_by_username" name="text_tech_trained_qualified_by_username">
-                            <input type="hidden" id="text_tech_trained_qualified_by_email" name="text_tech_trained_qualified_by_email">
-
+                            <label for="">Trained and Qualified by: nmodify </label>
+                              <select class="form-control select2bs4" style="width: 100%;" id="text_tech_trained_qualified_by" name="text_tech_trained_qualified_by">
+                                <option value="" selected disabled>Select Certified by</option>
+                            </select>
                         </div>
                         <div class="col-md-6">
                             <label for="">Mentored by:</label>
-                            <input class="form-control" type="text" id="text_tech_mentored_by" name="text_tech_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
-                            <datalist id="list_display_empno"></datalist>
+                            <select class="form-control select2bs4" style="width: 100%;" id="text_tech_mentored_by" name="text_tech_mentored_by">
+                                <option value="" selected disabled>Select Certified by</option>
+                            </select>
                         </div>
                     </div>
 
@@ -477,59 +475,6 @@
                             <input class="form-control" type="time" id="text_tech_time" name="text_tech_time">
                         </div>
                     </div>
-
-                    <!-- <div class="row mb-2">
-                        <div class="col-md-6"></div>
-                        <div class="col-md-3">
-                            <label class="" for="">Send Email Alert to:</label>
-                            <input class="form-control" type="text" id="text_edit_alert_estq_sec_tech" name="text_edit_alert_estq_sec_tech" list="list_display_empno" placeholder="Send email to">
-                            <datalist id="list_display_empno"></datalist>
-                            <input type="hidden" id="text_edit_alert_estq_sec_tech_username" name="text_edit_alert_estq_sec_tech_username">
-                            <input type="hidden" id="text_edit_alert_estq_sec_tech_email" name="text_edit_alert_estq_sec_tech_email">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="" for="">Add cc:</label>
-                            <input class="form-control" type="text" id="text_edit_alert_estq_cc_sec_tech" name="text_edit_alert_estq_cc_sec_tech" list="list_display_empno" placeholder="Cc">
-                            <datalist id="list_display_empno"></datalist>
-                            <input type="hidden" id="text_edit_alert_estq_cc_sec_tech_username" name="text_edit_alert_estq_cc_sec_tech_username">
-                            <input type="hidden" id="text_edit_alert_estq_cc_sec_tech_email" name="text_edit_alert_estq_cc_sec_tech_email">
-                        </div>
-                    </div> -->
-
-                    <div class="row mb-2">
-                        <div class="col-md-6"></div>
-
-                        <!-- ESTQ Section: To -->
-                        <div class="col-md-3">
-                            <label for="text_edit_alert_estq_sec_tech">Send Email Alert to:</label>
-                            <div id="selectedEstqAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                            <input class="form-control" type="text"
-                                id="text_edit_alert_estq_sec_tech"
-                                name="text_edit_alert_estq_sec_tech"
-                                list="list_display_empno"
-                                placeholder="Send email to">
-                            <datalist id="list_display_empno"></datalist>
-                            <input type="hidden" id="text_edit_alert_estq_sec_tech_username" name="text_edit_alert_estq_sec_tech_username">
-                            <input type="hidden" id="text_edit_alert_estq_sec_tech_email" name="text_edit_alert_estq_sec_tech_email">
-                        </div>
-
-                        <!-- ESTQ Section: CC -->
-                        <div class="col-md-3">
-                            <label for="text_edit_alert_estq_cc_sec_tech">Add cc:</label>
-                            <div id="selectedEstqAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
-                            <input class="form-control" type="text"
-                                id="text_edit_alert_estq_cc_sec_tech"
-                                name="text_edit_alert_estq_cc_sec_tech"
-                                list="list_display_empno"
-                                placeholder="Cc">
-                            <datalist id="list_display_empno"></datalist>
-                            <input type="hidden" id="text_edit_alert_estq_cc_sec_tech_username" name="text_edit_alert_estq_cc_sec_tech_username">
-                            <input type="hidden" id="text_edit_alert_estq_cc_sec_tech_email" name="text_edit_alert_estq_cc_sec_tech_email">
-                        </div>
-                    </div>
-                    <!-- ------------------------------------------------ -->
-
                 </div>
             </div>
         </div>
@@ -572,30 +517,19 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="ms-3" for="">Certified by:</label>
-                            <!-- original input replaced with select2 -->
-                            <!-- <input class="form-control" type="text" id="text_tech_es_1st_certified_by" name="text_tech_es_1st_certified_by" list="list_display_empno" placeholder="Select Certified by"> -->
-                            <!-- <datalist id="list_display_empno"></datalist> -->
                             <select class="form-control select2bs4" style="width: 100%;" id="text_tech_es_1st_certified_by" name="text_tech_es_1st_certified_by">
                                 <option value="" selected disabled>Select Certified by</option>
                             </select>
 
-                            <input type="hidden" id="text_tech_es_1st_certified_by_username" name="text_tech_es_1st_certified_by_username">
-                            <input type="hidden" id="text_tech_es_1st_certified_by_email" name="text_tech_es_1st_certified_by_email">
-
+   
                         </div>
 
                         <div class="col-md-6">
                             <label class="ms-3" for="">Certified by:</label>
-                            <!-- original input replaced with select2 -->
-                            <!-- <input class="form-control" type="text" id="text_tech_es_2nd_certified_by" name="text_tech_es_2nd_certified_by" list="list_display_empno" placeholder="Select Certified by"> -->
-                            <!-- <datalist id="list_display_empno"></datalist> -->
+
                             <select class="form-control select2bs4" style="width: 100%;" id="text_tech_es_2nd_certified_by" name="text_tech_es_2nd_certified_by">
                                 <option value="" selected disabled>Select Certified by</option>
                             </select>
-
-                            <input type="hidden" id="text_tech_es_2nd_certified_by_username" name="text_tech_es_2nd_certified_by_username">
-                            <input type="hidden" id="text_tech_es_2nd_certified_by_email" name="text_tech_es_2nd_certified_by_email">
-
                         </div>
                     </div>
 
@@ -673,9 +607,6 @@
                                 <select class="form-control select2bs4" style="width: 100%;" id="text_tech_qcs_1st_certified_by" name="text_tech_qcs_1st_certified_by">
                                     <option value="" selected disabled>Select Certified by</option>
                                 </select>
-
-                                <input type="hidden" id="text_tech_qcs_1st_certified_by_username" name="text_tech_qcs_1st_certified_by_username">
-                                <input type="hidden" id="text_tech_qcs_1st_certified_by_email" name="text_tech_qcs_1st_certified_by_email">
                             </div>
 
                             <div class="col-md-6">
@@ -686,9 +617,6 @@
                                 <select class="form-control select2bs4" style="width: 100%;" id="text_tech_qcs_2nd_certified_by" name="text_tech_qcs_2nd_certified_by">
                                     <option value="" selected disabled>Select Certified by</option>
                                 </select>
-
-                                <input type="hidden" id="text_tech_qcs_2nd_certified_by_username" name="text_tech_qcs_2nd_certified_by_username">
-                                <input type="hidden" id="text_tech_qcs_2nd_certified_by_email" name="text_tech_qcs_2nd_certified_by_email">
                             </div>
                         </div>
 
@@ -732,9 +660,6 @@
             <select class="form-control select2bs4" style="width: 100%;" id="text_tech_approved_by" name="text_tech_approved_by">
                 <option value="" selected disabled>Select Approved by</option>
             </select>
-
-            <input type="hidden" id="text_tech_approved_by_username" name="text_tech_approved_by_username">
-            <input type="hidden" id="text_tech_approved_by_email" name="text_tech_approved_by_email">
         </div>
         <div class="col-md-6"></div>
     </div>
