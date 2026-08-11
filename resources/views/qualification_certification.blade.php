@@ -154,27 +154,81 @@
                             </div>
                         </div>
 
-                        <!-- GLOBAL INPUTS -->
+                        {{-- GLOBAL INPUTS --}}
                         <hr style="height: 5px; background-color: black; border: none;">
+                          <div class="col-md-3 d-none">
+                                <label for="">QC Slip Id:</label>
+                                    <input class="form-control" type="text" class="form-control" id="qc_slips_id" name="qc_slips_id" placeholder="Auto Generated" readonly>
+                                </div>
+                                <div class="col-md-3  d-none">
+                                    <label for="">Approval Status:</label>
+                                    <input class="form-control" type="text" class="form-control" id="approval_status" name="approval_status" placeholder="Auto Generated" readonly>
+                                </div>
+                                <div class="row mb-5">
+                                    <div class="col-md-3">
+                                        <label for="">Control No.:</label>
+                                        <input class="form-control" type="text" class="form-control" id="textconno_new_operator" name="textconno_new_operator" placeholder="Auto Generated" readonly>
+                                    </div>
 
-                        <div class="row mb-5">
-                            <div class="col-md-3">
-                                <label for="">Control No.:</label>
-                                <input class="form-control" type="text" id="textconno_new_operator" name="textconno_new_operator" placeholder="Auto Generated" readonly>
+                                    <div class="col-md-3">
+                                        <label for="">Production Section:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="text_section_operator" id="text_section_operator">
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="" id="seriesDesignation">Series Name:</label>
+                                        <input class="form-control" type="text" id="text_series_operator" name="text_series_operator" placeholder="Enter series name here">
+                                    </div>
+
+                                    <div class="col-md-3" id="productLine">
+                                        <label for="">Product Line:</label>
+                                         <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_line">
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3" id="dateOfTransfer">
+                                        <label for="">Date of Transfer:</label>
+                                         <input type="date" class="form-control" style="width: 100%;" name="text_date_of_transfer" id="text_date_of_transfer">
+                                    </div>
+                                </div>
+                                <div class="row mt-2 mb-5">
+                                    <div class="col-md-12">
+                                        <button type="button" class="btn btn-primary" id="btnEmployeeOperator" data-target="#select_Employee_operator" data-toggle="modal" ><i class="fa-solid fa fa-user-plus me-3"></i>Add Employee</button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive mt-3 mb-5">
+                                    <table id="tbl_certified_list_operator" class="table table-bordered table-hover nowrap">
+                                        <thead class="table-primary">
+                                            <tr>
+                                                <th>Action</th>
+                                                <th>Employee No.</th>
+                                                <th>Employee Name</th>
+                                                <th>Station From</th>
+                                                <th>Station To</th>
+                                                <th>Remarks</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row mb-5">
+                                    <div class="col-md-12">
+                                        <label for="">Reason for Certification:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="text_certification_operator[]" id="text_certification_operator" multiple>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-5 div-transfer-flexibility d-none">
+                                    <div class="col-md-12">
+                                        <label for="">Lateral Transfer Flexibility:</label>
+                                        <select class="form-control select2bs4" style="width: 100%;" name="transfer_flexibility[]" id="transfer_flexibility" multiple>
+
+                                        </select>
+                                    </div>
                             </div>
-                            <div class="col-md-3">
-                                <label for="">Production Section:</label>
-                                <select class="form-control select2bs4" style="width: 100%;" name="text_section_operator" id="text_section_operator"></select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="" id="seriesDesignation">Series Name:</label>
-                                <input class="form-control" type="text" id="text_series_operator" name="text_series_operator" placeholder="Enter series name here">
-                            </div>
-                            <div class="col-md-3" id="productLine">
-                                <label for="">Product Line:</label>
-                                <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_line"></select>
-                            </div>
-                        </div>
 
                         <hr style="height: 5px; background-color: black; border: none;">
                             <!-- FORMAT 5 Operator -->
@@ -202,6 +256,7 @@
     $(document).ready(function () {
         operEmpArray = [];
         form = {
+            formSubmitTech: $('#formSubmit_Tech'),
             formSubmitOper: $('#formSubmitOper'),
             formSubmitMh: $('#formSubmit_MH'),
             formSubmitInspector: $('#formSubmit_Ins'),
@@ -217,7 +272,7 @@
            fvi_operator: '#tbl_fvi_operator',
            tbl_fvi_operator_2: '#tbl_fvi_operator_2',
         };
-        
+
         $('#modalCreateCQForm').on('hidden.bs.modal', function () {
             // resetFormValues({'frmId'  :   form.formSubmitOper})
             // resetFormValues({'frmId'  :   form.formSubmitMh})
@@ -487,9 +542,8 @@
         const saveFormOper = ($forms = null) => {
             // 1. Serialize standard form inputs into an array
             // console.log('saveFormOper called',$form[0]);
-            var $form = form.formSubmitOper ?? $forms;
-            var formArray = $form.serializeArray();
-            return;
+            console.log($forms);
+            var formArray = $forms.serializeArray();
             // 2. Push extra custom field values manually
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
@@ -517,7 +571,7 @@
                 } else {
                     data[field.name] = field.value;
                 }
-            },$form[0]);
+            },$forms[0]);
 
             // 4. Safely pull your dynamic table data array
             data.operator_employees = (typeof getOperEmpTableData === 'function')
@@ -530,11 +584,11 @@
                     dataTable.operator.draw();
                     $('#modalCreateCQForm').modal('hide');
                     $('#modalSendEmail').modal('hide');
-                    $form[0].reset();
+                    $forms[0].reset();
                 }
-            },$form);
+            },$forms);
         }
-        
+
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
             let position = $('#text_select_position').val();
@@ -543,7 +597,8 @@
                     $('#divMH').removeClass('d-none');
                     break;
                 case 'Technician':
-                    $('#divTechnician').removeClass('d-none');
+                    saveFormOper(form.formSubmitTech);
+                    // $('#divTechnician').removeClass('d-none');
                     break;
                 case 'Supervisor':
                 case 'Engineer':
@@ -562,8 +617,11 @@
             }
         });
         $(document).on('submit', '#formSubmit_Tech', function (e) {
+            e.preventDefault();
             var $form = $(this);
-            saveFormOper($form);
+            // saveFormOper($form);
+            $('#modalSendEmail').modal();
+
         });
         $(document).on('submit', '#formSubmitOper', function (e) {
             e.preventDefault();
@@ -664,37 +722,6 @@
                 positionCategory: $('#text_select_position').val(),
             }
             getApprovalStatusToggle(params)
-
-            // if(approvalStatus === 'OPERQCAPP' || approvalStatus === 'LQCHEADAPP'){
-            //     // alert('true')
-            //     $('.operApproved').removeClass('d-none');
-            // }else{
-            //     // alert('false')
-            //     $('.operApproved').addClass('d-none');
-            //     $('.btnSaveInspector').removeClass('d-none');
-            // }
-            // $('.operSave').removeClass('d-none');
-            // $('#div_Oper').removeClass('d-none');
-            form.formSubmitOper[0].reset();
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-            ],1);
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_operator_product_line',
-            ],2);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_ps_oper',
-            ],4);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_es_oper',
-            ],5);
-            $('#seriesDesignation').text('Series Name');
-            $('#productLine').removeClass('d-none');
-            $('#dateOfTransfer').addClass('d-none');
-            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
-
         }
         const selectInspectorValidation = () => {
             let approvalStatus = $('#approval_status').val();
@@ -703,30 +730,8 @@
                 positionCategory: $('#text_select_position').val(),
             }
             getApprovalStatusToggle(params)
-            // if(approvalStatus === 'LQCHEADAPP'){
-            //     $('.operApproved').removeClass('d-none');
-            // }else{
-            //     $('.operApproved').addClass('d-none');
-            //     $('.btnSaveInspector').removeClass('d-none');
-            // }
-            form.formSubmitInspector[0].reset();
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-            ],7);
-
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_ps_oper',
-            ],4);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_training_orientation_es_oper',
-            ],5);
-            $('#seriesDesignation').text('Designation');
-            $('#productLine').addClass('d-none');
-            $('#dateOfTransfer').removeClass('d-none');
-
-            form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
+           
+           
         }
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');

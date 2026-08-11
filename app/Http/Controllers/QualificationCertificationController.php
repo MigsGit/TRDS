@@ -121,7 +121,7 @@ class QualificationCertificationController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            return $request->all();
+            // return $request->all();
             $rapidxEmpNo           = session('global_user');
             $dateTime              = now();
             $date                  = now()->toDateString();
@@ -199,12 +199,14 @@ class QualificationCertificationController extends Controller
             //UPDATE OPERATOR APPROVAL STATUS
             $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
             $currentPositionCategory = $qcSlipDetails->position_category;
+            $qcModelApprover = OpApprover::class;
             //Inspector PROCESS
             if($currentPositionCategory === 'Inspector'){ //ADD
-                $qcModelApprover = OpApprover::class;
                 $operToApprovers = [];
                 if(filled($qcSlipId)){ //UPDATE {
                     $validatedData = app(SendEmailRequest::class)->validateResolved();
+
+
                     $currentApprovalStatus = $qcSlipDetails->approval_status;
                     $qcSlipDetails->update([
                         'status' => 'FORAPP'
@@ -282,7 +284,6 @@ class QualificationCertificationController extends Controller
             //OPERATOR PROCESS
             if($currentPositionCategory === 'Operator'){  //ADD
                 $currentApprovalStatus = 'APRODTO';
-                $qcModelApprover = OpApprover::class;
                 if(filled($qcSlipId)){ //UPDATE OPERATOR DETAILS
                     $currentApprovalStatus = $qcSlipDetails->approval_status;
                     if($qcSlipDetails->approval_status != 'FQCVVO'){
@@ -497,60 +498,77 @@ class QualificationCertificationController extends Controller
             }
             // TECHNICIAN PROCESS
             if($currentPositionCategory === 'Technician'){
-                $qcModelApprover = OpApprover::class;
                 $operToApprovers = [];
                 if(filled($qcSlipId)){
                     $currentApprovalStatus = $qcSlipDetails->approval_status;
-                    // $validatedData = app(SendEmailRequest::class)->validateResolved();
-                     //checkbox
-                     $aEngTq = [
-                        'es_tech_training_orientation'     => $this->joinSafe($request, 'text_es_tech_training_orientation'),
-                        'es_tech_training_orientation_14'     => $this->getSafe($request, 'text_es_tech_training_orientation_14'),
-                        'es_tech_training_orientation_15'     => $this->getSafe($request, 'text_es_tech_training_orientation_15'),
-                        'es_tech_training_orientation_16'     => $this->getSafe($request, 'text_es_tech_training_orientation_16')
-                     ];
-                    // Collect Technician training/certification inputs
-                return $operToApprovers = [
-                        "qc_slips_id" => $qcSlipId,
-                        'approval_status' => 'AENGTQ',
-                        'decision_status' => 'APP',
+                    if($currentApprovalStatus === 'ATECHENGTQ'){
+                        $aEngTq = [
+                            "qc_slips_id" => $qcSlipId,
+                            'es_tech_training_orientation'     => $this->joinSafe($request, 'text_es_tech_training_orientation'),
+                            'es_tech_training_orientation_14'     => $this->getSafe($request, 'text_es_tech_training_orientation_14'),
+                            'es_tech_training_orientation_15'     => $this->getSafe($request, 'text_es_tech_training_orientation_15'),
+                            'es_tech_training_orientation_16'     => $this->getSafe($request, 'text_es_tech_training_orientation_16')
+                        ];
+                        $qcModelApprover::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId],
+                            $aEngTq
+                        );
+                        // Collect Technician training/certification inputs
+                        $operToApprovers = [
+                            'approval_status' => 'ATECHENGTQ',
+                            'decision_status' => 'APP',
+                            // Engineering Section certification (first / second take)
+                            'first_approver'  => $this->joinSafe($request, 'text_tech_trained_qualified_by'),
+                            'first_approver_2'=> $this->joinSafe($request, 'text_tech_mentored_by'),
+                            'first_date'      => $this->getSafe($request, 'text_tech_date'),
+                            'first_time'      => $this->getSafe($request, 'text_tech_time')
+                        ];
+                        $qcModelApprover::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'ATECHENGTQ'],
+                            $operToApprovers
+                        );
+                    }
 
-                        // Engineering Section certification (first / second take)
-                      
-                        
-                        'first_approver'  => $this->joinSafe($request, 'text_tech_mentored_by'),
-                        'first_approver_2'=> $this->joinSafe($request, 'text_tech_trained_qualified_by'),
-                        'first_date'      => $this->getSafe($request, 'text_tech_es_1st_date'),
-                        'first_time'      => $this->getSafe($request, 'text_tech_es_1st_time'),
-                        
-                        'first_approver'  => $this->joinSafe($request, 'text_tech_es_1st_certified_by'),
-                        'first_status'    => $this->getSafe($request, 'text_tech_es_1st_take_result'),
-                        'second_approver' => $this->joinSafe($request, 'text_tech_es_2nd_certified_by'),
-                        'second_date'     => $this->getSafe($request, 'text_tech_es_2nd_date'),
-                        'second_time'     => $this->getSafe($request, 'text_tech_es_2nd_time'),
-                        'second_status'   => $this->getSafe($request, 'text_tech_es_2nd_take_result'),
+                    if($currentApprovalStatus === 'BTECHENGC'){
+                        $operToApprovers = [
+                            'approval_status' => 'BTECHENGC',
+                            'decision_status' => 'APP',
+                            'first_approver'  => $this->joinSafe($request, 'text_tech_es_1st_certified_by'),
+                            'first_status'    => $this->getSafe($request, 'text_tech_es_1st_take_result'),
+                            'first_date'      => $this->getSafe($request, 'text_tech_es_1st_date'),
+                            'first_time'      => $this->getSafe($request, 'text_tech_es_1st_time'),
+                            'second_approver' => $this->joinSafe($request, 'text_tech_es_2nd_certified_by'),
+                            'second_date'     => $this->getSafe($request, 'text_tech_es_2nd_date'),
+                            'second_time'     => $this->getSafe($request, 'text_tech_es_2nd_time'),
+                            'second_status'   => $this->getSafe($request, 'text_tech_es_2nd_take_result'),
+                        ];
+                        $qcModelApprover::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'BTECHENGC'],
+                            $operToApprovers
+                        );
+                    }
+                    if($currentApprovalStatus === 'CTECHQCC'){
+                        $operToApprovers = [
+                            'approval_status' => 'CTECHQCC',
+                            'decision_status' => 'APP',
+                            'first_approver'  => $this->joinSafe($request, 'text_tech_qcs_1st_certified_by'),
+                            'first_date'      => $this->getSafe($request, 'text_tech_qcs_1st_date'),
+                            'first_time'      => $this->getSafe($request, 'text_tech_qcs_1st_time'),
+                            'first_status'    => $this->getSafe($request, 'text_tech_qcs_1st_take_result'),
 
-                        // QCS certification (first / second take)
-                        'third_approver'  => $this->joinSafe($request, 'text_tech_qcs_1st_certified_by'),
-                        'third_date'      => $this->getSafe($request, 'text_tech_qcs_1st_date'),
-                        'third_time'      => $this->getSafe($request, 'text_tech_qcs_1st_time'),
-                        'third_status'    => $this->getSafe($request, 'text_tech_qcs_1st_take_result'),
-
-                        'fourth_approver' => $this->joinSafe($request, 'text_tech_qcs_2nd_certified_by'),
-                        'fourth_date'     => $this->getSafe($request, 'text_tech_qcs_2nd_date'),
-                        'fourth_time'     => $this->getSafe($request, 'text_tech_qcs_2nd_time'),
-                        'fourth_status'   => $this->getSafe($request, 'text_tech_qcs_2nd_take_result'),
-
-                        // Approved by
-                        'approved_by'     => $this->joinSafe($request, 'text_tech_approved_by'),
-                    ];
-
-                    $qcModelApprover::updateOrCreate(
-                        ['qc_slips_id' => $qcSlipId, 'approval_status' => 'AENGTQ'],
-                        $operToApprovers
-                    );
+                            'secon_approver' => $this->joinSafe($request, 'text_tech_qcs_2nd_certified_by'),
+                            'secon_date'     => $this->getSafe($request, 'text_tech_qcs_2nd_date'),
+                            'secon_time'     => $this->getSafe($request, 'text_tech_qcs_2nd_time'),
+                            'secon_status'   => $this->getSafe($request, 'text_tech_qcs_2nd_take_result'),
+                        ];
+                        $qcModelApprover::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'CTECHQCC'],
+                            $operToApprovers
+                        );
+                    }
                 }
             }
+
             //=== Update the Approval Status and Insert the new Approval Status and Emails to the Next Approvers
             $changeApprovalStatusParams = [
                 'qcSlipsId' => $qcSlipId,
@@ -560,8 +578,6 @@ class QualificationCertificationController extends Controller
                 'isMachineOperatorExists'=> $isMachineOperatorExists,
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
-
-
             if($currentApprovalStatus === 'FQCVVO'){ //OPERATOR FQCVVO to QCAPP Status - Final Approver QC Supervisor
                 $emailParams = [ //FOR QC
                     'qc_slips_id' => $qcSlipId,
@@ -589,7 +605,7 @@ class QualificationCertificationController extends Controller
                 ];
             }
             DB::commit();
-            $this->saveFormSendEmail($emailParams);
+            return $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -642,6 +658,10 @@ class QualificationCertificationController extends Controller
                 $to = $collectTo->pluck('email')->join(',');
                 $subject = "APPROVED: TRDS - Qualification Certification";
             }else{
+                // $qcModelApprover::updateOrCreate(
+                //     ['qc_slips_id' => $params['qc_slips_id'],'approval_status' => $params['approval_status']],
+                //     $params['update_data']
+                // );
                 $opApprover =  $qcModelApprover::insert($params['update_data']);
                 DB::commit();
                 foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
@@ -674,7 +694,7 @@ class QualificationCertificationController extends Controller
             // $from_name = 'issinfoservice@pricon.ph';
             $message = $this->commonController->emailMsg($emailParams);
             $rapidxEmpNo =  session('global_user');
-            $emailData = [
+            return $emailData = [
                 "to" =>$to,
                 // "to" =>"mrronquez@pricon.ph",
                 "cc" =>$cc,
@@ -694,7 +714,7 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             DB::commit();
-            $this->commonController->sendEmail($emailData);
+           $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -794,6 +814,9 @@ class QualificationCertificationController extends Controller
                 'd_ppd_certification_completion',
                 'e_qc_validation_process',
                 'f_qc_validation',
+
+                //Techician
+                'a_tech_eng_training_qualification',
             ];
             $qcSlip = QcSlip::with($arrRelation)
             ->where('id',$request->qcSlipsId)
@@ -826,6 +849,18 @@ class QualificationCertificationController extends Controller
             ->values()
             ->all();
 
+            $arrApprovers = $qcSlip->op_approvers;
+            
+            $json = [
+                'is_success' => 'true',
+                'qcSlip' => $qcSlip,
+                'rawOperApprovedConfirmedBy' => $arrOperApprovedConfirmedBy ?? [],
+                'rawReasonsStringCollection' => $rawReasonsStringCollection,
+                'rawBEnggTrainingItemsCollection' => $rawBOpEnggSectionTrainingOrientationCollection ?? '',
+                'rawAOperProdTrainingOrientationCollection' => $rawAOperProdTrainingOrientationCollection ?? '',
+                'rawReasonTransferFlexibility' => $rawReasonTransferFlexibilityCollection ?? '',
+
+            ];
             if($qcSlipPosition->position_category === 'Inspector'){
                 $arrRelation = [
                     'op_approvers',
@@ -1506,6 +1541,34 @@ class QualificationCertificationController extends Controller
     public function changeApprovalStatus($params){
         $selectedSection = str_contains($params['selectedSection'], 'PPD');
         $isMachineOperatorExists = $params['isMachineOperatorExists'];
+        if($params['selectPosition'] === 'Technician'){
+            switch (true) {
+                case ($params['approval_status'] === 'PB'):
+                    $newStatus = 'ATECHENGTQ';
+                    $statusName = 'A Engineering Training Qualification Update';
+                    break;
+                case ($params['approval_status'] === 'ATECHENGTQ'):
+                    $newStatus = 'BTECHENGC';
+                    $statusName = 'B Engineering Certification Update';
+                    break;
+                case ($params['approval_status'] === 'BTECHENGC'):
+                    $newStatus = 'CTECHQCC';
+                    $statusName = 'C QC Certifacation Update';
+                    break;
+                case ($params['approval_status'] === 'CTECHQCC'):
+                    $newStatus = 'TECHHEADAPP';
+                    $statusName = 'For Approval';
+                    break;
+                case ($params['approval_status'] === 'TECHHEADAPP'):
+                    $newStatus = 'OK';
+                    $statusName = 'CLOSED';
+                    break;
+                default:
+                    $newStatus = 'N/A';
+                    $statusName = 'N/A';
+                    break;
+            }
+        }
         if($params['selectPosition'] === 'Inspector'){
              switch (true) {
                 case ($params['approval_status'] === 'PB'):
