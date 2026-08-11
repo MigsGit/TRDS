@@ -880,7 +880,77 @@
         );
     }
 
-    const getEmployeeDetailsByEmpNoSelect2Inpsector = (params) => {
+    const getEmployeeDetailsByEmpNoSelect2Technician = (params) => {
+        let response = params.response;
+        // Safe access: optional chaining prevents crash if approversCollection is missing from response
+        const approversCollection = response?.approversCollection ?? null;
+        // console.log('approversCollection', approversCollection);
+        // return;
+        // Guard: exit early if the entire approvers collection is absent
+        if (!approversCollection || typeof approversCollection !== 'object') {
+            return;
+        }
+
+        const atechtq = approversCollection?.ATECHENGTQ?.[0] ?? null;
+        const btechc = approversCollection?.BTECHENGC?.[0]  ?? null;
+        const ctechc = approversCollection?.CTECHQCC?.[0]  ?? null;
+        const techheadapp = approversCollection?.TECHHEADAPP?.[0]  ?? null;
+
+        // const operApprovedConfirmedBy = rawOperApprovedConfirmedBy   ?? [];
+        const atechtqToFirst            = atechtq?.first_approver_exploded   ?? [];
+        const atechtqToFirstMentoredBy  = atechtq?.first_approver2_exploded  ?? [];
+
+        const btechcToFirst = btechc?.first_approver_exploded  ?? [];
+        const btechcToSecond = btechc?.second_approver_exploded  ?? [];
+
+        const ctechcToFirst= ctechc?.first_approver_exploded  ?? [];
+        const ctechcToSecond= ctechc?.second_approver_exploded  ?? [];
+
+        const techheadappToFirst  = techheadapp?.alert_prod_sec_exploded  ?? [];
+
+
+        // 1. Map them to a standard format Select2 expects: {id, text}
+        // const mappedOperApprovedConfirmedBy = operApprovedConfirmedBy.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedAtechtqToFirst = atechtqToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedAtechtqToFirstMentoredBy = atechtqToFirstMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedBtechcToFirst= btechcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedBtechcToSecond= btechcToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        
+        const mappedCtechcToFirst= ctechcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedCtechcToSecond= ctechcToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedTechheadappToFirst = techheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+
+        // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        //A
+        editSelectionsMap['#text_tech_trained_qualified_by'] = mappedAtechtqToFirst;
+        editSelectionsMap['#text_tech_mentored_by'] = mappedAtechtqToFirstMentoredBy;
+
+        editSelectionsMap['#text_tech_es_1st_certified_by'] = mappedBtechcToFirst;
+        editSelectionsMap['#text_tech_es_2nd_certified_by'] = mappedBtechcToSecond;
+
+        editSelectionsMap['#text_tech_qcs_1st_certified_by'] = mappedCtechcToFirst;
+        editSelectionsMap['#text_tech_qcs_2nd_certified_by'] = mappedCtechcToSecond;
+
+        editSelectionsMap['#text_tech_approved_by'] = mappedTechheadappToFirst;
+
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_tech_trained_qualified_by',
+                '#text_tech_mentored_by',
+                '#text_tech_es_1st_certified_by',
+                '#text_tech_es_2nd_certified_by',
+                '#text_tech_qcs_1st_certified_by',
+                '#text_tech_qcs_2nd_certified_by',
+                '#text_tech_approved_by',
+            ],
+            editSelectionsMap
+        );
+    }
+    const getEmployeeDetailsByEmpNoSelect2Inspector = (params) => {
         let response = params.response;
         // Safe access: optional chaining prevents crash if approversCollection is missing from response
         const approversCollection = response?.approversCollection ?? null;
@@ -984,8 +1054,7 @@
             let bOpEnggSectionTrainingOrientation = data.b_op_engg_section_training_orientation ?? [];
             let cQcCertification = data.c_qc_certification ?? [];
             let opApprovers = data.op_approvers?? [];
-            //TECHNICIAN
-            let aTechEngTrainingQualification = data.a_tech_eng_training_qualification ?? [];
+            
 
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             const approvalStatus = data.approval_status ?? '';
@@ -1048,8 +1117,37 @@
                 editSelectionsMap6
             );
 
-            if(positionCategory === 'Inspector'){
-                syncCheckboxesWithDb('text_es_tech_training_orientation', aTechEngTrainingQualification?.text_es_tech_training_orientation,form.formSubmitTech);
+            if(positionCategory === 'Technician'){
+                //TECHNICIAN
+                let aTechEngTrainingQualification = data.a_tech_eng_training_qualification ?? [];
+                syncCheckboxesWithDb('text_es_tech_training_orientation', aTechEngTrainingQualification?.es_tech_training_orientation,form.formSubmitTech);
+                form.formSubmitTech.find('#text_es_tech_training_orientation_14').val(aLqcTrainingQualification?.training_orientation_ins_4);
+                form.formSubmitTech.find('#text_es_tech_training_orientation_15').val(aLqcTrainingQualification?.training_orientation_ins_13);
+                form.formSubmitTech.find('#text_es_tech_training_orientation_16').val(aLqcTrainingQualification?.training_orientation_ins_21);
+                getEmployeeDetailsByEmpNoSelect2Technician({
+                    response : response,
+                });
+                const atechengtq = response?.approversCollection?.ATECHENGTQ?.[0] ?? null;
+                form.formSubmitTech.find('#text_tech_date').val(atechengtq?.first_date ?? '');
+                form.formSubmitTech.find('#text_tech_time').val(atechengtq?.first_time ?? '');
+
+                const btechengc = response?.approversCollection?.BTECHENGC?.[0] ?? null;
+                form.formSubmitTech.find('#text_tech_es_1st_take_result').val(btechengc?.first_status ?? '').trigger('change');
+                form.formSubmitTech.find('#text_tech_es_1st_date').val(btechengc?.first_date ?? '');
+                form.formSubmitTech.find('#text_tech_es_1st_time').val(btechengc?.first_time ?? '');
+                form.formSubmitTech.find('#text_tech_es_2nd_take_result').val(btechengc?.second_status ?? '').trigger('change');
+                form.formSubmitTech.find('#text_tech_es_2nd_date').val(btechengc?.second_date ?? '');
+                form.formSubmitTech.find('#text_tech_es_2nd_time').val(btechengc?.second_time ?? '');
+                const ctechqcc = response?.approversCollection?.CTECHQCC?.[0] ?? null;
+                form.formSubmitTech.find('#text_tech_qcs_1st_take_result').val(ctechqcc?.first_status ?? '').trigger('change');
+                form.formSubmitTech.find('#text_tech_qcs_1st_date').val(ctechqcc?.first_date ?? '');
+                form.formSubmitTech.find('#text_tech_qcs_1st_time').val(ctechqcc?.first_time ?? '');
+
+                form.formSubmitTech.find('#text_tech_qcs_2nd_take_result').val(ctechqcc?.second_status ?? '').trigger('change');
+                form.formSubmitTech.find('#text_tech_qcs_2nd_date').val(ctechqcc?.second_date ?? '');
+                form.formSubmitTech.find('#text_tech_qcs_2nd_time').val(ctechqcc?.second_time ?? '');
+
+
             }
             if(positionCategory === 'Inspector'){
                 const trainingOrientationInspector = aLqcTrainingQualification?.training_orientation_inspector;
@@ -1064,7 +1162,7 @@
                 let paramsGetEmpNo = {
                     response : response,
                 };
-                getEmployeeDetailsByEmpNoSelect2Inpsector(paramsGetEmpNo);
+                getEmployeeDetailsByEmpNoSelect2Inspector(paramsGetEmpNo);
                 const approversCollection = response?.approversCollection ?? null;
                 const alqctq = approversCollection?.ALQCTQ?.[0] ?? null;
 

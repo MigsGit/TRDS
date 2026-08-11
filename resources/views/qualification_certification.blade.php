@@ -854,7 +854,7 @@
             '#text_tech_es_1st_certified_by',
             '#text_tech_es_2nd_certified_by',
             '#text_tech_qcs_1st_certified_by',
-            '#text_tech_qcs_2nd_take_result',
+            '#text_tech_qcs_2nd_certified_by',
             '#text_tech_approved_by',
 
         ]);

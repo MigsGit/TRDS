@@ -1,8 +1,5 @@
 <form id="formSubmit_Tech">
     <h3 class="mt-5 mb-3 text-center">TECHNICIAN TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
-
-  
-
     <div class="accordion" id="accordionExampleTech">
         <div class="accordion-item">
             <h2 class="accordion-header">
@@ -648,9 +645,9 @@
             </div>
         </div>
     </div>
-
+    
+    @include('qualification_certification.qc_training_items_table')
     <hr style="height: 5px; background-color: black; border: none;">
-
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="">Approved by:</label>
