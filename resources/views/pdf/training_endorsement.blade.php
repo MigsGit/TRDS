@@ -254,16 +254,19 @@
         </tbody>
     </table>
 
-    <table class="dates-table" style="margin-top: 15px;">
-        <tr>
-            <td class="label">Employees will not be endorsed:</td>
-        </tr>
-        @foreach($employees_will_not_endorse as $employee)
+    @if(count($employees_will_not_endorse) > 0)
+        
+        <table class="dates-table" style="margin-top: 15px;">
             <tr>
-                <td><strong>{{ $employee['name'] ?? '' }} ({{ $employee['emp_no'] ?? '' }})</strong> - {{ $employee['remarks'] ?? '' }}</td>
+                <td class="label">Employees will not be endorsed:</td>
             </tr>
-        @endforeach
-    </table>
+            @foreach($employees_will_not_endorse as $employee)
+                <tr>
+                    <td><strong>{{ $employee['name'] ?? '' }} ({{ $employee['emp_no'] ?? '' }})</strong> - {{ $employee['remarks'] ?? '' }}</td>
+                </tr>
+            @endforeach
+        </table>
+    @endif
 
     {{-- Signatory Section --}}
     @php

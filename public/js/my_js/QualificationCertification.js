@@ -29,38 +29,18 @@
     const getApprovalStatusToggle = (params) => {
         let approvalStatus = params.approvalStatus;
         let positionCategory = params.positionCategory;
-        initDropdownMasterDetailsByFkidCombos([
-            '#text_operator_product_line',
-        ],2);
-        initDropdownMasterDetailsByFkidCombos([
-                '#text_certification_operator',
-        ],3);
-        initDropdownMasterDetailsByFkidCombos([
-                '#text_training_orientation_ps_oper',
-        ],4);
-        initDropdownMasterDetailsByFkidCombos([
-                '#text_training_orientation_es_oper',
-        ],5);
-        initDropdownMasterDetailsByFkidCombos([
-                '#transfer_flexibility',
-        ],6);
-        $('.inspectorSave').addClass('d-none');
-        $('.operSave').addClass('d-none');
-        $('.operApproved').addClass('d-none');
-        $('.btnSaveInspector').addClass('d-none')
-        $('#div_Oper').addClass('d-none');
-        $('#divInspector').addClass('d-none');
-        $('#productLine').addClass('d-none');
-        $('#seriesDesignation').text('Series Name');
-        $('#dateOfTransfer').addClass('d-none');
+        console.log();
 
-        if(positionCategory === 'Operator'){
-            $('#productLine').removeClass('d-none');
-            $('#div_Oper').removeClass('d-none');
-            $('.btn-link').removeClass('show');
-            $('#collapseOneOper').removeClass('show');
-            $('.operSave').removeClass('d-none');
-            $('#seriesDesignation').text('Series Name');
+            $('.inspectorSave').addClass('d-none');
+            $('.operSave').addClass('d-none');
+            $('.operApproved').addClass('d-none');
+            $('.btnSaveInspector').addClass('d-none')
+            $('#div_Oper').addClass('d-none');
+            $('#divInspector').addClass('d-none');
+            $('#text_date_of_transfer').addClass('d-none');
+            $('#productLine').addClass('d-none');
+            $('#seriesDesignation').text('Series');
+             $('#dateOfTransfer').addClass('d-none');
 
             form.formSubmitOper[0].reset();
             initDropdownMasterDetailsByFkidCombos([
@@ -70,61 +50,62 @@
             initDropdownMasterDetailsByFkidCombos([
                 '#text_operator_product_line',
             ],2);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_ps_oper',
+            ],4);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_training_orientation_es_oper',
+            ],5);
+            $('#seriesDesignation').text('Series Name');
+            $('#productLine').removeClass('d-none');
+            $('#dateOfTransfer').addClass('d-none');
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
-            if(approvalStatus ==='APRODTO'){
-                $('#collapseOneOper').addClass('show');
-            }
-            if(approvalStatus ==='BENGGTQ'){
-                $('#collapseTwoOper').addClass('show');
-            }
-            if(approvalStatus ==='CQCC'){
-                $('#collapseThreeOper').addClass('show');
+            if(positionCategory === 'Operator'){
+                $('#productLine').removeClass('d-none');
+                $('#div_Oper').removeClass('d-none');
+                $('.btn-link').removeClass('show');
+                $('#collapseOneOper').removeClass('show');
+                $('.operSave').removeClass('d-none');
+                if(approvalStatus ==='APRODTO'){
+                    $('#collapseOneOper').addClass('show');
+                }
+                if(approvalStatus ==='BENGGTQ'){
+                    $('#collapseTwoOper').addClass('show');
+                }
+                if(approvalStatus ==='CQCC'){
+                    $('#collapseThreeOper').addClass('show');
 
             }
-            if(approvalStatus ==='DPPDONLY'){
-                $('#collapseFourOper').addClass('show');
-            }
-            if(approvalStatus ==='ENGVP'){
-                $('#collapseFiveOper').addClass('show');
-            }
-            if(approvalStatus ==='EQCVP'){
-                $('#collapseSixOper').addClass('show');
-            }
-            if(approvalStatus ==='FQCVVO'){
-                $('#collapseSevenOper').addClass('show');
+            if(positionCategory === 'Inspector'){
+                $('#dateOfTransfer').removeClass('d-none');
+                $('#text_date_of_transfer').removeClass('d-none');
+                $('#seriesDesignation').text('Designation');
+                $('#divInspector').removeClass('d-none');
+                $('.btnSaveInspector').removeClass('d-none');
+                // $('.inspectorSave').removeClass('d-none')
+                form.formSubmitInspector[0].reset();
+                initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_station_to',
+                    '#text_oper_station_from',
+                ],7);
 
-            } //LQCHEADAPP
-            if(approvalStatus ==='QCAPP'){
-                $('.btnSaveInspector').addClass('d-none');
-                $('.operSave').addClass('d-none');
-                // $('.inspectorSave').addClass('d-none');
-                $('.operApproved').removeClass('d-none');
-            }
-            if(approvalStatus ==='OK'){
-                // $('#operDisapproved').addClass('d-none');
-                $('.operApproved').addClass('d-none');
-                // $('#operClosed').addClass('d-none');
-                $('.operSave').addClass('d-none');
-                // $('.inspectorSave').addClass('d-none');
-            }
-        }
-        if(positionCategory === 'Inspector'){
-            $('#dateOfTransfer').removeClass('d-none');
-            $('#seriesDesignation').text('Designation');
-            $('#divInspector').removeClass('d-none');
-            $('.btnSaveInspector').removeClass('d-none');
-            form.formSubmitInspector[0].reset();
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-            ],7);
+                initDropdownMasterDetailsByFkidCombos([
+                        '#text_training_orientation_ps_oper',
+                ],4);
+                initDropdownMasterDetailsByFkidCombos([
+                        '#text_training_orientation_es_oper',
+                ],5);
+                $('#seriesDesignation').text('Designation');
+                $('#productLine').addClass('d-none');
+                $('#dateOfTransfer').removeClass('d-none');
 
-            form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
-            if(approvalStatus !='LQCHEADAPP'){
-                $('.inspectorSave').removeClass('d-none')
-            }
+                form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+                $('#btnEmployeeOperator').prop('disabled',false);
+                
+                if(approvalStatus !='LQCHEADAPP'){
+                    $('.inspectorSave').removeClass('d-none')
+                }
 
             if( approvalStatus ==='LQCHEADAPP'){
                 $('.btnSaveInspector').addClass('d-none');
