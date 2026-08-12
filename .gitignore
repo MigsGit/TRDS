@@ -4,6 +4,7 @@
 /storage
 /vendor
 vendor
+.env_test
 .env
 .env.backup
 .phpunit.result.cache
