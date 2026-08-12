@@ -53,6 +53,8 @@
         $('#productLine').addClass('d-none');
         $('#seriesDesignation').text('Series Name');
         $('#dateOfTransfer').addClass('d-none');
+        $('#divTechnician').addClass('d-none'); // Added Chris
+
 
         if(positionCategory === 'Operator'){
             $('#productLine').removeClass('d-none');
