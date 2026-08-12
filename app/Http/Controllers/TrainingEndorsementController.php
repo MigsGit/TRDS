@@ -300,11 +300,15 @@ class TrainingEndorsementController extends Controller
             if(isset($data['endorsement_id'])){ // Update
                $inserted_te_id = $data['endorsement_id'];
                 TrainingEndorsement::where('id', $data['endorsement_id'])->update([
-                    'disapprove_remarks' => null,
-                    'disapprove_by'      => null,
-                    'mail_cc'            => implode(',', $data['attn']),
-                    'updated_by'         => $_SESSION['rapidx_user_id'] ?? 'system',
-                    'updated_at'         => now(),
+                    'disapprove_remarks'       => null,
+                    'disapprove_by'            => null,
+                    'mail_cc'                  => implode(',', $data['attn']),
+                    'hr_to_tu'                 => $data['hr_endorsement_to_operations_tu_date'] ?? null,
+                    'op_tu_training_date_from' => $data['operations_training_unit_training_date_from'] ?? null,
+                    'op_tu_training_date_to'   => $data['operations_training_unit_training_date_to'] ?? null,
+                    'op_tu_endorsement_to_req' => $data['operations_training_unit_endorsement_to_requestor'] ?? null,
+                    'updated_by'               => $_SESSION['rapidx_user_id'] ?? 'system',
+                    'updated_at'               => now(),
                 ]);
 
                 // 1. Fetch the OLD IDs and image details BEFORE deleting the records
@@ -391,16 +395,19 @@ class TrainingEndorsementController extends Controller
                 }
             }
             else{ // Create
-
                 $ctrl_no = $this->generateControlNumber();
                 $endorsementData = [
-                    'training_request_id' => $data['training_req_id'],
-                    'hr_memo_id'          => $data['hr_memo_id'],
-                    'date'                => $data['endorsement_date'],
-                    'ctrl_no'             => $ctrl_no,
-                    'mail_cc'             => implode(',', $data['attn']),
-                    'created_by'          => $_SESSION['rapidx_user_id'] ?? 'system',
-                    'created_at'          => now(),
+                    'training_request_id'      => $data['training_req_id'],
+                    'hr_memo_id'               => $data['hr_memo_id'],
+                    'date'                     => $data['endorsement_date'],
+                    'ctrl_no'                  => $ctrl_no,
+                    'mail_cc'                  => implode(',', $data['attn']),
+                    'hr_to_tu'                 => $data['hr_endorsement_to_operations_tu_date'] ?? null,
+                    'op_tu_training_date_from' => $data['operations_training_unit_training_date_from'] ?? null,
+                    'op_tu_training_date_to'   => $data['operations_training_unit_training_date_to'] ?? null,
+                    'op_tu_endorsement_to_req' => $data['operations_training_unit_endorsement_to_requestor'] ?? null,
+                    'created_by'               => $_SESSION['rapidx_user_id'] ?? 'system',
+                    'created_at'               => now(),
                 ];
                 $inserted_te_id = TrainingEndorsement::insertGetId($endorsementData);
                 foreach($list_of_employee as $employee){
