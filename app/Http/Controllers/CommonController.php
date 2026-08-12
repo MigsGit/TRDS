@@ -525,90 +525,91 @@ class CommonController extends Controller
 
     public function getApprovalStatus($approvalStatus){
         try {
+             $spanColor = 'bg-danger';
              switch ($approvalStatus) {
+                //TECHNICIAN
+                case 'ATECHENGTQ':
+                    $newStatus = 'ATECHENGTQ';
+                    $statusName = 'A Engineering Training Qualification Update';
+                    break;
+                case 'BTECHENGC':
+                    $newStatus = 'BTECHENGC';
+                    $statusName = 'B Engineering Certification Update';
+                    break;
+                case 'CTECHQCC':
+                    $newStatus = 'CTECHQCC';
+                    $statusName = 'C QC Certifacation Update';
+                    break;
+                case 'TECHHEADAPP':
+                    $newStatus = 'TECHHEADAPP';
+                    $statusName = 'For Section Head Approval';
+                    break;
                 //==== INSPECTOR
                 case 'ALQCTQ':
                     $newStatus = 'ALQCTQ';
                     $statusName = 'A LINE QUALITY CONTROL SECTION (Training and Qualification)';
-                    $spanColor = 'bg-danger';
                     break;
                 case 'BLQCTC':
                     $newStatus = 'BLQCTC';
                     $statusName = 'B LINE QUALITY CONTROL SECTION (Certification)';
-                    $spanColor = 'bg-danger';
                     break;
                 case 'CLQCOQC':
                     $newStatus = 'CLQCOQC';
                     $statusName = 'C VALIDATION PROCESS: QUALITY CONTROL SECTION <> OQC only';
-                    $spanColor = 'bg-danger';
                     break;
                 case 'LQCHEADAPP':
                     $newStatus = 'LQCHEADAPP';
                     $statusName = 'LQC HEAD APPROVAL';
-                    $spanColor = 'bg-danger';
                     break;
 
                 // ==== OPERATOR
                 case 'PB':
                     $approvalStatus = 'APRODTO';
                     $statusName = 'PREPARED BY';
-                    $spanColor = 'bg-danger';
                     break;
                 case 'APRODTO':
                     $approvalStatus = 'APRODTO';
                     $statusName = 'A Production Training Orientation';
-                    $spanColor = 'bg-danger';
-                    $spanColor = 'bg-danger';
                     break;
                 case 'BENGGTQ':
                     $approvalStatus = 'BENGGTQ';
                     $statusName = 'B Engineer Training Qualification';
-                    $spanColor = 'bg-danger';
                     break;
                 case 'CQCC':
                     $approvalStatus = 'CQCC';
                     $statusName = 'C Qc Certification';
-                    $spanColor = 'bg-danger';
                     break;
                 case 'DPPDONLY':
                     $newStatus = 'DPPDONLY';
                     $statusName = 'D PPD Update';
-                    $spanColor = 'bg-danger';
                     break;
                 case 'EENGVP':
                     $approvalStatus = 'EENGVP';
                     $statusName = 'E Engineering Validation Process';
-                    $spanColor = 'bg-danger';
                     break;
                 // case 'DPRDPPDONLY':
                 //     $newStatus = 'DPRDPPDONLY';
                 //     $statusName = 'D Production Update';
-                //     $spanColor = 'bg-danger';
                 //     break;
                 // case 'DENGGPPDONLY':
                 //     $newStatus = 'DENGGPPDONLY';
                 //     $statusName = 'D Engineering Update';
-                //     $spanColor = 'bg-danger';
                 //     break;
                 // case 'DQCPPDONLY':
                 //     $newStatus = 'DQCPPDONLY';
                 //     $statusName = 'D QC Update';
-                //     $spanColor = 'bg-danger';
                 //     break;
                 case 'EQCVP':
                     $approvalStatus = 'EQCVP';
                     $statusName = 'E Qc Validation Process';
-                    $spanColor = 'bg-danger';
                     break;
                 case 'FQCVVO':
                     $approvalStatus = 'FQCVVO';
                     $statusName = 'F Qc Validation Visual Operator';
-                    $spanColor = 'bg-danger';
                     break;
                 case 'QCAPP':
                     $approvalStatus = 'QCAPP'; //QC Supervisor Appoval
                     $statusName = 'QC Supervisor Approval';
-                    $spanColor = 'bg-danger';
                     break;
                 case 'OK':
                     $approvalStatus = 'CLOSED';
