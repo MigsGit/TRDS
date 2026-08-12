@@ -928,8 +928,11 @@ class TrainingEndorsementController extends Controller
         //     }
         // }
 
-        $trainingDateRange = "{$data->op_tu_training_date_from} - {$data->op_tu_training_date_to}";
+        // $trainingDateRange = "{$data->op_tu_training_date_from} - {$data->op_tu_training_date_to}";
 
+        $startDate = Carbon::parse($data->op_tu_training_date_from)->format('F j, Y');
+        $endDate = Carbon::parse($data->op_tu_training_date_to)->format('F j, Y');
+        $trainingDateRange = "{$startDate} - {$endDate}";
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,
