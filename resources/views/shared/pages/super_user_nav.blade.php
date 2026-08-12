@@ -159,8 +159,8 @@
 
                 <li class="nav-item has-treeview">
                     <a href="{{ route('ETR') }}" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>ETR</p>
+                        <i class="fas fa-cogs"></i>
+                        <p>TRDS Summary <br>Dashboard</p>
                     </a>
                 </li>
                 <li class="nav-header font-weight-bold">Export</li>
