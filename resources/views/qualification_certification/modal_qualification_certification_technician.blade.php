@@ -646,7 +646,10 @@
         </div>
     </div>
     
-    @include('qualification_certification.qc_training_items_table')
+    @include('qualification_certification.qc_training_items_table', [
+        'tableId'        => 'tblTrainingItems_tech',
+        'accordionParent' => '#accordionExampleTech',
+    ])
     <hr style="height: 5px; background-color: black; border: none;">
     <div class="row mb-3">
         <div class="col-md-6">
@@ -663,7 +666,7 @@
 
     <!-- <hr style="height: 1px; background-color: grey; border: none;"> -->
 
-    <div class="modal-footer">
+    <div class="modal-footer techSave">
         <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>Close</button>
         <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>Save Tech</button>
     </div>

@@ -1432,7 +1432,10 @@
                 </div>
                 </div>
             </div>
-            @include('qualification_certification.qc_training_items_table')
+            @include('qualification_certification.qc_training_items_table', [
+                'tableId'        => 'tblTrainingItems_ins',
+                'accordionParent' => '#accordionExampleInsp',
+            ])
              <hr style="height: 5px; background-color: black; border: none;">
             <div class="row mb-5">
                 <div class="col-md-6">
