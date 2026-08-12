@@ -76,33 +76,6 @@
                 if(approvalStatus ==='CQCC'){
                     $('#collapseThreeOper').addClass('show');
 
-                }
-                if(approvalStatus ==='DPPDONLY'){
-                    $('#collapseFourOper').addClass('show');
-                }
-                if(approvalStatus ==='ENGVP'){
-                    $('#collapseFiveOper').addClass('show');
-                }
-                if(approvalStatus ==='EQCVP'){
-                    $('#collapseSixOper').addClass('show');
-                }
-                if(approvalStatus ==='FQCVVO'){
-                    $('#collapseSevenOper').addClass('show');
-
-                } //LQCHEADAPP
-                if(approvalStatus ==='QCAPP'){
-                    $('.btnSaveInspector').addClass('d-none');
-                    $('.operSave').addClass('d-none');
-                    // $('.inspectorSave').addClass('d-none');
-                    $('.operApproved').removeClass('d-none');
-                }
-                if(approvalStatus ==='OK'){
-                    // $('#operDisapproved').addClass('d-none');
-                    $('.operApproved').addClass('d-none');
-                    // $('#operClosed').addClass('d-none');
-                    $('.operSave').addClass('d-none');
-                    // $('.inspectorSave').addClass('d-none');
-                }
             }
             if(positionCategory === 'Inspector'){
                 $('#dateOfTransfer').removeClass('d-none');
@@ -134,21 +107,30 @@
                     $('.inspectorSave').removeClass('d-none')
                 }
 
-                if( approvalStatus ==='LQCHEADAPP'){
-                    $('.btnSaveInspector').addClass('d-none');
-                    $('.operSave').addClass('d-none');
-                    // $('.inspectorSave').addClass('d-none');
-                    $('.operApproved').removeClass('d-none');
-                }
-                if(approvalStatus ==='OK'){
-                    // $('#operDisapproved').addClass('d-none');
-                    $('.operApproved').addClass('d-none');
-                    // $('#operClosed').addClass('d-none');
-                    $('.operSave').addClass('d-none');
-                    // $('.inspectorSave').addClass('d-none');
-                }
+            if( approvalStatus ==='LQCHEADAPP'){
+                $('.btnSaveInspector').addClass('d-none');
+                $('.operSave').addClass('d-none');
+                // $('.inspectorSave').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
             }
+            if(approvalStatus ==='OK'){
+                // $('#operDisapproved').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+                // $('#operClosed').addClass('d-none');
+                $('.operSave').addClass('d-none');
+                // $('.inspectorSave').addClass('d-none');
+            }
+        }
 
+        if(positionCategory === 'Technician'){
+            $('#divTechnician').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+             initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],7);
+        }
     }
     const togglePositionSectiontest = (position) => {
             initOperEmpModal();
@@ -177,7 +159,7 @@
                     $('#divMH').removeClass('d-none');
                     break;
                 case 'Technician':
-                    $('#divTechnian').removeClass('d-none');
+                    $('#Technician').removeClass('d-none');
                     break;
                 case 'Supervisor':
                 case 'Engineer':
@@ -978,11 +960,13 @@
             let aLqcTrainingQualification = data.a_lqc_training_qualification ?? [];
             let bLqcCertifications = data.b_lqc_certification ?? [];
             let cLqcOqcValidations = data.c_lqc_oqc_validation ?? [];
-
+            //INSPECTOR
             let aOperProdTrainingOrientation = data.a_oper_prod_training_orientation ?? [];
             let bOpEnggSectionTrainingOrientation = data.b_op_engg_section_training_orientation ?? [];
             let cQcCertification = data.c_qc_certification ?? [];
             let opApprovers = data.op_approvers?? [];
+            //TECHNICIAN
+            let aTechEngTrainingQualification = data.a_tech_eng_training_qualification ?? [];
 
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             const approvalStatus = data.approval_status ?? '';
@@ -1045,6 +1029,9 @@
                 editSelectionsMap6
             );
 
+            if(positionCategory === 'Inspector'){
+                syncCheckboxesWithDb('text_es_tech_training_orientation', aTechEngTrainingQualification?.text_es_tech_training_orientation,form.formSubmitTech);
+            }
             if(positionCategory === 'Inspector'){
                 const trainingOrientationInspector = aLqcTrainingQualification?.training_orientation_inspector;
                 form.formSubmitInspector.find('#text_training_orientation_ins_4').val(aLqcTrainingQualification?.training_orientation_ins_4);
