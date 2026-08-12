@@ -19,13 +19,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 
-
 Route::middleware('checkSession')->group(function(){
 
+   
     Route::get('/', function () {
         return view('blank');
     })->name('blank');
-
     Route::get('/training_attendance', function () {
         return view('training_attendance');
     })->name('training_attendance');
@@ -98,8 +97,9 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_training_request_controls', 'getTrainingRequestControls')->name('get_training_request_controls');
         Route::get('/get_training_request_ctrl_details', 'getTrainingRequestDetails')->name('get_training_request_ctrl_details');
         Route::get('/get_employees_for_not_endorsed', 'getEmployeesForNotEndorsed')->name('get_employees_for_not_endorsed');
-        Route::post('/add_not_endorsed_emp', 'addNotEndorsedEmp')->name('add_not_endorsed_emp');
         Route::get('/export_endorsement_pdf', 'exportEndorsementPdf')->name('export_endorsement_pdf');
+
+        Route::post('/add_not_endorsed_emp', 'addNotEndorsedEmp')->name('add_not_endorsed_emp');
         Route::post('/proceed_endorsement_approval', 'proceedEndorsementApproval')->name('proceed_endorsement_approval');
         Route::post('/approve_endorsement', 'approveEndorsement')->name('approve_endorsement');
         Route::post('/disapprove_endorsement', 'disapproveEndorsement')->name('disapprove_endorsement');
@@ -117,6 +117,8 @@ Route::middleware('checkSession')->group(function(){
         Route::post('save_form_send_email', 'saveFormSendEmail');
         Route::post('save_first_take_ins_sequence', 'saveFirstTakeInsSequence');
         Route::post('update_approval', 'updateApproval');
+        Route::post('save_qualification_certification_inspector', 'saveQualificationCertificationInspector');
+        Route::post('save_qc_lqc_training_items_by_qc_slip_id', 'saveQcLqcTrainingItemsByQcSlipId');
 
         Route::get('load_qc_slip', 'loadQcSlip');
         Route::get('get_div_dept_sec', 'getDivDeptSec');
@@ -124,6 +126,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('get_qc_slips_by_id', 'getQcSlipsById');
         Route::get('load1st_qc_validation', 'load1stQcValidation');
         Route::get('load2nd_qc_validation', 'load2ndQcValidation');
+        Route::get('/load_qc_lqc_training_items_by_qc_slip_id', 'loadQcLqcTrainingItemsByQcSlipId');
     });
 
     Route::controller(QuestionnairesController::class)->group(function () {

@@ -38,8 +38,8 @@ class CreateOpApproversTable extends Migration
             $table->string('second_status_2')->default('-')->comment('EVQC Status | PEN-Pending | PA-PASSED | FA-FAILED')->nullable();
             $table->longText('second_remarks')->nullable();
             $table->longText('second_approver_3')->comment('D- QC Certified')->nullable();
-            $table->longText('alert_prod_sec');
-            $table->longText('alert_prod_cc_sec');
+            $table->longText('alert_prod_sec')->nullable();
+            $table->longText('alert_prod_cc_sec')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

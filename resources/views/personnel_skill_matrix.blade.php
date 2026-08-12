@@ -146,9 +146,10 @@
 
                                 <div class="card-body">
                                     <div class="text-center mb-3">
-                                        {{-- <img src="images/default-user.png"
-                                            class="img-thumbnail rounded"
-                                            style="width:150px;height:180px;object-fit:cover;"> --}}
+                                        {{-- {{ asset('images/default-user.png') }} --}}
+                                        <img src="{{ asset('images/default-user') }}"
+                                        class="img-thumbnail rounded"
+                                        style="width:150px;height:180px;object-fit:cover;">
                                     </div>
 
                                     <div class="form-group row">
@@ -252,7 +253,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-success">Save Changes</button>
+                    {{-- <button class="btn btn-success">Save Changes</button> --}}
                     <button class="btn btn-secondary"data-dismiss="modal">Close</button>
                 </div>
 

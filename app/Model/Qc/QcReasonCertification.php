@@ -14,4 +14,10 @@ class QcReasonCertification extends Model
     {
         return $this->belongsTo(DropdownMasterDetail::class, 'reason_of_certification', 'id');
     }
+    protected $fillable = [
+        'qc_slips_id',
+        'reason_of_certification',
+        'transfer_flexibility',
+        'others',
+    ];
 }

@@ -11,7 +11,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Blank Page</h1>
+                    <h1>TRDSV2</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -30,10 +30,11 @@
                 <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Blank Page</h3>
+                            <h1 class="card-title">Welcome to Training Database System V2</h1>
                         </div>
                         <div class="card-body">
-                            Start Coding Here
+                            For concerns/issues, please contact ISS at local numbers 205, 206, or 208.
+                            Or you may send us e-mail at servicerequest@pricon.ph. Thank you!
                         </div>
                     </div>
                 </div>

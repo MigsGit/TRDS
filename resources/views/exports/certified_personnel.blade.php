@@ -66,12 +66,12 @@
                 <td style="text-align: center; border: 1px solid #000000;">{{ $row['station'] }}</td>
                 <td style="text-align: center; border: 1px solid #000000;">{{ $row['category'] }}</td>
                 <td style="text-align: center; border: 1px solid #000000;">{{ $row['date_hired'] }}</td>
-                <td style="text-align: center; border: 1px solid #000000; white-space: pre-wrap; word-wrap: break-word;">{!! nl2br(e($row['prod_name'])) !!}</td>
-                <td style="text-align: center; border: 1px solid #000000;">{{ $row['prod_date'] }}</td>
-                <td style="text-align: center; border: 1px solid #000000; white-space: pre-wrap; word-wrap: break-word;">{!! nl2br(e($row['eng_name'])) !!}</td>
-                <td style="text-align: center; border: 1px solid #000000;">{{ $row['eng_date'] }}</td>
-                <td style="text-align: center; border: 1px solid #000000; white-space: pre-wrap; word-wrap: break-word;">{!! nl2br(e($row['qc_name'])) !!}</td>
-                <td style="text-align: center; border: 1px solid #000000;">{{ $row['qc_date'] }}</td>
+                <td style="text-align: center; border: 1px solid #000000; white-space: pre-wrap; word-wrap: break-word;">{!! nl2br(e($row['prod_name'])) ?? 'N/A' !!}</td>
+                <td style="text-align: center; border: 1px solid #000000;">{{ $row['prod_date']  ?? 'N/A' }}</td>
+                <td style="text-align: center; border: 1px solid #000000; white-space: pre-wrap; word-wrap: break-word;">{!! nl2br(e($row['eng_name']))  ?? 'N/A' !!}</td>
+                <td style="text-align: center; border: 1px solid #000000;">{{ $row['eng_date']  ?? 'N/A' }}</td>
+                <td style="text-align: center; border: 1px solid #000000; white-space: pre-wrap; word-wrap: break-word;">{!! nl2br(e($row['qc_name']))  ?? 'N/A' !!}</td>
+                <td style="text-align: center; border: 1px solid #000000;">{{ $row['qc_date']  ?? 'N/A' }}</td>
                 @if ($row['remarks'] === 'PASSED')
                     <td style="text-align: center; font-weight: bold; color: #006100; background-color: #C6EFCE; border: 1px solid #000000;">{{ $row['remarks'] }}</td>
                 @else
