@@ -736,13 +736,8 @@ class QualificationCertificationController extends Controller
                 'appproval_at' => now()
             ]);
 
-            if($qcSlip->position_category === 'Operator'){
-                $qcModel = OpApprover::class;
-            }
-            if($qcSlip->position_category === 'Inspector'){
-                $qcModel = OpApprover::class;
-            }
-           $operToApprovers = [
+            $qcModel = OpApprover::class;
+            $operToApprovers = [
                 "decision_status"  => 'APP',
             ];
 
@@ -850,7 +845,7 @@ class QualificationCertificationController extends Controller
             ->all();
 
             $arrApprovers = $qcSlip->op_approvers;
-            
+
             $json = [
                 'is_success' => 'true',
                 'qcSlip' => $qcSlip,

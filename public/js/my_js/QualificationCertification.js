@@ -170,6 +170,7 @@
             }
         }
         if(positionCategory === 'Inspector'){
+            initTrainingItemsTable('#tblTrainingItems_ins');
             $('#dateOfTransfer').removeClass('d-none');
             $('#seriesDesignation').text('Designation');
             $('#divInspector').removeClass('d-none');
@@ -190,7 +191,6 @@
                 // $('.btnSaveMatrix').removeClass('d-none');
 
             }
-            initTrainingItemsTable('#tblTrainingItems_ins');
 
             if( approvalStatus ==='LQCHEADAPP'){
                 $('.btnSaveInspector').addClass('d-none');
@@ -208,6 +208,7 @@
         }
 
         if(positionCategory === 'Technician'){
+            initTrainingItemsTable('#tblTrainingItems_tech');
             $('#divTechnician').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
             $('#seriesDesignation').text('Designation');
@@ -226,7 +227,6 @@
                 $('.techSave').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
             }
-            initTrainingItemsTable('#tblTrainingItems_tech');
         }
     }
     const togglePositionSectiontest = (position) => {
