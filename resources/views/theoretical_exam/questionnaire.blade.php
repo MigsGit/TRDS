@@ -204,7 +204,6 @@
                                 </div>
 
                                 <div class="card-body">
-
                                     <!-- Category | Passing Score -->
                                     <div class="row">
                                         <div class="col-md-6">
@@ -1382,11 +1381,30 @@
                 $(this).closest(".input-group").remove();
             });
 
+            // function updateAnswers() {
+            //     let answers = [];
+
+            //     $(".chkAnswer:checked").each(function (){
+            //         answers.push($(this).closest(".input-group").find("input[name='choices[]']").val());
+            //     });
+
+            //     $('#choiceAnswerHidden').val(answers.join(" || "));
+            // }
+
             function updateAnswers() {
                 let answers = [];
 
-                $(".chkAnswer:checked").each(function (){
-                    answers.push($(this).closest(".input-group").find("input[name='choices[]']").val());
+                $(".chkAnswer:checked").each(function () {
+                    let answer = $(this)
+                        .closest(".input-group")
+                        .find("input[name='choices[]']")
+                        .val();
+
+                    // Remove leading/trailing spaces
+                    // and convert multiple spaces into one
+                    answer = answer.trim().replace(/\s+/g, " ");
+
+                    answers.push(answer);
                 });
 
                 $('#choiceAnswerHidden').val(answers.join(" || "));

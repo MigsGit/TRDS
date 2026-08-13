@@ -695,7 +695,7 @@ class QualificationCertificationController extends Controller
             // $from_name = 'issinfoservice@pricon.ph';
             $message = $this->commonController->emailMsg($emailParams);
             $rapidxEmpNo =  session('global_user');
-            return $emailData = [
+            $emailData = [
                 "to" =>$to,
                 // "to" =>"mrronquez@pricon.ph",
                 "cc" =>$cc,

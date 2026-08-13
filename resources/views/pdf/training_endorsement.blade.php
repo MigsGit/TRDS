@@ -313,7 +313,8 @@
                         <span style="display:block; font-weight: bold;">
                             {{ $checker->approver_details->name ?? '' }}
                             <br>
-                            QC Training Supervisor
+                            {{-- QC Training Supervisor --}}
+                            {{ $checker->approver_details->employee_info->Position ?? '' }}
                         </span>
                     </div>
                 @endforeach
@@ -331,13 +332,13 @@
                         <span style="display:block; font-weight: bold;">
                             {{ $approver->approver_details->name ?? '' }}
                             <br>
-                            @if ($approver->approver_details->employee_number == 2055)
+                            {{-- @if ($approver->approver_details->employee_number == 2055)
                                 TU Head
                             @elseif ($approver->approver_details->employee_number == 'S022')
                                 General Manager
-                            @else
+                            @else --}}
                                 {{ $approver->approver_details->employee_info->Position ?? '' }}
-                            @endif
+                            {{-- @endif --}}
                         </span>
                     </div>
                 @endforeach

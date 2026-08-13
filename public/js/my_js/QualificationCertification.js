@@ -113,6 +113,7 @@
         $('#dateOfTransfer').addClass('d-none');
         $('.techSave').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
+        $('#divTechnician').addClass('d-none');
         if(positionCategory === 'Operator'){
             $('#productLine').removeClass('d-none');
             $('#div_Oper').removeClass('d-none');
@@ -152,7 +153,6 @@
             }
             if(approvalStatus ==='FQCVVO'){
                 $('#collapseSevenOper').addClass('show');
-
             } //LQCHEADAPP
             if(approvalStatus ==='QCAPP'){
                 $('.btnSaveInspector').addClass('d-none');
