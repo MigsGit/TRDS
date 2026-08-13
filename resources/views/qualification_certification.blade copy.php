@@ -15,12 +15,6 @@
        max-height: 80vh; overflow-y: auto;
     }
 </style>
-
-<style>
-    .card-body {
-       max-height: 80vh; overflow-y: auto;
-    }
-</style>
 <div class="wrapper">
     <div class="content-wrapper">
         <section class="content-header">
@@ -249,10 +243,6 @@
                               @include('qualification_certification.modal_qualification_certification_technician')
                         </div>
                     </div>
-                         <div class="modal-footer justify-content-end">
-                            <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button>
-                            <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
-                        </div>
                 </div>
             </div>
         </div>
@@ -275,6 +265,7 @@
             operator: '',
             fvi_operator: '',
             tbl_fvi_operator_2: '',
+            training_items: '',
         };
         table = {
            operator: '#tbl_operator',
@@ -287,6 +278,7 @@
             // resetFormValues({'frmId'  :   form.formSubmitMh})
             // resetFormValues({'frmId'  :   form.formSubmitInspector})
         });
+
         const updateApproval = (params) => {
             let data = {
                 decision : params.decision,
@@ -387,10 +379,42 @@
                 { "data" : "second_take_ins_assessment_result","name":"second_take_ins_assessment_result", orderable: false, searchable: false  },
             ],
         });
-        // Training-items tables are initialized on demand via initTrainingItemsTable()
-        // in QualificationCertification.js (called from getApprovalStatusToggle).
+        dataTable.training_items = $('#tblTrainingItems').DataTable({
+            processing: true,
+            serverSide: true,
+            paging: false,         // Display all matrix items in one view
+            searching: false,      // Matrix layout does not require search bar
+            info: false,
+            ordering: false,
+            ajax: {
+                url: "load_qc_lqc_training_items_by_qc_slip_id",
+                type: "GET",
+                data: function (params) {
+                    params.qc_slips_id = $('#qc_slips_id').val()??'';
+                }
+            },
+            columns: [
+                { data: 'item_name', name: 'item_name' },
+                { data: 'day_1', name: 'day_1', className: 'text-center' },
+                { data: 'day_2', name: 'day_2', className: 'text-center' },
+                { data: 'day_3', name: 'day_3', className: 'text-center' },
+                { data: 'day_4', name: 'day_4', className: 'text-center' },
+                { data: 'day_5', name: 'day_5', className: 'text-center' },
+                { data: 'remarks', name: 'remarks' }
+            ]
+        });
+        // Pre-fill Day 1–5 date inputs in the #tblTrainingItems header from server response
+        dataTable.training_items.on('xhr', function () {
+            var json = dataTable.training_items.ajax.json();
+            if (json && json.headerDates) {
+                $.each(json.headerDates, function (dayNumber, dateValue) {
+                    $('.tblTrainingItems').closest('.table-responsive')
+                        .find('.header-date-input[data-day="' + dayNumber + '"]')
+                        .val(dateValue || '');
+                });
+            }
+        });
 
-        // alert('dsad')
         $('#select_position').change(function (e) {
             e.preventDefault();
             $('#select_access').val('').trigger('change');
@@ -585,7 +609,7 @@
                     saveInspectorDetails();
                     break;
                 case 'Operator':
-                    saveFormOper(form.formSubmitOper);
+                    saveFormOper();
                     break;
                 default:
                     alert('Unknown position selected. Please select a valid position.');
@@ -706,8 +730,8 @@
                 positionCategory: $('#text_select_position').val(),
             }
             getApprovalStatusToggle(params)
-           
-           
+
+
         }
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
@@ -844,45 +868,43 @@
         $(document).on('click', '#tbl_fvi_operator .btn-delete-fvi-row', function () {
             $(this).closest('tr').remove();
         });
-        // Delegated save handler — works for any .btnSaveMatrix button; table is
-        // identified via data-table-id so both inspector and technician contexts
-        // can share a single handler without ID collisions.
-        $(document).on('click', '.btnSaveMatrix', function () {
-            var tableId    = $(this).data('table-id');
-            var $table     = $('#' + tableId);
-            var matrixData = [];
-
-            $table.find('tbody tr').each(function () {
-                var row    = $(this);
-                var itemId = row.find('.input-remark').attr('data-item-id');
+        $('#btnSaveMatrix').on('click', function () {
+            let matrixData = [];
+            $('#tblTrainingItems tbody tr').each(function () {
+                let row = $(this);
+                let itemId = row.find('.input-remark').attr('data-item-id');
                 if (itemId) {
-                    var dayResults = {};
+                    let dayResults = {};
                     row.find('.input-result').each(function () {
-                        dayResults['day_' + $(this).data('day')] = $(this).val();
+                        let dayNum = $(this).data('day');
+                        dayResults['day_' + dayNum] = $(this).val();
                     });
+
                     matrixData.push({
                         training_item_id: itemId,
                         day_results:      dayResults,
                         remark:           row.find('.input-remark').val(),
-                        sub_description:  row.find('.input-sub-desc').val() || null,
+                        sub_description:  row.find('.input-sub-desc').val() ?? null,
                     });
                 }
             });
-
-            var dayDates = {};
-            $table.closest('.table-responsive')
+            // Collect header dates keyed as day_dates[day_N]
+            let dayDates = {};
+            $('#tblTrainingItems').closest('.table-responsive')
                 .find('.header-date-input').each(function () {
                     dayDates['day_' + $(this).data('day')] = $(this).val();
                 });
+            //     console.log('dayDates',dayDates);
+            // return;
 
             $.ajax({
                 url:  "save_qc_lqc_training_items_by_qc_slip_id",
                 type: "POST",
                 data: {
-                    _token:      "{{ csrf_token() }}",
+                    _token:     "{{ csrf_token() }}",
                     qc_slips_id: $('#qc_slips_id').val(),
-                    matrix:      matrixData,
-                    day_dates:   dayDates,
+                    matrix:     matrixData,
+                    day_dates:  dayDates,
                 },
                 success: function (response) {
                     if (response.is_success === 'true') {
@@ -894,6 +916,7 @@
         $('#btnCreateCQForm').click(function (e) {
             e.preventDefault();
             let categoryPosition = $('#text_select_position').val();
+            dataTable.training_items.draw();
             togglePositionSection(categoryPosition);
         });
     });
