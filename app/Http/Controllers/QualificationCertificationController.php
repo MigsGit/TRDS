@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use  App\Model\Qc\OpApprover;
 use App\Http\Controllers\CommonController;
 use App\Http\Requests\ALqcTrainingQualificationRequest;
 use App\Http\Requests\AOperProdTrainingOrientationRequest;
@@ -21,6 +22,7 @@ use App\Model\DropdownMaster;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
 use App\Model\Qc\AOperProdTrainingOrientation;
+use App\Model\Qc\ATechEngTrainingQualification;
 use App\Model\Qc\BLqcCertification;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
 use App\Model\Qc\CLqcOqcValidation;
@@ -37,7 +39,6 @@ use App\Model\SystemHrisViewDivDeptSec;
 use App\Model\SystemOneHrisEmpInfo;
 use App\Model\SystemOneHrisSubcon;
 use App\Model\SystemOneSubconEmpInfo;
-use  App\Model\Qc\OpApprover;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -509,7 +510,7 @@ class QualificationCertificationController extends Controller
                             'es_tech_training_orientation_15'     => $this->getSafe($request, 'text_es_tech_training_orientation_15'),
                             'es_tech_training_orientation_16'     => $this->getSafe($request, 'text_es_tech_training_orientation_16')
                         ];
-                        $qcModelApprover::updateOrCreate(
+                        ATechEngTrainingQualification::updateOrCreate(
                             ['qc_slips_id' => $qcSlipId],
                             $aEngTq
                         );
@@ -735,13 +736,8 @@ class QualificationCertificationController extends Controller
                 'appproval_at' => now()
             ]);
 
-            if($qcSlip->position_category === 'Operator'){
-                $qcModel = OpApprover::class;
-            }
-            if($qcSlip->position_category === 'Inspector'){
-                $qcModel = OpApprover::class;
-            }
-           $operToApprovers = [
+            $qcModel = OpApprover::class;
+            $operToApprovers = [
                 "decision_status"  => 'APP',
             ];
 
@@ -795,7 +791,6 @@ class QualificationCertificationController extends Controller
         }
     }
     public function getQcSlipsById(Request $request){ //nmodify
-
         try {
             $qcSlipPosition = QcSlip::
             where('id',$request->qcSlipsId)
@@ -816,7 +811,7 @@ class QualificationCertificationController extends Controller
                 'f_qc_validation',
 
                 //Techician
-                'a_tech_eng_training_qualification',
+                // 'a_tech_eng_training_qualification',
             ];
             $qcSlip = QcSlip::with($arrRelation)
             ->where('id',$request->qcSlipsId)
@@ -850,7 +845,7 @@ class QualificationCertificationController extends Controller
             ->all();
 
             $arrApprovers = $qcSlip->op_approvers;
-            
+
             $json = [
                 'is_success' => 'true',
                 'qcSlip' => $qcSlip,
