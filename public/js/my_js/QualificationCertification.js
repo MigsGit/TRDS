@@ -111,9 +111,8 @@
         $('#productLine').addClass('d-none');
         $('#seriesDesignation').text('Series Name');
         $('#dateOfTransfer').addClass('d-none');
-        // $('.btnSaveMatrix').addClass('d-none');
-        // alert('dsad')
         $('.techSave').addClass('d-none');
+        $('.btnSaveMatrix').addClass('d-none');
         if(positionCategory === 'Operator'){
             $('#productLine').removeClass('d-none');
             $('#div_Oper').removeClass('d-none');
@@ -176,6 +175,7 @@
             $('#divInspector').removeClass('d-none');
             $('.btnSaveInspector').removeClass('d-none');
             form.formSubmitInspector[0].reset();
+
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
@@ -188,7 +188,7 @@
             }
             if(approvalStatus ==='CLQCOQC'){
                 // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
-                // $('.btnSaveMatrix').removeClass('d-none');
+                $('.btnSaveMatrix').removeClass('d-none');
 
             }
 
@@ -219,7 +219,7 @@
             ],7);
             if(approvalStatus ==='CTECHQCC'){
                 // $('#btnSaveMatrix_tblTrainingItems_tech').removeClass('d-none');
-                // $('.btnSaveMatrix').removeClass('d-none');
+                $('.btnSaveMatrix').removeClass('d-none');
             }
             if(approvalStatus === 'TECHHEADAPP'){
                 // $('.btnSaveInspector').addClass('d-none');
@@ -1338,11 +1338,11 @@
                 checkCheckboxesFromColumn(bOpEnggSectionTrainingOrientation?.engg_orientation_docs,'chk',form.formSubmitOper);
 
                 form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper);
-                form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
-                form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ok_es_oper);
-                form.formSubmitOper.find('#text_first_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
+                form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper);
+                form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
+                form.formSubmitOper.find('#text_first_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ok_es_oper);
+                form.formSubmitOper.find('#text_first_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
                 form.formSubmitOper.find('#text_oa_1st_result_es_oper').val(bOpEnggSectionTrainingOrientation?.oa_1st_result_es_oper);
-                // form.formSubmitOper.find('#text_first_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
 
 
                 form.formSubmitOper.find('#text_obs_second_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_second_result_es_oper);
