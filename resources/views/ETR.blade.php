@@ -69,12 +69,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>ETR</h1>
+                        <h1>TRDS / ETR</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('blank') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">ETR</li>
+                            <li class="breadcrumb-item active">TRDS / ETR</li>
                         </ol>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
                             <div class="col-lg-6 col-md-12 mb-2 mb-lg-0">
                                 <h4 class="mb-0 font-weight-bold">
                                     <i class="fa fa-users text-dark mr-2"></i>
-                                    Employee Training Record (ETR)
+                                    Training Record of Employee
                                 </h4>
                             </div>
 
@@ -351,7 +351,9 @@
 
             $('.get-employee-info').on('select2:select', function (e) {
                 const data = e.params.data;
+                const hiringStatus = data.hiringStatus;
                 console.log(data);
+                console.log(hiringStatus);
                 console.log('employeeNo',data.employeeNo);
 
                 $('#displayEmployeeName').text(data.text);
@@ -362,15 +364,21 @@
                 $('#dateHired').text(data.dateHired);
                 $('#employmentStatus').text(data.employmentStatus);
 
-                switch (data.hiringStatus) {
-                    case '1':
-                        $('#hiringStatus').text('Contractual');
-                        break;
-                    case '2':
-                        $('#hiringStatus').text('Probationary');
-                        break;
-                    default:
-                        $('#hiringStatus').text('Regular');
+                if(hiringStatus === 'Contractual'){
+                    $('#hiringStatus').text('Contractual');
+                } else if(hiringStatus === 'Probationary'){
+                    $('#hiringStatus').text('Probationary');
+                }else{
+                    switch(hiringStatus){
+                        case '1':
+                            $('#hiringStatus').text('Contractual');
+                            break;
+                        case '2':
+                            $('#hiringStatus').text('Probationary');
+                            break;
+                        default:
+                            $('#hiringStatus').text('Regular');
+                    }
                 }
 
                 getEmployeeTrainingRecordId = data.id
@@ -407,35 +415,35 @@
                 ]
             });
 
-            // dataTRDSSummary = $("#tableTrdsSummary").DataTable({
-            //     "processing" : false,
-            //     "serverSide" : true,
-            //     "responsive": true,
-            //     "order": [[0, "desc"]],
-            //     "language": {
-            //         "info": "Showing _START_ to _END_ of _TOTAL_ TRDS Summary",
-            //         "lengthMenu": "Show _MENU_ TRDS Summary",
-            //     },
-            //     "ajax" : {
-            //         url: "view_trds_summary",
-            //         data: function (d) {
-            //             d.getEmployeeNoForTrdsSummary = getEmployeeNoForTrdsSummary;
-            //         }
-            //     },
-            //     "columns": [
-            //         { data: 'trainingDate'},
-            //         { data: 'title'},
-            //         { data: 'seriesName'},
-            //         { data: 'station'},
-            //         { data: 'detailedStation'},
-            //         { data: 'objective' },
-            //         { data: 'trainor' },
-            //         { data: 'result' },
-            //         { data: 'trainingVenue' },
-            //         { data: 'typeOfTraining' },
-            //         { data: 'training_remarks' },
-            //     ]
-            // });
+            dataTRDSSummary = $("#tableTrdsSummary").DataTable({
+                "processing" : false,
+                "serverSide" : true,
+                "responsive": true,
+                "order": [[0, "desc"]],
+                "language": {
+                    "info": "Showing _START_ to _END_ of _TOTAL_ TRDS Summary",
+                    "lengthMenu": "Show _MENU_ TRDS Summary",
+                },
+                "ajax" : {
+                    url: "view_trds_summary",
+                    data: function (d) {
+                        d.getEmployeeNoForTrdsSummary = getEmployeeNoForTrdsSummary;
+                    }
+                },
+                "columns": [
+                    { data: 'trainingDate'},
+                    { data: 'title'},
+                    { data: 'seriesName'},
+                    { data: 'station'},
+                    { data: 'detailedStation'},
+                    { data: 'objective' },
+                    { data: 'trainor' },
+                    { data: 'result' },
+                    { data: 'trainingVenue' },
+                    { data: 'typeOfTraining' },
+                    { data: 'training_remarks' },
+                ]
+            });
         });
     </script>
 @endsection

@@ -47,7 +47,7 @@ class HrMemoController extends Controller
             ])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
 
         // return $hr_memo_details;
-        
+
         // foreach($hr_memo_details as $memo_detail){
         //     foreach($memo_detail->trainee_details as $td){
         //         if ($td->employment_type == 1) {
@@ -67,10 +67,10 @@ class HrMemoController extends Controller
         //         }
         //     }
         // }
-        
+
         return DataTables::of($hr_memo_details)
         ->addColumn('action', function($hr_memo_details) use ($user_access, $globalUser){
-            $result = "";   
+            $result = "";
             $result .= "<center>";
 
             $canApproveHR  = $globalUser->rapidx_emp_id == $hr_memo_details->noted_by || $globalUser->user_level_id == 1; //Noted By Person & SuperAdmin Userlevel only is allowed
@@ -123,7 +123,7 @@ class HrMemoController extends Controller
             return $result;
         })
         ->addColumn('trainee_names', function($hr_memo_details){
-            
+
             $trainee_names = [];
 
             foreach($hr_memo_details->trainee_details as $td){
@@ -187,6 +187,7 @@ class HrMemoController extends Controller
 
             return $result;
         })
+
         ->addColumn('prepared_by_label', function($hr_memo_details){
             $prepared_by_name = $hr_memo_details->prepared_by_info->name ?? (object) ['name' => 'N/A'];
             $created_at_date = $hr_memo_details->created_at ? date("M j, Y h:i:s A", strtotime($hr_memo_details->created_at)) : '---';
@@ -217,7 +218,7 @@ class HrMemoController extends Controller
 
             // $received_status = !empty($hr_memo_details->received_date) ? 'Received' : 'Pending';
             // $badge_status = !empty($hr_memo_details->received_date) ? 'badge-success' : 'badge-secondary';
-                
+
             $result = "
                 <center>
                     <strong>{$received_by_name}<strong><br>
@@ -330,12 +331,12 @@ class HrMemoController extends Controller
 
         // CASE 1: Employee number exists
         // if (!empty($empNo)) {
-        
+
             $training_venue = DB::connection('mysql_systemone')->select($trainingVenueQuery);
 
             $hris = DB::connection('mysql_systemone')
                 ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
-                
+
 
             if (!empty($hris)) {
                 return response()->json([
@@ -680,7 +681,7 @@ class HrMemoController extends Controller
         $subcon = DB::connection('mysql_subcon')->select($subconTrainorQuery);
 
         $merged_trainor_list = array_merge($hris, $subcon);
-            
+
         return response()->json([
             'trainor_list' => $merged_trainor_list
         ]);

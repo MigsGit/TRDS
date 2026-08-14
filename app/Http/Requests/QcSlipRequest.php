@@ -25,7 +25,7 @@ class QcSlipRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'select_section' => 'required',
+            'select_section' => 'required',
             'text_select_position' => 'required',
             'text_section_operator' => 'required',
             'text_series_operator' => 'required',

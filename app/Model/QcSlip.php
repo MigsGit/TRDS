@@ -2,21 +2,22 @@
 
 namespace App\Model;
 
-use App\Model\Qc\BLqcCertification;
-use App\Model\Qc\CLqcOqcValidation;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
 use App\Model\Qc\AOperProdTrainingOrientation;
+use App\Model\Qc\ATechEngTrainingQualification;
+use App\Model\Qc\BLqcCertification;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
+use App\Model\Qc\CLqcOqcValidation;
 use App\Model\Qc\CQcCertification;
 use App\Model\Qc\DPpdCertificationCompletion;
 use App\Model\Qc\EQcValidationProcess;
 use App\Model\Qc\FQcValidation;
+use App\Model\Qc\OpApprover;
 use App\Model\Qc\QcLqcApprover;
 use App\Model\Qc\QcReasonCertification;
 use App\Model\Qc\QcSlipEmployee;
 use App\Model\RapidXUser;
-use App\Model\Qc\OpApprover;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -118,10 +119,11 @@ class QcSlip extends Model
     {
         return $this->hasOne(BLqcCertification::class, 'qc_slips_id',  'id')->where('deleted_at');
     }
-    // public function c_lqc_oqc_validation()
-    // {
-    //     return $this->hasOne(CLqcOqcValidation::class, 'qc_slips_id',  'id')->where('deleted_at');
-    // }
+    //TECHNICIAN
+    public function a_tech_eng_training_qualification()
+    {
+        return $this->hasOne(ATechEngTrainingQualification::class, 'qc_slips_id',  'id')->where('deleted_at');
+    }
 
 
 }

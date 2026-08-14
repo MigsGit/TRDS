@@ -166,8 +166,20 @@ class TrainingEndorsementController extends Controller
                     foreach($checker as $checker){
                         $format_updated_at = $checker['updated_at'] ? Carbon::parse($checker['updated_at'])->format('Y-m-d H:i:s') : null;
                         if($checker['updated_at'] != null){
-                            $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
-                            $result .= "<em >{$format_updated_at}</em><br>";
+                            if($row->status == 0 && !is_null($row->disapprove_remarks) && !is_null($row->disapprove_by)){
+                                if($row->disapprove_by == $checker['rapidx_id']){
+                                    $result .= "<span class='badge badge-danger mt-1'>{$checker['approver_details']['name']}</span><br>";
+                                    $result .= "<em >{$format_updated_at}</em><br>";
+                                }
+                                else{
+                                    $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
+                                    $result .= "<em >{$format_updated_at}</em><br>";
+                                }
+                            }
+                            else{
+                                $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
+                                $result .= "<em >{$format_updated_at}</em><br>";
+                            }
                         }
                         else{
                             $result .= "<span class='badge badge-warning mt-1'>{$checker['approver_details']['name']}</span><br>";
@@ -288,11 +300,15 @@ class TrainingEndorsementController extends Controller
             if(isset($data['endorsement_id'])){ // Update
                $inserted_te_id = $data['endorsement_id'];
                 TrainingEndorsement::where('id', $data['endorsement_id'])->update([
-                    'disapprove_remarks' => null,
-                    'disapprove_by'      => null,
-                    'mail_cc'            => implode(',', $data['attn']),
-                    'updated_by'         => $_SESSION['rapidx_user_id'] ?? 'system',
-                    'updated_at'         => now(),
+                    'disapprove_remarks'       => null,
+                    'disapprove_by'            => null,
+                    'mail_cc'                  => implode(',', $data['attn']),
+                    'hr_to_tu'                 => $data['hr_endorsement_to_operations_tu_date'] ?? null,
+                    'op_tu_training_date_from' => $data['operations_training_unit_training_date_from'] ?? null,
+                    'op_tu_training_date_to'   => $data['operations_training_unit_training_date_to'] ?? null,
+                    'op_tu_endorsement_to_req' => $data['operations_training_unit_endorsement_to_requestor'] ?? null,
+                    'updated_by'               => $_SESSION['rapidx_user_id'] ?? 'system',
+                    'updated_at'               => now(),
                 ]);
 
                 // 1. Fetch the OLD IDs and image details BEFORE deleting the records
@@ -379,16 +395,19 @@ class TrainingEndorsementController extends Controller
                 }
             }
             else{ // Create
-
                 $ctrl_no = $this->generateControlNumber();
                 $endorsementData = [
-                    'training_request_id' => $data['training_req_id'],
-                    'hr_memo_id'          => $data['hr_memo_id'],
-                    'date'                => $data['endorsement_date'],
-                    'ctrl_no'             => $ctrl_no,
-                    'mail_cc'             => implode(',', $data['attn']),
-                    'created_by'          => $_SESSION['rapidx_user_id'] ?? 'system',
-                    'created_at'          => now(),
+                    'training_request_id'      => $data['training_req_id'],
+                    'hr_memo_id'               => $data['hr_memo_id'],
+                    'date'                     => $data['endorsement_date'],
+                    'ctrl_no'                  => $ctrl_no,
+                    'mail_cc'                  => implode(',', $data['attn']),
+                    'hr_to_tu'                 => $data['hr_endorsement_to_operations_tu_date'] ?? null,
+                    'op_tu_training_date_from' => $data['operations_training_unit_training_date_from'] ?? null,
+                    'op_tu_training_date_to'   => $data['operations_training_unit_training_date_to'] ?? null,
+                    'op_tu_endorsement_to_req' => $data['operations_training_unit_endorsement_to_requestor'] ?? null,
+                    'created_by'               => $_SESSION['rapidx_user_id'] ?? 'system',
+                    'created_at'               => now(),
                 ];
                 $inserted_te_id = TrainingEndorsement::insertGetId($endorsementData);
                 foreach($list_of_employee as $employee){
@@ -737,13 +756,14 @@ class TrainingEndorsementController extends Controller
         ->where('id', $request->id)
         ->first();
 
-        $collectEndorsementToRequestorDate = collect($data->training_request_details->training_request_details ?? [])
-        ->flatMap(function ($detail) {
-            return $detail->training_attendance;
-        })
-        ->max('date');
+        // $collectEndorsementToRequestorDate = collect($data->training_request_details->training_request_details ?? [])
+        // ->flatMap(function ($detail) {
+        //     return $detail->training_attendance;
+        // })
+        // ->max('date');
 
-        $dateEndorsementToRequestor = $collectEndorsementToRequestorDate ? Carbon::parse($collectEndorsementToRequestorDate)->format('F d, Y') : null;
+        // $dateEndorsementToRequestor = $collectEndorsementToRequestorDate ? Carbon::parse($collectEndorsementToRequestorDate)->format('F d, Y') : null;
+        $dateEndorsementToRequestor = $data->op_tu_endorsement_to_req ? Carbon::parse($data->op_tu_endorsement_to_req)->format('F d, Y') : null;
 
         if (!$data) {
             abort(404, 'Endorsement not found.');
@@ -877,36 +897,42 @@ class TrainingEndorsementController extends Controller
 
         $attnEmails = $data->mail_cc ?? '';
         $endorsementDate = $data->date ? Carbon::parse($data->date)->format('F j, Y') : '';
-        $hr_memo_date_filed = $data->hr_memo_details->date_filed ? Carbon::parse($data->hr_memo_details->date_filed)->format('F j, Y') : '';
+        // $hr_memo_date_filed = $data->hr_memo_details->date_filed ? Carbon::parse($data->hr_memo_details->date_filed)->format('F j, Y') : '';
+        $hr_memo_date_filed = $data->hr_to_tu ? Carbon::parse($data->hr_to_tu)->format('F j, Y') : '';
 
-        // Getting Training Dates
-        $collection = collect($data);
+        // // Getting Training Dates
+        // $collection = collect($data);
 
-        // 1. Get all 'training_attendance' arrays from all employees
-        $allAttendance = collect($collection->get('training_endorsement_employees'))
-            ->pluck('training_request_details_info.training_attendance')
-            ->collapse(); // Flattens the multidimensional array into a single list
+        // // 1. Get all 'training_attendance' arrays from all employees
+        // $allAttendance = collect($collection->get('training_endorsement_employees'))
+        //     ->pluck('training_request_details_info.training_attendance')
+        //     ->collapse(); // Flattens the multidimensional array into a single list
 
 
-        // 2. Extract only the 'date' column and filter out empty/null values
-        $dates = $allAttendance->pluck('date')->filter();
+        // // 2. Extract only the 'date' column and filter out empty/null values
+        // $dates = $allAttendance->pluck('date')->filter();
 
-        // 3. Extract your lowest and highest dates
-        $lowestDate  = $dates->min();
-        $highestDate = $dates->max();
+        // // 3. Extract your lowest and highest dates
+        // $lowestDate  = $dates->min();
+        // $highestDate = $dates->max();
 
-        $trainingDateRange = '';
-        if ($lowestDate && $highestDate) {
-            $startDate = Carbon::parse($lowestDate)->format('F j, Y');
-            $endDate   = Carbon::parse($highestDate)->format('F j, Y');
+        // $trainingDateRange = '';
+        // if ($lowestDate && $highestDate) {
+        //     $startDate = Carbon::parse($lowestDate)->format('F j, Y');
+        //     $endDate   = Carbon::parse($highestDate)->format('F j, Y');
 
-            if ($startDate === $endDate) {
-                $trainingDateRange = $startDate;
-            } else {
-                $trainingDateRange = "{$startDate} - {$endDate}";
-            }
-        }
+        //     if ($startDate === $endDate) {
+        //         $trainingDateRange = $startDate;
+        //     } else {
+        //         $trainingDateRange = "{$startDate} - {$endDate}";
+        //     }
+        // }
 
+        // $trainingDateRange = "{$data->op_tu_training_date_from} - {$data->op_tu_training_date_to}";
+
+        $startDate = Carbon::parse($data->op_tu_training_date_from)->format('F j, Y');
+        $endDate = Carbon::parse($data->op_tu_training_date_to)->format('F j, Y');
+        $trainingDateRange = "{$startDate} - {$endDate}";
         $pdf = Pdf::loadView('pdf.training_endorsement', [
             'endorsement'                   => $data,
             'to'                            => $attnEmails,
@@ -919,7 +945,7 @@ class TrainingEndorsementController extends Controller
             'endorsement_to_requestor_date' => $endorsementDate,
             'employees'                     => $employees,
             'employees_will_not_endorse'    => $employees_will_not_endorse,
-            'date_endorsement_to_requestor'    => $dateEndorsementToRequestor,
+            'date_endorsement_to_requestor' => $dateEndorsementToRequestor,
         ]);
 
         $pdf->setPaper('A4', 'landscape');

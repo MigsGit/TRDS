@@ -306,7 +306,7 @@ const LinkForIdAndRevision = (linkIdRevision) => {
                 let cleanedQuestionDetails = details.reduce((count, item) => {
                     const examNo = item.exam_no;
 
-                    // Parse answer_choices_question safely
+                    // Parse answer_choices_question
                     let parsedAnswer = [];
                     try{
                         parsedAnswer = item.answer_choices_question
@@ -368,7 +368,7 @@ const ExamSubmission = () => {
         Object.keys(questionDetails).forEach(examNo => {
             let qDetail = questionDetails[examNo];
             let categoryType = qDetail.category_type;
-            let qId = qDetail.id; // DB question id used in form name attributes
+            let qId = qDetail.id;
 
             let resultEntry = {
                 exam_no: qDetail.exam_no,
