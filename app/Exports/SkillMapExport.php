@@ -55,7 +55,7 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
 
             foreach ($employee['stations'] as $station => $level) {
 
-                if ($level <= 0) {
+                if ($level < 0) {
                     continue;
                 }
 
