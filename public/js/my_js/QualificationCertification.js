@@ -216,7 +216,7 @@
              initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],7);
+            ],9);
             if(approvalStatus ==='CTECHQCC'){
                 // $('#btnSaveMatrix_tblTrainingItems_tech').removeClass('d-none');
                 $('.btnSaveMatrix').removeClass('d-none');

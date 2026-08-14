@@ -529,7 +529,6 @@ class QualificationCertificationController extends Controller
                             $operToApprovers
                         );
                     }
-
                     if($currentApprovalStatus === 'BTECHENGC'){
                         $operToApprovers = [
                             'approval_status' => 'BTECHENGC',
@@ -606,7 +605,7 @@ class QualificationCertificationController extends Controller
                 ];
             }
             DB::commit();
-            return $this->saveFormSendEmail($emailParams);
+            $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
