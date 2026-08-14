@@ -258,7 +258,7 @@
         
         <table class="dates-table" style="margin-top: 15px;">
             <tr>
-                <td class="label">Employees will not be endorsed:</td>
+                <td class="label">Employee(s) not endorsed::</td>
             </tr>
             @foreach($employees_will_not_endorse as $employee)
                 <tr>
