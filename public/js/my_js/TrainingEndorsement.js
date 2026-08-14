@@ -108,6 +108,11 @@ $(document).on('click', '.btnViewEndorsement', function () {
                 $('#selectApprovedBy').prop('disabled', true);
                 $('#selectCheckedBy').prop('disabled', true);
 
+                $('#hrEndorsementToOperationsTUDate').val(data.hr_to_tu)
+                $('#operationsTrainingUnitTrainingDateFrom').val(data.op_tu_training_date_from)
+                $('#operationsTrainingUnitTrainingDateTo').val(data.op_tu_training_date_to)
+                $('#operationsTrainingUnitEndorsementToRequestor').val(data.op_tu_endorsement_to_req)
+
                 endorsementEmpList = data.training_endorsement_employees || [];
 
                 var rows =  endorsementEmpList.map(function(detail) {
@@ -129,48 +134,50 @@ $(document).on('click', '.btnViewEndorsement', function () {
                         });
                         return;
                     }
-                    if (Array.isArray(emp.training_request_details_info.employee_exam_details.exam_result_details_info) && emp.training_request_details_info.employee_exam_details.exam_result_details_info.length > 0) {
+                    if (emp.training_request_details_info.employee_exam_details !== null && emp.training_request_details_info.employee_exam_details !== undefined) {
+                        if (Array.isArray(emp.training_request_details_info.employee_exam_details.exam_result_details_info) && emp.training_request_details_info.employee_exam_details.exam_result_details_info.length > 0) {
 
-                        ratings = emp.training_request_details_info.employee_exam_details.exam_result_details_info.map(function(exam) {
-                            return exam.rating !== undefined && exam.rating !== null
-                                ? exam.rating
-                                : '';
-                        }).join(' | ');
+                            ratings = emp.training_request_details_info.employee_exam_details.exam_result_details_info.map(function(exam) {
+                                return exam.rating !== undefined && exam.rating !== null
+                                    ? exam.rating
+                                    : '';
+                            }).join(' | ');
 
-                        remarks = emp.training_request_details_info.employee_exam_details.exam_result_details_info.map(function(exam) {
-                            return exam.remark !== undefined && exam.remark !== null
-                                ? exam.remark
-                                : '';
-                        }).join(' | ');
-                        examRemarks = remarks;
+                            remarks = emp.training_request_details_info.employee_exam_details.exam_result_details_info.map(function(exam) {
+                                return exam.remark !== undefined && exam.remark !== null
+                                    ? exam.remark
+                                    : '';
+                            }).join(' | ');
+                            examRemarks = remarks;
 
 
-                        var questionnaireArr = emp.training_request_details_info.employee_exam_details.exam_result_details_info.map(function(exam) {
-                            return exam.questionnaire !== undefined && exam.questionnaire !== null
-                                ? exam.questionnaire
-                                : null;
-                        }).filter(function(q) { return q !== null; });
-                        // If the backend returns an array of JSON strings, parse them
-                        var parsedQuestionnaires = questionnaireArr.map(function(q) {
-                            if (typeof q === 'string') {
-                                try {
-                                    return JSON.parse(q);
-                                } catch (e) {
-                                    return null;
+                            var questionnaireArr = emp.training_request_details_info.employee_exam_details.exam_result_details_info.map(function(exam) {
+                                return exam.questionnaire !== undefined && exam.questionnaire !== null
+                                    ? exam.questionnaire
+                                    : null;
+                            }).filter(function(q) { return q !== null; });
+                            // If the backend returns an array of JSON strings, parse them
+                            var parsedQuestionnaires = questionnaireArr.map(function(q) {
+                                if (typeof q === 'string') {
+                                    try {
+                                        return JSON.parse(q);
+                                    } catch (e) {
+                                        return null;
+                                    }
                                 }
-                            }
-                            return q;
-                        }).filter(function(q) { return q !== null; });
-                        questionnaire = JSON.stringify(parsedQuestionnaires);
-                        // Extract all exam_title values and join with |
-                        try {
-                            const qArr = JSON.parse(questionnaire);
-                            if (Array.isArray(qArr) && qArr.length > 0) {
-                                examTitles = qArr.map(q => q && q.exam_title ? q.exam_title : '').filter(Boolean).join(' | ');
-                            }
-                        } catch (e) {
+                                return q;
+                            }).filter(function(q) { return q !== null; });
+                            questionnaire = JSON.stringify(parsedQuestionnaires);
+                            // Extract all exam_title values and join with |
+                            try {
+                                const qArr = JSON.parse(questionnaire);
+                                if (Array.isArray(qArr) && qArr.length > 0) {
+                                    examTitles = qArr.map(q => q && q.exam_title ? q.exam_title : '').filter(Boolean).join(' | ');
+                                }
+                            } catch (e) {
 
-                            examTitles = '';
+                                examTitles = '';
+                            }
                         }
                     }
 
@@ -877,6 +884,11 @@ $(document).on('click', '.btnEditEndorsement', function(){
                 $('#btnSubmitEndorsement').show();
                 $('#selectApprovedBy').prop('readonly', false);
                 $('#selectCheckedBy').prop('readv conly', false);
+
+                $('#hrEndorsementToOperationsTUDate').val(data.hr_to_tu)
+                $('#operationsTrainingUnitTrainingDateFrom').val(data.op_tu_training_date_from)
+                $('#operationsTrainingUnitTrainingDateTo').val(data.op_tu_training_date_to)
+                $('#operationsTrainingUnitEndorsementToRequestor').val(data.op_tu_endorsement_to_req)
 
                 // Get job function from dynamic training request details block
                 let trJobFunctions = data.training_request_details ? data.training_request_details.job_function : null;

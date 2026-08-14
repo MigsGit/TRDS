@@ -63,6 +63,7 @@ function resetHrMemoApprovalForm(formSelector, dtTraineeDetails) {
 
     $formSelector.find('#subject').prop('disabled', false);
     $formSelector.find('#classification').prop('disabled', false);
+    $formSelector.find('#from').prop('disabled', false);
     $formSelector.find('#reason').prop('disabled', false);
     $formSelector.find('#dateFiled').prop('disabled', false);
     $formSelector.find('#selectTo').prop('disabled', false);
