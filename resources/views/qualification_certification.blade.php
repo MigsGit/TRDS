@@ -151,10 +151,10 @@
                                 <div class="form-group">
                                     <label for="text_select_position">Select Position</label>
                                     <select class="form-control select2bs4" style="width: 100%;" name="text_select_position" id="text_select_position">
-                                        <option value="" disabled>Select Position</option>
+                                        <option value="" disabled selected>Select Position</option>
                                         <option value="Operator">Operator</option>
                                         <option value="Inspector">Inspector</option>
-                                        <option value="Technician" selected>Technician</option>
+                                        <option value="Technician">Technician</option>
                                     </select>
                                 </div>
                             </div>
@@ -706,8 +706,8 @@
                 positionCategory: $('#text_select_position').val(),
             }
             getApprovalStatusToggle(params)
-           
-           
+
+
         }
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
