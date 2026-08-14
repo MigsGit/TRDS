@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('checkSession')->group(function(){
 
-   
+
     Route::get('/', function () {
         return view('blank');
     })->name('blank');
@@ -289,6 +289,8 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/view_direct_employee_info', 'viewDirectEmployeeInfo')->name('view_direct_employee_info');
         Route::get('/get_employee_trainings', 'getEmployeeTrainings')->name('get_employee_trainings');
         Route::get('/export_skill_map_pdf', 'exportSkillMapPdf')->name('export_skill_map_pdf');
+        Route::post('/export_skill_map_excel', 'exportSkillMapExcel')->name('export_skill_map_excel');
+        Route::post('/export_skill_map_excel_per_product_line', 'exportSkillMapExcelPerProductLine')->name('export_skill_map_excel_per_product_line');
         // Route::get('/test-pdf', function () {
         //     dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
         // });
