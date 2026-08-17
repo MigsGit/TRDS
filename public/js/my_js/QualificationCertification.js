@@ -174,6 +174,7 @@
             $('#seriesDesignation').text('Designation');
             $('#divInspector').removeClass('d-none');
             $('.btnSaveInspector').removeClass('d-none');
+            $('#productLine').removeClass('d-none');
             form.formSubmitInspector[0].reset();
 
             initDropdownMasterDetailsByFkidCombos([

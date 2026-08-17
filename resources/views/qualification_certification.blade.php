@@ -134,7 +134,7 @@
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title mb-0" id="createCQFormLabel">Qualification / Certification Form</h5>
+                        <h5 class="modal-title mb-0" id="createCQFormLabel">Qualification / Validation Form</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
                             </button>
                     </div>

@@ -464,7 +464,7 @@ class QualificationCertificationController extends Controller
                         ];
                     }
                     if($qcSlipDetails->approval_status === 'FQCVVO'){
-                        app(FQcValidationRequest::class)->validateResolved();
+                        // app(FQcValidationRequest::class)->validateResolved();
 
                         FQcValidation::updateOrCreate(
                             ['qc_slips_id' => $qcSlipId],
