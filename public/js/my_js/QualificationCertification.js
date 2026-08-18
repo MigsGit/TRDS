@@ -1338,8 +1338,8 @@
                 );
                 checkCheckboxesFromColumn(bOpEnggSectionTrainingOrientation?.engg_orientation_docs,'chk',form.formSubmitOper);
 
-                form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper);
-                form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper);
+                form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation?.engg_orientation_docs);
+                form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper).trigger('change');;
                 form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
                 form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
                 form.formSubmitOper.find('#text_first_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ok_es_oper);
@@ -1347,7 +1347,7 @@
                 form.formSubmitOper.find('#text_oa_1st_result_es_oper').val(bOpEnggSectionTrainingOrientation?.oa_1st_result_es_oper);
 
 
-                form.formSubmitOper.find('#text_obs_second_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_second_result_es_oper);
+                form.formSubmitOper.find('#text_obs_second_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_second_result_es_oper).trigger('change');;
                 form.formSubmitOper.find('#text_second_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.second_sample_es_oper);
                 form.formSubmitOper.find('#text_second_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ok_es_oper);
                 form.formSubmitOper.find('#text_second_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ng_es_oper);

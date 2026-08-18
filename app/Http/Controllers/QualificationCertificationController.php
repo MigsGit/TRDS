@@ -1599,11 +1599,11 @@ class QualificationCertificationController extends Controller
                     $newStatus = 'EENGVP';
                     $statusName = 'E Engineering Validation Process';
                     break;
-                case ($params['approval_status'] === 'CQCC'  && $selectedSection != 1 && $isMachineOperatorExists === 0): // QC Validation Process
+                case ($params['approval_status'] === 'CQCC'  && $selectedSection != 1 && $isMachineOperatorExists === 0):
                     $newStatus = 'EQCVP';
                     $statusName = 'E Qc Validation Process';
                     break;
-                case ($params['approval_status'] === 'CQCC' && $selectedSection):
+                case ($params['approval_status'] === 'CQCC' && $selectedSection): //EXCLUSIVE FOR PPD FORMAT ONLY
                     $newStatus = 'DPPDONLY';
                     $statusName = 'D PPD Production, Engg, QC Update';
                     break;
