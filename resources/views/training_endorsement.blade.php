@@ -76,6 +76,7 @@
                                                 <th class="text-center">Prepared By</th>
                                                 <th class="text-center">Checker</th>
                                                 <th class="text-center">Approver</th>
+                                                <th class="text-center">Approver</th>
                                             </tr>
                                         </thead>
                                     </table>
