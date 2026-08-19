@@ -50,178 +50,172 @@ class TrainingEndorsementController extends Controller
     public function getTrainingEndorsements(Request $request)
     {
         $rapidxEmpNo =  session('global_user');
-        $ecr = TrainingEndorsement::with([
+        $data = TrainingEndorsement::with([
             'training_request_details',
             'hr_memo_details',
-            'te_approval_details_pending',
+            'te_approval_details',
             'te_approval_details.approver_details',
             'created_by_user_details',
             'training_endorsement_employees' => function($query) {
                 $query->whereNull('deleted_at');
             },
             'training_endorsement_employees.training_request_details_info',
-        ]);
-
-
-        // return $_SESSION['rapidx_user_id']; te_approval_details
+        ])
+        ->whereNull('deleted_at')
+        ->get();
+        
+        // return $_SESSION['rapidx_user_id'];
         $user_access = User::with(['user_access_module'])
         ->where('rapidx_emp_id', $_SESSION['rapidx_user_id'])->first();
 
         // $exploded_u_access = 17 for approver
         $exploded_u_access = explode(',', $user_access->user_access_module->user_modules_id);
+        
+        if($request->status != ''){
+           $data = $data->where('status', $request->status);
+        }
 
         if($request->status != ''){
-           $ecr->where('status', $request->status);
+           $data = $data->where('status', $request->status);
+
         }else{
-            $ecr->whereHas('te_approval_details_pending',function($query) use ($rapidxEmpNo){
-                // Pending Approval
-                $query->where('rapidx_id',$rapidxEmpNo->rapidx_emp_id);
+            $data = collect($data)->filter(function($item) use ($rapidxEmpNo) {
+                return $item->te_approval_details_pending->contains(function($detail) use ($rapidxEmpNo) {
+                    return $detail->rapidx_id == $rapidxEmpNo->rapidx_emp_id;
+                });
             });
         }
-        $data = $ecr;
 
         return DataTables::of($data)
-            ->addColumn('employee_names', function ($row) {
-                // Join names into a single string for rendering if needed
-                return $row->training_endorsement_employees
-                    ->pluck('training_request_details_info.name')
-                    ->filter()
-                    ->implode(', ');
-            })
-            ->addColumn('action', function ($row) use($exploded_u_access) {
+        ->addColumn('employee_names', function ($row) {
+            // Join names into a single string for rendering if needed
+            return $row->training_endorsement_employees
+                ->pluck('training_request_details_info.name')
+                ->filter()
+                ->implode(', ');
+        })
+        ->addColumn('action', function ($row) use($exploded_u_access) {
 
-                $approver_array = $row->te_approval_details->where('approval_type', 'approved_by')->whereNull('updated_at')->pluck('rapidx_id')->toArray();
-                $checker_array = $row->te_approval_details->where('approval_type', 'checked_by')->whereNull('updated_at')->pluck('rapidx_id')->toArray();
-                $result = "";
-                $result .= '<center>';
-                $result .= '<button class="btn btn-sm mr-1 btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>';
+            $approver_array = $row->te_approval_details->where('approval_type', 'approved_by')->whereNull('updated_at')->pluck('rapidx_id')->toArray();
+            $checker_array = $row->te_approval_details->where('approval_type', 'checked_by')->whereNull('updated_at')->pluck('rapidx_id')->toArray();
+            $result = "";
+            $result .= '<center>';
+            $result .= '<button class="btn btn-sm mr-1 btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>';
+                
+            if($row->created_by == $_SESSION['rapidx_user_id'] && $row->status != 3){
+                $result .= '<button class="btn btn-sm mr-1 btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>';
+                $result .= '<button class="btn btn-sm mr-1 btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>';
+            }
 
-                if($row->created_by == $_SESSION['rapidx_user_id'] && $row->status != 3){
-                    $result .= '<button class="btn btn-sm mr-1 btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>';
-                    $result .= '<button class="btn btn-sm mr-1 btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>';
-                }
+            if($row->status == 0 && $row->created_by == $_SESSION['rapidx_user_id']){
+                $result .= '<button class="btn btn-sm mr-1 btn-secondary btnEditEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-edit"></i></button>';
+                $result .= '<button class="btn btn-sm mr-1 btn-success btnProceedApprovalEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Proceed Approval"><i class="fa fa-paper-plane"></i></button>';
+            }
+            else if ($row->status == 1 && in_array(17, $exploded_u_access) && in_array($_SESSION['rapidx_user_id'], $checker_array) ) {
+                $result .= '<button class="btn btn-sm mr-1 btn-success btnApproveEndorsement" data-approval-type="checker" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Approve Endorsement"><i class="fa fa-check"></i></button>';
+                $result .= '<button class="btn btn-sm mr-1 btn-danger btnRejectEndorsement" data-approval-type="checker" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Reject Endorsement"><i class="fa fa-times"></i></button>';
+            }
+            else if ($row->status == 2 && in_array(17, $exploded_u_access) && in_array($_SESSION['rapidx_user_id'], $approver_array)) {
+                $result .= '<button class="btn btn-sm mr-1 btn-success btnApproveEndorsement" data-approval-type="approver" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Approve Endorsement"><i class="fa fa-check"></i></button>';
+                $result .= '<button class="btn btn-sm mr-1 btn-danger btnRejectEndorsement" data-approval-type="approver" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Reject Endorsement"><i class="fa fa-times"></i></button>';
+            }
+            $result .= '</center>';
 
-                if($row->status == 0 && $row->created_by == $_SESSION['rapidx_user_id']){
-                    $result .= '<button class="btn btn-sm mr-1 btn-secondary btnEditEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-edit"></i></button>';
-                    $result .= '<button class="btn btn-sm mr-1 btn-success btnProceedApprovalEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Proceed Approval"><i class="fa fa-paper-plane"></i></button>';
+            // return '
+            // <center>
+            //     <button class="btn btn-sm btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>
+            //     <button class="btn btn-sm btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>
+            //     <button class="btn btn-sm btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>
+            // </center>
+            // ';
+            return $result;
+        })
+        ->addColumn('raw_status', function($row){
+            $result = "";
+            $result .= '<center>';
+            if($row->status == 0){
+                if(!is_null($row->disapprove_remarks) && !is_null($row->disapprove_by)){
+                    $result .= '<span class="badge badge-danger mt-1">Disapproved</span>';
+                    $result .= '<br><span class="mt-1"><strong>Remarks:</strong> '.$row->disapprove_remarks.'</span>';
                 }
-                else if ($row->status == 1 && in_array(17, $exploded_u_access) && in_array($_SESSION['rapidx_user_id'], $checker_array) ) {
-                    $result .= '<button class="btn btn-sm mr-1 btn-success btnApproveEndorsement" data-approval-type="checker" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Approve Endorsement"><i class="fa fa-check"></i></button>';
-                    $result .= '<button class="btn btn-sm mr-1 btn-danger btnRejectEndorsement" data-approval-type="checker" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Reject Endorsement"><i class="fa fa-times"></i></button>';
+                else{
+                    $result .= '<span class="badge badge-warning">Pending</span>';
                 }
-                else if ($row->status == 2 && in_array(17, $exploded_u_access) && in_array($_SESSION['rapidx_user_id'], $approver_array)) {
-                    $result .= '<button class="btn btn-sm mr-1 btn-success btnApproveEndorsement" data-approval-type="approver" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Approve Endorsement"><i class="fa fa-check"></i></button>';
-                    $result .= '<button class="btn btn-sm mr-1 btn-danger btnRejectEndorsement" data-approval-type="approver" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="Reject Endorsement"><i class="fa fa-times"></i></button>';
-                }
-                $result .= '</center>';
+            } elseif($row->status == 1){
+                $result .= '<span class="badge badge-info">For Endorsement Checker</span>';
+            } elseif($row->status == 2){
+                $result .= '<span class="badge badge-primary">For Endorsement Approver</span>';
+            } elseif($row->status == 3){
+                $result .= '<span class="badge badge-success">Approved</span>';
+            }
+            $result .= '</center>';
+            return $result;
+        })
+        ->addColumn('date_created', function ($row) {
+            return $row->created_at ?? '';
+        })
+        ->addColumn('prepared_by', function ($row){
+            $result = "";
+            $result .= "<center>";
+            $result .= "<span class='badge badge-info mt-1'>{$row->created_by_user_details->name}</span><br>";
+            // $result .= $row->created_by_user_details->name ?? '';
+            $result .= "<em >{$row->created_at}</em>";
+            $result .= "</center>";
+            return $result;
+        })
+        ->addColumn('raw_checker', function($row){
+            $checker = $row->te_approval_details->where('approval_type', 'checked_by')->flatten(1)->toArray();
 
-                // return '
-                // <center>
-                //     <button class="btn btn-sm btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>
-                //     <button class="btn btn-sm btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>
-                //     <button class="btn btn-sm btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>
-                // </center>
-                // ';
-                return $result;
-            })
-            ->addColumn('raw_status', function($row){
-                $result = "";
-                $result .= '<center>';
-                if($row->status == 0){
-                    if(!is_null($row->disapprove_remarks) && !is_null($row->disapprove_by)){
-                        $result .= '<span class="badge badge-danger mt-1">Disapproved</span>';
-                        $result .= '<br><span class="mt-1"><strong>Remarks:</strong> '.$row->disapprove_remarks.'</span>';
+            $result = "";
+            $result .= "<center>";
+            if($checker){
+                foreach($checker as $checker){
+                    $format_updated_at = $checker['updated_at'] ? Carbon::parse($checker['updated_at'])->format('Y-m-d H:i:s') : null;
+                    if($checker['updated_at'] != null){
+                        $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
+                        $result .= "<em >{$format_updated_at}</em><br>";
                     }
                     else{
-                        $result .= '<span class="badge badge-warning">Pending</span>';
-                    }
-                } elseif($row->status == 1){
-                    $result .= '<span class="badge badge-info">For Endorsement Checker</span>';
-                } elseif($row->status == 2){
-                    $result .= '<span class="badge badge-primary">For Endorsement Approver</span>';
-                } elseif($row->status == 3){
-                    $result .= '<span class="badge badge-success">Approved</span>';
-                }
-                $result .= '</center>';
-                return $result;
-            })
-            ->addColumn('date_created', function ($row) {
-                return $row->created_at ?? '';
-            })
-            ->addColumn('prepared_by', function ($row){
-                $result = "";
-                $result .= "<center>";
-                $result .= "<span class='badge badge-info mt-1'>{$row->created_by_user_details->name}</span><br>";
-                // $result .= $row->created_by_user_details->name ?? '';
-                $result .= "<em >{$row->created_at}</em>";
-                $result .= "</center>";
-                return $result;
-            })
-            ->addColumn('raw_checker', function($row){
-                $checker = $row->te_approval_details->where('approval_type', 'checked_by')->flatten(1)->toArray();
-
-                $result = "";
-                $result .= "<center>";
-                if($checker){
-                    foreach($checker as $checker){
-                        $format_updated_at = $checker['updated_at'] ? Carbon::parse($checker['updated_at'])->format('Y-m-d H:i:s') : null;
-                        if($checker['updated_at'] != null){
-                            if($row->status == 0 && !is_null($row->disapprove_remarks) && !is_null($row->disapprove_by)){
-                                if($row->disapprove_by == $checker['rapidx_id']){
-                                    $result .= "<span class='badge badge-danger mt-1'>{$checker['approver_details']['name']}</span><br>";
-                                    $result .= "<em >{$format_updated_at}</em><br>";
-                                }
-                                else{
-                                    $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
-                                    $result .= "<em >{$format_updated_at}</em><br>";
-                                }
-                            }
-                            else{
-                                $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
-                                $result .= "<em >{$format_updated_at}</em><br>";
-                            }
-                        }
-                        else{
-                            $result .= "<span class='badge badge-warning mt-1'>{$checker['approver_details']['name']}</span><br>";
-                            $result .= "<em >N/A</em><br>";
-                        }
+                        $result .= "<span class='badge badge-warning mt-1'>{$checker['approver_details']['name']}</span><br>";
+                        $result .= "<em >N/A</em><br>";
                     }
                 }
-                else{
-                    $result .= "<span class='badge badge-warning mt-1'>Not Assigned</span>";
-                }
-                $result .= "</center>";
+            }
+            else{
+                $result .= "<span class='badge badge-warning mt-1'>Not Assigned</span>";
+            }
+            $result .= "</center>";
 
-                return $result;
-            })
-            ->addColumn('raw_approver', function($row){
-                $approver = $row->te_approval_details->where('approval_type', 'approved_by')->flatten(1)->toArray();
+            return $result;
+        })
+        ->addColumn('raw_approver', function($row){
+            $approver = $row->te_approval_details->where('approval_type', 'approved_by')->flatten(1)->toArray();
 
-                $result = "";
-                $result .= "<center>";
-                if($approver){
-                    foreach($approver as $approver){
-                        $format_updated_at = $approver['updated_at'] ? Carbon::parse($approver['updated_at'])->format('Y-m-d H:i:s') : null;
-                        if($approver['updated_at'] != null){
-                            $result .= "<span class='badge badge-success mt-1'>{$approver['approver_details']['name']}</span><br>";
-                            $result .= "<em >{$format_updated_at}</em><br>";
-                        }
-                        else{
-                            $result .= "<span class='badge badge-warning mt-1'>{$approver['approver_details']['name']}</span><br>";
-                            $result .= "<em >N/A</em><br>";
-                        }
+            $result = "";
+            $result .= "<center>";
+            if($approver){
+                foreach($approver as $approver){
+                    $format_updated_at = $approver['updated_at'] ? Carbon::parse($approver['updated_at'])->format('Y-m-d H:i:s') : null;
+                    if($approver['updated_at'] != null){
+                        $result .= "<span class='badge badge-success mt-1'>{$approver['approver_details']['name']}</span><br>";
+                        $result .= "<em >{$format_updated_at}</em><br>";
+                    }
+                    else{
+                        $result .= "<span class='badge badge-warning mt-1'>{$approver['approver_details']['name']}</span><br>";
+                        $result .= "<em >N/A</em><br>";
                     }
                 }
-                else{
-                    $result .= "<span class='badge badge-warning mt-1'>Not Assigned</span>";
-                }
-                $result .= "</center>";
+            }
+            else{
+                $result .= "<span class='badge badge-warning mt-1'>Not Assigned</span>";
+            }
+            $result .= "</center>";
 
-                return $result;
-            })
-
-            ->rawColumns(['action', 'raw_status', 'prepared_by', 'raw_checker', 'raw_approver'])
-            ->make(true);
+            return $result;
+        })
+        
+        ->rawColumns(['action', 'raw_status', 'prepared_by', 'raw_checker', 'raw_approver'])
+        ->make(true);
     }
 
     public function getTrainingEndorsementById(Request $request)
