@@ -383,7 +383,8 @@ class HrMemoController extends Controller
             'date_filed' => 'required',
             'to' => 'required',
             'cc' => 'required',
-            'trainee_details' => 'required'
+            'trainee_details' => 'required',
+            'prepared_by' => 'required'
         );
 
         $data = $request->all();
@@ -702,7 +703,57 @@ class HrMemoController extends Controller
 
     public function viewEmpSkillCardPdf()
     {
-        $pdf = PDF::loadView('view_skill_card_pdf', compact(''))->setPaper('A4', 'portrait');
+        $products = [
+            [
+                'name'=>'Adapter Type',
+                'level'=>1,
+                'certified'=>'JAN. 2026',
+                'valid'=>'JULY 2026',
+                'skills'=>[
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                ]
+            ],
+
+            [
+                'name'=>'Connector Type',
+                'level'=>1,
+                'certified'=>'JAN. 2026',
+                'valid'=>'JULY 2026',
+                'skills'=>[
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                ]
+            ],
+
+            [
+                'name'=>'Adapter Type 1',
+                'level'=>1,
+                'certified'=>'JAN. 2026',
+                'valid'=>'JULY 2026',
+                'skills'=>[
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                ]
+            ],
+        ];
+
+        $pdf = PDF::loadView('pdf/employee_skill_card/view_skill_card_pdf', compact('products'))->setPaper('A3', 'landscape');
 
         return $pdf->stream();
     }

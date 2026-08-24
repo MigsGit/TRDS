@@ -63,6 +63,7 @@ function resetHrMemoApprovalForm(formSelector, dtTraineeDetails) {
 
     $formSelector.find('#subject').prop('disabled', false);
     $formSelector.find('#classification').prop('disabled', false);
+    $formSelector.find('#from').prop('disabled', false);
     $formSelector.find('#reason').prop('disabled', false);
     $formSelector.find('#dateFiled').prop('disabled', false);
     $formSelector.find('#selectTo').prop('disabled', false);
@@ -371,10 +372,35 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     $form.on('click', '#btnHRDisapprove', function () {
         const id = $form.find('#txtHrMemoId').val();
         let updateStatusTo = 4; //disapproved
-        // let forApproval = true;
-        confirmAction('Disapprove HR Memo Document?', function () {
-            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
+
+        Swal.fire({
+            title: 'Disapprove HR Memo',
+            input: 'textarea',
+            id: 'tuDisapproveRemarks',
+            inputLabel: 'Remarks',
+            inputPlaceholder: 'Enter reason for disapproval...',
+            inputAttributes: {
+                'aria-label': 'Enter remarks'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Remarks is required!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let remarks = result.value;
+                updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
+            }
         });
+
+        // let forApproval = true;
+        // confirmAction('Disapprove HR Memo Document?', function () {
+        //     updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
+        // });
     });
 
     // HR Approve button
@@ -942,10 +968,21 @@ function saveHrMemoApproval($form, $modal, dtHrMemoApproval, appendArray) {
                 traineeDetailsArray = [];
                 showSuccess('Successfully saved!');
             }
+            // else{
+            //     console.error('Save failed:', response);
+            //     showError('Failed: ' + response.error);
+            // }
         },
         error: function (xhr) {
+            if (xhr.status === 401) {
+                alert('Your session has expired.');
+
+                window.location.href = '../';
+                return;
+            }
+            
             console.error('Save failed:', xhr.responseText);
-            showError('Failed to save data.');
+            showError('Failed to save data.', xhr.responseText);
         }
     });
 }
@@ -1106,7 +1143,6 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
 
 function disableForm($form, status = null){
     console.log('disabled form & buttons');
-
     $form.find('input, textarea, select').prop('disabled', true);
 }
 
