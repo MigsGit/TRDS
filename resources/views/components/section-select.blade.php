@@ -1,13 +1,12 @@
 @props([
     'name',
     'id',
-    'label' => 'Sort by section:',
+    'label' => '',
 ])
 
 @php
     $sectionOptions = [
         ['value' => '', 'label' => 'Select Section', 'disabled' => true, 'selected' => true],
-        ['value' => 'ALL', 'label' => 'Display All'],
         ['value' => 'TSF1', 'label' => 'TS-F1'],
         ['value' => 'TSF3', 'label' => 'TS-F3'],
         ['value' => 'CN', 'label' => 'CN'],

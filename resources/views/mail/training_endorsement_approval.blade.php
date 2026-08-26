@@ -58,20 +58,42 @@
                 </tr>
             </table>
             <br>
-            
+
             <p>
                 Please review the training endorsement details and take the necessary actions.
             </p>
-            
+
         @endif
-        
+
         <span style="font-size: 14px;">Thank you.</span>
     </div>
 
     {{-- Email Footer --}}
     <hr style="border: 0; border-top: 1px solid #ccc; margin-top: 30px;">
-    
+
     <div style="margin-top: 15px;">
+        <div class="col-sm-12">
+            <div class="form-group row">
+                    <label class="col-sm-12 col-form-label">For more info, please log-in to your Rapidx account. Go to http://rapidx/ and Click http://rapidx/TRDSv2/training_endorsement </label>
+                </div>
+        </div>
+            <br>
+            <br>
+        <div class="col-sm-12">
+            <div class="form-group row">
+                <label class="col-sm-12 col-form-label"><b> Notice of Disclaimer: </b></label>
+                <br>
+                <label class="col-sm-12 col-form-label"></label>   This message contains confidential information intended for a specific individual and purpose. If you are not the intended recipient, you should delete this message. Any disclosure,copying, or distribution of this message, or the taking of any action based on it, is strictly prohibited.</label>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <br><br>
+            <label style="font-size: 18px;"><b>For concerns on using the form, please contact ISS at local numbers 205, 206, or 208. You may send us e-mail at <a href="mailto: servicerequest@pricon.ph">servicerequest@pricon.ph</a></b></label>
+        </div>
+    </div>
+
+    {{-- <div style="margin-top: 15px;">
         <p style="font-size: 12px; color: #666;">
             <b>Notice of Disclaimer:</b><br>
             <i>This message contains confidential information intended for a specific individual and purpose. If you are not the intended recipient, you should delete this message. Any disclosure, copying, or distribution of this message, or the taking of any action based on it, is strictly prohibited.</i>
@@ -82,6 +104,6 @@
         <span style="font-size: 16px; color: #0056b3;">
             <b>For concerns regarding this system, please contact ISS at local numbers 205, 206, or 208.</b>
         </span>
-    </div>
+    </div> --}}
 </body>
 </html>

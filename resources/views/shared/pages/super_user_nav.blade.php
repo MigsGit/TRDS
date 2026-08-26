@@ -35,7 +35,7 @@
                         <p>User list</p>
                     </a>
                 </li>
-                
+
                 <li class="nav-item has-treeview">
                     <a href="{{ route('insp_skill_chart_setting') }}"  class="nav-link">
                         <i class="nav-icon fas fa-cogs"></i>
@@ -137,7 +137,7 @@
 
                 <li class="nav-item has-treeview">
                     <a href="{{ route('personnel_skill_matrix') }}"  class="nav-link">
-                        <i class="fas fa-blind"></i>
+                        <i class="fas fa-chart-line"></i>
                         <p>Personnel Skill Matrix</p>
                     </a>
                 </li>
@@ -150,16 +150,34 @@
                     </li>
                 @endif
 
-
-                <li class="nav-item has-treeview">
+                {{-- <li class="nav-item has-treeview">
                     <a href="{{ route('qualification_certification') }}" class="nav-link">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Qualification / Certification</p>
                     </a>
+                </li> --}}
+
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('ETR') }}" class="nav-link">
+                        <i class="fas fa-cogs"></i>
+                        <p>TRDS Summary <br>Dashboard</p>
+                    </a>
                 </li>
-
-               g --}}
-
+                {{-- @if ( in_array(12,explode(',', $globalUser->user_modules_id)) ) --}}
+                    <li class="nav-item has-treeview">
+                        <a href="{{ route('qualification_certification') }}" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Qualification / Validation</p>
+                        </a>
+                    </li>
+                    {{-- @endif --}}
+                <li class="nav-header font-weight-bold">Export</li>
+                <li class="nav-item has-treeview">
+                    <a id="btnListCertPersonnel" class="nav-link">
+                        <i class="fas fa-file-excel"></i>
+                        <p>List of Certified Personnel</p>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div><!-- Sidebar -->

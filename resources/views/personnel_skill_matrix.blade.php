@@ -146,9 +146,10 @@
 
                                 <div class="card-body">
                                     <div class="text-center mb-3">
-                                        {{-- <img src="images/default-user.png"
-                                            class="img-thumbnail rounded"
-                                            style="width:150px;height:180px;object-fit:cover;"> --}}
+                                        {{-- {{ asset('images/default-user.png') }} --}}
+                                        {{-- <img src="{{ asset('images/default-user') }}"
+                                        class="img-thumbnail rounded"
+                                        style="width:150px;height:180px;object-fit:cover;"> --}}
                                     </div>
 
                                     <div class="form-group row">
@@ -252,7 +253,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-success">Save Changes</button>
+                    {{-- <button class="btn btn-success">Save Changes</button> --}}
                     <button class="btn btn-secondary"data-dismiss="modal">Close</button>
                 </div>
 
@@ -459,8 +460,14 @@
                 <!-- Body -->
                 <div class="modal-body">
                     <div class="col-md-12 mb-3">
-                        <button class="btn btn-warning text-light w-100 py-3 fs-5 d-flex align-items-center justify-content-center gap-2" data-toggle="modal" title="Click this to generate pdf file." data-target="#modalGenerateSkillMatrixDetails">
-                            <i class="fas fa-eye fa-lg mr-2" aria-hidden="true"></i> <span>Employee Skill Map</span>
+                        <button class="btn btn-secondary text-light w-100 py-3 fs-5 d-flex align-items-center justify-content-center gap-2" data-toggle="modal" title="Click this to generate excel file." data-target="#modalGenerateSkillMatrixPerProductLine">
+                            <i class="fas fa-eye fa-lg mr-2" aria-hidden="true"></i> <span>Employee Skill Map (Product Line)</span>
+                        </button>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <button class="btn btn-warning text-light w-100 py-3 fs-5 d-flex align-items-center justify-content-center gap-2" data-toggle="modal" title="Click this to generate excel file." data-target="#modalGenerateSkillMatrixDetails">
+                            <i class="fas fa-eye fa-lg mr-2" aria-hidden="true"></i> <span>Employee Skill Map (Per Process)</span>
                         </button>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -493,7 +500,7 @@
                 <!-- Header -->
                 <div class="modal-header">
                     <h4 class="modal-title font-weight-bold">
-                        Skill Map
+                        Skill Map (Per Process)
                     </h4>
 
                     <button type="button" class="close" data-dismiss="modal">
@@ -503,7 +510,26 @@
 
                 <!-- Body -->
                 <div class="modal-body">
+                        <div class="row">
+                            <div class="mb-4 col-sm-12">
+                                <label for="selectedProductLine" class="form-label me-2">Product Line</label>
+                                <div id="selectedProdLine" class="fs-5 mb-1"></div>
+                                <select name="product_line" id="selectedProductLine" class="form-control select2bs5" required></select>
+                            </div>
 
+                            <div class="mb-4 col-sm-12">
+                                <label for="selectPosition" class="form-label me-2">Position</label>
+                                <div id="selectedPosition" class="fs-5 mb-1"></div>
+                                <select name="position" id="selectPosition" class="form-control select2bs5" required>
+                                </select>
+                            </div>
+
+                            <div class="mb-4 col-sm-12">
+                                <label for="selectEmployee" class="form-label me-2">Employee</label>
+                                <div id="selectedEmployee" class="fs-5 mb-1"></div>
+                                <select name="employee[]" id="selectEmployee" class="form-control select2bs5" multiple required></select>
+                            </div>
+                        </div>
                 </div>
 
                 <div class="modal-footer">
@@ -514,6 +540,59 @@
             </div>
         </div>
     </div>
+
+     <div class="modal fade" id="modalGenerateSkillMatrixPerProductLine" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+
+                <!-- Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title font-weight-bold">
+                        Skill Map (Per Product Line)
+                    </h4>
+
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body">
+                        <div class="row">
+                            <div class="mb-4 col-sm-12">
+                                <label for="selectedPerProductLine" class="form-label me-2">Product Line</label>
+                                <div id="selectedPerProdLine" class="fs-5 mb-1"></div>
+                                <select name="per_product_line" id="selectedPerProductLine" class="form-control select2bs5" multiple required></select>
+                            </div>
+
+                            <div class="mb-4 col-sm-12">
+                                <label for="selectPositionPerProductLine" class="form-label me-2">Position</label>
+                                <div id="selectedPosition" class="fs-5 mb-1"></div>
+                                <select name="position" id="selectPositionPerProductLine" class="form-control select2bs5" required>
+                                    {{-- <option value="" selected="" disabled="">-- Select Position --</option>
+                                    <option value="1">Operator</option>
+                                    <option value="2">Inspector</option> --}}
+                                </select>
+                            </div>
+
+                            <div class="mb-4 col-sm-12">
+                                <label for="selectedEmployeePerProductLine" class="form-label me-2">Employee</label>
+                                <div id="selectEmployeePerProductLine" class="fs-5 mb-1"></div>
+                                <select name="employee[]" id="selectedEmployeePerProductLine" class="form-control select2bs5" multiple required></select>
+                            </div>
+                        </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btnGenerateSkillMatrixPerProductLine" id="btnGenerateSkillMatrixPerProductLine">Export</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
 
 
 @endsection
