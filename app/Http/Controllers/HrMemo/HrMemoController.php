@@ -334,7 +334,7 @@ class HrMemoController extends Controller
             $training_venue = DB::connection('mysql_systemone')->select($trainingVenueQuery);
 
             $hris = DB::connection('mysql_systemone')
-                ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
+                ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? AND tbl_EmployeeInfo.EmpStatus = 1 LIMIT 1", [$empNo]);
                 
 
             if (!empty($hris)) {
@@ -346,7 +346,7 @@ class HrMemoController extends Controller
 
             // fallback to subcon
             $subcon = DB::connection('mysql_subcon')
-                ->select($subconQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
+                ->select($subconQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? AND tbl_EmployeeInfo.EmpStatus = 1 LIMIT 1", [$empNo]);
 
             return response()->json([
                 'emp_details' => $subcon,
