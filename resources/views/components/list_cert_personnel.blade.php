@@ -30,7 +30,7 @@
                      <div class="col-12">
                         <div class="form-group mb-2">
                             <label>Series:</label>
-                            <select class="form-control select2bs4" id="selCertPersonnelSeries"></select>
+                            <select class="form-control select2bs4" id="selCertPersonnelSeries" multiple></select>
                         </div>
                     </div>
                 </div>
