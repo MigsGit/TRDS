@@ -32,6 +32,7 @@ class ListOfCertPersonnelController extends Controller
         // ==========================================
         // 1. QUERY QC SLIPS WITH RELATIONS
         // ==========================================
+        $exploded_series = explode(',', $request->series);
         $personel = QcSlip::with([
                 // 'product_line_details',
                 'op_approvers',
@@ -45,7 +46,8 @@ class ListOfCertPersonnelController extends Controller
             ->where('status', 'OK')
             ->where('section_category', $request->section)
             ->where('product_line', 'like' , '%' . $request->product_line . '%')
-            ->where('series_name','like' , '%' . $request->series . '%')
+            // ->where('series_name','like' , '%' . $request->series . '%')
+            ->whereIn('series_name', $exploded_series)
             ->where('position_category', $request->position)
             ->get()
             ->groupBy('position_category');
