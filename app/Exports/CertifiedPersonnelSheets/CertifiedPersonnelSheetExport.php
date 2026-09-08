@@ -14,11 +14,13 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
 {
     protected $category;
     protected $qcSlips;
+    protected $product_line;
 
-    public function __construct(string $category, $qcSlips)
+    public function __construct(string $category, $qcSlips, $product_line)
     {
         $this->category = $category;
         $this->qcSlips = $qcSlips;
+        $this->product_line = $product_line;
     }
 
     public function title(): string
@@ -44,7 +46,7 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
                     $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
                     $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
                     break;
-                case 'INSPECTOR':
+                case 'Inspector':
                     $qcApp = $approvers->firstWhere('approval_status', 'ALQCTQ');
                     break;
                 case 'OPTECH':
@@ -81,7 +83,6 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
                 // $dateStr = !empty($rawDate) ? Carbon::parse($rawDate)->format('F d, Y') : '';
 
                 $explodedNames = explode(' | ', $app->formatted['name'] ?? '');
-                // dd($explodedNames);
                 // $names = $app->formatted['name'] ?? '';
                 $dateStr = $app->formatted['date'] ?? '';
                 $rawRemarks = $app->formatted['remarks'] ?? '';
@@ -103,19 +104,20 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
                 $rows[] = [
                     'emp_no'       => $emp->employee_no,
                     'emp_name'     => $emp->employee_info->EmpName ?? '',
-                    'product_line' => $productLine,
+                    // 'product_line' => $productLine,
+                    'product_line' => $this->product_line,
                     'station'      => $emp->get_station_to->dropdown_masters_details ?? '',
                     // 'category'     => 'CERTIFICATION',
                     'category' => Str::contains(strtolower(json_encode($slip->reason_details ?? [])), 're-certification') 
                     ? 'RE-CERTIFICATION' 
                     : 'CERTIFICATION',
                     'date_hired'   => !empty($emp->employee_info->DateHired) ? Carbon::parse($emp->employee_info->DateHired)->format('F d, Y') : '',
-                    'prod_name'    => $prod['name'],
-                    'prod_date'    => $prod['date'],
-                    'eng_name'     => $eng['name'],
-                    'eng_date'     => $eng['date'],
-                    'qc_name'      => $qc['name'],
-                    'qc_date'      => $qc['date'],
+                    'prod_name'    => !empty($prod['name']) ? $prod['name'] : 'N/A',
+                    'prod_date'    => !empty($prod['date']) ? $prod['date'] : 'N/A',
+                    'eng_name'     => !empty($eng['name']) ? $eng['name'] : 'N/A',
+                    'eng_date'     => !empty($eng['date']) ? $eng['date'] : 'N/A',
+                    'qc_name'      => !empty($qc['name']) ? $qc['name'] : 'N/A',
+                    'qc_date'      => !empty($qc['date']) ? $qc['date'] : 'N/A',
                     'remarks'      => 'PASSED',
                 ];
             }
