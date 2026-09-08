@@ -82,7 +82,7 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
 
                 // $dateStr = !empty($rawDate) ? Carbon::parse($rawDate)->format('F d, Y') : '';
 
-                $explodedNames = explode(' | ', $app->formatted['name'] ?? '');
+                $explodedNames = explode(' | ', utf8_decode($app->formatted['name']) ?? '');
                 // $names = $app->formatted['name'] ?? '';
                 $dateStr = $app->formatted['date'] ?? '';
                 $rawRemarks = $app->formatted['remarks'] ?? '';
@@ -122,6 +122,33 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
                 ];
             }
         }
+
+        usort($rows, function ($a, $b) {
+            // Helper function to extract valid Carbon date based on priority
+            $getDate = function ($row) {
+                if (!empty($row['qc_date']) && $row['qc_date'] !== 'N/A') {
+                    return Carbon::parse($row['qc_date']);
+                }
+                if (!empty($row['eng_date']) && $row['eng_date'] !== 'N/A') {
+                    return Carbon::parse($row['eng_date']);
+                }
+                if (!empty($row['prod_date']) && $row['prod_date'] !== 'N/A') {
+                    return Carbon::parse($row['prod_date']);
+                }
+                return null; // Fallback if all dates are N/A
+            };
+
+            $dateA = $getDate($a);
+            $dateB = $getDate($b);
+
+            // Handle cases where all dates are N/A (push them to the bottom)
+            if ($dateA === null && $dateB === null) return 0;
+            if ($dateA === null) return 1;
+            if ($dateB === null) return -1;
+
+            // Sort ascending (Oldest date on top)
+            return $dateA->timestamp <=> $dateB->timestamp;
+        });
         return view('exports.certified_personnel', [
             'rows'        => $rows,
             'updated_as'  => Carbon::now()->format('M-y'),
