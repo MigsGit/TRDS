@@ -11,7 +11,7 @@ function GetRapidXUser(cboElement){
 		success: function(response){
 			let disabled = '';
 			if(response['users'].length > 0){
-				result = '<option value="0" disabled selected>Select One</option>';
+            result = '<option value="0" disabled selected>Select One</option>';
 				for(let index = 0; index < response['users'].length; index++){
                     result += '<option department="' + response['users'][index]['department'].department_name + '" recipient_name="' + response['users'][index].name + '" email="' + response['users'][index].email + '" value="' + response['users'][index].id + '">' + response['users'][index].name + '</option>';
 				}
@@ -28,6 +28,7 @@ function GetRapidXUser(cboElement){
         }
 	});
 }
+
 
 function GetSection(cboElement){
 	let result = '<option value="0" disabled selected>Select One</option>';

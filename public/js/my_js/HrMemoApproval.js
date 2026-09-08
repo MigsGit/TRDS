@@ -61,6 +61,17 @@ function resetHrMemoApprovalForm(formSelector, dtTraineeDetails) {
     $formSelector[0].reset();
     $formSelector.find('input[type="hidden"]').val('');
 
+    $formSelector.find('#subject').prop('disabled', false);
+    $formSelector.find('#classification').prop('disabled', false);
+    $formSelector.find('#from').prop('disabled', false);
+    $formSelector.find('#reason').prop('disabled', false);
+    $formSelector.find('#dateFiled').prop('disabled', false);
+    $formSelector.find('#selectTo').prop('disabled', false);
+    $formSelector.find('#selectCc').prop('disabled', false);
+    $formSelector.find('#notedBy').prop('disabled', false);
+    $formSelector.find('#btnAddTrainee').prop('disabled', false);
+    $formSelector.find('#btnAddTrainee').prop('hidden', false);
+
     $formSelector.find('#btnSubmitHrMemoApproval').removeClass('d-none');
     $formSelector.find('#btnApprove').addClass('d-none');
     $formSelector.find('#btnDisapprove').addClass('d-none')
@@ -76,15 +87,20 @@ function initHrMemoApprovalTable($table, url = 'view_hr_memo') {
     return $table.DataTable({
         processing: true,
         serverSide: true,
+        scrollY: '380px',
+        scrollCollapse: true,
         ajax: { url: url },
         fixedHeader: true,
         columns: [
             { data: 'action', orderable: false, searchable: false },
+            { data: 'trainee_names', visible: false, searchable: true},
             { data: 'status_label' },
             { data: 'document_no' },    // customize this per hr_memo_approval
             { data: 'date_filed' },    // customize this per hr_memo_approval
             { data: 'reason_label' },    // customize this per hr_memo_approval
-            { data: 'subject' }    // customize this per hr_memo_approval
+            { data: 'subject' },    // customize this per hr_memo_approval
+            { data: 'prepared_by_label' },    // customize this per hr_memo_approval
+            { data: 'received_by_label' }    // customize this per hr_memo_approval
         ]
     });
 }
@@ -104,19 +120,30 @@ function initTraineeDetailsTable($table1) {
                 render: function (data){
                     let actionButtons;
 
-                    if(data.status > 1){ //View
-                        actionButtons = "<button class='btn btn-md btn-secondary viewTDRow' data-id='" + data.id + "' type='button'><i class='fa-solid fas fa-eye'></i></button>";
-                    }else{ //Add/Edit
+                    if(data.status == 1 || data.status == 4 || data.status == 7){ //Add/Edit
                         actionButtons = "<button class='btn btn-md btn-danger removeTDRow mr-1' data-id='" + data.id + "' title='Remove Row' type='button'><i class='fa fa-times'></i></button>";
                         actionButtons += "<button class='btn btn-md btn-secondary editTDRow' data-id='" + data.id + "' type='button'><i class='fas fa-edit'></i></button>";
+                    }else{ //View
+                        actionButtons = "<button class='btn btn-md btn-secondary viewTDRow' data-id='" + data.id + "' type='button'><i class='fa-solid fas fa-eye'></i></button>";
                     }
 
                     return actionButtons;
                 }
             },
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.settings._iDisplayStart + meta.row + 1;
+                }
+            },
             { data: "emp_no" },
             { data: "emp_name" },
-            { data: "traning_venue" },
+            { data: "position" },
+            { data: "department" },
+            { data: "section" },
+            { data: "training_venue" },
             { data: "endorsement_date" }
         ],
     });
@@ -129,6 +156,14 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     let traineeDetailsArray = [];
     let traineeIdCounter = 1;
 
+    // dtTraineeDetails.on('order.dt search.dt draw.dt', function () {
+    //     let i = 1;
+
+    //     dtTraineeDetails.cells(null, 0, { search: 'applied', order: 'applied' }).every(function () {
+    //         this.data(i++);
+    //     });
+    // }).draw();
+
     // initial check (on page load)
     // updateRemoveButtons($tableTD);
 
@@ -138,19 +173,30 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         traineeIdCounter = 1; //set counter to 1 every new memo
 
         $addButtonTD.data('counter', traineeIdCounter)
-        // console.log('btn counter', $addButtonTD.data('counter'));
+        // $addButtonTD.data('counter', null);
 
         selectEmailRecipients($('.selectToRecipients'));
         selectEmailRecipients($('.selectCcRecipients'));
+        selectEmailRecipients($('.selectNotedBy'), '', true);
         $modal.modal('show');
     });
 
     // add trainee details button
     $addButtonTD.on('click', function (){
-        // console.log('btn counter', $addButtonTD.data('counter'));
-
         $formTD[0].reset();
         $formTD.find('input[type="hidden"]').val('');
+        $addButtonTD.data('counter', null);
+        // console.log('counterNow', $addButtonTD.data('counter'));
+
+        $formTD.find('#employeeNumber').prop('disabled', false);
+        $formTD.find('#trainingVenue').prop('disabled', false);
+        $formTD.find('#trainor').prop('disabled', false);
+        $formTD.find('#dateStart').prop('disabled', false);
+        $formTD.find('#dateEnd').prop('disabled', false);
+        $formTD.find('#typeOfTraining').prop('disabled', false);
+        $formTD.find('#endorsementDate').prop('disabled', false);
+        $formTD.find('#btnAddExamination').prop('hidden', false);
+        $modalTD.find('#btnAddTraineeDetailsToList').prop('hidden', false);
 
         // Remove all rows except template row
         $($tableExam).find('tbody tr:not(.data-row)').remove();
@@ -158,13 +204,14 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         // Clear template row inputs
         $($tableExam).find('.data-row input').val('');
 
-        // <select class="form-control form-control-sm select2bs5 selectTitle" name="title[]" required></select>
-        // <select class="form-control form-control-sm select2bs5 selectResult" name="result[]" required></select>
         // Remove any additional rows except the default one
         const defaultExamRow = `
             <tr class="data-row" data-checkbox-id=''>
                 <td>
-                    <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" required></select>
+                    <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" id="title" required></select>
+                </td>
+                <td>
+                    <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" readonly></textarea>
                 </td>
                 <td>
                     <select class="form-control form-control-md" name="result[]" id="result" required>
@@ -190,57 +237,12 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         const $tbody = $($tableExam).find('tbody');
         $tbody.html(defaultExamRow);
 
+        getTrainorDetails($formTD.find('.selectTrainor'));
         getExaminations($('#tblExamination tr:last').find('.selectExamTitle'));
-        selectEmpNo($('.selectEmpNo'));
+        selectEmpNo($formTD.find('.selectEmpNo'));
+        selectTrainingVenue($formTD.find('.selectTrainingVenue'));
         $modalTD.modal('show');
     });
-    // $addButtonTD.on('click', function (){ // KINOMENT KO NAGE-ERROR
-
-    //     $formTD[0].reset();
-    //     $formTD.find('input[type="hidden"]').val('');
-
-    //     // Remove all rows except template row
-    //     $($tableExam).find('tbody tr:not(.data-row)').remove();
-
-    //     // Clear template row inputs
-    //     $($tableExam).find('.data-row input').val('');
-
-    //     // <select class="form-control form-control-sm select2bs5 selectTitle" name="title[]" required></select>
-    //     // <select class="form-control form-control-sm select2bs5 selectResult" name="result[]" required></select>
-    //     // Remove any additional rows except the default one
-    //     const defaultExamRow = `
-    //         <tr class="data-row" data-checkbox-id=''>
-    //             <td>
-    //                 <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" required></select>
-    //             </td>
-    //             <td>
-    //                 <select class="form-control form-control-md" name="result[]" id="result" required>
-    //                     <option value="" disabled selected>Select Result</option>
-    //                     <option value="1">Passed</option>
-    //                     <option value="2">Failed</option>
-    //                     <option value="3">Complied</option>
-    //                 </select>
-    //             </td>
-    //             <td>
-    //                 <input type="text" class="form-control form-control-md" name="remarks[]" id="remarks" required></input>
-    //             </td>
-    //             <td id="removeRow">
-    //                 <center>
-    //                     <button class="btn btn-md btn-danger removeRow" title="Remove Row" type="button" disabled>
-    //                         <i class="fa fa-times"></i>
-    //                     </button>
-    //                 </center>
-    //             </td>
-    //         </tr>
-    //     `;
-
-    //     const $tbody = $($tableExam).find('tbody');
-    //     $tbody.html(defaultExamRow);
-
-    //     getExaminations($('#tblExamination tr:last').find('.selectExamTitle'));
-    //     selectEmployeeDetails($('.selectEmpNo'));
-    //     $modalTD.modal('show');
-    // });
 
     // Handle employee number input
     $('#employeeNumber').on('change', function(){
@@ -251,17 +253,28 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             data: { employee_number: empNo },
             dataType: "json",
             success: function (response) {
-                emp_details = response[0];
-                console.log('emp_details', emp_details);
-
+                emp_details = response['emp_details'][0];
+                training_venue = response['training_venue'];
                 $formTD.find('#employeeName').val(emp_details.EmpName);
                 $formTD.find('#dateHired').val(emp_details.DateHired);
                 $formTD.find('#position').val(emp_details.Position);
-                $formTD.find('#trainingVenue').val(emp_details.Venue);
                 $formTD.find('#department').val(emp_details.Department);
                 $formTD.find('#prodAllocation').val(emp_details.Section);
             }
         });
+    });
+
+    // old code commented Clark 07/27/2026
+    // Handle exam selection
+    // $tableExam.on('change', '.selectExamTitle', function (e) {
+    //     let objective = $tableExam.find('option:selected').data('objective');
+    //     $tableExam.find('#objective').val(objective);
+    // });
+
+    $tableExam.on('change', '.selectExamTitle', function () {
+        const $row = $(this).closest('tr');
+        const objective = $(this).find('option:selected').data('objective');
+        $row.find('#objective').val(objective);
     });
 
     $addButtonExam.on('click', function () {
@@ -278,7 +291,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         newRow.find('.select2-container').remove();
 
         let $newSelectExamTitle = newRow.find('.selectExamTitle');
-        // let $newSelectResult = newRow.find('.selectResult');
 
         // 🔥 Clean select2 plugin traces from cloned select
         $newSelectExamTitle
@@ -289,15 +301,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             .empty()        // ← THIS clears options
             .val(null);
 
-        // 🔥 Clean select2 plugin traces from cloned select
-        // $newSelectResult
-        //     .removeClass('select2-hidden-accessible')
-        //     .removeAttr('data-select2-id')
-        //     .removeAttr('tabindex')
-        //     .removeAttr('aria-hidden')
-        //     .empty()        // ← THIS clears options
-        //     .val(null);
-
         // Append new row first
         $tableExam.find('tbody').append(newRow);
 
@@ -305,10 +308,6 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         $newSelectExamTitle.select2({
             theme: 'bootstrap-5',
         });
-
-        // $newSelectResult.select2({
-        //     theme: 'bootstrap-5',
-        // });
 
         // Update button states
         updateRemoveButtons($tableExam, 'Table', '.removeExamRow');
@@ -331,17 +330,15 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     // View button
     $table.on('click', '.btnView', function () {
         const id = $(this).data('id');
+        const approval = $(this).data('approval');
         traineeDetailsArray = [];
-        fetchHrMemoById(id, $modal, dtTraineeDetails, $form, 'view', traineeDetailsArray);
+        fetchHrMemoById(id, $modal, dtTraineeDetails, $form, 'view', traineeDetailsArray, approval);
     });
 
-    // Disable button
-    $table.on('click', '.btnDisable', function () {
-        const id = $(this).data('id');
-        let updateStatusTo = 2; //cancelled
-        confirmAction('Are you sure you want to disable this?', function () {
-            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo);
-        });
+    // View Disapproval Remarks button
+    $table.on('click', '.btnViewRemarks', function () {
+        const remarks = $(this).data('remarks');
+        showMessage(remarks, 'Disapproval Remarks', function(){});
     });
 
     // Enable button
@@ -349,6 +346,15 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         const id = $(this).data('id');
         let updateStatusTo = 1; //pending
         confirmAction('Are you sure you want to enable this?', function () {
+            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo);
+        });
+    });
+
+    // Disable button
+    $table.on('click', '.btnDisable', function () {
+        const id = $(this).data('id');
+        let updateStatusTo = 2; //cancelled
+        confirmAction('Are you sure you want to disable this?', function () {
             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo);
         });
     });
@@ -362,23 +368,64 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         });
     });
 
-    // Approve button
-    $form.on('click', '#btnApprove', function () {
+    // Disapprove button
+    $form.on('click', '#btnHRDisapprove', function () {
         const id = $form.find('#txtHrMemoId').val();
-        let updateStatusTo = 4; //aproved
+        let updateStatusTo = 4; //disapproved
+        // let forApproval = true;
+        confirmAction('Disapprove HR Memo Document?', function () {
+            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
+        });
+    });
+
+    // HR Approve button
+    $form.on('click', '#btnHRApprove', function () {
+        const id = $form.find('#txtHrMemoId').val();
+        let updateStatusTo = 5; //approved
         // let forApproval = true;
         confirmAction('Approve HR Memo Document?', function () {
             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
         });
     });
 
-    // Disapprove button
-    $form.on('click', '#btnDisapprove', function () {
+    // TU Approve button
+    $form.on('click', '#btnTUApprove', function () {
         const id = $form.find('#txtHrMemoId').val();
-        let updateStatusTo = 5; //disapproved
+        let updateStatusTo = 6; //approved
         // let forApproval = true;
-        confirmAction('Disapprove HR Memo Document?', function () {
+        confirmAction('Approve HR Memo Document?', function () {
             updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
+        });
+    });
+
+    // TU Disapprove button
+    $form.on('click', '#btnTUDisapprove', function () {
+        const id = $form.find('#txtHrMemoId').val();
+        let updateStatusTo = 7; // disapproved
+
+        Swal.fire({
+            title: 'Disapprove HR Memo',
+            input: 'textarea',
+            id: 'tuDisapproveRemarks',
+            inputLabel: 'Remarks',
+            inputPlaceholder: 'Enter reason for disapproval...',
+            inputAttributes: {
+                'aria-label': 'Enter remarks'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Remarks is required!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let remarks = result.value;
+
+                updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
+            }
         });
     });
 
@@ -400,25 +447,41 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     });
 
     $tableTD.on('click', '.editTDRow', function(e) {
+        $formTD.find('#employeeNumber').prop('disabled', false);
+        $formTD.find('#dateStart').prop('disabled', false);
+        $formTD.find('#dateEnd').prop('disabled', false);
+        $formTD.find('#typeOfTraining').prop('disabled', false);
+        $formTD.find('#trainingVenue').prop('disabled', false);
+        $formTD.find('#trainor').prop('disabled', false);
+        $formTD.find('#endorsementDate').prop('disabled', false);
+        $formTD.find('#btnAddExamination').prop('hidden', false);
+        $modalTD.find('#btnAddTraineeDetailsToList').prop('hidden', false);
+
         e.preventDefault();
-        let id = $(this).data("id");
-        let trainee = traineeDetailsArray.find(item => item.action.id == id);
-        console.log('trainees', trainee);
-        console.log('edit traineeDetailsArray', traineeDetailsArray);
+        let editId = $(this).data("id");
+        let trainee = traineeDetailsArray.find(item => item.action.id == editId);
+
+        $addButtonTD.data('counter', editId);
+        console.log('counterNow', $addButtonTD.data('counter'));
 
         selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
+        selectTrainingVenue($formTD.find('.selectTrainingVenue'), trainee.training_venue);
+        getTrainorDetails($formTD.find('.selectTrainor'), trainee.trainor);
+
+        $formTD.find('#dateStart').val(trainee.date_start);
+        $formTD.find('#dateEnd').val(trainee.date_end);
+        $formTD.find('#typeOfTraining').val(trainee.type_of_training);
         $formTD.find('#endorsementDate').val(trainee.endorsement_date);
 
         $tableExam.find('tbody').empty();
         trainee.exam_details.forEach(function (exam){
-            // getExaminations($('#tblExamination tr:last').find('.selectExamTitle'), exam.exam_title);
-            // $('#tblExamination tr:last').find('#result').val(exam.result);
-            // $('#tblExamination tr:last').find('#remarks').val(exam.remarks);
-
             let rowExams = `
                 <tr class="data-row" data-checkbox-id=''>
                     <td>
-                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" required></select>
+                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" id="title" required></select>
+                    </td>
+                    <td>
+                        <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" readonly></textarea>
                     </td>
                     <td>
                         <select class="form-control form-control-md" name="result[]" id="result" required>
@@ -443,6 +506,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
             $tableExam.find('tbody').append(rowExams);
             getExaminations($('#tblExamination tr:last').find('.selectExamTitle'), exam.exam_title);
+            $('#tblExamination tr:last').find('#objective').val(exam.objective);
             $('#tblExamination tr:last').find('#result').val(exam.result);
             $('#tblExamination tr:last').find('#remarks').val(exam.remarks);
         });
@@ -454,6 +518,11 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     $tableTD.on('click', '.viewTDRow', function(e) {
         e.preventDefault();
         $formTD.find('#employeeNumber').prop('disabled', true);
+        $formTD.find('#dateStart').prop('disabled', true);
+        $formTD.find('#dateEnd').prop('disabled', true);
+        $formTD.find('#typeOfTraining').prop('disabled', true);
+        $formTD.find('#trainingVenue').prop('disabled', true);
+        $formTD.find('#trainor').prop('disabled', true);
         $formTD.find('#endorsementDate').prop('disabled', true);
         $formTD.find('#btnAddExamination').prop('hidden', true);
         $modalTD.find('#btnAddTraineeDetailsToList').prop('hidden', true);
@@ -462,6 +531,12 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         let trainee = traineeDetailsArray.find(item => item.action.id == id);
 
         selectEmpNo($('.selectEmpNo'), trainee.action.emp_id);
+        selectTrainingVenue($formTD.find('.selectTrainingVenue'), trainee.training_venue);
+        getTrainorDetails($formTD.find('.selectTrainor'), trainee.trainor);
+        
+        $formTD.find('#dateStart').val(trainee.date_start);
+        $formTD.find('#dateEnd').val(trainee.date_end);
+        $formTD.find('#typeOfTraining').val(trainee.type_of_training);
         $formTD.find('#endorsementDate').val(trainee.endorsement_date);
 
         $tableExam.find('tbody').empty();
@@ -469,7 +544,10 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
             let rowExams = `
                 <tr class="data-row" data-checkbox-id=''>
                     <td>
-                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" disabled></select>
+                        <select class="form-control form-control-sm select2bs5 selectExamTitle" name="title[]" id="title" disabled></select>
+                    </td>
+                    <td>
+                        <textarea class="form-control" style="height: 38px;" name="objective[]" id="objective" disabled></textarea>
                     </td>
                     <td>
                         <select class="form-control form-control-md" name="result[]" id="result" disabled>
@@ -494,6 +572,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
             $tableExam.find('tbody').append(rowExams);
             getExaminations($('#tblExamination tr:last').find('.selectExamTitle'), exam.exam_title);
+            $('#tblExamination tr:last').find('#objective').val(exam.objective);
             $('#tblExamination tr:last').find('#result').val(exam.result);
             $('#tblExamination tr:last').find('#remarks').val(exam.remarks);
         });
@@ -506,58 +585,85 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     $('#btnAddTraineeDetailsToList').on('click', function (e) {
         e.preventDefault();
         let empId = $formTD.find('#employeeNumber').val();
+        let position = $formTD.find('#position').val();
+        let department = $formTD.find('#department').val();
+        let section = $formTD.find('#prodAllocation').val();
+        let trainingVenue = $formTD.find('#trainingVenue').val();
         let endorsementDate = $formTD.find('#endorsementDate').val();
-        let counterNow = $form.find('#btnAddTrainee').data('counter');
+        let date_start = $formTD.find('#dateStart').val();
+        let date_end = $formTD.find('#dateEnd').val();
+        let trainor = $formTD.find('#trainor').val();
+        let type_of_training = $formTD.find('#typeOfTraining').val();
+        // let counterNow = $form.find('#btnAddTrainee').data('counter');
+        let counterNow = $form.find('#btnAddTrainee').data('counter') || null;
+        console.log('counterNow', counterNow);
 
         if(empId == null){
             showError('Please select an employee.');
             return;
         }
 
-        if(endorsementDate == ''){
-            showError('Please fill up the Endorsement date.');
+        if(endorsementDate == '' || trainingVenue == '' || trainor == '' || date_start == '' || date_end == '' || type_of_training == ''){
+            showError('Please fill up the required fields.');
             return;
         }
 
         let empType = $formTD.find('#employeeNumber').find('option:selected').data('emp_type');
         let empNumber = $formTD.find('#employeeNumber').find('option:selected').text();
         let empName = $formTD.find('#employeeName').val();
-        let trainingVenue = $formTD.find('#trainingVenue').val();
         let exam_list = [];
         let hasError = false;
 
         $('.data-row').each(function (){
             let exam_title = $(this).find('.selectExamTitle').val();
+            let objective = $(this).find('#objective').val();
             let result = $(this).find('#result').val();
             let remarks = $(this).find('#remarks').val();
 
-            if(exam_title == null || result == null || remarks == ''){
+            if(exam_title == null || objective == null || result == null || remarks == ''){
                 showError('Please fill in all examination details.');
                 hasError = true;
                 return false; // stops the .each loop
             }
 
-            exam_list.push({exam_title, result, remarks});
+            exam_list.push({exam_title, objective, result, remarks});
         });
 
         if(hasError){
             return; // stop the rest of the function
         }
 
+        // let traineeDetailsList = {
+        //     action: {id: counterNow, emp_id: empId, emp_type: empType, status: 1}, //status 1 means "added/edited but not yet saved to database"
+
+        let isEdit = counterNow !== null;
         let traineeDetailsList = {
-            action: {id: counterNow, emp_id: empId, emp_type: empType},
+            action: {
+                id: isEdit ? counterNow : getNextId(traineeDetailsArray),
+                emp_id: empId,
+                emp_type: empType,
+                status: 1
+            },
             emp_no: empNumber,
             emp_name : empName,
-            traning_venue: trainingVenue,
+            position: position,
+            department: department,
+            section: section,
+            training_venue: trainingVenue,
+            trainor: trainor,
+            date_start: date_start,
+            date_end: date_end,
+            type_of_training: type_of_training,
             endorsement_date: endorsementDate,
             exam_details: exam_list
         }
+        console.log('traineeDetailsArray', traineeDetailsArray);
 
-        let index = traineeDetailsArray.findIndex(function(item) {
+        let index = traineeDetailsArray.findIndex(function(item){
             return item.action.id == counterNow;
         });
 
-        if (index !== -1) {
+        if (isEdit && index !== -1) {
             // EDIT existing
             traineeDetailsArray[index] = traineeDetailsList;
         } else {
@@ -566,14 +672,36 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         }
 
         // traineeDetailsArray.push(traineeDetailsList);
-        $addButtonTD.data('counter', traineeIdCounter);
-        // console.log('btn counter', $addButtonTD.data('counter'));
+        // $addButtonTD.data('counter', traineeIdCounter);
 
         dtTraineeDetails.clear().draw();
         dtTraineeDetails.rows.add(traineeDetailsArray).draw();
         showSuccess('Trainee details added to the list.');
         $modalTD.modal('hide');
     });
+
+    $modalTD.on('hidden.bs.modal', function () {
+        if ($('#modalHrMemoApproval').hasClass('show')) {
+            $('body').addClass('modal-open');
+        }
+    });
+
+    //Inspector Skill Chart
+    $('#btnShowExportReportModal').on('click', function (){
+        const $formExport = $('#exportInspectorSkillChart');
+        $formExport[0].reset();
+        $('#modalExportReport').modal('show');
+    });
+
+    //Employee Skill Card
+    $('#btnShowExportPDFModal').on('click', function (){
+        window.open(`view_emp_skill_card_pdf`, '_blank');
+    });
+}
+
+function getNextId(traineeDetailsArray) {
+    if (traineeDetailsArray.length === 0) return 1;
+    return Math.max(...traineeDetailsArray.map(x => x.action.id || 0)) + 1;
 }
 
 function updateRemoveButtons($table, measure_type, array = null, cboElement){
@@ -593,9 +721,10 @@ function updateRemoveButtons($table, measure_type, array = null, cboElement){
 
 }
 
-function selectEmailRecipients(cboElement, rapidxId = null, mode = null){
+function selectEmailRecipients(cboElement, rapidxId = null, hr_only = false){
     let result = '<option value="" disabled selected> Select Name/s </option>';
     $.ajax({
+        data: { hr_only },
         method: "get",
         url: "get_email_recipients_dropdown_details",
         dataType: "json",
@@ -603,11 +732,9 @@ function selectEmailRecipients(cboElement, rapidxId = null, mode = null){
             result = '<option value="" disabled selected>--Loading--</option>';
         },
         success: function (response) {
-            console.log(response);
-
             if(response.length > 0){
-                    result = '<option value="" disabled selected> Select Name/s </option>';
-
+                    // result = '<option value="" disabled selected> Select Name/s </option>';
+                    result = '';
                 for (let i = 0; i < response.length; i++) {
                     result += '<option value="' + response[i]['id'] + '" data-email="' + response[i]['email'] + '">' + response[i]['name'] + '</option>';
                 }
@@ -616,13 +743,14 @@ function selectEmailRecipients(cboElement, rapidxId = null, mode = null){
             }
 
             cboElement.html(result);
+
             if(rapidxId != null){
                 cboElement.val(rapidxId).trigger('change');
             }
 
-            if(mode == 'view'){
-                cboElement.prop('disabled', true).trigger('change.select2');
-            }
+            // if(mode == 'view'){
+            //     cboElement.prop('disabled', true).trigger('change.select2');
+            // }
         },
         error: function(data, xhr, status) {
             result = '<option value="0" selected disabled> -- Reload Again -- </option>';
@@ -642,8 +770,6 @@ function selectEmpNo(cboElement, empId = null, mode = null){
             result = '<option value="" disabled selected>--Loading--</option>';
         },
         success: function (response) {
-            console.log(response);
-
             if(response.length > 0){
                     result = '<option value="" disabled selected> Select Employee No </option>';
 
@@ -670,6 +796,44 @@ function selectEmpNo(cboElement, empId = null, mode = null){
     });
 }
 
+function selectTrainingVenue(cboElement, trainingId = null, mode = null){
+    let result = '<option value="" disabled selected> Select One </option>';
+    $.ajax({
+        method: "get",
+        url: "get_training_venue_dropdown_details",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value="" disabled selected>--Loading--</option>';
+        },
+        success: function (response) {
+            let venue = response.training_venue;
+            if(venue.length > 0){
+                    result = '<option value="" disabled selected> Select Training Venue </option>';
+
+                for (let i = 0; i < venue.length; i++) {
+                    result += '<option value="' + venue[i].Venue + '">' + venue[i].Venue + '</option>';
+                }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+
+            cboElement.html(result);
+            if(trainingId != null){
+                cboElement.val(trainingId).trigger('change');
+            }
+
+            if(mode == 'view'){
+                cboElement.prop('disabled', true).trigger('change.select2');
+            }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}
+
 function getExaminations(cboElement, examId = null, mode = null){
     let result = '<option value="" disabled selected> Select Examination </option>';
     $.ajax({
@@ -680,6 +844,8 @@ function getExaminations(cboElement, examId = null, mode = null){
             result = '<option value="" disabled selected>--Loading--</option>';
         },
         success: function (response) {
+            // console.log('response:', response);
+
             if(response.length > 0){
                     result = '<option value="" disabled selected> Select Examination </option>';
 
@@ -688,14 +854,55 @@ function getExaminations(cboElement, examId = null, mode = null){
                 }
 
                 for (let di = 0; di < response.length; di++) {
-                    result += '<option value="' + response[di]['id'] + '">' + response[di]['examination_name'] + '</option>';
+                    result += '<option value="' + response[di]['id'] + '" data-objective="' + response[di]['objective'] + '">' + response[di]['examination_name'] + '</option>';
                 }
             }else{
                 result = '<option value="0" selected disabled> -- No record found -- </option>';
             }
             cboElement.html(result);
+
+            // console.log('Inserted HTML:', cboElement.html());
+
             if(examId != null){
                 cboElement.val(examId).trigger('change');
+            }
+
+            if(mode == 'view'){
+                cboElement.prop('disabled', true).trigger('change.select2');
+            }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}
+
+
+function getTrainorDetails(cboElement, trainorId = null, mode = null){
+    let result = '<option value="" disabled selected> Select Trainor </option>';
+    $.ajax({
+        method: "get",
+        url: "get_trainor_dropdown_details",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value="" disabled selected>--Loading--</option>';
+        },
+        success: function (response) {
+            let trainorList = response.trainor_list;
+            if(trainorList.length > 0){
+                    result = '<option value="" disabled selected> Select Trainor </option>';
+
+                for (let ti = 0; ti < trainorList.length; ti++) {
+                    result += '<option value="' + trainorList[ti]['EmpNo'] + '">' + trainorList[ti]['TrainorName'] + '</option>';
+                }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+            cboElement.html(result);
+            if(trainorId != null){
+                cboElement.val(trainorId).trigger('change');
             }
 
             if(mode == 'view'){
@@ -747,7 +954,7 @@ function saveHrMemoApproval($form, $modal, dtHrMemoApproval, appendArray) {
 /**
  * Fetch hr_memo_approval data by ID
  */
-function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray) {
+function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray, approval = false) {
     $.ajax({
         type: 'GET',
         url: 'get_hr_memo_by_id',
@@ -758,30 +965,49 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray)
                 disableForm($form, response.status);
             }
 
-            if (response.status == 3) {
-                console.log('hide save, show approval');
+            if (response.status == 3 && approval == true){ //HR APPROVAL
+                console.log('hide save & TU approval, show HR approval');
 
                 $form.find('#btnSubmitHrMemoApproval').addClass('d-none');
-                $form.find('#btnApprove').removeClass('d-none');
-                $form.find('#btnDisapprove').removeClass('d-none');
+                $form.find('#btnHRApprove').removeClass('d-none');
+                $form.find('#btnHRDisapprove').removeClass('d-none');
+                $form.find('#hrDisapproveRemarks').prop('disabled', false);
+                $form.find('#btnTUApprove').addClass('d-none');
+                $form.find('#btnTUDisapprove').addClass('d-none');
 
                 $form.find('#btnAddTrainee').prop('disabled', true);
                 $form.find('#btnAddTrainee').prop('hidden', true);
-            } else if(response.status == 1) {
-                console.log('show save, hide approval');
+            }else if (response.status == 5 && approval == true){ //TU Receiving
+                console.log('hide save & HR approval, show TU approval');
+
+                $form.find('#btnSubmitHrMemoApproval').addClass('d-none');
+                $form.find('#btnHRApprove').addClass('d-none');
+                $form.find('#btnHRDisapprove').addClass('d-none');
+                $form.find('#btnTUApprove').removeClass('d-none');
+                $form.find('#btnTUDisapprove').removeClass('d-none');
+                $form.find('#tuDisapproveRemarks').prop('disabled', false);
+
+                $form.find('#btnAddTrainee').prop('disabled', true);
+                $form.find('#btnAddTrainee').prop('hidden', true);
+            }else if(response.status == 1 || response.status == 4 || response.status == 7){ //Pending, HR & TU Disapproved
+                console.log('show save, hide ALL approval');
 
                 $form.find('#btnSubmitHrMemoApproval').removeClass('d-none');
-                $form.find('#btnApprove').addClass('d-none');
-                $form.find('#btnDisapprove').addClass('d-none');
+                $form.find('#btnHRApprove').addClass('d-none');
+                $form.find('#btnHRDisapprove').addClass('d-none');
+                $form.find('#btnTUApprove').addClass('d-none');
+                $form.find('#btnTUDisapprove').addClass('d-none');
 
                 $form.find('#btnAddTrainee').prop('disabled', false);
                 $form.find('#btnAddTrainee').prop('hidden', false);
-
-            } else if(response.status != 1 && response.status != 3){
+                $form.find('input, textarea, select').prop('disabled', false);
+            }else{
                 console.log('hide all');
                 $form.find('#btnSubmitHrMemoApproval').addClass('d-none');
-                $form.find('#btnApprove').addClass('d-none');
-                $form.find('#btnDisapprove').addClass('d-none');
+                $form.find('#btnHRApprove').addClass('d-none');
+                $form.find('#btnHRDisapprove').addClass('d-none');
+                $form.find('#btnTUApprove').addClass('d-none');
+                $form.find('#btnTUDisapprove').addClass('d-none');
 
                 $form.find('#btnAddTrainee').prop('disabled', true);
                 $form.find('#btnAddTrainee').prop('hidden', true);
@@ -794,6 +1020,8 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray)
             $form.find('#reason').val(response.reason);
             $form.find('#classification').val(response.classification);
             $form.find('#dateFiled').val(response.date_filed);
+            $form.find('#preparedById').val(response.prepared_by);
+            $form.find('#preparedByName').val(response.prepared_by_info.name);
 
             let toIds = [];
             let ccIds = [];
@@ -810,6 +1038,7 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray)
 
             selectEmailRecipients($('.selectToRecipients'), toIds);
             selectEmailRecipients($('.selectCcRecipients'), ccIds);
+            selectEmailRecipients($('.selectNotedBy'), response.noted_by, true);
 
             traineeIdCounter = 1; //set counter to 1 every new memo
 
@@ -819,26 +1048,40 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray)
 
                 if(item.employment_type == 1){ //HRIS
                     empName = item.hris_emp_info.EmpName;
-                    trainingVenue = item.hris_emp_info.Venue;
+                    position = item.hris_emp_info.Position;
+                    department = item.hris_emp_info.Department;
+                    section = item.hris_emp_info.Section;
+                    // trainingVenue = item.hris_emp_info.Venue ?? "N/A";
                 }else if(item.employment_type == 2){ //SUBCON
                     empName = item.subcon_emp_info.EmpName;
-                    training_venue = item.subcon_emp_info.Venue;
+                    position = item.subcon_emp_info.Position;
+                    department = item.subcon_emp_info.Department;
+                    section = item.subcon_emp_info.Section;
+                    // trainingVenue = item.subcon_emp_info.Venue ?? "N/A";
                 }
 
                 item.emp_exam_details.forEach(function(exam_item){
                     let exam_title = exam_item.category;
+                    let objective = exam_item.objective;
                     let result = exam_item.result;
                     let remarks = exam_item.training_remarks;
 
-                    exam_list.push({exam_title, result, remarks});
+                    exam_list.push({exam_title, objective, result, remarks});
                 });
 
                 let traineeDetailsList = {
                     action: {id: counterNow, emp_id: item.hris_id, emp_type: item.employment_type, status: response.status},
                     emp_no: item.employee_no,
                     emp_name: empName,
-                    traning_venue: trainingVenue,
+                    position: position,
+                    department: department,
+                    section: section,
                     endorsement_date: item.endorsement_date,
+                    training_venue: item.emp_exam_details[0].training_venue,
+                    trainor: item.emp_exam_details[0].trainor,
+                    date_start: item.emp_exam_details[0].date_start,
+                    date_end: item.emp_exam_details[0].date_end,
+                    type_of_training: item.emp_exam_details[0].type_of_training,
                     exam_details: exam_list
                 }
 
@@ -871,34 +1114,36 @@ function disableForm($form, status = null){
 /**
  * Disable or update hr_memo_approval status
  */
-function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null) {
-    SendHrMemoMail(id, updateToStatus);
-    // $.ajax({
-    //     type: 'POST',
-    //     url: 'update_hr_memo_status',
-    //     data: {
-    //         id: id,
-    //         new_status: updateToStatus
-    //     },
-    //     dataType: 'json',
-    //     success: function (response) {
-    //         if(response.success == true) {
-    //             showSuccess('Status updated successfully.');
-    //             if(modal != null){
-    //                 modal.modal('hide');
-    //             }
+function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null, remarks = '') {
+// function updateHrMemoApprovalStatus(id, dtHMA, updateToStatus, modal = null) {
+    $.ajax({
+        type: 'POST',
+        url: 'update_hr_memo_status',
+        data: {
+            id: id,
+            new_status: updateToStatus,
+            remarks: remarks
+        },
+        dataType: 'json',
+        success: function (response) {
+            if(response.success == true) {
+                showSuccess('Status updated successfully.');
+                if(modal != null){
+                    modal.modal('hide');
+                }
 
-    //             if(updateToStatus > 2){
-    //                 SendHrMemoMail(id, updateToStatus);
-    //             }
-    //             dtHMA.draw();
-    //         }
-    //     },
-    //     error: function (xhr) {
-    //         console.error('Status update failed:', xhr.responseText);
-    //         showError('Failed to update status.');
-    //     }
-    // });
+                //temp comment when testing
+                if(updateToStatus > 2){
+                    SendHrMemoMail(id, updateToStatus);
+                }
+                dtHMA.draw();
+            }
+        },
+        error: function (xhr) {
+            console.error('Status update failed:', xhr.responseText);
+            showError('Failed to update status.');
+        }
+    });
 }
 
 function SendHrMemoMail(hr_memo_id, updateToStatus){
@@ -937,6 +1182,34 @@ function confirmAction(message, callback) {
         confirmButtonText: 'Yes'
     }).then((result) => {
         if (result.isConfirmed) callback();
+    });
+}
+
+/**
+ * SweetAlert success helper
+ */
+function showMessage(message, title = 'Information') {
+    Swal.fire({
+        icon: 'info',
+        title: title,
+        // html: message,
+        html: `
+           <div style="
+                border:1px solid #ccc;
+                padding:15px;
+                border-radius:5px;
+                text-align:left;
+                white-space:pre-wrap;
+                max-height:500px;
+                overflow-y:auto;
+            ">
+                ${message}
+            </div>
+        `,
+        width: '800px', // or '60%', '70%', '1000px'
+        showConfirmButton: true,
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'CLOSE'
     });
 }
 

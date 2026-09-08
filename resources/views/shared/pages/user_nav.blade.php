@@ -8,14 +8,14 @@
             class="brand-image img-circle elevation-3"
             style="opacity: .8">
 
-        <span class="brand-text font-weight-light font-size"><h5>System Title</h5></span>
+        <span class="brand-text font-weight-light font-size"><h5>TRDSv2</h5></span>
     </a> <!-- System title and logo -->
 
     <!-- Sidebar -->
     <div class="sidebar">
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                <li class="nav-item has-treeview fixed-bottom">
+                <li class="nav-item has-treeview">
                     <a href="{{ url('../RapidX') }}" class="nav-link">
                         <i class="nav-icon fas fa-arrow-left"></i>
                         <p>Return to RapidX</p>

@@ -119,10 +119,17 @@
                 $("#iBtnAddUserIcon").addClass('fa fa-check');
             },
             error: function(data, xhr, status){
-                toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
-                $("#iBtnAddUserIcon").removeClass('fa fa-spinner fa-pulse');
+                     $("#iBtnAddUserIcon").removeClass('fa fa-spinner fa-pulse');
                 $("#btnAddUser").removeAttr('disabled');
                 $("#iBtnAddUserIcon").addClass('fa fa-check');
+                if( data.status === 422 ){
+                    Swal.fire({ icon: 'error', title: 'Error', text: ('Please check the required fields.')});
+                    toastr.error(data.responseJSON.message);
+                    errorHandler(errorResponse.errors['user_level_id'], $('#selAddUserLevel'));
+                        return;
+                }
+                toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+
             }
         });
     }
@@ -540,6 +547,78 @@
         });
     }
 
+    const getSystemOneEmployeeDetailsRev1 = (comboId) => {
+        comboId.select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Search Employee Name or ID...',
+            minimumInputLength: 2, // Only search after typing 2 characters to save performance
+            ajax: {
+                url: "get_system_one_employee_details",
+                dataType: 'json',
+                delay: 250, // Wait 250ms after typing stops before hitting the server
+                data: function (params) {
+                    return {
+                        search: params.term, // Search keyword
+                        page: params.page || 1 // Current page (defaults to 1)
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.results, // Must be formatted as [{id: 1, text: 'Name'}]
+                        pagination: {
+                            more: data.pagination.more // True if there are more records to load
+                        }
+                    };
+                },
+                cache: true
+            }
+       });
+    }
+
+
+
+    function getSystemOneEmployeeDetailstest(cboElement,userId=null){
+        let result = '<option value="">N/A</option>';
+        $.ajax({
+            url: 'get_system_one_employee_details',
+            method: 'get',
+            dataType: 'json',
+            beforeSend: function(){
+                result = '<option value=""> -- Loading -- </option>';
+                cboElement.html(result);
+            },
+            success: function(JsonObject){
+
+                let userCollection = JsonObject['userCollection'];
+                result = '';
+                if(userCollection.length > 0){
+                    result = '<option value="">N/A</option>';
+                    for(let index = 0; index < userCollection.length; index++){
+                        let disabled = '';
+                        let EmpNo = userCollection[index].EmpNo;
+                        let EmpName = userCollection[index].EmpName;
+                        result += '<option value="' + EmpNo + '">' + EmpName + '</option>';
+                    }
+                }
+                else{
+                    result = '<option value=""> -- No record found -- </option>';
+                }
+
+                cboElement.html(result);
+                if(userId != null){
+                    cboElement.val(userId).attr('readonly',true);
+                }
+            },
+            error: function(data, xhr, status){
+                result = '<option value=""> -- Reload Again -- </option>';
+                cboElement.html(result);
+                console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+            }
+        });
+    }
+
     const getEmpIdData = (id) => {
         $.ajax({
             type: "get",
@@ -550,7 +629,14 @@
             dataType: "json",
             success: function (response) {
                 console.log(response);
-                let middlename = "";
+                if(response['empInfo'].length == 0){
+                    let params = {
+                        frmId : $('#formAddUser')
+                    }
+                    resetFormValues(params);
+                    selAddUserLevel
+                    $('#selAddUserLevel').val('');
+                }
                 $('#systemoneEmpId').val(response['empInfo'][0]['pkid']);
                 $('#txtAddfirstName').val(response['empInfo'][0]['FirstName']);
                 $('#txtAddMiddleName').val(response['empInfo'][0]['MiddleName']);
@@ -558,7 +644,7 @@
                 $('#txtAddLastName').val(response['empInfo'][0]['LastName']);
                 $('#txtAddUserPosition').val(response['empInfo'][0]['Position']);
                 $('#txtAddUserSection').val(response['empInfo'][0]['Section']);
-                $('#rapidxEmpId').val(response['rapidxUser']['id']);
+                $('#rapidxEmpId').val(response['rapidxUser']['id']??'');
                 $('#txtAddUserEmail').val(response['rapidxUser']['email']);
 
                 // $username = strtolower(substr($fname, 0, 1).substr($mname, 0,1).$lname);
@@ -605,7 +691,9 @@
         }
         call_ajax(data,'get_user_module_access',function(response){
             console.log(response);
-            
+
         })
     }
+
+
 // });

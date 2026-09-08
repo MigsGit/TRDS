@@ -15,12 +15,6 @@
     <div class="sidebar">
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                <li class="nav-item has-treeview fixed-bottom">
-                    <a href="{{ url('../RapidX') }}" class="nav-link">
-                        <i class="nav-icon fas fa-arrow-left"></i>
-                        <p>Return to RapidX</p>
-                    </a>
-                </li>
                 <li class="nav-item has-treeview">
                     <a href="{{ url('../RapidX') }}" class="nav-link">
                         <i class="nav-icon fas fa-arrow-left"></i>
@@ -88,11 +82,11 @@
                                 <p> Training Request</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="{{ route('training_request_approval') }}" class="nav-link">
                                 <p> Traning Approval</p>
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
 
                 </li>
@@ -115,7 +109,7 @@
                     <a href="#" class="nav-link">
                         <i class="fas fa-cogs"></i>
                         <p>
-                            [Chan] Theoretical Exam 
+                            [Chan] Theoretical Exam
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
@@ -127,7 +121,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
+                            <a href="{{ route('examDashboard') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Examination</p>
                             </a>
@@ -139,7 +133,7 @@
                             </a>
                         </li>
                     </ul>
-                </li> 
+                </li>
 
                 <li class="nav-item has-treeview">
                     <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">

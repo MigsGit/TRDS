@@ -43,11 +43,11 @@
                                 </div>
 
                                 <div class="float-sm-left mb-4 col-2">
-                                    <select class="form-control selectFilter" name="select_filter" id="selectFilterId">
-                                        <option value="4" selected>All Training Request</option>
-                                        <option value="1">Conformance</option>
-                                        <option value="2">Receiving</option>
-                                        <option value="3">TU Head Approval</option>
+                                    <select class="form-control selectFilter" id="selectFilterId">
+                                        <option value="3" {{ $defaultFilter == 3 ? 'selected' : '' }}>All Training Request</option>
+                                        <option value="0" {{ $defaultFilter == 0 ? 'selected' : '' }}>Conformance</option>
+                                        <option value="1" {{ $defaultFilter == 1 ? 'selected' : '' }}>Receiving</option>
+                                        <option value="2" {{ $defaultFilter == 2 ? 'selected' : '' }}>TU Head Approval</option>
                                     </select>
                                 </div>
 
@@ -121,7 +121,6 @@
                             <div class="header">
                                 <h5 class="text-info"><i class="fa fa-info-circle"></i> Request Details</h5>
                             </div>
-
                         </div>
 
                         <div class="row">
@@ -160,7 +159,7 @@
                                             <option value="6">Supervisor</option>
                                             <option value="7">Clerk</option>
                                         </select>
-                                        
+
                                     </div>
                                 </div>
 
@@ -174,7 +173,7 @@
                                             <option value="1">Automotive Line</option>
                                             <option value="2">Non-Automotive Line</option>
                                         </select>
-                                        
+
                                     </div>
                                 </div>
 
@@ -194,26 +193,41 @@
                                             <option value="7">Flexibility Certification</option>
                                             <option value="8">Re-certification</option>
                                         </select>
-                                        
+
                                     </div>
                                 </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="header">
+                                <h5 class="text-info"><i class="fa fa-info-circle"></i> Memo Details</h5>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="input-group  mb-3">
+                                    <div class="input-group-prepend w-30">
+                                        <span class="input-group-text w-100" id="basic-addon1">Memo Doc No.</span>
+                                    </div>
+                                    <select name="memo_doc_no" id="selectMemoDocNo" class="form-control select2bs5" required></select>
+                                </div>
+                            </div>
+
                         </div>
 
                         <div class="row mt-2">
                             <div class="col">
                                 <div class="table-responsive tbl">
-                                    <div class="d-flex justify-content-between">
-                                        <button type="button" id="btnAddTrainee" class="btn btn-primary"><i class="fa fa-plus"></i> Request Employee</button>
-                                    </div>
-                                    <br>
-                                    <table class="table table-sm table-bordered" id="tblRequestedEmployeeDetails" style="width: 100%;">
+
+                                    <table class="table table-sm table-bordered" id="tblEmployeeListByMemoDoc" style="width: 100%;">
                                         <thead>
                                             <tr>
-                                                <th>Actionss</th>
+                                                <th>Action</th>
                                                 <th>Date Hired</th>
                                                 <th>Employee No</th>
                                                 <th>Name</th>
-                                                <th>Position/Dept./Section</th>
+                                                <th >Position/Dept./Section</th>
                                                 <th>Title</th>
                                                 <th>Result</th>
                                                 <th>Remarks</th>
@@ -234,8 +248,6 @@
                                                 <th>Employee No</th>
                                                 <th>Name</th>
                                                 <th>Position/Dept./Section</th>
-                                                {{-- <th>From Station/Production</th> --}}
-                                                {{-- <th>To Station/Production</th> --}}
                                             </tr>
                                         </thead>
                                     </table>
@@ -255,7 +267,7 @@
                             </div>
 
                             <div class="col-sm-6">
-                                 <div class="input-group  mb-3">
+                                <div class="input-group  mb-3">
                                     <div class="input-group-prepend w-50">
                                         <span class="input-group-text w-100" id="basic-addon1">Section Head</span>
                                     </div>
@@ -276,74 +288,6 @@
         <!-- /.modal-dialog -->
     </div>
     <!-- /.modal -->
-    
-
-    <div class="modal fade" id="modalAddEmployee" data-backdrop="static">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-plus"></i> Add Employee</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form method="post" id="formAddEmployee" autocomplete="off">
-                    @csrf
-                    <div class="modal-body">
-
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="input-group  mb-3">
-                                    <div class="input-group-prepend w-30">
-                                        <span class="input-group-text w-100" id="basic-addon1">Memo Doc No.</span>
-                                    </div>
-                                    <select name="memo_doc_no" id="selectMemoDocNo" class="form-control select2bs5" required></select>
-                                </div>
-                            </div>
-                            
-                        </div>
-
-                        <div class="row mt-2">
-                            <div class="col">
-                                <div class="table-responsive">
-                                    <br>
-                                    <table class="table table-sm table-bordered" id="tblRequestedEmployeeByMemoDoc" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th>Action</th>
-                                                <th>Date Hired</th>
-                                                <th>Employee No</th>
-                                                <th>Name</th>
-                                                <th>Position/Dept./Section</th>
-                                                <th>Title</th>
-                                                <th>Result</th>
-                                                <th>Remarks</th>
-                                                <th>Venue</th>
-                                                <th>Endorsement Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mt-4">
-
-                        </div>
-
-                    </div>
-                    <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" id="btnSubmitHrMemoApproval" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
-                    </div>
-                </form>
-            </div>
-            <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-    </div>
 
 
 @endsection

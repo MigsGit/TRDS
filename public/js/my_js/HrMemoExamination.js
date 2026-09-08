@@ -48,6 +48,7 @@ function initExaminationsTable($table, url = 'view_examinations') {
         columns: [
             { data: 'action', orderable: false, searchable: false },
             { data: 'examination_name' },    // customize this per examinations
+            { data: 'objective' },    // customize this per examinations
             { data: 'status_label' }
         ]
     });
@@ -129,6 +130,7 @@ function fetchExaminationsById(id, $modal) {
             // Populate modal fields (adjust names per examinations)
             $('#txtExaminationId').val(response.id);
             $('#txtExaminationName').val(response.examination_name);
+            $('#txtObjective').val(response.objective);
             $modal.modal('show');
         },
         error: function (xhr) {

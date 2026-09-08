@@ -23,6 +23,10 @@ class HrMemo extends Model
         return $this->hasOne(RapidXUser::class, 'id', 'prepared_by');
     }
 
+    public function received_by_info(){
+        return $this->hasOne(RapidXUser::class, 'id', 'received_by');
+    }
+
     public function noted_by_info(){
         return $this->hasOne(RapidXUser::class, 'id', 'noted_by');
     }

@@ -18,6 +18,7 @@ class CreateQuestionnairesTable extends Migration
             $table->unsignedTinyInteger('revision')->default(0);
             $table->unsignedTinyInteger('category')->comment = '0-Newly Hired, 1-Certification, 2-Re-Certification';
             $table->string('exam_title')->nullable();
+            $table->string('description')->nullable();
             $table->longText('exam_instruction')->nullable();
             $table->string('purpose')->nullable();
             $table->string('department')->nullable();

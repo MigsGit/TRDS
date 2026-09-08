@@ -94,6 +94,37 @@ const GetSystemOneHrisSection = (element) => {
     ajaxRequest(ajaxGetSystemOneHrisSection);
 };
 
+const GetExamTitle = (element) => {
+    const ajaxGetExamTitle = {
+        url: 'get_exam_title',
+        method: 'GET',
+
+        successCallback: (response) => {
+            const examTitle = response || [];
+            let result = '';
+
+            if (examTitle.length > 0) {
+                result += '<option value="" disabled selected>Select Exam Title</option>';
+
+                examTitle.forEach(item => {
+                    const title = item?.exam_title ?? 'No Exam Title';
+                    result += `<option value="${title}">${title}</option>`;
+                });
+            } else {
+                result = '<option value="" disabled selected>Not found</option>';
+            }
+
+            element.html(result);
+        },
+
+        errorCallback: () => {
+            element.html('<option value="" disabled selected>Reload Again</option>');
+        }
+    };
+
+    ajaxRequest(ajaxGetExamTitle);
+};
+
 const CreateUpdateQuestionnaire = () => {
     let formData = $('#formCreateUpdateQuestionnaire').serialize();
 
@@ -114,6 +145,7 @@ const CreateUpdateQuestionnaire = () => {
                 alert('Saving failed!');
             }else{
                 $('#modalCreateUpdateQuestionnaire').modal('hide');
+                $('.reset').val('');
                 toastr.success('Saved!');
                 dataQuestionnaire.draw();
             }
@@ -145,7 +177,8 @@ const GetQuestionnaireById = (questionnaireId) => {
 
             $('#slctQuestionnaireCategory').val(getQuestionnaireData[0].category);
             $('#nmbrQuestionnairePassingScore').val(getQuestionnaireData[0].passing_score);
-            $('#txtQuestionnaireTitle').val(getQuestionnaireData[0].exam_title);
+            $('#slctQuestionnaireExamTitle').val(getQuestionnaireData[0].exam_title).trigger('change');
+            $('#txtQuestionnaireDescription').val(getQuestionnaireData[0].description);
             $('#txtQuestionnaireInstruction').val(getQuestionnaireData[0].exam_instruction);
             $('#txtQuestionnairePurpose').val(getQuestionnaireData[0].purpose);
             $('#slctQuestionnaireDepartment').val(getQuestionnaireData[0].department).trigger('change');
@@ -164,7 +197,7 @@ const GetQuestionnaireById = (questionnaireId) => {
 const ChangeQuestionnaireStatus = (questionnaireId) => {
     let formData = $('#formChangeQuestionnaireStatus').serialize() + '&questionnaireId' + questionnaireId;
 
-    const ajaxGetQuestionnaireById = {
+    const ajaxGetQuestionnaireStatus = {
         url: "change_questionnaire_status",
         method: "POST",
         data: formData,
@@ -209,9 +242,63 @@ const ChangeQuestionnaireStatus = (questionnaireId) => {
         }
     };
 
-    ajaxRequest(ajaxGetQuestionnaireById);
+    ajaxRequest(ajaxGetQuestionnaireStatus);
 };
 
+function CopyQuestionnaire(id, description){
+    $.ajax({
+        url: 'copy_questionnaire',
+        type: 'POST',
+        data: {
+            questionnaire_id: id,
+            description: description,
+            _token: csrfToken
+        },
+
+        beforeSend:function(){
+            Swal.fire({
+                title: 'Copying...',
+                text: 'Please wait while copying questionnaire.',
+                allowOutsideClick: false,
+                didOpen:()=>{
+                    Swal.showLoading();
+                }
+            });
+        },
+
+        success:function(response){
+            if(response.success){
+                Swal.fire(
+                    'Success',
+                    response.message,
+                    'success'
+                ).then(()=>{
+                    location.reload();
+                });
+            }else{
+                Swal.fire(
+                    'Error',
+                    response.message,
+                    'error'
+                );
+            }
+        },
+
+        error:function(xhr){
+            let message = 'Copy failed.';
+
+            if(xhr.responseJSON && xhr.responseJSON.message){
+                message = xhr.responseJSON.message;
+            }
+
+            Swal.fire(
+                'Error',
+                message,
+                'error'
+            );
+        }
+    });
+}
 // =================================================================================================================================
 // ===================================================== QUESTIONNAIRE DETAILS =====================================================
 // =================================================================================================================================
@@ -231,7 +318,9 @@ const CreateUpdateQuestionnaireDetails = () => {
         successCallback: function(response){
 
             if(response['result'] == 1){
-                alert('Questionnaire Details already exists!');
+                alert('File name is already exists!');
+            }else if(response['result'] == 0){
+                alert('Points exceed the passing score!');
             }else if(response['hasError'] == 1){
                 alert('Saving failed!');
             }else{
@@ -242,6 +331,7 @@ const CreateUpdateQuestionnaireDetails = () => {
                 $('#identificationEssay').empty();
                 $('#multipleGrid').empty();
                 $('#formCreateUpdateQuestionnaireDetails')[0].reset();
+                $('.reset').val('');
                 toastr.success('Saved!');
                 dataQuestionnaireDetails.draw();
             }
@@ -254,6 +344,47 @@ const CreateUpdateQuestionnaireDetails = () => {
 
     ajaxRequest(ajaxGetCreateUpdateQuestionnaireDetails);
 };
+
+function RenderTable() {
+    // Table header
+    $('#questionTable thead tr').html('<th>Question</th>');
+
+    getOptions.forEach((options, getIndex) => {
+        $('#questionTable thead tr').append(`
+            <th class="position-relative">
+                ${options}
+                <button type="button" class="btn btn-sm btn-secondary multipleRemove removeOption" data-index="${getIndex}" style="position:absolute; top:2px; right:2px;">&times;</button>
+            </th>
+        `);
+    });
+
+    // Table body
+    $('#questionTable tbody').html('');
+    getQuestions.forEach((question, questionIndex) => {
+        let row = `<tr>
+            <td class="position-relative" style="padding-left:1rem;">
+                <button class="btn btn-sm btn-secondary multipleRemove removeQuestion" data-index="${questionIndex}" style="margin-right:5px;">&times;</button>&nbsp;
+                ${question}
+            </td>`;
+
+        getOptions.forEach((options, optionIndex) => {
+            let radioId = `question${questionIndex}_option${optionIndex}`;
+            let checked = getSelectedAnswers[questionIndex] == (optionIndex + 1) ? 'checked' : '';
+
+            // <input type="radio" id="${radioId}" data-row="${questionIndex}" data-column="${optionIndex + 1}" ${checked}>
+            row += `<td class="text-center">
+                        <input type="radio" id="${radioId}" data-row="${questionIndex}" data-column="${options}" ${checked}>
+                        <label for="${radioId}" class="sr-only"></label>
+                    </td>`;
+        });
+
+        row += '</tr>';
+        $('#questionTable tbody').append(row);
+    });
+
+    $('#questionnaireQuestionHidden').val(JSON.stringify(getQuestions));
+    $('#gridChoicesHidden').val(JSON.stringify(getOptions));
+}
 
 const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRevision) => {
     const ajaxGetQuestionnaireDetailsById = {
@@ -275,49 +406,96 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
             if(getQuestionnaireDetials.length === 0){
                 return;
             }
-            
 
             $('#slctQuestionnaireCategoryType').val(getQuestionnaireDetials.category_type).trigger('change')
             $('#nmbrQuestionnairePoints').val(getQuestionnaireDetials.points)
 
-            let parsedData = JSON.parse(getQuestionnaireDetials.answer_choices_question);
-            let question = parsedData[0].question;
-            let choices = parsedData[0].choices;
-            let answer  = parsedData[0].answer;
+            let getData     = JSON.parse(getQuestionnaireDetials.answer_choices_question)
+            let question    = getData[0].question
+            let choices     = getData[0].choices
+            let answer      = getData[0].answer
+            let image       = getQuestionnaireDetials.image
+
+            if(!image){
+                $('#txtAttachment').addClass('d-none')
+                $('#fileAttachment').removeClass('d-none')
+            }else{
+                $('#fileAttachment').addClass('d-none')
+                $('#txtAttachment').removeClass('d-none')
+            }
+
+            $('#txteUploadImage').val(image)
 
             switch (getQuestionnaireDetials.category_type) {
                 case 0:
                     $('#txtQuestionnaireQuestion').val(question);
                     $('.divChoices').empty();
                     $('#btnAddChoice').click();
-        
+
                     for(let i = 1; i < choices.length; i++){
                         $('#btnAddChoice').click();
                     }
-        
+                    // question1_option3 answer_choices_question
                     $('.divChoices .input-group').each(function(index){
                         let choiceValue = choices[index];
-        
+
                         $(this).find("input[name='choices[]']").val(choiceValue);
-        
-                        if(choiceValue === answer){
+
+                        let answerArr = typeof answer === 'string' ? answer.split(' || ') : [];
+                        if(answerArr.includes(choiceValue)){
                             $(this)
                                 .find('.chkAnswer')
                                 .prop('checked', true)
                                 .trigger('change');
                         }
                     });
+                    $('.chkAnswer').prop('disabled', false);
                     break;
 
                 case 1:
-                    
+                    $('#txtQuestionnaireQuestion').val(question);
+                    $('#txtQuestionType').val(getQuestionnaireDetials.type).trigger('change');
+                    $('#txtIdentification').val(answer)
                     break;
 
                 case 2:
-                    
+                    $('#txtQuestionnaireDescription').val(getQuestionnaireDetials.description)
+                    let rawData = getQuestionnaireDetials.answer_choices_question;
+
+                    if (!rawData) return;
+
+                    let getData = JSON.parse(rawData);
+
+                    getQuestions = [];
+                    getOptions = [];
+                    getSelectedAnswers = [];
+
+                    if (getData.length > 0) {
+                        getOptions = getData[0].choices;
+                    }
+
+                    getData.forEach((item, index) => {
+                        getQuestions.push(item.question);
+                        getSelectedAnswers[index] = item.answer;
+                    });
+                    console.log('getData',getData);
+
+                    RenderTable();
+
+                    getSelectedAnswers.forEach((ans, rowIndex) => {
+                    console.log('getData',ans);
+
+                        if (ans !== null) {
+                            let radio = $(`input[data-row="${rowIndex}"][data-column="${ans}"]`);
+                            radio.prop('checked', true);
+                        }
+                    });
+
+                    $('#gridAnswerHidden').val(JSON.stringify(getSelectedAnswers));
+
                     break;
                 default:
-                    console.log('IRROR');
+                    console.log('IRRORMAN');
                     break;
             }
         },
@@ -328,4 +506,55 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
     };
 
     ajaxRequest(ajaxGetQuestionnaireDetailsById);
+};
+
+const ChangeQuestionnaireDetailsStatus = (questionnaireId) => {
+    let formData = $('#formChangeQuestionnaireDetailsStatus').serialize() + '&questionnaireId' + questionnaireId;
+
+    const ajaxChangeQuestionnaireDetailsStatus = {
+        url: "change_questionnaire_details_status",
+        method: "POST",
+        data: formData,
+        dataType: "json",
+
+        beforeSendCallback: function(){
+            $("#iBtnChangeQuestionnaireDetailsStatusIcon").addClass('fa fa-spinner fa-pulse');
+            $("#btnChangeQuestionnaireDetailsStatus").prop('disabled', 'disabled');
+        },
+
+        successCallback: function(response){
+            let getQuestionnaireData = response;
+            console.log('getQuestionnaireData:', getQuestionnaireData);
+
+            if(response['hasError'] == '1'){
+                toastr.error('Questionnaire activation failed!');
+            }else{
+                if($("#txtChangeQuestionnaireDetailsStatus").val() == 0){
+                    toastr.success('Questionnaire activation success!');
+                    $("#txtChangeQuestionnaireDetailsStatus").val() == 1;
+                }
+                else{
+                    toastr.success('Questionnaire deactivation success!');
+                    $("#txtChangeQuestionnaireDetailsStatus").val() == 0;
+                }
+                $("#modalChangeQuestionnaireDetailsStatus").modal('hide');
+                $("#formChangeQuestionnaireDetailsStatus")[0].reset();
+                dataQuestionnaireDetails.draw();
+            }
+
+            $("#iBtnChangeQuestionnaireDetailsStatusIcon").removeClass('fa fa-spinner fa-pulse');
+            $("#btnChangeQuestionnaireDetailsStatus").removeAttr('disabled');
+            $("#iBtnChangeQuestionnaireDetailsStatusIcon").addClass('fa fa-check');
+        },
+
+        errorCallback: function(xhr, status, error){
+            console.log('Ajax Error:', xhr.responseText);
+            toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+            $("#iBtnChangeQuestionnaireDetailsStatusIcon").removeClass('fa fa-spinner fa-pulse');
+            $("#btnChangeQuestionnaireDetailsStatus").removeAttr('disabled');
+            $("#iBtnChangeQuestionnaireDetailsStatusIcon").addClass('fa fa-check');
+        }
+    };
+
+    ajaxRequest(ajaxChangeQuestionnaireDetailsStatus);
 };

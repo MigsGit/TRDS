@@ -1,5 +1,5 @@
 @php
-    session_start();
+    // session_start();
     $isLogin = false;
     if(isset($_SESSION['rapidx_user_id'])){
         $isLogin = true;
@@ -42,7 +42,7 @@
                             <p>This is an On-Going Feature</p>
                         </div>
                         <div class="modal-footer">
-                            
+
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>

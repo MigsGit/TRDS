@@ -9,6 +9,8 @@ use App\Model\SystemOneSubconEmpInfo;
 
 class HrMemoTraineeDetails extends Model
 {
+
+    protected $table = 'hr_memo_trainee_details';
     public function hris_emp_info()
     {
         return $this->hasOne(SystemOneHrisEmpInfo::class, 'pkid', 'hris_id');

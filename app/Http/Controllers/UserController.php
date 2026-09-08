@@ -14,6 +14,7 @@ use App\Model\UserModule;
 use App\RapidXUser;
 use Auth;
 use DataTables;
+use App\Model\SystemOneSubconEmpInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -25,7 +26,6 @@ use QrCode;
 
 class UserController extends Controller
 {
-
     public function save_user_module_access(UserAccessModuleRequest $userAccessModuleRequest){
         try {
             date_default_timezone_set('Asia/Manila');
@@ -49,170 +49,6 @@ class UserController extends Controller
             throw $e;
         }
     }
-    // Sign In
-    public function sign_in(Request $request){
-        $user_data = array(
-            'username' => $request->get('username'),
-            'password' => $request->get('password'),
-            'status' => "1"
-        );
-
-        $validator = Validator::make($user_data, [
-            'username' => 'required',
-            'password' => 'required|alphaNum|min:8'
-        ]);
-
-        if($validator->passes()){
-            if(Auth::attempt($user_data)){
-                if(Auth::user()->is_password_changed == 0){
-                    return response()->json(['result' => "2"]);
-                }
-                else{
-                    return response()->json(['result' => "1"]);
-                }
-            }
-            else{
-                return response()->json(['result' => "0", 'error_message' => 'Login Failed!', 'error' => $validator->messages()]);
-            }
-        }
-        else{
-            return response()->json(['result' => "0", 'error' => $validator->messages()]);
-        }
-    }
-
-    // Sign Out
-    public function sign_out(Request $request){
-        Auth::logout();
-        return response()->json(['result' => "1"]);
-    }
-
-    // Change Password
-    public function change_pass(Request $request){
-        date_default_timezone_set('Asia/Manila');
-        $user_data = array(
-            'username' => $request->username,
-            'password' => $request->password,
-            'new_password' => $request->new_password,
-            'confirm_password' => $request->confirm_password,
-        );
-
-        $validator = Validator::make($user_data, [
-            'username' => 'required',
-            'password' => 'required|alphaNum|min:8',
-            'new_password' => 'required|alphaNum|min:8|required_with:confirm_password|same:confirm_password',
-            'confirm_password' => 'required|alphaNum|min:8'
-        ]);
-
-        if($validator->passes()){
-
-            if(Auth::attempt($user_data)){
-                try{
-                    User::where('id', Auth::user()->id)
-                        ->increment('update_version', 1,
-                            [
-                                'is_password_changed' => 1,
-                                'password' => Hash::make($request->new_password),
-                                'last_updated_by' => Auth::user()->id,
-                                'updated_at' => date('Y-m-d H:i:s'),
-                            ]
-                        );
-                    DB::commit();
-                    return response()->json(['result' => "1"]);
-                }
-                catch(\Exception $e) {
-                    DB::rollback();
-                    // throw $e;
-                    return response()->json(['result' => "0"]);
-                }
-
-                return response()->json(['result' => 1]);
-            }
-            else{
-                return response()->json(['result' => "0", 'error' => 'Login Failed!']);
-            }
-        }
-        else{
-            return response()->json(['result' => "0", 'error' => $validator->messages()]);
-        }
-    }
-
-    // Change User Status
-    public function change_user_stat(Request $request){
-        date_default_timezone_set('Asia/Manila');
-
-        $data = $request->all();
-
-        $validator = Validator::make($data, [
-            'user_id' => 'required',
-            'status' => 'required',
-        ]);
-
-        if($validator->passes()){
-            try{
-                User::where('id', $request->user_id)
-                    ->increment('update_version', 1,
-                        [
-                            'status' => $request->status,
-                            'last_updated_by' => Auth::user()->id,
-                            'updated_at' => date('Y-m-d H:i:s'),
-                        ]
-                    );
-                DB::commit();
-                return response()->json(['result' => "1"]);
-            }
-            catch(\Exception $e) {
-                DB::rollback();
-                // throw $e;
-                return response()->json(['result' => "0"]);
-            }
-
-            return response()->json(['result' => 1]);
-        }
-        else{
-            return response()->json(['result' => "0", 'error' => $validator->messages()]);
-        }
-    }
-
-    // Reset Password
-    public function reset_password(Request $request){
-        date_default_timezone_set('Asia/Manila');
-
-        // $password = 'pmi1234' . Str::random(10);
-        $password = 'pmi12345';
-
-        try{
-            User::where('id', $request->user_id)
-                ->increment('update_version', 1,
-                    [
-                        'is_password_changed' => 0,
-                        'password' => Hash::make($password),
-                        'last_updated_by' => Auth::user()->id,
-                        'updated_at' => date('Y-m-d H:i:s'),
-                    ]
-                );
-
-            $has_email = 0;
-            $user = User::where('id', $request->user_id)->get();
-
-            if(count($user) > 0 && $user[0]->email != ""){
-                $has_email = 1;
-                // $has_email = 0;
-                $subject = 'PATS User Reset Password';
-                $email = $user[0]->email;
-                $message = 'This is a notification from PATS. Your PATS user password account was successfully reset.';
-
-                dispatch(new SendUserPasswordJob($subject, $message, $user[0]->username, $password, $email));
-            }
-            DB::commit();
-            return response()->json(['result' => "1", 'user' => $user, 'has_email' => $has_email, 'password' => $password]);
-        }
-        catch(\Exception $e) {
-            DB::rollback();
-            // throw $e;
-            return response()->json(['result' => "0"]);
-        }
-    }
-
     //View Users
 	public function view_users(){
     $users = User::with([
@@ -223,10 +59,11 @@ class UserController extends Controller
                 ->get();
 
         return DataTables::of($users)
+
             ->addColumn('label1', function($user){
                 $result = "";
 
-                if(blank($user->deleted_at)){
+                if($user->status === 1){
                     $result .= '<span class="badge badge-pill badge-success">Active</span>';
                 }
                 else{
@@ -243,8 +80,6 @@ class UserController extends Controller
                 }
                 else{
                     $userHris = $user->rapidx_system_one_subcon_emp_info;
-
-                    $result .= '<span class="badge badge-pill badge-danger">Inactive</span>';
                 }
                 return $userHris->FirstName.' '.$userHris->LastName;
                 return $result;
@@ -260,7 +95,6 @@ class UserController extends Controller
                 // $result .= '<button class="dropdown-item aGenUserBarcode" user-id="' . $user->id . '" employee-id="' . $user->employee_id . '" type="button" style="padding: 1px 1px; text-align: center;" data-toggle="modal" data-target="#modalGenUserBarcode">Generate Barcode</button>';
                 $result .= '</div>
                         </div></center>';
-
                 return $result;
             })
             ->addColumn('checkbox', function($user){
@@ -284,7 +118,7 @@ class UserController extends Controller
         //     $userAccessModule =  UserAccessModule::where('users_id',$usersId)->first('user_modules_id');
         //     $userAccessModule = explode(',',$userAccessModule->user_modules_id);
         // }
-      
+
         if (filled($usersId)) {
             $userAccess = UserAccessModule::where('users_id', $usersId)->first();
             $userAccessModule = $userAccess ? explode(',', $userAccess->user_modules_id) : [];
@@ -346,6 +180,7 @@ class UserController extends Controller
             $userRequestValidated = $userRequest->validated();
             $rapidxUserId = $userRequest->user_id;
             if(blank($rapidxUserId)){ //add
+
                 $userRequestValidated['created_at'] = now();
                 $userId = User::insertGetId(
                     $userRequestValidated
@@ -472,6 +307,69 @@ class UserController extends Controller
 
 
         return response()->json(['userCollection' => $userCollection]);
+    }
+    public function getSystemOneEmployeeDetails(Request $request){ //nmodify
+    // return response()->json(['token' => csrf_token()]);
+        $search = $request->input('search');
+    $page = $request->input('page', 1);
+    $perPage = 20; // Load 20 results at a time
+
+    if (empty($search)) {
+        return response()->json(['results' => [], 'pagination' => ['more' => false]]);
+    }
+
+    //1. Query the regular HRIS connection
+    $hrisQuery = DB::connection('mysql_hris_subcon')
+        ->table('vw_pmi_subcon_hris_rapidx')
+        ->where('EmpNo', 'LIKE', "%{$search}%")
+        ->orWhere('EmpName', 'LIKE', "%{$search}%")
+        ->select('EmpNo as id', DB::raw("CONCAT(EmpNo, ' - ', EmpName) as text"));
+
+    // 2. Query the Subcontractor connection
+    // $subconQuery = DB::connection('mysql_subcon')
+    //     ->table('vw_employeeinfo')
+    //     ->where('EmpNo', 'LIKE', "%{$search}%")
+    //     ->orWhere('EmpName', 'LIKE', "%{$search}%")
+    //     ->select('EmpNo as id', DB::raw("CONCAT(EmpNo, ' - ', EmpName) as text"));
+
+    // 3. Combine them in memory safely using get()
+    // (Fast because 'LIKE' filter narrows 20k down to just a few matches)
+    $hrisResults = $hrisQuery->get();
+    // $subconResults = $subconQuery->get();
+
+    // $mergedResults = $hrisResults->concat($subconResults)->unique('id');
+
+    // 4. Manually slice the results for pagination based on the requested page
+    $totalCount = $hrisResults->count();
+    $offset = ($page - 1) * $perPage;
+
+    // Slice only the 20 items needed for the current scroll page
+    $paginatedResults = $hrisResults->slice($offset, $perPage)->values();
+
+    // 5. Check if there are more items left to stream to Select2
+    $morePages = ($offset + $perPage) < $totalCount;
+
+    return response()->json([
+        'results'    => $paginatedResults,
+        'pagination' => [
+            'more' => $morePages
+        ]
+    ]);
+
+        // // 1. Fetch data from both connections (returns plain arrays)
+        // $hrisData = DB::connection('mysql_systemone')
+        //     ->select("SELECT EmpNo, EmpName, Department, Division, Section FROM vw_employeeinfo");
+
+        // $subconData = DB::connection('mysql_subcon')
+        //     ->select("SELECT EmpNo, EmpName, Department, Division, Section FROM vw_employeeinfo");
+
+        // // 2. Convert to collections and merge them completely
+        // $mergedCollection = collect($hrisData)->concat($subconData);
+
+        // // 3. (Optional) If you want to ensure there are no duplicate EmpNo's between lists
+        // $finalData = $mergedCollection->unique('EmpNo')->values();
+
+        // return response()->json(['userCollection' => $finalData]);
     }
 
     // Get User By Batch
@@ -664,12 +562,23 @@ class UserController extends Controller
         $hris_data = DB::connection('mysql_systemone')
         ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
         $rapidxUser = RapidXUser::where('employee_number',$request->empId)->first();
+        //   $hris_data = SystemOneHrisSubcon::
+        // where('EmpNo', $request->empId)
+        // ->get();
         if(count($hris_data) > 0){
             return response()->json(['empInfo' => $hris_data, 'rapidxUser' => $rapidxUser]);
         }
         else{
-            $subcon_data = DB::connection('mysql_systemone')
-            ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
+              $subcon_data = SystemOneSubconEmpInfo::where('EmpStatus', 'Active')
+            ->where('EmpNo', $request->empId)
+            ->orderBy('DateHired', 'desc')
+            ->get();
+
+            // old code (Issue - No results returned.) - Boss Da
+            // return $subcon_data;
+            // $subcon_data = DB::connection('mysql_hris_subcon')
+            // ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
+
             return response()->json(['empInfo' => $subcon_data,'rapidxUser' => $rapidxUser]);
         }
 

@@ -13,6 +13,10 @@
 <!-- DataTables -->
 <link rel="stylesheet" href="{{ asset('public/template/plugins/datatables-bs4/css/dataTables.bootstrap4.css') }}">
 
+<!-- RowReorder -->
+{{-- <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.2.6/css/rowReorder.dataTables.min.css"> --}}
+<link rel="stylesheet" href="{{ asset('public/template/plugins/datatables-rowreorder/css/rowReorder.dataTables.min.css') }}">
+
 <!-- Select2 -->
 {{-- <link rel="stylesheet" href="{{ asset('public/template/plugins/select2/css/select2.min.css') }}">
 <link rel="stylesheet" href="{{ asset('public/template/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}"> --}}
@@ -48,6 +52,7 @@
 <link href="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1581152091/smartwizard/smart_wizard_theme_arrows.min.css" rel="stylesheet" type="text/css" /> --}}
 
 
+<link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.5.0/css/rowReorder.dataTables.min.css">
 
 <link href="{{ asset('public/css/flash.css') }}" rel="stylesheet">
 

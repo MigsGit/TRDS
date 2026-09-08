@@ -17,6 +17,10 @@
 <script src="{{ asset('public/template/plugins/datatables/jquery.dataTables.js') }}"></script>
 <script src="{{ asset('public/template/plugins/datatables-bs4/js/dataTables.bootstrap4.js') }}"></script>
 
+<!-- RowReorder -->
+{{-- <script src="https://cdn.datatables.net/rowreorder/1.2.6/js/dataTables.rowReorder.min.js"></script> --}}
+<script src="{{ asset('public/template/plugins/datatables-rowreorder/js/dataTables.rowReorder.min.js') }}"></script>
+
 <!-- Select2 -->
 {{-- <script src="{{ asset('public/template/plugins/select2/js/select2.full.min.js') }}"></script> --}}
 <script src="{{ asset('public/template/plugins/select2/js/select2.min.js') }}"></script>
@@ -33,11 +37,13 @@
 <!-- Datepicker -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
+
 {{--
 <script src="{{ asset('public/template/plugins/daterangepicker/moment.min.js') }}"></script>
 <script src="{{ asset('public/template/plugins/daterangepicker/daterangepicker.js') }}"></script> --}}
 
-<script type="text/javascript" src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1581152197/smartwizard/jquery.smartWizard.min.js"></script>
+<!-- <script type="text/javascript" src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1581152197/smartwizard/jquery.smartWizard.min.js"></script> -->
+
 
 <script>
     toastr.options = {
@@ -61,13 +67,22 @@
 </script>
 
 <!-- Custom JS -->
+<script src="{{ asset('public/js/my_js/Common.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/Questionnaires.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/Examination.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/ExamResult.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/User.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/CustomerClaim.js') }}?<?=time()?>"></script>
-<script src="{{ asset('public/js/my_js/Common.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/RapidXUser.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/EmailRecipient.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/ProductClassification.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/TrainingRequest.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/TrainingEndorsement.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/QualificationCertification.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/PersonnelSkillMatrix.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/ExamTitle.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/ETR.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/ListOfCertPersonnel.js') }}?<?=time()?>"></script>
+
 
 {{-- <script src="https://cdn.jsdelivr.net/npm/@coreui/coreui@4.0.2/dist/js/coreui.bundle.min.js"></script> --}}

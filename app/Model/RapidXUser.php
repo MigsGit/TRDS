@@ -13,4 +13,8 @@ class RapidXUser extends Model
     // public function department(){
     //     return $this->hasOne(RapidXDepartment::class, 'department_id', 'department_id');
     // }
+
+    public function employee_info(){
+        return $this->belongsTo(SystemOneHrisEmpInfo::class, 'employee_number', 'EmpNo');
+    }
 }
