@@ -253,14 +253,22 @@ class InspectorCertificationMatrixExport implements FromCollection, WithEvents, 
                 // Font Styling
                 $sheet->getStyle("A3:{$lastColumnLetter}5")->getFont()->setBold(true);
 
-                // Header Fills
+                 // Header Fills
                 $sheet->getStyle("{$startColLetter}3:{$endColLetter}3")->getFill()
                     ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()->setARGB('FCE4D6'); // Light Pink Header
+                    ->getStartColor()->setARGB('ffb8fd'); // Light Pink Header
+                $sheet->getStyle("{$startColLetter}3:{$endColLetter}3")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+                $sheet->getStyle("{$startColLetter}3:{$endColLetter}3")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-                $sheet->getStyle("{$startColLetter}4:{$lastColumnLetter}5")->getFill()
+
+                $sheet->getStyle("{$startColLetter}4:{$lastColumnLetter}4")->getFill()
                     ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()->setARGB('FFF2CC'); // Yellow Sub-headers
+                    ->getStartColor()->setARGB('fcff57'); // Yellow Sub-headers
+
+                $sheet->getStyle("{$startColLetter}5:{$lastColumnLetter}5")->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('feffb3'); // Yellow Sub-headers
+
 
                 // Table Borders
                 $sheet->getStyle("A4:{$lastColumnLetter}{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
