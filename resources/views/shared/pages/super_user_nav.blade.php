@@ -178,6 +178,12 @@
                         <p>List of Certified Personnel</p>
                     </a>
                 </li>
+                <li class="nav-item has-treeview">
+                    <a id="btnInsCertMatrix" class="nav-link">
+                        <i class="fas fa-file-excel"></i>
+                        <p>Inspectors Certification Matrix</p>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div><!-- Sidebar -->
