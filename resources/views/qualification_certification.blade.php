@@ -41,7 +41,7 @@
                                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                                         <div class="mb-2 mb-md-0">
                                             <p class="text-uppercase text-muted small mb-1">Certification workspace</p>
-                                            <h5 class="card-title mb-0 text-secondary">Certification / Validation</h5>
+                                            <h5 class="card-title mb-0 text-secondary">Certification / Validation ssss</h5>
                                         </div>
                                         <button type="button" id="btnCreateCQForm" class="btn btn-primary" data-toggle="modal" data-target="#modalCreateCQForm"><i class="fa fa-plus fa-md mr-2"></i>Certify Employee</button>
                                     </div>
@@ -263,6 +263,8 @@
 @section('js_content')
     <script type="text/javascript">
     $(document).ready(function () {
+    alert('sadasd')
+
         operEmpArray = [];
         form = {
             formSubmitTech: $('#formSubmit_Tech'),
@@ -893,7 +895,12 @@
         $('#btnCreateCQForm').click(function (e) {
             e.preventDefault();
             let categoryPosition = $('#text_select_position').val();
-            togglePositionSection(categoryPosition);
+            // togglePositionSection(categoryPosition);
+             // ==== Toggle Collapse based on approval status
+            getApprovalStatusToggle({
+                approvalStatus: '',
+                positionCategory : categoryPosition,
+             });
         });
     });
 

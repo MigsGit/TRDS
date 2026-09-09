@@ -31,6 +31,8 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
         ]);
     }
 
+    // dd($this->employees);
+
     public function drawings()
     {
         $drawings = [];
@@ -55,6 +57,7 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
 
             foreach ($employee['stations'] as $station => $level) {
 
+                // dd($station)
                 if ($level < 0) {
                     continue;
                 }

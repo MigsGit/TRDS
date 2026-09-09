@@ -165,7 +165,7 @@
                 </li>
                 {{-- @if ( in_array(12,explode(',', $globalUser->user_modules_id)) ) --}}
                     <li class="nav-item has-treeview">
-                        <a href="{{ route('qualification_certification') }}" class="nav-link">
+                        <a href="{{ route('qualification_certification2') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Qualification / Certification</p>
                         </a>

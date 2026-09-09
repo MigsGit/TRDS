@@ -565,6 +565,10 @@ class QualificationCertificationController extends Controller
                             ['qc_slips_id' => $qcSlipId, 'approval_status' => 'CTECHQCC'],
                             $operToApprovers
                         );
+                        $countCLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId)->count();
+                        if($countCLqcTrainingItemResult === 0 ){
+                            return response()->json(['is_success' => 'false', "message" => "Please input the C Inspector Training / Certification And Validation Slip"],409);
+                        }
                     }
                 }
             }
@@ -810,7 +814,7 @@ class QualificationCertificationController extends Controller
                 'f_qc_validation',
 
                 //Techician
-                // 'a_tech_eng_training_qualification',
+                'a_tech_eng_training_qualification',
             ];
             $qcSlip = QcSlip::with($arrRelation)
             ->where('id',$request->qcSlipsId)
@@ -1018,8 +1022,17 @@ class QualificationCertificationController extends Controller
                     return $itemArray;
                 });
             });
+            $rawProductLineCollection =  collect(explode('|', $qcSlip->product_line))
+                ->map(function($id) {
+                    return trim($id);
+                })
+            ->filter()
+            ->values()
+            ->all();
             $arrApproversCollection =  [
                  'approversCollection' => $processedData ?? [],
+                 'rawProductLineCollection' => $rawProductLineCollection ?? [],
+
             ];
             return response()->json(array_merge( $json,$arrApproversCollection));
         } catch (Exception $e) {
