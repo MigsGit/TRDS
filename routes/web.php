@@ -1,9 +1,12 @@
 <?php
+use App\Http\Controllers\ETRController;
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\ExaminationResultController;
 use App\Http\Controllers\ExamTitleController;
 use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
+use App\Http\Controllers\InspCertMatrixController;
+use App\Http\Controllers\InspSkillChartSettingController;
 use App\Http\Controllers\ListOfCertPersonnelController;
 use App\Http\Controllers\PersonnelSkillMatrixController;
 use App\Http\Controllers\QualificationCertificationController;
@@ -12,16 +15,13 @@ use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ETRController;
-use App\Http\Controllers\InspSkillChartSettingController;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('checkSession')->group(function(){
 
-   
+
     Route::get('/', function () {
         return view('blank');
     })->name('blank');
@@ -48,9 +48,9 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/hr_memo', function () {
         return view('hr_memo_approval');
     })->name('hr_memo');
-    Route::get('/qualification_certification', function () {
+    Route::get('/qualification_certification2', function () {
         return view('qualification_certification');
-    })->name('qualification_certification');
+    })->name('qualification_certification2');
 
     Route::get('/training_request_conformance', function () {
         return view('training_request_conformance');
@@ -289,6 +289,8 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/view_direct_employee_info', 'viewDirectEmployeeInfo')->name('view_direct_employee_info');
         Route::get('/get_employee_trainings', 'getEmployeeTrainings')->name('get_employee_trainings');
         Route::get('/export_skill_map_pdf', 'exportSkillMapPdf')->name('export_skill_map_pdf');
+        Route::post('/export_skill_map_excel', 'exportSkillMapExcel')->name('export_skill_map_excel');
+        Route::post('/export_skill_map_excel_per_product_line', 'exportSkillMapExcelPerProductLine')->name('export_skill_map_excel_per_product_line');
         // Route::get('/test-pdf', function () {
         //     dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
         // });
@@ -306,8 +308,9 @@ Route::middleware('checkSession')->group(function(){
     Route::controller(ListOfCertPersonnelController::class)->group(function(){
         Route::get('/get_dropdown_select_certpersonnel', 'getDropdownSelectCertPersonnel')->name('get_dropdown_select_certpersonnel');
         Route::get('/export_list_cert_personnel', 'exportListCertPersonnel')->name('export_list_cert_personnel');
+        });
+        
+    Route::controller(InspCertMatrixController::class)->group(function(){
+        Route::get('/export-inspector-cert-matrix', 'exportInspectorCertMatrix')->name('export-inspector-cert-matrix');
     });
-
-
-
 });

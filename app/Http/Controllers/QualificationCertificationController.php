@@ -464,7 +464,7 @@ class QualificationCertificationController extends Controller
                         ];
                     }
                     if($qcSlipDetails->approval_status === 'FQCVVO'){
-                        app(FQcValidationRequest::class)->validateResolved();
+                        // app(FQcValidationRequest::class)->validateResolved();
 
                         FQcValidation::updateOrCreate(
                             ['qc_slips_id' => $qcSlipId],
@@ -529,7 +529,6 @@ class QualificationCertificationController extends Controller
                             $operToApprovers
                         );
                     }
-
                     if($currentApprovalStatus === 'BTECHENGC'){
                         $operToApprovers = [
                             'approval_status' => 'BTECHENGC',
@@ -566,6 +565,10 @@ class QualificationCertificationController extends Controller
                             ['qc_slips_id' => $qcSlipId, 'approval_status' => 'CTECHQCC'],
                             $operToApprovers
                         );
+                        $countCLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId)->count();
+                        if($countCLqcTrainingItemResult === 0 ){
+                            return response()->json(['is_success' => 'false', "message" => "Please input the C Inspector Training / Certification And Validation Slip"],409);
+                        }
                     }
                 }
             }
@@ -702,7 +705,7 @@ class QualificationCertificationController extends Controller
                 ];
             }
             DB::commit();
-            return $this->saveFormSendEmail($emailParams);
+            $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -907,7 +910,7 @@ class QualificationCertificationController extends Controller
                 'f_qc_validation',
 
                 //Techician
-                // 'a_tech_eng_training_qualification',
+                'a_tech_eng_training_qualification',
             ];
             $qcSlip = QcSlip::with($arrRelation)
             ->where('id',$request->qcSlipsId)
@@ -1115,8 +1118,17 @@ class QualificationCertificationController extends Controller
                     return $itemArray;
                 });
             });
+            $rawProductLineCollection =  collect(explode('|', $qcSlip->product_line))
+                ->map(function($id) {
+                    return trim($id);
+                })
+            ->filter()
+            ->values()
+            ->all();
             $arrApproversCollection =  [
                  'approversCollection' => $processedData ?? [],
+                 'rawProductLineCollection' => $rawProductLineCollection ?? [],
+
             ];
             return response()->json(array_merge( $json,$arrApproversCollection));
         } catch (Exception $e) {
@@ -1744,11 +1756,11 @@ class QualificationCertificationController extends Controller
                     $newStatus = 'EENGVP';
                     $statusName = 'E Engineering Validation Process';
                     break;
-                case ($params['approval_status'] === 'CQCC'  && $selectedSection != 1 && $isMachineOperatorExists === 0): // QC Validation Process
+                case ($params['approval_status'] === 'CQCC'  && $selectedSection != 1 && $isMachineOperatorExists === 0):
                     $newStatus = 'EQCVP';
                     $statusName = 'E Qc Validation Process';
                     break;
-                case ($params['approval_status'] === 'CQCC' && $selectedSection):
+                case ($params['approval_status'] === 'CQCC' && $selectedSection): //EXCLUSIVE FOR PPD FORMAT ONLY
                     $newStatus = 'DPPDONLY';
                     $statusName = 'D PPD Production, Engg, QC Update';
                     break;

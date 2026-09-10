@@ -95,7 +95,7 @@
                                                              <table id="tbl_operator" class="table table-striped table-hover table-bordered nowrap">
                                                             <thead class="table-primary">
                                                                 <tr>
-                                                                <th>Action</th>
+                                                                <th>Actionxxxx</th>
                                                                 <th>Status</th>
                                                                 <th>Ctrl No. / Doc No.</th>
                                                                 <th>Series Name</th>

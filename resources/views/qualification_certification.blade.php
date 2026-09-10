@@ -6,7 +6,7 @@
 @section('content_page')
 @php
     $classificationTabs = [
-        ['key' => 'mh', 'label' => 'MH', 'active' => true],
+        ['key' => 'mh', 'label' => 'TRDSV2', 'active' => true],
     ];
 @endphp
 
@@ -41,7 +41,7 @@
                                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                                         <div class="mb-2 mb-md-0">
                                             <p class="text-uppercase text-muted small mb-1">Certification workspace</p>
-                                            <h5 class="card-title mb-0 text-secondary">Qualification / Certification</h5>
+                                            <h5 class="card-title mb-0 text-secondary">Certification / Validation ssss</h5>
                                         </div>
                                         <button type="button" id="btnCreateCQForm" class="btn btn-primary" data-toggle="modal" data-target="#modalCreateCQForm"><i class="fa fa-plus fa-md mr-2"></i>Certify Employee</button>
                                     </div>
@@ -65,7 +65,6 @@
                                     </ul>
 
                                     <div class="tab-content" id="myTabContent">
-                                        <!-- For MH Tab -->
                                         <div class="tab-pane fade show active" id="operator" role="tabpanel" aria-labelledby="for-checking-tab">
                                             <div class="card shadow-sm border-0">
                                                 <div class="card-body overflow-auto">
@@ -134,7 +133,7 @@
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title mb-0" id="createCQFormLabel">Qualification / Certification Form</h5>
+                        <h5 class="modal-title mb-0" id="createCQFormLabel">Certification / Validation Form</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
                             </button>
                     </div>
@@ -935,6 +934,11 @@
             let categoryPosition = $('#text_select_position').val();
             $('#operApproved').addClass('d-none');
             togglePositionSection(categoryPosition);
+             // ==== Toggle Collapse based on approval status
+            // getApprovalStatusToggle({
+            //     approvalStatus: '',
+            //     positionCategory : categoryPosition,
+            //  });
         });
     });
 

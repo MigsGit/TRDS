@@ -32,8 +32,9 @@ class ListOfCertPersonnelController extends Controller
         // ==========================================
         // 1. QUERY QC SLIPS WITH RELATIONS
         // ==========================================
+        $exploded_series = explode(',', $request->series);
         $personel = QcSlip::with([
-                'product_line_details',
+                // 'product_line_details',
                 'op_approvers',
                 'qc_slip_employees',
                 'qc_slip_employees.system_one_subcon_emp_info',
@@ -44,11 +45,13 @@ class ListOfCertPersonnelController extends Controller
             ->whereNull('deleted_at')
             ->where('status', 'OK')
             ->where('section_category', $request->section)
-            ->where('product_line', $request->product_line)
-            ->where('series_name', $request->series)
+            ->where('product_line', 'like' , '%' . $request->product_line . '%')
+            // ->where('series_name','like' , '%' . $request->series . '%')
+            ->whereIn('series_name', $exploded_series)
             ->where('position_category', $request->position)
             ->get()
             ->groupBy('position_category');
+
         // ==========================================
         // 2. REASON OF CERTIFICATION BATCH QUERY
         // ==========================================
@@ -64,6 +67,30 @@ class ListOfCertPersonnelController extends Controller
                 return $slip;
             });
         });
+
+
+        // $personel->transform(function ($group) {
+        //     return $group->map(function ($slip) {
+        //         // Handle Certification Reasons
+        //         $rawReasons = optional($slip->qc_reason_certification)->reason_of_certification;
+        //         $slip->reason_of_certification_ids = $rawReasons 
+        //             ? array_map('trim', explode('|', $rawReasons)) 
+        //             : [];
+
+        //         // Handle Product Line IDs and fetch details
+        //         $productLineIds = $slip->product_line 
+        //             ? array_map('trim', explode('|', $slip->product_line)) 
+        //             : [];
+
+        //         $slip->product_line_details = !empty($productLineIds)
+        //             ? DropdownMasterDetail::whereIn('id', $productLineIds)->get()
+        //             : collect();
+
+        //         return $slip;
+        //     });
+        // });
+
+        // return $personel;
 
         // Step 2B: Extract unique Reason IDs & fetch batch details
         $allReasonIds = $personel->flatten(1)
@@ -207,6 +234,7 @@ class ListOfCertPersonnelController extends Controller
             }
         }
 
+
         $prod_line = DropdownMasterDetail::where('id', $request->product_line)->first();
         $product_line = $prod_line->dropdown_masters_details ?? '';
         $filename = "Certified_Personnel_List_{$request->position}_{$request->section}_{$product_line}_{$request->series}.xlsx";
@@ -214,6 +242,6 @@ class ListOfCertPersonnelController extends Controller
         if($personel->isEmpty()){
             return view('errors.404', ['message' => 'No data found for the selected criteria. Please adjust your filters and try again.']);
         }
-        return Excel::download(new CertifiedPersonnelExport($personel, $request->position), $filename);
+        return Excel::download(new CertifiedPersonnelExport($personel, $request->position, $product_line), $filename);
     }
 }

@@ -1,8 +1,8 @@
-<div class="modal fade" id="modalListOfCertPersonnel" data-backdrop="static" data-formid="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="modalInspectorCertMatrix" data-backdrop="static" data-formid="" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title"><i class="fas fa-file-excel fa-sm"></i> List of Certified Personnel</h3>
+                <h3 class="modal-title"><i class="fas fa-file-excel fa-sm"></i> Inspector Certification Matrix</h3>
                 <button id="close" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -11,30 +11,17 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="form-group">
-                            <label>Position:</label>
-                            <select class="form-control select2bs4" id="selCertPersonnelPosition"></select>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="form-group">
                             <label>Section:</label>
-                            <select class="form-control select2bs4" id="selCertPersonnelSection"></select>
+                            <select class="form-control select2bs4" id="selInsCertMatrixSection"></select>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="form-group mb-2">
                             <label>Product Line:</label>
-                            <select class="form-control select2bs4" id="selCertPersonnelProductLine"></select>
-                        </div>
-                    </div>
-                     <div class="col-12">
-                        <div class="form-group mb-2">
-                            <label>Series:</label>
-                            <select class="form-control select2bs4" id="selCertPersonnelSeries" multiple></select>
+                            <select class="form-control select2bs4" id="selInsCertMatrixProductLine" multiple></select>
                         </div>
                     </div>
                 </div>
-
                 <!-- Added Note -->
                 <div class="alert alert-info border-0 shadow-sm mt-3 py-2 px-3 mb-0" role="alert">
                     <small>
@@ -45,7 +32,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-sm btn-success" id="btnExportListCertPersonnel">Export</button>
+                <button type="button" class="btn btn-sm btn-success" id="btnExportInspectorCertMatrix">Export</button>
             </div>
         </div>
     </div>
