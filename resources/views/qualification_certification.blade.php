@@ -150,10 +150,11 @@
                                 <div class="form-group">
                                     <label for="text_select_position">Select Position</label>
                                     <select class="form-control select2bs4" style="width: 100%;" name="text_select_position" id="text_select_position">
-                                        <option value="" disabled selected>Select Position</option>
-                                        <option value="Operator">Operator</option>
+                                        <option value="" disabled>Select Position</option>
+                                        <option value="Operator" >Operator</option>
                                         <option value="Inspector">Inspector</option>
                                         <option value="Technician">Technician</option>
+                                        <option value="Supervisor">Supervisor</option>
                                     </select>
                                 </div>
                             </div>
@@ -247,6 +248,9 @@
                         <div class="d-none" id="divTechnician">
                               @include('qualification_certification.modal_qualification_certification_technician')
                         </div>
+                        <div class="d-none" id="divSupervisor">
+                              @include('qualification_certification.modal_qualification_certification_supervisor')
+                        </div>
                     </div>
                          <div class="modal-footer justify-content-end">
                             <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button>
@@ -266,6 +270,7 @@
         operEmpArray = [];
         form = {
             formSubmitTech: $('#formSubmit_Tech'),
+            formSubmitSep: $('#formSubmit_SEP'),
             formSubmitOper: $('#formSubmitOper'),
             formSubmitMh: $('#formSubmit_MH'),
             formSubmitInspector: $('#formSubmit_Ins'),
@@ -555,7 +560,7 @@
 
             call_ajax_serialize(data,{},'save_qualification_certification_oper', function(response){
                 if (response.is_success === 'true') {
-                    Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
+                    Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Saved.' });
                     dataTable.operator.draw();
                     $('#modalCreateCQForm').modal('hide');
                     $('#modalSendEmail').modal('hide');
@@ -563,10 +568,33 @@
                 }
             },$forms);
         }
+                    
+        const saveSupervisor = () => {
+             Swal.fire({
+                title: 'Are you sure you want to save this request?',
+                // html: 'This will allow you to add employees who will not be endorsed for this training endorsement.<br> <em style="font-size: 1rem;">You can specify the reason for not endorsing each employee.</em>',
+                html: '',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, proceed',
+                cancelButtonText: 'Cancel'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    Swal.fire({ icon: 'success', title: 'Saved', text: 'Saved.' });
+                                        $('#modalCreateCQForm').modal('hide');
 
+                    $('#modalSendEmail').modal('hide');
+
+                }
+            });
+        }
+            
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
+    
             let position = $('#text_select_position').val();
+            //         alert(position)
+            // return;
                switch (position) {
                 case 'MH':
                     $('#divMH').removeClass('d-none');
@@ -575,21 +603,31 @@
                     saveFormOper(form.formSubmitTech);
                     // $('#divTechnician').removeClass('d-none');
                     break;
-                case 'Supervisor':
-                case 'Engineer':
-                case 'Planner':
-                    $('#divSEP').removeClass('d-none');
+               case 'Supervisor':
+                    saveSupervisor();
+                    // saveFormOper();
                     break;
+                case 'Engineer':
+                // case 'Planner':
+                //     $('#divSEP').removeClass('d-none');
+                //     break;
                 case 'Inspector':
                     saveInspectorDetails();
                     break;
                 case 'Operator':
-                    saveFormOper(form.formSubmitOper);
+                    saveFormOper();
                     break;
                 default:
                     alert('Unknown position selected. Please select a valid position.');
                     break;
             }
+        });
+        $(document).on('submit', '#formSubmit_SEP', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+
+            // saveFormOper($form);
+            $('#modalSendEmail').modal();
         });
         $(document).on('submit', '#formSubmit_Tech', function (e) {
             e.preventDefault();
@@ -699,6 +737,7 @@
             getApprovalStatusToggle(params)
         }
         const selectInspectorValidation = () => {
+            getApprovalStatusToggle(params)
             let approvalStatus = $('#approval_status').val();
             let params = {
                 approvalStatus: approvalStatus,
@@ -706,15 +745,11 @@
             }
             getApprovalStatusToggle(params)
         }
+       
+           
+
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
-
-        // $positionSelect.click(function () {
-        //     alert('click');
-        // }).on('change', function () {
-        //    togglePositionSection($(this).val());
-        // });
-
         $positionSelect.on('change', function () {
             let params = {
                 approvalStatus: $('#approval_status').val(),
@@ -723,6 +758,7 @@
             getApprovalStatusToggle(params)
         });
         const togglePositionSection = (position) => {
+
             initOperEmpModal();
             $('#tbl_certified_list_operator tbody').empty();
             $positionSections.addClass('d-none');
@@ -751,14 +787,16 @@
                     $('#divMH').removeClass('d-none');
                     break;
                 case 'Technician':
-                    alert('asdsad')
+                    // $('#divTechnician').removeClass('d-none');
                     selectInspectorValidation();
                     break;
                 case 'Supervisor':
-                case 'Engineer':
-                case 'Planner':
-                    $('#divSEP').removeClass('d-none');
+                    selectInspectorValidation();
                     break;
+                case 'Engineer':
+                // case 'Planner':
+                //     $('#divSEP').removeClass('d-none');
+                //     break;
                 case 'Inspector':
                     selectInspectorValidation();
                     break;
@@ -894,6 +932,7 @@
         $('#btnCreateCQForm').click(function (e) {
             e.preventDefault();
             let categoryPosition = $('#text_select_position').val();
+            $('#operApproved').addClass('d-none');
             togglePositionSection(categoryPosition);
              // ==== Toggle Collapse based on approval status
             // getApprovalStatusToggle({
