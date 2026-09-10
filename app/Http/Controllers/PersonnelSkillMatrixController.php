@@ -459,7 +459,7 @@ class PersonnelSkillMatrixController extends Controller
         $employees = collect(json_decode($request->employees, true))
             ->map(function ($employee) use ($productLineId) {
 
-                $empNo = $employee['empNo'] ?? '';
+                $empNo = $employee['empNo'] ?? ''; 
 
                 $records = QcSlipEmployee::where('employee_no', $empNo)
                     ->whereHas('qcSlip', function ($q) use ($productLineId) {

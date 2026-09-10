@@ -263,8 +263,6 @@
 @section('js_content')
     <script type="text/javascript">
     $(document).ready(function () {
-    alert('sadasd')
-
         operEmpArray = [];
         form = {
             formSubmitTech: $('#formSubmit_Tech'),
@@ -707,8 +705,6 @@
                 positionCategory: $('#text_select_position').val(),
             }
             getApprovalStatusToggle(params)
-
-
         }
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
@@ -718,6 +714,7 @@
         // }).on('change', function () {
         //    togglePositionSection($(this).val());
         // });
+
         $positionSelect.on('change', function () {
             let params = {
                 approvalStatus: $('#approval_status').val(),
@@ -748,12 +745,15 @@
             // $('.operSave').addClass('d-none');
             // $('.operApproved').addClass('d-none');
             // $('.btnSaveInspector').addClass('d-none');
+            alert('position'+position)
+
             switch (position) {
                 case 'MH':
                     $('#divMH').removeClass('d-none');
                     break;
                 case 'Technician':
-                    $('#divTechnician').removeClass('d-none');
+                    alert('asdsad')
+                    selectInspectorValidation();
                     break;
                 case 'Supervisor':
                 case 'Engineer':
@@ -895,12 +895,12 @@
         $('#btnCreateCQForm').click(function (e) {
             e.preventDefault();
             let categoryPosition = $('#text_select_position').val();
-            // togglePositionSection(categoryPosition);
+            togglePositionSection(categoryPosition);
              // ==== Toggle Collapse based on approval status
-            getApprovalStatusToggle({
-                approvalStatus: '',
-                positionCategory : categoryPosition,
-             });
+            // getApprovalStatusToggle({
+            //     approvalStatus: '',
+            //     positionCategory : categoryPosition,
+            //  });
         });
     });
 
