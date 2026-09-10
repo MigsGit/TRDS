@@ -11,6 +11,7 @@
         ['value' => 'Operator', 'label' => 'Operator'],
         ['value' => 'Inspector', 'label' => 'Inspector'],
         ['value' => 'Technician', 'label' => 'Technician'],
+        // ['value' => 'Supervisor', 'label' => 'Supervisor'],
     ];
 @endphp
 

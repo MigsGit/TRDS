@@ -154,7 +154,7 @@
                                         <option value="Operator" >Operator</option>
                                         <option value="Inspector">Inspector</option>
                                         <option value="Technician">Technician</option>
-                                        <option value="Supervisor">Supervisor</option>
+                                        {{-- <option value="Supervisor">Supervisor</option> --}}
                                     </select>
                                 </div>
                             </div>
@@ -568,7 +568,7 @@
                 }
             },$forms);
         }
-                    
+
         const saveSupervisor = () => {
              Swal.fire({
                 title: 'Are you sure you want to save this request?',
@@ -588,10 +588,10 @@
                 }
             });
         }
-            
+
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
-    
+
             let position = $('#text_select_position').val();
             //         alert(position)
             // return;
@@ -737,7 +737,6 @@
             getApprovalStatusToggle(params)
         }
         const selectInspectorValidation = () => {
-            getApprovalStatusToggle(params)
             let approvalStatus = $('#approval_status').val();
             let params = {
                 approvalStatus: approvalStatus,
@@ -745,8 +744,8 @@
             }
             getApprovalStatusToggle(params)
         }
-       
-           
+
+
 
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
