@@ -114,7 +114,7 @@
         $('.techSave').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
         $('#divSupervisor').addClass('d-none');
-
+        $('#divTechnician').addClass('d-none');
 
         if(positionCategory === 'Supervisor'){
             initTrainingItemsTable('#tblTrainingItems_sep');
@@ -159,7 +159,6 @@
             }
             if(approvalStatus ==='FQCVVO'){
                 $('#collapseSevenOper').addClass('show');
-
             } //LQCHEADAPP
             if(approvalStatus ==='QCAPP'){
                 $('.btnSaveInspector').addClass('d-none');
@@ -1304,8 +1303,12 @@
                 checkCheckboxesFromColumn(bOpEnggSectionTrainingOrientation?.engg_orientation_docs,'chk',form.formSubmitOper);
 
                 form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper);
+<<<<<<< HEAD
                 form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper);
                 form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
+=======
+                form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
+>>>>>>> 49d91e443c5194475c7ab969ab6ed0c9cfc03bf9
                 form.formSubmitOper.find('#text_first_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ok_es_oper);
                 form.formSubmitOper.find('#text_first_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
                 form.formSubmitOper.find('#text_oa_1st_result_es_oper').val(bOpEnggSectionTrainingOrientation?.oa_1st_result_es_oper);

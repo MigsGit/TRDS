@@ -608,7 +608,7 @@
                     saveInspectorDetails();
                     break;
                 case 'Operator':
-                    saveFormOper();
+                    saveFormOper(form.formSubmitOper);
                     break;
                 default:
                     alert('Unknown position selected. Please select a valid position.');
@@ -735,6 +735,8 @@
                 positionCategory: $('#text_select_position').val(),
             }
             getApprovalStatusToggle(params)
+           
+           
         }
         // const selectSupervisorValidation = () => {
         //     let approvalStatus = $('#approval_status').val();

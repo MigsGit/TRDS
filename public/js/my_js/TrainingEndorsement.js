@@ -108,6 +108,11 @@ $(document).on('click', '.btnViewEndorsement', function () {
                 $('#selectApprovedBy').prop('disabled', true);
                 $('#selectCheckedBy').prop('disabled', true);
 
+                $('#hrEndorsementToOperationsTUDate').val(data.hr_to_tu)
+                $('#operationsTrainingUnitTrainingDateFrom').val(data.op_tu_training_date_from)
+                $('#operationsTrainingUnitTrainingDateTo').val(data.op_tu_training_date_to)
+                $('#operationsTrainingUnitEndorsementToRequestor').val(data.op_tu_endorsement_to_req)
+
                 endorsementEmpList = data.training_endorsement_employees || [];
 
                 var rows =  endorsementEmpList.map(function(detail) {
@@ -879,6 +884,11 @@ $(document).on('click', '.btnEditEndorsement', function(){
                 $('#btnSubmitEndorsement').show();
                 $('#selectApprovedBy').prop('readonly', false);
                 $('#selectCheckedBy').prop('readv conly', false);
+
+                $('#hrEndorsementToOperationsTUDate').val(data.hr_to_tu)
+                $('#operationsTrainingUnitTrainingDateFrom').val(data.op_tu_training_date_from)
+                $('#operationsTrainingUnitTrainingDateTo').val(data.op_tu_training_date_to)
+                $('#operationsTrainingUnitEndorsementToRequestor').val(data.op_tu_endorsement_to_req)
 
                 // Get job function from dynamic training request details block
                 let trJobFunctions = data.training_request_details ? data.training_request_details.job_function : null;

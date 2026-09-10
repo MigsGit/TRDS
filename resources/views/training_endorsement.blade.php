@@ -8,6 +8,11 @@
 @section('title', 'Training Endorsement')
 
 @section('content_page')
+<!-- Select2 CSS CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
+
+    <!-- Select2 Bootstrap 4 Theme CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" />
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
@@ -97,51 +102,96 @@
                 <form method="post" id="formAddEndorsement" autocomplete="off">
                     @csrf
                     <div class="modal-body">
-
+                        <!-- Hidden Fields -->
                         <input type="hidden" name="endorsement_id" id="endorsementId" value="">
                         <input type="hidden" name="hr_memo_id" id="hrMemoId" value="">
                         <input type="hidden" name="training_req_id" id="trainingReqId" value="">
 
-                        <!-- Top inputs -->
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="input-group input-group-sm mb-3">
-                                    <div class="input-group-prepend w-50">
-                                        <span class="input-group-text w-100">Document Number</span>
-                                    </div>
-                                    <input type="text" class="form-control" name="document_no" id="documentNo" placeholder="Auto Generated" readonly>
-                                </div>
+                        <!-- Section 1: Document Details -->
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0 font-weight-bold text-secondary">Document Information</h6>
                             </div>
-
-                            <div class="col-sm-6">
-                                <div class="input-group input-group-sm mb-3">
-                                    <div class="input-group-prepend w-50">
-                                        <span class="input-group-text w-100">Training Req Ctrl #</span>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group input-group-sm mb-3">
+                                            <div class="input-group-prepend w-50">
+                                                <span class="input-group-text font-weight-bold w-100">Document Number</span>
+                                            </div>
+                                            <input type="text" class="form-control" name="document_no" id="documentNo" placeholder="Auto Generated" readonly>
+                                        </div>
                                     </div>
-                                    <input type="text" class="form-control" name="training_req_ctrl" id="trainingReqCtrl" list="trainingReqCtrlList" required>
-                                    <datalist id="trainingReqCtrlList"></datalist>
+
+                                    <div class="col-md-6">
+                                        <div class="input-group input-group-sm mb-3">
+                                            <div class="input-group-prepend w-50">
+                                                <span class="input-group-text font-weight-bold w-100">Training Req Ctrl #</span>
+                                            </div>
+                                            <input type="text" class="form-control" name="training_req_ctrl" id="trainingReqCtrl" list="trainingReqCtrlList" required>
+                                            <datalist id="trainingReqCtrlList"></datalist>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group input-group-sm mb-3 mb-md-0">
+                                            <div class="input-group-prepend w-50">
+                                                <span class="input-group-text font-weight-bold w-100">HR Memo Ctrl #</span>
+                                            </div>
+                                            <input type="text" class="form-control" name="hr_memo_ctrl" id="hrMemoCtrl" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="input-group input-group-sm mb-0">
+                                            <div class="input-group-prepend w-50">
+                                                <span class="input-group-text font-weight-bold w-100">Date</span>
+                                            </div>
+                                            <input type="date" class="form-control" name="endorsement_date" value="<?= date('Y-m-d') ?>" id="endorsementDate" readonly>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="input-group input-group-sm mb-3">
-                                    <div class="input-group-prepend w-50">
-                                        <span class="input-group-text w-100">HR Memo Ctrl #</span>
-                                    </div>
-                                    <input type="text" class="form-control" name="hr_memo_ctrl" id="hrMemoCtrl" readonly>
-                                </div>
+                        <!-- Section 2: Endorsement & Process Tracking Dates -->
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0 font-weight-bold text-secondary">Workflow & Tracking Dates</h6>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="input-group input-group-sm mb-3">
-                                    <div class="input-group-prepend w-50">
-                                        <span class="input-group-text w-100">Date</span>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6 mb-3">
+                                        <label for="hrEndorsementToOperationsTUDate" class="small font-weight-bold text-muted">
+                                            HR Endorsement to Operations TU
+                                        </label>
+                                        <input type="date" class="form-control form-control-sm" name="hr_endorsement_to_operations_tu_date" id="hrEndorsementToOperationsTUDate">
                                     </div>
-                                    <input type="text" class="form-control" name="endorsement_date" value="<?= date('Y-m-d') ?>" id="endorsementDate" readonly>
-                                </div>
-                            </div>
 
+                                    <div class="col-lg-4 col-md-6 mb-3">
+                                        <label for="operationsTrainingUnitTrainingDate" class="small font-weight-bold text-muted">
+                                            Operations Training Unit Training Date (From - To)
+                                        </label>
+                                        <div class="form-row">
+                                            <div class="col-6">
+                                                <input type="date" class="form-control form-control-sm" name="operations_training_unit_training_date_from" id="operationsTrainingUnitTrainingDateFrom" title="From Date">
+                                            </div>
+                                            <div class="col-6">
+                                                <input type="date" class="form-control form-control-sm" name="operations_training_unit_training_date_to" id="operationsTrainingUnitTrainingDateTo" title="To Date">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4 col-md-12 mb-3">
+                                        <label for="operationsTrainingUnitEndorsementToRequestor" class="small font-weight-bold text-muted">
+                                            Operations TU Endorsement to Requestor
+                                        </label>
+                                        <input type="date" class="form-control form-control-sm" name="operations_training_unit_endorsement_to_requestor" id="operationsTrainingUnitEndorsementToRequestor">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Employee DataTable -->
@@ -187,7 +237,7 @@
                                     <div class="input-group-prepend w-50">
                                         <span class="input-group-text w-100">ATTN (CC)</span>
                                     </div>
-                                    <select name="attn[]" id="attn" class="form-control select2bs5" multiple required></select>
+                                    <select name="attn[]" id="attn" class="form-control select2bs51" multiple required></select>
                                 </div>
                             </div>
                         </div>
@@ -197,7 +247,7 @@
                                     <div class="input-group-prepend w-50">
                                         <span class="input-group-text w-100">Checked By</span>
                                     </div>
-                                    <select name="checked_by[]" id="selectCheckedBy" class="form-control select2bs5" required multiple></select>
+                                    <select name="checked_by[]" id="selectCheckedBy" class="form-control select2bs51" required multiple></select>
                                 </div>
                             </div>
 
@@ -206,7 +256,7 @@
                                     <div class="input-group-prepend w-50">
                                         <span class="input-group-text w-100">Approved By</span>
                                     </div>
-                                    <select name="approved_by[]" id="selectApprovedBy" class="form-control select2bs5" required multiple></select>
+                                    <select name="approved_by[]" id="selectApprovedBy" class="form-control select2bs51" required multiple></select>
                                 </div>
                             </div>
                         </div>
@@ -315,15 +365,28 @@
 @section('js_content')
 <script>
     var endorsementEmpList = [];
-    $('.modal').on('shown.bs.modal', function () {
-        $(this).find('.select2bs5').each(function () {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $(this).closest('.modal'),
+    // $('.modal').on('shown.bs.modal', function () {
+    //     $(this).find('.select2bs51').each(function () {
+    //         $(this).select2({
+    //             theme: 'bootstrap-4',
+    //             dropdownParent: $(this).closest('.modal'),
 
+    //         });
+    //     });
+    // });
+        $('.modal').on('shown.bs.modal', function () {
+            $(this).find('.select2bs5, select[multiple]').each(function () {
+                // Destroy previous instance to prevent duplicate floating overlays
+                if ($(this).hasClass("select2-hidden-accessible")) {
+                    $(this).select2('destroy');
+                }
+
+                $(this).select2({
+                    theme: 'bootstrap-5',
+                    dropdownParent: $(this).closest('.modal-body'), // Key fix for scroll positioning
+                });
             });
         });
-    });
 
      $('#modalAddEndorsement').on('hidden.bs.modal', function () {
         $('#trainingReqCtrl').prop('disabled', false);
