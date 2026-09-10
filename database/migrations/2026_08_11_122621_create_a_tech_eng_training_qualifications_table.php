@@ -16,10 +16,10 @@ class CreateATechEngTrainingQualificationsTable extends Migration
         Schema::create('a_tech_eng_training_qualifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('qc_slips_id')->constrained('qc_slips')->cascadeOnDelete()->comment('reference from qc_slips_id');
-            $table->longText('text_es_tech_training_orientation')->nullable();
-            $table->longText('text_es_tech_training_orientation_14');
-            $table->longText('text_es_tech_training_orientation_15')->nullable();
-            $table->longText('text_es_tech_training_orientation_16')->nullable();
+            $table->longText('es_tech_training_orientation')->nullable();
+            $table->longText('es_tech_training_orientation_14');
+            $table->longText('es_tech_training_orientation_15')->nullable();
+            $table->longText('es_tech_training_orientation_16')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

@@ -71,6 +71,7 @@
                                                 <th class="text-center">Prepared By</th>
                                                 <th class="text-center">Checker</th>
                                                 <th class="text-center">Approver</th>
+                                                <th class="text-center">Approver</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -232,7 +233,7 @@
                                     <div class="input-group-prepend w-50">
                                         <span class="input-group-text w-100">ATTN (CC)</span>
                                     </div>
-                                    <select name="attn[]" id="attn" class="form-control select2bs5" multiple required></select>
+                                    <select name="attn[]" id="attn" class="form-control select2bs51" multiple required></select>
                                 </div>
                             </div>
                         </div>
@@ -242,7 +243,7 @@
                                     <div class="input-group-prepend w-50">
                                         <span class="input-group-text w-100">Checked By</span>
                                     </div>
-                                    <select name="checked_by[]" id="selectCheckedBy" class="form-control select2bs5" required multiple></select>
+                                    <select name="checked_by[]" id="selectCheckedBy" class="form-control select2bs51" required multiple></select>
                                 </div>
                             </div>
 
@@ -251,7 +252,7 @@
                                     <div class="input-group-prepend w-50">
                                         <span class="input-group-text w-100">Approved By</span>
                                     </div>
-                                    <select name="approved_by[]" id="selectApprovedBy" class="form-control select2bs5" required multiple></select>
+                                    <select name="approved_by[]" id="selectApprovedBy" class="form-control select2bs51" required multiple></select>
                                 </div>
                             </div>
                         </div>
@@ -360,15 +361,28 @@
 @section('js_content')
 <script>
     var endorsementEmpList = [];
-    $('.modal').on('shown.bs.modal', function () {
-        $(this).find('.select2bs5').each(function () {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $(this).closest('.modal'),
+    // $('.modal').on('shown.bs.modal', function () {
+    //     $(this).find('.select2bs51').each(function () {
+    //         $(this).select2({
+    //             theme: 'bootstrap-4',
+    //             dropdownParent: $(this).closest('.modal'),
 
+    //         });
+    //     });
+    // });
+        $('.modal').on('shown.bs.modal', function () {
+            $(this).find('.select2bs5, select[multiple]').each(function () {
+                // Destroy previous instance to prevent duplicate floating overlays
+                if ($(this).hasClass("select2-hidden-accessible")) {
+                    $(this).select2('destroy');
+                }
+
+                $(this).select2({
+                    theme: 'bootstrap-5',
+                    dropdownParent: $(this).closest('.modal-body'), // Key fix for scroll positioning
+                });
             });
         });
-    });
 
      $('#modalAddEndorsement').on('hidden.bs.modal', function () {
         $('#trainingReqCtrl').prop('disabled', false);

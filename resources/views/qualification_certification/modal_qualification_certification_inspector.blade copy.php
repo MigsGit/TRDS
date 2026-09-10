@@ -1,26 +1,5 @@
-<style>
-    .table-custom {
-        border: 1px solid #000;
-    }
-    .table-custom th, .table-custom td {
-        border: 1px solid #000;
-        vertical-align: middle;
-        text-align: center;
-        padding: 4px 8px;
-    }
-    .header-bg {
-        background-color: #00ff00 !important;
-        color: #000;
-        font-weight: bold;
-        font-size: 1.1rem;
-    }
-    .col-level {
-        width: 15%;
-    }
-    .col-criteria {
-        width: 85%;
-    }
-</style>
+ <!-- FORMAT 4 Inspector -->
+
 <form id="formSubmit_Ins">
     <div class="accordion" id="accordionExampleInsp">
         <div class="accordion-item">
@@ -1468,49 +1447,44 @@
 
         <div class="row">
             <div class="col-md-6">
-                <div class="container my-4">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-custom mb-0">
-                            <thead>
-                                <tr>
-                                    <th colspan="2" class="header-bg">
-                                        Traning / Certification and Validation
-                                    </th>
-                                </tr>
-                                <tr class="fw-bold">
-                                    <th class="col-level">Level</th>
-                                    <th class="col-criteria">Criteria</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Awareness and understanding only</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Can do with assistance</td>
-                                </tr>
-                                <tr>
-                                    <td rowspan="2">3</td>
-                                    <td>Knowledgeable on the process</td>
-                                </tr>
-                                <tr>
-                                    <td>Skilled, no supervision required, can lead and review work of others</td>
-                                </tr>
-                                <tr>
-                                    <td rowspan="2">4</td>
-                                    <td>Expert, can perform without supervision</td>
-                                </tr>
-                                <tr>
-                                    <td>Expert / SME</td>
-                                </tr>
+                <div class="table-responsive">
+                    <table id="" class="table table-bordered nowrap">
+                        <thead class="table table-success">
+                            <tr>
+                                <th colspan="3">Validation and Certification Criteria</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="text-center">
+                            <tr>
+                                <td>No.</td>
+                                <td>Rating</td>
+                                <td>Remarks</td>
+                            </tr>
+
+                            <tr>
+                                <td>3</td>
+                                <td>Passed</td>
+                                <td>Skilled, no supervision required, can lead and review work of others</td>
+                            </tr>
+
+                            <tr>
+                                <td>2</td>
+                                <td>Re-train</td>
+                                <td>Need to re-train by co-inspectors and re-certify by Supervisors</td>
+                            </tr>
+
+                            <tr>
+                                <td>1</td>
+                                <td>Failed</td>
+                                <td>Need to re-train by training unit re-certify by Supervisors</td>
+                            </tr>
                         </tbody>
-                        </table>
-                    </div>
+                    </table>
                 </div>
             </div>
         </div>
+    </div>
 
 
     <div class="modal-footer inspectorSave">

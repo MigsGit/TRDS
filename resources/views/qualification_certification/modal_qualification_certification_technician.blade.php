@@ -1,17 +1,14 @@
 <form id="formSubmit_Tech">
     <h3 class="mt-5 mb-3 text-center">TECHNICIAN TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
-
-  
-
     <div class="accordion" id="accordionExampleTech">
         <div class="accordion-item">
-            <h2 class="accordion-header">
-            <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneTech" aria-expanded="true" aria-controls="collapseOneTech">
-                <h5>ENGINEERING SECTION (Training and Qualification)</h5>
+            <h2 class="card-header">
+            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOneTech" aria-expanded="true" aria-controls="collapseOneTech">
+                <h5>A ENGINEERING SECTION (Training and Qualification)</h5>
             </button>
             </h2>
             <div id="collapseOneTech" class="accordion-collapse collapse show" data-parent="#accordionExampleTech">
-                <div class="accordion-body">
+                <div class="card-body">
 
                     <!-- ------------------------------------------------ -->
 
@@ -480,13 +477,13 @@
         </div>
 
         <div class="accordion-item">
-            <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseTwoTech" aria-expanded="false" aria-controls="collapseTwoTech">
-                <h5>ENGINEERING SECTION (Certification)</h5>
+            <h2 class="card-header">
+            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoTech" aria-expanded="false" aria-controls="collapseTwoTech">
+                <h5>B ENGINEERING SECTION (Certification)</h5>
             </button>
             </h2>
             <div id="collapseTwoTech" class="accordion-collapse collapse" data-parent="#accordionExampleTech">
-                <div class="accordion-body">
+                <div class="card-body">
 
                     <!-- ------------------------------------------------ -->
 
@@ -521,7 +518,7 @@
                                 <option value="" selected disabled>Select Certified by</option>
                             </select>
 
-   
+
                         </div>
 
                         <div class="col-md-6">
@@ -562,13 +559,13 @@
         </div>
 
         <div class="accordion-item">
-            <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseThreeTech" aria-expanded="false" aria-controls="collapseThreeTech">
-                <h5>QUALITY CONTROL SECTION (CERTIFICATION)</h5>
+            <h2 class="card-header">
+            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThreeTech" aria-expanded="false" aria-controls="collapseThreeTech">
+                <h5>C QUALITY CONTROL SECTION (CERTIFICATION)</h5>
             </button>
             </h2>
             <div id="collapseThreeTech" class="accordion-collapse collapse" data-parent="#accordionExampleTech">
-                <div class="accordion-body">
+                <div class="card-body">
 
                     <!-- ------------------------------------------------ -->
 
@@ -649,8 +646,11 @@
         </div>
     </div>
 
+    @include('qualification_certification.qc_training_items_table', [
+        'tableId'        => 'tblTrainingItems_tech',
+        'accordionParent' => '#accordionExampleTech',
+    ])
     <hr style="height: 5px; background-color: black; border: none;">
-
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="">Approved by:</label>
@@ -666,7 +666,7 @@
 
     <!-- <hr style="height: 1px; background-color: grey; border: none;"> -->
 
-    <div class="modal-footer">
+    <div class="modal-footer techSave">
         <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>Close</button>
         <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>Save Tech</button>
     </div>

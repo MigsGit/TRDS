@@ -6,15 +6,9 @@
 @section('content_page')
 @php
     $classificationTabs = [
-        ['key' => 'mh', 'label' => 'TRDSV2', 'active' => true],
+        ['key' => 'mh', 'label' => 'MH', 'active' => true],
     ];
 @endphp
-
-<style>
-    .card-body {
-       max-height: 80vh; overflow-y: auto;
-    }
-</style>
 
 <style>
     .card-body {
@@ -41,7 +35,7 @@
                                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                                         <div class="mb-2 mb-md-0">
                                             <p class="text-uppercase text-muted small mb-1">Certification workspace</p>
-                                            <h5 class="card-title mb-0 text-secondary">Certification / Validation ssss</h5>
+                                            <h5 class="card-title mb-0 text-secondary">Qualification / Certification</h5>
                                         </div>
                                         <button type="button" id="btnCreateCQForm" class="btn btn-primary" data-toggle="modal" data-target="#modalCreateCQForm"><i class="fa fa-plus fa-md mr-2"></i>Certify Employee</button>
                                     </div>
@@ -65,6 +59,7 @@
                                     </ul>
 
                                     <div class="tab-content" id="myTabContent">
+                                        <!-- For MH Tab -->
                                         <div class="tab-pane fade show active" id="operator" role="tabpanel" aria-labelledby="for-checking-tab">
                                             <div class="card shadow-sm border-0">
                                                 <div class="card-body overflow-auto">
@@ -100,7 +95,7 @@
                                                              <table id="tbl_operator" class="table table-striped table-hover table-bordered nowrap">
                                                             <thead class="table-primary">
                                                                 <tr>
-                                                                <th>Action</th>
+                                                                <th>Actionxxxx</th>
                                                                 <th>Status</th>
                                                                 <th>Ctrl No. / Doc No.</th>
                                                                 <th>Series Name</th>
@@ -133,7 +128,7 @@
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title mb-0" id="createCQFormLabel">Certification / Validation Form</h5>
+                        <h5 class="modal-title mb-0" id="createCQFormLabel">Qualification / Certification Form</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
                             </button>
                     </div>
@@ -151,10 +146,9 @@
                                     <label for="text_select_position">Select Position</label>
                                     <select class="form-control select2bs4" style="width: 100%;" name="text_select_position" id="text_select_position">
                                         <option value="" disabled>Select Position</option>
-                                        <option value="Operator" >Operator</option>
+                                        <option value="Operator">Operator</option>
                                         <option value="Inspector">Inspector</option>
-                                        <option value="Technician">Technician</option>
-                                        {{-- <option value="Supervisor">Supervisor</option> --}}
+                                        <option value="Technician" selected>Technician</option>
                                     </select>
                                 </div>
                             </div>
@@ -248,14 +242,7 @@
                         <div class="d-none" id="divTechnician">
                               @include('qualification_certification.modal_qualification_certification_technician')
                         </div>
-                        <div class="d-none" id="divSupervisor">
-                              @include('qualification_certification.modal_qualification_certification_supervisor')
-                        </div>
                     </div>
-                         <div class="modal-footer justify-content-end">
-                            <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button>
-                            <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
-                        </div>
                 </div>
             </div>
         </div>
@@ -270,7 +257,6 @@
         operEmpArray = [];
         form = {
             formSubmitTech: $('#formSubmit_Tech'),
-            formSubmitSep: $('#formSubmit_SEP'),
             formSubmitOper: $('#formSubmitOper'),
             formSubmitMh: $('#formSubmit_MH'),
             formSubmitInspector: $('#formSubmit_Ins'),
@@ -279,6 +265,7 @@
             operator: '',
             fvi_operator: '',
             tbl_fvi_operator_2: '',
+            training_items: '',
         };
         table = {
            operator: '#tbl_operator',
@@ -291,6 +278,7 @@
             // resetFormValues({'frmId'  :   form.formSubmitMh})
             // resetFormValues({'frmId'  :   form.formSubmitInspector})
         });
+
         const updateApproval = (params) => {
             let data = {
                 decision : params.decision,
@@ -391,10 +379,42 @@
                 { "data" : "second_take_ins_assessment_result","name":"second_take_ins_assessment_result", orderable: false, searchable: false  },
             ],
         });
-        // Training-items tables are initialized on demand via initTrainingItemsTable()
-        // in QualificationCertification.js (called from getApprovalStatusToggle).
+        dataTable.training_items = $('#tblTrainingItems').DataTable({
+            processing: true,
+            serverSide: true,
+            paging: false,         // Display all matrix items in one view
+            searching: false,      // Matrix layout does not require search bar
+            info: false,
+            ordering: false,
+            ajax: {
+                url: "load_qc_lqc_training_items_by_qc_slip_id",
+                type: "GET",
+                data: function (params) {
+                    params.qc_slips_id = $('#qc_slips_id').val()??'';
+                }
+            },
+            columns: [
+                { data: 'item_name', name: 'item_name' },
+                { data: 'day_1', name: 'day_1', className: 'text-center' },
+                { data: 'day_2', name: 'day_2', className: 'text-center' },
+                { data: 'day_3', name: 'day_3', className: 'text-center' },
+                { data: 'day_4', name: 'day_4', className: 'text-center' },
+                { data: 'day_5', name: 'day_5', className: 'text-center' },
+                { data: 'remarks', name: 'remarks' }
+            ]
+        });
+        // Pre-fill Day 1–5 date inputs in the #tblTrainingItems header from server response
+        dataTable.training_items.on('xhr', function () {
+            var json = dataTable.training_items.ajax.json();
+            if (json && json.headerDates) {
+                $.each(json.headerDates, function (dayNumber, dateValue) {
+                    $('.tblTrainingItems').closest('.table-responsive')
+                        .find('.header-date-input[data-day="' + dayNumber + '"]')
+                        .val(dateValue || '');
+                });
+            }
+        });
 
-        // alert('dsad')
         $('#select_position').change(function (e) {
             e.preventDefault();
             $('#select_access').val('').trigger('change');
@@ -524,7 +544,7 @@
             // console.log('saveFormOper called',$form[0]);
             console.log($forms);
             var formArray = $forms.serializeArray();
-            // 2. Push extra custom field values manually line date_of
+            // 2. Push extra custom field values manually
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
             formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
@@ -560,7 +580,7 @@
 
             call_ajax_serialize(data,{},'save_qualification_certification_oper', function(response){
                 if (response.is_success === 'true') {
-                    Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Saved.' });
+                    Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
                     dataTable.operator.draw();
                     $('#modalCreateCQForm').modal('hide');
                     $('#modalSendEmail').modal('hide');
@@ -569,32 +589,9 @@
             },$forms);
         }
 
-        const saveSupervisor = () => {
-             Swal.fire({
-                title: 'Are you sure you want to save this request?',
-                // html: 'This will allow you to add employees who will not be endorsed for this training endorsement.<br> <em style="font-size: 1rem;">You can specify the reason for not endorsing each employee.</em>',
-                html: '',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, proceed',
-                cancelButtonText: 'Cancel'
-            }).then(function (result) {
-                if (result.isConfirmed) {
-                    Swal.fire({ icon: 'success', title: 'Saved', text: 'Saved.' });
-                                        $('#modalCreateCQForm').modal('hide');
-
-                    $('#modalSendEmail').modal('hide');
-
-                }
-            });
-        }
-
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
-
             let position = $('#text_select_position').val();
-            //         alert(position)
-            // return;
                switch (position) {
                 case 'MH':
                     $('#divMH').removeClass('d-none');
@@ -603,14 +600,11 @@
                     saveFormOper(form.formSubmitTech);
                     // $('#divTechnician').removeClass('d-none');
                     break;
-               case 'Supervisor':
-                    saveSupervisor();
-                    // saveFormOper();
-                    break;
+                case 'Supervisor':
                 case 'Engineer':
-                // case 'Planner':
-                //     $('#divSEP').removeClass('d-none');
-                //     break;
+                case 'Planner':
+                    $('#divSEP').removeClass('d-none');
+                    break;
                 case 'Inspector':
                     saveInspectorDetails();
                     break;
@@ -621,13 +615,6 @@
                     alert('Unknown position selected. Please select a valid position.');
                     break;
             }
-        });
-        $(document).on('submit', '#formSubmit_SEP', function (e) {
-            e.preventDefault();
-            var $form = $(this);
-
-            // saveFormOper($form);
-            $('#modalSendEmail').modal();
         });
         $(document).on('submit', '#formSubmit_Tech', function (e) {
             e.preventDefault();
@@ -743,12 +730,17 @@
                 positionCategory: $('#text_select_position').val(),
             }
             getApprovalStatusToggle(params)
+
+
         }
-
-
-
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
+
+        // $positionSelect.click(function () {
+        //     alert('click');
+        // }).on('change', function () {
+        //    togglePositionSection($(this).val());
+        // });
         $positionSelect.on('change', function () {
             let params = {
                 approvalStatus: $('#approval_status').val(),
@@ -757,7 +749,6 @@
             getApprovalStatusToggle(params)
         });
         const togglePositionSection = (position) => {
-
             initOperEmpModal();
             $('#tbl_certified_list_operator tbody').empty();
             $positionSections.addClass('d-none');
@@ -780,22 +771,18 @@
             // $('.operSave').addClass('d-none');
             // $('.operApproved').addClass('d-none');
             // $('.btnSaveInspector').addClass('d-none');
-
             switch (position) {
                 case 'MH':
                     $('#divMH').removeClass('d-none');
                     break;
                 case 'Technician':
-                    // $('#divTechnician').removeClass('d-none');
-                    selectInspectorValidation();
+                    $('#divTechnician').removeClass('d-none');
                     break;
                 case 'Supervisor':
-                    selectInspectorValidation();
-                    break;
                 case 'Engineer':
-                // case 'Planner':
-                //     $('#divSEP').removeClass('d-none');
-                //     break;
+                case 'Planner':
+                    $('#divSEP').removeClass('d-none');
+                    break;
                 case 'Inspector':
                     selectInspectorValidation();
                     break;
@@ -881,45 +868,43 @@
         $(document).on('click', '#tbl_fvi_operator .btn-delete-fvi-row', function () {
             $(this).closest('tr').remove();
         });
-        // Delegated save handler — works for any .btnSaveMatrix button; table is
-        // identified via data-table-id so both inspector and technician contexts
-        // can share a single handler without ID collisions.
-        $(document).on('click', '.btnSaveMatrix', function () {
-            var tableId    = $(this).data('table-id');
-            var $table     = $('#' + tableId);
-            var matrixData = [];
-
-            $table.find('tbody tr').each(function () {
-                var row    = $(this);
-                var itemId = row.find('.input-remark').attr('data-item-id');
+        $('#btnSaveMatrix').on('click', function () {
+            let matrixData = [];
+            $('#tblTrainingItems tbody tr').each(function () {
+                let row = $(this);
+                let itemId = row.find('.input-remark').attr('data-item-id');
                 if (itemId) {
-                    var dayResults = {};
+                    let dayResults = {};
                     row.find('.input-result').each(function () {
-                        dayResults['day_' + $(this).data('day')] = $(this).val();
+                        let dayNum = $(this).data('day');
+                        dayResults['day_' + dayNum] = $(this).val();
                     });
+
                     matrixData.push({
                         training_item_id: itemId,
                         day_results:      dayResults,
                         remark:           row.find('.input-remark').val(),
-                        sub_description:  row.find('.input-sub-desc').val() || null,
+                        sub_description:  row.find('.input-sub-desc').val() ?? null,
                     });
                 }
             });
-
-            var dayDates = {};
-            $table.closest('.table-responsive')
+            // Collect header dates keyed as day_dates[day_N]
+            let dayDates = {};
+            $('#tblTrainingItems').closest('.table-responsive')
                 .find('.header-date-input').each(function () {
                     dayDates['day_' + $(this).data('day')] = $(this).val();
                 });
+            //     console.log('dayDates',dayDates);
+            // return;
 
             $.ajax({
                 url:  "save_qc_lqc_training_items_by_qc_slip_id",
                 type: "POST",
                 data: {
-                    _token:      "{{ csrf_token() }}",
+                    _token:     "{{ csrf_token() }}",
                     qc_slips_id: $('#qc_slips_id').val(),
-                    matrix:      matrixData,
-                    day_dates:   dayDates,
+                    matrix:     matrixData,
+                    day_dates:  dayDates,
                 },
                 success: function (response) {
                     if (response.is_success === 'true') {
@@ -931,13 +916,8 @@
         $('#btnCreateCQForm').click(function (e) {
             e.preventDefault();
             let categoryPosition = $('#text_select_position').val();
-            $('#operApproved').addClass('d-none');
+            dataTable.training_items.draw();
             togglePositionSection(categoryPosition);
-             // ==== Toggle Collapse based on approval status
-            // getApprovalStatusToggle({
-            //     approvalStatus: '',
-            //     positionCategory : categoryPosition,
-            //  });
         });
     });
 

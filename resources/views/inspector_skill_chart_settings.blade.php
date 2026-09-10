@@ -166,6 +166,7 @@
                                         <option value="Card Connectors">Card Connectors</option>
                                         <option value="TC/DC Connectors">TC/DC Connectors</option>
                                         <option value="Flexicon Connectors">Flexicon Connectors</option>
+                                        <option value="Mounting Socket Connectors">Mounting Socket Connectors</option>
                                         <option value="Battery Connectors">Battery Connectors</option>
                                         <option value="Molding Connectors">Molding Connectors</option>
                                         <option value="Stamping">Stamping</option>
