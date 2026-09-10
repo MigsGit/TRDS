@@ -155,7 +155,7 @@
                                         <option value="Operator" >Operator</option>
                                         <option value="Inspector">Inspector</option>
                                         <option value="Technician">Technician</option>
-                                        <option value="Supervisor" selected>Supervisor</option>
+                                        <option value="Supervisor">Supervisor</option>
                                     </select>
                                 </div>
                             </div>
@@ -271,6 +271,7 @@
         operEmpArray = [];
         form = {
             formSubmitTech: $('#formSubmit_Tech'),
+            formSubmitSep: $('#formSubmit_SEP'),
             formSubmitOper: $('#formSubmitOper'),
             formSubmitMh: $('#formSubmit_MH'),
             formSubmitInspector: $('#formSubmit_Ins'),
@@ -581,7 +582,7 @@
                     // $('#divTechnician').removeClass('d-none');
                     break;
                case 'Supervisor':
-                    $('#divSupervisor').removeClass('d-none');
+                    saveFormOper(form.formSubmitSep);
                     break;
                 case 'Engineer':
                 // case 'Planner':
@@ -597,6 +598,12 @@
                     alert('Unknown position selected. Please select a valid position.');
                     break;
             }
+        });
+        $(document).on('submit', '#formSubmit_SEP', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            // saveFormOper($form);
+            $('#modalSendEmail').modal();
         });
         $(document).on('submit', '#formSubmit_Tech', function (e) {
             e.preventDefault();
@@ -713,6 +720,14 @@
             }
             getApprovalStatusToggle(params)
         }
+        // const selectSupervisorValidation = () => {
+        //     let approvalStatus = $('#approval_status').val();
+        //     let params = {
+        //         approvalStatus: approvalStatus,
+        //         positionCategory: $('#text_select_position').val(),
+        //     }
+        //     getApprovalStatusToggle(params)
+        // }
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnician, #divSupervisor, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
 
@@ -758,10 +773,11 @@
                     $('#divMH').removeClass('d-none');
                     break;
                 case 'Technician':
-                    $('#divTechnician').removeClass('d-none');
+                    // $('#divTechnician').removeClass('d-none');
+                    selectInspectorValidation();
                     break;
                 case 'Supervisor':
-                    $('#divSupervisor').removeClass('d-none');
+                    selectInspectorValidation();
                     break;
                 case 'Engineer':
                 // case 'Planner':

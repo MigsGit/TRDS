@@ -113,6 +113,13 @@
         $('#dateOfTransfer').addClass('d-none');
         $('.techSave').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
+        $('#divSupervisor').addClass('d-none');
+
+
+        if(positionCategory === 'Supervisor'){
+            initTrainingItemsTable('#tblTrainingItems_sep');
+            $('#divSupervisor').removeClass('d-none');
+        }
         if(positionCategory === 'Operator'){
             $('#productLine').removeClass('d-none');
             $('#div_Oper').removeClass('d-none');
@@ -206,7 +213,6 @@
                 $('.inspectorSave').addClass('d-none');
             }
         }
-
         if(positionCategory === 'Technician'){
             initTrainingItemsTable('#tblTrainingItems_tech');
             $('#divTechnician').removeClass('d-none');

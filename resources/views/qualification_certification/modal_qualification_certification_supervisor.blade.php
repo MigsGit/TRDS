@@ -347,6 +347,17 @@
                 </div>
             </div>
         </div>
+        @include('qualification_certification.qc_training_items_table', [
+            'tableId'        => 'tblTrainingItems_sep',
+            'accordionParent' => '#accordionExampleSEP',
+        ])
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <label for="">Approved by:</label>
+                <select class="form-control select2bs4" style="width: 100%;" id="text_sep_approved_inspector" name="text_sep_approved_inspector"></select>
+            </div>
+            <div class="col-md-6"></div>
+        </div>
 
     </div>
 
