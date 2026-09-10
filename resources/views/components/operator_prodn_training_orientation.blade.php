@@ -61,7 +61,7 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="">Operator Name:</label>
+                        <label for="">Employee Name:</label>
                         <select class="form-control select2bs4" style="width: 100%;" id="text_oper_emp_number" name="text_oper_emp_number" placeholder="Enter Employee Number">
                         </select>
                     </div>

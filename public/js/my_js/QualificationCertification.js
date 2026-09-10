@@ -229,48 +229,8 @@
             }
         }
     }
-    const togglePositionSectiontest = (position) => {
-            initOperEmpModal();
-            $('#tbl_certified_list_operator tbody').empty();
-            $positionSections.addClass('d-none');
-            // text_operator_product_line
-            // text_series_operator
-            // text_certification_operator
-            // transfer_flexibility
 
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_operator_product_line',
-            ],2);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_certification_operator',
-            ],3);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#transfer_flexibility',
-            ],6);
-            // $('.inspectorSave').addClass('d-none');
-            $('.operSave').addClass('d-none');
-            $('.operApproved').addClass('d-none');
-            $('.btnSaveInspector').addClass('d-none');
-            switch (position) {
-                case 'MH':
-                    $('#divMH').removeClass('d-none');
-                    break;
-                case 'Technician':
-                    $('#Technician').removeClass('d-none');
-                    break;
-                case 'Supervisor':
-                case 'Engineer':
-                case 'Planner':
-                    $('#divSEP').removeClass('d-none');
-                    break;
-                case 'Inspector':
-                    selectInspectorValidation();
-                    break;
-                case 'Operator':
-                    selectOperatorValidation();
-                    break;
-            }
-        }
+
     const saveFirstTakeInsSequence = (params) =>{
         let data = {
             qcSlipsId : params.qcSlipsId,

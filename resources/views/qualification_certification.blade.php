@@ -152,9 +152,10 @@
                                     <label for="text_select_position">Select Position</label>
                                     <select class="form-control select2bs4" style="width: 100%;" name="text_select_position" id="text_select_position">
                                         <option value="" disabled>Select Position</option>
-                                        <option value="Operator" selected>Operator</option>
+                                        <option value="Operator" >Operator</option>
                                         <option value="Inspector">Inspector</option>
                                         <option value="Technician">Technician</option>
+                                        <option value="Supervisor" selected>Supervisor</option>
                                     </select>
                                 </div>
                             </div>
@@ -247,6 +248,9 @@
                         </div>
                         <div class="d-none" id="divTechnician">
                               @include('qualification_certification.modal_qualification_certification_technician')
+                        </div>
+                        <div class="d-none" id="divSupervisor">
+                              @include('qualification_certification.modal_qualification_certification_supervisor')
                         </div>
                     </div>
                          <div class="modal-footer justify-content-end">
@@ -576,11 +580,13 @@
                     saveFormOper(form.formSubmitTech);
                     // $('#divTechnician').removeClass('d-none');
                     break;
-                case 'Supervisor':
-                case 'Engineer':
-                case 'Planner':
-                    $('#divSEP').removeClass('d-none');
+               case 'Supervisor':
+                    $('#divSupervisor').removeClass('d-none');
                     break;
+                case 'Engineer':
+                // case 'Planner':
+                //     $('#divSEP').removeClass('d-none');
+                //     break;
                 case 'Inspector':
                     saveInspectorDetails();
                     break;
@@ -708,7 +714,7 @@
             getApprovalStatusToggle(params)
         }
         var $positionSelect = $('#text_select_position');
-        var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
+        var $positionSections = $('#divMH, #divTechnician, #divSupervisor, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
 
         // $positionSelect.click(function () {
         //     alert('click');
@@ -723,6 +729,7 @@
             getApprovalStatusToggle(params)
         });
         const togglePositionSection = (position) => {
+
             initOperEmpModal();
             $('#tbl_certified_list_operator tbody').empty();
             $positionSections.addClass('d-none');
@@ -745,6 +752,7 @@
             // $('.operSave').addClass('d-none');
             // $('.operApproved').addClass('d-none');
             // $('.btnSaveInspector').addClass('d-none');
+
             switch (position) {
                 case 'MH':
                     $('#divMH').removeClass('d-none');
@@ -753,10 +761,12 @@
                     $('#divTechnician').removeClass('d-none');
                     break;
                 case 'Supervisor':
-                case 'Engineer':
-                case 'Planner':
-                    $('#divSEP').removeClass('d-none');
+                    $('#divSupervisor').removeClass('d-none');
                     break;
+                case 'Engineer':
+                // case 'Planner':
+                //     $('#divSEP').removeClass('d-none');
+                //     break;
                 case 'Inspector':
                     selectInspectorValidation();
                     break;
@@ -892,6 +902,7 @@
         $('#btnCreateCQForm').click(function (e) {
             e.preventDefault();
             let categoryPosition = $('#text_select_position').val();
+            $('#operApproved').addClass('d-none');
             togglePositionSection(categoryPosition);
         });
     });
