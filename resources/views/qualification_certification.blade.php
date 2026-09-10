@@ -745,7 +745,6 @@
             // $('.operSave').addClass('d-none');
             // $('.operApproved').addClass('d-none');
             // $('.btnSaveInspector').addClass('d-none');
-            alert('position'+position)
 
             switch (position) {
                 case 'MH':

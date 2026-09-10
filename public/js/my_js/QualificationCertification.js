@@ -113,7 +113,6 @@
         $('.techSave').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
         $('#divTechnician').addClass('d-none');
-        alert('positionCategory: ' + positionCategory)
         if(positionCategory === 'Operator'){
             // $('#productLine').removeClass('d-none');
             $('#div_Oper').removeClass('d-none');
