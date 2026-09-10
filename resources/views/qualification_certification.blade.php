@@ -561,7 +561,7 @@
 
             call_ajax_serialize(data,{},'save_qualification_certification_oper', function(response){
                 if (response.is_success === 'true') {
-                    Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Operator form saved.' });
+                    Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Saved.' });
                     dataTable.operator.draw();
                     $('#modalCreateCQForm').modal('hide');
                     $('#modalSendEmail').modal('hide');
@@ -569,7 +569,22 @@
                 }
             },$forms);
         }
-
+                    
+        const saveSupervisor = () => {
+             Swal.fire({
+                title: 'Are you sure you want to save this request?',
+                // html: 'This will allow you to add employees who will not be endorsed for this training endorsement.<br> <em style="font-size: 1rem;">You can specify the reason for not endorsing each employee.</em>',
+                html: '',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, proceed',
+                cancelButtonText: 'Cancel'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    Swal.fire({ icon: 'success', title: 'Saved', text: 'Saved.' });
+                }
+            });
+        }
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
             let position = $('#text_select_position').val();
@@ -582,7 +597,8 @@
                     // $('#divTechnician').removeClass('d-none');
                     break;
                case 'Supervisor':
-                    saveFormOper(form.formSubmitSep);
+                    saveSupervisor();
+                    // saveFormOper();
                     break;
                 case 'Engineer':
                 // case 'Planner':
