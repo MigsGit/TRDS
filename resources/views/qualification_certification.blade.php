@@ -582,13 +582,20 @@
             }).then(function (result) {
                 if (result.isConfirmed) {
                     Swal.fire({ icon: 'success', title: 'Saved', text: 'Saved.' });
+                                        $('#modalCreateCQForm').modal('hide');
+
+                    $('#modalSendEmail').modal('hide');
+
                 }
             });
         }
             
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
+    
             let position = $('#text_select_position').val();
+            //         alert(position)
+            // return;
                switch (position) {
                 case 'MH':
                     $('#divMH').removeClass('d-none');
@@ -621,7 +628,7 @@
             var $form = $(this);
 
             // saveFormOper($form);
-            // $('#modalSendEmail').modal();
+            $('#modalSendEmail').modal();
         });
         $(document).on('submit', '#formSubmit_Tech', function (e) {
             e.preventDefault();
