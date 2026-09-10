@@ -585,6 +585,7 @@
                 }
             });
         }
+            
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
             let position = $('#text_select_position').val();
@@ -618,8 +619,9 @@
         $(document).on('submit', '#formSubmit_SEP', function (e) {
             e.preventDefault();
             var $form = $(this);
+
             // saveFormOper($form);
-            $('#modalSendEmail').modal();
+            // $('#modalSendEmail').modal();
         });
         $(document).on('submit', '#formSubmit_Tech', function (e) {
             e.preventDefault();
@@ -729,11 +731,6 @@
             getApprovalStatusToggle(params)
         }
         const selectInspectorValidation = () => {
-            let approvalStatus = $('#approval_status').val();
-            let params = {
-                approvalStatus: approvalStatus,
-                positionCategory: $('#text_select_position').val(),
-            }
             getApprovalStatusToggle(params)
             let approvalStatus = $('#approval_status').val();
             let params = {
@@ -742,16 +739,11 @@
             }
             getApprovalStatusToggle(params)
         }
-        const selectInspectorValidation = () => {
-            let approvalStatus = $('#approval_status').val();
-            let params = {
-                approvalStatus: approvalStatus,
-                positionCategory: $('#text_select_position').val(),
-            }
-            getApprovalStatusToggle(params)
+       
            
-           
-      // });
+
+        var $positionSelect = $('#text_select_position');
+        var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
         $positionSelect.on('change', function () {
             let params = {
                 approvalStatus: $('#approval_status').val(),
