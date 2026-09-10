@@ -18,4 +18,8 @@ class TrainingEndorsementEmployee extends Model
         return $this->belongsTo(TrainingEndorsement::class, 'training_endorsement_id', 'id')->whereNull('deleted_at');
     }
 
+    // TRDS SUMMARY
+    public function get_training_request_details_info(){
+        return $this->hasOne(TrainingRequestDetails::class, 'id', 'training_request_detail_id')->select(['id', 'emp_no', 'department', 'name', 'section']);
+    }
 }

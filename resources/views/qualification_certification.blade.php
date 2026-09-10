@@ -524,7 +524,7 @@
             // console.log('saveFormOper called',$form[0]);
             console.log($forms);
             var formArray = $forms.serializeArray();
-            // 2. Push extra custom field values manually
+            // 2. Push extra custom field values manually line date_of
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
             formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
