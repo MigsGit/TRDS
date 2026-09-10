@@ -6,6 +6,12 @@ $('.select2bs4').each(function () {
     });
 });
 
+$(document).on('hidden.bs.modal', '.modal', function () {
+    if ($('.modal:visible').length) {
+        $(document.body).addClass('modal-open');
+    }
+});
+
 /**
  * Reusable function for using Ajax Request
  *

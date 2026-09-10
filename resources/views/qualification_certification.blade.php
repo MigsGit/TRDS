@@ -735,23 +735,23 @@
                 positionCategory: $('#text_select_position').val(),
             }
             getApprovalStatusToggle(params)
+            let approvalStatus = $('#approval_status').val();
+            let params = {
+                approvalStatus: approvalStatus,
+                positionCategory: $('#text_select_position').val(),
+            }
+            getApprovalStatusToggle(params)
         }
-        // const selectSupervisorValidation = () => {
-        //     let approvalStatus = $('#approval_status').val();
-        //     let params = {
-        //         approvalStatus: approvalStatus,
-        //         positionCategory: $('#text_select_position').val(),
-        //     }
-        //     getApprovalStatusToggle(params)
-        // }
-        var $positionSelect = $('#text_select_position');
-        var $positionSections = $('#divMH, #divTechnician, #divSupervisor, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
-
-        // $positionSelect.click(function () {
-        //     alert('click');
-        // }).on('change', function () {
-        //    togglePositionSection($(this).val());
-        // });
+        const selectInspectorValidation = () => {
+            let approvalStatus = $('#approval_status').val();
+            let params = {
+                approvalStatus: approvalStatus,
+                positionCategory: $('#text_select_position').val(),
+            }
+            getApprovalStatusToggle(params)
+           
+           
+      // });
         $positionSelect.on('change', function () {
             let params = {
                 approvalStatus: $('#approval_status').val(),
