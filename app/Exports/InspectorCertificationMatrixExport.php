@@ -15,16 +15,18 @@ class InspectorCertificationMatrixExport implements FromCollection, WithEvents, 
 {
     protected $personnel;
     protected $productLines;
+    protected $section;
     
     // Sub-processes under each product line header
     protected $processes = ['IQC', 'IPQC', 'OQC'];
 
-    public function __construct($personnel, $productLines)
+    public function __construct($personnel, $productLines, $section)
     {
         $this->personnel = $personnel;
         
         // Ensure $productLines contains ONLY the user-selected product lines
         $this->productLines = collect($productLines)->values();
+        $this->section = $section;
     }
 
     public function title(): string
@@ -57,7 +59,7 @@ class InspectorCertificationMatrixExport implements FromCollection, WithEvents, 
                 // ----------------------------------------------------
                 // 1. TOP TITLE HEADERS
                 // ----------------------------------------------------
-                $sheet->setCellValue('A1', 'TS-F1 QC INSPECTORS SKILL MATRIX');
+                $sheet->setCellValue('A1', $this->section . ' QC INSPECTORS SKILL MATRIX');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
 
                 $sheet->setCellValue('A2', 'Updated as of ' . Carbon::now()->format('F Y'));
