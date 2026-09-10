@@ -16,52 +16,77 @@ class InspCertMatrixController extends Controller
         $exploded_product_line = array_map('trim', (array) $exploded_product_line);
 
         $personel = QcSlip::with([
-                'op_approvers',
-                'qc_slip_employees' => function ($query) {
-                    $query->whereNull('deleted_at'); 
-                },
-                'qc_slip_employees.system_one_subcon_emp_info',
-                'qc_slip_employees.system_one_hris_emp_info',
-                'qc_slip_employees.get_station_to',
-                'qc_reason_certification'
-            ])
-            ->whereNull('deleted_at')
-            ->where('status', 'OK')
-            ->where('section_category', $request->section)
-            ->where(function ($query) use ($exploded_product_line) {
-                foreach ($exploded_product_line as $productLine) {
-                    $query->orWhere('product_line', 'LIKE', '%' . trim($productLine) . '%');
+            'op_approvers',
+            'qc_slip_employees' => function ($query) {
+                $query->whereNull('deleted_at'); 
+            },
+            'qc_slip_employees.system_one_subcon_emp_info',
+            'qc_slip_employees.system_one_hris_emp_info',
+            'qc_slip_employees.get_station_to',
+            'qc_reason_certification'
+        ])
+        ->whereNull('deleted_at')
+        ->where('status', 'OK')
+        ->where('section_category', $request->section)
+        ->where(function ($query) use ($exploded_product_line) {
+            foreach ($exploded_product_line as $productLine) {
+                $query->orWhere('product_line', 'LIKE', '%' . trim($productLine) . '%');
+            }
+        })
+        ->where('position_category', 'Inspector')
+        ->get()
+        ->map(function ($slip) use ($exploded_product_line) {
+            // 1. Transform qc_slip_employees to single Object
+            $slip->setRelation('qc_slip_employees', $slip->qc_slip_employees->first());
+
+            // 2. Transform raw reasons pipe-separated string
+            $rawReasons = optional($slip->qc_reason_certification)->reason_of_certification;
+            $slip->reason_of_certification_ids = $rawReasons 
+                ? array_map('trim', explode('|', $rawReasons)) 
+                : [];
+            
+            // 3. Handle Product Line IDs
+            $rawProductLineIds = $slip->product_line 
+                ? array_map('trim', explode('|', $slip->product_line)) 
+                : [];
+
+            // FILTER: Keep ONLY the IDs that were selected in the request ($exploded_product_line)
+            $filteredProductLineIds = array_intersect($rawProductLineIds, $exploded_product_line);
+
+            $slip->product_line_details = !empty($filteredProductLineIds)
+                ? DropdownMasterDetail::whereIn('id', $filteredProductLineIds)->get()
+                : collect();
+
+            return $slip;
+        })
+        ->groupBy(function ($slip) {
+            return optional($slip->qc_slip_employees)->employee_no ?? 'Unassigned';
+        })
+        // ------------------------------------------------------------------------
+        // SORT EMPLOYEES (OUTER ROWS) FROM OLDEST TO NEWEST BASED ON APPROVAL DATE
+        // ------------------------------------------------------------------------
+        ->sortBy(function ($employeeSlips) {
+            // Find the earliest approval date among all slips of this employee
+            $earliestTimestamp = $employeeSlips->map(function ($slip) {
+                $opApprover = collect($slip->op_approvers)->firstWhere('approval_status', 'BLQCTC')
+                        ?? collect($slip->op_approvers)->first();
+
+                $dateStr = null;
+                if ($opApprover) {
+                    $dateStr = !empty($opApprover['second_date']) 
+                        ? $opApprover['second_date'] 
+                        : ($opApprover['first_date'] ?? null);
                 }
-            })
-            ->where('position_category', 'Inspector')
-            ->get()
-            ->map(function ($slip) use ($exploded_product_line) {
-                // 1. Transform qc_slip_employees to single Object
-                $slip->setRelation('qc_slip_employees', $slip->qc_slip_employees->first());
 
-                // 2. Transform raw reasons pipe-separated string
-                $rawReasons = optional($slip->qc_reason_certification)->reason_of_certification;
-                $slip->reason_of_certification_ids = $rawReasons 
-                    ? array_map('trim', explode('|', $rawReasons)) 
-                    : [];
-                
-                // 3. Handle Product Line IDs
-                $rawProductLineIds = $slip->product_line 
-                    ? array_map('trim', explode('|', $slip->product_line)) 
-                    : [];
+                if (empty($dateStr)) {
+                    $dateStr = $slip->appproval_at ?? '9999-12-31';
+                }
 
-                // FILTER: Keep ONLY the IDs that were selected in the request ($exploded_product_line)
-                $filteredProductLineIds = array_intersect($rawProductLineIds, $exploded_product_line);
+                return \Carbon\Carbon::parse($dateStr)->timestamp;
+            })->min(); // Get earliest date for this employee
 
-                $slip->product_line_details = !empty($filteredProductLineIds)
-                    ? DropdownMasterDetail::whereIn('id', $filteredProductLineIds)->get()
-                    : collect();
-
-                return $slip;
-            })
-            ->groupBy(function ($slip) {
-                return optional($slip->qc_slip_employees)->employee_no ?? 'Unassigned';
-            });
+            return $earliestTimestamp;
+        });
         
         $prod_line = DropdownMasterDetail::whereIn('id', $exploded_product_line)->get();
         $product_line = $prod_line->pluck('dropdown_masters_details')->flatten()->toArray();
