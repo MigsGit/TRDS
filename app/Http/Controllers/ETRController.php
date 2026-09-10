@@ -11,6 +11,8 @@ use App\Model\SystemOneHrisTrainee;
 use App\Model\SystemOneSubconEmpInfo;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
 use App\Model\QcSlip;
+use App\Model\ExamResult;
+use App\Model\TrainingEndorsement;
 
 class ETRController extends Controller
 {
@@ -74,194 +76,319 @@ class ETRController extends Controller
         return response()->json($employees);
     }
 
-    // public function getSystemoneEmployeeTrainingDetails(Request $request){
-    //     $search = trim($request->search);
-
-    //     $hrisEmployees = SystemOneHrisEmpInfo::query()
-    //         ->where('EmpStatus', '!=', 'Active')
-    //         ->where(function ($query) use ($search) {
-    //             $query->where('EmpNo', 'LIKE', "%{$search}%")
-    //                 ->orWhere('EmpName', 'LIKE', "%{$search}%");
-    //         });
-
-    //     $subconEmployees = SystemOneSubconEmpInfo::query()
-    //         ->where('EmpStatus', '!=', 'Resigned')
-    //         ->where(function ($query) use ($search) {
-    //             $query->where('EmpNo', 'LIKE', "%{$search}%")
-    //                 ->orWhere('EmpName', 'LIKE', "%{$search}%");
-    //         });
-
-    //     $employees = $hrisEmployees
-    //         ->unionAll($subconEmployees)
-    //         ->limit(50)
-    //         ->get();
-
-    //     return response()->json($employees);
-    // }
-
     public function viewTRDSSummary(Request $request){
+        $employeeNo = $request->getEmployeeNoForTrdsSummary;
+
+        $test = ExamResult::with([
+            'training_request_info.training_endorsement_info'
+        ])
+        ->where('employee_no', $employeeNo)
+        ->where('status', 0)
+        ->where('logdel', 0)
+        ->first();
+
+
+        $getTrainingEndoresementId = optional(
+            optional(
+                optional($test)->training_request_info
+            )->training_endorsement_info
+        )->id;
+
+        $trainingEndorsement = null;
+
+        if ($getTrainingEndoresementId) {
+            $trainingEndorsement = TrainingEndorsement::with([
+                'created_by_user_details',
+                'get_training_endorsement_employees.get_training_request_details_info.employee_exam_details.exam_result_details_info' => function ($query) {
+                    $query->where('exam_result_status', 1)
+                        ->where('remark', 'Passed')
+                        ->where('status', 0)
+                        ->where('logdel', 0);
+                }
+            ])
+            ->where('id', $getTrainingEndoresementId)
+            ->select('id', 'date', 'created_by')
+            ->first();
+            // return $trainingEndorsement;
+        }
+
+        $data = collect();
+
+        if($trainingEndorsement){
+            foreach ($trainingEndorsement->get_training_endorsement_employees as $endorsementEmployee) {
+                $trainingRequest = $endorsementEmployee->get_training_request_details_info;
+                if (!$trainingRequest) {
+                    continue;
+                }
+
+                $examDetails = $trainingRequest->employee_exam_details;
+                if (!$examDetails) {
+                    continue;
+                }
+
+                $examResults = $examDetails->exam_result_details_info;
+                if (!$examResults) {
+                    continue;
+                }
+
+                if ($examResults instanceof \Illuminate\Database\Eloquent\Model) {
+                    $examResults = collect([$examResults]);
+                }
+
+                if (!$examResults instanceof \Illuminate\Support\Collection) {
+                    $examResults = collect($examResults);
+                }
+
+                foreach ($examResults as $examResult) {
+                    $questionnaire = $examResult->questionnaire;
+                    if (is_string($questionnaire)) {
+                        $questionnaire = json_decode(
+                            $questionnaire,
+                            true
+                        );
+                    }
+
+                    if (!is_array($questionnaire)) {
+                        $questionnaire = [];
+                    }
+
+                    $trainingEndorsementRecord = (object) [
+                        'trainingDate' => $trainingEndorsement->date ?? '',
+                        'title' => $questionnaire['exam_title'] ?? '',
+                        'seriesName' => $trainingRequest->section ?? 'N/A',
+                        'department' => $trainingRequest->department ?? 'N/A',
+                        'station' => 'N/A',
+                        'detailedStation' => 'N/A',
+                        'objective' => $questionnaire['purpose'] ?? '',
+                        'trainor' => optional(
+                            $trainingEndorsement->created_by_user_details
+                        )->name ?? '',
+                        'passingScore' => $examResult->rating ?? '',
+                        'result' => 'Passed',
+                        'record_type' => 'TrainingEndorsement',
+                        'exam_result_id' => $examResult->id ?? null,
+                    ];
+
+                    $data->push($trainingEndorsementRecord);
+                }
+            }
+        }
+
         $query = HrMemoTraineeCategoryDetails::with([
             'exam_info_test',
             'employee_info_tist',
             'rapidx_system_one_hris_emp_info'
         ])
-        ->whereHas('employee_info_tist', function ($q) use ($request) {
-            $q->where('employee_no', $request->getEmployeeNoForTrdsSummary);
+        ->whereHas('employee_info_tist', function ($q) use ($employeeNo) {
+            $q->where('employee_no', $employeeNo);
         });
+
+        $hrMemoData = $query->get();
+        $hrMemoData->each(function ($item) {
+            $item->record_type = 'HrMemoTraineeCategoryDetails';
+        });
+
+        $data = $data->merge($hrMemoData);
         $query2 = QcSlip::with([
-            'qc_slip_employees' => function ($q) use ($request) {
-                $q->where('employee_no', $request->getEmployeeNoForTrdsSummary);
+            'qc_slip_employees' => function ($q) use ($employeeNo) {
+                $q->where('employee_no', $employeeNo);
             },
             'qc_slip_employees.get_station_to',
             'productLine',
             'qc_reason_certification.dropdown_reason'
         ])
-        ->whereHas('qc_slip_employees', function ($q) use ($request) {
-            $q->where('employee_no', $request->getEmployeeNoForTrdsSummary);
+        ->whereHas('qc_slip_employees', function ($q) use ($employeeNo) {
+            $q->where('employee_no', $employeeNo);
         })
         ->where('status', 'OK')
         ->get();
 
-        $data = $query->get()->merge($query2);
-        // return $request->getEmployeeNoForTrdsSummary;
+        $query2->each(function ($item) {
+            $item->record_type = 'QcSlip';
+        });
 
-        // $passed   = (clone $query)->where('result', 1)->count();
-        // $complied = (clone $query)->where('result', 2)->count();
-        // $failed   = (clone $query)->where('result', 3)->count();
-        // $total    = (clone $query)->count();
-
+        $data = $data->merge($query2);
         return DataTables::collection($data)
-
-        ->addColumn('trainingDate', function ($row) {
-
-            if ($row instanceof \App\Model\QcSlip) {
-                return $row->created_at
-                    ? $row->created_at->format('Y-m-d')
-                    : '';
-            }
-
-            if (!$row->date_start && !$row->date_end) {
-                return '';
-            }
-
-            return $row->date_start.' - '.$row->date_end;
-        })
-        ->addColumn('title', function ($row) {
-
-            if ($row instanceof QcSlip) {
-                // return optional($row->productLine)->dropdown_masters_details;
-                return 'Qualification and Certification';
-            }
-
-            return optional($row->exam_info_test)->examination_name;
-        })
-        ->addColumn('seriesName', function ($row) {
-            // if ($row instanceof QcSlip) {
-            //     return $row->series_name ?? '';
-            // }
-            if ($row instanceof QcSlip) {
-                return optional($row->productLine)->dropdown_masters_details;
-            }
-
-            return 'N/A';
-        })
-
-        ->addColumn('station', function ($row) {
-
-            if ($row instanceof QcSlip) {
-                return optional(
-                    optional($row->qc_slip_employees->first())->get_station_to
-                )->dropdown_masters_details ?? '';
-            }
-
-            return 'N/A';
-        })
-        ->addColumn('detailedStation', function ($row) {
-                // return '';
-            if ($row instanceof QcSlip) {
-                $employee = $row->qc_slip_employees->first();
-
-                return $employee->remarks ?? '';
-            }
-            return 'N/A';
-        })
-        ->addColumn('objective', function ($row) {
-            if(!$row->objective){
-                return '';
-            }
-            return $row->objective;
-        })
-        ->addColumn('trainor', function ($row) {
-            $trainor = $row->rapidx_system_one_hris_emp_info;
-
-            if (!$trainor) {
-                return '';
-            }
-
-            return trim($trainor->FirstName . ' ' . $trainor->LastName);
-        })
-        ->addColumn('result', function ($row) {
-
-            if ($row instanceof QcSlip) {
-
-                $employee = $row->qc_slip_employees->first();
-
-                if (!$employee) {
-                    return '<span class="badge badge-secondary">N/A</span>';
+            ->addColumn('trainingDate', function ($row) {
+                if (($row->record_type ?? null) === 'TrainingEndorsement') {
+                    return $row->trainingDate ?? '';
                 }
 
-                $result = $employee->second_take_ins_assessment_result
-                    ?: $employee->first_take_ins_assessment_result;
+                if ($row instanceof \App\Model\QcSlip) {
+                    return $row->created_at
+                        ? $row->created_at->format('Y-m-d')
+                        : '';
+                }
 
-                switch ($result) {
-                    case 'PASSED':
+                if (!$row->date_start && !$row->date_end) {
+                    return '';
+                }
+
+                return $row->date_start . ' - ' . $row->date_end;
+            })
+
+            ->addColumn('title', function ($row) {
+                if (($row->record_type ?? null) === 'TrainingEndorsement') {
+                    return $row->title ?? '';
+                }
+
+                if ($row instanceof \App\Model\QcSlip) {
+                    return 'Qualification and Certification';
+                }
+
+                return optional(
+                    $row->exam_info_test
+                )->examination_name;
+            })
+
+            ->addColumn('seriesName', function ($row) {
+                if (($row->record_type ?? null) === 'TrainingEndorsement') {
+                    return $row->seriesName ?? 'N/A';
+                }
+
+                if ($row instanceof \App\Model\QcSlip) {
+                    return optional(
+                        $row->productLine
+                    )->dropdown_masters_details;
+                }
+
+                return 'N/A';
+            })
+
+            ->addColumn('station', function ($row) {
+                if (($row->record_type ?? null) === 'TrainingEndorsement') {
+                    return 'N/A';
+                }
+
+                if ($row instanceof \App\Model\QcSlip) {
+                    return optional(
+                        optional(
+                            $row->qc_slip_employees->first()
+                        )->get_station_to
+                    )->dropdown_masters_details ?? '';
+                }
+
+                return 'N/A';
+            })
+
+            ->addColumn('detailedStation', function ($row) {
+                if (($row->record_type ?? null) === 'TrainingEndorsement') {
+                    return 'N/A';
+                }
+
+                if ($row instanceof \App\Model\QcSlip) {
+                    $employee = $row->qc_slip_employees->first();
+                    return $employee
+                        ? ($employee->remarks ?? '')
+                        : '';
+                }
+
+                return 'N/A';
+            })
+
+            ->addColumn('objective', function ($row) {
+                if (($row->record_type ?? null) === 'TrainingEndorsement') {
+                    return $row->objective ?? '';
+                }
+
+                return $row->objective ?? '';
+            })
+
+            ->addColumn('trainor', function ($row) {
+                if (($row->record_type ?? null) === 'TrainingEndorsement') {
+                    return $row->trainor ?? '';
+                }
+
+                if ($row instanceof \App\Model\QcSlip) {
+                    return '';
+                }
+
+                $trainor = $row->rapidx_system_one_hris_emp_info;
+                if (!$trainor) {
+                    return '';
+                }
+
+                return trim(
+                    $trainor->FirstName . ' ' . $trainor->LastName
+                );
+            })
+
+            ->addColumn('training_remarks', function ($row) {
+                if (($row->record_type ?? null) === 'TrainingEndorsement') {
+                    return $row->passingScore. '%' ?? '';
+                }else{
+                    $data = $row->training_remarks ?? '';
+                }
+
+                return $data ?? '';
+            })
+
+            ->addColumn('result', function ($row) {
+                if (($row->record_type ?? null) === 'TrainingEndorsement') {
+                    return '<span class="badge badge-success">Passed</span>';
+                }
+
+                if ($row instanceof \App\Model\QcSlip) {
+                    $employee = $row->qc_slip_employees->first();
+
+                    if (!$employee) {
+                        return '<span class="badge badge-secondary">N/A</span>';
+                    }
+
+                    $result = $employee->second_take_ins_assessment_result
+                        ?: $employee->first_take_ins_assessment_result;
+
+                    switch ($result) {
+                        case 'PASSED':
+                            return '<span class="badge badge-success">Passed</span>';
+                        case 'FAILED':
+                            return '<span class="badge badge-danger">Failed</span>';
+                        default:
+                            return '<span class="badge badge-secondary">N/A</span>';
+                    }
+                }
+
+                switch ((int) $row->result) {
+                    case 1:
                         return '<span class="badge badge-success">Passed</span>';
 
-                    case 'FAILED':
+                    case 2:
+                        return '<span class="badge badge-primary">Complied</span>';
+
+                    case 3:
                         return '<span class="badge badge-danger">Failed</span>';
 
                     default:
                         return '<span class="badge badge-secondary">N/A</span>';
                 }
-            }
+            })
 
+            ->addColumn('trainingVenue', function ($row) {
+                if (($row->record_type ?? null) === 'TrainingEndorsement') {
+                    return $row->department ?? 'N/A';
+                }
 
-            switch ((int) $row->result) {
-                case 1:
-                    return '<span class="badge badge-success">Passed</span>';
+                return $row->training_venue ?? '';
+            })
 
-                case 2:
-                    return '<span class="badge badge-primary">Complied</span>';
+            ->addColumn('typeOfTraining', function ($row) {
+                if (($row->record_type ?? null) === 'TrainingEndorsement') {
+                    return 'Training Unit';
+                }
 
-                case 3:
-                    return '<span class="badge badge-danger">Failed</span>';
+                if ($row instanceof \App\Model\QcSlip) {
+                    return optional(
+                        optional(
+                            $row->qc_reason_certification
+                        )->dropdown_reason
+                    )->dropdown_masters_details ?? '';
+                }
 
-                default:
-                    return '<span class="badge badge-secondary">N/A</span>';
-            }
-        })
-        ->addColumn('trainingVenue', function ($row) {
-            if(!$row->training_venue){
-                return '';
-            }
-            return $row->training_venue;
-        })
-        ->addColumn('typeOfTraining', function ($row) {
-            if ($row instanceof QcSlip) {
-                return optional(
-                    optional($row->qc_reason_certification)->dropdown_reason
-                )->dropdown_masters_details ?? '';
-            }
-
-            return $row->type_of_training;
-        })
-        // ->with([
-        //     'passed'   => $passed,
-        //     'complied' => $complied,
-        //     'failed'   => $failed,
-        //     'total'    => $total,
-        // ])
-        ->rawColumns(['result'])
-        ->make(true);
+                return $row->type_of_training ?? '';
+            })
+            ->rawColumns([
+                'result'
+            ])
+            ->make(true);
     }
 }
