@@ -1103,11 +1103,42 @@ class QualificationCertificationController extends Controller
                         data-day="5"
                         value="' . e($row['day_5_result']) . '">';
         })
+        // ->addColumn('remarks', function ($row) {
+        //     return '<input type="text" class="form-control form-control-sm input-remark"
+        //                 data-item-id="' . $row['id'] . '"
+        //                 value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
+        // })
         ->addColumn('remarks', function ($row) {
-            return '<input type="text" class="form-control form-control-sm input-remark"
-                        data-item-id="' . $row['id'] . '"
-                        value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
-        })
+        // Check if current row is the "RESULT" row
+        if (strtoupper(trim($row['item_name'])) === 'RESULT') {
+            // Collect numeric day values
+            $days = [
+                $row['day_1_result'],
+                $row['day_2_result'],
+                $row['day_3_result'],
+                $row['day_4_result'],
+                $row['day_5_result']
+            ];
+
+            // Filter out empty or non-numeric strings
+            $validDays = array_filter($days, function ($val) {
+                return $val !== '' && $val !== null && is_numeric($val);
+            });
+
+            // Compute Average
+            $count = count($validDays);
+            $average = $count > 0 ? round(array_sum($validDays) / $count, 2) : 0;
+
+            // Render static/disabled input displaying AVERAGE for RESULT row
+            return '<input type="text" class="form-control form-control-sm text-center bg-light font-weight-bold"
+                        value="AVERAGE: ' . $average . '" readonly>';
+        }
+
+        // Return standard input for non-RESULT rows
+        return '<input type="text" class="form-control form-control-sm input-remark"
+                    data-item-id="' . $row['id'] . '"
+                    value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
+    })
         ->rawColumns(['item_name', 'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
         ->with('headerDates', $headerDates)
         ->make(true);
