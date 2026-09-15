@@ -18,8 +18,8 @@ use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
 date_default_timezone_set('Asia/Manila');
+
 
 class TrainingEndorsementController extends Controller
 {
@@ -49,6 +49,7 @@ class TrainingEndorsementController extends Controller
 
     public function getTrainingEndorsements(Request $request)
     {
+        date_default_timezone_set('Asia/Manila');
         $rapidxEmpNo =  session('global_user');
         $data = TrainingEndorsement::with([
             'training_request_details',
@@ -170,7 +171,10 @@ class TrainingEndorsementController extends Controller
             $result .= "<center>";
             if($checker){
                 foreach($checker as $checker){
-                    $format_updated_at = $checker['updated_at'] ? Carbon::parse($checker['updated_at'])->format('Y-m-d H:i:s') : null;
+                    // $format_updated_at = $checker['updated_at'] ? Carbon::parse($checker['updated_at'])->format('Y-m-d H:i:s') : null;
+                    $format_updated_at = $checker['updated_at'] 
+                    ? Carbon::parse($checker['updated_at'])->setTimezone('Asia/Manila')->format('Y-m-d H:i:s') 
+                    : null;
                     if($checker['updated_at'] != null){
                         $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
                         $result .= "<em >{$format_updated_at}</em><br>";
@@ -195,7 +199,10 @@ class TrainingEndorsementController extends Controller
             $result .= "<center>";
             if($approver){
                 foreach($approver as $approver){
-                    $format_updated_at = $approver['updated_at'] ? Carbon::parse($approver['updated_at'])->format('Y-m-d H:i:s') : null;
+                    // $format_updated_at = $approver['updated_at'] ? Carbon::parse($approver['updated_at'])->format('Y-m-d H:i:s') : null;
+                    $format_updated_at = $approver['updated_at'] 
+                    ? Carbon::parse($approver['updated_at'])->setTimezone('Asia/Manila')->format('Y-m-d H:i:s') 
+                    : null;
                     if($approver['updated_at'] != null){
                         $result .= "<span class='badge badge-success mt-1'>{$approver['approver_details']['name']}</span><br>";
                         $result .= "<em >{$format_updated_at}</em><br>";
@@ -266,6 +273,8 @@ class TrainingEndorsementController extends Controller
 
     public function saveTrainingEndorsement(TrainingEndorsementRequest $request)
     {
+        date_default_timezone_set('Asia/Manila');
+
         $data = $request->validated();
         DB::beginTransaction();
         $inserted_te_id = null;
@@ -475,6 +484,8 @@ class TrainingEndorsementController extends Controller
 
     public function deleteTrainingEndorsement(Request $request)
     {
+        date_default_timezone_set('Asia/Manila');
+
         DB::beginTransaction();
         try{
             TrainingEndorsement::where('id', $request->id)
@@ -684,6 +695,8 @@ class TrainingEndorsementController extends Controller
     }
 
     public function addNotEndorsedEmp(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
         DB::beginTransaction();
         try{
             TrainingEndorsementEmployee::insert([
@@ -948,6 +961,8 @@ class TrainingEndorsementController extends Controller
     }
 
     public function proceedEndorsementApproval(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
         DB::beginTransaction();
         try{
             TrainingEndorsement::where('id', $request->id)
@@ -981,6 +996,8 @@ class TrainingEndorsementController extends Controller
     }
 
     public function approveEndorsement(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
         DB::beginTransaction();
         try{
             $approval_type = $request->approval_type; // 'checker' or 'approver'
@@ -1041,6 +1058,8 @@ class TrainingEndorsementController extends Controller
     }
 
     public function disapproveEndorsement(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
         DB::beginTransaction();
         try{
 
