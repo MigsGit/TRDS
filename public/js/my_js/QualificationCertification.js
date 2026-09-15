@@ -106,16 +106,22 @@
         $('.operApproved').addClass('d-none');
         $('.btnSaveInspector').addClass('d-none')
         $('#div_Oper').addClass('d-none');
-        $('#divTechnician').addClass('d-none');
         $('#divInspector').addClass('d-none');
-        $('#productLine').addClass('d-none');
+        // $('#productLine').addClass('d-none');
         $('#seriesDesignation').text('Series Name');
         $('#dateOfTransfer').addClass('d-none');
         $('.techSave').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
+        $('#divSupervisor').addClass('d-none');
         $('#divTechnician').addClass('d-none');
-        if(positionCategory === 'Operator'){
+
+        if(positionCategory === 'Supervisor'){
+            initTrainingItemsTable('#tblTrainingItems_sep');
+            $('#divSupervisor').removeClass('d-none');
             $('#productLine').removeClass('d-none');
+        }
+        if(positionCategory === 'Operator'){
+            // $('#productLine').removeClass('d-none');
             $('#div_Oper').removeClass('d-none');
             $('.btn-link').removeClass('show');
             $('#collapseOneOper').removeClass('show');
@@ -127,9 +133,9 @@
                 '#text_oper_station_to',
                 '#text_oper_station_from',
             ],1);
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_operator_product_line',
-            ],2);
+            // initDropdownMasterDetailsByFkidCombos([
+            //     '#text_operator_product_line',
+            // ],2);
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             $('#btnEmployeeOperator').prop('disabled',false);
             if(approvalStatus ==='APRODTO'){
@@ -174,6 +180,7 @@
             $('#seriesDesignation').text('Designation');
             $('#divInspector').removeClass('d-none');
             $('.btnSaveInspector').removeClass('d-none');
+            // $('#productLine').removeClass('d-none');
             form.formSubmitInspector[0].reset();
 
             initDropdownMasterDetailsByFkidCombos([
@@ -206,7 +213,6 @@
                 $('.inspectorSave').addClass('d-none');
             }
         }
-
         if(positionCategory === 'Technician'){
             initTrainingItemsTable('#tblTrainingItems_tech');
             $('#divTechnician').removeClass('d-none');
@@ -216,7 +222,7 @@
              initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],7);
+            ],9);
             if(approvalStatus ==='CTECHQCC'){
                 // $('#btnSaveMatrix_tblTrainingItems_tech').removeClass('d-none');
                 $('.btnSaveMatrix').removeClass('d-none');
@@ -229,48 +235,7 @@
             }
         }
     }
-    const togglePositionSectiontest = (position) => {
-            initOperEmpModal();
-            $('#tbl_certified_list_operator tbody').empty();
-            $positionSections.addClass('d-none');
-            // text_operator_product_line
-            // text_series_operator
-            // text_certification_operator
-            // transfer_flexibility
 
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_operator_product_line',
-            ],2);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_certification_operator',
-            ],3);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#transfer_flexibility',
-            ],6);
-            // $('.inspectorSave').addClass('d-none');
-            $('.operSave').addClass('d-none');
-            $('.operApproved').addClass('d-none');
-            $('.btnSaveInspector').addClass('d-none');
-            switch (position) {
-                case 'MH':
-                    $('#divMH').removeClass('d-none');
-                    break;
-                case 'Technician':
-                    $('#Technician').removeClass('d-none');
-                    break;
-                case 'Supervisor':
-                case 'Engineer':
-                case 'Planner':
-                    $('#divSEP').removeClass('d-none');
-                    break;
-                case 'Inspector':
-                    selectInspectorValidation();
-                    break;
-                case 'Operator':
-                    selectOperatorValidation();
-                    break;
-            }
-        }
     const saveFirstTakeInsSequence = (params) =>{
         let data = {
             qcSlipsId : params.qcSlipsId,
@@ -1166,10 +1131,11 @@
 
             populateEditOperEmpTable(data.qc_slip_employees, approvalStatus);
 
-            const arrProductLine = Array.isArray(data.product_line) ? data.product_line : [data.product_line];
+            // const arrProductLine = Array.isArray(data.product_line) ? data.product_line : [data.product_line];
+
             const productLine = '#text_operator_product_line';
             let editSelectionsMap2 = {};
-            editSelectionsMap2[productLine] = arrProductLine;
+            editSelectionsMap2[productLine] = response.rawProductLineCollection;
             initDropdownMasterDetailsByFkidCombos(
                 [productLine],
                 2,
@@ -1197,10 +1163,10 @@
             if(positionCategory === 'Technician'){
                  //TECHNICIAN
                 let aTechEngTrainingQualification = data.a_tech_eng_training_qualification ?? [];
-                syncCheckboxesWithDb('text_es_tech_training_orientation', aTechEngTrainingQualification?.es_tech_training_orientation,form.formSubmitTech);
-                form.formSubmitTech.find('#text_es_tech_training_orientation_14').val(aTechEngTrainingQualification?.training_orientation_ins_4);
-                form.formSubmitTech.find('#text_es_tech_training_orientation_15').val(aTechEngTrainingQualification?.training_orientation_ins_13);
-                form.formSubmitTech.find('#text_es_tech_training_orientation_16').val(aTechEngTrainingQualification?.training_orientation_ins_21);
+                syncCheckboxesWithDb('text_es_tech_training_orientation', aTechEngTrainingQualification?.es_tech_training_orientation,form.formSubmitTech); //es_tech_training_orientation
+                form.formSubmitTech.find('#text_es_tech_training_orientation_14').val(aTechEngTrainingQualification?.es_tech_training_orientation_14);
+                form.formSubmitTech.find('#text_es_tech_training_orientation_15').val(aTechEngTrainingQualification?.es_tech_training_orientation_15);
+                form.formSubmitTech.find('#text_es_tech_training_orientation_16').val(aTechEngTrainingQualification?.es_tech_training_orientation_16);
                 getEmployeeDetailsByEmpNoSelect2Technician({
                     response : response,
                 });
@@ -1337,14 +1303,16 @@
                 );
                 checkCheckboxesFromColumn(bOpEnggSectionTrainingOrientation?.engg_orientation_docs,'chk',form.formSubmitOper);
 
-                form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper);
-                form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
+                form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation?.engg_orientation_docs);
+                form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper).trigger('change');;
+                form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
+                form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
                 form.formSubmitOper.find('#text_first_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ok_es_oper);
                 form.formSubmitOper.find('#text_first_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
                 form.formSubmitOper.find('#text_oa_1st_result_es_oper').val(bOpEnggSectionTrainingOrientation?.oa_1st_result_es_oper);
 
 
-                form.formSubmitOper.find('#text_obs_second_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_second_result_es_oper);
+                form.formSubmitOper.find('#text_obs_second_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_second_result_es_oper).trigger('change');;
                 form.formSubmitOper.find('#text_second_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.second_sample_es_oper);
                 form.formSubmitOper.find('#text_second_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ok_es_oper);
                 form.formSubmitOper.find('#text_second_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ng_es_oper);
