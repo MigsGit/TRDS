@@ -444,6 +444,8 @@ class PersonnelSkillMatrixController extends Controller
         $productLine = DropdownMasterDetail::where('id', $productLineId)
             ->value('dropdown_masters_details');
 
+            // return $productLine;
+
         $productStation = DropdownMasterDetail::whereHas('dropdown_master', function ($q) use ($position) {
                 $q->where('dropdown_masters', 'Stations')
                 ->where('category', $position);
@@ -451,6 +453,8 @@ class PersonnelSkillMatrixController extends Controller
             ->where('dropdown_masters_details', '!=', 'N/A')
             ->select('id', 'dropdown_masters_details')
             ->get();
+
+            // return $productStation;
 
         $employees = collect(json_decode($request->employees, true))
             ->map(function ($employee) use ($productLineId) {
@@ -475,15 +479,17 @@ class PersonnelSkillMatrixController extends Controller
                     'dateHired' => $employee['dateHired'] ?? '',
 
                     'stations' => [
-                        1 => $partPrepCount,
-                        2 => $visualCount,
-                        3 => $assemblyCount,
-                        4 => $machineCount,
+                        1 => $this->getSkillLevel($partPrepCount),
+                        2 => $this->getSkillLevel($visualCount),
+                        3 => $this->getSkillLevel($assemblyCount),
+                        4 => $this->getSkillLevel($machineCount),
                     ],
                 ];
             })
             ->values()
             ->toArray();
+
+        // return $employees;
 
         return Excel::download(
             new SkillMapExport(
@@ -493,6 +499,27 @@ class PersonnelSkillMatrixController extends Controller
             ),
             'skill_matrix.xlsx'
         );
+    }
+
+    private function getSkillLevel($count)
+    {
+        if ($count <= 0) {
+            return 0;
+        }
+
+        if ($count == 1) {
+            return 1;
+        }
+
+        if ($count <= 3) {
+            return 2;
+        }
+
+        if ($count <= 6) {
+            return 3;
+        }
+
+        return 4;
     }
 
      public function exportSkillMapExcelPerProductLine(Request $request)
