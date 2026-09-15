@@ -569,7 +569,7 @@
                 }
             },$forms);
         }
-                    
+
         const saveSupervisor = () => {
              Swal.fire({
                 title: 'Are you sure you want to save this request?',
@@ -589,10 +589,10 @@
                 }
             });
         }
-            
+
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
-    
+
             let position = $('#text_select_position').val();
             //         alert(position)
             // return;
@@ -605,7 +605,8 @@
                     // $('#divTechnician').removeClass('d-none');
                     break;
                case 'Supervisor':
-                    saveSupervisor();
+                    saveFormOper(form.formSubmitSep);
+                    // saveSupervisor();
                     // saveFormOper();
                     break;
                 case 'Engineer':
@@ -616,7 +617,7 @@
                     saveInspectorDetails();
                     break;
                 case 'Operator':
-                    saveFormOper();
+                    saveFormOper(form.formSubmitOper);
                     break;
                 default:
                     alert('Unknown position selected. Please select a valid position.');
@@ -738,7 +739,6 @@
             getApprovalStatusToggle(params)
         }
         const selectInspectorValidation = () => {
-            getApprovalStatusToggle(params)
             let approvalStatus = $('#approval_status').val();
             let params = {
                 approvalStatus: approvalStatus,
@@ -746,8 +746,8 @@
             }
             getApprovalStatusToggle(params)
         }
-       
-           
+
+
 
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
@@ -871,6 +871,10 @@
             '#text_tech_qcs_1st_certified_by',
             '#text_tech_qcs_2nd_certified_by',
             '#text_tech_approved_by',
+
+            //Sup
+            '#text_a_sep_trained_certified_by',
+            '#text_sep_trained_certified_by',
 
         ]);
         // initSelectPassFail([
