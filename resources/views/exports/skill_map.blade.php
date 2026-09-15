@@ -73,7 +73,7 @@
 
     <!-- LEVEL 3 -->
     <td align="center"></td>
-    <td>
+    <td> 
         <strong>Level 3 -</strong><br>
         Certified (at least 4~6 series / products)
     </td>
