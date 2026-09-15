@@ -21,8 +21,17 @@ class CheckSession
         session_start();
 
         // dd($_SESSION);
+        // dd('test');
         if(!isset($_SESSION['rapidx_user_id'])){
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Session expired.'
+                ], 401);
+            }
+            
             return redirect('../');
+            // return redirect()->route('dashboard');
         }
 
         $user = DB::table('users')

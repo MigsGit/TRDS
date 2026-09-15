@@ -8,11 +8,13 @@ class CertifiedPersonnelExport implements WithMultipleSheets
 {
     protected $groupedQcSlips;
     protected $position;
+    protected $product_line;
 
-    public function __construct($groupedQcSlips, $position)
+    public function __construct($groupedQcSlips, $position, $product_line)
     {
         $this->groupedQcSlips = $groupedQcSlips;
         $this->position = $position;
+        $this->product_line = $product_line;
     }
 
     public function sheets(): array
@@ -28,7 +30,7 @@ class CertifiedPersonnelExport implements WithMultipleSheets
         //         return strtoupper($key) === $category;
         //     }) ?? collect();
 
-            $sheets[] = new CertifiedPersonnelSheetExport($this->position, $this->groupedQcSlips[$this->position]);
+            $sheets[] = new CertifiedPersonnelSheetExport($this->position, $this->groupedQcSlips[$this->position], $this->product_line);
         // }
 
         return $sheets;

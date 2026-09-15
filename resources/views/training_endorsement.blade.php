@@ -8,11 +8,6 @@
 @section('title', 'Training Endorsement')
 
 @section('content_page')
-<!-- Select2 CSS CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
-
-    <!-- Select2 Bootstrap 4 Theme CSS CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" />
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
@@ -75,6 +70,7 @@
                                                 <th class="text-center">Training Request Ctrl #</th>
                                                 <th class="text-center">Prepared By</th>
                                                 <th class="text-center">Checker</th>
+                                                <th class="text-center">Approver</th>
                                                 <th class="text-center">Approver</th>
                                             </tr>
                                         </thead>
