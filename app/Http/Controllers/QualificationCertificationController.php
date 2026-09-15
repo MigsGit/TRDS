@@ -572,7 +572,7 @@ class QualificationCertificationController extends Controller
                     }
                 }
             }
-             if ($select_position === 'Supervisor') {
+             if ($currentPositionCategory === 'Supervisor') {
                 $request->validate([
                     // Shared header fields (qualification_certification.blade.php)
                     // A. TRAINING / ORIENTATION (modal_qualification_certification_supervisor.blade.php)
@@ -653,7 +653,7 @@ class QualificationCertificationController extends Controller
                     // }
                 }
             }
-            
+
 // text_sep_approved_inspector
                 //  // A. TRAINING / ORIENTATION (modal_qualification_certification_supervisor.blade.php)
                 //     'text_sep_training_orientation'     => 'nullable|array',
@@ -1864,7 +1864,7 @@ class QualificationCertificationController extends Controller
         if(count( $qcSlip ) != 0){
             $currentCtrlNo = explode('-',$qcSlip[0]->control_no);
             $arrCtrNo		 	= end($currentCtrlNo);
-            $series 	 	= str_pad(($arrCtrNo1),3,"0",STR_PAD_LEFT);
+            $series 	 	= str_pad(($arrCtrNo),3,"0",STR_PAD_LEFT);
             $currentCtrlNo = $params['section']."-".$params['selectSection']."-".date('m').date('y').'-'.$series;
 
         }else{
