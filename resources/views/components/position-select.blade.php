@@ -10,12 +10,8 @@
         ['value' => 'ALL', 'label' => 'Display All'],
         ['value' => 'Operator', 'label' => 'Operator'],
         ['value' => 'Inspector', 'label' => 'Inspector'],
-        // ['value' => 'CN', 'label' => 'CN'],
-        // ['value' => 'CNF3', 'label' => 'CN-F3'],
-        // ['value' => 'PPDCN', 'label' => 'PPD-CN'],
-        // ['value' => 'PPDTS', 'label' => 'PPD-TS'],
-        // ['value' => 'PPDF3', 'label' => 'PPD-F3'],
-        // ['value' => 'YF', 'label' => 'YF'],
+        ['value' => 'Technician', 'label' => 'Technician'],
+        // ['value' => 'Supervisor', 'label' => 'Supervisor'],
     ];
 @endphp
 

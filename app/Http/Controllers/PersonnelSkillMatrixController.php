@@ -627,6 +627,27 @@ class PersonnelSkillMatrixController extends Controller
         return 4;
     }
 
+    private function getSkillLevel($count)
+    {
+        if ($count <= 0) {
+            return 0;
+        }
+
+        if ($count == 1) {
+            return 1;
+        }
+
+        if ($count <= 3) {
+            return 2;
+        }
+
+        if ($count <= 6) {
+            return 3;
+        }
+
+        return 4;
+    }
+
      public function exportSkillMapExcelPerProductLine(Request $request)
     {
         // return 'asd';
