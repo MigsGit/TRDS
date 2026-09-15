@@ -1,7 +1,7 @@
 <table>
     <tr>
         <td colspan="10">
-            <strong>Employee Skill Inspector</strong>
+            <strong>Employee Skill Map</strong>
         </td>
     </tr>
 
