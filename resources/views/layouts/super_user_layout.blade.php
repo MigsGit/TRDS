@@ -108,6 +108,7 @@
                 @include('shared.pages.super_user_nav')
                 @yield('content_page')
                 @include('components.list_cert_personnel')
+                @include('components.insp_cert_matrix')
                 @include('shared.pages.admin_footer')
             </div>
 

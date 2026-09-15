@@ -9,7 +9,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 class TrainingAttendanceRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Determine if the user is authorized to make this request. 
      *
      * @return bool
      */

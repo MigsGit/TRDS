@@ -63,6 +63,7 @@ function resetHrMemoApprovalForm(formSelector, dtTraineeDetails) {
 
     $formSelector.find('#subject').prop('disabled', false);
     $formSelector.find('#classification').prop('disabled', false);
+    $formSelector.find('#from').prop('disabled', false);
     $formSelector.find('#reason').prop('disabled', false);
     $formSelector.find('#dateFiled').prop('disabled', false);
     $formSelector.find('#selectTo').prop('disabled', false);
@@ -92,6 +93,7 @@ function initHrMemoApprovalTable($table, url = 'view_hr_memo') {
         fixedHeader: true,
         columns: [
             { data: 'action', orderable: false, searchable: false },
+            { data: 'trainee_names', visible: false, searchable: true},
             { data: 'status_label' },
             { data: 'document_no' },    // customize this per hr_memo_approval
             { data: 'date_filed' },    // customize this per hr_memo_approval
@@ -128,6 +130,14 @@ function initTraineeDetailsTable($table1) {
                     return actionButtons;
                 }
             },
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.settings._iDisplayStart + meta.row + 1;
+                }
+            },
             { data: "emp_no" },
             { data: "emp_name" },
             { data: "position" },
@@ -145,6 +155,14 @@ function initTraineeDetailsTable($table1) {
 function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetails, $tableTD, $modalTD, $formTD, $addButtonTD, $addButtonExam, $tableExam){
     let traineeDetailsArray = [];
     let traineeIdCounter = 1;
+
+    // dtTraineeDetails.on('order.dt search.dt draw.dt', function () {
+    //     let i = 1;
+
+    //     dtTraineeDetails.cells(null, 0, { search: 'applied', order: 'applied' }).every(function () {
+    //         this.data(i++);
+    //     });
+    // }).draw();
 
     // initial check (on page load)
     // updateRemoveButtons($tableTD);
@@ -246,10 +264,17 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         });
     });
 
+    // old code commented Clark 07/27/2026
     // Handle exam selection
-    $tableExam.on('change', '.selectExamTitle', function (e) {
-        let objective = $tableExam.find('option:selected').data('objective');
-        $tableExam.find('#objective').val(objective);
+    // $tableExam.on('change', '.selectExamTitle', function (e) {
+    //     let objective = $tableExam.find('option:selected').data('objective');
+    //     $tableExam.find('#objective').val(objective);
+    // });
+
+    $tableExam.on('change', '.selectExamTitle', function () {
+        const $row = $(this).closest('tr');
+        const objective = $(this).find('option:selected').data('objective');
+        $row.find('#objective').val(objective);
     });
 
     $addButtonExam.on('click', function () {
@@ -347,10 +372,35 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
     $form.on('click', '#btnHRDisapprove', function () {
         const id = $form.find('#txtHrMemoId').val();
         let updateStatusTo = 4; //disapproved
-        // let forApproval = true;
-        confirmAction('Disapprove HR Memo Document?', function () {
-            updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
+
+        Swal.fire({
+            title: 'Disapprove HR Memo',
+            input: 'textarea',
+            id: 'tuDisapproveRemarks',
+            inputLabel: 'Remarks',
+            inputPlaceholder: 'Enter reason for disapproval...',
+            inputAttributes: {
+                'aria-label': 'Enter remarks'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Remarks is required!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let remarks = result.value;
+                updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal, remarks);
+            }
         });
+
+        // let forApproval = true;
+        // confirmAction('Disapprove HR Memo Document?', function () {
+        //     updateHrMemoApprovalStatus(id, dtHMA, updateStatusTo, $modal);
+        // });
     });
 
     // HR Approve button
@@ -661,10 +711,16 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         }
     });
 
+    //Inspector Skill Chart
     $('#btnShowExportReportModal').on('click', function (){
         const $formExport = $('#exportInspectorSkillChart');
         $formExport[0].reset();
         $('#modalExportReport').modal('show');
+    });
+
+    //Employee Skill Card
+    $('#btnShowExportPDFModal').on('click', function (){
+        window.open(`view_emp_skill_card_pdf`, '_blank');
     });
 }
 
@@ -813,6 +869,8 @@ function getExaminations(cboElement, examId = null, mode = null){
             result = '<option value="" disabled selected>--Loading--</option>';
         },
         success: function (response) {
+            // console.log('response:', response);
+
             if(response.length > 0){
                     result = '<option value="" disabled selected> Select Examination </option>';
 
@@ -827,6 +885,9 @@ function getExaminations(cboElement, examId = null, mode = null){
                 result = '<option value="0" selected disabled> -- No record found -- </option>';
             }
             cboElement.html(result);
+
+            // console.log('Inserted HTML:', cboElement.html());
+
             if(examId != null){
                 cboElement.val(examId).trigger('change');
             }
@@ -907,10 +968,21 @@ function saveHrMemoApproval($form, $modal, dtHrMemoApproval, appendArray) {
                 traineeDetailsArray = [];
                 showSuccess('Successfully saved!');
             }
+            // else{
+            //     console.error('Save failed:', response);
+            //     showError('Failed: ' + response.error);
+            // }
         },
         error: function (xhr) {
+            if (xhr.status === 401) {
+                alert('Your session has expired.');
+
+                window.location.href = '../';
+                return;
+            }
+            
             console.error('Save failed:', xhr.responseText);
-            showError('Failed to save data.');
+            showError('Failed to save data.', xhr.responseText);
         }
     });
 }
@@ -1071,7 +1143,6 @@ function fetchHrMemoById(id, $modal, $table, $form, $mode, $traineeDetailsArray,
 
 function disableForm($form, status = null){
     console.log('disabled form & buttons');
-
     $form.find('input, textarea, select').prop('disabled', true);
 }
 

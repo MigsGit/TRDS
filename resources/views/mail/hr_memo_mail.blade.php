@@ -103,7 +103,7 @@ body{
 
         <br><br>
 
-        <a href="http://rapidx/TRDSv2" class="button" style="display: inline-block; background: #4A90E2; color: #ffffff; font-family: Ubuntu, Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: normal; line-height: 100%; Margin: 0; text-decoration: none; text-transform: none; padding: 9px 26px 9px 26px; mso-padding-alt: 0px; border-radius: 24px;" target="_blank">
+        <a href="http://rapidx/TRDSv2/hr_memo" class="button" style="display: inline-block; background: #4A90E2; color: #ffffff; font-family: Ubuntu, Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: normal; line-height: 100%; Margin: 0; text-decoration: none; text-transform: none; padding: 9px 26px 9px 26px; mso-padding-alt: 0px; border-radius: 24px;" target="_blank">
             Open TRDSV2 on RapidX
         </a>
 

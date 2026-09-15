@@ -119,10 +119,17 @@
                 $("#iBtnAddUserIcon").addClass('fa fa-check');
             },
             error: function(data, xhr, status){
-                toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
-                $("#iBtnAddUserIcon").removeClass('fa fa-spinner fa-pulse');
+                     $("#iBtnAddUserIcon").removeClass('fa fa-spinner fa-pulse');
                 $("#btnAddUser").removeAttr('disabled');
                 $("#iBtnAddUserIcon").addClass('fa fa-check');
+                if( data.status === 422 ){
+                    Swal.fire({ icon: 'error', title: 'Error', text: ('Please check the required fields.')});
+                    toastr.error(data.responseJSON.message);
+                    errorHandler(errorResponse.errors['user_level_id'], $('#selAddUserLevel'));
+                        return;
+                }
+                toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+
             }
         });
     }
@@ -569,9 +576,9 @@
             }
        });
     }
- 
 
-  
+
+
     function getSystemOneEmployeeDetailstest(cboElement,userId=null){
         let result = '<option value="">N/A</option>';
         $.ajax({
@@ -583,7 +590,7 @@
                 cboElement.html(result);
             },
             success: function(JsonObject){
-           
+
                 let userCollection = JsonObject['userCollection'];
                 result = '';
                 if(userCollection.length > 0){
@@ -621,7 +628,7 @@
             },
             dataType: "json",
             success: function (response) {
-                console.log();
+                console.log(response);
                 if(response['empInfo'].length == 0){
                     let params = {
                         frmId : $('#formAddUser')
@@ -687,6 +694,6 @@
 
         })
     }
-   
-    
+
+
 // });

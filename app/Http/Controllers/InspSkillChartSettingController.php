@@ -48,8 +48,7 @@ class InspSkillChartSettingController extends Controller
     public function addProcessStationInfo(Request $request){
         $validation = array(
             'section' => ['required', 'string', 'max:255'],
-            'process_station' => ['required', 'string', 'max:255'],
-            'product_line' => ['required', 'string', 'max:255']
+            'process_station' => ['required', 'string', 'max:255']
         );
 
         $data = $request->all();
@@ -58,17 +57,24 @@ class InspSkillChartSettingController extends Controller
             return response()->json(['result' => '0', 'error' => $validator->messages()]);
         }else{
             DB::beginTransaction();
-
+            
+            if($request->product_line != 'N/A'){
+                $product_lines = implode(',', $request->product_line);
+            }else{
+                $product_lines = $request->product_line;
+            }
+                  
             try{
                 $process_array = array(
                     'section' => $request->section,
+                    'skill_category' => $request->skill_category,
                     'process_station' => $request->process_station,
-                    'product_line' => $request->product_line
+                    'process_order' => $request->process_order,
+                    'product_line' => $product_lines
                 );
 
                 if(isset($request->id)){ // EDIT
-                    InspectorSkillChartSetting::where('id', $request->id)
-                    ->update($process_array);
+                    InspectorSkillChartSetting::where('id', $request->id)->update($process_array);
                 }else{ // ADD
                     InspectorSkillChartSetting::insert($process_array);
                 }
@@ -122,5 +128,13 @@ class InspSkillChartSettingController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function getProcessCountPerCategory(Request $request){
+        $count =  InspectorSkillChartSetting::where('section', $request->section)->where('skill_category', $request->skill_category)
+                    ->where('status', 0)
+                    ->count();
+
+        return response()->json(['count' => $count ]);
     }
 }

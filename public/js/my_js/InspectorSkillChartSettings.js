@@ -49,6 +49,8 @@ function initProcessStationsTable($table, url = 'view_process_stations') {
         columns: [
             { data: 'action', orderable: false, searchable: false },
             { data: 'section' },    // customize this per process_stations
+            { data: 'skill_category' },    // customize this per process_stations
+            { data: 'process_order' },    // customize this per process_stations
             { data: 'process_station' },    // customize this per process_stations
             { data: 'product_line' },    // customize this per process_stations
             { data: 'status_label' }
@@ -69,7 +71,14 @@ function bindProcessStationsEvents($table, $form, $modal, dtProcessStation, $add
     // Submit form (Add / Edit)
     $form.on('submit', function (e) {
         e.preventDefault();
-        saveProcessStations($form, $modal, dtProcessStation);
+
+        if($form.find('#naProductLineCheckbox').is(":checked")){
+            saveProcessStations($form, $modal, dtProcessStation);
+        }else if($form.find('#productLine').val() != ""){
+            saveProcessStations($form, $modal, dtProcessStation);
+        }else{
+            showError('Failed to save data, Please Select Product Line');
+        }
     });
 
     // Edit button
@@ -91,6 +100,41 @@ function bindProcessStationsEvents($table, $form, $modal, dtProcessStation, $add
         const id = $(this).data('id');
         confirmAction('Are you sure you want to enable this examination?', function () {
             updateProcessStationsStatus(id, dtProcessStation);
+        });
+    });
+
+    $form.on('change', '#naProductLineCheckbox', function (e) {
+        if ($(this).is(":checked")){
+            $("#productLine").val('N/A').prop("disabled", true).trigger('change');
+                // .val("N/A")
+                // .prop("readonly", true)
+                // .prop("required", false)
+                // .attr("placeholder", "Not Applicable");
+        }else{
+            $("#productLine").val('').prop("disabled", false).trigger('change');
+                // .val("")
+                // .prop("readonly", false)
+                // .prop("required", true)
+                // .attr("placeholder", "Enter a value");
+        }
+    });
+
+    $form.on('change', '#skillCategory, #section', function (e) {
+        let section = $form.find('#section').val();
+        let skill_category = $form.find('#skillCategory').val();
+        $.ajax({
+            type: 'GET',
+            url: 'get_process_count_per_category',
+            data: { skill_category, section },
+            dataType: 'json',
+            success: function (response) {
+                let next_count = response.count + 1;
+                $('#processOrder').val(next_count);
+            },
+            error: function (xhr) {
+                console.error('Fetch failed:', xhr.responseText);
+                showError('Failed to fetch data.');
+            }
         });
     });
 }
@@ -133,8 +177,13 @@ function fetchProcessStationsById(id, $modal) {
             
             $('#txtProcessId').val(response.id);
             $('#section').val(response.section);
+            $('#processOrder').val(response.process_order);
+            $('#skillCategory').val(response.skill_category);
             $('#processStation').val(response.process_station);
-            $('#productLine').val(response.product_line);
+
+            let selected_product_line = response.product_line.split(",");
+            $('#productLine').val(selected_product_line).trigger("change");
+
             $modal.modal('show');
         },
         error: function (xhr) {

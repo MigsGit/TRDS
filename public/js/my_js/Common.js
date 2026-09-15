@@ -6,6 +6,12 @@ $('.select2bs4').each(function () {
     });
 });
 
+$(document).on('hidden.bs.modal', '.modal', function () {
+    if ($('.modal:visible').length) {
+        $(document.body).addClass('modal-open');
+    }
+});
+
 /**
  * Reusable function for using Ajax Request
  *
@@ -133,9 +139,9 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
             Swal.close();
             fn(result);
             $('#modal-loading').modal('hide');
-            if(elFormId !=null){
-                elFormId[0].reset();
-            }
+            // if(elFormId !=null){
+            //     elFormId[0].reset();
+            // }
 
         },
         error: function (result) {
@@ -156,9 +162,9 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
                 // Swal.fire({ icon: 'error', title: 'Error', text: (errorResponse.message) ? errorResponse.message : 'Internal Server Error.'});
             }
             if( result.status === 409 ){
-
+                toastr.error(errorResponse.message ?? '');
+                Swal.fire({ icon: 'error', title: 'Error', text: (errorResponse.message) ? errorResponse.message : 'Internal Server Error.'});
             }
-
             if( result.status === 422 ){
                 Swal.fire({ icon: 'error', title: 'Error', text: ('Please check the required fields.')});
                 toastr.error(errorResponse.message);
@@ -168,6 +174,13 @@ const  call_ajax_serialize = (data = null, serialized_data, handler, fn,elFormId
                 errorHandler(errorResponse.errors['text_alert_prod_sec'], $('#text_alert_prod_sec'));
                 errorHandler(errorResponse.errors['text_alert_prod_cc_sec'], $('#text_alert_prod_cc_sec'));
                 errorHandler(errorResponse.errors['text_qcs_station_1st_oper'], $('#text_qcs_station_1st_oper'));
+                errorHandler(errorResponse.errors['text_series_operator'], $('#text_series_operator'));
+                // errorHandler(errorResponse.errors['text_section_operator'], $('#text_section_operator'));
+                errorHandler(errorResponse.errors['text_operator_product_line'], $('#text_operator_product_line'));
+                errorHandler(errorResponse.errors['text_certification_operator'], $('#text_certification_operator'));
+
+
+                // text_qcs_station_1st_oper checkbox
             }
 
         }
@@ -216,7 +229,7 @@ const  swalConfirmation =(message, callback) => {
 
 
 const handleValidatorErrors = (errors) => {
-    
+
     document.querySelectorAll('div input').forEach(function(input) {
         input.classList.remove('is-invalid');
     });

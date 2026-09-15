@@ -13,6 +13,7 @@ use App\Model\Hr\HrMemoTraineeDetails;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
 use App\Exports\InspectorSkillChart;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +36,37 @@ class HrMemoController extends Controller
         // return $globalUser;
         $user_access = explode(',', $globalUser->user_modules_id);
 
-        $hr_memo_details = HrMemo::with(['prepared_by_info', 'received_by_info', 'noted_by_info', 'email_recipients.rapidx_user', 'trainee_details.emp_exam_details.exam_info'])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
+        $hr_memo_details = HrMemo::with([
+            'prepared_by_info',
+            'received_by_info',
+            'noted_by_info',
+            'email_recipients.rapidx_user',
+            'trainee_details.emp_exam_details.exam_info',
+            'trainee_details.hris_emp_info',
+            'trainee_details.subcon_emp_info',
+            ])->whereNull('deleted_at')->orderBy('id', 'DESC')->get();
+
+        // return $hr_memo_details;
+
+        // foreach($hr_memo_details as $memo_detail){
+        //     foreach($memo_detail->trainee_details as $td){
+        //         if ($td->employment_type == 1) {
+        //             // HRIS employee
+        //             $td->load(['hris_emp_info' => function ($q) {
+        //                 $q->select(
+        //                     'vw_employeeinfo.*',
+        //                 );
+        //             }]);
+        //         } else {
+        //             // Subcon employee
+        //             $td->load(['subcon_emp_info' => function ($q) {
+        //                 $q->select(
+        //                     'vw_employeeinfo.*',
+        //                 );
+        //             }]);
+        //         }
+        //     }
+        // }
 
         return DataTables::of($hr_memo_details)
         ->addColumn('action', function($hr_memo_details) use ($user_access, $globalUser){
@@ -91,6 +122,21 @@ class HrMemoController extends Controller
             $result .= "</center>";
             return $result;
         })
+        ->addColumn('trainee_names', function($hr_memo_details){
+
+            $trainee_names = [];
+
+            foreach($hr_memo_details->trainee_details as $td){
+                if ($td->employment_type == 1) {
+                    $trainee_names[] = $td->hris_emp_info->EmpName;
+                } else {
+                    $trainee_names[] = $td->subcon_emp_info->EmpName;
+                }
+            }
+
+            $result = implode(', ', $trainee_names);
+            return $result;
+        })
         ->addColumn('status_label', function($hr_memo_details){
             $result = "";
             $result .= "<center>";
@@ -141,6 +187,7 @@ class HrMemoController extends Controller
 
             return $result;
         })
+
         ->addColumn('prepared_by_label', function($hr_memo_details){
             $prepared_by_name = $hr_memo_details->prepared_by_info->name ?? (object) ['name' => 'N/A'];
             $created_at_date = $hr_memo_details->created_at ? date("M j, Y h:i:s A", strtotime($hr_memo_details->created_at)) : '---';
@@ -171,7 +218,7 @@ class HrMemoController extends Controller
 
             // $received_status = !empty($hr_memo_details->received_date) ? 'Received' : 'Pending';
             // $badge_status = !empty($hr_memo_details->received_date) ? 'badge-success' : 'badge-secondary';
-                
+
             $result = "
                 <center>
                     <strong>{$received_by_name}<strong><br>
@@ -181,7 +228,7 @@ class HrMemoController extends Controller
 
             return $result;
         })
-        ->rawColumns(['action', 'reason_label', 'status_label', 'prepared_by_label', 'received_by_label']) // Specify the columns that contain HTML
+        ->rawColumns(['action', 'trainee_names','reason_label', 'status_label', 'prepared_by_label', 'received_by_label']) // Specify the columns that contain HTML
         ->make(true);
     }
 
@@ -284,11 +331,11 @@ class HrMemoController extends Controller
 
         // CASE 1: Employee number exists
         // if (!empty($empNo)) {
-        
+
             $training_venue = DB::connection('mysql_systemone')->select($trainingVenueQuery);
 
             $hris = DB::connection('mysql_systemone')
-                ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
+                ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? AND tbl_EmployeeInfo.EmpStatus = 1 LIMIT 1", [$empNo]);
                 
 
             if (!empty($hris)) {
@@ -300,7 +347,7 @@ class HrMemoController extends Controller
 
             // fallback to subcon
             $subcon = DB::connection('mysql_subcon')
-                ->select($subconQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
+                ->select($subconQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? AND tbl_EmployeeInfo.EmpStatus = 1 LIMIT 1", [$empNo]);
 
             return response()->json([
                 'emp_details' => $subcon,
@@ -337,7 +384,8 @@ class HrMemoController extends Controller
             'date_filed' => 'required',
             'to' => 'required',
             'cc' => 'required',
-            'trainee_details' => 'required'
+            'trainee_details' => 'required',
+            'prepared_by' => 'required'
         );
 
         $data = $request->all();
@@ -634,7 +682,7 @@ class HrMemoController extends Controller
         $subcon = DB::connection('mysql_subcon')->select($subconTrainorQuery);
 
         $merged_trainor_list = array_merge($hris, $subcon);
-            
+
         return response()->json([
             'trainor_list' => $merged_trainor_list
         ]);
@@ -652,5 +700,62 @@ class HrMemoController extends Controller
             new InspectorSkillChart($selectedSheets),
             'QC Inspectors Skill Chart.xlsx'
         );
+    }
+
+    public function viewEmpSkillCardPdf()
+    {
+        $products = [
+            [
+                'name'=>'Adapter Type',
+                'level'=>1,
+                'certified'=>'JAN. 2026',
+                'valid'=>'JULY 2026',
+                'skills'=>[
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                ]
+            ],
+
+            [
+                'name'=>'Connector Type',
+                'level'=>1,
+                'certified'=>'JAN. 2026',
+                'valid'=>'JULY 2026',
+                'skills'=>[
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                ]
+            ],
+
+            [
+                'name'=>'Adapter Type 1',
+                'level'=>1,
+                'certified'=>'JAN. 2026',
+                'valid'=>'JULY 2026',
+                'skills'=>[
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                ]
+            ],
+        ];
+
+        $pdf = PDF::loadView('pdf/employee_skill_card/view_skill_card_pdf', compact('products'))->setPaper('A3', 'landscape');
+
+        return $pdf->stream();
     }
 }

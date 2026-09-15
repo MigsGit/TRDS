@@ -48,4 +48,8 @@ class TrainingRequestDetails extends Model
         // return $this->hasMany(ExamResult::class, 'employee_no','emp_no');
         return $this->hasOne(ExamResult::class, 'employee_no','emp_no');
     }
+    public function training_endorsement_employee(){
+        // return $this->hasMany(ExamResult::class, 'employee_no','emp_no');emp_no
+        return $this->hasOne(TrainingEndorsementEmployee::class, 'emp_no','emp_no');
+    }
 }

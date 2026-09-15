@@ -38,7 +38,7 @@
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Qualification / Certification Form</h5>
+                <h5 class="modal-title" id="staticBackdropLabel">Qualification / Validation Form</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -61,7 +61,7 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="">Operator Name:</label>
+                        <label for="">Employee Name:</label>
                         <select class="form-control select2bs4" style="width: 100%;" id="text_oper_emp_number" name="text_oper_emp_number" placeholder="Enter Employee Number">
                         </select>
                     </div>

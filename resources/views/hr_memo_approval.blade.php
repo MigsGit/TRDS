@@ -44,6 +44,12 @@
                                 </div>
                                 
                                 <div class="float-sm-right mr-2" hidden>
+                                    <button class="btn btn-warning" id="btnShowExportPDFModal">
+                                        <i class="fa fa-initial-icon"></i> Export PDF <br> Employee Skill Card
+                                    </button>
+                                </div>
+
+                                <div class="float-sm-right mr-2" hidden>
                                     <button class="btn btn-success" id="btnShowExportReportModal">
                                         <i class="fa fa-initial-icon"></i> Export <br> Inspector Skill Chart
                                     </button>
@@ -79,8 +85,9 @@
                                         <thead>
                                             <tr>
                                                 <th style="width: 10%;">Action</th>
+                                                <th hidden>Trainee Names</th>
                                                 <th style="width: 10%;">Status</th>
-                                                <th style="width: 15%;" class="text-center">Document No.</th>
+                                                <th style="width: 10%;" class="text-center">Document No.</th>
                                                 <th style="width: 10%;" class="text-center">Date Filed</th>
                                                 <th style="width: 10%;" class="text-center">Reason</th>
                                                 <th style="width: 15%;" class="text-center">Subject</th>
@@ -195,14 +202,14 @@
                                         <thead>
                                             <tr>
                                                 <th style="width: 5%;">Action</th>
-                                                {{-- <th style="width: 10%;">Number</th> --}}
+                                                <th style="width: 5%;">No.</th>
                                                 <th style="width: 10%;">Employee No</th>
                                                 <th style="width: 10%;">Name</th>
                                                 <th style="width: 10%;">Position</th>
                                                 <th style="width: 10%;">Department</th>
                                                 <th style="width: 10%;">Section</th>
                                                 <th style="width: 10%;">Training Venue</th>
-                                                <th style="width: 10%;">Endorsement Date</th>
+                                                <th style="width: 5%;">Endorsement Date</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -500,13 +507,13 @@
                                 <label>Section/s</label>
                                 <select class="form-control select2bs5" name="section_export[]" id="selectSectionToExport" multiple required>
                                     <option value="" disabled selected>Select Section/s</option>
-                                    <option value="TSF1">TS-F1</option>
-                                    <option value="TSF3">TS-F3</option>
+                                    <option value="TS-F1">TS-F1</option>
+                                    <option value="TS-F3">TS-F3</option>
                                     <option value="CN">CN</option>
-                                    <option value="CNF3">CN-F3</option>
-                                    <option value="PPDCN">PPD-CN</option>
-                                    <option value="PPDTS">PPD-TS</option>
-                                    <option value="PPDF3">PPD-F3</option>
+                                    <option value="CN-F3">CN-F3</option>
+                                    <option value="PPD-CN">PPD-CN</option>
+                                    <option value="PPD-TS">PPD-TS</option>
+                                    <option value="PPD-F3">PPD-F3</option>
                                     <option value="YF">YF</option>
                                 </select>
                             </div>

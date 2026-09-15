@@ -79,11 +79,11 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                     const correctItem = qData.answer_choices_question[0];
                     const userAnswerRaw = item.user_answer ? String(item.user_answer).trim() : '';
                     const userAnswers = userAnswerRaw
-                        ? userAnswerRaw.split(',').map(x => x.trim())
+                        ? userAnswerRaw.split(' || ').map(x => x.trim())
                         : [];
 
                     const correctAnswers = String(correctItem.answer || '')
-                        .split(',')
+                        .split(' || ')
                         .map(x => x.trim());
 
                     (item.choices || []).forEach(choice => {

@@ -5,6 +5,13 @@
 @section('content_page')
 
     <style>
+        table.table thead th{
+            text-align: center;
+            vertical-align: middle;
+        }
+        table.table tbody td{
+            vertical-align: middle;
+        }
         .exam-scroll-container {
             max-height: 80vh;
             overflow-y: auto;
@@ -60,6 +67,7 @@
                                                 <th>Status</th>
                                                 <th>Category</th>
                                                 <th>Exam Title</th>
+                                                <th>Description</th>
                                                 <th>Exam Instruction</th>
                                                 <th>Purpose</th>
                                                 <th>Department</th>
@@ -321,7 +329,7 @@
                 "processing" : false,
                 "serverSide" : true,
                 "responsive": true,
-                "order": [[3, "asc"],[3, "asc"]],
+                "order": [[4, "asc"]],
                 "language": {
                     "info": "Showing _START_ to _END_ of _TOTAL_ Exam Result",
                     "lengthMenu": "Show _MENU_ Exam Result",
@@ -352,6 +360,7 @@
                         },
                     },
                     { "data" : "exam_title"},
+                    { "data" : "description"},
                     { "data" : "exam_instruction"},
                     { "data" : "purpose"},
                     { "data" : "department"},
@@ -359,6 +368,12 @@
                     { "data" : "product_line"},
                     { "data" : "passing_score"}
                 ],
+                columnDefs: [
+                    {
+                        targets: 0, // Action column
+                        className: 'text-nowrap'
+                    }
+                ]
             });
 
             $(document).on('click', '.actionQuestionnaireDetailsForExamResult', function() {
@@ -389,17 +404,17 @@
                     { data: 'action' },
                     { data: 'exam_taken' },
                     { data: 'date_examination' },
-                    { data: 'exam_result_info',
-                            render: function (data) {
-                                return data ? data.employee_no : 'No Data';
-                            }
+                    { data: 'employee_no'   },
+                    { data: 'employee_name' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            const score = Number(row.score) || 0;
+                            const essayScore = Number(row.identification_essay_score) || 0;
+
+                            return score + essayScore;
+                        }
                     },
-                    { data: 'exam_result_info',
-                            render: function (data) {
-                                return data ? data.employee_name : 'No Data';
-                            }
-                    },
-                    { data: 'score' },
                     { data: 'remark' },
                     { data: 'rating' }
                 ]
