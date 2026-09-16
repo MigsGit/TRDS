@@ -745,8 +745,6 @@
             getApprovalStatusToggle(params)
         }
 
-
-
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
         $positionSelect.on('change', function () {
@@ -869,6 +867,10 @@
             '#text_tech_qcs_1st_certified_by',
             '#text_tech_qcs_2nd_certified_by',
             '#text_tech_approved_by',
+            //Supervisor
+            '#text_a_sep_trained_certified_by',
+            '#text_sep_trained_certified_by',
+            '#text_sep_approved_inspector',
 
         ]);
         // initSelectPassFail([

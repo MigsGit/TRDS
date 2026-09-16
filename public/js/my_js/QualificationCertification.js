@@ -106,7 +106,7 @@
         $('.operSave').addClass('d-none');
         $('.operApproved').addClass('d-none');
         $('.btnSaveInspector').addClass('d-none')
-        // $('#productLine').addClass('d-none');
+        $('#productLine').addClass('d-none');
         $('#seriesDesignation').text('Series Name');
         $('#dateOfTransfer').addClass('d-none');
         $('.techSave').addClass('d-none');
@@ -136,7 +136,7 @@
             }
         }
         if(positionCategory === 'Operator'){
-            // $('#productLine').removeClass('d-none');
+            $('#productLine').removeClass('d-none');
             $('#div_Oper').removeClass('d-none');
             $('.btn-link').removeClass('show');
             $('#collapseOneOper').removeClass('show');
