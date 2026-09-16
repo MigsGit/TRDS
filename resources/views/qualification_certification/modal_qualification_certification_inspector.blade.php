@@ -1,4 +1,4 @@
-<style>
+{{-- <style>
     .table-custom {
         border: 1px solid #000;
     }
@@ -20,7 +20,7 @@
     .col-criteria {
         width: 85%;
     }
-</style>
+</style> --}}
 <form id="formSubmit_Ins">
     <div class="accordion" id="accordionExampleInsp">
         <div class="accordion-item">
@@ -1229,6 +1229,7 @@
             </div>
             </div>
         </div>
+        </div> <!-- FIX: was missing - closes .accordion-item opened for "A LINE QUALITY CONTROL SECTION" -->
         <div class="accordion-item">
             <h2 class="card-header">
             <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoInsp" aria-expanded="false" aria-controls="collapseTwoInsp">
@@ -1453,6 +1454,7 @@
             </div>
             </div>
         </div>
+        </div> <!-- FIX: was missing - closes .accordion#accordionExampleInsp opened at the top of this file -->
         @include('qualification_certification.qc_training_items_table', [
             'tableId'        => 'tblTrainingItems_ins',
             'accordionParent' => '#accordionExampleInsp',
@@ -1515,7 +1517,7 @@
 
     <div class="modal-footer inspectorSave">
         <button type="button" class="btn btn-secondary btnSaveInspector" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
-        <button type="submit" class="btn btn-success btnSaveInspector" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>Save Inspector</button>
+        <button type="submit" class="btn btn-success btnSaveInspector" id="addNewInspector"><i class="fa-solid fa-file-import me-2" style="color: white"></i>Save Inspector</button>
     </div>
 
 </form>
