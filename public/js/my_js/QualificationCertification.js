@@ -108,13 +108,14 @@
         $('.btnSaveInspector').addClass('d-none')
         $('#div_Oper').addClass('d-none');
         $('#divInspector').addClass('d-none');
+         $('#divSupervisor').addClass('d-none');
+        $('#divTechnician').addClass('d-none');
         // $('#productLine').addClass('d-none');
         $('#seriesDesignation').text('Series Name');
         $('#dateOfTransfer').addClass('d-none');
         $('.techSave').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
-        $('#divSupervisor').addClass('d-none');
-        $('#divTechnician').addClass('d-none');
+
         $('.saveSep').addClass('d-none');
         if(positionCategory === 'Supervisor'){
             $('.saveSep').removeClass('d-none');
