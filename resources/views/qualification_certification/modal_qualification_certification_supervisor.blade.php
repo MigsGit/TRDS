@@ -368,7 +368,7 @@
 
     <div class="modal-footer saveSep">
         <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
-        <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUPVR SUBMIT</button>
+        <button type="submit" class="btn btn-success" id="addNewSupervisor"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUPVR SUBMIT</button>
     </div>
 
 </form>

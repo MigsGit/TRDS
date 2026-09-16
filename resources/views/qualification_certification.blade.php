@@ -242,9 +242,9 @@
                         <div class="d-none" id="div_Oper">
                               @include('qualification_certification.modal_qualification_certification_operator')
                         </div>
-                        {{-- <div class="d-none" id="divInspector">
+                        <div class="d-none" id="divInspector">
                               @include('qualification_certification.modal_qualification_certification_inspector')
-                        </div> --}}
+                        </div>
                         <div class="d-none" id="divTechnician">
                               @include('qualification_certification.modal_qualification_certification_technician')
                         </div>
@@ -940,6 +940,5 @@
             //  });
         });
     });
-
     </script>
 @endsection
