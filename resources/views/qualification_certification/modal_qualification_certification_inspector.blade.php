@@ -1,4 +1,4 @@
-{{-- <style>
+<style>
     .table-custom {
         border: 1px solid #000;
     }
@@ -20,7 +20,7 @@
     .col-criteria {
         width: 85%;
     }
-</style> --}}
+</style>
 <form id="formSubmit_Ins">
     <div class="accordion" id="accordionExampleInsp">
         <div class="accordion-item">
