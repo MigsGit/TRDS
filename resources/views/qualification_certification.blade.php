@@ -524,7 +524,7 @@
             // console.log('saveFormOper called',$form[0]);
             console.log($forms);
             var formArray = $forms.serializeArray();
-            // 2. Push extra custom field values manually
+            // 2. Push extra custom field values manually line date_of
             formArray.push({ name: 'text_alert_prod_sec', value: $('#text_alert_prod_sec').val() });
             formArray.push({ name: 'text_alert_prod_cc_sec', value: $('#text_alert_prod_cc_sec').val() });
             formArray.push({ name: 'text_select_position', value: $('#text_select_position').val() });
@@ -568,7 +568,7 @@
                 }
             },$forms);
         }
-                    
+
         const saveSupervisor = () => {
              Swal.fire({
                 title: 'Are you sure you want to save this request?',
@@ -588,10 +588,10 @@
                 }
             });
         }
-            
+
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
-    
+
             let position = $('#text_select_position').val();
             //         alert(position)
             // return;
@@ -615,7 +615,7 @@
                     saveInspectorDetails();
                     break;
                 case 'Operator':
-                    saveFormOper();
+                    saveFormOper(form.formSubmitOper);
                     break;
                 default:
                     alert('Unknown position selected. Please select a valid position.');
@@ -737,7 +737,6 @@
             getApprovalStatusToggle(params)
         }
         const selectInspectorValidation = () => {
-            getApprovalStatusToggle(params)
             let approvalStatus = $('#approval_status').val();
             let params = {
                 approvalStatus: approvalStatus,
@@ -745,8 +744,8 @@
             }
             getApprovalStatusToggle(params)
         }
-       
-           
+
+
 
         var $positionSelect = $('#text_select_position');
         var $positionSections = $('#divMH, #divTechnician, #divSEP, #divInspector, #div_Oper , .operSave, .operApproved','.inspectorSave');
