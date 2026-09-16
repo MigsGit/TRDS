@@ -1229,7 +1229,10 @@
             </div>
             </div>
         </div>
-        </div> <!-- FIX: was missing - closes .accordion-item opened for "A LINE QUALITY CONTROL SECTION" -->
+        <!-- NOTE: intentionally NOT closing .accordion#accordionExampleInsp here -
+             both accordion-items must stay nested inside the SAME .accordion wrapper
+             (they share data-parent="#accordionExampleInsp"). The wrapper is closed
+             once, after the second accordion-item, further below. -->
         <div class="accordion-item">
             <h2 class="card-header">
             <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoInsp" aria-expanded="false" aria-controls="collapseTwoInsp">
