@@ -894,7 +894,8 @@
             $table.find('tbody tr').each(function () {
                 var row    = $(this);
                 var itemId = row.find('.input-remark').attr('data-item-id');
-                if (itemId) {
+                var isSelected = row.find('.chk-select-item').is(':checked');
+                if (itemId && isSelected) {
                     var dayResults = {};
                     row.find('.input-result').each(function () {
                         dayResults['day_' + $(this).data('day')] = $(this).val();
@@ -907,6 +908,11 @@
                     });
                 }
             });
+
+            if (!matrixData.length) {
+                Swal.fire({ icon: 'warning', title: 'No rows selected', text: 'Please select at least one training item row to save.' });
+                return;
+            }
 
             var dayDates = {};
             $table.closest('.table-responsive')

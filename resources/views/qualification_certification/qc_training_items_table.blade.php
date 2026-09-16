@@ -23,6 +23,9 @@
                 <thead class="table-secondary text-center">
                     <tr>
                         <th rowspan="2" class="align-middle" style="width: 25%;">Training Items</th>
+                        <th rowspan="2" class="align-middle text-center" style="width: 5%;">
+                            <input type="checkbox" class="chk-select-all" id="chkSelectAll_{{ $tableId }}" title="Select All">
+                        </th>
                         <th colspan="5">Result</th>
                         <th rowspan="2" class="align-middle" style="width: 20%;">Remarks</th>
                     </tr>

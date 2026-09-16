@@ -76,7 +76,8 @@ class QualificationCertificationController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            $qcSlipsId = $request->input('qc_slips_id');
+
+           return $qcSlipsId = $request->input('qc_slips_id');
             $matrixData = $request->input('matrix', []);
             $dayDates   = $request->input('day_dates', []);  // e.g. ['day_1' => '2026-07-30', ...]
 
@@ -653,7 +654,7 @@ class QualificationCertificationController extends Controller
                     // }
                 }
             }
-            
+
 // text_sep_approved_inspector
                 //  // A. TRAINING / ORIENTATION (modal_qualification_certification_supervisor.blade.php)
                 //     'text_sep_training_orientation'     => 'nullable|array',
@@ -1181,6 +1182,9 @@ class QualificationCertificationController extends Controller
             }
             return $html;
         })
+        ->addColumn('select_item', function ($row) {
+            return '<input type="checkbox" class="chk-select-item" data-item-id="' . $row['id'] . '" value="' . $row['id'] . '">';
+        })
         ->addColumn('day_1', function ($row) {
             return '<input type="text" class="form-control form-control-sm text-center input-result"
                         data-item-id="' . $row['id'] . '"
@@ -1247,7 +1251,7 @@ class QualificationCertificationController extends Controller
                     data-item-id="' . $row['id'] . '"
                     value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
     })
-        ->rawColumns(['item_name', 'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
+        ->rawColumns(['item_name', 'select_item', 'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
         ->with('headerDates', $headerDates)
         ->make(true);
     }
