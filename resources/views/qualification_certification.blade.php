@@ -615,7 +615,7 @@
                     saveInspectorDetails();
                     break;
                 case 'Operator':
-                    saveFormOper();
+                    saveFormOper(form.formSubmitOper);
                     break;
                 default:
                     alert('Unknown position selected. Please select a valid position.');

@@ -705,7 +705,7 @@ class QualificationCertificationController extends Controller
                 ];
             }
             DB::commit();
-            $this->saveFormSendEmail($emailParams);
+            return $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -910,7 +910,7 @@ class QualificationCertificationController extends Controller
                 'f_qc_validation',
 
                 //Techician
-                'a_tech_eng_training_qualification',
+                // 'a_tech_eng_training_qualification',
             ];
             $qcSlip = QcSlip::with($arrRelation)
             ->where('id',$request->qcSlipsId)
