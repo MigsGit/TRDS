@@ -1,5 +1,6 @@
 // $(document).ready(function () {
-    /**
+
+/**
      * Synchronizes a group of checkboxes with a piped string value from the database.
      * @param {string} nameAttribute - The HTML name attribute of the checkbox group.
      * @param {string} rawDbValue - The piped string from your database (e.g., "Visual | Assembly").
