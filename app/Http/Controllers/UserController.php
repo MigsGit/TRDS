@@ -14,6 +14,7 @@ use App\Model\UserModule;
 use App\RapidXUser;
 use Auth;
 use DataTables;
+use App\Model\SystemOneSubconEmpInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -58,7 +59,7 @@ class UserController extends Controller
                 ->get();
 
         return DataTables::of($users)
-            
+
             ->addColumn('label1', function($user){
                 $result = "";
 
@@ -179,6 +180,7 @@ class UserController extends Controller
             $userRequestValidated = $userRequest->validated();
             $rapidxUserId = $userRequest->user_id;
             if(blank($rapidxUserId)){ //add
+
                 $userRequestValidated['created_at'] = now();
                 $userId = User::insertGetId(
                     $userRequestValidated
@@ -307,7 +309,7 @@ class UserController extends Controller
         return response()->json(['userCollection' => $userCollection]);
     }
     public function getSystemOneEmployeeDetails(Request $request){ //nmodify
-
+    // return response()->json(['token' => csrf_token()]);
         $search = $request->input('search');
     $page = $request->input('page', 1);
     $perPage = 20; // Load 20 results at a time
@@ -316,33 +318,33 @@ class UserController extends Controller
         return response()->json(['results' => [], 'pagination' => ['more' => false]]);
     }
 
-    // 1. Query the regular HRIS connection
-    $hrisQuery = DB::connection('mysql_systemone')
-        ->table('vw_employeeinfo')
+    //1. Query the regular HRIS connection
+    $hrisQuery = DB::connection('mysql_hris_subcon')
+        ->table('vw_pmi_subcon_hris_rapidx')
         ->where('EmpNo', 'LIKE', "%{$search}%")
         ->orWhere('EmpName', 'LIKE', "%{$search}%")
         ->select('EmpNo as id', DB::raw("CONCAT(EmpNo, ' - ', EmpName) as text"));
 
     // 2. Query the Subcontractor connection
-    $subconQuery = DB::connection('mysql_subcon')
-        ->table('vw_employeeinfo')
-        ->where('EmpNo', 'LIKE', "%{$search}%")
-        ->orWhere('EmpName', 'LIKE', "%{$search}%")
-        ->select('EmpNo as id', DB::raw("CONCAT(EmpNo, ' - ', EmpName) as text"));
+    // $subconQuery = DB::connection('mysql_subcon')
+    //     ->table('vw_employeeinfo')
+    //     ->where('EmpNo', 'LIKE', "%{$search}%")
+    //     ->orWhere('EmpName', 'LIKE', "%{$search}%")
+    //     ->select('EmpNo as id', DB::raw("CONCAT(EmpNo, ' - ', EmpName) as text"));
 
-    // 3. Combine them in memory safely using get() 
+    // 3. Combine them in memory safely using get()
     // (Fast because 'LIKE' filter narrows 20k down to just a few matches)
     $hrisResults = $hrisQuery->get();
-    $subconResults = $subconQuery->get();
+    // $subconResults = $subconQuery->get();
 
-    $mergedResults = $hrisResults->concat($subconResults)->unique('id');
+    // $mergedResults = $hrisResults->concat($subconResults)->unique('id');
 
     // 4. Manually slice the results for pagination based on the requested page
-    $totalCount = $mergedResults->count();
+    $totalCount = $hrisResults->count();
     $offset = ($page - 1) * $perPage;
-    
+
     // Slice only the 20 items needed for the current scroll page
-    $paginatedResults = $mergedResults->slice($offset, $perPage)->values();
+    $paginatedResults = $hrisResults->slice($offset, $perPage)->values();
 
     // 5. Check if there are more items left to stream to Select2
     $morePages = ($offset + $perPage) < $totalCount;
@@ -560,12 +562,23 @@ class UserController extends Controller
         $hris_data = DB::connection('mysql_systemone')
         ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
         $rapidxUser = RapidXUser::where('employee_number',$request->empId)->first();
+        //   $hris_data = SystemOneHrisSubcon::
+        // where('EmpNo', $request->empId)
+        // ->get();
         if(count($hris_data) > 0){
             return response()->json(['empInfo' => $hris_data, 'rapidxUser' => $rapidxUser]);
         }
         else{
-            $subcon_data = DB::connection('mysql_systemone')
-            ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
+              $subcon_data = SystemOneSubconEmpInfo::where('EmpStatus', 'Active')
+            ->where('EmpNo', $request->empId)
+            ->orderBy('DateHired', 'desc')
+            ->get();
+
+            // old code (Issue - No results returned.) - Boss Da
+            // return $subcon_data;
+            // $subcon_data = DB::connection('mysql_hris_subcon')
+            // ->select("SELECT * FROM vw_employeeinfo WHERE EmpNo = '".$request->empId."'");
+
             return response()->json(['empInfo' => $subcon_data,'rapidxUser' => $rapidxUser]);
         }
 

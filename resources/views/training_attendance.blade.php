@@ -2,6 +2,11 @@
 @extends($layout)
 @section('title', 'Training Request')
 @section('content_page')
+<style>
+    .card-body {
+       max-height: 80vh; overflow-y: auto;
+    }
+</style>
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->

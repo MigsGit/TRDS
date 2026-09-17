@@ -18,7 +18,7 @@ class CreateTrainingEndorsementsTable extends Migration
             $table->integer('status')->default(0)->comment('0 - pending, 1 - for Approval, 2 - Approved checker, 3 - approved approver');
             $table->unsignedBigInteger('training_request_id');
             $table->unsignedBigInteger('hr_memo_id');
-            $table->string('ctrl_no')->nullable();
+            $table->string('ctrl_no')->nullable()->unique();
             $table->string('date')->nullable();
             $table->longText('disapprove_remarks')->nullable();
             $table->string('disapprove_by')->nullable();
