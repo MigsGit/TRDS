@@ -213,6 +213,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_trainor_dropdown_details', 'getTrainorDropdownDetails')->name('get_trainor_dropdown_details');
         Route::get('/export_inspector_skill_chart', 'exportInspectorSkillChart')->name('export_inspector_skill_chart');
         Route::get('/view_emp_skill_card_pdf', 'viewEmpSkillCardPdf')->name('viewEmpSkillCardPdf');
+        Route::get('/export_employee_skill_card', 'exportEmployeeSkillCard')->name('export_employee_skill_card');
     });
 
     // =======================================================================================================
