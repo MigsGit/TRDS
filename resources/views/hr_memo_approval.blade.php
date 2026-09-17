@@ -43,14 +43,14 @@
                                     </button>
                                 </div>
                                 
-                                <div class="float-sm-right mr-2" hidden>
-                                    <button class="btn btn-warning" id="btnShowExportPDFModal">
+                                <div class="float-sm-right mr-2">
+                                    <button class="btn btn-warning" hidden id="btnShowExportPDFModal">
                                         <i class="fa fa-initial-icon"></i> Export PDF <br> Employee Skill Card
                                     </button>
                                 </div>
 
-                                <div class="float-sm-right mr-2" hidden>
-                                    <button class="btn btn-success" id="btnShowExportReportModal">
+                                <div class="float-sm-right mr-2">
+                                    <button class="btn btn-success" hidden id="btnShowExportReportModal">
                                         <i class="fa fa-initial-icon"></i> Export <br> Inspector Skill Chart
                                     </button>
                                 </div>
