@@ -12,6 +12,7 @@ use App\Model\Hr\HrMemoEmailRecipients;
 use App\Model\Hr\HrMemoTraineeDetails;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
 use App\Exports\InspectorSkillChart;
+use App\Exports\EmployeeSkillCard;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -701,60 +702,74 @@ class HrMemoController extends Controller
         );
     }
 
-    public function viewEmpSkillCardPdf()
+    public function exportEmployeeSkillCard(Request $request)
     {
-        $products = [
-            [
-                'name'=>'Adapter Type',
-                'level'=>1,
-                'certified'=>'JAN. 2026',
-                'valid'=>'JULY 2026',
-                'skills'=>[
-                    true,
-                    true,
-                    true,
-                    true,
-                    false,
-                    true,
-                    true,
-                ]
-            ],
+        // $request->validate([
+        //     'section_export'   => 'required',
+        // ]);
 
-            [
-                'name'=>'Connector Type',
-                'level'=>1,
-                'certified'=>'JAN. 2026',
-                'valid'=>'JULY 2026',
-                'skills'=>[
-                    true,
-                    true,
-                    true,
-                    false,
-                    true,
-                    true,
-                    true,
-                ]
-            ],
+        // $selectedSheets = $request->input('section_export', []);
 
-            [
-                'name'=>'Adapter Type 1',
-                'level'=>1,
-                'certified'=>'JAN. 2026',
-                'valid'=>'JULY 2026',
-                'skills'=>[
-                    true,
-                    true,
-                    true,
-                    true,
-                    false,
-                    true,
-                    true,
-                ]
-            ],
-        ];
-
-        $pdf = PDF::loadView('pdf/employee_skill_card/view_skill_card_pdf', compact('products'))->setPaper('A3', 'landscape');
-
-        return $pdf->stream();
+        return Excel::download(
+            new EmployeeSkillCard(),
+            'Employee Skill Card.xlsx'
+        );
     }
+
+    // public function viewEmpSkillCardPdf()
+    // {
+    //     $products = [
+    //         [
+    //             'name'=>'Adapter Type',
+    //             'level'=>1,
+    //             'certified'=>'JAN. 2026',
+    //             'valid'=>'JULY 2026',
+    //             'skills'=>[
+    //                 true,
+    //                 true,
+    //                 true,
+    //                 true,
+    //                 false,
+    //                 true,
+    //                 true,
+    //             ]
+    //         ],
+
+    //         [
+    //             'name'=>'Connector Type',
+    //             'level'=>1,
+    //             'certified'=>'JAN. 2026',
+    //             'valid'=>'JULY 2026',
+    //             'skills'=>[
+    //                 true,
+    //                 true,
+    //                 true,
+    //                 false,
+    //                 true,
+    //                 true,
+    //                 true,
+    //             ]
+    //         ],
+
+    //         [
+    //             'name'=>'Adapter Type 1',
+    //             'level'=>1,
+    //             'certified'=>'JAN. 2026',
+    //             'valid'=>'JULY 2026',
+    //             'skills'=>[
+    //                 true,
+    //                 true,
+    //                 true,
+    //                 true,
+    //                 false,
+    //                 true,
+    //                 true,
+    //             ]
+    //         ],
+    //     ];
+
+    //     $pdf = PDF::loadView('pdf/employee_skill_card/view_skill_card_pdf', compact('products'))->setPaper('A4', 'portrait');
+
+    //     return $pdf->stream();
+    // }
 }
