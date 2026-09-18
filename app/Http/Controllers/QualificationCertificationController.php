@@ -42,6 +42,7 @@ use App\Model\SystemOneSubconEmpInfo;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 
 class QualificationCertificationController extends Controller
@@ -72,51 +73,76 @@ class QualificationCertificationController extends Controller
         return collect((array) $value)->filter()->join($separator);
     }
 
+    /**
+     * Persist checked training item rows submitted from the QC/LQC training
+     * items matrix (select_item checkbox column in qc_training_items_table.blade.php).
+     *
+     * Payload contract:
+     *   qc_slips_id: int
+     *   items: [{ item_id, sub_description, item_remark, day_1..day_5 }]
+     *   day_dates: { day_1..day_5 } (optional — header date inputs)
+     */
     public function saveQcLqcTrainingItemsByQcSlipId(Request $request){
+        // return $request->all();
+        // $validator = Validator::make($request->all(), [
+        //     'qc_slips_id'              => 'required|integer|exists:qc_slips,id',
+        //     'items'                    => 'required|array|min:1',
+        //     'items.*.item_id'         => 'required|integer|exists:dropdown_master_details,id',
+        //     'items.*.sub_description' => 'nullable|string',
+        //     'items.*.item_remark'     => 'nullable|string',
+        //     'items.*.day_1'           => 'nullable|string',
+        //     'items.*.day_2'           => 'nullable|string',
+        //     'items.*.day_3'           => 'nullable|string',
+        //     'items.*.day_4'           => 'nullable|string',
+        //     'items.*.day_5'           => 'nullable|string',
+        //     'day_dates'                => 'nullable|array',
+        // ]);
+
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => $validator->errors()->first(),
+        //     ], 422);
+        // }
+
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
 
-           return $qcSlipsId = $request->input('qc_slips_id');
-            $matrixData = $request->input('matrix', []);
-            $dayDates   = $request->input('day_dates', []);  // e.g. ['day_1' => '2026-07-30', ...]
+            $qcSlipsId = $request->input('qc_slips_id');
+            $dayDates  = $request->input('day_dates', []);
 
+            foreach ($request->input('items', []) as $item) {
+                $itemId         = $item['item_id'];
+                $itemRemark     = $item['item_remark'] ?? null;
+                $subDescription = $item['sub_description'] ?? null;
 
-            // DB::transaction(function () use ($qcSlipsId, $matrixData, $dayDates) {
-                foreach ($matrixData as $row) {
-                    $itemId         = $row['training_item_id'];
-                    $remark         = $row['remark'] ?? null;
-                    $subDescription = $row['sub_description'] ?? null;
-                    $dayResults     = $row['day_results'] ?? [];
-
-                    foreach ($dayResults as $dayKey => $resultValue) {
-                        $dayNumber = (int) str_replace('day_', '', $dayKey);
-
-                        if ($dayNumber >= 1 && $dayNumber <= 5) {
-                            CLqcTrainingItemResult::updateOrCreate(
-                                [
-                                    'qc_slips_id'      => $qcSlipsId,
-                                    'training_item_id' => $itemId,
-                                    'day_number'       => $dayNumber,
-                                ],
-                                [
-                                    'result'          => $resultValue,
-                                    'item_remark'     => $remark,
-                                    'sub_description' => $subDescription,
-                                    'date'            => $dayDates['day_' . $dayNumber] ?? null,
-                                ]
-                            );
-                        }
-                    }
+                for ($dayNumber = 1; $dayNumber <= 5; $dayNumber++) {
+                    CLqcTrainingItemResult::updateOrCreate(
+                        [
+                            'qc_slips_id'      => $qcSlipsId,
+                            'training_item_id' => $itemId,
+                            'day_number'       => $dayNumber,
+                        ],
+                        [
+                            'result'          => $item['day_' . $dayNumber] ?? null,
+                            'item_remark'     => $itemRemark,
+                            'sub_description' => $subDescription,
+                            'date'            => $dayDates['day_' . $dayNumber] ?? null,
+                        ]
+                    );
                 }
-            // });
+            }
+
             DB::commit();
-            return response()->json([
-                'is_success' => 'true',
-                'message'    => 'Training items matrix saved successfully!',
-            ]);
+
+            return response()->json(['success' => true]);
         } catch (Exception $e) {
-            throw $e;
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
         }
     }
     public function saveQualificationCertificationOper(Request $request){
@@ -1160,6 +1186,7 @@ class QualificationCertificationController extends Controller
             return [
                 'id'              => $item->id,
                 'item_name'       => $item->dropdown_masters_details,
+                'training_item_id'       => $item->training_item_id,
                 'sub_description' => $item->c_lqc_training_item_results->first()->sub_description ?? '',
                 'day_1_result'    => $resultsByDay->get(1)->result ?? '',
                 'day_2_result'    => $resultsByDay->get(2)->result ?? '',
@@ -1183,7 +1210,8 @@ class QualificationCertificationController extends Controller
             return $html;
         })
         ->addColumn('select_item', function ($row) {
-            return '<input type="checkbox" class="chk-select-item" data-item-id="' . $row['id'] . '" value="' . $row['id'] . '">';
+            $isChecked = 'checked';
+            return '<input type="checkbox" class="chk-select-item" data-item-id="' . $row['training_item_id'] . '" value="' . $row['id'] . '">';
         })
         ->addColumn('day_1', function ($row) {
             return '<input type="text" class="form-control form-control-sm text-center input-result"

@@ -887,29 +887,28 @@
         // identified via data-table-id so both inspector and technician contexts
         // can share a single handler without ID collisions.
         $(document).on('click', '.btnSaveMatrix', function () {
-            var tableId    = $(this).data('table-id');
-            var $table     = $('#' + tableId);
-            var matrixData = [];
+            var tableId       = $(this).data('table-id');
+            var tableSelector = '#' + tableId;
+            var $table        = $(tableSelector);
+            var items         = [];
 
             $table.find('tbody tr').each(function () {
-                var row    = $(this);
-                var itemId = row.find('.input-remark').attr('data-item-id');
-                var isSelected = row.find('.chk-select-item').is(':checked');
-                if (itemId && isSelected) {
-                    var dayResults = {};
-                    row.find('.input-result').each(function () {
-                        dayResults['day_' + $(this).data('day')] = $(this).val();
-                    });
-                    matrixData.push({
-                        training_item_id: itemId,
-                        day_results:      dayResults,
-                        remark:           row.find('.input-remark').val(),
-                        sub_description:  row.find('.input-sub-desc').val() || null,
-                    });
-                }
+                var row  = $(this);
+                var $chk = row.find('.chk-select-item');
+                if (!$chk.length || !$chk.is(':checked')) { return; }
+
+                var item = {
+                    item_id:         $chk.data('item-id'),
+                    sub_description: row.find('.input-sub-desc').val() || null,
+                    item_remark:     row.find('.input-remark').val() || null,
+                };
+                row.find('.input-result').each(function () {
+                    item['day_' + $(this).data('day')] = $(this).val();
+                });
+                items.push(item);
             });
 
-            if (!matrixData.length) {
+            if (!items.length) {
                 Swal.fire({ icon: 'warning', title: 'No rows selected', text: 'Please select at least one training item row to save.' });
                 return;
             }
@@ -921,18 +920,27 @@
                 });
 
             $.ajax({
-                url:  "save_qc_lqc_training_items_by_qc_slip_id",
+                url:  'save_qc_lqc_training_items_by_qc_slip_id',
                 type: "POST",
                 data: {
                     _token:      "{{ csrf_token() }}",
                     qc_slips_id: $('#qc_slips_id').val(),
-                    matrix:      matrixData,
+                    items:       items,
                     day_dates:   dayDates,
                 },
                 success: function (response) {
-                    if (response.is_success === 'true') {
-                        Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Training items saved.' });
+                    if (response.success) {
+                        Swal.fire({ icon: 'success', title: 'Saved', text: 'Training items saved.' });
+                        if ($.fn.DataTable.isDataTable(tableSelector)) {
+                            $(tableSelector).DataTable().ajax.reload(null, false);
+                        }
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Save failed', text: response.message || 'Unable to save selected training items.' });
                     }
+                },
+                error: function (xhr) {
+                    var message = (xhr.responseJSON && xhr.responseJSON.message) || 'Unable to save selected training items.';
+                    Swal.fire({ icon: 'error', title: 'Save failed', text: message });
                 }
             });
         });
