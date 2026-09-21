@@ -1,6 +1,6 @@
 // $(document).ready(function () {
 
-    /**
+/**
      * Synchronizes a group of checkboxes with a piped string value from the database.
      * @param {string} nameAttribute - The HTML name attribute of the checkbox group.
      * @param {string} rawDbValue - The piped string from your database (e.g., "Visual | Assembly").
@@ -38,7 +38,7 @@
             },
             columns: [
                 { data: 'item_name', name: 'item_name' },
-                { data: 'select_item', name: 'select_item', orderable: false, searchable: false, className: 'text-center' },
+                { data: 'select_item',   name: 'select_item',   className: 'text-center' },
                 { data: 'day_1',   name: 'day_1',   className: 'text-center' },
                 { data: 'day_2',   name: 'day_2',   className: 'text-center' },
                 { data: 'day_3',   name: 'day_3',   className: 'text-center' },
@@ -111,13 +111,18 @@
         $('#seriesDesignation').text('Series Name');
         $('#dateOfTransfer').addClass('d-none');
         $('.techSave').addClass('d-none');
-        // $('.btnSaveMatrix').addClass('d-none');
+        $('.btnSaveMatrix').addClass('d-none');
+        $('.saveSep').addClass('d-none');
         $('#div_Oper').addClass('d-none');
         $('#divInspector').addClass('d-none');
         $('#divSupervisor').addClass('d-none');
-        $('#divSupervisor').addClass('d-none');
         $('#divTechnician').addClass('d-none');
-        $('.saveSep').addClass('d-none');
+        $('#divMH').addClass('d-none');
+
+        if(positionCategory === 'MH'){
+            $('#divMH').removeClass('d-none');
+            initTrainingItemsTable('#tblTrainingItems_mh');
+        }
         if(positionCategory === 'Supervisor'){
             $('.saveSep').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
@@ -1550,12 +1555,5 @@
     $(document).on('click', '.btnRemoveOperEmpMain', () => {
         $(this).closest('tr').remove();
         //  nmodifys
-    });
-
-    // "Select All" — only toggles select_item checkboxes on the current
-    // (server-side rendered) page of the training items table.
-    $(document).on('change', '.chk-select-all', function () {
-        var $table = $(this).closest('table');
-        $table.find('tbody .chk-select-item').prop('checked', $(this).is(':checked'));
     });
 // });

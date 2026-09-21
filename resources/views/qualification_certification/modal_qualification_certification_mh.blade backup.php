@@ -287,13 +287,42 @@
                         </div>
 
                         <h4 class="mt-3 mb-3">RESULT</h4>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="ms-3" for="">First Take:</label>
+                                <select class="form-control select2bs4" style="width: 100%;" name="text_mh_first_result" id="text_mh_first_result">
+                                    <option value="" selected disabled>Select Result</option>
+                                    <option value="PASSED">PASSED</option>
+                                    <option value="FAILED">FAILED</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="ms-3" for="">Second Take:</label>
+                                <select class="form-control select2bs4" style="width: 100%;" name="text_mh_second_result" id="text_mh_second_result">
+                                    <option value="" selected disabled>Select Result</option>
+                                    <option value="PASSED">PASSED</option>
+                                    <option value="FAILED">FAILED</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label class="ms-3" for="">Trained by:</label>
-                                        <select class="form-control select2bs4" style="width: 100%;" name="text_mh_first_trained_by" id="text_mh_first_trained_by" multiple>
-                                        </select>
+                                        <input class="form-control" type="text" id="text_mh_first_trained_by" name="text_mh_first_trained_by" list="list_display_empno" placeholder="Select Trained by">
+                                        <datalist id="list_display_empno"></datalist>
+
+                                        <input type="hidden" id="text_mh_first_trained_by_username" name="text_mh_first_trained_by_username">
+                                        <input type="hidden" id="text_mh_first_trained_by_email" name="text_mh_first_trained_by_email">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="ms-3" for="">Mentored by:</label>
+                                        <input class="form-control" type="text" id="text_mh_first_mentored_by" name="text_mh_first_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                        <datalist id="list_display_empno"></datalist>
                                     </div>
                                 </div>
 
@@ -302,13 +331,97 @@
                             <div class="col-md-6">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="ms-3" for="">Date:</label>
-                                        <input class="form-control" type="date" id="text_mh_first_date" name="text_mh_first_date">
+                                        <label class="ms-3" for="">Trained by:</label>
+                                        <input class="form-control" type="text" id="text_mh_second_trained_by" name="text_mh_second_trained_by" list="list_display_empno" placeholder="Select Trained by">
+                                        <datalist id="list_display_empno"></datalist>
+
+                                        <input type="hidden" id="text_mh_second_trained_by_username" name="text_mh_second_trained_by_username">
+                                        <input type="hidden" id="text_mh_second_trained_by_email" name="text_mh_second_trained_by_email">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="ms-3" for="">Mentored by:</label>
+                                        <input class="form-control" type="text" id="text_mh_second_mentored_by" name="text_mh_second_mentored_by" list="list_display_empno" placeholder="Select Mentored by">
+                                        <datalist id="list_display_empno"></datalist>
                                     </div>
                                 </div>
 
                             </div>
                         </div>
+
+                        <div class="row mb-5">
+                            <div class="col-md-3">
+                                <label class="ms-3" for="">Date:</label>
+                                <input class="form-control" type="date" id="text_mh_first_date" name="text_mh_first_date">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="ms-3" for="">Time:</label>
+                                <input class="form-control" type="time" id="text_mh_first_time" name="text_mh_first_time">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="ms-3" for="">Date:</label>
+                                <input class="form-control" type="date" id="text_mh_second_date" name="text_mh_second_date">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="ms-3" for="">Time:</label>
+                                <input class="form-control" type="time" id="text_mh_second_time" name="text_mh_second_time">
+                            </div>
+                        </div>
+
+                        <!-- <div class="row mb-2">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-3">
+                                <label class="" for="">Send Email Alert to:</label>
+                                <input class="form-control" type="text" id="text_alert_pw_sec_mh" name="text_alert_pw_sec_mh" list="list_display_empno" placeholder="Send email to">
+                                <datalist id="list_display_empno"></datalist>
+                                <input type="hidden" id="text_alert_pw_sec_mh_username" name="text_alert_pw_sec_mh_username">
+                                <input type="hidden" id="text_alert_pw_sec_mh_email" name="text_alert_pw_sec_mh_email">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="" for="">Add cc:</label>
+                                <input class="form-control" type="text" id="text_alert_pw_cc_sec_mh" name="text_alert_pw_cc_sec_mh" list="list_display_empno" placeholder="Cc">
+                                <datalist id="list_display_empno"></datalist>
+                                <input type="hidden" id="text_alert_pw_cc_sec_mh_username" name="text_alert_pw_cc_sec_mh_username">
+                                <input type="hidden" id="text_alert_pw_cc_sec_mh_email" name="text_alert_pw_cc_sec_mh_email">
+                            </div>
+                        </div> -->
+
+                        <div class="row mb-2">
+                            <div class="col-md-6"></div>
+
+                            <!-- PW Section: To -->
+                            <div class="col-md-3">
+                                <label for="text_alert_pw_sec_mh">Send Email Alert to:</label>
+                                <div id="selectedPwAlertRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
+                                <input class="form-control" type="text"
+                                    id="text_alert_pw_sec_mh"
+                                    name="text_alert_pw_sec_mh"
+                                    list="list_display_empno"
+                                    placeholder="Send email to">
+                                <datalist id="list_display_empno"></datalist>
+                                <input type="hidden" id="text_alert_pw_sec_mh_username" name="text_alert_pw_sec_mh_username">
+                                <input type="hidden" id="text_alert_pw_sec_mh_email" name="text_alert_pw_sec_mh_email">
+                            </div>
+
+                            <!-- PW Section: CC -->
+                            <div class="col-md-3">
+                                <label for="text_alert_pw_cc_sec_mh">Add cc:</label>
+                                <div id="selectedPwAlertCcRecipients" class="fs-5 mb-1"></div> <!-- Badge container -->
+                                <input class="form-control" type="text"
+                                    id="text_alert_pw_cc_sec_mh"
+                                    name="text_alert_pw_cc_sec_mh"
+                                    list="list_display_empno"
+                                    placeholder="Cc">
+                                <datalist id="list_display_empno"></datalist>
+                                <input type="hidden" id="text_alert_pw_cc_sec_mh_username" name="text_alert_pw_cc_sec_mh_username">
+                                <input type="hidden" id="text_alert_pw_cc_sec_mh_email" name="text_alert_pw_cc_sec_mh_email">
+                            </div>
+                        </div>
+
+                        <!-- ------------------------------------------------ -->
 
                     </div>
                 </div>

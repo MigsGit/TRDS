@@ -155,6 +155,7 @@
                                         <option value="Inspector">Inspector</option>
                                         <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
+                                        <option value="MH">MH</option>
                                     </select>
                                 </div>
                             </div>
@@ -250,6 +251,9 @@
                         </div>
                         <div class="d-none" id="divSupervisor">
                               @include('qualification_certification.modal_qualification_certification_supervisor')
+                        </div>
+                        <div class="d-none" id="divMH">
+                              @include('qualification_certification.modal_qualification_certification_mh')
                         </div>
                     </div>
                          <div class="modal-footer justify-content-end">
@@ -781,7 +785,8 @@
 
             switch (position) {
                 case 'MH':
-                    $('#divMH').removeClass('d-none');
+                    // $('#divMH').removeClass('d-none');
+                    selectInspectorValidation();
                     break;
                 case 'Technician':
                     // $('#divTechnician').removeClass('d-none');
@@ -871,6 +876,9 @@
             '#text_a_sep_trained_certified_by',
             '#text_sep_trained_certified_by',
             '#text_sep_approved_inspector',
+            //MH
+            '#text_mh_first_trained_by',
+
 
         ]);
         // initSelectPassFail([
@@ -887,31 +895,26 @@
         // identified via data-table-id so both inspector and technician contexts
         // can share a single handler without ID collisions.
         $(document).on('click', '.btnSaveMatrix', function () {
-            var tableId       = $(this).data('table-id');
-            var tableSelector = '#' + tableId;
-            var $table        = $(tableSelector);
-            var items         = [];
+            var tableId    = $(this).data('table-id');
+            var $table     = $('#' + tableId);
+            var matrixData = [];
 
             $table.find('tbody tr').each(function () {
-                var row  = $(this);
-                var $chk = row.find('.chk-select-item');
-                if (!$chk.length || !$chk.is(':checked')) { return; }
-
-                var item = {
-                    item_id:         $chk.data('item-id'),
-                    sub_description: row.find('.input-sub-desc').val() || null,
-                    item_remark:     row.find('.input-remark').val() || null,
-                };
-                row.find('.input-result').each(function () {
-                    item['day_' + $(this).data('day')] = $(this).val();
-                });
-                items.push(item);
+                var row    = $(this);
+                var itemId = row.find('.input-remark').attr('data-item-id');
+                if (itemId) {
+                    var dayResults = {};
+                    row.find('.input-result').each(function () {
+                        dayResults['day_' + $(this).data('day')] = $(this).val();
+                    });
+                    matrixData.push({
+                        training_item_id: itemId,
+                        day_results:      dayResults,
+                        remark:           row.find('.input-remark').val(),
+                        sub_description:  row.find('.input-sub-desc').val() || null,
+                    });
+                }
             });
-
-            if (!items.length) {
-                Swal.fire({ icon: 'warning', title: 'No rows selected', text: 'Please select at least one training item row to save.' });
-                return;
-            }
 
             var dayDates = {};
             $table.closest('.table-responsive')
@@ -920,27 +923,18 @@
                 });
 
             $.ajax({
-                url:  'save_qc_lqc_training_items_by_qc_slip_id',
+                url:  "save_qc_lqc_training_items_by_qc_slip_id",
                 type: "POST",
                 data: {
                     _token:      "{{ csrf_token() }}",
                     qc_slips_id: $('#qc_slips_id').val(),
-                    items:       items,
+                    matrix:      matrixData,
                     day_dates:   dayDates,
                 },
                 success: function (response) {
-                    if (response.success) {
-                        Swal.fire({ icon: 'success', title: 'Saved', text: 'Training items saved.' });
-                        if ($.fn.DataTable.isDataTable(tableSelector)) {
-                            $(tableSelector).DataTable().ajax.reload(null, false);
-                        }
-                    } else {
-                        Swal.fire({ icon: 'error', title: 'Save failed', text: response.message || 'Unable to save selected training items.' });
+                    if (response.is_success === 'true') {
+                        Swal.fire({ icon: 'success', title: 'Saved', text: response.message || 'Training items saved.' });
                     }
-                },
-                error: function (xhr) {
-                    var message = (xhr.responseJSON && xhr.responseJSON.message) || 'Unable to save selected training items.';
-                    Swal.fire({ icon: 'error', title: 'Save failed', text: message });
                 }
             });
         });
