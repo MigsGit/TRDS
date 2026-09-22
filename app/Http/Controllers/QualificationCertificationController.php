@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use  App\Model\Qc\OpApprover;
 use App\Http\Controllers\CommonController;
 use App\Http\Requests\ALqcTrainingQualificationRequest;
+use App\Http\Requests\AMhTrainingOrientationRequest;
 use App\Http\Requests\AOperProdTrainingOrientationRequest;
 use App\Http\Requests\BLqcCertificationRequest;
 use App\Http\Requests\BOpEnggSectionTrainingOrientationRequest;
@@ -21,6 +22,7 @@ use App\Http\Requests\SendEmailRequest;
 use App\Model\DropdownMaster;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
+use App\Model\Qc\AMhTrainingOrientation;
 use App\Model\Qc\AOperProdTrainingOrientation;
 use App\Model\Qc\ATechEngTrainingQualification;
 use App\Model\Qc\BLqcCertification;
@@ -123,7 +125,6 @@ class QualificationCertificationController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            // return $request->all();
             $rapidxEmpNo           = session('global_user');
             $dateTime              = now();
             $date                  = now()->toDateString();
@@ -201,8 +202,114 @@ class QualificationCertificationController extends Controller
             //UPDATE OPERATOR APPROVAL STATUS
             $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
             $currentPositionCategory = $qcSlipDetails->position_category;
+            $currentApprovalStatus = $qcSlipDetails->approval_status;
             $qcModelApprover = OpApprover::class;
-            //Inspector PROCESS
+            if($currentPositionCategory === 'MH'){
+                // ASepTrainingOrientationRequest
+                $operToApprovers = [];
+                $currentApprovalStatus = 'AMHTO';
+                $validatedData = app(AMhTrainingOrientationRequest::class)->validateResolved();
+                $aMhTrainingOrientation = [
+                    'qc_slips_id' => $qcSlipId,
+                    'mh_training_orientation'  => $this->joinSafe($request, 'text_mh_training_orientation'),
+                ];
+                AMhTrainingOrientation::updateOrCreate(
+                    ['qc_slips_id' => $qcSlipId],
+                    $aMhTrainingOrientation
+                );
+                if(filled($qcSlipId)){
+                    $currentApprovalStatus = $qcSlipDetails->approval_status;
+                    // --- A. TRAINING / ORIENTATION ---
+                    // if($currentApprovalStatus === 'ASEPTO'){
+                        $operToApprovers = [
+                            "qc_slips_id"   => $qcSlipId,
+                            'approval_status' => 'AMHTO',
+                            'decision_status' => 'APP',
+                            'first_approver'  => $this->joinSafe($request, 'text_mh_first_trained_by'),
+                            'first_date'      => $this->getSafe($request, 'text_mh_first_date'),
+                        ];
+                        $qcModelApprover::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'ASEPTO'],
+                            $operToApprovers
+                        );
+                    // }
+                        if($qcSlipDetails->approval_status === 'BMHQC'){
+                            $qcModelApprover::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'BMHQC'],
+                                [
+                                    "qc_slips_id"   => $qcSlipId,
+                                    'approval_status' => 'BMHQC',
+                                    'decision_status' => 'APP',
+                                ]
+                            );
+                            $countCLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId)->count();
+                            if($countCLqcTrainingItemResult === 0 ){
+                                return response()->json(['is_success' => 'false', "message" => "Please input the C Inspector Training / Certification And Validation Slip"],409);
+                            }
+                        }
+                    // }
+                }
+            }
+            // SUPERVISOR / ENGINEER / PLANNER PROCESS
+            if($currentPositionCategory === 'Supervisor'){
+                $validatedData = app(ASepTrainingOrientationRequest::class)->validateResolved();
+                $aSepTrainingOrientation = [
+                    'qc_slips_id' => $qcSlipId,
+                    'sep_training_orientation'  => $this->joinSafe($request, 'text_sep_training_orientation'),
+                ];
+                ASepTrainingOrientation::updateOrCreate(
+                    ['qc_slips_id' => $qcSlipId],
+                    $aSepTrainingOrientation
+                );
+
+                $operToApprovers = [];
+                $currentApprovalStatus = 'ASEPTO';
+                if(filled($qcSlipId)){
+                    $currentApprovalStatus = $qcSlipDetails->approval_status;
+
+                    // --- A. TRAINING / ORIENTATION ---
+                    $operToApprovers = [
+                    '   qc_slips_id' => $qcSlipId,
+                        'approval_status' => 'ASEPTO',
+                        'decision_status' => 'APP',
+                        'first_approver'  => $this->joinSafe($request, 'text_a_sep_trained_certified_by'),
+                        'first_date'      => $this->getSafe($request, 'text_a_sep_date'),
+                    ];
+                    $qcModelApprover::updateOrCreate(
+                        ['qc_slips_id' => $qcSlipId, 'approval_status' => 'ASEPTO'],
+                        $operToApprovers
+                    );
+                    // --- B. CERTIFICATION ---
+                    // if($currentApprovalStatus === 'BSEPC'){
+                    $operToApprovers = [
+                    '   qc_slips_id' => $qcSlipId,
+                        'approval_status' => 'BSEPC',
+                        'decision_status' => 'APP',
+                        'first_status'    => $this->getSafe($request, 'text_sep_theoretical_result'),
+                        'first_status_2'   => $this->getSafe($request, 'text_sep_handson_result'),
+                        'first_approver'  => $this->joinSafe($request, 'text_sep_trained_certified_by'),
+                        'first_date'      => $this->getSafe($request, 'text_sep_date'),
+                    ];
+                    $qcModelApprover::updateOrCreate(
+                        ['qc_slips_id' => $qcSlipId, 'approval_status' => 'BSEPC'],
+                        $operToApprovers
+                    );
+                    if($qcSlipDetails->approval_status == 'CLQCOQC'){
+                        $qcModelApprover::updateOrCreate(
+                        ['qc_slips_id' => $qcSlipId, 'approval_status' => 'CLQCOQC'],
+                            [
+                                "qc_slips_id"   => $qcSlipId,
+                                'approval_status' => 'CLQCOQC',
+                                'decision_status' => 'APP',
+                            ]
+                        );
+                        $countCLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId)->count();
+                        if($countCLqcTrainingItemResult === 0 ){
+                            return response()->json(['is_success' => 'false', "message" => "Please input the C Inspector Training / Certification And Validation Slip"],409);
+                        }
+                    }
+                }
+            }
             if($currentPositionCategory === 'Inspector'){ //ADD
                 $operToApprovers = [];
                 if(filled($qcSlipId)){ //UPDATE {
@@ -283,7 +390,6 @@ class QualificationCertificationController extends Controller
                     }
                 }
             }
-            //OPERATOR PROCESS
             if($currentPositionCategory === 'Operator'){  //ADD
                 $currentApprovalStatus = 'APRODTO';
                 if(filled($qcSlipId)){ //UPDATE OPERATOR DETAILS
@@ -498,7 +604,6 @@ class QualificationCertificationController extends Controller
                     }
                 }
             }
-            // TECHNICIAN PROCESS
             if($currentPositionCategory === 'Technician'){
                 $operToApprovers = [];
                 if(filled($qcSlipId)){
@@ -573,24 +678,7 @@ class QualificationCertificationController extends Controller
                     }
                 }
             }
-             if ($currentPositionCategory === 'Supervisor') {
-                $request->validate([
-                    // Shared header fields (qualification_certification.blade.php)
-                    // A. TRAINING / ORIENTATION (modal_qualification_certification_supervisor.blade.php)
-                    'text_sep_training_orientation'     => 'nullable|array',
-                    'text_sep_training_orientation.*'   => 'nullable|string',
-                    'text_a_sep_trained_certified_by'   => 'nullable|array',
-                    'text_a_sep_trained_certified_by.*' => 'nullable|string',
-                    'text_a_sep_date'                   => 'nullable|date',
 
-                    // B. CERTIFICATION (modal_qualification_certification_supervisor.blade.php)
-                    'text_sep_theoretical_result'      => 'nullable|in:PASSED,FAILED',
-                    'text_sep_handson_result'          => 'nullable|in:PASSED,FAILED',
-                    'text_sep_trained_certified_by'    => 'nullable|array',
-                    'text_sep_trained_certified_by.*'  => 'nullable|string',
-                    'text_sep_date'                     => 'nullable|date',
-                ]);
-            }
             //   $collectOperatorEmployees = collect($request->operator_employees)->map(function($rowOperatorEmployees)use ($qcSlipGetId){
             //     $collectOperatorEmployees = collect($this->getSafe($request, 'operator_employees', []))->map(function($rowOperatorEmployees)use ($qcSlipGetId){
             //          if($currentApprovalStatus === 'CTECHQCC'){
@@ -654,22 +742,6 @@ class QualificationCertificationController extends Controller
                     // }
                 }
             }
-
-// text_sep_approved_inspector
-                //  // A. TRAINING / ORIENTATION (modal_qualification_certification_supervisor.blade.php)
-                //     'text_sep_training_orientation'     => 'nullable|array',
-                //     'text_sep_training_orientation.*'   => 'nullable|string',
-                //     'text_a_sep_trained_certified_by'   => 'nullable|array',
-                //     'text_a_sep_trained_certified_by.*' => 'nullable|string',
-                //     'text_a_sep_date'                   => 'nullable|date',
-
-                //     // B. CERTIFICATION (modal_qualification_certification_supervisor.blade.php)
-                //     'text_sep_theoretical_result'      => 'nullable|in:PASSED,FAILED',
-                //     'text_sep_handson_result'          => 'nullable|in:PASSED,FAILED',
-                //     'text_sep_trained_certified_by'    => 'nullable|array',
-                //     'text_sep_trained_certified_by.*'  => 'nullable|string',
-                //     'text_sep_date'                     => 'nullable|date',
-
             //=== Update the Approval Status and Insert the new Approval Status and Emails to the Next Approvers
             $changeApprovalStatusParams = [
                 'qcSlipsId' => $qcSlipId,
@@ -706,7 +778,7 @@ class QualificationCertificationController extends Controller
                 ];
             }
             DB::commit();
-            return $this->saveFormSendEmail($emailParams);
+            $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -815,7 +887,7 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             DB::commit();
-           $this->commonController->sendEmail($emailData);
+        //    $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -1802,6 +1874,23 @@ class QualificationCertificationController extends Controller
     public function changeApprovalStatus($params){
         $selectedSection = str_contains($params['selectedSection'], 'PPD');
         $isMachineOperatorExists = $params['isMachineOperatorExists'];
+        if($params['selectPosition'] === 'MH'){
+                // CSEPHEAD
+            switch (true) {
+                case ($params['approval_status'] === 'PB'):
+                    $newStatus = 'BMHQC';
+                    $statusName = 'B Inspector Training Certification And Validation';
+                    break;
+                case ($params['approval_status'] === 'BMHQC'):
+                    $newStatus = 'LQCHEADAPP';
+                    $statusName = 'For Section Head Approval';
+                    break;
+                default:
+                    $newStatus = 'N/A';
+                    $statusName = 'N/A';
+                    break;
+            }
+        }
         if($params['selectPosition'] === 'Supervisor'){
                 // CSEPHEAD
             switch (true) {

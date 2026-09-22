@@ -120,8 +120,11 @@
         $('#divMH').addClass('d-none');
 
         if(positionCategory === 'MH'){
-            $('#divMH').removeClass('d-none');
             initTrainingItemsTable('#tblTrainingItems_mh');
+            $('#divMH').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
         }
         if(positionCategory === 'Supervisor'){
             $('.saveSep').removeClass('d-none');

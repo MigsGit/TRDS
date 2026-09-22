@@ -420,7 +420,6 @@
         $(document).on('click', '.btnRemoveOperEmpMain', function() {
             $(this).closest('tr').remove();
         });
-
         $(document).on('change', '.first_take_ins_sequence',function (e) {
             let qcSlipsIdData = $(this).attr('qc-slips-id');
             let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
@@ -474,7 +473,6 @@
             }
             saveFirstTakeInsSequence(params);
         })
-
         $(table.operator).on('click', '#btnGetQcSlipsId','tr',function (e) {
             e.preventDefault();
             let qcSlipsId = $(this).attr('qc-slips-id');
@@ -522,7 +520,6 @@
 
             $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
          });
-
         const saveFormOper = ($forms = null) => {
             // 1. Serialize standard form inputs into an array
             // console.log('saveFormOper called',$form[0]);
@@ -572,7 +569,6 @@
                 }
             },$forms);
         }
-
         const saveSupervisor = () => {
              Swal.fire({
                 title: 'Are you sure you want to save this request?',
@@ -592,7 +588,12 @@
                 }
             });
         }
-
+        $(document).on('submit', '#formSubmit_MH', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            // saveFormOper($form);
+            $('#modalSendEmail').modal();
+        });
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
 
@@ -601,7 +602,7 @@
             // return;
                switch (position) {
                 case 'MH':
-                    $('#divMH').removeClass('d-none');
+                    saveFormOper(form.formSubmitMh);
                     break;
                 case 'Technician':
                     saveFormOper(form.formSubmitTech);
@@ -661,6 +662,7 @@
                 }
             });
         });
+        
         const saveInspectorDetails = ($forms = null) => {
             // 1. Serialize standard form inputs into an array
             var $form = form.formSubmitInspector ?? $forms;

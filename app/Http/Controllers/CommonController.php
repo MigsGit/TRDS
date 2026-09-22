@@ -525,8 +525,18 @@ class CommonController extends Controller
 
     public function getApprovalStatus($approvalStatus){
         try {
+            
              $spanColor = 'bg-danger';
              switch ($approvalStatus) {
+                //MH
+                case 'BMHQC':
+                    $newStatus = 'BMHQC';
+                    $statusName = 'B Inspector Training Certification And Validation';
+                    break;
+                case 'LQCHEADAPP':
+                    $newStatus = 'LQCHEADAPP';
+                    $statusName = 'For Section Head Approval';
+                break;
                 //TECHNICIAN
                 case 'ATECHENGTQ':
                     $newStatus = 'ATECHENGTQ';
@@ -780,7 +790,6 @@ class CommonController extends Controller
                 </body>
             </html>';
     }
-
     public function sendEmailTrainingEndorsement($details, $type)
     {
         // Send email to the approver

@@ -4,13 +4,13 @@
     
         <div class="accordion" id="accordionExampleMH">
             <div class="accordion-item">
-                <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-toggle="collapse" data-target="#collapseOneMH" aria-expanded="true" aria-controls="collapseOneMH">
+                <h2 class="card-header">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOneMH" aria-expanded="true" aria-controls="collapseOneMH">
                     <h5>PRODUCTION / WAREHOUSE SUPERVISOR (Training/Orientation)</h5>
                 </button>
                 </h2>
                 <div id="collapseOneMH" class="accordion-collapse collapse show" data-parent="#accordionExampleMH">
-                    <div class="accordion-body">
+                    <div class="card-body">
                         <div class="row mb-2">
                             <div class="col-md-1"></div>
 
