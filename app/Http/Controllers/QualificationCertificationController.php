@@ -981,9 +981,10 @@ class QualificationCertificationController extends Controller
                 'd_ppd_certification_completion',
                 'e_qc_validation_process',
                 'f_qc_validation',
-
                 //Techician
-                // 'a_tech_eng_training_qualification',
+                'a_tech_eng_training_qualification',
+                //MH
+                'a_mh_training_orientation',
             ];
             $qcSlip = QcSlip::with($arrRelation)
             ->where('id',$request->qcSlipsId)

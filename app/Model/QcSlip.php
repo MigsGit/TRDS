@@ -4,6 +4,7 @@ namespace App\Model;
 
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
+use App\Model\Qc\AMhTrainingOrientation;
 use App\Model\Qc\AOperProdTrainingOrientation;
 use App\Model\Qc\ATechEngTrainingQualification;
 use App\Model\Qc\BLqcCertification;
@@ -132,6 +133,9 @@ class QcSlip extends Model
     public function a_tech_eng_training_qualification()
     {
         return $this->hasOne(ATechEngTrainingQualification::class, 'qc_slips_id',  'id')->where('deleted_at');
+    }
+    public function a_mh_training_orientation (){
+        return $this->hasOne(AMhTrainingOrientation::class, 'qc_slips_id',  'id')->where('deleted_at');
     }
 
 

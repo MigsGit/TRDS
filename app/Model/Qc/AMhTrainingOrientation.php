@@ -13,4 +13,5 @@ class AMhTrainingOrientation extends Model
         'mh_training_orientation',
     ];
 
+ 
 }

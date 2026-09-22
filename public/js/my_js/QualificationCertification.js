@@ -1032,21 +1032,48 @@
             editSelectionsMap
         );
     }
+    const getEmployeeDetailsByEmpNoSelect2Mh = (params) => {
+        let response = params.response;
+
+        //MH
+        const amhto = response?.approversCollection?.AMHTO?.[0] ?? null;
+        const mhheadapp = response?.approversCollection?.MHHEADAPP?.[0] ?? null;
+
+        const amhtoToFirst = amhto?.first_approver_exploded ?? [];
+        const mhheadappToFirst = mhheadapp?.alert_prod_sec_exploded ?? [];
+
+        const mappedAmhtoToFirst = amhtoToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedMhheadappToFirst = mhheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        
+         // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        editSelectionsMap['#text_mh_first_trained_by'] = mappedAmhtoToFirst;
+        editSelectionsMap['#text_mh_approved_confirmed_by'] = mappedMhheadappToFirst;
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_mh_first_trained_by',
+                // '#text_mh_approved_confirmed_by',
+            ],
+            editSelectionsMap
+        );
+
+    }
     const getEmployeeDetailsByEmpNoSelect2Sep = (params) => {
         let response = params.response;
         const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
         const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
         const sepheadapp = response?.approversCollection?.SEPHEADAPP?.[0] ?? null;
+        
 
         const aseptoToFirst     = asepto?.first_approver_exploded   ?? [];
         const btechengcToFirst  = btechengc?.first_approver_exploded  ?? [];
         const sepheadappToFirst = sepheadapp?.alert_prod_sec_exploded  ?? [];
 
-
         const mappedAseptoToFirst = aseptoToFirst.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedBtechengcToFirst = btechengcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedSepheadappToFirst = sepheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
-
+       
 
          // 2. Assign those formatted arrays to their target selectors inside the map
         let editSelectionsMap = {};
@@ -1054,7 +1081,6 @@
         editSelectionsMap['#text_a_sep_trained_certified_by'] = mappedAseptoToFirst;
         editSelectionsMap['#text_sep_trained_certified_by'] = mappedBtechengcToFirst;
         editSelectionsMap['#text_sep_approved_inspector'] = mappedSepheadappToFirst;
-
 
         // 3. Initialize all employee selectors simultaneously
         initGetSystemOneEmployeeDetailsCombos(
@@ -1229,7 +1255,17 @@
                 6,
                 editSelectionsMap6
             );
+            if(positionCategory === 'MH'){
+                const mhTrainingOrientation = data.a_mh_training_orientation?.mh_training_orientation;
+                syncCheckboxesWithDb('text_mh_training_orientation', mhTrainingOrientation,form.formSubmitMh);
 
+                const amhto = response?.approversCollection?.AMHTO?.[0] ?? null;
+                form.formSubmitMh.find('#text_a_mh_date').val(amhto?.first_date ?? '');
+
+                getEmployeeDetailsByEmpNoSelect2Mh({
+                    response : response,
+                });
+            }
             if(positionCategory === 'Supervisor'){
                 const sepTrainingOrientation = data.a_sep_training_orientation?.sep_training_orientation;
                 syncCheckboxesWithDb('text_sep_training_orientation', sepTrainingOrientation,form.formSubmitSep);
