@@ -253,8 +253,8 @@
                         </div>
                     </div>
                          <div class="modal-footer justify-content-end">
-                            <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2" style="color: white d-none"></i>Disapproved</button>
-                            <button type="button" class="btn btn-success operApproved" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
+                            <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2"></i>Disapproved</button>
+                            <button type="button" class="btn btn-success operApproved  d-none" id="operApproved"><i class="fa-solid fa fa-thumbs-up me-2" style="color: white"></i> For your Conformance</button>
                         </div>
                 </div>
             </div>

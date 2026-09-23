@@ -188,19 +188,19 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('questionnaire') }}" class="nav-link">
+                            <a href="{{ route('blank') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Work Assignment</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('examDashboard') }}" class="nav-link">
+                            <a href="{{ route('blank') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>GRR Attributes Examination</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('examination_result') }}" class="nav-link">
+                            <a href="{{ route('blank') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>GRR Variables</p>
                             </a>

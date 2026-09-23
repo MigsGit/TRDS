@@ -119,13 +119,15 @@
         $('.saveSep').addClass('d-none');
         if(positionCategory === 'Supervisor'){
             $('.saveSep').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
             if(approvalStatus ==='CLQCOQC'){
                 // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
                 $('.btnSaveMatrix').removeClass('d-none');
             }
             initTrainingItemsTable('#tblTrainingItems_sep');
             $('#divSupervisor').removeClass('d-none');
-            $('#productLine').removeClass('d-none');
             if(approvalStatus === 'SEPHEADAPP'){
                 $('.saveSep').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
@@ -136,6 +138,7 @@
             }
         }
         if(positionCategory === 'Operator'){
+            $('#seriesDesignation').text('Designation');
             $('#productLine').removeClass('d-none');
             $('#div_Oper').removeClass('d-none');
             $('.btn-link').removeClass('show');
@@ -193,6 +196,7 @@
             initTrainingItemsTable('#tblTrainingItems_ins');
             $('#dateOfTransfer').removeClass('d-none');
             $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
             $('#divInspector').removeClass('d-none');
             $('.btnSaveInspector').removeClass('d-none');
             // $('#productLine').removeClass('d-none');
@@ -229,6 +233,10 @@
             }
         }
         if(positionCategory === 'Technician'){
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+
             if(approvalStatus ==='CLQCOQC'){
 
                 // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
@@ -236,8 +244,6 @@
             }
             initTrainingItemsTable('#tblTrainingItems_tech');
             $('#divTechnician').removeClass('d-none');
-            $('#dateOfTransfer').removeClass('d-none');
-            $('#seriesDesignation').text('Designation');
             $('.techSave').removeClass('d-none');
              initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
