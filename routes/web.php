@@ -13,6 +13,7 @@ use App\Http\Controllers\QualificationCertificationController;
 use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingEndorsementController;
+use App\Http\Controllers\TrainingRecordUpdateController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -84,6 +85,11 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/ETR', function () {
         return view('ETR');
     })->name('ETR');
+
+    Route::get('/TRU', function () {
+        return view('training_record_update');
+    })->name('TRU');
+
 
     // TRAINING ENDORSEMENT CONTROLLER
     Route::controller(TrainingEndorsementController::class)->group(function () {
@@ -297,7 +303,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_product_line', 'getProductLine')->name('get_product_line');
         Route::get('/get_employee_position', 'getEmployeePosition')->name('get_employee_position');
         Route::get('/get_employees', 'getEmployees')->name('get_employees');
-});
+    });
 
     Route::controller(ETRController::class)->group(function () {
         Route::get('view_employee_training_record', 'viewEmployeeTrainingRecord');
@@ -312,5 +318,17 @@ Route::middleware('checkSession')->group(function(){
         
     Route::controller(InspCertMatrixController::class)->group(function(){
         Route::get('/export-inspector-cert-matrix', 'exportInspectorCertMatrix')->name('export-inspector-cert-matrix');
+    });
+
+    Route::controller(TrainingRecordUpdateController::class)->group(function () {
+        Route::get('/get_type_of_trainings', 'getTypeOfTrainings')->name('get_type_of_trainings');
+        Route::get('/get_venues', 'getVenue')->name('get_venues');
+        Route::get('/get_employees', 'getEmployees')->name('get_employees');
+        Route::post('/save_training_record', 'saveTrainingRecord')->name('save_training_record');
+        Route::get('/dt_get_training_records', 'dtGetTrainingRecords');
+        Route::get('/get_training_record_by_id', 'getTrainingRecordById');
+        Route::get('/get_trainee_details', 'getTraineeDetails')->name('get_trainee_details');
+        Route::post('/delete_training_record', 'deleteTrainingRecord')->name('delete_training_record');
+        Route::post('/import_trainees', 'importTrainees')->name('import_trainees');
     });
 });
