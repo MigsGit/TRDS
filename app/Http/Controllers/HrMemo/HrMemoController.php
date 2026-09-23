@@ -12,6 +12,7 @@ use App\Model\Hr\HrMemoEmailRecipients;
 use App\Model\Hr\HrMemoTraineeDetails;
 use App\Model\Hr\HrMemoTraineeCategoryDetails;
 use App\Exports\InspectorSkillChart;
+use App\Exports\EmployeeSkillCard;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -335,8 +336,8 @@ class HrMemoController extends Controller
             $training_venue = DB::connection('mysql_systemone')->select($trainingVenueQuery);
 
             $hris = DB::connection('mysql_systemone')
-                ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
-
+                ->select($hrisQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? AND tbl_EmployeeInfo.EmpStatus = 1 LIMIT 1", [$empNo]);
+                
 
             if (!empty($hris)) {
                 return response()->json([
@@ -347,7 +348,7 @@ class HrMemoController extends Controller
 
             // fallback to subcon
             $subcon = DB::connection('mysql_subcon')
-                ->select($subconQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? LIMIT 1", [$empNo]);
+                ->select($subconQuery . " WHERE tbl_EmployeeInfo.EmpNo = ? AND tbl_EmployeeInfo.EmpStatus = 1 LIMIT 1", [$empNo]);
 
             return response()->json([
                 'emp_details' => $subcon,
@@ -384,7 +385,8 @@ class HrMemoController extends Controller
             'date_filed' => 'required',
             'to' => 'required',
             'cc' => 'required',
-            'trainee_details' => 'required'
+            'trainee_details' => 'required',
+            'prepared_by' => 'required'
         );
 
         $data = $request->all();
@@ -701,10 +703,74 @@ class HrMemoController extends Controller
         );
     }
 
-    public function viewEmpSkillCardPdf()
+    public function exportEmployeeSkillCard(Request $request)
     {
-        $pdf = PDF::loadView('view_skill_card_pdf', compact(''))->setPaper('A4', 'portrait');
+        // $request->validate([
+        //     'section_export'   => 'required',
+        // ]);
 
-        return $pdf->stream();
+        // $selectedSheets = $request->input('section_export', []);
+
+        return Excel::download(
+            new EmployeeSkillCard(),
+            'Employee Skill Card.xlsx'
+        );
     }
+
+    // public function viewEmpSkillCardPdf()
+    // {
+    //     $products = [
+    //         [
+    //             'name'=>'Adapter Type',
+    //             'level'=>1,
+    //             'certified'=>'JAN. 2026',
+    //             'valid'=>'JULY 2026',
+    //             'skills'=>[
+    //                 true,
+    //                 true,
+    //                 true,
+    //                 true,
+    //                 false,
+    //                 true,
+    //                 true,
+    //             ]
+    //         ],
+
+    //         [
+    //             'name'=>'Connector Type',
+    //             'level'=>1,
+    //             'certified'=>'JAN. 2026',
+    //             'valid'=>'JULY 2026',
+    //             'skills'=>[
+    //                 true,
+    //                 true,
+    //                 true,
+    //                 false,
+    //                 true,
+    //                 true,
+    //                 true,
+    //             ]
+    //         ],
+
+    //         [
+    //             'name'=>'Adapter Type 1',
+    //             'level'=>1,
+    //             'certified'=>'JAN. 2026',
+    //             'valid'=>'JULY 2026',
+    //             'skills'=>[
+    //                 true,
+    //                 true,
+    //                 true,
+    //                 true,
+    //                 false,
+    //                 true,
+    //                 true,
+    //             ]
+    //         ],
+    //     ];
+
+    //     $pdf = PDF::loadView('pdf/employee_skill_card/view_skill_card_pdf', compact('products'))->setPaper('A4', 'portrait');
+
+    //     return $pdf->stream();
+    // }
 }

@@ -21,7 +21,7 @@ const GetEmployeeDetails = (element, searchTerm, successCallback, errorCallback)
                     employmentStatus: item.EmpStatus,
                     hiringStatus: item.HiringStatus,
                     dateHired: item.DateHired,
-                    text: `${item.EmpNo} - ${item.EmpName}`,
+                    text: `${item.EmpNo} - ${decodeURIComponent(escape(item.EmpName))}`,
                 }))
             );
 

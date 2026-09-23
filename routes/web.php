@@ -16,6 +16,8 @@ use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRecordUpdateController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GrrSettingsController;
+use App\Http\Controllers\GrrQuestionnaireSettingsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -49,9 +51,9 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/hr_memo', function () {
         return view('hr_memo_approval');
     })->name('hr_memo');
-    Route::get('/qualification_certification', function () {
+    Route::get('/qualification_certification2', function () {
         return view('qualification_certification');
-    })->name('qualification_certification');
+    })->name('qualification_certification2');
 
     Route::get('/training_request_conformance', function () {
         return view('training_request_conformance');
@@ -90,6 +92,9 @@ Route::middleware('checkSession')->group(function(){
         return view('training_record_update');
     })->name('TRU');
 
+    Route::get('/grr_attributes_settings', function () {
+        return view('recertification/grr_attributes_settings');
+    })->name('grr_attributes_settings');
 
     // TRAINING ENDORSEMENT CONTROLLER
     Route::controller(TrainingEndorsementController::class)->group(function () {
@@ -213,6 +218,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_trainor_dropdown_details', 'getTrainorDropdownDetails')->name('get_trainor_dropdown_details');
         Route::get('/export_inspector_skill_chart', 'exportInspectorSkillChart')->name('export_inspector_skill_chart');
         Route::get('/view_emp_skill_card_pdf', 'viewEmpSkillCardPdf')->name('viewEmpSkillCardPdf');
+        Route::get('/export_employee_skill_card', 'exportEmployeeSkillCard')->name('export_employee_skill_card');
     });
 
     // =======================================================================================================
@@ -315,7 +321,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_dropdown_select_certpersonnel', 'getDropdownSelectCertPersonnel')->name('get_dropdown_select_certpersonnel');
         Route::get('/export_list_cert_personnel', 'exportListCertPersonnel')->name('export_list_cert_personnel');
         });
-        
+
     Route::controller(InspCertMatrixController::class)->group(function(){
         Route::get('/export-inspector-cert-matrix', 'exportInspectorCertMatrix')->name('export-inspector-cert-matrix');
     });
@@ -331,4 +337,21 @@ Route::middleware('checkSession')->group(function(){
         Route::post('/delete_training_record', 'deleteTrainingRecord')->name('delete_training_record');
         Route::post('/import_trainees', 'importTrainees')->name('import_trainees');
     });
+
+    Route::controller(GrrSettingsController::class)->group(function () {
+        Route::get('/view_grr_attributes', 'viewGrrAttributes')->name('view_grr_attributes');
+        Route::post('/add_grr_sample', 'addGrrSample')->name('add_grr_sample');
+        Route::get('/get_grr_attributes_by_id', 'getGrrAttributesById')->name('get_grr_attributes_by_id');
+        Route::post('/update_grr_status', 'updateGrrStatus')->name('update_grr_status');
+
+    });
+
+    Route::controller(GrrQuestionnaireSettingsController::class)->group(function () {
+        Route::get('/view_grr_questionnaire', 'viewGrrQuestionnaire')->name('view_grr_questionnaire');
+        Route::get('/get_grr_sample_by_id', 'getGrrSampleById')->name('get_grr_sample_by_id');
+        Route::post('/add_grr_questionnaire', 'addGrrQuestionnaire')->name('add_grr_questionnaire');
+        Route::get('/get_grr_questionnaire_by_id', 'getGrrQuestionnaireById')->name('get_grr_questionnaire_by_id');
+        Route::post('/update_grr_questionnaire_status', 'updateGrrQuestionnaireStatus')->name('update_grr_questionnaire_status');
+    });
+
 });

@@ -35,4 +35,9 @@ class TrainingEndorsement extends Model
         return $this->hasMany(TrainingEndorsementApprovals::class, 'training_endorsement_id', 'id')->whereNull('updated_at')->whereNull('deleted_at');
     }
 
+
+    // TRDS SUMMARY
+    public function get_training_endorsement_employees(){
+        return $this->hasMany(TrainingEndorsementEmployee::class, 'training_endorsement_id', 'id')->select(['emp_no','training_endorsement_id','training_request_detail_id']);
+    }
 }
