@@ -84,6 +84,7 @@
 <script src="{{ asset('public/js/my_js/ETR.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/ListOfCertPersonnel.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/InspectorCertificationMatrix.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/TrainingRecordUpdate.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/GrrAttributesSettings.js') }}?<?=time()?>"></script>
 
 

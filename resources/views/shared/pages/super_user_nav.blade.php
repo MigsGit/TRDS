@@ -171,6 +171,12 @@
                         </a>
                     </li>
                     {{-- @endif --}}
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('TRU') }}" class="nav-link">
+                        <i class="far fa-list-alt nav-icon"></i>
+                        <p>Training Record Update</p>
+                    </a>
+                </li>
 
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
