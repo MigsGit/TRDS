@@ -13,6 +13,7 @@ use App\Model\Hr\HrMemoTraineeCategoryDetails;
 use App\Model\QcSlip;
 use App\Model\ExamResult;
 use App\Model\TrainingEndorsement;
+use App\Model\TrainingRecordEmployee;
 
 class ETRController extends Controller
 {
@@ -208,10 +209,36 @@ class ETRController extends Controller
         });
 
         $data = $data->merge($query2);
+
+        $query3 = TrainingRecordEmployee::
+        with([
+            'employee_details',
+            // 'training_record',
+            'training_record' => function ($query) {
+                $query->whereNull('deleted_at'); // Eager-load the deleted training_record model
+            },
+            'training_record.venue_details',
+            'training_record.type_of_training_details'
+        ])
+        ->where('employee_no', $employeeNo)
+        ->whereNull('deleted_at')
+        ->whereHas('training_record')
+        ->get();
+
+        $query3->each(function ($item) {
+            $item->record_type = 'TrainingRecordEmployee';
+        });
+        $data = $data->merge($query3);
+
         return DataTables::collection($data)
             ->addColumn('trainingDate', function ($row) {
                 if (($row->record_type ?? null) === 'TrainingEndorsement') {
                     return $row->trainingDate ?? '';
+                }
+                if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
+                    return $row->training_record->start_date && $row->training_record->end_date
+                        ? $row->training_record->start_date . ' - ' . $row->training_record->end_date
+                        : '';
                 }
 
                 if ($row instanceof \App\Model\QcSlip) {
@@ -231,6 +258,9 @@ class ETRController extends Controller
                 if (($row->record_type ?? null) === 'TrainingEndorsement') {
                     return $row->title ?? '';
                 }
+                if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
+                    return $row->training_record->training_title ?? '';
+                }
 
                 if ($row instanceof \App\Model\QcSlip) {
                     return 'Qualification and Certification';
@@ -245,6 +275,9 @@ class ETRController extends Controller
                 if (($row->record_type ?? null) === 'TrainingEndorsement') {
                     return $row->seriesName ?? 'N/A';
                 }
+                if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
+                    return $row->series ?? 'N/A';
+                }
 
                 if ($row instanceof \App\Model\QcSlip) {
                     return optional(
@@ -258,6 +291,9 @@ class ETRController extends Controller
             ->addColumn('station', function ($row) {
                 if (($row->record_type ?? null) === 'TrainingEndorsement') {
                     return 'N/A';
+                }
+                if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
+                    return $row->station ?? 'N/A';
                 }
 
                 if ($row instanceof \App\Model\QcSlip) {
@@ -275,6 +311,9 @@ class ETRController extends Controller
                 if (($row->record_type ?? null) === 'TrainingEndorsement') {
                     return 'N/A';
                 }
+                if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
+                    return 'N/A';
+                }
 
                 if ($row instanceof \App\Model\QcSlip) {
                     $employee = $row->qc_slip_employees->first();
@@ -290,6 +329,9 @@ class ETRController extends Controller
                 if (($row->record_type ?? null) === 'TrainingEndorsement') {
                     return $row->objective ?? '';
                 }
+                if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
+                    return $row->training_record->objective ?? '';
+                }
 
                 return $row->objective ?? '';
             })
@@ -298,6 +340,14 @@ class ETRController extends Controller
                 if (($row->record_type ?? null) === 'TrainingEndorsement') {
                     return $row->trainor ?? '';
                 }
+                if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
+                    $trainer = "";
+                    foreach ($row->training_record->trainer_details as $trainor) {
+                        $trainer .= $trainor->FirstName . ' ' . $trainor->LastName . ', ';
+                    }
+                    return rtrim($trainer, ', ');
+                }
+                
 
                 if ($row instanceof \App\Model\QcSlip) {
                     return '';
@@ -320,12 +370,20 @@ class ETRController extends Controller
                     $data = $row->training_remarks ?? '';
                 }
 
+                if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
+                    return $row->training_record->remarks ?? '';
+                }
+
                 return $data ?? '';
             })
 
             ->addColumn('result', function ($row) {
                 if (($row->record_type ?? null) === 'TrainingEndorsement') {
                     return '<span class="badge badge-success">Passed</span>';
+                }
+
+                if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
+                    return '<span class="badge badge-secondary">N/A</span>';
                 }
 
                 if ($row instanceof \App\Model\QcSlip) {
@@ -368,12 +426,20 @@ class ETRController extends Controller
                     return $row->department ?? 'N/A';
                 }
 
+                if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
+                    return $row->training_record->venue_details->dropdown_masters_details ?? 'N/A';
+                }
+
                 return $row->training_venue ?? '';
             })
 
             ->addColumn('typeOfTraining', function ($row) {
                 if (($row->record_type ?? null) === 'TrainingEndorsement') {
                     return 'Training Unit';
+                }
+
+                if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
+                    return $row->training_record->type_of_training_details->dropdown_masters_details ?? 'N/A';
                 }
 
                 if ($row instanceof \App\Model\QcSlip) {

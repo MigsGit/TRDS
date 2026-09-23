@@ -7,10 +7,12 @@ use App\Model\SystemOneHrisSubcon;
 use App\Model\TrainingRecordEmployee;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TrainingRecord extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'training_records';
     protected $fillable = [
@@ -41,6 +43,10 @@ class TrainingRecord extends Model
 
     public function venue_details(){
         return $this->hasOne(DropdownMasterDetail::class, 'id', 'venue');
+    }
+
+    public function type_of_training_details(){
+        return $this->hasOne(DropdownMasterDetail::class, 'id', 'type_of_training');
     }
 
     public function trainee_details(){
