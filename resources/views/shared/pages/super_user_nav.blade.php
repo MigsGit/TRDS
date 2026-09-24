@@ -43,6 +43,13 @@
                     </a>
                 </li>
 
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('dropdown_maintenance') }}"  class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Dropdown Maintenance</p>
+                    </a>
+                </li>
+
                 <li class="nav-header font-weight-bold">Modules</li>
                 {{-- <li class="nav-item has-treeview">
                     <a href="{{ route('hr_memo') }}" class="nav-link">

@@ -1,8 +1,11 @@
 <?php
+use App\Http\Controllers\DropdownController;
 use App\Http\Controllers\ETRController;
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\ExaminationResultController;
 use App\Http\Controllers\ExamTitleController;
+use App\Http\Controllers\GrrQuestionnaireSettingsController;
+use App\Http\Controllers\GrrSettingsController;
 use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
 use App\Http\Controllers\InspCertMatrixController;
@@ -16,8 +19,6 @@ use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRecordUpdateController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\GrrSettingsController;
-use App\Http\Controllers\GrrQuestionnaireSettingsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -95,6 +96,10 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/grr_attributes_settings', function () {
         return view('recertification/grr_attributes_settings');
     })->name('grr_attributes_settings');
+
+    Route::get('/dropdown_maintenance', function () {
+        return view('dropdown_maintenance');
+    })->name('dropdown_maintenance');
 
     // TRAINING ENDORSEMENT CONTROLLER
     Route::controller(TrainingEndorsementController::class)->group(function () {
@@ -352,6 +357,15 @@ Route::middleware('checkSession')->group(function(){
         Route::post('/add_grr_questionnaire', 'addGrrQuestionnaire')->name('add_grr_questionnaire');
         Route::get('/get_grr_questionnaire_by_id', 'getGrrQuestionnaireById')->name('get_grr_questionnaire_by_id');
         Route::post('/update_grr_questionnaire_status', 'updateGrrQuestionnaireStatus')->name('update_grr_questionnaire_status');
+    });
+
+    Route::controller(DropdownController::class)->group(function(){
+        Route::get('/get_dropdown_types', 'get_dropdown_types')->name('get_dropdown_types');
+        Route::post('/save_dropdown_type', 'save_dropdown_type')->name('save_dropdown_type');
+        Route::get('/dt_get_dropdown_items', 'dt_get_dropdown_items')->name('dt_get_dropdown_items');
+        Route::post('/save_dropdown_items', 'save_dropdown_items')->name('save_dropdown_items');
+        Route::get('/get_dropdown_item_by_id', 'get_dropdown_item_by_id')->name('get_dropdown_item_by_id');
+        Route::post('/delete_dropdown_item', 'delete_dropdown_item')->name('delete_dropdown_item');
     });
 
 });
