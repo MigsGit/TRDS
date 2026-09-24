@@ -118,13 +118,21 @@
         $('#divSupervisor').addClass('d-none');
         $('#divTechnician').addClass('d-none');
         $('#divMH').addClass('d-none');
+        $('.btnSaveMatrix').addClass('d-none');
 
         if(positionCategory === 'MH'){
             initTrainingItemsTable('#tblTrainingItems_mh');
+            $('.btnMh').removeClass('d-none');
+            $('.btnSaveMatrix').removeClass('d-none');
             $('#divMH').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
             $('#seriesDesignation').text('Designation');
             $('#productLine').removeClass('d-none');
+
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.btnMh').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
         }
         if(positionCategory === 'Supervisor'){
             $('.saveSep').removeClass('d-none');
@@ -1037,7 +1045,7 @@
 
         //MH
         const amhto = response?.approversCollection?.AMHTO?.[0] ?? null;
-        const mhheadapp = response?.approversCollection?.MHHEADAPP?.[0] ?? null;
+        const mhheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
 
         const amhtoToFirst = amhto?.first_approver_exploded ?? [];
         const mhheadappToFirst = mhheadapp?.alert_prod_sec_exploded ?? [];
@@ -1053,7 +1061,7 @@
         initGetSystemOneEmployeeDetailsCombos(
             [
                 '#text_mh_first_trained_by',
-                // '#text_mh_approved_confirmed_by',
+                '#text_mh_approved_confirmed_by',
             ],
             editSelectionsMap
         );
@@ -1260,11 +1268,12 @@
                 syncCheckboxesWithDb('text_mh_training_orientation', mhTrainingOrientation,form.formSubmitMh);
 
                 const amhto = response?.approversCollection?.AMHTO?.[0] ?? null;
-                form.formSubmitMh.find('#text_a_mh_date').val(amhto?.first_date ?? '');
+                form.formSubmitMh.find('#text_mh_first_date').val(amhto?.first_date ?? '');
 
                 getEmployeeDetailsByEmpNoSelect2Mh({
                     response : response,
                 });
+                
             }
             if(positionCategory === 'Supervisor'){
                 const sepTrainingOrientation = data.a_sep_training_orientation?.sep_training_orientation;

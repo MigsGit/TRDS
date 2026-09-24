@@ -1590,13 +1590,12 @@ class QualificationCertificationController extends Controller
                 'op_approvers',
                 'op_approvers_pending',
                 'system_one_hris_subcon',
+                'qc_slip_employees',
+                'qc_slip_employees.system_one_hris_subcon',
             );
-
-
             if(filled($selectPosition) && $selectPosition != 'ALL'){
                 $data->where('position_category',$selectPosition);
             }
-
             if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
                 $data->where('section_category',$selectMhSortBySection);
             }
@@ -1633,37 +1632,21 @@ class QualificationCertificationController extends Controller
             }
             $data->whereNull('deleted_at');
             $data->orderBy('id','DESC');
-            $qclixx = $data;
-            $qcSlips = $data->get();
-            // Convert to a raw array for database handling
-            $allEmpIdsTo= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
-                ->flatten()                              // Flatten into a single layer of OpApprover models
-                ->pluck('alert_prod_sec')               // Pull out all the pipe-separated strings
-                ->filter()                               // Remove null or empty entries
-                ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
-                    return array_map('trim', explode('|', $item));
-                })
-                ->unique()                               // Drop duplicates
-                ->values()                               // Re-index array keys
-                ->all();                                 // Convert to a raw array for database handling
-            $allEmpIdsCc= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
-                ->flatten()                              // Flatten into a single layer of OpApprover models
-                ->pluck('alert_prod_cc_sec')               // Pull out all the pipe-separated strings
-                ->filter()                               // Remove null or empty entries
-                ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
-                    return array_map('trim', explode('|', $item));
-                })
-                ->unique()                               // Drop duplicates
-                ->values()                               // Re-index array keys
-                ->all();                                 // Convert to a raw array for database handling
+
+            // Keep the query as an Eloquent builder so Yajra v9 uses EloquentDataTable
+            // instead of CollectionDataTable and supports filterColumn().
+            $qcSlips = $data;
+            $allEmpIdsTo = []; // kept for later use if needed by other rows
+            $allEmpIdsCc = [];
 
             // 3. Fetch all matching names from HRIS into a quick-lookup map array
-            $arrHrisSubconEmpNo = array_merge($allEmpIdsTo,$allEmpIdsCc);
-            $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', $arrHrisSubconEmpNo)
+            // This is kept only for the rawStatus display; the search itself is handled at query level.
+            $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', array_merge($allEmpIdsTo, $allEmpIdsCc))
                 ->get()
                 ->pluck('empname', 'EmpNo');
 
-            return DataTables($qcSlips)
+           $qcSlipsDetails=  $qcSlips->get();
+                return DataTables($qcSlipsDetails)
             ->addColumn('rawAction',function ($row) use ($request){
                 $result = '';
                 $result .= '<center>';
@@ -1768,7 +1751,20 @@ class QualificationCertificationController extends Controller
                 $result .= '</br>';
                 return $result;
             })
-            ->rawColumns(['rawAction','rawStatus','created_by','created_at'])
+            ->addColumn('employee_names', function ($row) {
+                // Join names into a single string for rendering if needed
+                return $row->qc_slip_employees
+                    ->pluck('system_one_hris_subcon.empname')
+                    ->filter()
+                    ->implode(', ');
+            })
+          
+            // ->filterColumn('employee_names', function ($query, $keyword) {
+            //     $query->whereHas('qc_slip_employees.system_one_hris_subcon', function ($subQuery) use ($keyword) {
+            //         $subQuery->where('name', 'like', '%' . $keyword . '%');
+            //     });
+            // })
+            ->rawColumns(['rawAction','rawStatus','created_by','created_at','employee_names'])
             ->make(true);
         } catch (Exception $e) {
             throw $e;
@@ -2073,7 +2069,7 @@ class QualificationCertificationController extends Controller
         date_default_timezone_set('Asia/Manila');
         //Systemon HRIS / Subcon
 
-        $qcSlip = QcSlip::orderBy('id','desc')->whereYear('created_at',now())
+        $qcSlip = QcSlip::orderBy('id','desc')->whereMonth('created_at',now())
         ->where('position_category',$params['positionCategory'])
         ->whereNull('deleted_at')
         ->limit(1)->get(['control_no']);
@@ -2081,7 +2077,7 @@ class QualificationCertificationController extends Controller
         if(count( $qcSlip ) != 0){
             $currentCtrlNo = explode('-',$qcSlip[0]->control_no);
             $arrCtrNo		 	= end($currentCtrlNo);
-            $series 	 	= str_pad(($arrCtrNo),3,"0",STR_PAD_LEFT);
+            $series 	 	= str_pad(($arrCtrNo+1),3,"0",STR_PAD_LEFT);
             $currentCtrlNo = $params['section']."-".$params['selectSection']."-".date('m').date('y').'-'.$series;
 
         }else{

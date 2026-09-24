@@ -322,17 +322,19 @@
         <hr style="height: 5px; background-color: black; border: none;">
 
         <div class="col-md-6">
-            <label for="">Approved / Confirmed by:</label>
-            <input class="form-control" type="text" id="text_mh_approved_confirmed_by" name="text_mh_approved_confirmed_by" list="list_display_empno" placeholder="Select Certified by">
+            <label for="">Approved / Confirmed by:</label> 
+             <select class="form-control select2bs4" style="width: 100%;" name="text_mh_approved_confirmed_by" id="text_mh_approved_confirmed_by" multiple>
+            </select>
+            {{-- nmodify <input class="form-control" type="text" id="text_mh_approved_confirmed_by" name="text_mh_approved_confirmed_by" list="list_display_empno" placeholder="Select Certified by">
             <datalist id="list_display_empno"></datalist>
 
             <label for="" class="mt-1">Prodn / PPC-WHSE Sec. Head</label>
 
             <input type="hidden" id="text_mh_approved_confirmed_by_username" name="text_mh_approved_confirmed_by_username">
-            <input type="hidden" id="text_mh_approved_confirmed_by_email" name="text_mh_approved_confirmed_by_email">
+            <input type="hidden" id="text_mh_approved_confirmed_by_email" name="text_mh_approved_confirmed_by_email"> --}}
         </div>
 
-        <div class="modal-footer">
+        <div class="modal-footer btnMh d-none">
             <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
             <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>MH SUBMIT</button>
         </div>

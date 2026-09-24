@@ -108,6 +108,7 @@
                                                                 <th>Section</th>
                                                                 <th>Position</th>
                                                                 <th>Date Filed</th>
+                                                                <th class='d-none'>Emp Name</th>
                                                                 <!-- <th>Qualified by</th> -->
                                                                 {{-- <th>Certified by</th> --}}
                                                                 {{-- <th>Approved / Conformed by</th> --}}
@@ -358,6 +359,10 @@
                 { "data" : "section_category" },
                 { "data" : "position_category" },
                 { "data" : "created_at" },
+                { "data" : "employee_names",
+                    visible: false,    // Hides column from display
+                    searchable: true   // Keeps column indexed for searching
+                },
             ],
 
         });
@@ -880,8 +885,7 @@
             '#text_sep_approved_inspector',
             //MH
             '#text_mh_first_trained_by',
-
-
+            '#text_mh_approved_confirmed_by',
         ]);
         // initSelectPassFail([
         //     '#text_oa_1st_result_es_oper',

@@ -25,9 +25,7 @@ class AMhTrainingOrientationRequest extends FormRequest
     {
         return [
             'text_mh_training_orientation'     => 'required',
-            // 'text_mh_training_orientation.*'   => 'required|array',
             'text_mh_first_trained_by'   => 'required',
-            // 'text_mh_first_trained_by.*' => 'required|array',
             'text_mh_first_date'                   => 'required|date',
         ];
     }
