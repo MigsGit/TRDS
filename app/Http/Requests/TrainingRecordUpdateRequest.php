@@ -15,7 +15,7 @@ class TrainingRecordUpdateRequest extends FormRequest
     {
         $u_m_access = explode(',', session('global_user')->user_modules_id);
 
-        if(in_array('21', $u_m_access)){
+        if(in_array('21', $u_m_access)){ // 21 - Training Record Update on table user_module
             return true;
         }
         return false;
