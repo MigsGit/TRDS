@@ -1,5 +1,6 @@
 // $(document).ready(function () {
-    /**
+
+/**
      * Synchronizes a group of checkboxes with a piped string value from the database.
      * @param {string} nameAttribute - The HTML name attribute of the checkbox group.
      * @param {string} rawDbValue - The piped string from your database (e.g., "Visual | Assembly").
@@ -105,23 +106,40 @@
         $('.operSave').addClass('d-none');
         $('.operApproved').addClass('d-none');
         $('.btnSaveInspector').addClass('d-none')
-        $('#div_Oper').addClass('d-none');
-        $('#divInspector').addClass('d-none');
-        // $('#productLine').addClass('d-none');
+        $('#productLine').addClass('d-none');
         $('#seriesDesignation').text('Series Name');
         $('#dateOfTransfer').addClass('d-none');
         $('.techSave').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
+        $('#div_Oper').addClass('d-none');
+        $('#divInspector').addClass('d-none');
+        $('#divSupervisor').addClass('d-none');
         $('#divSupervisor').addClass('d-none');
         $('#divTechnician').addClass('d-none');
-
+        $('.saveSep').addClass('d-none');
         if(positionCategory === 'Supervisor'){
+            $('.saveSep').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            if(approvalStatus ==='CLQCOQC'){
+                // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
+                $('.btnSaveMatrix').removeClass('d-none');
+            }
             initTrainingItemsTable('#tblTrainingItems_sep');
             $('#divSupervisor').removeClass('d-none');
-            $('#productLine').removeClass('d-none');
+            if(approvalStatus === 'SEPHEADAPP'){
+                $('.saveSep').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                $('.operApproved').addClass('d-none');
+                $('.saveSep').addClass('d-none');
+            }
         }
         if(positionCategory === 'Operator'){
-            // $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
             $('#div_Oper').removeClass('d-none');
             $('.btn-link').removeClass('show');
             $('#collapseOneOper').removeClass('show');
@@ -178,6 +196,7 @@
             initTrainingItemsTable('#tblTrainingItems_ins');
             $('#dateOfTransfer').removeClass('d-none');
             $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
             $('#divInspector').removeClass('d-none');
             $('.btnSaveInspector').removeClass('d-none');
             // $('#productLine').removeClass('d-none');
@@ -194,9 +213,9 @@
                 $('.inspectorSave').removeClass('d-none')
             }
             if(approvalStatus ==='CLQCOQC'){
+
                 // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
                 $('.btnSaveMatrix').removeClass('d-none');
-
             }
 
             if( approvalStatus ==='LQCHEADAPP'){
@@ -214,10 +233,17 @@
             }
         }
         if(positionCategory === 'Technician'){
-            initTrainingItemsTable('#tblTrainingItems_tech');
-            $('#divTechnician').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
             $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+
+            if(approvalStatus ==='CLQCOQC'){
+
+                // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
+                $('.btnSaveMatrix').removeClass('d-none');
+            }
+            initTrainingItemsTable('#tblTrainingItems_tech');
+            $('#divTechnician').removeClass('d-none');
             $('.techSave').removeClass('d-none');
              initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
@@ -232,6 +258,10 @@
                 // $('.operSave').addClass('d-none');
                 $('.techSave').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
+            }
+              if(approvalStatus ==='OK'){
+                $('.operApproved').addClass('d-none');
+                $('.techSave').addClass('d-none');
             }
         }
     }
@@ -993,6 +1023,40 @@
             editSelectionsMap
         );
     }
+    const getEmployeeDetailsByEmpNoSelect2Sep = (params) => {
+        let response = params.response;
+        const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
+        const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
+        const sepheadapp = response?.approversCollection?.SEPHEADAPP?.[0] ?? null;
+
+        const aseptoToFirst     = asepto?.first_approver_exploded   ?? [];
+        const btechengcToFirst  = btechengc?.first_approver_exploded  ?? [];
+        const sepheadappToFirst = sepheadapp?.alert_prod_sec_exploded  ?? [];
+
+
+        const mappedAseptoToFirst = aseptoToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedBtechengcToFirst = btechengcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedSepheadappToFirst = sepheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+
+
+         // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        //A
+        editSelectionsMap['#text_a_sep_trained_certified_by'] = mappedAseptoToFirst;
+        editSelectionsMap['#text_sep_trained_certified_by'] = mappedBtechengcToFirst;
+        editSelectionsMap['#text_sep_approved_inspector'] = mappedSepheadappToFirst;
+
+
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_a_sep_trained_certified_by',
+                '#text_sep_trained_certified_by',
+                '#text_sep_approved_inspector',
+            ],
+            editSelectionsMap
+        );
+    }
     const getEmployeeDetailsByEmpNoSelect2Inspector = (params) => {
         let response = params.response;
         // Safe access: optional chaining prevents crash if approversCollection is missing from response
@@ -1008,12 +1072,9 @@
         const blqctc = approversCollection?.BLQCTC?.[0]  ?? null;
         const lqcheadapp = approversCollection?.LQCHEADAPP?.[0]  ?? null;
 
-        // const operApprovedConfirmedBy = rawOperApprovedConfirmedBy   ?? [];
         const alqctqToFirst            = alqctq?.first_approver_exploded   ?? [];
         const alqctqToFirstMentoredBy  = alqctq?.first_approver2_exploded  ?? [];
-
         const blqctcToFirst = blqctc?.first_approver_exploded  ?? [];
-
         const lqcheadappToFirst  = lqcheadapp?.alert_prod_sec_exploded  ?? [];
 
 
@@ -1160,6 +1221,22 @@
                 editSelectionsMap6
             );
 
+            if(positionCategory === 'Supervisor'){
+                const sepTrainingOrientation = data.a_sep_training_orientation?.sep_training_orientation;
+                syncCheckboxesWithDb('text_sep_training_orientation', sepTrainingOrientation,form.formSubmitSep);
+                const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
+                form.formSubmitSep.find('#text_a_sep_date').val(asepto?.first_date ?? '');
+
+                const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
+                form.formSubmitSep.find('#text_sep_date').val(btechengc?.first_date ?? '');
+                form.formSubmitSep.find('#text_sep_theoretical_result').val(btechengc?.first_status ?? '');
+                form.formSubmitSep.find('#text_sep_handson_result').val(btechengc?.first_status_2 ?? '');
+
+
+                getEmployeeDetailsByEmpNoSelect2Sep({
+                    response : response,
+                });
+            }
             if(positionCategory === 'Technician'){
                  //TECHNICIAN
                 let aTechEngTrainingQualification = data.a_tech_eng_training_qualification ?? [];
@@ -1198,7 +1275,6 @@
                 form.formSubmitInspector.find('#text_training_orientation_ins_21').val(aLqcTrainingQualification?.training_orientation_ins_21);
                 form.formSubmitInspector.find('#text_training_orientation_ins_54').val(aLqcTrainingQualification?.training_orientationns_54);
                 // dtInstance.ajax.url(`load_qc_lqc_training_items_by_qc_slip_id?qcSlipsId=${data.id}`).draw();
-
                 syncCheckboxesWithDb('text_training_orientation_inspector', trainingOrientationInspector,form.formSubmitInspector);
 
                 let paramsGetEmpNo = {

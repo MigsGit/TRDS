@@ -171,6 +171,49 @@
                         </a>
                     </li>
                     {{-- @endif --}}
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('TRU') }}" class="nav-link">
+                        <i class="far fa-list-alt nav-icon"></i>
+                        <p>Training Record Update</p>
+                    </a>
+                </li>
+
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-book-open"></i>
+                        <p>
+                            Recertification
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('grr_attributes_settings') }}" class="nav-link">
+                                <i class="fas fa-cogs nav-icon"></i>
+                                <p>GRR Attributes Settings</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('blank') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Work Assignment</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('blank') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>GRR Attributes Examination</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('blank') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>GRR Variables</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
                 <li class="nav-header font-weight-bold">Export</li>
                 <li class="nav-item has-treeview">
                     <a id="btnListCertPersonnel" class="nav-link">

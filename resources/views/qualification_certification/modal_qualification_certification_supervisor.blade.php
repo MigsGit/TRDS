@@ -366,9 +366,9 @@
     <p>2. Duration of ceritification activity should be done within 1 month period. (Training and orientation, theoretical exam and hands-on)</p>
     <p>3. Certification slip shall be accomplished by Section Head and submitted to TU along with the theoretical exam at the end of training for updating of ETR.</p>
 
-    <div class="modal-footer">
+    <div class="modal-footer saveSep">
         <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
-        <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUPVR SUBMIT</button>
+        <button type="submit" class="btn btn-success" id="addNewSupervisor"><i class="fa-solid fa-file-import me-2" style="color: white"></i>SUPVR SUBMIT</button>
     </div>
 
 </form>
