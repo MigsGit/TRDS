@@ -440,11 +440,17 @@
                     toastr.success('Dropdown item saved successfully.');
                 },
                 error: function (xhr) {
+                    $('#btnSaveDropdownItem').prop('disabled', false);
                     if(xhr.status == 422){
                         handleValidatorErrors(xhr.responseJSON.errors);
                     }
+
+                    if(xhr.status == 403){
+                        toastr.error('Super Admin or Admin privileges, along with specific module access, are required.', 'Access Denied');
+                        return;
+                    } 
+
                     toastr.error('Failed to save dropdown item.');
-                    $('#btnSaveDropdownItem').prop('disabled', false);
 
                 },
                 complete: function () {
