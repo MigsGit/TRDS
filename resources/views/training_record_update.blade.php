@@ -611,6 +611,9 @@
                 });
             });
 
+            $('#btnDownloadTemplate').on('click', function() {
+                window.location.href = '{{ asset("public/excel_template/tru_template.xlsx") }}'; // Replace with the actual path to your template file
+            });
         });
 
         $(document).on('click', '.btnEditTraining', function(){
