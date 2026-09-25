@@ -299,15 +299,43 @@
                                         Add Individual Trainee
                                     </label>
 
-                                    <small class="text-muted d-block mb-2">
+                                    <small class="text-muted d-block mb-3">
                                         Search an employee then press <b>Enter</b> to add.
                                     </small>
 
-                                    <input type="text" class="form-control" id="trainee" list="traineeList"
-                                        placeholder="Employee No. or Employee Name">
+                                    <!-- Employee Search -->
+                                    <div class="form-group">
+                                        <label class="small font-weight-bold text-muted">
+                                            EMPLOYEE
+                                        </label>
+                                        <input type="text" class="form-control" id="trainee" list="traineeList"
+                                            placeholder="Employee No. or Employee Name">
 
-                                    <datalist id="traineeList"></datalist>
+                                        <datalist id="traineeList"></datalist>
+                                    </div>
 
+                                    <!-- Station & Series -->
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label class="small font-weight-bold text-muted">
+                                                STATION
+                                            </label>
+                                            <input type="text" class="form-control" id="station" name="station"
+                                                placeholder="Enter Station">
+                                        </div>
+
+                                        <div class="form-group col-md-6">
+                                            <label class="small font-weight-bold text-muted">
+                                                SERIES
+                                            </label>
+                                            <input type="text" class="form-control" id="series" name="series"
+                                                placeholder="Enter Series">
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary btn-sm w-100" id="btnAddTrainee">
+                                        <i class="fas fa-plus mr-1"></i>
+                                        Add Trainee
+                                    </button>
                                 </div>
 
                                 <!-- Right -->
@@ -545,12 +573,19 @@
                 saveTrainingRecord(data);
             });
 
-            $('#trainee').on('keyup', function(e) {
-                e.preventDefault();
-                if(e.keyCode === 13){
-                    getTraineeDetails($(this).val());
-                }
-                // Add your change event logic here
+            // $('#trainee').on('keyup', function(e) {
+            //     e.preventDefault();
+            //     if(e.keyCode === 13){
+            //         getTraineeDetails($(this).val());
+            //     }
+            //     // Add your change event logic here
+            // });
+
+            $('#btnAddTrainee').on('click', function() {
+                let traineeId = $('#trainee').val();
+                let station = $('#station').val();
+                let series = $('#series').val();
+                getTraineeDetails(traineeId, station, series);
             });
 
             $('#btnClearTrainees').on('click', function() {
