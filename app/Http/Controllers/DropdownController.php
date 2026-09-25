@@ -43,8 +43,13 @@ class DropdownController extends Controller
         ->addColumn('action', function($row){
             $result = "";
             $result .="<center>";
-            $result .= '<button class="btn btn-sm btn-primary btnEditItem" data-id="'.$row->id.'">Edit</button>';
-            $result .= '<button class="btn btn-sm btn-danger ml-2 btnDeleteItem" data-id="'.$row->id.'">Delete</button>';
+            if(is_null($row->deleted_at)){
+                $result .= '<button class="btn btn-sm btn-primary btnEditItem" data-id="'.$row->id.'">Edit</button>';
+                $result .= '<button class="btn btn-sm btn-danger ml-2 btnChangeStatus" data-id="'.$row->id.'" data-status="0">Inactive</button>';
+            }
+            else{
+                $result .= '<button class="btn btn-sm btn-success ml-2 btnChangeStatus" data-id="'.$row->id.'" data-status="1">Activate</button>';  
+            }
             $result .="</center>";
             return $result;
         })
@@ -96,15 +101,15 @@ class DropdownController extends Controller
         ->where('id', $request->id)->whereNull('deleted_at')->first();
     }
 
-    public function delete_dropdown_item(Request $request){
+    public function change_status_dropdown_item(Request $request){
         DB::beginTransaction();
         try{
             DropdownMasterDetail::where('id', $request->id)->update([
-                'deleted_at' => NOW(),
+                'deleted_at' => $request->status == 0 ? NOW() : NULL,
                 'updated_by' => $_SESSION["rapidx_user_id"]
             ]);
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Dropdown item deleted successfully.']);
+            return response()->json(['success' => true, 'message' => 'Dropdown item status updated successfully.']);
         }catch(\Throwable $e){
             DB::rollback();
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
