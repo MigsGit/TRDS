@@ -459,13 +459,13 @@
             });
         }
 
-        function deleteDropdownItem(id) {
+        function changeStatusItem(id, status) {
             Swal.fire({
                 title: 'Are you sure?',
-                text: 'This dropdown item will be removed.',
+                text: 'This dropdown item will be ' + (status == 0 ? 'deactivated' : 'activated') + '.',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Yes, delete it'
+                confirmButtonText: 'Yes, ' + (status == 0 ? 'deactivate it' : 'activate it')
             }).then(function (result) {
                 if (!result.isConfirmed) {
                     return;
@@ -474,9 +474,9 @@
                 let typeId = $('#selectDropdownType').val();
 
                 $.ajax({
-                    url: "{{ route('delete_dropdown_item') }}",
+                    url: "{{ route('change_status_dropdown_item') }}",
                     type: 'POST',
-                    data: { id: id },
+                    data: { id: id, status: status },
                     beforeSend: function () {
                         // show loading state
                     },
@@ -485,10 +485,10 @@
                         dtDropdownItems.draw();
 
                         // show success message
-                        toastr.success('Dropdown item deleted successfully.');
+                        toastr.success('Dropdown item ' + (status == 0 ? 'deactivated' : 'activated') + ' successfully.');
                     },
                     error: function (xhr) {
-                        toastr.error('Failed to delete dropdown item.');
+                        toastr.error('Failed to proceed with dropdown item status change.');
                     }
                 });
             });
@@ -528,8 +528,8 @@
             openEditItemModal($(this).data('id'));
         });
 
-        $(document).on('click', '.btnDeleteItem', function () {
-            deleteDropdownItem($(this).data('id'));
+        $(document).on('click', '.btnChangeStatus', function () {
+            changeStatusItem($(this).data('id'), $(this).data('status'));
         });
 
         $('#modalDropdownType').on('hidden.bs.modal', function () {

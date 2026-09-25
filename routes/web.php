@@ -365,7 +365,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/dt_get_dropdown_items', 'dt_get_dropdown_items')->name('dt_get_dropdown_items');
         Route::post('/save_dropdown_items', 'save_dropdown_items')->name('save_dropdown_items');
         Route::get('/get_dropdown_item_by_id', 'get_dropdown_item_by_id')->name('get_dropdown_item_by_id');
-        Route::post('/delete_dropdown_item', 'delete_dropdown_item')->name('delete_dropdown_item');
+        Route::post('/change_status_dropdown_item', 'change_status_dropdown_item')->name('change_status_dropdown_item');
     });
 
 });
