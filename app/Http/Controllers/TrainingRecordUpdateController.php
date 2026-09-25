@@ -138,19 +138,19 @@ class TrainingRecordUpdateController extends Controller
 
     public function getTraineeDetails(Request $request){
         $data = SystemOneHrisSubcon::where('EmpNo', $request->EmpId)->first();
-        $qc_slip = QcSlipEmployee::with([
-            'qcSlip',
-            'get_station_to'
-        ])
-        ->where('employee_no', $request->EmpId)
-        ->whereHas('qcSlip') // This filters out records where qcSlip is null
-        ->whereNull('deleted_at')
-        ->orderBy('qc_slips_id', 'DESC')
-        ->first();
-        if(is_null($qc_slip)){
-            return response()->json(['success' => false, 'msg' => 'No QC slip found for this trainee.']);
-        }
-        return response()->json(['success' => true, 'data' => $data, 'qc_slip' => $qc_slip]);
+        // $qc_slip = QcSlipEmployee::with([
+        //     'qcSlip',
+        //     'get_station_to'
+        // ])
+        // ->where('employee_no', $request->EmpId)
+        // ->whereHas('qcSlip') // This filters out records where qcSlip is null
+        // ->whereNull('deleted_at')
+        // ->orderBy('qc_slips_id', 'DESC')
+        // // ->first();
+        // if(is_null($qc_slip)){
+        //     return response()->json(['success' => false, 'msg' => 'No QC slip found for this trainee.']);
+        // }
+        return response()->json(['success' => true, 'data' => $data]);
     }
 
     public function deleteTrainingRecord(Request $request){
@@ -182,39 +182,31 @@ class TrainingRecordUpdateController extends Controller
         $file = $request->file('file');
 
         $collections = Excel::toCollection(new TRUserImport, $file);
+        $importedData = collect($collections->first())->keyBy('employee_number');
+        $imported_emp_no = $importedData->keys()->toArray();
 
-        $imported_emp_no = collect($collections->first())->pluck('employee_number')->toArray();
-
-        $qc_slip = QcSlipEmployee::with([
-            'qcSlip' => function ($query) {
-                $query->select('id', 'series_name');
-            },
-            'get_station_to' => function ($query) {
-                $query->select('id', 'dropdown_masters_details');
-            }
-        ])
-        ->whereIn('employee_no', $imported_emp_no)
-        ->whereHas('qcSlip')
-        ->whereNull('deleted_at')
-        ->orderBy('qc_slips_id', 'DESC')
+        $data = SystemOneHrisSubcon::whereIn('EmpNo', $imported_emp_no)
         ->get([
-            'employee_no',
-            'qc_slips_id',
-            'station_to'
+            'EmpNo',
+            'empname',
+            'Deparment',
         ])
-        ->unique('employee_no')
+        ->unique('EmpNo')
         ->values()
-        ->map(function ($item) {
+        ->map(function ($item) use ($importedData) {
+            // Find matching record from imported Excel data
+            $excelRecord = $importedData->get($item->EmpNo);
+
             return [
                 'action'        => '<center><button type="button" class="btn btn-sm btn-danger btnRemoveTrainee"><i class="fas fa-times"></i></button></center>',
-                'empNo'         => $item->employee_info->EmpNo ?? '',
-                'empName'       => $item->employee_info->EmpName ?? '',
-                'empDept'       => $item->employee_info->Department ?? '',
-                'qcSlipStation' => $item->get_station_to->dropdown_masters_details ?? '',
-                'qcSlipSeries'  => $item->qcSlip->series_name ?? '',
+                'empNo'         => $item->EmpNo ?? '',
+                'empName'       => $item->empname ?? '',
+                'empDept'       => $item->Deparment ?? '',
+                'qcSlipStation' => $excelRecord['station'] ?? '',
+                'qcSlipSeries'  => $excelRecord['series'] ?? '',
             ];
         });
 
-        return response()->json(['success' => true, 'msg' => 'Employee details fetched successfully.', 'data' => $qc_slip]);
+        return response()->json(['success' => true, 'msg' => 'Employee details fetched successfully.', 'data' => $data]);
     }
 }

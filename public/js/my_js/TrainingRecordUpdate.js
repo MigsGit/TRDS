@@ -174,7 +174,7 @@ const getTrainingRecord = (trainingId) => {
     });
 }
 
-const getTraineeDetails = (EmpId) => {
+const getTraineeDetails = (EmpId, station, series) => {
     $.ajax({
         type: "GET",
         url: "get_trainee_details",
@@ -192,11 +192,11 @@ const getTraineeDetails = (EmpId) => {
 
             if(response.success){
                 data.action        = `<center><button type="button" class="btn btn-sm btn-danger btnRemoveTrainee"><i class="fas fa-times"></i></button></center>`;
-                data.empNo         = response.qc_slip.employee_info.EmpNo || "";
-                data.empName       = response.qc_slip.employee_info.EmpName || "";
-                data.empDept       = response.qc_slip.employee_info.Department || "";
-                data.qcSlipStation = response.qc_slip.get_station_to.dropdown_masters_details || "";
-                data.qcSlipSeries  = response.qc_slip.qc_slip.series_name || "";
+                data.empNo         = response.data.EmpNo || "";
+                data.empName       = response.data.empname || "";
+                data.empDept       = response.data.Deparment || "";
+                data.qcSlipStation = station || "N/A";
+                data.qcSlipSeries  = series || "N/A";
 
                 traineeArray.push(data);
 
@@ -209,6 +209,8 @@ const getTraineeDetails = (EmpId) => {
             }
 
             $('#trainee').val('');
+            $('#station').val('');
+            $('#series').val('');
         },
         error: function(xhr, status, error){
             console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
