@@ -152,6 +152,7 @@
                                     <label for="text_select_position">Select Position</label>
                                     <select class="form-control select2bs4" style="width: 100%;" name="text_select_position" id="text_select_position">
                                         <option value="" disabled>Select Position</option>
+                                        <option value="VisualOperator" >Visual Operator</option>
                                         <option value="Operator" >Operator</option>
                                         <option value="Inspector">Inspector</option>
                                         <option value="Technician">Technician</option>
@@ -255,6 +256,12 @@
                         </div>
                         <div class="d-none" id="divMH">
                               @include('qualification_certification.modal_qualification_certification_mh')
+                        </div>
+                        <div class="d-none" id="divMH">
+                              @include('qualification_certification.modal_qualification_certification_mh')
+                        </div>
+                        <div class="" id="divAllOperators">
+                              @include('qualification_certification.modal_qualification_certification_all_operators')
                         </div>
                     </div>
                          <div class="modal-footer justify-content-end">
