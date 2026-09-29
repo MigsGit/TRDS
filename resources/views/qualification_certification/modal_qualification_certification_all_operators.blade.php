@@ -85,11 +85,11 @@
             </div>
             <div class="accordion-item">
                 <h2 class="card-header">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOneOperators" aria-expanded="true" aria-controls="collapseOneOperators">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoOperators" aria-expanded="true" aria-controls="collapseTwoOperators">
                     <h5>3) PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS)</h5>
                 </button>
                 </h2>
-                <div id="collapseOneOperators" class="accordion-collapse collapse show" data-parent="#accordionExampleOperators">
+                <div id="collapseTwoOperators" class="accordion-collapse collapse show" data-parent="#accordionExampleOperators">
                     <div class="card-body">
                         <!-- ------------------------------------------------ -->
 
@@ -153,6 +153,12 @@
                                     <input class="form-control" type="time" id="text_pv2_time_operator" name="text_pv2_time_operator">
                                 </div>  
                             </div>
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="">Date:</label>
+                                    <input class="form-control" type="text" id="text_reason_disqualification" name="text_reason_disqualification">
+                                </div>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -164,13 +170,6 @@
             <label for="">Approved / Confirmed by:</label> 
              <select class="form-control select2bs4" style="width: 100%;" name="text_visual_approved_confirmed_by" id="text_visual_approved_confirmed_by" multiple>
             </select>
-            {{-- nmodify <input class="form-control" type="text" id="text_mh_approved_confirmed_by" name="text_mh_approved_confirmed_by" list="list_display_empno" placeholder="Select CONDUCTED BY">
-            <datalist id="list_display_empno"></datalist>
-
-            <label for="" class="mt-1">Prodn / PPC-WHSE Sec. Head</label>
-
-            <input type="hidden" id="text_mh_approved_confirmed_by_username" name="text_mh_approved_confirmed_by_username">
-            <input type="hidden" id="text_mh_approved_confirmed_by_email" name="text_mh_approved_confirmed_by_email"> --}}
         </div>
 
         <div class="modal-footer btnMh d-none">

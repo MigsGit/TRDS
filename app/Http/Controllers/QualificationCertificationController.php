@@ -196,6 +196,29 @@ class QualificationCertificationController extends Controller
             $currentPositionCategory = $qcSlipDetails->position_category;
             $currentApprovalStatus = $qcSlipDetails->approval_status;
             $qcModelApprover = OpApprover::class;
+            
+            if($currentPositionCategory === 'VisualOperator'){
+               return $visualOperatorValidation = [
+                    'text_sel_result1_operator'           => $this->getSafe($request, 'text_sel_result1_operator'),
+                    'text_sel_result2_operator'           => $this->getSafe($request, 'text_sel_result2_operator'),
+                    'text_sec1_certified_operator'        => $this->joinSafe($request, 'text_sec1_certified_operator'),
+                    'text_sec2_certified_operator'        => $this->joinSafe($request, 'text_sec2_certified_operator'),
+                    'text_sec1_date_operator'             => $this->getSafe($request, 'text_sec1_date_operator'),
+                    'text_sec2_date_operator'             => $this->getSafe($request, 'text_sec2_date_operator'),
+                    'text_sec1_time_operator'             => $this->getSafe($request, 'text_sec1_time_operator'),
+                    'text_sec2_time_operator'             => $this->getSafe($request, 'text_sec2_time_operator'),
+                    'text_pv_result1_operator'            => $this->getSafe($request, 'text_pv_result1_operator'),
+                    'text_pv_result2_operator'            => $this->getSafe($request, 'text_pv_result2_operator'),
+                    'text_pv1_certified_operator'         => $this->joinSafe($request, 'text_pv1_certified_operator'),
+                    'text_pv2_certified_operator'         => $this->joinSafe($request, 'text_pv2_certified_operator'),
+                    'text_pv1_date_operator'              => $this->getSafe($request, 'text_pv1_date_operator'),
+                    'text_pv2_date_operator'              => $this->getSafe($request, 'text_pv2_date_operator'),
+                    'text_pv1_time_operator'              => $this->getSafe($request, 'text_pv1_time_operator'),
+                    'text_pv2_time_operator'              => $this->getSafe($request, 'text_pv2_time_operator'),
+                    'text_reason_disqualification'        => $this->getSafe($request, 'text_reason_disqualification'),
+                    'text_visual_approved_confirmed_by'   => $this->joinSafe($request, 'text_visual_approved_confirmed_by'),
+                ];
+            }
             if($currentPositionCategory === 'MH'){
                 // ASepTrainingOrientationRequest
                 $operToApprovers = [];

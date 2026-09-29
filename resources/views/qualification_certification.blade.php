@@ -754,6 +754,7 @@
             }
             getApprovalStatusToggle(params)
         }
+        
         const selectInspectorValidation = () => {
             let approvalStatus = $('#approval_status').val();
             let params = {
