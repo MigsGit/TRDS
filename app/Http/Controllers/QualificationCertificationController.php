@@ -113,6 +113,165 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
+
+    /**
+     * NEW standalone endpoint (does not replace loadQcLqcTrainingItemsByQcSlipId).
+     * Loads the LQC training-items checklist scoped to a single qc_slips_id AND
+     * a position ("Visual Operator" | "Parts Prep" | "Machine Operator") so the
+     * 3 new position-specific tables can be tracked independently.
+     */
+    public function loadQcLqcTrainingItemsByPosition(Request $request){
+        $qcSlipsId = $request->input('qc_slips_id');
+        $position  = $request->input('position');
+
+        // Header dates keyed by day_number, scoped to this position
+        $headerDates = CLqcTrainingItemResult::where('qc_slips_id', $qcSlipsId)
+            ->where('position', $position)
+            ->whereNotNull('date')
+            ->orderBy('day_number')
+            ->get(['day_number', 'date'])
+            ->unique('day_number')
+            ->pluck('date', 'day_number');
+
+        $items = DropdownMasterDetail::with(['c_lqc_training_item_results' => function ($query) use ($qcSlipsId, $position) {
+            $query->where('qc_slips_id', $qcSlipsId)->where('position', $position);
+        }])
+        ->where('dropdown_masters_id', 8)
+        ->orderBy('id', 'asc')
+        ->get();
+
+        $data = $items->map(function ($item) {
+            $resultsByDay = $item->c_lqc_training_item_results->keyBy('day_number');
+            $firstResult  = $item->c_lqc_training_item_results->first();
+
+            return [
+                'id'              => $item->id,
+                'item_name'       => $item->dropdown_masters_details,
+                'sub_description' => $firstResult->sub_description ?? '',
+                'is_checked'      => $firstResult->is_checked ?? null,
+                'day_1_result'    => $resultsByDay->get(1)->result ?? '',
+                'day_2_result'    => $resultsByDay->get(2)->result ?? '',
+                'day_3_result'    => $resultsByDay->get(3)->result ?? '',
+                'day_4_result'    => $resultsByDay->get(4)->result ?? '',
+                'day_5_result'    => $resultsByDay->get(5)->result ?? '',
+                'item_remark'     => $firstResult->item_remark ?? '',
+            ];
+        });
+
+        return datatables()->of($data)
+        ->editColumn('item_name', function ($row) {
+            $html = '<strong>' . e($row['item_name']) . '</strong>';
+            $lower = strtolower($row['item_name']);
+            if (str_contains($lower, 'systems and procedure') || str_contains($lower, 'work instruction') || str_contains($lower,'point panel')) {
+                $html .= '<br><input type="text" class="form-control form-control-sm mt-1 input-sub-desc"
+                              data-item-id="' . $row['id'] . '"
+                              placeholder="Details..."
+                              value="' . e($row['sub_description']) . '">';
+            }
+            return $html;
+        })
+        ->addColumn('select_item', function ($row) {
+            $isChecked = ((int) $row['is_checked'] === 1) ? 'checked' : '';
+            return '<input type="checkbox" class="chk-select-item" '.$isChecked.' data-item-id="' . $row['id'] . '" value="' . $row['id'] . '">';
+        })
+        ->addColumn('day_1', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="1"
+                        value="' . e($row['day_1_result']) . '">';
+        })
+        ->addColumn('day_2', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="2"
+                        value="' . e($row['day_2_result']) . '">';
+        })
+        ->addColumn('day_3', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="3"
+                        value="' . e($row['day_3_result']) . '">';
+        })
+        ->addColumn('day_4', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="4"
+                        value="' . e($row['day_4_result']) . '">';
+        })
+        ->addColumn('day_5', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="5"
+                        value="' . e($row['day_5_result']) . '">';
+        })
+        ->addColumn('remarks', function ($row) {
+            return '<input type="text" class="form-control form-control-sm input-remark"
+                        data-item-id="' . $row['id'] . '"
+                        value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
+        })
+        ->rawColumns(['item_name','select_item','day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
+        ->with('headerDates', $headerDates)
+        ->make(true);
+    }
+
+    /**
+     * NEW standalone endpoint (does not replace saveQcLqcTrainingItemsByQcSlipId).
+     * Persists is_checked/result/sub_description/item_remark per position via updateOrCreate,
+     * matched on qc_slips_id + training_item_id + day_number + position so the 3 new
+     * position-specific matrices never collide with each other or with legacy rows.
+     */
+    public function saveQcLqcTrainingItemsByPosition(Request $request){
+        try {
+            date_default_timezone_set('Asia/Manila');
+            DB::beginTransaction();
+
+            $qcSlipsId  = $request->input('qc_slips_id');
+            $position   = $request->input('position');
+            $matrixData = $request->input('matrix', []);
+            $dayDates   = $request->input('day_dates', []); // e.g. ['day_1' => '2026-09-29', ...]
+
+            foreach ($matrixData as $row) {
+                $itemId         = $row['training_item_id'];
+                $remark         = $row['remark'] ?? null;
+                $subDescription = $row['sub_description'] ?? null;
+                $isChecked      = (isset($row['is_checked']) && (int) $row['is_checked'] === 1) ? 1 : null;
+                $dayResults     = $row['day_results'] ?? [];
+
+                foreach ($dayResults as $dayKey => $resultValue) {
+                    $dayNumber = (int) str_replace('day_', '', $dayKey);
+
+                    if ($dayNumber >= 1 && $dayNumber <= 5) {
+                            
+                        CLqcTrainingItemResult::updateOrCreate(
+                            [
+                                'qc_slips_id'      => $qcSlipsId,
+                                'training_item_id' => $itemId,
+                                'day_number'       => $dayNumber,
+                                'position'         => $position,
+                            ],
+                            [
+                                'result'          => $resultValue,
+                                'item_remark'     => $remark,
+                                'sub_description' => $subDescription,
+                                'is_checked'      => $isChecked,
+                                'date'            => $dayDates['day_' . $dayNumber] ?? null,
+                            ]
+                        );
+                    }
+                }
+            }
+
+            DB::commit();
+            return response()->json([
+                'is_success' => 'true',
+                'message'    => 'Training items matrix saved successfully!',
+            ]);
+        } catch (Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+
     public function saveQualificationCertificationOper(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');

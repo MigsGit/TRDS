@@ -63,6 +63,156 @@
         return dtInstance;
     };
 
+    // ==========================================================================
+    // NEW standalone position-specific training tables (Visual Operator / Parts
+    // Prep / Machine Operator). These are entirely separate from the legacy
+    // initTrainingItemsTable()/.btnSaveMatrix flow above, which is left intact.
+    // ==========================================================================
+
+    /**
+     * Shared initializer used by the 3 position-specific wrapper functions below.
+     * @param  {string} tableSelector  CSS ID selector for the target <table>.
+     * @param  {string} position       'Visual Operator' | 'Parts Prep' | 'Machine Operator'
+     * @param  {string} qcSlipsId      Optional explicit qc_slips_id override.
+     * @return {DataTables.Api|null}
+     */
+    const initPositionTrainingTable = (tableSelector, position, qcSlipsId) => {
+        var $table = $(tableSelector);
+        if (!$table.length) { return null; }
+
+        if ($.fn.DataTable.isDataTable(tableSelector)) {
+            $(tableSelector).DataTable().destroy();
+        }
+
+        var dtInstance = $table.DataTable({
+            processing: true,
+            serverSide: true,
+            paging:    false,
+            searching: false,
+            info:      false,
+            ordering:  false,
+            ajax: {
+                url:  'load_qc_lqc_training_items_by_position',
+                type: 'GET',
+                data: function (params) {
+                    params.qc_slips_id = qcSlipsId || $('#qc_slips_id').val() || '';
+                    params.position    = position;
+                }
+            },
+            columns: [
+                { data: 'item_name', name: 'item_name' },
+                { data: 'select_item',   name: 'select_item',   className: 'text-center' },
+                { data: 'day_1',   name: 'day_1',   className: 'text-center' },
+                { data: 'day_2',   name: 'day_2',   className: 'text-center' },
+                { data: 'day_3',   name: 'day_3',   className: 'text-center' },
+                { data: 'day_4',   name: 'day_4',   className: 'text-center' },
+                { data: 'day_5',   name: 'day_5',   className: 'text-center' },
+                { data: 'remarks', name: 'remarks' }
+            ]
+        });
+
+        dtInstance.on('xhr', function () {
+            var json = dtInstance.ajax.json();
+            if (json && json.headerDates) {
+                $.each(json.headerDates, function (dayNumber, dateValue) {
+                    $table.closest('.table-responsive')
+                        .find('.header-date-input[data-day="' + dayNumber + '"]')
+                        .val(dateValue || '');
+                });
+            }
+        });
+
+        return dtInstance;
+    };
+
+    // const initVisualOperatorTrainingTable = (qcSlipsId) => {
+    //     return initPositionTrainingTable('#tblTrainingItemsVisual', 'Visual Operator', qcSlipsId);
+    // };
+
+    const initPartsPrepTrainingTable = (qcSlipsId) => {
+        return initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Parts Prep', qcSlipsId);
+    };
+
+    const initMachineOperatorTrainingTable = (qcSlipsId) => {
+        return initPositionTrainingTable('#tblTrainingItemsMachine', 'Machine Operator', qcSlipsId);
+    };
+
+    /**
+     * Reads every row of a position-specific training table body into a plain
+     * array of row objects ready to be posted to save_qc_lqc_training_items_by_position.
+     * @param  {jQuery} $tableBody
+     * @return {Array<Object>}
+     */
+    const gatherPositionMatrixRows = ($tableBody) => {
+        var rows = [];
+        $tableBody.find('tr').each(function () {
+            var $row = $(this);
+            var $checkbox = $row.find('.chk-select-item');
+            if (!$checkbox.length) { return; }
+
+            var dayResults = {};
+            $row.find('.input-result').each(function () {
+                var $input = $(this);
+                dayResults['day_' + $input.data('day')] = $input.val();
+            });
+
+            rows.push({
+                training_item_id: $checkbox.data('item-id'),
+                is_checked:       $checkbox.is(':checked') ? 1 : null,
+                remark:           $row.find('.input-remark').val() || null,
+                sub_description:  $row.find('.input-sub-desc').val() || null,
+                day_results:      dayResults
+            });
+        });
+        return rows;
+    };
+
+    /**
+     * Generic save handler for any of the 3 new position-specific matrices.
+     * @param {string} tableSelector  CSS ID selector for the target <table>.
+     * @param {string} position       'Visual Operator' | 'Parts Prep' | 'Machine Operator'
+     * @param {string} qcSlipsId      Optional explicit qc_slips_id override.
+     */
+    const savePositionMatrix = (tableSelector, position, qcSlipsId) => {
+        var $table = $(tableSelector);
+        if (!$table.length) { return; }
+
+        var matrix   = gatherPositionMatrixRows($table.find('tbody'));
+        var dayDates = {};
+        $table.closest('.table-responsive').find('.header-date-input').each(function () {
+            dayDates['day_' + $(this).data('day')] = $(this).val();
+        });
+
+        ajaxRequest({
+            url: 'save_qc_lqc_training_items_by_position',
+            method: 'POST',
+            data: {
+                qc_slips_id: qcSlipsId || $('#qc_slips_id').val() || '',
+                position:    position,
+                matrix:      matrix,
+                day_dates:   dayDates
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            successCallback: function (response) {
+                toastr.success(response.message || 'Matrix saved successfully!');
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                toastr.error('Failed to save matrix.');
+            }
+        });
+    };
+
+    $(document).on('click', '.btnSavePositionMatrix', function () {
+        var $btn          = $(this);
+        var tableSelector = '#' + $btn.data('table-id');
+        var position      = $btn.data('position');
+
+        savePositionMatrix(tableSelector, position);
+    });
+
     function syncCheckboxesWithDb(nameAttribute, rawDbValue,$comboId=form.formSubmitOper) {
         // 1. Explode and clean your database values into an array of clean strings
         // If the database value is null/empty, fall back to an empty array
@@ -120,6 +270,11 @@
         $('#divMH').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
 
+        if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Visual Operator', $('#qc_slips_id').val());
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Part Prep', $('#qc_slips_id').val());
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'Machine Operator', $('#qc_slips_id').val());
+        }
         if(positionCategory === 'MH'){
             initTrainingItemsTable('#tblTrainingItems_mh');
             $('.btnMh').removeClass('d-none');

@@ -4,17 +4,18 @@
     $tableId        = $tableId        ?? 'tblTrainingItems_default';
     $accordionParent = $accordionParent ?? '#accordionExampleInsp';
     $collapseId     = 'collapseTrainingItems_' . $tableId;
+    $position       = $position       ?? 'Machine Operator';
 @endphp
 <div class="accordion-item">
     <h2 class="card-header">
     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{ $collapseId }}" aria-expanded="false" aria-controls="{{ $collapseId }}">
-        <h5>INSPECTOR TRAINING / CERTIFICATION AND VALIDATION SLIP</h5>
+        <h5>QC</h5>
     </button>
     </h2>
     <div id="{{ $collapseId }}" class="accordion-collapse collapse" data-parent="{{ $accordionParent }}">
     <div class="card-body">
         <div class="row">
-                <button style="float: right !important;" type="button" class="btn btn-success btnSaveMatrix" id="btnSaveMatrix_{{ $tableId }}" data-table-id="{{ $tableId }}"><i class="fa-solid fa fa-save me-2" style="color: white"></i> SaveMatrix</button>
+                <button style="float: right !important;" type="button" class="btn btn-success btnSavePositionMatrix" id="btnSaveMatrix_{{ $tableId }}" data-table-id="{{ $tableId }}" data-position="{{ $position }}"><i class="fa-solid fa fa-save me-2" style="color: white"></i> SaveMatrix</button>
         </div>
 
         <hr>

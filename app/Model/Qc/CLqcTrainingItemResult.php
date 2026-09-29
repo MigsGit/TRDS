@@ -18,9 +18,11 @@ class CLqcTrainingItemResult extends Model
     protected $fillable =[
         'qc_slips_id',
         'training_item_id',
+        'position',
         'day_number',   
         'result',
         'item_remark',
+        'is_checked',
         'sub_description',
         'date',
     ];
