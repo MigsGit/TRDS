@@ -64,15 +64,15 @@
     };
 
     // ==========================================================================
-    // NEW standalone position-specific training tables (Visual Operator / Parts
-    // Prep / Machine Operator). These are entirely separate from the legacy
+    // NEW standalone position-specific training tables (Production / Engineering
+    // / QC). These are entirely separate from the legacy
     // initTrainingItemsTable()/.btnSaveMatrix flow above, which is left intact.
     // ==========================================================================
 
     /**
      * Shared initializer used by the 3 position-specific wrapper functions below.
      * @param  {string} tableSelector  CSS ID selector for the target <table>.
-     * @param  {string} position       'Visual Operator' | 'Parts Prep' | 'Machine Operator'
+     * @param  {string} position       'Production' | 'Engineering' | 'QC'
      * @param  {string} qcSlipsId      Optional explicit qc_slips_id override.
      * @return {DataTables.Api|null}
      */
@@ -120,21 +120,31 @@
                         .val(dateValue || '');
                 });
             }
+            if (json && json.trainerValidations) {
+                $.each(json.trainerValidations, function (dayNumber, trainerRow) {
+                    var $dayScope = $table.find('[data-day="' + dayNumber + '"]');
+                    $dayScope.filter('.trainer-emp-no').val(trainerRow.trainer_emp_no || '');
+                    $dayScope.filter('.trainer-name-display').text(trainerRow.trainer_name || '');
+                    $dayScope.filter('.input-day-date').val(trainerRow.validation_date || '');
+                    $dayScope.filter('.input-day-time').val(trainerRow.validation_time || '');
+                    $dayScope.filter('.select-day-result').val(trainerRow.overall_result || '');
+                });
+            }
         });
 
         return dtInstance;
     };
 
-    // const initVisualOperatorTrainingTable = (qcSlipsId) => {
-    //     return initPositionTrainingTable('#tblTrainingItemsVisual', 'Visual Operator', qcSlipsId);
-    // };
+    const initVisualOperatorTrainingTable = (qcSlipsId) => {
+        return initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', qcSlipsId);
+    };
 
     const initPartsPrepTrainingTable = (qcSlipsId) => {
-        return initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Parts Prep', qcSlipsId);
+        return initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineering', qcSlipsId);
     };
 
     const initMachineOperatorTrainingTable = (qcSlipsId) => {
-        return initPositionTrainingTable('#tblTrainingItemsMachine', 'Machine Operator', qcSlipsId);
+        return initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', qcSlipsId);
     };
 
     /**
@@ -168,17 +178,41 @@
     };
 
     /**
+     * Reads the embedded Trainer Verification tfoot rows (Day 1-5) of a
+     * position-specific training table into a plain day-keyed object ready to
+     * be posted to save_qc_lqc_training_items_by_position as `trainer_days`.
+     * @param  {jQuery} $table
+     * @return {Object}
+     */
+    const gatherTrainerDays = ($table) => {
+        var trainerDays = {};
+        for (var day = 1; day <= 5; day++) {
+            trainerDays['day_' + day] = {
+                trainer_emp_no:  $table.find('.trainer-emp-no[data-day="' + day + '"]').val() || null,
+                trainer_name:    $table.find('.trainer-name-display[data-day="' + day + '"]').text().trim() || null,
+                validation_date: $table.find('.input-day-date[data-day="' + day + '"]').val() || null,
+                validation_time: $table.find('.input-day-time[data-day="' + day + '"]').val() || null,
+                overall_result:  $table.find('.select-day-result[data-day="' + day + '"]').val() || null
+            };
+        }
+        return trainerDays;
+    };
+
+    /**
      * Generic save handler for any of the 3 new position-specific matrices.
+     * Collects both the item-row matrix AND the embedded Trainer Verification
+     * fields (Day 1-5) in a single combined payload.
      * @param {string} tableSelector  CSS ID selector for the target <table>.
-     * @param {string} position       'Visual Operator' | 'Parts Prep' | 'Machine Operator'
+     * @param {string} position       'Production' | 'Engineering' | 'QC'
      * @param {string} qcSlipsId      Optional explicit qc_slips_id override.
      */
     const savePositionMatrix = (tableSelector, position, qcSlipsId) => {
         var $table = $(tableSelector);
         if (!$table.length) { return; }
 
-        var matrix   = gatherPositionMatrixRows($table.find('tbody'));
-        var dayDates = {};
+        var matrix      = gatherPositionMatrixRows($table.find('tbody'));
+        var trainerDays = gatherTrainerDays($table);
+        var dayDates    = {};
         $table.closest('.table-responsive').find('.header-date-input').each(function () {
             dayDates['day_' + $(this).data('day')] = $(this).val();
         });
@@ -187,10 +221,11 @@
             url: 'save_qc_lqc_training_items_by_position',
             method: 'POST',
             data: {
-                qc_slips_id: qcSlipsId || $('#qc_slips_id').val() || '',
-                position:    position,
-                matrix:      matrix,
-                day_dates:   dayDates
+                qc_slips_id:  qcSlipsId || $('#qc_slips_id').val() || '',
+                position:     position,
+                matrix:       matrix,
+                day_dates:    dayDates,
+                trainer_days: trainerDays
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -211,6 +246,88 @@
         var position      = $btn.data('position');
 
         savePositionMatrix(tableSelector, position);
+    });
+
+    /**
+     * Trainer barcode scan handler (Enter/KeyCode 13) for the embedded Trainer
+     * Verification row of any of the 3 new position-specific tables.
+     *
+     * STRICT COMPLETION VALIDATION RULE BEFORE SCANNING:
+     *   1. Every .chk-select-item checkbox in the active table must be checked.
+     *   2. Every .input-result for the scanned day_number must be filled.
+     * If either check fails, scanning is blocked, the input is cleared, and a
+     * SweetAlert warning is shown.
+     */
+    $(document).on('keypress', '.trainer-scan-input', function (e) {
+        if (e.which !== 13 && e.keyCode !== 13) { return; }
+        e.preventDefault();
+
+        var $input   = $(this);
+        var day      = $input.data('day');
+        var empNo    = $.trim($input.val());
+        var $table   = $input.closest('table');
+        var $tbody   = $table.find('tbody');
+
+        if (!empNo) { return; }
+
+        var allChecked = true;
+        $tbody.find('.chk-select-item').each(function () {
+            if (!$(this).is(':checked')) {
+                allChecked = false;
+                return false;
+            }
+        });
+
+        var allResultsFilled = true;
+        var $dayResultInputs = $tbody.find('.input-result[data-day="' + day + '"]');
+        if (!$dayResultInputs.length) { allResultsFilled = false; }
+        $dayResultInputs.each(function () {
+            if (!$.trim($(this).val())) {
+                allResultsFilled = false;
+                return false;
+            }
+        });
+
+        if (!allChecked || !allResultsFilled) {
+            $input.val('');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Incomplete Matrix',
+                text: 'Cannot scan Trainer ID: All row checkboxes and Day ' + day + ' item results must be completed first.'
+            });
+            return;
+        }
+
+        ajaxRequest({
+            url: 'get_employee_details_by_no',
+            method: 'GET',
+            data: { emp_no: empNo },
+            successCallback: function (response) {
+                if (!response || !response.emp_no) {
+                    $input.val('');
+                    Swal.fire({ icon: 'error', title: 'Not Found', text: 'No employee found for Trainer ID "' + empNo + '".' });
+                    return;
+                }
+
+                var now         = new Date();
+                var pad         = function (n) { return String(n).padStart(2, '0'); };
+                var currentDate = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+                var currentTime = pad(now.getHours()) + ':' + pad(now.getMinutes());
+
+                var $dayScope = $table.find('[data-day="' + day + '"]');
+                $dayScope.filter('.trainer-emp-no').val(response.emp_no);
+                $dayScope.filter('.trainer-name-display').text(response.name || '');
+                $dayScope.filter('.input-day-date').val(currentDate);
+                $dayScope.filter('.input-day-time').val(currentTime);
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                $input.val('');
+                Swal.fire({ icon: 'error', title: 'Scan Failed', text: 'Unable to look up Trainer ID.' });
+            }
+        });
+
+        $input.val('');
     });
 
     function syncCheckboxesWithDb(nameAttribute, rawDbValue,$comboId=form.formSubmitOper) {

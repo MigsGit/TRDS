@@ -6,7 +6,7 @@
             @include('qualification_certification.operator_visual_training_items_table', [
                 'tableId'        => 'tblTrainingItemsVisual',
                 'accordionParent' => '#accordionExampleVisual',
-                'position'       => 'Visual Operator',
+                'position'       => 'Production',
             ])
           
         </div>
@@ -14,14 +14,14 @@
           @include('qualification_certification.operator_partsprep_training_items_table', [
                 'tableId'        => 'tblTrainingItemsPartsPrep',
                 'accordionParent' => '#accordionExamplePartsPrep',
-                'position'       => 'Parts Prep',
+                'position'       => 'Engineering',
             ])
         </div>
         <div class="accordion" id="accordionExampleMachine">
           @include('qualification_certification.operator_machine_training_items_table', [
                 'tableId'        => 'tblTrainingItemsMachine',
                 'accordionParent' => '#accordionExampleMachine',
-                'position'       => 'Machine Operator',
+                'position'       => 'QC',
             ])
         </div>
         <div class="accordion" id="accordionExampleOperators">

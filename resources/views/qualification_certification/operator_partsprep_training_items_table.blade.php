@@ -4,7 +4,7 @@
     $tableId        = $tableId        ?? 'tblTrainingItems_default';
     $accordionParent = $accordionParent ?? '#accordionExampleInsp';
     $collapseId     = 'collapseTrainingItems_' . $tableId;
-    $position       = $position       ?? 'Parts Prep';
+    $position       = $position       ?? 'Engineering';
 @endphp
 <div class="accordion-item">
     <h2 class="card-header">
@@ -41,6 +41,50 @@
                 <tbody>
                     <!-- DataTables AJAX population -->
                 </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th colspan="2" class="text-end align-middle">Trainer ID (Scan):</th>
+                        @for ($day = 1; $day <= 5; $day++)
+                            <td class="text-center">
+                                <input type="text" class="form-control form-control-sm trainer-scan-input" data-day="{{ $day }}" data-position="{{ $position }}" placeholder="Scan Trainer ID">
+                                <input type="hidden" class="trainer-emp-no" data-day="{{ $day }}" value="">
+                                <div class="trainer-name-display small text-muted mt-1" data-day="{{ $day }}"></div>
+                            </td>
+                        @endfor
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="text-end align-middle">Validation Date:</th>
+                        @for ($day = 1; $day <= 5; $day++)
+                            <td class="text-center">
+                                <input type="date" class="form-control form-control-sm input-day-date" data-day="{{ $day }}">
+                            </td>
+                        @endfor
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="text-end align-middle">Validation Time:</th>
+                        @for ($day = 1; $day <= 5; $day++)
+                            <td class="text-center">
+                                <input type="time" class="form-control form-control-sm input-day-time" data-day="{{ $day }}">
+                            </td>
+                        @endfor
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="text-end align-middle">Overall Result:</th>
+                        @for ($day = 1; $day <= 5; $day++)
+                            <td class="text-center">
+                                <select class="form-control form-control-sm select-day-result" data-day="{{ $day }}">
+                                    <option value="">--</option>
+                                    <option value="Passed">Passed</option>
+                                    <option value="Failed">Failed</option>
+                                </select>
+                            </td>
+                        @endfor
+                        <td></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>

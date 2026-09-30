@@ -25,6 +25,11 @@ class CLqcTrainingItemResult extends Model
         'is_checked',
         'sub_description',
         'date',
+        'trainer_emp_no',
+        'trainer_name',
+        'validation_date',
+        'validation_time',
+        'overall_result',
     ];
 
     public function dropdown_master_details()

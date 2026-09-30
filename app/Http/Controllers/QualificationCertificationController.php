@@ -133,6 +133,15 @@ class QualificationCertificationController extends Controller
             ->unique('day_number')
             ->pluck('date', 'day_number');
 
+        // Existing Trainer Barcode Validation data (Day 1-5), scoped to this position,
+        // keyed by day_number so the front-end can re-populate the embedded trainer rows.
+        $trainerValidations = CLqcTrainingItemResult::where('qc_slips_id', $qcSlipsId)
+            ->where('position', $position)
+            ->orderBy('day_number')
+            ->get(['day_number', 'trainer_emp_no', 'trainer_name', 'validation_date', 'validation_time', 'overall_result'])
+            ->unique('day_number')
+            ->keyBy('day_number');
+
         $items = DropdownMasterDetail::with(['c_lqc_training_item_results' => function ($query) use ($qcSlipsId, $position) {
             $query->where('qc_slips_id', $qcSlipsId)->where('position', $position);
         }])
@@ -211,63 +220,100 @@ class QualificationCertificationController extends Controller
         })
         ->rawColumns(['item_name','select_item','day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
         ->with('headerDates', $headerDates)
+        ->with('trainerValidations', $trainerValidations)
         ->make(true);
     }
 
     /**
+     * NEW standalone endpoint. Looks up a scanned Trainer barcode/employee number
+     * against the HRIS/subcon employee view and returns the employee name so the
+     * front-end can auto-fill the Trainer Verification row without touching any
+     * legacy employee-lookup endpoint (e.g. get_system_one_employee_details).
+     */
+    public function getEmployeeDetailsByNo(Request $request){
+        $empNo = $request->input('emp_no');
+
+        if (blank($empNo)) {
+            return response()->json(['emp_no' => null, 'name' => null], 422);
+        }
+
+        $employee = SystemOneHrisSubcon::where('EmpNo', $empNo)->first();
+
+        if (!$employee) {
+            return response()->json(['emp_no' => null, 'name' => null], 404);
+        }
+
+        return response()->json([
+            'emp_no' => $employee->EmpNo,
+            'name'   => $employee->EmpName,
+        ]);
+    }
+
+    /**
      * NEW standalone endpoint (does not replace saveQcLqcTrainingItemsByQcSlipId).
-     * Persists is_checked/result/sub_description/item_remark per position via updateOrCreate,
-     * matched on qc_slips_id + training_item_id + day_number + position so the 3 new
+     * Persists is_checked/result/sub_description/item_remark AND the day-scoped
+     * Trainer Barcode Validation fields (trainer_emp_no/trainer_name/
+     * validation_date/validation_time/overall_result) directly into
+     * c_lqc_training_item_results via updateOrCreate(), matched on
+     * qc_slips_id + training_item_id + day_number + position so the 3 new
      * position-specific matrices never collide with each other or with legacy rows.
+     * Trainer fields are day-scoped (like the existing `date` column) and are
+     * broadcast to every item row sharing the same day_number/position.
      */
     public function saveQcLqcTrainingItemsByPosition(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');
-            DB::beginTransaction();
 
-            $qcSlipsId  = $request->input('qc_slips_id');
-            $position   = $request->input('position');
-            $matrixData = $request->input('matrix', []);
-            $dayDates   = $request->input('day_dates', []); // e.g. ['day_1' => '2026-09-29', ...]
+            $qcSlipsId   = $request->input('qc_slips_id');
+            $position    = $request->input('position');
+            $matrixData  = $request->input('matrix', []);
+            $dayDates    = $request->input('day_dates', []);   // e.g. ['day_1' => '2026-09-30', ...]
+            $trainerDays = $request->input('trainer_days', []); // e.g. ['day_1' => ['trainer_emp_no' => ..., 'trainer_name' => ..., 'validation_date' => ..., 'validation_time' => ..., 'overall_result' => ...], ...]
 
-            foreach ($matrixData as $row) {
-                $itemId         = $row['training_item_id'];
-                $remark         = $row['remark'] ?? null;
-                $subDescription = $row['sub_description'] ?? null;
-                $isChecked      = (isset($row['is_checked']) && (int) $row['is_checked'] === 1) ? 1 : null;
-                $dayResults     = $row['day_results'] ?? [];
+            DB::transaction(function () use ($qcSlipsId, $position, $matrixData, $dayDates, $trainerDays) {
+                foreach ($matrixData as $row) {
+                    $itemId         = $row['training_item_id'];
+                    $remark         = $row['remark'] ?? null;
+                    $subDescription = $row['sub_description'] ?? null;
+                    $isChecked      = (isset($row['is_checked']) && (int) $row['is_checked'] === 1) ? 1 : null;
+                    $dayResults     = $row['day_results'] ?? [];
 
-                foreach ($dayResults as $dayKey => $resultValue) {
-                    $dayNumber = (int) str_replace('day_', '', $dayKey);
+                    foreach ($dayResults as $dayKey => $resultValue) {
+                        $dayNumber = (int) str_replace('day_', '', $dayKey);
 
-                    if ($dayNumber >= 1 && $dayNumber <= 5) {
-                            
-                        CLqcTrainingItemResult::updateOrCreate(
-                            [
-                                'qc_slips_id'      => $qcSlipsId,
-                                'training_item_id' => $itemId,
-                                'day_number'       => $dayNumber,
-                                'position'         => $position,
-                            ],
-                            [
-                                'result'          => $resultValue,
-                                'item_remark'     => $remark,
-                                'sub_description' => $subDescription,
-                                'is_checked'      => $isChecked,
-                                'date'            => $dayDates['day_' . $dayNumber] ?? null,
-                            ]
-                        );
+                        if ($dayNumber >= 1 && $dayNumber <= 5) {
+                            $trainerDayData = $trainerDays['day_' . $dayNumber] ?? [];
+
+                            CLqcTrainingItemResult::updateOrCreate(
+                                [
+                                    'qc_slips_id'      => $qcSlipsId,
+                                    'training_item_id' => $itemId,
+                                    'day_number'       => $dayNumber,
+                                    'position'         => $position,
+                                ],
+                                [
+                                    'result'          => $resultValue,
+                                    'item_remark'     => $remark,
+                                    'sub_description' => $subDescription,
+                                    'is_checked'      => $isChecked,
+                                    'date'            => $dayDates['day_' . $dayNumber] ?? null,
+                                    'trainer_emp_no'  => $trainerDayData['trainer_emp_no'] ?? null,
+                                    'trainer_name'    => $trainerDayData['trainer_name'] ?? null,
+                                    'validation_date' => $trainerDayData['validation_date'] ?? null,
+                                    'validation_time' => $trainerDayData['validation_time'] ?? null,
+                                    'overall_result'  => $trainerDayData['overall_result'] ?? null,
+                                ]
+                            );
+                        }
                     }
                 }
-            }
+            });
 
-            DB::commit();
             return response()->json([
                 'is_success' => 'true',
                 'message'    => 'Training items matrix saved successfully!',
             ]);
         } catch (Exception $e) {
-            DB::rollback();
             throw $e;
         }
     }
