@@ -203,7 +203,9 @@ class TrainingRecordUpdateController extends Controller
             return [
                 'action'        => '<center><button type="button" class="btn btn-sm btn-danger btnRemoveTrainee"><i class="fas fa-times"></i></button></center>',
                 'empNo'         => $item->EmpNo ?? '',
-                'empName'       => $item->empname ?? '',
+                'empName' => isset($item->empname) 
+                    ? (mb_detect_encoding($item->empname, 'UTF-8', true) ? utf8_decode($item->empname) : $item->empname) 
+                    : '',
                 'empDept'       => $item->Deparment ?? '',
                 'qcSlipStation' => $excelRecord['station'] ?? '',
                 'qcSlipSeries'  => $excelRecord['series'] ?? '',
