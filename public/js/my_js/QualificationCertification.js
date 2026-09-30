@@ -258,6 +258,67 @@
      * If either check fails, scanning is blocked, the input is cleared, and a
      * SweetAlert warning is shown.
      */
+    $(document).on('keypress', '.chk-trainer-scan-input', function (e) {
+        if (e.which !== 13 && e.keyCode !== 13) { return; }
+        e.preventDefault();
+
+        var $input   = $(this);
+        var day      = $input.data('day');
+        var empNo    = $.trim($input.val());
+        var $table   = $input.closest('table');
+        var $tbody   = $table.find('tbody');
+
+        if (!empNo) { return; }
+
+        var allChecked = true;
+        $tbody.find('.chk-select-item').each(function () {
+            if (!$(this).is(':checked')) {
+                allChecked = false;
+                return false;
+            }
+        });
+
+        // if (!allChecked) {
+        //     $input.val('');
+        //     Swal.fire({
+        //         icon: 'warning',
+        //         title: 'Incomplete Matrix',
+        //         text: 'Cannot scan Trainer ID: All row checkboxes and Day ' + day + ' item results must be completed first.'
+        //     });
+        //     return;
+        // }
+        ajaxRequest({
+            url: 'get_employee_details_by_no',
+            method: 'GET',
+            data: { emp_no: empNo },
+            successCallback: function (response) {
+                if (!response || !response.emp_no) {
+                    $input.val('');
+                    Swal.fire({ icon: 'error', title: 'Not Found', text: 'No employee found for Trainer ID "' + empNo + '".' });
+                    return;
+                }
+
+                var now         = new Date();
+                var pad         = function (n) { return String(n).padStart(2, '0'); };
+                var currentDate = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+                var currentTime = pad(now.getHours()) + ':' + pad(now.getMinutes());
+
+                $('.chk-trainer-scan-input').val(response.emp_no);
+                $('.chk-trainer-name-display').text(response.name || '');
+                $('input.input-chk-time').val(currentDate);
+                $('select.select-chk-result').val(currentTime);
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                $input.val('');
+                Swal.fire({ icon: 'error', title: 'Scan Failed', text: 'Unable to look up Trainer ID.' });
+            }
+        });
+
+        $input.val('');
+
+
+    });
     $(document).on('keypress', '.trainer-scan-input', function (e) {
         if (e.which !== 13 && e.keyCode !== 13) { return; }
         e.preventDefault();
@@ -388,9 +449,9 @@
         $('.btnSaveMatrix').addClass('d-none');
 
         if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
-            initPositionTrainingTable('#tblTrainingItemsVisual', 'Visual Operator', $('#qc_slips_id').val());
-            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Part Prep', $('#qc_slips_id').val());
-            initPositionTrainingTable('#tblTrainingItemsMachine', 'Machine Operator', $('#qc_slips_id').val());
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', $('#qc_slips_id').val());
+            // initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Part Prep', $('#qc_slips_id').val());
+            // initPositionTrainingTable('#tblTrainingItemsMachine', 'Machine Operator', $('#qc_slips_id').val());
         }
         if(positionCategory === 'MH'){
             initTrainingItemsTable('#tblTrainingItems_mh');
@@ -1495,7 +1556,7 @@
                 positionCategory : positionCategory,
              });
 
-
+          
             // ==== QC Slip Details
             $('#qc_slips_id').val(data.id);
             $('#textconno_new_operator').val(data.control_no);

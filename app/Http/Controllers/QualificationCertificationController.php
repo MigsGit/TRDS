@@ -262,7 +262,7 @@ class QualificationCertificationController extends Controller
 
         return response()->json([
             'emp_no' => $employee->EmpNo,
-            'name'   => $employee->EmpName,
+            'name'   => $employee->empname,
         ]);
     }
 
@@ -284,8 +284,9 @@ class QualificationCertificationController extends Controller
     public function saveQcLqcTrainingItemsByPosition(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');
-   return $request->all();
-            $qcSlipsId            = $request->input('qc_slips_id');
+//    return $request->all();
+            // $qcSlipsId            = $request->input('qc_slips_id');
+            $qcSlipsId            = 212;
             $position             = $request->input('position');
             $matrixData           = $request->input('matrix', []);
             $dayDates             = $request->input('day_dates', []);              // e.g. ['day_1' => '2026-09-30', ...]
