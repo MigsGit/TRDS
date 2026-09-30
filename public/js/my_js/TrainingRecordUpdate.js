@@ -131,18 +131,27 @@ const getTrainingRecord = (trainingId) => {
                     // editing with an existing attachment: show read-only info + reupload checkbox, hide file input
                     $('#attachments_current_wrapper').removeClass('d-none');
                     // $('#attachments_text').val(record.attachments);
-                    $('#attachments_text').val(
-                        record.attachments
-                            ? record.attachments.split(',').join('\n')
-                            : ''
+                    const storageUrl = $('meta[name="storage-url"]').attr('content');
+                    let rawAttachments = record.attachments.split(',');
+                    let formattedAttachments = rawAttachments
+                        .map(att => `<a href="${storageUrl}/${record.id}/${att}" target="_blank">${att}</a>`)
+                        .join('<br>');
+                    // $('#attachments_text').val(
+                    //     record.attachments
+                    //         ? record.attachments.split(',').join('\n')
+                    //         : ''
+                    // );
+                    $('#attachments_text').html(
+                        formattedAttachments
                     );
+
                     $('#attachments_checkbox_reupload').prop('checked', false);
                     $('#attachments').addClass('d-none').val('');
                 }
                 else{
                     // no existing attachment: behave like "add" mode, show the file input
                     $('#attachments_current_wrapper').addClass('d-none');
-                    $('#attachments_text').val('');
+                    $('#attachments_text').html('');
                     $('#attachments_checkbox_reupload').prop('checked', false);
                     $('#attachments').removeClass('d-none').val('');
                 }

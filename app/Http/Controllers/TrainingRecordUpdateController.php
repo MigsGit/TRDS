@@ -63,7 +63,7 @@ class TrainingRecordUpdateController extends Controller
             // remove attachments if reuploading
             if(isset($request->editing_record_id) && isset($request->attachments_checkbox_reupload)){
                 // delete existing attachments from storage
-                Storage::deleteDirectory("training_update/{$savedId}");
+                Storage::deleteDirectory("public/training_update/{$savedId}");
                 // clear the attachments field in the database
                 TrainingRecord::where('id', $savedId)->update(['attachments' => null]);
             }
@@ -72,7 +72,7 @@ class TrainingRecordUpdateController extends Controller
                 foreach($attachments as $attachment){
                     $filename = $attachment->getClientOriginalName();
                     $filenames[] = $filename;
-                    Storage::putFileAs("training_update/{$savedId}", $attachment, $filename);
+                    Storage::putFileAs("public/training_update/{$savedId}", $attachment, $filename);
                     // You can save the file or perform other operations here
                 }
                 if(!empty($filenames)){
