@@ -134,7 +134,7 @@ const getTrainingRecord = (trainingId) => {
                     const storageUrl = $('meta[name="storage-url"]').attr('content');
                     let rawAttachments = record.attachments.split(',');
                     let formattedAttachments = rawAttachments
-                        .map(att => `<a href="${storageUrl}/${record.id}/${att}" target="_blank">${att}</a>`)
+                        .map(att => `<a href="${storageUrl}/training_update/${record.id}/${att}" target="_blank">${att}</a>`)
                         .join('<br>');
                     // $('#attachments_text').val(
                     //     record.attachments
