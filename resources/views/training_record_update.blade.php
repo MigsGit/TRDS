@@ -175,11 +175,13 @@
 
                                 <div id="attachments_current_wrapper" class="d-none mb-2">
                                     <div class="input-group">
-                                        <div class="input-group-prepend">
+                                        {{-- <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-paperclip"></i></span>
-                                        </div>
+                                        </div> --}}
                                         {{-- <input type="text" class="form-control" id="attachments_text" readonly> --}}
-                                        <textarea class="form-control" id="attachments_text" readonly></textarea>
+                                        {{-- <textarea class="form-control" id="attachments_text" readonly></textarea> --}}
+                                        <div id="attachments_text"></div>
+
                                     </div>
                                     <div class="custom-control custom-checkbox mt-1">
                                         <input type="checkbox" class="custom-control-input" id="attachments_checkbox_reupload" name="attachments_checkbox_reupload" value="1">
@@ -243,43 +245,7 @@
                         </div>
                     </div>
 
-                    <!-- Section 3: Trainees -->
-                    {{-- <div class="section-divider mt-3">
-                        <i class="fas fa-users text-primary mr-2"></i> Trainee
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label for="trainee" class="font-weight-bold small text-muted">
-                                    TRAINEE <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" class="form-control" id="trainee" list="traineeList">
-                                <datalist id="traineeList">
-                                </datalist>
-                                
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="table-responsive">
-                                <table id="tableTrainees" class="table table-sm table-bordered table-striped table-hover w-100">
-                                    <thead>
-                                        <tr>
-                                            <th>Action</th>
-                                            <th>Employee Number</th>
-                                            <th>Trainee Name</th>
-                                            <th>Department</th>
-                                            <th>Station</th>
-                                            <th>Series</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div> --}}
+                  
                     <!-- Section 3: Trainees -->
                     <div class="section-divider mt-3">
                         <i class="fas fa-users text-primary mr-2"></i> Trainees
