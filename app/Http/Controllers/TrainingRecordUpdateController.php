@@ -182,7 +182,10 @@ class TrainingRecordUpdateController extends Controller
         $file = $request->file('file');
 
         $collections = Excel::toCollection(new TRUserImport, $file);
-        $importedData = collect($collections->first())->keyBy('employee_number');
+        // $importedData = collect($collections->first())->keyBy('employee_number');
+        $importedData = collect($collections->first())->keyBy(function ($row) {
+            return strtoupper($row['employee_number'] ?? '');
+        });
         $imported_emp_no = $importedData->keys()->toArray();
 
         $data = SystemOneHrisSubcon::whereIn('EmpNo', $imported_emp_no)
@@ -195,7 +198,7 @@ class TrainingRecordUpdateController extends Controller
         ->values()
         ->map(function ($item) use ($importedData) {
             // Find matching record from imported Excel data
-            $excelRecord = $importedData->get($item->EmpNo);
+            $excelRecord = $importedData->get(strtoupper($item->EmpNo));
 
             return [
                 'action'        => '<center><button type="button" class="btn btn-sm btn-danger btnRemoveTrainee"><i class="fas fa-times"></i></button></center>',
