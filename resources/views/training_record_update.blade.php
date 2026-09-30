@@ -515,8 +515,8 @@
                 // rowId: 'id', // optional
                 "ordering": false,
                 "searching": true,
-                "paging": false,
-                "info" : false,
+                "paging": true,
+                "info": false,
                 "columns": [
                     { "data": "action" },
                     { "data": "empNo" },
