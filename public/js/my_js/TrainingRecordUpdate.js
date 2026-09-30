@@ -150,7 +150,8 @@ const getTrainingRecord = (trainingId) => {
                     return {
                         action: `<center><button type="button" class="btn btn-sm btn-danger btnRemoveTrainee"><i class="fas fa-times"></i></button></center>`,
                         empNo: td.employee_no,
-                        empName: ` ${td.employee_details.LastName}, ${td.employee_details.FirstName} ${td.employee_details.MiddleName}`,
+                        // empName: `${td.employee_details.empname}`,
+                        empName: `${fixEncoding(td.employee_details.empname)}`,
                         empDept: td.employee_details.Deparment,
                         qcSlipStation: td.station,
                         qcSlipSeries: td.series
@@ -172,6 +173,16 @@ const getTrainingRecord = (trainingId) => {
             console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
         }
     });
+}
+
+
+const fixEncoding = (str) => {
+    if (!str) return '';
+    try {
+        return decodeURIComponent(escape(str));
+    } catch (e) {
+        return str;
+    }
 }
 
 const getTraineeDetails = (EmpId, station, series) => {
