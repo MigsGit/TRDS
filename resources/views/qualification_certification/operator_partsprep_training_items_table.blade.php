@@ -4,7 +4,7 @@
     $tableId        = $tableId        ?? 'tblTrainingItems_default';
     $accordionParent = $accordionParent ?? '#accordionExampleInsp';
     $collapseId     = 'collapseTrainingItems_' . $tableId;
-    $position       = $position       ?? 'Engineering';
+    $position       = $position       ?? 'Engineer';
 @endphp
 <div class="accordion-item">
     <h2 class="card-header">
@@ -22,6 +22,20 @@
         <div class="table-responsive">
             <table id="{{ $tableId }}" class="table table-bordered table-hover align-middle nowrap w-100 js-training-items-table">
                 <thead class="table-secondary text-center">
+                    <tr class="table-light">
+                        <th colspan="8" class="text-start">
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <span class="fw-bold me-2">Checkbox Trainer Validation:</span>
+                                <input type="text" class="form-control form-control-sm chk-trainer-scan-input" data-position="{{ $position }}" placeholder="Scan Trainer ID" style="max-width: 160px;">
+                                <input type="hidden" class="chk-trainer-emp-no" value="">
+                                <span class="chk-trainer-name-display text-muted" style="min-width: 140px;"></span>
+                                <label class="mb-0 ms-2">Date:</label>
+                                <input type="date" class="form-control form-control-sm input-chk-date" style="max-width: 150px;">
+                                <label class="mb-0 ms-2">Time:</label>
+                                <input type="time" class="form-control form-control-sm input-chk-time" style="max-width: 120px;">
+                            </div>
+                        </th>
+                    </tr>
                     <tr>
                         <th rowspan="2" class="align-middle" style="width: 25%;">Training Items</th>
                         <th rowspan="2" class="align-middle text-center" style="width: 5%;">

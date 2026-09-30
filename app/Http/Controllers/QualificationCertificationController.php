@@ -117,8 +117,8 @@ class QualificationCertificationController extends Controller
     /**
      * NEW standalone endpoint (does not replace loadQcLqcTrainingItemsByQcSlipId).
      * Loads the LQC training-items checklist scoped to a single qc_slips_id AND
-     * a position ("Visual Operator" | "Parts Prep" | "Machine Operator") so the
-     * 3 new position-specific tables can be tracked independently.
+     * a position ("Production" | "Engineer" | "QC") so the 3 new position-specific
+     * tables can be tracked independently.
      */
     public function loadQcLqcTrainingItemsByPosition(Request $request){
         $qcSlipsId = $request->input('qc_slips_id');
@@ -141,6 +141,22 @@ class QualificationCertificationController extends Controller
             ->get(['day_number', 'trainer_emp_no', 'trainer_name', 'validation_date', 'validation_time', 'overall_result'])
             ->unique('day_number')
             ->keyBy('day_number');
+
+        // Existing single Checkbox Trainer Validation for the ENTIRE matrix
+        // (not per-day/per-row). Since the same values are broadcast to every
+        // row/day when saved, any single existing row for this qc_slips_id +
+        // position carries the current checkbox trainer verification state.
+        $chkTrainerRow = CLqcTrainingItemResult::where('qc_slips_id', $qcSlipsId)
+            ->where('position', $position)
+            ->whereNotNull('chk_trainer_emp_no')
+            ->first(['chk_trainer_emp_no', 'chk_trainer_name', 'chk_validation_date', 'chk_validation_time']);
+
+        $chkTrainerValidation = [
+            'chk_trainer_emp_no'  => $chkTrainerRow->chk_trainer_emp_no ?? null,
+            'chk_trainer_name'    => $chkTrainerRow->chk_trainer_name ?? null,
+            'chk_validation_date' => $chkTrainerRow->chk_validation_date ?? null,
+            'chk_validation_time' => $chkTrainerRow->chk_validation_time ?? null,
+        ];
 
         $items = DropdownMasterDetail::with(['c_lqc_training_item_results' => function ($query) use ($qcSlipsId, $position) {
             $query->where('qc_slips_id', $qcSlipsId)->where('position', $position);
@@ -221,6 +237,7 @@ class QualificationCertificationController extends Controller
         ->rawColumns(['item_name','select_item','day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
         ->with('headerDates', $headerDates)
         ->with('trainerValidations', $trainerValidations)
+        ->with('chkTrainerValidation', $chkTrainerValidation)
         ->make(true);
     }
 
@@ -251,26 +268,31 @@ class QualificationCertificationController extends Controller
 
     /**
      * NEW standalone endpoint (does not replace saveQcLqcTrainingItemsByQcSlipId).
-     * Persists is_checked/result/sub_description/item_remark AND the day-scoped
+     * Persists is_checked/result/sub_description/item_remark, the day-scoped
      * Trainer Barcode Validation fields (trainer_emp_no/trainer_name/
-     * validation_date/validation_time/overall_result) directly into
+     * validation_date/validation_time/overall_result), AND the single Checkbox
+     * Trainer Validation fields (chk_trainer_emp_no/chk_trainer_name/
+     * chk_validation_date/chk_validation_time) directly into
      * c_lqc_training_item_results via updateOrCreate(), matched on
      * qc_slips_id + training_item_id + day_number + position so the 3 new
      * position-specific matrices never collide with each other or with legacy rows.
-     * Trainer fields are day-scoped (like the existing `date` column) and are
-     * broadcast to every item row sharing the same day_number/position.
+     * Both the Day 1-5 trainer fields and the Checkbox Trainer fields are NOT
+     * day/row-scoped — they are broadcast to every item row / day_number that
+     * belongs to this qc_slips_id + position, mirroring how `date` is already
+     * broadcast per day.
      */
     public function saveQcLqcTrainingItemsByPosition(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');
+   return $request->all();
+            $qcSlipsId            = $request->input('qc_slips_id');
+            $position             = $request->input('position');
+            $matrixData           = $request->input('matrix', []);
+            $dayDates             = $request->input('day_dates', []);              // e.g. ['day_1' => '2026-09-30', ...]
+            $trainerDays          = $request->input('trainer_days', []);           // e.g. ['day_1' => ['trainer_emp_no' => ..., 'trainer_name' => ..., 'validation_date' => ..., 'validation_time' => ..., 'overall_result' => ...], ...]
+            $chkTrainerValidation = $request->input('chk_trainer_validation', []); // e.g. ['chk_trainer_emp_no' => ..., 'chk_trainer_name' => ..., 'chk_validation_date' => ..., 'chk_validation_time' => ...]
 
-            $qcSlipsId   = $request->input('qc_slips_id');
-            $position    = $request->input('position');
-            $matrixData  = $request->input('matrix', []);
-            $dayDates    = $request->input('day_dates', []);   // e.g. ['day_1' => '2026-09-30', ...]
-            $trainerDays = $request->input('trainer_days', []); // e.g. ['day_1' => ['trainer_emp_no' => ..., 'trainer_name' => ..., 'validation_date' => ..., 'validation_time' => ..., 'overall_result' => ...], ...]
-
-            DB::transaction(function () use ($qcSlipsId, $position, $matrixData, $dayDates, $trainerDays) {
+            DB::transaction(function () use ($qcSlipsId, $position, $matrixData, $dayDates, $trainerDays, $chkTrainerValidation) {
                 foreach ($matrixData as $row) {
                     $itemId         = $row['training_item_id'];
                     $remark         = $row['remark'] ?? null;
@@ -292,16 +314,20 @@ class QualificationCertificationController extends Controller
                                     'position'         => $position,
                                 ],
                                 [
-                                    'result'          => $resultValue,
-                                    'item_remark'     => $remark,
-                                    'sub_description' => $subDescription,
-                                    'is_checked'      => $isChecked,
-                                    'date'            => $dayDates['day_' . $dayNumber] ?? null,
-                                    'trainer_emp_no'  => $trainerDayData['trainer_emp_no'] ?? null,
-                                    'trainer_name'    => $trainerDayData['trainer_name'] ?? null,
-                                    'validation_date' => $trainerDayData['validation_date'] ?? null,
-                                    'validation_time' => $trainerDayData['validation_time'] ?? null,
-                                    'overall_result'  => $trainerDayData['overall_result'] ?? null,
+                                    'result'              => $resultValue,
+                                    'item_remark'         => $remark,
+                                    'sub_description'     => $subDescription,
+                                    'is_checked'          => $isChecked,
+                                    'date'                => $dayDates['day_' . $dayNumber] ?? null,
+                                    'trainer_emp_no'      => $trainerDayData['trainer_emp_no'] ?? null,
+                                    'trainer_name'        => $trainerDayData['trainer_name'] ?? null,
+                                    'validation_date'     => $trainerDayData['validation_date'] ?? null,
+                                    'validation_time'     => $trainerDayData['validation_time'] ?? null,
+                                    'overall_result'      => $trainerDayData['overall_result'] ?? null,
+                                    'chk_trainer_emp_no'  => $chkTrainerValidation['chk_trainer_emp_no'] ?? null,
+                                    'chk_trainer_name'    => $chkTrainerValidation['chk_trainer_name'] ?? null,
+                                    'chk_validation_date' => $chkTrainerValidation['chk_validation_date'] ?? null,
+                                    'chk_validation_time' => $chkTrainerValidation['chk_validation_time'] ?? null,
                                 ]
                             );
                         }

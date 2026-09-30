@@ -14,7 +14,7 @@
           @include('qualification_certification.operator_partsprep_training_items_table', [
                 'tableId'        => 'tblTrainingItemsPartsPrep',
                 'accordionParent' => '#accordionExamplePartsPrep',
-                'position'       => 'Engineering',
+                'position'       => 'Engineer',
             ])
         </div>
         <div class="accordion" id="accordionExampleMachine">

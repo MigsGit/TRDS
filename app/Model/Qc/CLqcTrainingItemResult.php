@@ -30,6 +30,10 @@ class CLqcTrainingItemResult extends Model
         'validation_date',
         'validation_time',
         'overall_result',
+        'chk_trainer_emp_no',
+        'chk_trainer_name',
+        'chk_validation_date',
+        'chk_validation_time',
     ];
 
     public function dropdown_master_details()
