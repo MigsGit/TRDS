@@ -76,7 +76,7 @@
      * @param  {string} qcSlipsId      Optional explicit qc_slips_id override.
      * @return {DataTables.Api|null}
      */
-    const initPositionTrainingTable = (tableSelector, position, qcSlipsId) => {
+    const initPositionTrainingTable = (tableSelector, position, qcSlipsId,ddMastersId) => {
         var $table = $(tableSelector);
         if (!$table.length) { return null; }
 
@@ -97,6 +97,7 @@
                 data: function (params) {
                     params.qc_slips_id = qcSlipsId || $('#qc_slips_id').val() || '';
                     params.position    = position;
+                    params.dd_masters_id = ddMastersId;
                 }
             },
             columns: [
@@ -133,18 +134,6 @@
         });
 
         return dtInstance;
-    };
-
-    const initVisualOperatorTrainingTable = (qcSlipsId) => {
-        return initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', qcSlipsId);
-    };
-
-    const initPartsPrepTrainingTable = (qcSlipsId) => {
-        return initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineering', qcSlipsId);
-    };
-
-    const initMachineOperatorTrainingTable = (qcSlipsId) => {
-        return initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', qcSlipsId);
     };
 
     /**
@@ -447,11 +436,12 @@
         $('#divTechnician').addClass('d-none');
         $('#divMH').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
-
+        $('.btnAllOperator').addClass('d-none');
         if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
-            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', $('#qc_slips_id').val());
-            // initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Part Prep', $('#qc_slips_id').val());
-            // initPositionTrainingTable('#tblTrainingItemsMachine', 'Machine Operator', $('#qc_slips_id').val());
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', $('#qc_slips_id').val(),8);
+            $('.btnAllOperator').removeClass('d-none');
+            // initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineering', $('#qc_slips_id').val(),ddMastersId);
+            // initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', $('#qc_slips_id').val(),ddMastersId);
         }
         if(positionCategory === 'MH'){
             initTrainingItemsTable('#tblTrainingItems_mh');

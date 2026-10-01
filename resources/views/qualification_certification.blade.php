@@ -286,6 +286,7 @@
             formSubmitOper: $('#formSubmitOper'),
             formSubmitMh: $('#formSubmit_MH'),
             formSubmitInspector: $('#formSubmit_Ins'),
+            formSubmitOperators: $('#formSubmitOperators'),
         };
         dataTable = {
             operator: '',
@@ -638,6 +639,12 @@
                     alert('Unknown position selected. Please select a valid position.');
                     break;
             }
+        });
+        $(document).on('submit', '#formSubmitOperators', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            saveFormOper($form);
+            // $('#modalSendEmail').modal();
         });
         $(document).on('submit', '#formSubmit_SEP', function (e) {
             e.preventDefault();

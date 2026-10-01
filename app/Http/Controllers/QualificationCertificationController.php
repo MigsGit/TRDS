@@ -123,6 +123,7 @@ class QualificationCertificationController extends Controller
     public function loadQcLqcTrainingItemsByPosition(Request $request){
         $qcSlipsId = $request->input('qc_slips_id');
         $position  = $request->input('position');
+        $ddMastersId  = $request->input('dd_masters_id');
 
         // Header dates keyed by day_number, scoped to this position
         $headerDates = CLqcTrainingItemResult::where('qc_slips_id', $qcSlipsId)
@@ -161,7 +162,7 @@ class QualificationCertificationController extends Controller
         $items = DropdownMasterDetail::with(['c_lqc_training_item_results' => function ($query) use ($qcSlipsId, $position) {
             $query->where('qc_slips_id', $qcSlipsId)->where('position', $position);
         }])
-        ->where('dropdown_masters_id', 8)
+        ->where('dropdown_masters_id', $ddMastersId)
         ->orderBy('id', 'asc')
         ->get();
 
@@ -200,34 +201,54 @@ class QualificationCertificationController extends Controller
             return '<input type="checkbox" class="chk-select-item" '.$isChecked.' data-item-id="' . $row['id'] . '" value="' . $row['id'] . '">';
         })
         ->addColumn('day_1', function ($row) {
-            return '<input type="text" class="form-control form-control-sm text-center input-result"
+            $day1Val = $row['day_1_result'] ?? '';
+            return '<select class="form-control form-control-sm  text-center input-result"
                         data-item-id="' . $row['id'] . '"
-                        data-day="1"
-                        value="' . e($row['day_1_result']) . '">';
+                        data-day="1">
+                            <option value=""' . ($day1Val === '' ? ' selected' : '') . '>--</option>
+                            <option value="Passed"' . ($day1Val === 'Passed' ? ' selected' : '') . '>Passed</option>
+                            <option value="Failed"' . ($day1Val === 'Failed' ? ' selected' : '') . '>Failed</option>
+                        </select>';
         })
         ->addColumn('day_2', function ($row) {
-            return '<input type="text" class="form-control form-control-sm text-center input-result"
+            $day2Val = $row['day_2_result'] ?? '';
+            return '<select class="form-control form-control-sm  text-center input-result"
                         data-item-id="' . $row['id'] . '"
-                        data-day="2"
-                        value="' . e($row['day_2_result']) . '">';
+                        data-day="2">
+                            <option value=""' . ($day2Val === '' ? ' selected' : '') . '>--</option>
+                            <option value="Passed"' . ($day2Val === 'Passed' ? ' selected' : '') . '>Passed</option>
+                            <option value="Failed"' . ($day2Val === 'Failed' ? ' selected' : '') . '>Failed</option>
+                        </select>';
         })
         ->addColumn('day_3', function ($row) {
-            return '<input type="text" class="form-control form-control-sm text-center input-result"
+            $day3Val = $row['day_3_result'] ?? '';
+            return '<select class="form-control form-control-sm  text-center input-result"
                         data-item-id="' . $row['id'] . '"
-                        data-day="3"
-                        value="' . e($row['day_3_result']) . '">';
+                        data-day="3">
+                            <option value=""' . ($day3Val === '' ? ' selected' : '') . '>--</option>
+                            <option value="Passed"' . ($day3Val === 'Passed' ? ' selected' : '') . '>Passed</option>
+                            <option value="Failed"' . ($day3Val === 'Failed' ? ' selected' : '') . '>Failed</option>
+                        </select>';
         })
         ->addColumn('day_4', function ($row) {
-            return '<input type="text" class="form-control form-control-sm text-center input-result"
+            $day4Val = $row['day_4_result'] ?? '';
+            return '<select class="form-control form-control-sm  text-center input-result"
                         data-item-id="' . $row['id'] . '"
-                        data-day="4"
-                        value="' . e($row['day_4_result']) . '">';
+                        data-day="4">
+                            <option value=""' . ($day4Val === '' ? ' selected' : '') . '>--</option>
+                            <option value="Passed"' . ($day4Val === 'Passed' ? ' selected' : '') . '>Passed</option>
+                            <option value="Failed"' . ($day4Val === 'Failed' ? ' selected' : '') . '>Failed</option>
+                        </select>';
         })
         ->addColumn('day_5', function ($row) {
-            return '<input type="text" class="form-control form-control-sm text-center input-result"
+            $day5Val = $row['day_5_result'] ?? '';
+            return '<select class="form-control form-control-sm  text-center input-result"
                         data-item-id="' . $row['id'] . '"
-                        data-day="5"
-                        value="' . e($row['day_5_result']) . '">';
+                        data-day="5">
+                            <option value=""' . ($day5Val === '' ? ' selected' : '') . '>--</option>
+                            <option value="Passed"' . ($day5Val === 'Passed' ? ' selected' : '') . '>Passed</option>
+                            <option value="Failed"' . ($day5Val === 'Failed' ? ' selected' : '') . '>Failed</option>
+                        </select>';
         })
         ->addColumn('remarks', function ($row) {
             return '<input type="text" class="form-control form-control-sm input-remark"
@@ -430,7 +451,11 @@ class QualificationCertificationController extends Controller
             $qcModelApprover = OpApprover::class;
             
             if($currentPositionCategory === 'VisualOperator'){
-               return $visualOperatorValidation = [
+                'For Production Update'; 'AOPERPRDN';
+                'For Engineering Update'; 'BOPERENGG';
+                'For QC Update'; 'COPERQC';
+
+                return $visualOperatorValidation = [
                     'text_sel_result1_operator'           => $this->getSafe($request, 'text_sel_result1_operator'),
                     'text_sel_result2_operator'           => $this->getSafe($request, 'text_sel_result2_operator'),
                     'text_sec1_certified_operator'        => $this->joinSafe($request, 'text_sec1_certified_operator'),
@@ -1581,123 +1606,6 @@ class QualificationCertificationController extends Controller
         ->with('headerDates', $headerDates)
         ->make(true);
     }
-    public function loadQcLqcTrainingItemsByQcSlipIdTEST(Request $request){
-        $qcSlipsId = $request->qc_slips_id;
-
-        // Header dates keyed by day_number
-        $headerDates = CLqcTrainingItemResult::where('qc_slips_id', $qcSlipsId)
-            ->whereNotNull('date')
-            ->orderBy('day_number')
-            ->get(['day_number', 'date'])
-            ->unique('day_number')
-            ->pluck('date', 'day_number');
-
-        $items = DropdownMasterDetail::with(['c_lqc_training_item_results' => function ($query) use ($qcSlipsId) {
-            $query->where('qc_slips_id', $qcSlipsId);
-        }])
-        ->where('dropdown_masters_id', 8)
-        ->orderBy('id', 'asc')
-        ->get();
-
-        $data = $items->map(function ($item) {
-            $resultsByDay = $item->c_lqc_training_item_results->keyBy('day_number');
-
-            return [
-                'id'              => $item->id,
-                'item_name'       => $item->dropdown_masters_details,
-                'sub_description' => $item->c_lqc_training_item_results->first()->sub_description ?? '',
-                'day_1_result'    => $resultsByDay->get(1)->result ?? '',
-                'day_2_result'    => $resultsByDay->get(2)->result ?? '',
-                'day_3_result'    => $resultsByDay->get(3)->result ?? '',
-                'day_4_result'    => $resultsByDay->get(4)->result ?? '',
-                'day_5_result'    => $resultsByDay->get(5)->result ?? '',
-                'item_remark'     => $item->c_lqc_training_item_results->first()->item_remark ?? '',
-            ];
-        });
-
-        return datatables()->of($data)
-        ->editColumn('item_name', function ($row) {
-            $html = '<strong>' . e($row['item_name']) . '</strong>';
-            $lower = strtolower($row['item_name']);
-            if (str_contains($lower, 'systems and procedure') || str_contains($lower, 'work instruction') || str_contains($lower,'point panel')) {
-                $html .= '<br><input type="text" class="form-control form-control-sm mt-1 input-sub-desc"
-                              data-item-id="' . $row['id'] . '"
-                              placeholder="Details..."
-                              value="' . e($row['sub_description']) . '">';
-            }
-            return $html;
-        })
-        ->addColumn('day_1', function ($row) {
-            return '<input type="text" class="form-control form-control-sm text-center input-result"
-                        data-item-id="' . $row['id'] . '"
-                        data-day="1"
-                        value="' . e($row['day_1_result']) . '">';
-        })
-        ->addColumn('day_2', function ($row) {
-            return '<input type="text" class="form-control form-control-sm text-center input-result"
-                        data-item-id="' . $row['id'] . '"
-                        data-day="2"
-                        value="' . e($row['day_2_result']) . '">';
-        })
-        ->addColumn('day_3', function ($row) {
-            return '<input type="text" class="form-control form-control-sm text-center input-result"
-                        data-item-id="' . $row['id'] . '"
-                        data-day="3"
-                        value="' . e($row['day_3_result']) . '">';
-        })
-        ->addColumn('day_4', function ($row) {
-            return '<input type="text" class="form-control form-control-sm text-center input-result"
-                        data-item-id="' . $row['id'] . '"
-                        data-day="4"
-                        value="' . e($row['day_4_result']) . '">';
-        })
-        ->addColumn('day_5', function ($row) {
-            return '<input type="text" class="form-control form-control-sm text-center input-result"
-                        data-item-id="' . $row['id'] . '"
-                        data-day="5"
-                        value="' . e($row['day_5_result']) . '">';
-        })
-        // ->addColumn('remarks', function ($row) {
-        //     return '<input type="text" class="form-control form-control-sm input-remark"
-        //                 data-item-id="' . $row['id'] . '"
-        //                 value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
-        // })
-        ->addColumn('remarks', function ($row) {
-        // Check if current row is the "RESULT" row
-        if (strtoupper(trim($row['item_name'])) === 'RESULT') {
-            // Collect numeric day values
-            $days = [
-                $row['day_1_result'],
-                $row['day_2_result'],
-                $row['day_3_result'],
-                $row['day_4_result'],
-                $row['day_5_result']
-            ];
-
-            // Filter out empty or non-numeric strings
-            $validDays = array_filter($days, function ($val) {
-                return $val !== '' && $val !== null && is_numeric($val);
-            });
-
-            // Compute Average
-            $count = count($validDays);
-            $average = $count > 0 ? round(array_sum($validDays) / $count, 2) : 0;
-
-            // Render static/disabled input displaying AVERAGE for RESULT row
-            // return '<input type="text" class="form-control form-control-sm text-center bg-light font-weight-bold"
-            //             value="AVERAGE: ' . $average . '" readonly>';
-            return '<input type="text" class="form-control form-control-sm text-center bg-light font-weight-bold" value="">';
-        }
-
-        // Return standard input for non-RESULT rows
-        return '<input type="text" class="form-control form-control-sm input-remark"
-                    data-item-id="' . $row['id'] . '"
-                    value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
-    })
-        ->rawColumns(['item_name', 'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
-        ->with('headerDates', $headerDates)
-        ->make(true);
-    }
     public function load1stQcValidation(Request $request){
         try {
            $qcSlipEmployee = QcSlipEmployee::with('system_one_subcon_emp_info','system_one_hris_emp_info')
@@ -1840,43 +1748,43 @@ class QualificationCertificationController extends Controller
                 'qc_slip_employees',
                 'qc_slip_employees.system_one_hris_subcon',
             );
-            if(filled($selectPosition) && $selectPosition != 'ALL'){
-                $data->where('position_category',$selectPosition);
-            }
-            if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
-                $data->where('section_category',$selectMhSortBySection);
-            }
-            if(filled($selectAccess)){
-                $selectedAccess = [
-                    'PB',
-                    'FORAPP',
-                    'OK',
-                ];
-                if($selectAccess === 'ALL'){
-                    $selectedAccess = [
-                        'PB',
-                        'FORAPP',
-                        'OK',
-                    ];
-                }
-                if($selectAccess === 'FORAPP'){
-                    $selectedAccess = [
-                        'FORAPP',
-                    ];
-                }
-                if($selectAccess === 'OK'){
-                    $selectedAccess = [
-                        'OK',
-                    ];
-                }
-                $data->whereIn('status',$selectedAccess);
-            }
-            if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
-                $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
-                $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
-                    $query->orWhere('alert_prod_cc_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
-                });
-            }
+            // if(filled($selectPosition) && $selectPosition != 'ALL'){
+            //     $data->where('position_category',$selectPosition);
+            // }
+            // if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
+            //     $data->where('section_category',$selectMhSortBySection);
+            // }
+            // if(filled($selectAccess)){
+            //     $selectedAccess = [
+            //         'PB',
+            //         'FORAPP',
+            //         'OK',
+            //     ];
+            //     if($selectAccess === 'ALL'){
+            //         $selectedAccess = [
+            //             'PB',
+            //             'FORAPP',
+            //             'OK',
+            //         ];
+            //     }
+            //     if($selectAccess === 'FORAPP'){
+            //         $selectedAccess = [
+            //             'FORAPP',
+            //         ];
+            //     }
+            //     if($selectAccess === 'OK'){
+            //         $selectedAccess = [
+            //             'OK',
+            //         ];
+            //     }
+            //     $data->whereIn('status',$selectedAccess);
+            // }
+            // if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
+            //     $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
+            //     $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
+            //         $query->orWhere('alert_prod_cc_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
+            //     });
+            // }
             $data->whereNull('deleted_at');
             $data->orderBy('id','DESC');
 
@@ -1892,7 +1800,7 @@ class QualificationCertificationController extends Controller
                 ->get()
                 ->pluck('empname', 'EmpNo');
 
-           $qcSlipsDetails=  $qcSlips->get();
+           $qcSlipsDetails=  $qcSlips->where('control_no','QC-TSF1-0826-001')->get();
                 return DataTables($qcSlipsDetails)
             ->addColumn('rawAction',function ($row) use ($request){
                 $result = '';

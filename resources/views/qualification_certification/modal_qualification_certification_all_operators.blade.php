@@ -3,7 +3,7 @@
         <h3 class="mt-5 mb-3 text-center">Operators OPERATOR'S TRAINING / CERTIFICATION AND VALIDATION SLIP</h3>
     
         <div class="accordion" id="accordionExampleVisual">
-            @include('qualification_certification.operator_visual_training_items_table', [
+            @include('qualification_certification.operator_prodn_training_items_table', [
                 'tableId'        => 'tblTrainingItemsVisual',
                 'accordionParent' => '#accordionExampleVisual',
                 'position'       => 'Production',
@@ -11,14 +11,14 @@
           
         </div>
         <div class="accordion" id="accordionExamplePartsPrep">
-          @include('qualification_certification.operator_partsprep_training_items_table', [
+          @include('qualification_certification.operator_engg_training_items_table', [
                 'tableId'        => 'tblTrainingItemsPartsPrep',
                 'accordionParent' => '#accordionExamplePartsPrep',
                 'position'       => 'Engineer',
             ])
         </div>
         <div class="accordion" id="accordionExampleMachine">
-          @include('qualification_certification.operator_machine_training_items_table', [
+          @include('qualification_certification.operator_engg_training_items_table', [
                 'tableId'        => 'tblTrainingItemsMachine',
                 'accordionParent' => '#accordionExampleMachine',
                 'position'       => 'QC',
@@ -191,9 +191,9 @@
             </select>
         </div>
 
-        <div class="modal-footer btnMh d-none">
+        <div class="modal-footer btnAllOperator d-none">
             <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>CLOSE</button>
-            <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>MH SUBMIT</button>
+            <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>OPERATOR SUBMIT</button>
         </div>
 
     </form>
