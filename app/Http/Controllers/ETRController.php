@@ -492,7 +492,6 @@ class ETRController extends Controller
                 if (isset($row->training_record)) {
                     return $result = "<a href='storage/app/public/training_update/" . ($row->training_record->id) . "/" . ($row->training_record->attachments ?? '#') . "' target='_blank'>View Attachment</a>";
                 }
-
                 return '';
             })
 
