@@ -105,6 +105,10 @@ class ETRController extends Controller
                         ->where('remark', 'Passed')
                         ->where('status', 0)
                         ->where('logdel', 0);
+                },
+                'get_training_endorsement_employees' => function ($query) use($employeeNo) {
+                    $query->where('emp_no', $employeeNo)
+                    ->whereNull('deleted_at');
                 }
             ])
             ->where('id', $getTrainingEndoresementId)
@@ -114,6 +118,7 @@ class ETRController extends Controller
         }
 
         $data = collect();
+        $qwe = collect();
 
         if($trainingEndorsement){
             foreach ($trainingEndorsement->get_training_endorsement_employees as $endorsementEmployee) {
@@ -161,17 +166,43 @@ class ETRController extends Controller
                         'station' => 'N/A',
                         'detailedStation' => 'N/A',
                         'objective' => $questionnaire['purpose'] ?? '',
-                        'trainor' => optional(
-                            $trainingEndorsement->created_by_user_details
-                        )->name ?? '',
+                        'trainor' => optional($trainingEndorsement->created_by_user_details)->name ?? '',
                         'passingScore' => $examResult->rating ?? '',
                         'result' => 'Passed',
                         'record_type' => 'TrainingEndorsement',
                         'exam_result_id' => $examResult->id ?? null,
+                        'attachment'  => null,
                     ];
 
-                    $data->push($trainingEndorsementRecord);
+                    $qwe->push($trainingEndorsementRecord);
                 }
+
+                if( !empty($endorsementEmployee->hands_on_filename) ){
+
+                    $handsOnRecord = (object) [
+                        'trainingDate'    => $trainingEndorsement->date ?? '',
+                        'title'           => 'Mag Plate Measurement',
+                        'seriesName'      => $trainingRequest->section ?? 'N/A',
+                        'department'      => $trainingRequest->department ?? 'N/A',
+                        'station'         => 'N/A',
+                        'detailedStation' => 'N/A',
+                        'objective'       => 'To evaluate the capability of newly hired personnel in measuring precise dimensions of the Magnification Plate and unit using data processor commands based on set specifications.',
+                        'trainor'         => optional(
+                            $trainingEndorsement->created_by_user_details
+                        )->name ?? '',
+                        'passingScore'    => '100',
+                        'result'          => 'Passed',
+                        'record_type'     => 'TrainingEndorsement',
+                        'exam_result_id'  => null,
+                        'attachment'      =>    $trainingEndorsement->get_training_endorsement_employees[0]->id . '.' .
+                                                $trainingEndorsement->get_training_endorsement_employees[0]->hands_on_filename_ext
+                                                ?? null,
+
+                    ];
+                    $qwe->push($handsOnRecord);
+                }
+
+                $data = $qwe;
             }
         }
 
@@ -347,7 +378,7 @@ class ETRController extends Controller
                     }
                     return rtrim($trainer, ', ');
                 }
-                
+
 
                 if ($row instanceof \App\Model\QcSlip) {
                     return '';
@@ -452,8 +483,17 @@ class ETRController extends Controller
 
                 return $row->type_of_training ?? '';
             })
+
+            ->addColumn('attachment', function ($row) {
+                if ($row->attachment) {
+                    return $result = "<a href='storage/app/public/hands_on_attachments/" . ($row->attachment ?? '#') . "' target='_blank'>View Attachment</a>";
+                }
+            return '';
+            })
+
             ->rawColumns([
-                'result'
+                'result',
+                'attachment',
             ])
             ->make(true);
     }
