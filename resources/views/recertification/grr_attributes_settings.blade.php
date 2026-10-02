@@ -35,16 +35,16 @@
                                 <h3 class="card-title">GRR Attributes Settings Module</h3>
                             </div>
 
-                            
+
                             {{-- <ul class="nav nav-tabs" id="employeeTab" role="tablist">
 
-                                <li class="nav-item"> 
+                                <li class="nav-item">
                                     <a class="nav-link active" id="grrSample-tab" data-toggle="tab" href="#grrSample" role="tab" aria-controls="grrSample" aria-selected="true">
                                         GRR Sample Settings
                                     </a>
                                 </li>
 
-                                <li class="nav-item"> 
+                                <li class="nav-item">
                                     <a class="nav-link" id="grrQuestionnaire-tab" data-toggle="tab" href="#grrQuestionnaire" role="tab" aria-controls="grrQuestionnaire" aria-selected="false">
                                         GRR Questionnaire Settings
                                     </a>
@@ -83,7 +83,7 @@
 
                                 <!-- GRR Questionnaire Settings -->
                                 {{-- <div class="tab-pane fade" id="grrQuestionnaire" role="tabpanel" aria-labelledby="grrQuestionnaire-tab">
-                                    
+
                                     <div class="mr-2" style="float: right;">
                                         <button type="button" class="btn btn-dark" id="btnShowAddGRRQuestionnaireModal">
                                             <i class="fa fa-plus"></i> Add GRR Questionnaire
@@ -166,9 +166,9 @@
 
 
                                 {{-- <div class="form-group">
-                                    <label>Skill Category</label> 
+                                    <label>Skill Category</label>
                                     <!-- <input type="text" class="form-control" name="process_station" id="processStation" placeholder="Enter Process Station" required> -->
-                                
+
                                     <select class="form-control select2bs5" name="skill_category" id="skillCategory" required>
                                         <option value="" disabled selected>Select Skill Category</option>
                                         <option value="PROCESS / SYSTEM SKILLS">Process / System Skills</option>
@@ -217,7 +217,7 @@
                                         <input type="checkbox" id="naProductLineCheckbox" name="product_line" value="N/A"> Not Applicable
                                     </label>
                                 </div> --}}
-                                
+
                             </div>
                         </div>
                     </div>
@@ -336,9 +336,9 @@
                                     <input type="text" class="form-control" name="location" id="location" required>
                                 </div>
                             </div>
-                            
-                            
-                        
+
+
+
 
                         </div>
                     </div>
