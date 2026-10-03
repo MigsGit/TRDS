@@ -218,7 +218,8 @@ class ETRController extends Controller
                 $query->whereNull('deleted_at'); // Eager-load the deleted training_record model
             },
             'training_record.venue_details',
-            'training_record.type_of_training_details'
+            'training_record.type_of_training_details',
+            'training_record.result_details'
         ])
         ->where('employee_no', $employeeNo)
         ->whereNull('deleted_at')
@@ -383,7 +384,16 @@ class ETRController extends Controller
                 }
 
                 if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
-                    return '<span class="badge badge-secondary">N/A</span>';
+                    if (strtolower($row->training_record->result_details->dropdown_masters_details) == 'passed') {
+                        return '<span class="badge badge-success">Passed</span>';
+                    }
+                    else if (strtolower($row->training_record->result_details->dropdown_masters_details) == 'failed') {
+                        return '<span class="badge badge-danger">Failed</span>';
+                    }
+                    else{
+                        return $row->training_record->result_details->dropdown_masters_details ? '<span class="badge badge-secondary">' . $row->training_record->result_details->dropdown_masters_details . '</span>' : '<span class="badge badge-secondary">N/A</span>';
+                    }
+
                 }
 
                 if ($row instanceof \App\Model\QcSlip) {

@@ -31,6 +31,10 @@ class TrainingRecordUpdateController extends Controller
         return SystemOneHrisSubcon::get();
     }
 
+    public function getResultList(Request $request){
+        return DropdownMasterDetail::where('dropdown_masters_id', 16)->whereNull('deleted_at')->get(['dropdown_masters_details', 'id']);
+    }
+
     public function saveTrainingRecord(TrainingRecordUpdateRequest $request){
         $data = $request->validated();
         DB::beginTransaction();

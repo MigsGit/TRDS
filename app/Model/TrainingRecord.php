@@ -49,6 +49,10 @@ class TrainingRecord extends Model
         return $this->hasOne(DropdownMasterDetail::class, 'id', 'type_of_training');
     }
 
+    public function result_details(){
+        return $this->hasOne(DropdownMasterDetail::class, 'id', 'result');
+    }
+
     public function trainee_details(){
         return $this->hasMany(TrainingRecordEmployee::class, 'training_record_id', 'id');
     }
