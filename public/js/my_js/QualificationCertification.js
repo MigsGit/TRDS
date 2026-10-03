@@ -473,6 +473,10 @@
         $('#divMH').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
         $('.btnAllOperator').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsVisual').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsPartsPrep').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsMachine').addClass('d-none');
+
         if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
             $('#dateOfTransfer').removeClass('d-none');
             $('#seriesDesignation').text('Designation');
@@ -481,6 +485,12 @@
             initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 11);
             initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 12);
             $('.btnAllOperator').removeClass('d-none');
+
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+                // $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+                // $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
         }
         if(positionCategory === 'MH'){
             initTrainingItemsTable('#tblTrainingItems_mh');

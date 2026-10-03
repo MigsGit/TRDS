@@ -17,14 +17,14 @@ class AddPositionAndIsCheckedToCLqcTrainingItemResultsTable extends Migration
                 ->comment('1 if checked, NULL if unticked');
         });
 
-        // 2. Drop old unique constraint and add new composite unique constraint
-        Schema::table('c_lqc_training_item_results', function (Blueprint $table) {
-            $table->dropUnique('c_lqc_tir_slip_item_day_unique');
-            $table->unique(
-                ['qc_slips_id', 'training_item_id', 'day_number', 'position'],
-                'c_lqc_tir_slip_item_day_position_unique'
-            );
-        });
+        // // 2. Drop old unique constraint and add new composite unique constraint
+        // Schema::table('c_lqc_training_item_results', function (Blueprint $table) {
+        //     $table->dropUnique('c_lqc_tir_slip_item_day_unique');
+        //     $table->unique(
+        //         ['qc_slips_id', 'training_item_id', 'day_number', 'position'],
+        //         'c_lqc_tir_slip_item_day_position_unique'
+        //     );
+        // });
     }
 
     public function down()
