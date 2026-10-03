@@ -150,6 +150,7 @@ const getTrainingRecord = (trainingId) => {
                 $('#trainer').val(record.trainer ? record.trainer.split(',') : []).trigger('change');
                 $('#venue').val(record.venue).trigger('change');
                 $('#typeOfTraining').val(record.type_of_training).trigger('change');
+                $('#result').val(record.result).trigger('change');
                 
                 if(record.attachments != null){
                     // editing with an existing attachment: show read-only info + reupload checkbox, hide file input
