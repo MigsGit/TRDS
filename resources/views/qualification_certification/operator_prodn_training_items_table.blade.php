@@ -87,7 +87,7 @@
                     <tr>
                         <th colspan="" class="text-end align-middle">Overall Result:</th>
                        <td class="text-center">
-                            <select class="form-control form-control-sm select-chk-result" data-day="{{ $day }}">
+                            <select class="form-control form-control-sm select-chk-result">
                                     <option value="">--</option>
                                     <option value="Passed">Passed</option>
                                     <option value="Failed">Failed</option>

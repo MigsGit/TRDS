@@ -374,7 +374,6 @@ class QualificationCertificationController extends Controller
             $dateTime              = now();
             $date                  = now()->toDateString();
             $time                  = now()->format('H:i:s');
-            $qcSlipId              = $this->getSafe($request, 'qc_slips_id', '');
             $isMachineOperatorExists = 0;
             $staticQc              = 'QC';
             $select_section            = $this->getSafe($request, 'select_section', '');
@@ -388,6 +387,7 @@ class QualificationCertificationController extends Controller
                 'positionCategory' => $select_position,
             ];
             $generateControlNumber = $this->generateControlNumber($params);
+            $qcSlipId              = $this->getSafe($request, 'qc_slips_id', '');
             if(blank($qcSlipId) || $qcSlipId === ""){ //ADD
                 $validatedData = app(SendEmailRequest::class)->validateResolved();
                 $validatedData = app(QcSlipRequest::class)->validateResolved();
@@ -451,30 +451,185 @@ class QualificationCertificationController extends Controller
             $qcModelApprover = OpApprover::class;
             
             if($currentPositionCategory === 'VisualOperator'){
-                'For Production Update'; 'AOPERPRDN';
-                'For Engineering Update'; 'BOPERENGG';
-                'For QC Update'; 'COPERQC';
-
-                return $visualOperatorValidation = [
-                    'text_sel_result1_operator'           => $this->getSafe($request, 'text_sel_result1_operator'),
-                    'text_sel_result2_operator'           => $this->getSafe($request, 'text_sel_result2_operator'),
-                    'text_sec1_certified_operator'        => $this->joinSafe($request, 'text_sec1_certified_operator'),
-                    'text_sec2_certified_operator'        => $this->joinSafe($request, 'text_sec2_certified_operator'),
-                    'text_sec1_date_operator'             => $this->getSafe($request, 'text_sec1_date_operator'),
-                    'text_sec2_date_operator'             => $this->getSafe($request, 'text_sec2_date_operator'),
-                    'text_sec1_time_operator'             => $this->getSafe($request, 'text_sec1_time_operator'),
-                    'text_sec2_time_operator'             => $this->getSafe($request, 'text_sec2_time_operator'),
-                    'text_pv_result1_operator'            => $this->getSafe($request, 'text_pv_result1_operator'),
-                    'text_pv_result2_operator'            => $this->getSafe($request, 'text_pv_result2_operator'),
-                    'text_pv1_certified_operator'         => $this->joinSafe($request, 'text_pv1_certified_operator'),
-                    'text_pv2_certified_operator'         => $this->joinSafe($request, 'text_pv2_certified_operator'),
-                    'text_pv1_date_operator'              => $this->getSafe($request, 'text_pv1_date_operator'),
-                    'text_pv2_date_operator'              => $this->getSafe($request, 'text_pv2_date_operator'),
-                    'text_pv1_time_operator'              => $this->getSafe($request, 'text_pv1_time_operator'),
-                    'text_pv2_time_operator'              => $this->getSafe($request, 'text_pv2_time_operator'),
-                    'text_reason_disqualification'        => $this->getSafe($request, 'text_reason_disqualification'),
-                    'text_visual_approved_confirmed_by'   => $this->joinSafe($request, 'text_visual_approved_confirmed_by'),
-                ];
+                // 'For Production Update Training and Orientation'; 'AOPERPRDN';
+                if($currentApprovalStatus !='PB'){
+                    // $currentApprovalStatus = $qcSlipDetails->approval_status;
+                    $cLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId);
+                    switch ($currentApprovalStatus) {
+                        case 'AOPERPRDN':
+                            $cLqcTrainingItemResult->whereNotNull('chk_trainer_emp_no');
+                            $messageAlert = 'Checklist Production Update';
+                            break;
+                        case 'AOPERPRDN1':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',1)
+                            ->where('position','Production')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 2 Production Update';
+                            break;
+                        case 'AOPERPRDN2':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',2)
+                            ->where('position','Production')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 2 Production Update';
+                            break;
+                        case 'AOPERPRDN3':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',3)
+                            ->where('position','Production')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 3 Production Update';
+                            break;
+                        case 'AOPERPRDN4':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',4)
+                            ->where('position','Production')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 4 Production Update';
+                            break;
+                        case 'AOPERPRDN5':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',5)
+                            ->where('position','Production')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 5 Production Update';
+                            break;
+                        //ENGG
+                        case 'BOPERENGG':
+                            $cLqcTrainingItemResult
+                                ->where('position','Engineer')
+                            ->whereNotNull('chk_trainer_emp_no');
+                            break;
+                        case 'BOPERENGG1':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',1)
+                            ->where('position','Engineer')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 2 ENGG Update';
+                            break;
+                        case 'BOPERENGG2':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',2)
+                            ->where('position','Engineer')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 2 ENGG Update';
+                            break;
+                        case 'BOPERENGG3':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',3)
+                            ->where('position','Engineer')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 3 ENGG Update';
+                            break;
+                        case 'BOPERENGG4':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',4)
+                            ->where('position','Engineer')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 4 ENGG Update';
+                            break;
+                        case 'BOPERENGG5':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',5)
+                            ->where('position','Engineer')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 5 Production Update';
+                            break;
+                        //QC
+                        case 'COPERQC':
+                            $cLqcTrainingItemResult
+                            ->where('position','QC')
+                            ->whereNotNull('chk_trainer_emp_no');
+                            break;
+                        case 'COPERQC1':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',1)
+                            ->where('position','QC')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 2 QC Update';
+                            break;
+                        case 'COPERQC2':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',2)
+                            ->where('position','QC')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 2 QC Update';
+                            break;
+                        case 'COPERQC3':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',3)
+                            ->where('position','QC')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 3 QC Update';
+                            break;
+                        case 'COPERQC4':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',4)
+                            ->where('position','QC')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 4 QC Update';
+                            break;
+                        case 'COPERQC5':
+                            $cLqcTrainingItemResult
+                            ->where('day_number',5)
+                            ->where('position','QC')
+                            ->whereNotNull('trainer_emp_no');
+                            $messageAlert = 'Day 5 QC Update';
+                            break;
+                        default:
+                            $cLqcTrainingItemResult;
+                            break;
+                    }
+                   $countCLqcTrainingItemResult = $cLqcTrainingItemResult->count();
+                    if($countCLqcTrainingItemResult === 0 ){
+                        return response()->json(['is_success' => 'false', "message" => 'Please input the '.$messageAlert.''],409);
+                    }
+                    $qcModelApprover::updateOrCreate(
+                        ['qc_slips_id' => $qcSlipId, 'approval_status' => $currentApprovalStatus],
+                        [
+                            "qc_slips_id"   => $qcSlipId,
+                            'decision_status' => 'APP',
+                        ]
+                    );
+                    if($currentApprovalStatus === 'DOPEROSC'){  //PRODUCT ORIENTATION AND SAMPLE CHECK (QC)
+                        $qcModelApprover::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'DOPEROSC'],
+                           [
+                                "qc_slips_id"   => $qcSlipId,
+                                'decision_status' => 'APP',
+                                'first_approver'  => $this->joinSafe($request, 'text_sec1_certified_operator'),
+                                'first_date'      => $this->getSafe($request, 'text_sec1_date_operator'),
+                                'first_time'      => $this->getSafe($request, 'text_sec1_time_operator'),
+                                'first_status'    => $this->getSafe($request, 'text_sel_result1_operator'),
+                                
+                                'second_approver'  => $this->getSafe($request, 'text_sec2_certified_operator'),
+                                'second_status'  => $this->getSafe($request, 'text_sel_result2_operator'),
+                                'second_date'      => $this->getSafe($request, 'text_sec2_date_operator'),
+                                'second_time'      => $this->getSafe($request, 'text_sec2_time_operator'),
+                            ]
+                        );
+                    }
+                    if($currentApprovalStatus === 'EOPERVISUAL'){ //PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS)
+                         $qcModelApprover::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'DOPEROSC'],
+                           [
+                                "qc_slips_id"   => $qcSlipId,
+                                'decision_status' => 'APP',
+                                'first_approver'  => $this->joinSafe($request, 'text_pv1_certified_operator'),
+                                'first_date'      => $this->getSafe($request, 'text_pv1_date_operator'),
+                                'first_time'      => $this->getSafe($request, 'text_pv2_date_operator'),
+                                'first_status'    => $this->getSafe($request, 'text_pv1_time_operator'),
+                                'first_remarks'    => $this->getSafe($request, 'text_reason_disqualification'),
+                                
+                                'second_approver'  => $this->getSafe($request, 'text_pv2_certified_operator'),
+                                'second_status'  => $this->getSafe($request, 'text_pv_result2_operator'),
+                                'second_date'      => $this->getSafe($request, 'text_pv2_date_operator'),
+                                'second_time'      => $this->getSafe($request, 'text_pv2_time_operator'),
+                            ]
+                        );
+                    }
+                }
             }
             if($currentPositionCategory === 'MH'){
                 // ASepTrainingOrientationRequest
@@ -896,7 +1051,7 @@ class QualificationCertificationController extends Controller
                         $operToApprovers = [
                             'approval_status' => 'ATECHENGTQ',
                             'decision_status' => 'APP',
-                            // Engineering Section certification (first / second take)
+                            // Engineer Section certification (first / second take)
                             'first_approver'  => $this->joinSafe($request, 'text_tech_trained_qualified_by'),
                             'first_approver_2'=> $this->joinSafe($request, 'text_tech_mentored_by'),
                             'first_date'      => $this->getSafe($request, 'text_tech_date'),
@@ -1139,7 +1294,7 @@ class QualificationCertificationController extends Controller
             // $from_name = 'issinfoservice@pricon.ph';
             $message = $this->commonController->emailMsg($emailParams);
             $rapidxEmpNo =  session('global_user');
-            $emailData = [
+           return $emailData = [
                 "to" =>$to,
                 // "to" =>"mrronquez@pricon.ph",
                 "cc" =>$cc,
@@ -1800,7 +1955,7 @@ class QualificationCertificationController extends Controller
                 ->get()
                 ->pluck('empname', 'EmpNo');
 
-           $qcSlipsDetails=  $qcSlips->where('control_no','QC-TSF1-0826-001')->get();
+           $qcSlipsDetails=  $qcSlips->where('control_no','QC-TSF1-1026-003')->get();
                 return DataTables($qcSlipsDetails)
             ->addColumn('rawAction',function ($row) use ($request){
                 $result = '';
@@ -2026,6 +2181,135 @@ class QualificationCertificationController extends Controller
     public function changeApprovalStatus($params){
         $selectedSection = str_contains($params['selectedSection'], 'PPD');
         $isMachineOperatorExists = $params['isMachineOperatorExists'];
+       if ($params['selectPosition'] === 'VisualOperator') {
+            $currentStatus = $params['approval_status'] ?? '';
+            switch ($currentStatus) {
+
+                // ==========================================
+                // 1. CHECKBOX VALIDATION PHASE
+                // ==========================================
+                case 'PB':
+                    $newStatus  = 'AOPERPRDN';
+                    $statusName = 'A Production Update Checklist';
+                    break;
+
+                case 'AOPERPRDN':
+                    $newStatus  = 'BOPERENGG';
+                    $statusName = 'A Engineer Update Checklist';
+                    break;
+
+                case 'BOPERENGG':
+                    $newStatus  = 'COPERQC';
+                    $statusName = 'A QC Update Checklist';
+                    break;
+
+                // ==========================================
+                // 2. DAY 1 PHASE
+                // ==========================================
+                case 'COPERQC':
+                    $newStatus  = 'AOPERPRDN1';
+                    $statusName = 'A Production Day 1 Update';
+                    break;
+
+                case 'AOPERPRDN1':
+                    $newStatus  = 'BOPERENGG1';
+                    $statusName = 'A Engineer Day 1 Update';
+                    break;
+
+                case 'BOPERENGG1':
+                    $newStatus  = 'COPERQC1';
+                    $statusName = 'A QC Day 1 Update';
+                    break;
+
+                // ==========================================
+                // 3. DAY 2 PHASE
+                // ==========================================
+                case 'COPERQC1':
+                    $newStatus  = 'AOPERPRDN2';
+                    $statusName = 'A Production Day 2 Update';
+                    break;
+
+                case 'AOPERPRDN2':
+                    $newStatus  = 'BOPERENGG2';
+                    $statusName = 'A Engineer Day 2 Update';
+                    break;
+
+                case 'BOPERENGG2':
+                    $newStatus  = 'COPERQC2';
+                    $statusName = 'A QC Day 2 Update';
+                    break;
+
+                // ==========================================
+                // 4. DAY 3 PHASE
+                // ==========================================
+                case 'COPERQC2':
+                    $newStatus  = 'AOPERPRDN3';
+                    $statusName = 'A Production Day 3 Update';
+                    break;
+
+                case 'AOPERPRDN3':
+                    $newStatus  = 'BOPERENGG3';
+                    $statusName = 'A Engineer Day 3 Update';
+                    break;
+
+                case 'BOPERENGG3':
+                    $newStatus  = 'COPERQC3';
+                    $statusName = 'A QC Day 3 Update';
+                    break;
+
+                // ==========================================
+                // 5. DAY 4 PHASE
+                // ==========================================
+                case 'COPERQC3':
+                    $newStatus  = 'AOPERPRDN4';
+                    $statusName = 'A Production Day 4 Update';
+                    break;
+
+                case 'AOPERPRDN4':
+                    $newStatus  = 'BOPERENGG4';
+                    $statusName = 'A Engineer Day 4 Update';
+                    break;
+
+                case 'BOPERENGG4':
+                    $newStatus  = 'COPERQC4';
+                    $statusName = 'A QC Day 4 Update';
+                    break;
+
+                // ==========================================
+                // 6. DAY 5 PHASE
+                // ==========================================
+                case 'COPERQC4':
+                    $newStatus  = 'AOPERPRDN5';
+                    $statusName = 'A Production Day 5 Update';
+                    break;
+
+                case 'AOPERPRDN5':
+                    $newStatus  = 'BOPERENGG5';
+                    $statusName = 'A Engineer Day 5 Update';
+                    break;
+                case 'BOPERENGG5':
+                    $newStatus  = 'COPERQC5';
+                    $statusName = 'A QC Day 5 Update';
+                    break;
+                //Status For D & E   ==========
+                case 'COPERQC5':
+                    $newStatus  = 'DOPEROSC';
+                    $statusName = 'D PRODUCT ORIENTATION AND SAMPLE CHECK (QC)';
+                    break;
+                case 'DOPEROSC':
+                    $newStatus  = 'EOPERVISUAL';
+                    $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
+                    break;
+                case 'DOPEROSC':
+                    $newStatus  = 'LQCHEADAPP';
+                    $statusName = 'For Section Head Approval';
+                    break;
+                default:
+                      $newStatus = 'N/A';
+                    $statusName = 'N/A';
+                    break;
+            }
+        }
         if($params['selectPosition'] === 'MH'){
                 // CSEPHEAD
             switch (true) {
@@ -2064,11 +2348,11 @@ class QualificationCertificationController extends Controller
             switch (true) {
                 case ($params['approval_status'] === 'PB'):
                     $newStatus = 'ATECHENGTQ';
-                    $statusName = 'A Engineering Training Qualification Update';
+                    $statusName = 'A Engineer Training Qualification Update';
                     break;
                 case ($params['approval_status'] === 'ATECHENGTQ'):
                     $newStatus = 'BTECHENGC';
-                    $statusName = 'B Engineering Certification Update';
+                    $statusName = 'B Engineer Certification Update';
                     break;
                 case ($params['approval_status'] === 'BTECHENGC'):
                     $newStatus = 'CTECHQCC';
@@ -2122,7 +2406,7 @@ class QualificationCertificationController extends Controller
                     break;
                 case ($params['approval_status'] === 'CQCC' && $selectedSection != 1 && $isMachineOperatorExists > 0): //For Machine Operator Only
                     $newStatus = 'EENGVP';
-                    $statusName = 'E Engineering Validation Process';
+                    $statusName = 'E Engineer Validation Process';
                     break;
                 case ($params['approval_status'] === 'CQCC'  && $selectedSection != 1 && $isMachineOperatorExists === 0):
                     $newStatus = 'EQCVP';
@@ -2138,7 +2422,7 @@ class QualificationCertificationController extends Controller
                 //     break;
                 // case ($params['approval_status'] === 'DPRDPPDONLY'):
                 //     $newStatus = 'EQCVP';
-                //     $statusName = 'D Engineering Update';
+                //     $statusName = 'D Engineer Update';
                 //     break;
                 // case ($params['approval_status'] === 'DENGGPPDONLY'):
                 //     $newStatus = 'DQCPPDONLY';
@@ -2147,7 +2431,7 @@ class QualificationCertificationController extends Controller
 
                 case ($params['approval_status'] === 'DPPDONLY' && $isMachineOperatorExists === 0): // QC Validation Pr
                     $newStatus = 'EENGVP'; //For Machine Operator Only
-                    $statusName = 'E Engineering Validation Process';
+                    $statusName = 'E Engineer Validation Process';
                     break;
                 case ($params['approval_status'] === 'DPPDONLY' && $isMachineOperatorExists > 0): // QC Validation Pr
                     $newStatus = 'EQCVP';  // QC Validation Process

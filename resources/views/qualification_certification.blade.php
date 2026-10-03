@@ -635,6 +635,9 @@
                 case 'Operator':
                     saveFormOper(form.formSubmitOper);
                     break;
+                case 'VisualOperator':
+                    saveFormOper(form.formSubmitOperators);
+                    break;
                 default:
                     alert('Unknown position selected. Please select a valid position.');
                     break;
@@ -643,8 +646,8 @@
         $(document).on('submit', '#formSubmitOperators', function (e) {
             e.preventDefault();
             var $form = $(this);
-            saveFormOper($form);
-            // $('#modalSendEmail').modal();
+            // saveFormOper($form);
+            $('#modalSendEmail').modal();
         });
         $(document).on('submit', '#formSubmit_SEP', function (e) {
             e.preventDefault();
@@ -901,6 +904,12 @@
             //MH
             '#text_mh_first_trained_by',
             '#text_mh_approved_confirmed_by',
+            //NEW OPERATOR
+            '#text_sec1_certified_operator',
+            '#text_sec2_certified_operator',
+            '#text_pv1_certified_operator',
+            '#text_pv2_certified_operator',
+            '#text_visual_approved_confirmed_by',
         ]);
         // initSelectPassFail([
         //     '#text_oa_1st_result_es_oper',

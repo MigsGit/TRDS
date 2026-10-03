@@ -131,11 +131,20 @@
                     $dayScope.filter('.select-day-result').val(trainerRow.overall_result || '');
                 });
             }
+            if (json && json.chkTrainerValidation) {
+                var chkData = json.chkTrainerValidation;
+                $table.find('.chk-trainer-emp-no').val(chkData.chk_trainer_emp_no || '');
+                $table.find('.chk-trainer-name-display').text(chkData.chk_trainer_name || '');
+                $table.find('.input-chk-date').val(chkData.chk_validation_date || '');
+                $table.find('.input-chk-time').val(chkData.chk_validation_time || '');
+            }
         });
 
         return dtInstance;
     };
 
+    /**
+  
     /**
      * Reads every row of a position-specific training table body into a plain
      * array of row objects ready to be posted to save_qc_lqc_training_items_by_position.
@@ -188,6 +197,22 @@
     };
 
     /**
+     * Reads the single Global/Checkbox Trainer Validation fields of a
+     * position-specific training table (not day-scoped — one set of values
+     * per table) ready to be posted as `chk_trainer_validation`.
+     * @param  {jQuery} $table
+     * @return {Object}
+     */
+    const gatherChkTrainerValidation = ($table) => {
+        return {
+            chk_trainer_emp_no:  $table.find('.chk-trainer-emp-no').val() || null,
+            chk_trainer_name:    $table.find('.chk-trainer-name-display').text().trim() || null,
+            chk_validation_date: $table.find('.input-chk-date').val() || null,
+            chk_validation_time: $table.find('.input-chk-time').val() || null
+        };
+    };
+
+    /**
      * Generic save handler for any of the 3 new position-specific matrices.
      * Collects both the item-row matrix AND the embedded Trainer Verification
      * fields (Day 1-5) in a single combined payload.
@@ -199,8 +224,9 @@
         var $table = $(tableSelector);
         if (!$table.length) { return; }
 
-        var matrix      = gatherPositionMatrixRows($table.find('tbody'));
-        var trainerDays = gatherTrainerDays($table);
+        var matrix               = gatherPositionMatrixRows($table.find('tbody'));
+        var trainerDays          = gatherTrainerDays($table);
+        var chkTrainerValidation = gatherChkTrainerValidation($table);
         var dayDates    = {};
         $table.closest('.table-responsive').find('.header-date-input').each(function () {
             dayDates['day_' + $(this).data('day')] = $(this).val();
@@ -210,11 +236,12 @@
             url: 'save_qc_lqc_training_items_by_position',
             method: 'POST',
             data: {
-                qc_slips_id:  qcSlipsId || $('#qc_slips_id').val() || '',
-                position:     position,
-                matrix:       matrix,
-                day_dates:    dayDates,
-                trainer_days: trainerDays
+                qc_slips_id:            qcSlipsId || $('#qc_slips_id').val() || '',
+                position:               position,
+                matrix:                 matrix,
+                day_dates:              dayDates,
+                trainer_days:           trainerDays,
+                chk_trainer_validation: chkTrainerValidation
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -247,42 +274,50 @@
      * If either check fails, scanning is blocked, the input is cleared, and a
      * SweetAlert warning is shown.
      */
+    /**
+     * Checkbox/Global Trainer barcode scan handler (Enter/KeyCode 13).
+     *
+     * GATING RULE 1: every .chk-select-item in the active table must be
+     * checked before this scan is allowed. If not, the scan is blocked, the
+     * input is cleared, and a SweetAlert warning is shown.
+     */
     $(document).on('keypress', '.chk-trainer-scan-input', function (e) {
         if (e.which !== 13 && e.keyCode !== 13) { return; }
         e.preventDefault();
 
-        var $input   = $(this);
-        var day      = $input.data('day');
-        var empNo    = $.trim($input.val());
-        var $table   = $input.closest('table');
-        var $tbody   = $table.find('tbody');
+        var $input = $(this);
+        var empNo  = $.trim($input.val());
+        var $table = $input.closest('table');
+        var $tbody = $table.find('tbody');
 
         if (!empNo) { return; }
 
-        var allChecked = true;
-        $tbody.find('.chk-select-item').each(function () {
+        var allChecked  = true;
+        var $checkboxes = $tbody.find('.chk-select-item');
+        if (!$checkboxes.length) { allChecked = false; }
+        $checkboxes.each(function () {
             if (!$(this).is(':checked')) {
                 allChecked = false;
                 return false;
             }
         });
 
-        // if (!allChecked) {
-        //     $input.val('');
-        //     Swal.fire({
-        //         icon: 'warning',
-        //         title: 'Incomplete Matrix',
-        //         text: 'Cannot scan Trainer ID: All row checkboxes and Day ' + day + ' item results must be completed first.'
-        //     });
-        //     return;
-        // }
+        if (!allChecked) {
+            $input.val('');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Incomplete Checklist',
+                text: 'Cannot scan Checkbox Trainer ID: All row checkboxes must be ticked first.'
+            });
+            return;
+        }
+
         ajaxRequest({
             url: 'get_employee_details_by_no',
             method: 'GET',
             data: { emp_no: empNo },
             successCallback: function (response) {
                 if (!response || !response.emp_no) {
-                    $input.val('');
                     Swal.fire({ icon: 'error', title: 'Not Found', text: 'No employee found for Trainer ID "' + empNo + '".' });
                     return;
                 }
@@ -292,22 +327,29 @@
                 var currentDate = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
                 var currentTime = pad(now.getHours()) + ':' + pad(now.getMinutes());
 
-                $('.chk-trainer-scan-input').val(response.emp_no);
-                $('.chk-trainer-name-display').text(response.name || '');
-                $('input.input-chk-time').val(currentDate);
-                $('select.select-chk-result').val(currentTime);
+                $table.find('.chk-trainer-emp-no').val(response.emp_no);
+                $table.find('.chk-trainer-name-display').text(response.name || '');
+
+                var $dateInput = $table.find('.input-chk-date');
+                var $timeInput = $table.find('.input-chk-time');
+                if (!$.trim($dateInput.val())) { $dateInput.val(currentDate); }
+                if (!$.trim($timeInput.val())) { $timeInput.val(currentTime); }
             },
             errorCallback: function (xhr, status, error) {
                 console.log('Ajax Error:', xhr.responseText);
-                $input.val('');
                 Swal.fire({ icon: 'error', title: 'Scan Failed', text: 'Unable to look up Trainer ID.' });
             }
         });
 
         $input.val('');
-
-
     });
+    /**
+     * Day 1-5 Trainer barcode scan handler (Enter/KeyCode 13).
+     *
+     * GATING RULE 2: the Checkbox/Global Trainer must already be validated
+     * (i.e. .chk-trainer-emp-no is populated) AND every .input-result for the
+     * scanned day must be filled before this scan is allowed.
+     */
     $(document).on('keypress', '.trainer-scan-input', function (e) {
         if (e.which !== 13 && e.keyCode !== 13) { return; }
         e.preventDefault();
@@ -320,13 +362,7 @@
 
         if (!empNo) { return; }
 
-        var allChecked = true;
-        $tbody.find('.chk-select-item').each(function () {
-            if (!$(this).is(':checked')) {
-                allChecked = false;
-                return false;
-            }
-        });
+        var chkTrainerValidated = !!$.trim($table.find('.chk-trainer-emp-no').val());
 
         var allResultsFilled = true;
         var $dayResultInputs = $tbody.find('.input-result[data-day="' + day + '"]');
@@ -338,12 +374,12 @@
             }
         });
 
-        if (!allChecked || !allResultsFilled) {
+        if (!chkTrainerValidated || !allResultsFilled) {
             $input.val('');
             Swal.fire({
                 icon: 'warning',
                 title: 'Incomplete Matrix',
-                text: 'Cannot scan Trainer ID: All row checkboxes and Day ' + day + ' item results must be completed first.'
+                text: 'Cannot scan Trainer ID: Checkbox Trainer validation and Day ' + day + ' item results must be completed first.'
             });
             return;
         }
@@ -438,10 +474,13 @@
         $('.btnSaveMatrix').addClass('d-none');
         $('.btnAllOperator').addClass('d-none');
         if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
-            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', $('#qc_slips_id').val(),8);
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 10);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 11);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 12);
             $('.btnAllOperator').removeClass('d-none');
-            // initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineering', $('#qc_slips_id').val(),ddMastersId);
-            // initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', $('#qc_slips_id').val(),ddMastersId);
         }
         if(positionCategory === 'MH'){
             initTrainingItemsTable('#tblTrainingItems_mh');
@@ -1544,6 +1583,8 @@
             getApprovalStatusToggle({
                 approvalStatus: currentStatus,
                 positionCategory : positionCategory,
+                qcSlipsId : data.id,
+
              });
 
           

@@ -528,6 +528,94 @@ class CommonController extends Controller
             
              $spanColor = 'bg-danger';
              switch ($approvalStatus) {
+                //VISUAL OPERATOR
+                // Initial State
+                case 'PB':
+                    $statusName = 'Pending Initial Checklist';
+                    break;
+
+                // Checkbox Validation Phase
+                case 'AOPERPRDN':
+                    $statusName = 'A Production Update Checklist';
+                    break;
+
+                case 'BOPERENGG':
+                    $statusName = 'B Engineer Update Checklist';
+                    break;
+
+                case 'COPERQC':
+                    $statusName = 'C QC Update Checklist';
+                    break;
+
+                // Day 1 Phase
+                case 'AOPERPRDN1':
+                    $statusName = 'A Production Day 1 Update';
+                    break;
+
+                case 'BOPERENGG1':
+                    $statusName = 'B Engineer Day 1 Update';
+                    break;
+
+                case 'COPERQC1':
+                    $statusName = 'C QC Day 1 Update';
+                    break;
+
+                // Day 2 Phase
+                case 'AOPERPRDN2':
+                    $statusName = 'A Production Day 2 Update';
+                    break;
+
+                case 'BOPERENGG2':
+                    $statusName = 'B Engineer Day 2 Update';
+                    break;
+
+                case 'COPERQC2':
+                    $statusName = 'C QC Day 2 Update';
+                    break;
+
+                // Day 3 Phase
+                case 'AOPERPRDN3':
+                    $statusName = 'A Production Day 3 Update';
+                    break;
+
+                case 'BOPERENGG3':
+                    $statusName = 'B Engineer Day 3 Update';
+                    break;
+
+                case 'COPERQC3':
+                    $statusName = 'C QC Day 3 Update';
+                    break;
+
+                // Day 4 Phase
+                case 'AOPERPRDN4':
+                    $statusName = 'A Production Day 4 Update';
+                    break;
+
+                case 'BOPERENGG4':
+                    $statusName = 'B Engineer Day 4 Update';
+                    break;
+
+                case 'COPERQC4':
+                    $statusName = 'C QC Day 4 Update';
+                    break;
+
+                // Day 5 Phase
+                case 'AOPERPRDN5':
+                    $statusName = 'A Production Day 5 Update';
+                    break;
+
+                case 'BOPERENGG5':
+                    $statusName = 'B Engineer Day 5 Update';
+                    break;
+                case 'COPERQC5':
+                    $statusName = 'C QC Day 5 Update';
+                    break;
+                case 'DOPEROSC':
+                    $statusName = 'D PRODUCT ORIENTATION AND SAMPLE CHECK (QC)';
+                    break;
+                case 'EOPERVISUAL':
+                    $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
+                    break;
                 //MH
                 case 'BMHQC':
                     $newStatus = 'BMHQC';

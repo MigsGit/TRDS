@@ -22,20 +22,6 @@
         <div class="table-responsive">
             <table id="{{ $tableId }}" class="table table-bordered table-hover align-middle nowrap w-100 js-training-items-table">
                 <thead class="table-secondary text-center">
-                    <tr class="table-light">
-                        <th colspan="8" class="text-start">
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                <span class="fw-bold me-2">Checkbox Trainer Validation:</span>
-                                <input type="text" class="form-control form-control-sm chk-trainer-scan-input" data-position="{{ $position }}" placeholder="Scan Trainer ID" style="max-width: 160px;">
-                                <input type="hidden" class="chk-trainer-emp-no" value="">
-                                <span class="chk-trainer-name-display text-muted" style="min-width: 140px;"></span>
-                                <label class="mb-0 ms-2">Date:</label>
-                                <input type="date" class="form-control form-control-sm input-chk-date" style="max-width: 150px;">
-                                <label class="mb-0 ms-2">Time:</label>
-                                <input type="time" class="form-control form-control-sm input-chk-time" style="max-width: 120px;">
-                            </div>
-                        </th>
-                    </tr>
                     <tr>
                         <th rowspan="2" class="align-middle" style="width: 25%;">Training Items</th>
                         <th rowspan="2" class="align-middle text-center" style="width: 5%;">
@@ -57,7 +43,13 @@
                 </tbody>
                 <tfoot class="table-light">
                     <tr>
-                        <th colspan="2" class="text-end align-middle">Trainer ID (Scan):</th>
+                        <th colspan="" class="text-end align-middle">Trainer ID (Scan):</th>
+                        <td class="text-center">
+                            <input type="text" class="form-control form-control-sm chk-trainer-scan-input" data-position="{{ $position }}" placeholder="Scan Trainer ID" style="max-width: 160px;">
+                            <input type="hidden" class="chk-trainer-emp-no" value="">
+                            <span class="chk-trainer-name-display text-muted" style="min-width: 140px;">
+                                </span>
+                        </td>
                         @for ($day = 1; $day <= 5; $day++)
                             <td class="text-center">
                                 <input type="text" class="form-control form-control-sm trainer-scan-input" data-day="{{ $day }}" data-position="{{ $position }}" placeholder="Scan Trainer ID">
@@ -68,7 +60,10 @@
                         <td></td>
                     </tr>
                     <tr>
-                        <th colspan="2" class="text-end align-middle">Validation Date:</th>
+                        <th colspan="" class="text-end align-middle">Validation Date:</th>
+                        <td class="text-center">
+                              <input type="date" class="form-control form-control-sm input-chk-date" style="max-width: 150px;">
+                        </td>
                         @for ($day = 1; $day <= 5; $day++)
                             <td class="text-center">
                                 <input type="date" class="form-control form-control-sm input-day-date" data-day="{{ $day }}">
@@ -77,7 +72,10 @@
                         <td></td>
                     </tr>
                     <tr>
-                        <th colspan="2" class="text-end align-middle">Validation Time:</th>
+                        <th colspan="" class="text-end align-middle">Validation Time:</th>
+                        <td class="text-center">
+                           <input type="time" class="form-control form-control-sm input-chk-time" style="max-width: 150px;">
+                        </td>
                         @for ($day = 1; $day <= 5; $day++)
                             <td class="text-center">
                                 <input type="time" class="form-control form-control-sm input-day-time" data-day="{{ $day }}">
@@ -86,7 +84,14 @@
                         <td></td>
                     </tr>
                     <tr>
-                        <th colspan="2" class="text-end align-middle">Overall Result:</th>
+                        <th colspan="" class="text-end align-middle">Overall Result:</th>
+                       <td class="text-center">
+                            <select class="form-control form-control-sm select-chk-result">
+                                    <option value="">--</option>
+                                    <option value="Passed">Passed</option>
+                                    <option value="Failed">Failed</option>
+                            </select>
+                        </td>
                         @for ($day = 1; $day <= 5; $day++)
                             <td class="text-center">
                                 <select class="form-control form-control-sm select-day-result" data-day="{{ $day }}">

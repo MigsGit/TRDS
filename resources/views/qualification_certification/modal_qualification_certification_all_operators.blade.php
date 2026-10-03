@@ -18,7 +18,7 @@
             ])
         </div>
         <div class="accordion" id="accordionExampleMachine">
-          @include('qualification_certification.operator_engg_training_items_table', [
+          @include('qualification_certification.operator_qc_training_items_table', [
                 'tableId'        => 'tblTrainingItemsMachine',
                 'accordionParent' => '#accordionExampleMachine',
                 'position'       => 'QC',
@@ -173,7 +173,7 @@
                             </div>
                             <div class="row mb-3">
                                 <div class="col-md-12">
-                                    <label for="">Date:</label>
+                                    <label for="">Reason For Disqualification:</label>
                                     <input class="form-control" type="text" id="text_reason_disqualification" name="text_reason_disqualification">
                                 </div>
                             </div>
