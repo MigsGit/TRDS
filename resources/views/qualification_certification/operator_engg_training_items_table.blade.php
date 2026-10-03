@@ -78,7 +78,7 @@
                         </td>
                         @for ($day = 1; $day <= 5; $day++)
                             <td class="text-center">
-                                <input required  type="time" class="form-control form-control-sm input-day-time" data-day="{{ $day }}">
+                                <input  type="time" class="form-control form-control-sm input-day-time" data-day="{{ $day }}">
                             </td>
                         @endfor
                         <td></td>
@@ -86,7 +86,7 @@
                     <tr>
                         <th colspan="" class="text-end align-middle">Overall Result:</th>
                        <td class="text-center">
-                            <select required class="form-control form-control-sm select-chk-result">
+                            <select class="form-control form-control-sm select-chk-result">
                                     <option value="">--</option>
                                     <option value="Passed">Passed</option>
                                     <option value="Failed">Failed</option>

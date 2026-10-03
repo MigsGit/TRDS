@@ -501,6 +501,10 @@
             if( approvalStatus.includes('OPERQC')){
                 $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
             }
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
         }
         if(positionCategory === 'MH'){
             initTrainingItemsTable('#tblTrainingItems_mh');
@@ -1422,6 +1426,44 @@
             editSelectionsMap
         );
     }
+    const getEmployeeDetailsByEmpNoSelect2Operators = (params) => {
+        let response = params.response;
+        const doperosc = response?.approversCollection?.DOPEROSC?.[0] ?? null;
+        const eopervisual = response?.approversCollection?.EOPERVISUAL?.[0] ?? null;
+        const opheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
+
+        const doperoscToFirst = doperosc?.first_approver_exploded ?? [];
+        const doperoscToSecond = doperosc?.second_approver_exploded ?? [];
+        const eopervisualToFirst = eopervisual?.first_approver_exploded ?? [];
+        const eopervisualToSecond = eopervisual?.second_approver_exploded ?? [];
+        const opheadappToFirst = opheadapp?.alert_prod_sec_exploded ?? [];
+
+        const mappedEopervisualToFirst = eopervisualToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedEopervisualToSecond = eopervisualToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedDoperoscToFirst = doperoscToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedDoperoscToSecond = doperoscToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedOpheadappToFirst = opheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        
+         // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        editSelectionsMap['#text_pv1_certified_operator'] = mappedEopervisualToFirst;
+        editSelectionsMap['#text_pv2_certified_operator'] = mappedEopervisualToSecond;
+        editSelectionsMap['#text_sec1_certified_operator'] = mappedDoperoscToFirst;
+        editSelectionsMap['#text_sec2_certified_operator'] = mappedDoperoscToSecond;
+        editSelectionsMap['#text_visual_approved_confirmed_by'] = mappedOpheadappToFirst;
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_pv1_certified_operator',
+                '#text_pv2_certified_operator',
+                '#text_sec1_certified_operator',
+                '#text_sec2_certified_operator',
+                '#text_visual_approved_confirmed_by',
+            ],
+            editSelectionsMap
+        );
+
+    }
     const getEmployeeDetailsByEmpNoSelect2Mh = (params) => {
         let response = params.response;
 
@@ -1647,6 +1689,30 @@
                 6,
                 editSelectionsMap6
             );
+            if(positionCategory === 'VisualOperator'){
+                const doperosc = response?.approversCollection?.DOPEROSC?.[0] ?? null;
+                form.formSubmitOperators.find('#text_sel_result1_operator').val(doperosc?.first_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_sec1_date_operator').val(doperosc?.first_date ?? '');
+                form.formSubmitOperators.find('#text_sec1_time_operator').val(doperosc?.first_time ?? '');
+                
+                form.formSubmitOperators.find('#text_sel_result2_operator').val(doperosc?.second_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_sec2_date_operator').val(doperosc?.second_date ?? '');
+                form.formSubmitOperators.find('#text_sec2_time_operator').val(doperosc?.second_time ?? '');
+
+                const eopervisual = response?.approversCollection?.EOPERVISUAL?.[0] ?? null;
+                
+                form.formSubmitOperators.find('#text_pv_result1_operator').val(eopervisual?.first_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_pv1_date_operator').val(eopervisual?.first_date ?? '');
+                form.formSubmitOperators.find('#text_pv1_time_operator').val(eopervisual?.first_time ?? '');
+                form.formSubmitOperators.find('#text_reason_disqualification').val(eopervisual?.first_remarks ?? '');
+                
+                form.formSubmitOperators.find('#text_pv_result2_operator').val(eopervisual?.second_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_pv2_date_operator').val(eopervisual?.second_date ?? '');
+                form.formSubmitOperators.find('#text_pv2_time_operator').val(eopervisual?.second_time ?? '');
+                getEmployeeDetailsByEmpNoSelect2Operators({
+                      response : response,
+                })
+            }
             if(positionCategory === 'MH'){
                 const mhTrainingOrientation = data.a_mh_training_orientation?.mh_training_orientation;
                 syncCheckboxesWithDb('text_mh_training_orientation', mhTrainingOrientation,form.formSubmitMh);

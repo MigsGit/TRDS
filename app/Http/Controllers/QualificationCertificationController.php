@@ -600,7 +600,7 @@ class QualificationCertificationController extends Controller
                     );
                     if($currentApprovalStatus === 'DOPEROSC'){  //PRODUCT ORIENTATION AND SAMPLE CHECK (QC)
                         $qcModelApprover::updateOrCreate(
-                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'DOPEROSC'],
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => $currentApprovalStatus],
                            [
                                 "qc_slips_id"   => $qcSlipId,
                                 'decision_status' => 'APP',
@@ -618,14 +618,14 @@ class QualificationCertificationController extends Controller
                     }
                     if($currentApprovalStatus === 'EOPERVISUAL'){ //PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS)
                          $qcModelApprover::updateOrCreate(
-                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'DOPEROSC'],
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => $currentApprovalStatus],
                            [
                                 "qc_slips_id"   => $qcSlipId,
                                 'decision_status' => 'APP',
                                 'first_approver'  => $this->joinSafe($request, 'text_pv1_certified_operator'),
                                 'first_date'      => $this->getSafe($request, 'text_pv1_date_operator'),
-                                'first_time'      => $this->getSafe($request, 'text_pv2_date_operator'),
-                                'first_status'    => $this->getSafe($request, 'text_pv1_time_operator'),
+                                'first_time'      => $this->getSafe($request, 'text_pv1_time_operator'),
+                                'first_status'    => $this->getSafe($request, 'text_pv_result1_operator'),
                                 'first_remarks'    => $this->getSafe($request, 'text_reason_disqualification'),
                                 
                                 'second_approver'  => $this->getSafe($request, 'text_pv2_certified_operator'),
@@ -1960,7 +1960,7 @@ class QualificationCertificationController extends Controller
             $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', array_merge($allEmpIdsTo, $allEmpIdsCc))
                 ->get()
                 ->pluck('empname', 'EmpNo');
-
+                            //QC-TSF1-1026-003 QC-TSF1-0826-001
            $qcSlipsDetails=  $qcSlips->where('control_no','QC-TSF1-1026-003')->get();
                 return DataTables($qcSlipsDetails)
             ->addColumn('rawAction',function ($row) use ($request){
@@ -2306,7 +2306,7 @@ class QualificationCertificationController extends Controller
                     $newStatus  = 'EOPERVISUAL';
                     $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
                     break;
-                case 'DOPEROSC':
+                case 'EOPERVISUAL':
                     $newStatus  = 'LQCHEADAPP';
                     $statusName = 'For Section Head Approval';
                     break;
