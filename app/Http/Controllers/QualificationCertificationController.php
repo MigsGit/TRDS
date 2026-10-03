@@ -1784,7 +1784,7 @@ class QualificationCertificationController extends Controller
                     $statusName = 'B Inspector Training Certification And Validation';
                     break;
                 case ($params['approval_status'] === 'BMHQC'):
-                    $newStatus = 'MHHEADAPP';
+                    $newStatus = 'LQCHEADAPP'; //MHHEADAPP
                     $statusName = 'For Section Head Approval';
                     break;
                 default:
