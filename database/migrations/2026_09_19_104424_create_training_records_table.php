@@ -21,7 +21,7 @@ class CreateTrainingRecordsTable extends Migration
             $table->string('trainer')->nullable()->comment = "Employee Number";
             $table->smallInteger('venue')->nullable()->comment = "fkid dropdown details";
             $table->smallInteger('type_of_training')->nullable()->comment = "fkid dropdown details";
-            // $table->string('result')->nullable();
+            $table->smallInteger('result')->nullable()->comment = "fkid dropdown details";
             $table->longText('objective')->nullable();
             $table->longText('remarks')->nullable();
             $table->string('attachments')->nullable();

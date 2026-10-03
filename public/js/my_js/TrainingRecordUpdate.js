@@ -72,6 +72,30 @@ const getEmployees = (cboElement) => {
     });
 }
 
+const getResultList = (cboElement) => {
+    $.ajax({
+        type: "GET",
+        url: "get_result_list",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value=""> -- Loading -- </option>';
+            cboElement.html(result);
+        },
+        success: function (response) {
+            let result = "";
+            result += `<option value="" selected disabled> -- Select Result -- </option>`;
+
+            response.forEach(element => {
+                result += `<option value="${element.id}">${element.dropdown_masters_details}</option>`;
+            });
+            cboElement.html(result);
+        },
+        error: function(xhr, status, error){
+            console.log('xhr: ' + xhr + "\n" + "status: " + status + "\n" + "error: " + error);
+        }
+    });
+}
+
 const saveTrainingRecord = (serializeData) => {
     
     $.ajax({

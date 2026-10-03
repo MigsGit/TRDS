@@ -47,9 +47,9 @@
                             </select>
                         </div>
                         <div class="form-group col-md-6 mb-0 text-md-right">
-                            <button type="button" class="btn btn-success" id="btnAddDropdownType">
+                            {{-- <button type="button" class="btn btn-success" id="btnAddDropdownType">
                                 <i class="fas fa-plus mr-1"></i> Add Dropdown Type
-                            </button>
+                            </button> --}}
                             
                         </div>
                     </div>

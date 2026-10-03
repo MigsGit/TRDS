@@ -202,7 +202,7 @@
 
                     <div class="form-row">
                         <!-- Trainer -->
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                             <label for="trainer" class="font-weight-bold small text-muted">
                                 TRAINER <span class="text-danger">*</span>
                             </label>
@@ -216,7 +216,7 @@
                         </div>
 
                         <!-- Venue -->
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                             <label for="venue" class="font-weight-bold small text-muted">
                                 VENUE <span class="text-danger">*</span>
                             </label>
@@ -229,9 +229,10 @@
                                 </select>
                             </div>
                         </div>
-
+                    </div>
+                    <div class="form-row">
                         <!-- Type of Training -->
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                             <label for="typeOfTraining" class="font-weight-bold small text-muted">
                                 TYPE OF TRAINING <span class="text-danger">*</span>
                             </label>
@@ -240,6 +241,18 @@
                                     <span class="input-group-text"><i class="fas fa-chalkboard-teacher"></i></span>
                                 </div>
                                 <select class="custom-select select2bs4" id="typeOfTraining" name="type_of_training" required>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="trainingResult" class="font-weight-bold small text-muted">
+                                Training Result <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-poll"></i></span>
+                                </div>
+                                <select class="custom-select select2bs4" id="trainingResult" name="result" required>
                                 </select>
                             </div>
                         </div>
@@ -422,6 +435,7 @@
 
         getTypeofTraining($('#typeOfTraining'));
         getVenue($('#venue'));
+        getResultList($('#trainingResult'));
         getEmployees($('#trainer'));
         getEmployees($('#traineeList'));
 

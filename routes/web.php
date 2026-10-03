@@ -341,6 +341,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_trainee_details', 'getTraineeDetails')->name('get_trainee_details');
         Route::post('/delete_training_record', 'deleteTrainingRecord')->name('delete_training_record');
         Route::post('/import_trainees', 'importTrainees')->name('import_trainees');
+        Route::get('/get_result_list', 'getResultList')->name('get_result_list');
     });
 
     Route::controller(GrrSettingsController::class)->group(function () {
