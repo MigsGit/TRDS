@@ -150,13 +150,14 @@ class QualificationCertificationController extends Controller
         $chkTrainerRow = CLqcTrainingItemResult::where('qc_slips_id', $qcSlipsId)
             ->where('position', $position)
             ->whereNotNull('chk_trainer_emp_no')
-            ->first(['chk_trainer_emp_no', 'chk_trainer_name', 'chk_validation_date', 'chk_validation_time']);
+            ->first(['chk_trainer_emp_no', 'chk_trainer_name', 'chk_validation_date', 'chk_validation_time','chk_overall_result']);
 
         $chkTrainerValidation = [
             'chk_trainer_emp_no'  => $chkTrainerRow->chk_trainer_emp_no ?? null,
             'chk_trainer_name'    => $chkTrainerRow->chk_trainer_name ?? null,
             'chk_validation_date' => $chkTrainerRow->chk_validation_date ?? null,
             'chk_validation_time' => $chkTrainerRow->chk_validation_time ?? null,
+            'chk_overall_result' => $chkTrainerRow->chk_overall_result ?? null,
         ];
 
         $items = DropdownMasterDetail::with(['c_lqc_training_item_results' => function ($query) use ($qcSlipsId, $position) {
@@ -306,8 +307,8 @@ class QualificationCertificationController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
 //    return $request->all();
-            // $qcSlipsId            = $request->input('qc_slips_id');
-            $qcSlipsId            = 212;
+            $qcSlipsId            = $request->input('qc_slips_id');
+            // $qcSlipsId            = 212;
             $position             = $request->input('position');
             $matrixData           = $request->input('matrix', []);
             $dayDates             = $request->input('day_dates', []);              // e.g. ['day_1' => '2026-09-30', ...]
@@ -350,6 +351,7 @@ class QualificationCertificationController extends Controller
                                     'chk_trainer_name'    => $chkTrainerValidation['chk_trainer_name'] ?? null,
                                     'chk_validation_date' => $chkTrainerValidation['chk_validation_date'] ?? null,
                                     'chk_validation_time' => $chkTrainerValidation['chk_validation_time'] ?? null,
+                                    'chk_overall_result' => $chkTrainerValidation['chk_overall_result'] ?? null,
                                 ]
                             );
                         }
@@ -455,6 +457,7 @@ class QualificationCertificationController extends Controller
                 if($currentApprovalStatus !='PB'){
                     // $currentApprovalStatus = $qcSlipDetails->approval_status;
                     $cLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId);
+                    // return $currentApprovalStatus;
                     switch ($currentApprovalStatus) {
                         case 'AOPERPRDN':
                             $cLqcTrainingItemResult->whereNotNull('chk_trainer_emp_no');
@@ -500,6 +503,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                                 ->where('position','Engineer')
                             ->whereNotNull('chk_trainer_emp_no');
+                            $messageAlert = 'Checklist ENGG Update';
                             break;
                         case 'BOPERENGG1':
                             $cLqcTrainingItemResult
@@ -541,6 +545,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('position','QC')
                             ->whereNotNull('chk_trainer_emp_no');
+                            $messageAlert = 'Checklist QC Update';
                             break;
                         case 'COPERQC1':
                             $cLqcTrainingItemResult
@@ -579,6 +584,7 @@ class QualificationCertificationController extends Controller
                             break;
                         default:
                             $cLqcTrainingItemResult;
+                            $messageAlert = 'Day 5 QC Update';
                             break;
                     }
                    $countCLqcTrainingItemResult = $cLqcTrainingItemResult->count();

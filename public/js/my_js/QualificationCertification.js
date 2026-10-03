@@ -137,6 +137,7 @@
                 $table.find('.chk-trainer-name-display').text(chkData.chk_trainer_name || '');
                 $table.find('.input-chk-date').val(chkData.chk_validation_date || '');
                 $table.find('.input-chk-time').val(chkData.chk_validation_time || '');
+                $table.find('.select-chk-result').val(chkData.chk_overall_result || '');
             }
         });
 
@@ -208,7 +209,8 @@
             chk_trainer_emp_no:  $table.find('.chk-trainer-emp-no').val() || null,
             chk_trainer_name:    $table.find('.chk-trainer-name-display').text().trim() || null,
             chk_validation_date: $table.find('.input-chk-date').val() || null,
-            chk_validation_time: $table.find('.input-chk-time').val() || null
+            chk_validation_time: $table.find('.input-chk-time').val() || null,
+            chk_overall_result:  $table.find('.select-chk-result').val() || null
         };
     };
 
@@ -332,8 +334,10 @@
 
                 var $dateInput = $table.find('.input-chk-date');
                 var $timeInput = $table.find('.input-chk-time');
+                var $resultSelect = $table.find('.select-chk-result');
                 if (!$.trim($dateInput.val())) { $dateInput.val(currentDate); }
                 if (!$.trim($timeInput.val())) { $timeInput.val(currentTime); }
+                if (!$.trim($resultSelect.val())) { $resultSelect.val(''); }
             },
             errorCallback: function (xhr, status, error) {
                 console.log('Ajax Error:', xhr.responseText);
@@ -486,10 +490,16 @@
             initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 12);
             $('.btnAllOperator').removeClass('d-none');
 
+            
             if( approvalStatus.includes('OPERPRDN')){
                 $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
-                // $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
-                // $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
             }
         }
         if(positionCategory === 'MH'){

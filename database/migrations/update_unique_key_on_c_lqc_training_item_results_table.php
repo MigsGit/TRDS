@@ -12,30 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('c_lqc_training_item_results', function (Blueprint $table) {
-            // 1. Drop foreign keys that rely on the old unique index
-            // (Adjust foreign key names if yours differ in schema)
-            $table->dropForeign(['qc_slips_id']);
-            $table->dropForeign(['training_item_id']);
+            // Position & Checkbox status
+            $table->string('position')->nullable()->after('item_remark')->comment('VisualOperator | Engineer | QC; NULL for legacy rows');
+            $table->unsignedTinyInteger('is_checked')->nullable()->default(null)->after('position')->comment('1 if checked, NULL if unticked');
 
-            // 2. Drop the old 3-column unique index
-            $table->dropUnique('c_lqc_tir_slip_item_day_unique');
+            // Day-level Trainer Validation
+            $table->string('trainer_emp_no')->nullable()->after('is_checked')->comment('Scanned trainer employee number');
+            $table->string('trainer_name')->nullable()->after('trainer_emp_no')->comment('Resolved trainer name from employee lookup');
+            $table->date('validation_date')->nullable()->after('trainer_name')->comment('Trainer validation date for this day');
+            $table->time('validation_time')->nullable()->after('validation_date')->comment('Trainer validation time for this day');
+            $table->string('overall_result')->nullable()->after('validation_time')->comment('Passed | Failed');
 
-            // 3. Create the new 4-column unique index including position
-            $table->unique(
-                ['qc_slips_id', 'training_item_id', 'day_number', 'position'],
-                'c_lqc_tir_slip_item_day_pos_unique'
-            );
-
-            // 4. Re-add the foreign key constraints
-            $table->foreign('qc_slips_id')
-                  ->references('id')
-                  ->on('qc_slips')
-                  ->onDelete('cascade');
-
-            $table->foreign('training_item_id')
-                  ->references('id')
-                  ->on('c_lqc_training_items')
-                  ->onDelete('cascade');
+            // Global Checkbox Trainer Validation
+            $table->string('chk_trainer_emp_no')->nullable()->after('overall_result')->comment('Scanned Checkbox Trainer employee number');
+            $table->string('chk_trainer_name')->nullable()->after('chk_trainer_emp_no')->comment('Resolved Checkbox Trainer name from employee lookup');
+            $table->date('chk_validation_date')->nullable()->after('chk_trainer_name')->comment('Checkbox Trainer validation date for the matrix');
+            $table->time('chk_validation_time')->nullable()->after('chk_validation_date')->comment('Checkbox Trainer validation time for the matrix');
+            $table->string('chk_overall_result')->nullable()->after('chk_validation_time')->comment('Checkbox Trainer validation result for the matrix');
         });
     }
 
@@ -44,26 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('c_lqc_training_item_results', function (Blueprint $table) {
-            $table->dropForeign(['qc_slips_id']);
-            $table->dropForeign(['training_item_id']);
-
-            $table->dropUnique('c_lqc_tir_slip_item_day_pos_unique');
-
-            $table->unique(
-                ['qc_slips_id', 'training_item_id', 'day_number'],
-                'c_lqc_tir_slip_item_day_unique'
-            );
-
-            $table->foreign('qc_slips_id')
-                  ->references('id')
-                  ->on('qc_slips')
-                  ->onDelete('cascade');
-
-            $table->foreign('training_item_id')
-                  ->references('id')
-                  ->on('c_lqc_training_items')
-                  ->onDelete('cascade');
-        });
+       Schema::dropIfExists('c_lqc_training_item_results');
     }
 };
