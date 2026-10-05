@@ -1700,7 +1700,7 @@ class QualificationCertificationController extends Controller
                     data-item-id="' . $row['id'] . '"
                     value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
     })
-        ->rawColumns(['item_name', 'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
+        ->rawColumns(['item_name','select_item', 'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
         ->with('headerDates', $headerDates)
         ->make(true);
     }
@@ -1929,12 +1929,13 @@ class QualificationCertificationController extends Controller
                 'op_approvers',
                 'op_approvers_pending',
                 'system_one_hris_subcon',
-                'qc_slip_employees',
-                'qc_slip_employees.system_one_hris_subcon',
             );
+
+
             if(filled($selectPosition) && $selectPosition != 'ALL'){
                 $data->where('position_category',$selectPosition);
             }
+
             if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
                 $data->where('section_category',$selectMhSortBySection);
             }
@@ -1971,22 +1972,37 @@ class QualificationCertificationController extends Controller
             }
             $data->whereNull('deleted_at');
             $data->orderBy('id','DESC');
-
-            // Keep the query as an Eloquent builder so Yajra v9 uses EloquentDataTable
-            // instead of CollectionDataTable and supports filterColumn().
-            $qcSlips = $data;
-            $allEmpIdsTo = []; // kept for later use if needed by other rows
-            $allEmpIdsCc = [];
+            $qclixx = $data;
+            $qcSlips = $data->get();
+            // Convert to a raw array for database handling
+            $allEmpIdsTo= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
+                ->flatten()                              // Flatten into a single layer of OpApprover models
+                ->pluck('alert_prod_sec')               // Pull out all the pipe-separated strings
+                ->filter()                               // Remove null or empty entries
+                ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
+                    return array_map('trim', explode('|', $item));
+                })
+                ->unique()                               // Drop duplicates
+                ->values()                               // Re-index array keys
+                ->all();                                 // Convert to a raw array for database handling
+            $allEmpIdsCc= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
+                ->flatten()                              // Flatten into a single layer of OpApprover models
+                ->pluck('alert_prod_cc_sec')               // Pull out all the pipe-separated strings
+                ->filter()                               // Remove null or empty entries
+                ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
+                    return array_map('trim', explode('|', $item));
+                })
+                ->unique()                               // Drop duplicates
+                ->values()                               // Re-index array keys
+                ->all();                                 // Convert to a raw array for database handling
 
             // 3. Fetch all matching names from HRIS into a quick-lookup map array
-            // This is kept only for the rawStatus display; the search itself is handled at query level.
-            $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', array_merge($allEmpIdsTo, $allEmpIdsCc))
+            $arrHrisSubconEmpNo = array_merge($allEmpIdsTo,$allEmpIdsCc);
+            $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', $arrHrisSubconEmpNo)
                 ->get()
                 ->pluck('empname', 'EmpNo');
-                            //QC-TSF1-1026-003 QC-TSF1-0826-001
-        //    $qcSlipsDetails=  $qcSlips->where('control_no','QC-TSF1-1026-003')->get();
-           $qcSlipsDetails=  $qcSlips->get();
-                return DataTables($qcSlipsDetails)
+
+            return DataTables($qcSlips)
             ->addColumn('rawAction',function ($row) use ($request){
                 $result = '';
                 $result .= '<center>';
@@ -2098,12 +2114,6 @@ class QualificationCertificationController extends Controller
                     ->filter()
                     ->implode(', ');
             })
-
-            // ->filterColumn('employee_names', function ($query, $keyword) {
-            //     $query->whereHas('qc_slip_employees.system_one_hris_subcon', function ($subQuery) use ($keyword) {
-            //         $subQuery->where('name', 'like', '%' . $keyword . '%');
-            //     });
-            // })
             ->rawColumns(['rawAction','rawStatus','created_by','created_at','employee_names'])
             ->make(true);
         } catch (Exception $e) {

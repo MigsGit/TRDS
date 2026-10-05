@@ -38,7 +38,11 @@
             },
             columns: [
                 { data: 'item_name', name: 'item_name' },
-                { data: 'select_item',   name: 'select_item',   className: 'text-center' },
+                {   data: 'select_item',
+                    visible: false,    // Hides column from display
+                    name: 'select_item',
+                    className: 'text-center'
+                },
                 { data: 'day_1',   name: 'day_1',   className: 'text-center' },
                 { data: 'day_2',   name: 'day_2',   className: 'text-center' },
                 { data: 'day_3',   name: 'day_3',   className: 'text-center' },
@@ -145,7 +149,7 @@
     };
 
     /**
-  
+
     /**
      * Reads every row of a position-specific training table body into a plain
      * array of row objects ready to be posted to save_qc_lqc_training_items_by_position.
@@ -303,8 +307,9 @@
                 return false;
             }
         });
-
-        if (!allChecked) {
+    
+        //Visual Operator
+        if (!allChecked && $('#text_select_position').val() != 'VisualOperator') {
             $input.val('');
             Swal.fire({
                 icon: 'warning',
@@ -475,6 +480,7 @@
         $('#divSupervisor').addClass('d-none');
         $('#divTechnician').addClass('d-none');
         $('#divMH').addClass('d-none');
+        $('#divAllOperators').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
         $('.btnAllOperator').addClass('d-none');
         $('#btnSaveMatrix_tblTrainingItemsVisual').addClass('d-none');
@@ -482,15 +488,20 @@
         $('#btnSaveMatrix_tblTrainingItemsMachine').addClass('d-none');
 
         if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],17);
+            $('#divAllOperators').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
             $('#seriesDesignation').text('Designation');
             $('#productLine').removeClass('d-none');
-            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 10);
-            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 11);
-            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 12);
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 18);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 19);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 20);
             $('.btnAllOperator').removeClass('d-none');
 
-            
+
             if( approvalStatus.includes('OPERPRDN')){
                 $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
             }
@@ -1443,7 +1454,7 @@
         const mappedDoperoscToFirst = doperoscToFirst.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedDoperoscToSecond = doperoscToSecond.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedOpheadappToFirst = opheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
-        
+
          // 2. Assign those formatted arrays to their target selectors inside the map
         let editSelectionsMap = {};
         editSelectionsMap['#text_pv1_certified_operator'] = mappedEopervisualToFirst;
@@ -1476,7 +1487,7 @@
 
         const mappedAmhtoToFirst = amhtoToFirst.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedMhheadappToFirst = mhheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
-        
+
          // 2. Assign those formatted arrays to their target selectors inside the map
         let editSelectionsMap = {};
         editSelectionsMap['#text_mh_first_trained_by'] = mappedAmhtoToFirst;
@@ -1496,7 +1507,7 @@
         const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
         const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
         const sepheadapp = response?.approversCollection?.SEPHEADAPP?.[0] ?? null;
-        
+
 
         const aseptoToFirst     = asepto?.first_approver_exploded   ?? [];
         const btechengcToFirst  = btechengc?.first_approver_exploded  ?? [];
@@ -1505,7 +1516,7 @@
         const mappedAseptoToFirst = aseptoToFirst.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedBtechengcToFirst = btechengcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedSepheadappToFirst = sepheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
-       
+
 
          // 2. Assign those formatted arrays to their target selectors inside the map
         let editSelectionsMap = {};
@@ -1649,7 +1660,7 @@
 
              });
 
-          
+
             // ==== QC Slip Details
             $('#qc_slips_id').val(data.id);
             $('#textconno_new_operator').val(data.control_no);
@@ -1694,18 +1705,18 @@
                 form.formSubmitOperators.find('#text_sel_result1_operator').val(doperosc?.first_status ?? '').trigger('change');
                 form.formSubmitOperators.find('#text_sec1_date_operator').val(doperosc?.first_date ?? '');
                 form.formSubmitOperators.find('#text_sec1_time_operator').val(doperosc?.first_time ?? '');
-                
+
                 form.formSubmitOperators.find('#text_sel_result2_operator').val(doperosc?.second_status ?? '').trigger('change');
                 form.formSubmitOperators.find('#text_sec2_date_operator').val(doperosc?.second_date ?? '');
                 form.formSubmitOperators.find('#text_sec2_time_operator').val(doperosc?.second_time ?? '');
 
                 const eopervisual = response?.approversCollection?.EOPERVISUAL?.[0] ?? null;
-                
+
                 form.formSubmitOperators.find('#text_pv_result1_operator').val(eopervisual?.first_status ?? '').trigger('change');
                 form.formSubmitOperators.find('#text_pv1_date_operator').val(eopervisual?.first_date ?? '');
                 form.formSubmitOperators.find('#text_pv1_time_operator').val(eopervisual?.first_time ?? '');
                 form.formSubmitOperators.find('#text_reason_disqualification').val(eopervisual?.first_remarks ?? '');
-                
+
                 form.formSubmitOperators.find('#text_pv_result2_operator').val(eopervisual?.second_status ?? '').trigger('change');
                 form.formSubmitOperators.find('#text_pv2_date_operator').val(eopervisual?.second_date ?? '');
                 form.formSubmitOperators.find('#text_pv2_time_operator').val(eopervisual?.second_time ?? '');
@@ -1723,7 +1734,7 @@
                 getEmployeeDetailsByEmpNoSelect2Mh({
                     response : response,
                 });
-                
+
             }
             if(positionCategory === 'Supervisor'){
                 const sepTrainingOrientation = data.a_sep_training_orientation?.sep_training_orientation;

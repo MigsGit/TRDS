@@ -48,14 +48,14 @@ class DropdownController extends Controller
                 $result .= '<button class="btn btn-sm btn-danger ml-2 btnChangeStatus" data-id="'.$row->id.'" data-status="0">Inactive</button>';
             }
             else{
-                $result .= '<button class="btn btn-sm btn-success ml-2 btnChangeStatus" data-id="'.$row->id.'" data-status="1">Activate</button>';  
+                $result .= '<button class="btn btn-sm btn-success ml-2 btnChangeStatus" data-id="'.$row->id.'" data-status="1">Activate</button>';
             }
             $result .="</center>";
             return $result;
         })
         ->addColumn('status', function($row){
             $result = "";
-            if( is_null($row->deleted_at)) 
+            if( is_null($row->deleted_at))
                 $result = '<span class="badge badge-success">Active</span>';
             else
                 $result = '<span class="badge badge-danger">Inactive</span>';

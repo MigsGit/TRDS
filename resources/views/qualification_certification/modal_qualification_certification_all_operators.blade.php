@@ -1,14 +1,14 @@
 <!-- FORMAT 1 MH -->
 <form id="formSubmitOperators">
         <h3 class="mt-5 mb-3 text-center">Operators OPERATOR'S TRAINING / CERTIFICATION AND VALIDATION SLIP</h3>
-    
+     <h4 class="mt-5 mb-3 text-center">PRACTICAL ORIENTATION AND VALIDATION</h4>
         <div class="accordion" id="accordionExampleVisual">
             @include('qualification_certification.operator_prodn_training_items_table', [
                 'tableId'        => 'tblTrainingItemsVisual',
                 'accordionParent' => '#accordionExampleVisual',
                 'position'       => 'Production',
             ])
-          
+
         </div>
         <div class="accordion" id="accordionExamplePartsPrep">
           @include('qualification_certification.operator_engg_training_items_table', [
@@ -92,11 +92,11 @@
                             <div class="col-md-6">
                                 <label for="">Time:</label>
                                 <input class="form-control" type="time" id="text_sec1_time_operator" name="text_sec1_time_operator">
-                            </div>  
+                            </div>
                             <div class="col-md-6">
                                 <label for="">Time:</label>
                                 <input class="form-control" type="time" id="text_sec2_time_operator" name="text_sec2_time_operator">
-                            </div>  
+                            </div>
                         </div>
                 </div>
             </div>
@@ -139,7 +139,7 @@
                                     </select>
                                 </div>
                             </div>
-                            
+
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="">CONDUCTED BY:</label>
@@ -165,11 +165,11 @@
                                 <div class="col-md-6">
                                     <label for="">Time:</label>
                                     <input class="form-control" type="time" id="text_pv1_time_operator" name="text_pv1_time_operator">
-                                </div>  
+                                </div>
                                 <div class="col-md-6">
                                     <label for="">Time:</label>
                                     <input class="form-control" type="time" id="text_pv2_time_operator" name="text_pv2_time_operator">
-                                </div>  
+                                </div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-md-12">
@@ -182,11 +182,11 @@
             </div>
         </div>
 
-        
+
         <hr style="height: 5px; background-color: black; border: none;">
 
         <div class="col-md-6">
-            <label for="">Approved / Confirmed by:</label> 
+            <label for="">Approved / Confirmed by:</label>
              <select class="form-control select2bs4" style="width: 100%;" name="text_visual_approved_confirmed_by" id="text_visual_approved_confirmed_by" multiple>
             </select>
         </div>
@@ -197,3 +197,4 @@
         </div>
 
     </form>
+
