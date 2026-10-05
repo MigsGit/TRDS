@@ -30,7 +30,7 @@ class ASepTrainingOrientationRequest extends FormRequest
             'text_a_sep_trained_certified_by.*' => 'required|string',
             'text_a_sep_date'                   => 'required|date',
 
-            // B. CERTIFICATION (modal_qualification_certification_supervisor.blade.php)
+            // B. CERTIFICATION
             'text_sep_theoretical_result'      => 'required|in:PASSED,FAILED',
             'text_sep_handson_result'          => 'required|in:PASSED,FAILED',
             'text_sep_trained_certified_by'    => 'required|array',

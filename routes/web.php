@@ -134,7 +134,8 @@ Route::middleware('checkSession')->group(function(){
         Route::post('save_first_take_ins_sequence', 'saveFirstTakeInsSequence');
         Route::post('update_approval', 'updateApproval');
         Route::post('save_qualification_certification_inspector', 'saveQualificationCertificationInspector');
-        Route::post('save_qc_lqc_training_items_by_qc_slip_id', 'saveQcLqcTrainingItemsByQcSlipId');
+        Route::post('save_qc_lqc_training_items_by_qc_slip_id', 'saveQcLqcTrainingItemsByQcSlipId')->name('save_qc_lqc_training_items_by_qc_slip_id');
+        Route::post('save_qc_lqc_training_items_by_position', 'saveQcLqcTrainingItemsByPosition')->name('save_qc_lqc_training_items_by_position');
 
         Route::get('load_qc_slip', 'loadQcSlip');
         Route::get('get_div_dept_sec', 'getDivDeptSec');
@@ -143,6 +144,8 @@ Route::middleware('checkSession')->group(function(){
         Route::get('load1st_qc_validation', 'load1stQcValidation');
         Route::get('load2nd_qc_validation', 'load2ndQcValidation');
         Route::get('/load_qc_lqc_training_items_by_qc_slip_id', 'loadQcLqcTrainingItemsByQcSlipId');
+        Route::get('/load_qc_lqc_training_items_by_position', 'loadQcLqcTrainingItemsByPosition');
+        Route::get('/get_employee_details_by_no', 'getEmployeeDetailsByNo');
     });
 
     Route::controller(QuestionnairesController::class)->group(function () {
