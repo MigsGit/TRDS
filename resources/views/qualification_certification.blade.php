@@ -108,6 +108,7 @@
                                                                 <th>Section</th>
                                                                 <th>Position</th>
                                                                 <th>Date Filed</th>
+                                                                <th class='d-none'>Emp Name</th>
                                                                 <!-- <th>Qualified by</th> -->
                                                                 {{-- <th>Certified by</th> --}}
                                                                 {{-- <th>Approved / Conformed by</th> --}}
@@ -151,10 +152,12 @@
                                     <label for="text_select_position">Select Position</label>
                                     <select class="form-control select2bs4" style="width: 100%;" name="text_select_position" id="text_select_position">
                                         <option value="" disabled>Select Position</option>
+                                        <option value="VisualOperator" >Visual Operator</option>
                                         <option value="Operator" >Operator</option>
                                         <option value="Inspector">Inspector</option>
                                         <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
+                                        <option value="MH">MH</option>
                                     </select>
                                 </div>
                             </div>
@@ -251,6 +254,15 @@
                         <div class="d-none" id="divSupervisor">
                               @include('qualification_certification.modal_qualification_certification_supervisor')
                         </div>
+                        <div class="d-none" id="divMH">
+                              @include('qualification_certification.modal_qualification_certification_mh')
+                        </div>
+                        <div class="d-none" id="divMH">
+                              @include('qualification_certification.modal_qualification_certification_mh')
+                        </div>
+                        <div class="" id="divAllOperators">
+                              @include('qualification_certification.modal_qualification_certification_all_operators')
+                        </div>
                     </div>
                          <div class="modal-footer justify-content-end">
                             <button type="button" class="btn btn-danger d-none" id="operDisapproved"><i class="fa-solid fa fa-thumbs-down me-2"></i>Disapproved</button>
@@ -274,6 +286,7 @@
             formSubmitOper: $('#formSubmitOper'),
             formSubmitMh: $('#formSubmit_MH'),
             formSubmitInspector: $('#formSubmit_Ins'),
+            formSubmitOperators: $('#formSubmitOperators'),
         };
         dataTable = {
             operator: '',
@@ -354,6 +367,10 @@
                 { "data" : "section_category" },
                 { "data" : "position_category" },
                 { "data" : "created_at" },
+                { "data" : "employee_names",
+                    visible: false,    // Hides column from display
+                    searchable: true   // Keeps column indexed for searching
+                },
             ],
 
         });
@@ -416,7 +433,6 @@
         $(document).on('click', '.btnRemoveOperEmpMain', function() {
             $(this).closest('tr').remove();
         });
-
         $(document).on('change', '.first_take_ins_sequence',function (e) {
             let qcSlipsIdData = $(this).attr('qc-slips-id');
             let QcSlipEmployeesIdData = $(this).attr('qc-slip-employees-id');
@@ -470,7 +486,6 @@
             }
             saveFirstTakeInsSequence(params);
         })
-
         $(table.operator).on('click', '#btnGetQcSlipsId','tr',function (e) {
             e.preventDefault();
             let qcSlipsId = $(this).attr('qc-slips-id');
@@ -518,7 +533,6 @@
 
             $('.div-transfer-flexibility').toggleClass('d-none', !hasValue);
          });
-
         const saveFormOper = ($forms = null) => {
             // 1. Serialize standard form inputs into an array
             // console.log('saveFormOper called',$form[0]);
@@ -568,7 +582,6 @@
                 }
             },$forms);
         }
-
         const saveSupervisor = () => {
              Swal.fire({
                 title: 'Are you sure you want to save this request?',
@@ -588,7 +601,12 @@
                 }
             });
         }
-
+        $(document).on('submit', '#formSubmit_MH', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            // saveFormOper($form);
+            $('#modalSendEmail').modal();
+        });
         $('#formSendEmail').click(function (e) {
             e.preventDefault();
 
@@ -597,7 +615,7 @@
             // return;
                switch (position) {
                 case 'MH':
-                    $('#divMH').removeClass('d-none');
+                    saveFormOper(form.formSubmitMh);
                     break;
                 case 'Technician':
                     saveFormOper(form.formSubmitTech);
@@ -617,10 +635,19 @@
                 case 'Operator':
                     saveFormOper(form.formSubmitOper);
                     break;
+                case 'VisualOperator':
+                    saveFormOper(form.formSubmitOperators);
+                    break;
                 default:
                     alert('Unknown position selected. Please select a valid position.');
                     break;
             }
+        });
+        $(document).on('submit', '#formSubmitOperators', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            // saveFormOper($form);
+            $('#modalSendEmail').modal();
         });
         $(document).on('submit', '#formSubmit_SEP', function (e) {
             e.preventDefault();
@@ -657,6 +684,7 @@
                 }
             });
         });
+        
         const saveInspectorDetails = ($forms = null) => {
             // 1. Serialize standard form inputs into an array
             var $form = form.formSubmitInspector ?? $forms;
@@ -736,6 +764,7 @@
             }
             getApprovalStatusToggle(params)
         }
+        
         const selectInspectorValidation = () => {
             let approvalStatus = $('#approval_status').val();
             let params = {
@@ -781,7 +810,8 @@
 
             switch (position) {
                 case 'MH':
-                    $('#divMH').removeClass('d-none');
+                    // $('#divMH').removeClass('d-none');
+                    selectInspectorValidation();
                     break;
                 case 'Technician':
                     // $('#divTechnician').removeClass('d-none');
@@ -871,7 +901,15 @@
             '#text_a_sep_trained_certified_by',
             '#text_sep_trained_certified_by',
             '#text_sep_approved_inspector',
-
+            //MH
+            '#text_mh_first_trained_by',
+            '#text_mh_approved_confirmed_by',
+            //NEW OPERATOR
+            '#text_sec1_certified_operator',
+            '#text_sec2_certified_operator',
+            '#text_pv1_certified_operator',
+            '#text_pv2_certified_operator',
+            '#text_visual_approved_confirmed_by',
         ]);
         // initSelectPassFail([
         //     '#text_oa_1st_result_es_oper',

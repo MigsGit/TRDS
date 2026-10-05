@@ -38,6 +38,7 @@
             },
             columns: [
                 { data: 'item_name', name: 'item_name' },
+                { data: 'select_item',   name: 'select_item',   className: 'text-center' },
                 { data: 'day_1',   name: 'day_1',   className: 'text-center' },
                 { data: 'day_2',   name: 'day_2',   className: 'text-center' },
                 { data: 'day_3',   name: 'day_3',   className: 'text-center' },
@@ -61,6 +62,363 @@
 
         return dtInstance;
     };
+
+    // ==========================================================================
+    // NEW standalone position-specific training tables (Production / Engineering
+    // / QC). These are entirely separate from the legacy
+    // initTrainingItemsTable()/.btnSaveMatrix flow above, which is left intact.
+    // ==========================================================================
+
+    /**
+     * Shared initializer used by the 3 position-specific wrapper functions below.
+     * @param  {string} tableSelector  CSS ID selector for the target <table>.
+     * @param  {string} position       'Production' | 'Engineering' | 'QC'
+     * @param  {string} qcSlipsId      Optional explicit qc_slips_id override.
+     * @return {DataTables.Api|null}
+     */
+    const initPositionTrainingTable = (tableSelector, position, qcSlipsId,ddMastersId) => {
+        var $table = $(tableSelector);
+        if (!$table.length) { return null; }
+
+        if ($.fn.DataTable.isDataTable(tableSelector)) {
+            $(tableSelector).DataTable().destroy();
+        }
+
+        var dtInstance = $table.DataTable({
+            processing: true,
+            serverSide: true,
+            paging:    false,
+            searching: false,
+            info:      false,
+            ordering:  false,
+            ajax: {
+                url:  'load_qc_lqc_training_items_by_position',
+                type: 'GET',
+                data: function (params) {
+                    params.qc_slips_id = qcSlipsId || $('#qc_slips_id').val() || '';
+                    params.position    = position;
+                    params.dd_masters_id = ddMastersId;
+                }
+            },
+            columns: [
+                { data: 'item_name', name: 'item_name' },
+                { data: 'select_item',   name: 'select_item',   className: 'text-center' },
+                { data: 'day_1',   name: 'day_1',   className: 'text-center' },
+                { data: 'day_2',   name: 'day_2',   className: 'text-center' },
+                { data: 'day_3',   name: 'day_3',   className: 'text-center' },
+                { data: 'day_4',   name: 'day_4',   className: 'text-center' },
+                { data: 'day_5',   name: 'day_5',   className: 'text-center' },
+                { data: 'remarks', name: 'remarks' }
+            ]
+        });
+
+        dtInstance.on('xhr', function () {
+            var json = dtInstance.ajax.json();
+            if (json && json.headerDates) {
+                $.each(json.headerDates, function (dayNumber, dateValue) {
+                    $table.closest('.table-responsive')
+                        .find('.header-date-input[data-day="' + dayNumber + '"]')
+                        .val(dateValue || '');
+                });
+            }
+            if (json && json.trainerValidations) {
+                $.each(json.trainerValidations, function (dayNumber, trainerRow) {
+                    var $dayScope = $table.find('[data-day="' + dayNumber + '"]');
+                    $dayScope.filter('.trainer-emp-no').val(trainerRow.trainer_emp_no || '');
+                    $dayScope.filter('.trainer-name-display').text(trainerRow.trainer_name || '');
+                    $dayScope.filter('.input-day-date').val(trainerRow.validation_date || '');
+                    $dayScope.filter('.input-day-time').val(trainerRow.validation_time || '');
+                    $dayScope.filter('.select-day-result').val(trainerRow.overall_result || '');
+                });
+            }
+            if (json && json.chkTrainerValidation) {
+                var chkData = json.chkTrainerValidation;
+                $table.find('.chk-trainer-emp-no').val(chkData.chk_trainer_emp_no || '');
+                $table.find('.chk-trainer-name-display').text(chkData.chk_trainer_name || '');
+                $table.find('.input-chk-date').val(chkData.chk_validation_date || '');
+                $table.find('.input-chk-time').val(chkData.chk_validation_time || '');
+                $table.find('.select-chk-result').val(chkData.chk_overall_result || '');
+            }
+        });
+
+        return dtInstance;
+    };
+
+    /**
+  
+    /**
+     * Reads every row of a position-specific training table body into a plain
+     * array of row objects ready to be posted to save_qc_lqc_training_items_by_position.
+     * @param  {jQuery} $tableBody
+     * @return {Array<Object>}
+     */
+    const gatherPositionMatrixRows = ($tableBody) => {
+        var rows = [];
+        $tableBody.find('tr').each(function () {
+            var $row = $(this);
+            var $checkbox = $row.find('.chk-select-item');
+            if (!$checkbox.length) { return; }
+
+            var dayResults = {};
+            $row.find('.input-result').each(function () {
+                var $input = $(this);
+                dayResults['day_' + $input.data('day')] = $input.val();
+            });
+
+            rows.push({
+                training_item_id: $checkbox.data('item-id'),
+                is_checked:       $checkbox.is(':checked') ? 1 : null,
+                remark:           $row.find('.input-remark').val() || null,
+                sub_description:  $row.find('.input-sub-desc').val() || null,
+                day_results:      dayResults
+            });
+        });
+        return rows;
+    };
+
+    /**
+     * Reads the embedded Trainer Verification tfoot rows (Day 1-5) of a
+     * position-specific training table into a plain day-keyed object ready to
+     * be posted to save_qc_lqc_training_items_by_position as `trainer_days`.
+     * @param  {jQuery} $table
+     * @return {Object}
+     */
+    const gatherTrainerDays = ($table) => {
+        var trainerDays = {};
+        for (var day = 1; day <= 5; day++) {
+            trainerDays['day_' + day] = {
+                trainer_emp_no:  $table.find('.trainer-emp-no[data-day="' + day + '"]').val() || null,
+                trainer_name:    $table.find('.trainer-name-display[data-day="' + day + '"]').text().trim() || null,
+                validation_date: $table.find('.input-day-date[data-day="' + day + '"]').val() || null,
+                validation_time: $table.find('.input-day-time[data-day="' + day + '"]').val() || null,
+                overall_result:  $table.find('.select-day-result[data-day="' + day + '"]').val() || null
+            };
+        }
+        return trainerDays;
+    };
+
+    /**
+     * Reads the single Global/Checkbox Trainer Validation fields of a
+     * position-specific training table (not day-scoped — one set of values
+     * per table) ready to be posted as `chk_trainer_validation`.
+     * @param  {jQuery} $table
+     * @return {Object}
+     */
+    const gatherChkTrainerValidation = ($table) => {
+        return {
+            chk_trainer_emp_no:  $table.find('.chk-trainer-emp-no').val() || null,
+            chk_trainer_name:    $table.find('.chk-trainer-name-display').text().trim() || null,
+            chk_validation_date: $table.find('.input-chk-date').val() || null,
+            chk_validation_time: $table.find('.input-chk-time').val() || null,
+            chk_overall_result:  $table.find('.select-chk-result').val() || null
+        };
+    };
+
+    /**
+     * Generic save handler for any of the 3 new position-specific matrices.
+     * Collects both the item-row matrix AND the embedded Trainer Verification
+     * fields (Day 1-5) in a single combined payload.
+     * @param {string} tableSelector  CSS ID selector for the target <table>.
+     * @param {string} position       'Production' | 'Engineering' | 'QC'
+     * @param {string} qcSlipsId      Optional explicit qc_slips_id override.
+     */
+    const savePositionMatrix = (tableSelector, position, qcSlipsId) => {
+        var $table = $(tableSelector);
+        if (!$table.length) { return; }
+
+        var matrix               = gatherPositionMatrixRows($table.find('tbody'));
+        var trainerDays          = gatherTrainerDays($table);
+        var chkTrainerValidation = gatherChkTrainerValidation($table);
+        var dayDates    = {};
+        $table.closest('.table-responsive').find('.header-date-input').each(function () {
+            dayDates['day_' + $(this).data('day')] = $(this).val();
+        });
+
+        ajaxRequest({
+            url: 'save_qc_lqc_training_items_by_position',
+            method: 'POST',
+            data: {
+                qc_slips_id:            qcSlipsId || $('#qc_slips_id').val() || '',
+                position:               position,
+                matrix:                 matrix,
+                day_dates:              dayDates,
+                trainer_days:           trainerDays,
+                chk_trainer_validation: chkTrainerValidation
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            successCallback: function (response) {
+                toastr.success(response.message || 'Matrix saved successfully!');
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                toastr.error('Failed to save matrix.');
+            }
+        });
+    };
+
+    $(document).on('click', '.btnSavePositionMatrix', function () {
+        var $btn          = $(this);
+        var tableSelector = '#' + $btn.data('table-id');
+        var position      = $btn.data('position');
+
+        savePositionMatrix(tableSelector, position);
+    });
+
+    /**
+     * Trainer barcode scan handler (Enter/KeyCode 13) for the embedded Trainer
+     * Verification row of any of the 3 new position-specific tables.
+     *
+     * STRICT COMPLETION VALIDATION RULE BEFORE SCANNING:
+     *   1. Every .chk-select-item checkbox in the active table must be checked.
+     *   2. Every .input-result for the scanned day_number must be filled.
+     * If either check fails, scanning is blocked, the input is cleared, and a
+     * SweetAlert warning is shown.
+     */
+    /**
+     * Checkbox/Global Trainer barcode scan handler (Enter/KeyCode 13).
+     *
+     * GATING RULE 1: every .chk-select-item in the active table must be
+     * checked before this scan is allowed. If not, the scan is blocked, the
+     * input is cleared, and a SweetAlert warning is shown.
+     */
+    $(document).on('keypress', '.chk-trainer-scan-input', function (e) {
+        if (e.which !== 13 && e.keyCode !== 13) { return; }
+        e.preventDefault();
+
+        var $input = $(this);
+        var empNo  = $.trim($input.val());
+        var $table = $input.closest('table');
+        var $tbody = $table.find('tbody');
+
+        if (!empNo) { return; }
+
+        var allChecked  = true;
+        var $checkboxes = $tbody.find('.chk-select-item');
+        if (!$checkboxes.length) { allChecked = false; }
+        $checkboxes.each(function () {
+            if (!$(this).is(':checked')) {
+                allChecked = false;
+                return false;
+            }
+        });
+
+        if (!allChecked) {
+            $input.val('');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Incomplete Checklist',
+                text: 'Cannot scan Checkbox Trainer ID: All row checkboxes must be ticked first.'
+            });
+            return;
+        }
+
+        ajaxRequest({
+            url: 'get_employee_details_by_no',
+            method: 'GET',
+            data: { emp_no: empNo },
+            successCallback: function (response) {
+                if (!response || !response.emp_no) {
+                    Swal.fire({ icon: 'error', title: 'Not Found', text: 'No employee found for Trainer ID "' + empNo + '".' });
+                    return;
+                }
+
+                var now         = new Date();
+                var pad         = function (n) { return String(n).padStart(2, '0'); };
+                var currentDate = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+                var currentTime = pad(now.getHours()) + ':' + pad(now.getMinutes());
+
+                $table.find('.chk-trainer-emp-no').val(response.emp_no);
+                $table.find('.chk-trainer-name-display').text(response.name || '');
+
+                var $dateInput = $table.find('.input-chk-date');
+                var $timeInput = $table.find('.input-chk-time');
+                var $resultSelect = $table.find('.select-chk-result');
+                if (!$.trim($dateInput.val())) { $dateInput.val(currentDate); }
+                if (!$.trim($timeInput.val())) { $timeInput.val(currentTime); }
+                if (!$.trim($resultSelect.val())) { $resultSelect.val(''); }
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                Swal.fire({ icon: 'error', title: 'Scan Failed', text: 'Unable to look up Trainer ID.' });
+            }
+        });
+
+        $input.val('');
+    });
+    /**
+     * Day 1-5 Trainer barcode scan handler (Enter/KeyCode 13).
+     *
+     * GATING RULE 2: the Checkbox/Global Trainer must already be validated
+     * (i.e. .chk-trainer-emp-no is populated) AND every .input-result for the
+     * scanned day must be filled before this scan is allowed.
+     */
+    $(document).on('keypress', '.trainer-scan-input', function (e) {
+        if (e.which !== 13 && e.keyCode !== 13) { return; }
+        e.preventDefault();
+
+        var $input   = $(this);
+        var day      = $input.data('day');
+        var empNo    = $.trim($input.val());
+        var $table   = $input.closest('table');
+        var $tbody   = $table.find('tbody');
+
+        if (!empNo) { return; }
+
+        var chkTrainerValidated = !!$.trim($table.find('.chk-trainer-emp-no').val());
+
+        var allResultsFilled = true;
+        var $dayResultInputs = $tbody.find('.input-result[data-day="' + day + '"]');
+        if (!$dayResultInputs.length) { allResultsFilled = false; }
+        $dayResultInputs.each(function () {
+            if (!$.trim($(this).val())) {
+                allResultsFilled = false;
+                return false;
+            }
+        });
+
+        if (!chkTrainerValidated || !allResultsFilled) {
+            $input.val('');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Incomplete Matrix',
+                text: 'Cannot scan Trainer ID: Checkbox Trainer validation and Day ' + day + ' item results must be completed first.'
+            });
+            return;
+        }
+
+        ajaxRequest({
+            url: 'get_employee_details_by_no',
+            method: 'GET',
+            data: { emp_no: empNo },
+            successCallback: function (response) {
+                if (!response || !response.emp_no) {
+                    $input.val('');
+                    Swal.fire({ icon: 'error', title: 'Not Found', text: 'No employee found for Trainer ID "' + empNo + '".' });
+                    return;
+                }
+
+                var now         = new Date();
+                var pad         = function (n) { return String(n).padStart(2, '0'); };
+                var currentDate = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+                var currentTime = pad(now.getHours()) + ':' + pad(now.getMinutes());
+
+                var $dayScope = $table.find('[data-day="' + day + '"]');
+                $dayScope.filter('.trainer-emp-no').val(response.emp_no);
+                $dayScope.filter('.trainer-name-display').text(response.name || '');
+                $dayScope.filter('.input-day-date').val(currentDate);
+                $dayScope.filter('.input-day-time').val(currentTime);
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                $input.val('');
+                Swal.fire({ icon: 'error', title: 'Scan Failed', text: 'Unable to look up Trainer ID.' });
+            }
+        });
+
+        $input.val('');
+    });
 
     function syncCheckboxesWithDb(nameAttribute, rawDbValue,$comboId=form.formSubmitOper) {
         // 1. Explode and clean your database values into an array of clean strings
@@ -111,12 +469,57 @@
         $('#dateOfTransfer').addClass('d-none');
         $('.techSave').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
+        $('.saveSep').addClass('d-none');
         $('#div_Oper').addClass('d-none');
         $('#divInspector').addClass('d-none');
         $('#divSupervisor').addClass('d-none');
-        $('#divSupervisor').addClass('d-none');
         $('#divTechnician').addClass('d-none');
-        $('.saveSep').addClass('d-none');
+        $('#divMH').addClass('d-none');
+        $('.btnSaveMatrix').addClass('d-none');
+        $('.btnAllOperator').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsVisual').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsPartsPrep').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsMachine').addClass('d-none');
+
+        if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 10);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 11);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 12);
+            $('.btnAllOperator').removeClass('d-none');
+
+            
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+        }
+        if(positionCategory === 'MH'){
+            initTrainingItemsTable('#tblTrainingItems_mh');
+            $('.btnMh').removeClass('d-none');
+            $('.btnSaveMatrix').removeClass('d-none');
+            $('#divMH').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.btnMh').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+        }
         if(positionCategory === 'Supervisor'){
             $('.saveSep').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
@@ -1023,21 +1426,86 @@
             editSelectionsMap
         );
     }
+    const getEmployeeDetailsByEmpNoSelect2Operators = (params) => {
+        let response = params.response;
+        const doperosc = response?.approversCollection?.DOPEROSC?.[0] ?? null;
+        const eopervisual = response?.approversCollection?.EOPERVISUAL?.[0] ?? null;
+        const opheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
+
+        const doperoscToFirst = doperosc?.first_approver_exploded ?? [];
+        const doperoscToSecond = doperosc?.second_approver_exploded ?? [];
+        const eopervisualToFirst = eopervisual?.first_approver_exploded ?? [];
+        const eopervisualToSecond = eopervisual?.second_approver_exploded ?? [];
+        const opheadappToFirst = opheadapp?.alert_prod_sec_exploded ?? [];
+
+        const mappedEopervisualToFirst = eopervisualToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedEopervisualToSecond = eopervisualToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedDoperoscToFirst = doperoscToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedDoperoscToSecond = doperoscToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedOpheadappToFirst = opheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        
+         // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        editSelectionsMap['#text_pv1_certified_operator'] = mappedEopervisualToFirst;
+        editSelectionsMap['#text_pv2_certified_operator'] = mappedEopervisualToSecond;
+        editSelectionsMap['#text_sec1_certified_operator'] = mappedDoperoscToFirst;
+        editSelectionsMap['#text_sec2_certified_operator'] = mappedDoperoscToSecond;
+        editSelectionsMap['#text_visual_approved_confirmed_by'] = mappedOpheadappToFirst;
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_pv1_certified_operator',
+                '#text_pv2_certified_operator',
+                '#text_sec1_certified_operator',
+                '#text_sec2_certified_operator',
+                '#text_visual_approved_confirmed_by',
+            ],
+            editSelectionsMap
+        );
+
+    }
+    const getEmployeeDetailsByEmpNoSelect2Mh = (params) => {
+        let response = params.response;
+
+        //MH
+        const amhto = response?.approversCollection?.AMHTO?.[0] ?? null;
+        const mhheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
+
+        const amhtoToFirst = amhto?.first_approver_exploded ?? [];
+        const mhheadappToFirst = mhheadapp?.alert_prod_sec_exploded ?? [];
+
+        const mappedAmhtoToFirst = amhtoToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedMhheadappToFirst = mhheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        
+         // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        editSelectionsMap['#text_mh_first_trained_by'] = mappedAmhtoToFirst;
+        editSelectionsMap['#text_mh_approved_confirmed_by'] = mappedMhheadappToFirst;
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_mh_first_trained_by',
+                '#text_mh_approved_confirmed_by',
+            ],
+            editSelectionsMap
+        );
+
+    }
     const getEmployeeDetailsByEmpNoSelect2Sep = (params) => {
         let response = params.response;
         const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
         const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
         const sepheadapp = response?.approversCollection?.SEPHEADAPP?.[0] ?? null;
+        
 
         const aseptoToFirst     = asepto?.first_approver_exploded   ?? [];
         const btechengcToFirst  = btechengc?.first_approver_exploded  ?? [];
         const sepheadappToFirst = sepheadapp?.alert_prod_sec_exploded  ?? [];
 
-
         const mappedAseptoToFirst = aseptoToFirst.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedBtechengcToFirst = btechengcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
         const mappedSepheadappToFirst = sepheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
-
+       
 
          // 2. Assign those formatted arrays to their target selectors inside the map
         let editSelectionsMap = {};
@@ -1045,7 +1513,6 @@
         editSelectionsMap['#text_a_sep_trained_certified_by'] = mappedAseptoToFirst;
         editSelectionsMap['#text_sep_trained_certified_by'] = mappedBtechengcToFirst;
         editSelectionsMap['#text_sep_approved_inspector'] = mappedSepheadappToFirst;
-
 
         // 3. Initialize all employee selectors simultaneously
         initGetSystemOneEmployeeDetailsCombos(
@@ -1178,9 +1645,11 @@
             getApprovalStatusToggle({
                 approvalStatus: currentStatus,
                 positionCategory : positionCategory,
+                qcSlipsId : data.id,
+
              });
 
-
+          
             // ==== QC Slip Details
             $('#qc_slips_id').val(data.id);
             $('#textconno_new_operator').val(data.control_no);
@@ -1220,7 +1689,42 @@
                 6,
                 editSelectionsMap6
             );
+            if(positionCategory === 'VisualOperator'){
+                const doperosc = response?.approversCollection?.DOPEROSC?.[0] ?? null;
+                form.formSubmitOperators.find('#text_sel_result1_operator').val(doperosc?.first_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_sec1_date_operator').val(doperosc?.first_date ?? '');
+                form.formSubmitOperators.find('#text_sec1_time_operator').val(doperosc?.first_time ?? '');
+                
+                form.formSubmitOperators.find('#text_sel_result2_operator').val(doperosc?.second_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_sec2_date_operator').val(doperosc?.second_date ?? '');
+                form.formSubmitOperators.find('#text_sec2_time_operator').val(doperosc?.second_time ?? '');
 
+                const eopervisual = response?.approversCollection?.EOPERVISUAL?.[0] ?? null;
+                
+                form.formSubmitOperators.find('#text_pv_result1_operator').val(eopervisual?.first_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_pv1_date_operator').val(eopervisual?.first_date ?? '');
+                form.formSubmitOperators.find('#text_pv1_time_operator').val(eopervisual?.first_time ?? '');
+                form.formSubmitOperators.find('#text_reason_disqualification').val(eopervisual?.first_remarks ?? '');
+                
+                form.formSubmitOperators.find('#text_pv_result2_operator').val(eopervisual?.second_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_pv2_date_operator').val(eopervisual?.second_date ?? '');
+                form.formSubmitOperators.find('#text_pv2_time_operator').val(eopervisual?.second_time ?? '');
+                getEmployeeDetailsByEmpNoSelect2Operators({
+                      response : response,
+                })
+            }
+            if(positionCategory === 'MH'){
+                const mhTrainingOrientation = data.a_mh_training_orientation?.mh_training_orientation;
+                syncCheckboxesWithDb('text_mh_training_orientation', mhTrainingOrientation,form.formSubmitMh);
+
+                const amhto = response?.approversCollection?.AMHTO?.[0] ?? null;
+                form.formSubmitMh.find('#text_mh_first_date').val(amhto?.first_date ?? '');
+
+                getEmployeeDetailsByEmpNoSelect2Mh({
+                    response : response,
+                });
+                
+            }
             if(positionCategory === 'Supervisor'){
                 const sepTrainingOrientation = data.a_sep_training_orientation?.sep_training_orientation;
                 syncCheckboxesWithDb('text_sep_training_orientation', sepTrainingOrientation,form.formSubmitSep);

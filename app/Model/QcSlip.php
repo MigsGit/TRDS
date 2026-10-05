@@ -4,6 +4,7 @@ namespace App\Model;
 
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
+use App\Model\Qc\AMhTrainingOrientation;
 use App\Model\Qc\AOperProdTrainingOrientation;
 use App\Model\Qc\ASepTrainingOrientation;
 use App\Model\Qc\ATechEngTrainingQualification;
@@ -134,7 +135,10 @@ class QcSlip extends Model
     {
         return $this->hasOne(ATechEngTrainingQualification::class, 'qc_slips_id',  'id')->where('deleted_at');
     }
+    public function a_mh_training_orientation (){
+        return $this->hasOne(AMhTrainingOrientation::class, 'qc_slips_id',  'id')->where('deleted_at');
     //SERP
+    }
     public function a_sep_training_orientation()
     {
         return $this->hasOne(ASepTrainingOrientation::class, 'qc_slips_id',  'id')->where('deleted_at');
