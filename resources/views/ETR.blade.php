@@ -282,6 +282,7 @@
                                                         <th>Venue</th>
                                                         <th>Type of <br>Training</th>
                                                         <th>Remarks</th>
+                                                        <th>Attachment</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -442,6 +443,7 @@
                     { data: 'trainingVenue' },
                     { data: 'typeOfTraining' },
                     { data: 'training_remarks' },
+                    { data: 'attachment' },
                 ]
             });
         });

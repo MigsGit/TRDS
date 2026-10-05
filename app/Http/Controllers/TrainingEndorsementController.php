@@ -176,7 +176,12 @@ class TrainingEndorsementController extends Controller
                     ? Carbon::parse($checker['updated_at'])->setTimezone('Asia/Manila')->format('Y-m-d H:i:s') 
                     : null;
                     if($checker['updated_at'] != null){
-                        $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
+                        if($row->disapprove_by == $checker['approver_details']['id']) {
+                            $result .= "<span class='badge badge-danger mt-1'>{$checker['approver_details']['name']}</span><br>";
+                        }
+                        else {
+                            $result .= "<span class='badge badge-success mt-1'>{$checker['approver_details']['name']}</span><br>";
+                        }
                         $result .= "<em >{$format_updated_at}</em><br>";
                     }
                     else{
@@ -204,7 +209,12 @@ class TrainingEndorsementController extends Controller
                     ? Carbon::parse($approver['updated_at'])->setTimezone('Asia/Manila')->format('Y-m-d H:i:s') 
                     : null;
                     if($approver['updated_at'] != null){
-                        $result .= "<span class='badge badge-success mt-1'>{$approver['approver_details']['name']}</span><br>";
+                        if($row->disapprove_by == $approver['approver_details']['id']) {
+                            $result .= "<span class='badge badge-danger mt-1'>{$approver['approver_details']['name']}</span><br>";
+                        }
+                        else{
+                            $result .= "<span class='badge badge-success mt-1'>{$approver['approver_details']['name']}</span><br>";
+                        }
                         $result .= "<em >{$format_updated_at}</em><br>";
                     }
                     else{

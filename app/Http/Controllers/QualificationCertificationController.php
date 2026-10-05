@@ -201,6 +201,58 @@ class QualificationCertificationController extends Controller
             $qcSlipDetails = QcSlip::where('id',$qcSlipId)->first();
             $currentPositionCategory = $qcSlipDetails->position_category;
             $qcModelApprover = OpApprover::class;
+              // SUPERVISOR / ENGINEER / PLANNER PROCESS
+            if($currentPositionCategory === 'Supervisor'){
+                $operToApprovers = [];
+                $currentApprovalStatus = 'ASEPTO';
+                if(filled($qcSlipId)){
+                    $currentApprovalStatus = $qcSlipDetails->approval_status;
+                    // --- A. TRAINING / ORIENTATION ---
+                    // if($currentApprovalStatus === 'ASEPTO'){
+                        $operToApprovers = [
+                            'approval_status' => 'ASEPTO',
+                            'decision_status' => 'APP',
+                            'first_approver'  => $this->joinSafe($request, 'text_a_sep_trained_certified_by'),
+                            'first_date'      => $this->getSafe($request, 'text_a_sep_date'),
+                        ];
+                        $qcModelApprover::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'ASEPTO'],
+                            $operToApprovers
+                        );
+                    // }
+
+                    // --- B. CERTIFICATION ---
+                    // if($currentApprovalStatus === 'BSEPC'){
+                        $operToApprovers = [
+                            'approval_status' => 'BSEPC',
+                            'decision_status' => 'APP',
+                            'first_status'    => $this->getSafe($request, 'text_sep_theoretical_result'),
+                            'first_status_2'   => $this->getSafe($request, 'text_sep_handson_result'),
+                            'first_approver'  => $this->joinSafe($request, 'text_sep_trained_certified_by'),
+                            'first_date'      => $this->getSafe($request, 'text_sep_date'),
+                        ];
+                        $qcModelApprover::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'BSEPC'],
+                            $operToApprovers
+                        );
+                        if($qcSlipDetails->approval_status == 'CLQCOQC'){
+                            $qcModelApprover::updateOrCreate(
+                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'CLQCOQC'],
+                                [
+                                    "qc_slips_id"   => $qcSlipId,
+                                    'approval_status' => 'CLQCOQC',
+                                    'decision_status' => 'APP',
+                                ]
+                            );
+                            $countCLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId)->count();
+                            if($countCLqcTrainingItemResult === 0 ){
+                                return response()->json(['is_success' => 'false', "message" => "Please input the C Inspector Training / Certification And Validation Slip"],409);
+                            }
+                        }
+                    // }
+                }
+            }
+
             //Inspector PROCESS
             if($currentPositionCategory === 'Inspector'){ //ADD
                 $operToApprovers = [];
@@ -572,24 +624,7 @@ class QualificationCertificationController extends Controller
                     }
                 }
             }
-             if ($select_position === 'Supervisor') {
-                $request->validate([
-                    // Shared header fields (qualification_certification.blade.php)
-                    // A. TRAINING / ORIENTATION (modal_qualification_certification_supervisor.blade.php)
-                    'text_sep_training_orientation'     => 'nullable|array',
-                    'text_sep_training_orientation.*'   => 'nullable|string',
-                    'text_a_sep_trained_certified_by'   => 'nullable|array',
-                    'text_a_sep_trained_certified_by.*' => 'nullable|string',
-                    'text_a_sep_date'                   => 'nullable|date',
 
-                    // B. CERTIFICATION (modal_qualification_certification_supervisor.blade.php)
-                    'text_sep_theoretical_result'      => 'nullable|in:PASSED,FAILED',
-                    'text_sep_handson_result'          => 'nullable|in:PASSED,FAILED',
-                    'text_sep_trained_certified_by'    => 'nullable|array',
-                    'text_sep_trained_certified_by.*'  => 'nullable|string',
-                    'text_sep_date'                     => 'nullable|date',
-                ]);
-            }
             //   $collectOperatorEmployees = collect($request->operator_employees)->map(function($rowOperatorEmployees)use ($qcSlipGetId){
             //     $collectOperatorEmployees = collect($this->getSafe($request, 'operator_employees', []))->map(function($rowOperatorEmployees)use ($qcSlipGetId){
             //          if($currentApprovalStatus === 'CTECHQCC'){
@@ -601,59 +636,7 @@ class QualificationCertificationController extends Controller
             //      });
             //  });
 
-            // SUPERVISOR / ENGINEER / PLANNER PROCESS
-            if($currentPositionCategory === 'Supervisor'){
-                $operToApprovers = [];
-                $currentApprovalStatus = 'ASEPTO';
-                if(filled($qcSlipId)){
-                    $currentApprovalStatus = $qcSlipDetails->approval_status;
 
-                    // --- A. TRAINING / ORIENTATION ---
-                    // if($currentApprovalStatus === 'ASEPTO'){
-                        $operToApprovers = [
-                            'approval_status' => 'ASEPTO',
-                            'decision_status' => 'APP',
-                            'first_approver'  => $this->joinSafe($request, 'text_a_sep_trained_certified_by'),
-                            'first_date'      => $this->getSafe($request, 'text_a_sep_date'),
-                        ];
-                        $qcModelApprover::updateOrCreate(
-                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'ASEPTO'],
-                            $operToApprovers
-                        );
-                    // }
-
-                    // --- B. CERTIFICATION ---
-                    // if($currentApprovalStatus === 'BSEPC'){
-                        $operToApprovers = [
-                            'approval_status' => 'BSEPC',
-                            'decision_status' => 'APP',
-                            'first_status'    => $this->getSafe($request, 'text_sep_theoretical_result'),
-                            'first_status_2'   => $this->getSafe($request, 'text_sep_handson_result'),
-                            'first_approver'  => $this->joinSafe($request, 'text_sep_trained_certified_by'),
-                            'first_date'      => $this->getSafe($request, 'text_sep_date'),
-                        ];
-                        $qcModelApprover::updateOrCreate(
-                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'BSEPC'],
-                            $operToApprovers
-                        );
-                        if($qcSlipDetails->approval_status == 'CLQCOQC'){
-                            $qcModelApprover::updateOrCreate(
-                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'CLQCOQC'],
-                                [
-                                    "qc_slips_id"   => $qcSlipId,
-                                    'approval_status' => 'CLQCOQC',
-                                    'decision_status' => 'APP',
-                                ]
-                            );
-                            $countCLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId)->count();
-                            if($countCLqcTrainingItemResult === 0 ){
-                                return response()->json(['is_success' => 'false', "message" => "Please input the C Inspector Training / Certification And Validation Slip"],409);
-                            }
-                        }
-                    // }
-                }
-            }
-            
 // text_sep_approved_inspector
                 //  // A. TRAINING / ORIENTATION (modal_qualification_certification_supervisor.blade.php)
                 //     'text_sep_training_orientation'     => 'nullable|array',
@@ -705,7 +688,7 @@ class QualificationCertificationController extends Controller
                 ];
             }
             DB::commit();
-            $this->saveFormSendEmail($emailParams);
+            return $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -910,7 +893,7 @@ class QualificationCertificationController extends Controller
                 'f_qc_validation',
 
                 //Techician
-                'a_tech_eng_training_qualification',
+                // 'a_tech_eng_training_qualification',
             ];
             $qcSlip = QcSlip::with($arrRelation)
             ->where('id',$request->qcSlipsId)
@@ -1200,6 +1183,123 @@ class QualificationCertificationController extends Controller
                         value="' . e($row['day_3_result']) . '">';
         })
         ->addColumn('day_4', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-cente r input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="4"
+                        value="' . e($row['day_4_result']) . '">';
+        })
+        ->addColumn('day_5', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="5"
+                        value="' . e($row['day_5_result']) . '">';
+        })
+        // ->addColumn('remarks', function ($row) {
+        //     return '<input type="text" class="form-control form-control-sm input-remark"
+        //                 data-item-id="' . $row['id'] . '"
+        //                 value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
+        // })
+        ->addColumn('remarks', function ($row) {
+        // Check if current row is the "RESULT" row
+        // if (strtoupper(trim($row['item_name'])) === 'RESULT') {
+        //     // Collect numeric day values
+        //     $days = [
+        //         $row['day_1_result'],
+        //         $row['day_2_result'],
+        //         $row['day_3_result'],
+        //         $row['day_4_result'],
+        //         $row['day_5_result']
+        //     ];
+
+        //     // Filter out empty or non-numeric strings
+        //     $validDays = array_filter($days, function ($val) {
+        //         return $val !== '' && $val !== null && is_numeric($val);
+        //     });
+
+        //     // Compute Average
+        //     $count = count($validDays);
+        //     $average = $count > 0 ? round(array_sum($validDays) / $count, 2) : 0;
+
+        //     // Render static/disabled input displaying AVERAGE for RESULT row
+        //     // return '<input type="text" class="form-control form-control-sm text-center bg-light font-weight-bold"
+        //     //             value="AVERAGE: ' . $average . '" readonly>';
+        //     return '<input type="text" class="form-control form-control-sm text-center bg-light font-weight-bold" value="">';
+        // }
+
+        // Return standard input for non-RESULT rows
+        return '<input type="text" class="form-control form-control-sm input-remark"
+                    data-item-id="' . $row['id'] . '"
+                    value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
+    })
+        ->rawColumns(['item_name', 'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
+        ->with('headerDates', $headerDates)
+        ->make(true);
+    }
+    public function loadQcLqcTrainingItemsByQcSlipIdTEST(Request $request){
+        $qcSlipsId = $request->qc_slips_id;
+
+        // Header dates keyed by day_number
+        $headerDates = CLqcTrainingItemResult::where('qc_slips_id', $qcSlipsId)
+            ->whereNotNull('date')
+            ->orderBy('day_number')
+            ->get(['day_number', 'date'])
+            ->unique('day_number')
+            ->pluck('date', 'day_number');
+
+        $items = DropdownMasterDetail::with(['c_lqc_training_item_results' => function ($query) use ($qcSlipsId) {
+            $query->where('qc_slips_id', $qcSlipsId);
+        }])
+        ->where('dropdown_masters_id', 8)
+        ->orderBy('id', 'asc')
+        ->get();
+
+        $data = $items->map(function ($item) {
+            $resultsByDay = $item->c_lqc_training_item_results->keyBy('day_number');
+
+            return [
+                'id'              => $item->id,
+                'item_name'       => $item->dropdown_masters_details,
+                'sub_description' => $item->c_lqc_training_item_results->first()->sub_description ?? '',
+                'day_1_result'    => $resultsByDay->get(1)->result ?? '',
+                'day_2_result'    => $resultsByDay->get(2)->result ?? '',
+                'day_3_result'    => $resultsByDay->get(3)->result ?? '',
+                'day_4_result'    => $resultsByDay->get(4)->result ?? '',
+                'day_5_result'    => $resultsByDay->get(5)->result ?? '',
+                'item_remark'     => $item->c_lqc_training_item_results->first()->item_remark ?? '',
+            ];
+        });
+
+        return datatables()->of($data)
+        ->editColumn('item_name', function ($row) {
+            $html = '<strong>' . e($row['item_name']) . '</strong>';
+            $lower = strtolower($row['item_name']);
+            if (str_contains($lower, 'systems and procedure') || str_contains($lower, 'work instruction') || str_contains($lower,'point panel')) {
+                $html .= '<br><input type="text" class="form-control form-control-sm mt-1 input-sub-desc"
+                              data-item-id="' . $row['id'] . '"
+                              placeholder="Details..."
+                              value="' . e($row['sub_description']) . '">';
+            }
+            return $html;
+        })
+        ->addColumn('day_1', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="1"
+                        value="' . e($row['day_1_result']) . '">';
+        })
+        ->addColumn('day_2', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="2"
+                        value="' . e($row['day_2_result']) . '">';
+        })
+        ->addColumn('day_3', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="3"
+                        value="' . e($row['day_3_result']) . '">';
+        })
+        ->addColumn('day_4', function ($row) {
             return '<input type="text" class="form-control form-control-sm text-center input-result"
                         data-item-id="' . $row['id'] . '"
                         data-day="4"
@@ -1238,8 +1338,9 @@ class QualificationCertificationController extends Controller
             $average = $count > 0 ? round(array_sum($validDays) / $count, 2) : 0;
 
             // Render static/disabled input displaying AVERAGE for RESULT row
-            return '<input type="text" class="form-control form-control-sm text-center bg-light font-weight-bold"
-                        value="AVERAGE: ' . $average . '" readonly>';
+            // return '<input type="text" class="form-control form-control-sm text-center bg-light font-weight-bold"
+            //             value="AVERAGE: ' . $average . '" readonly>';
+            return '<input type="text" class="form-control form-control-sm text-center bg-light font-weight-bold" value="">';
         }
 
         // Return standard input for non-RESULT rows
@@ -1675,6 +1776,23 @@ class QualificationCertificationController extends Controller
     public function changeApprovalStatus($params){
         $selectedSection = str_contains($params['selectedSection'], 'PPD');
         $isMachineOperatorExists = $params['isMachineOperatorExists'];
+        if($params['selectPosition'] === 'MH'){
+                // CSEPHEAD
+            switch (true) {
+                case ($params['approval_status'] === 'PB'):
+                    $newStatus = 'BMHQC';
+                    $statusName = 'B Inspector Training Certification And Validation';
+                    break;
+                case ($params['approval_status'] === 'BMHQC'):
+                    $newStatus = 'MHHEADAPP';
+                    $statusName = 'For Section Head Approval';
+                    break;
+                default:
+                    $newStatus = 'N/A';
+                    $statusName = 'N/A';
+                    break;
+            }
+        }
         if($params['selectPosition'] === 'Supervisor'){
                 // CSEPHEAD
             switch (true) {
@@ -1864,7 +1982,7 @@ class QualificationCertificationController extends Controller
         if(count( $qcSlip ) != 0){
             $currentCtrlNo = explode('-',$qcSlip[0]->control_no);
             $arrCtrNo		 	= end($currentCtrlNo);
-            $series 	 	= str_pad(($arrCtrNo1),3,"0",STR_PAD_LEFT);
+            $series 	 	= str_pad(($arrCtrNo+1),3,"0",STR_PAD_LEFT);
             $currentCtrlNo = $params['section']."-".$params['selectSection']."-".date('m').date('y').'-'.$series;
 
         }else{

@@ -299,7 +299,7 @@ class TrainingRequestController extends Controller
         $trainingRequest->section_id = $data['section'];
         $trainingRequest->job_function = $data['job_function'];
         $trainingRequest->area_allocation = $data['area_line'];
-        $trainingRequest->reason = $data['reason']
+        $trainingRequest->reason = $data['reason'];
         $trainingRequest->section_head = $data['section_head'];
         $trainingRequest->created_by = $_SESSION["rapidx_user_id"] ?? 0;
 
