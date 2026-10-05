@@ -14,24 +14,39 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
     protected $productLine;
     protected $employees;
     protected $productStation;
+    protected $position;
 
-    public function __construct($productLine, $employees, $productStation)
+    public function __construct($productLine, $employees, $productStation, $position)
     {
         $this->productLine = $productLine;
         $this->employees = $employees;
         $this->productStation = $productStation;
+        $this->position = $position;
     }
 
     public function view(): View
     {
-        return view('exports.skill_map', [
-            'productLine'    => $this->productLine,
-            'employees'      => $this->employees,
-            'productStation' => $this->productStation,
-        ]);
+        // dd($this->position);
+        if($this->position == 'INSPECTOR') {
+            // Custom logic for Inspector
+            // dd($this->employees);
+            return view('exports.skill_map_inspector', [
+                'productLine'    => $this->productLine,
+                'employees'      => $this->employees,
+                'productStation' => $this->productStation,
+                'position'       => $this->position,
+            ]);
+        }else if($this->position == 'OPERATOR') {
+            return view('exports.skill_map_operator', [
+                'productLine'    => $this->productLine,
+                'employees'      => $this->employees,
+                'productStation' => $this->productStation,
+                'position'       => $this->position,
+            ]);
+        }
+
     }
 
-    // dd($this->employees);
 
     public function drawings()
     {
@@ -43,15 +58,31 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
         |--------------------------------------------------------------------------
         */
 
-        $stationColumns = [
-            1 => 'E', // Parts Prep
-            2 => 'F', // Visual Inspection
-            3 => 'G', // Assembly Process
-            4 => 'H', // Machine Operation
-        ];
+        if ($this->position === 'INSPECTOR') {
+
+            $stationColumns = [
+                1 => 'E',
+                2 => 'F',
+                3 => 'G',
+                4 => 'H',
+                5 => 'I',
+                6 => 'J',
+            ];
+
+        } else {
+
+            $stationColumns = [
+                1 => 'E',
+                2 => 'F',
+                3 => 'G',
+                4 => 'H',
+            ];
+        }
+
+        // dd($this->employees[0]['stations']);
 
         foreach ($this->employees as $index => $employee) {
-
+            // dd($employee);
             // Employee starts at row 4
             $row = $index + 4;
 
@@ -100,12 +131,21 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
 
         $legendRow  = count($this->employees) + 5;
 
-        $legendColumns = [
-            1 => 'A',
-            2 => 'C',
-            3 => 'E',
-            4 => 'G',
-        ];
+        if ($this->position === 'INSPECTOR') {
+            $legendColumns = [
+                1 => 'A',
+                2 => 'C',
+                3 => 'F',
+                4 => 'I',
+            ];
+        } else if ($this->position === 'OPERATOR') {
+            $legendColumns = [
+                1 => 'A',
+                2 => 'C',
+                3 => 'E',
+                4 => 'G',
+            ];
+        }
 
 
         foreach ($legendColumns as $level => $column) {
@@ -144,6 +184,12 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
         |--------------------------------------------------------------------------
         */
 
+        if ($this->position === 'INSPECTOR') {
+            $lastColumn = 'J';
+        } else {
+            $lastColumn = 'H';
+        }
+
         $sheet->getColumnDimension('A')->setWidth(18);
         $sheet->getColumnDimension('B')->setWidth(30);
         $sheet->getColumnDimension('C')->setWidth(18);
@@ -153,6 +199,8 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
         $sheet->getColumnDimension('F')->setWidth(18);
         $sheet->getColumnDimension('G')->setWidth(18);
         $sheet->getColumnDimension('H')->setWidth(18);
+        $sheet->getColumnDimension('I')->setWidth(18);
+        $sheet->getColumnDimension('J')->setWidth(18);
 
         /*
         |--------------------------------------------------------------------------
@@ -173,7 +221,7 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
     |--------------------------------------------------------------------------
     */
 
-    $sheet->getStyle("A4:H{$employeeEndRow}")->getAlignment()
+    $sheet->getStyle("A4:{$lastColumn}{$employeeEndRow}")->getAlignment()
     ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
     ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
@@ -198,7 +246,7 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
     $lastRow = $legendRow - 2;
     $rowRow = $legendRow;
 
-    $sheet->getStyle("A1:H{$lastRow}")->applyFromArray([
+    $sheet->getStyle("A1:{$lastColumn}{$lastRow}")->applyFromArray([
         'borders' => [
             'allBorders' => [
                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
@@ -209,7 +257,7 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
         ],
     ]);
 
-    $sheet->getStyle("A{$rowRow}:H{$rowRow}")->applyFromArray([
+    $sheet->getStyle("A{$rowRow}:{$lastColumn}{$rowRow}")->applyFromArray([
         'borders' => [
             'top' => [
                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
