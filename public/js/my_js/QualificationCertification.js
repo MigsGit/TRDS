@@ -38,7 +38,10 @@
             },
             columns: [
                 { data: 'item_name', name: 'item_name' },
-                { data: 'select_item',   name: 'select_item',   className: 'text-center' },
+                {   data: 'select_item',
+                    visible: false,    // Hides column from display
+                    name: 'select_item',
+                    className: 'text-center' },
                 { data: 'day_1',   name: 'day_1',   className: 'text-center' },
                 { data: 'day_2',   name: 'day_2',   className: 'text-center' },
                 { data: 'day_3',   name: 'day_3',   className: 'text-center' },

@@ -3,9 +3,8 @@
 /public/storage
 /storage
 /vendor
-vendor
+/vendor_1x
 .env
-.env.backup
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml

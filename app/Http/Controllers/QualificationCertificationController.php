@@ -637,7 +637,7 @@ class QualificationCertificationController extends Controller
                     }
                 }
             }
-            if($currentPositionCategory === 'MH'){
+           if($currentPositionCategory === 'MH'){
                 // ASepTrainingOrientationRequest
                 $operToApprovers = [];
                 $currentApprovalStatus = 'AMHTO';
@@ -1112,69 +1112,6 @@ class QualificationCertificationController extends Controller
                 }
             }
 
-            //   $collectOperatorEmployees = collect($request->operator_employees)->map(function($rowOperatorEmployees)use ($qcSlipGetId){
-            //     $collectOperatorEmployees = collect($this->getSafe($request, 'operator_employees', []))->map(function($rowOperatorEmployees)use ($qcSlipGetId){
-            //          if($currentApprovalStatus === 'CTECHQCC'){
-            //              $qcModelApprover::updateOrCreate(
-            //                  ['qc_slips_id' => $qcSlipId, 'approval_status' => 'CTECHQCC'],
-            //                  $operToApprovers
-            //              );
-            //          }
-            //      });
-            //  });
-
-            // SUPERVISOR / ENGINEER / PLANNER PROCESS
-            if($currentPositionCategory === 'Supervisor'){
-                $operToApprovers = [];
-                $currentApprovalStatus = 'ASEPTO';
-                if(filled($qcSlipId)){
-                    $currentApprovalStatus = $qcSlipDetails->approval_status;
-
-                    // --- A. TRAINING / ORIENTATION ---
-                    // if($currentApprovalStatus === 'ASEPTO'){
-                        $operToApprovers = [
-                            'approval_status' => 'ASEPTO',
-                            'decision_status' => 'APP',
-                            'first_approver'  => $this->joinSafe($request, 'text_a_sep_trained_certified_by'),
-                            'first_date'      => $this->getSafe($request, 'text_a_sep_date'),
-                        ];
-                        $qcModelApprover::updateOrCreate(
-                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'ASEPTO'],
-                            $operToApprovers
-                        );
-                    // }
-
-                    // --- B. CERTIFICATION ---
-                    // if($currentApprovalStatus === 'BSEPC'){
-                        $operToApprovers = [
-                            'approval_status' => 'BSEPC',
-                            'decision_status' => 'APP',
-                            'first_status'    => $this->getSafe($request, 'text_sep_theoretical_result'),
-                            'first_status_2'   => $this->getSafe($request, 'text_sep_handson_result'),
-                            'first_approver'  => $this->joinSafe($request, 'text_sep_trained_certified_by'),
-                            'first_date'      => $this->getSafe($request, 'text_sep_date'),
-                        ];
-                        $qcModelApprover::updateOrCreate(
-                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'BSEPC'],
-                            $operToApprovers
-                        );
-                        if($qcSlipDetails->approval_status == 'CLQCOQC'){
-                            $qcModelApprover::updateOrCreate(
-                            ['qc_slips_id' => $qcSlipId, 'approval_status' => 'CLQCOQC'],
-                                [
-                                    "qc_slips_id"   => $qcSlipId,
-                                    'approval_status' => 'CLQCOQC',
-                                    'decision_status' => 'APP',
-                                ]
-                            );
-                            $countCLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId)->count();
-                            if($countCLqcTrainingItemResult === 0 ){
-                                return response()->json(['is_success' => 'false', "message" => "Please input the C Inspector Training / Certification And Validation Slip"],409);
-                            }
-                        }
-                    // }
-                }
-            }
             //=== Update the Approval Status and Insert the new Approval Status and Emails to the Next Approvers
             $changeApprovalStatusParams = [
                 'qcSlipsId' => $qcSlipId,
@@ -1715,7 +1652,7 @@ class QualificationCertificationController extends Controller
                         value="' . e($row['day_3_result']) . '">';
         })
         ->addColumn('day_4', function ($row) {
-            return '<input type="text" class="form-control form-control-sm text-center input-result"
+            return '<input type="text" class="form-control form-control-sm text-cente r input-result"
                         data-item-id="' . $row['id'] . '"
                         data-day="4"
                         value="' . e($row['day_4_result']) . '">';
@@ -1758,6 +1695,92 @@ class QualificationCertificationController extends Controller
         //     return '<input type="text" class="form-control form-control-sm text-center bg-light font-weight-bold" value="">';
         // }
 
+        // Return standard input for non-RESULT rows
+        return '<input type="text" class="form-control form-control-sm input-remark"
+                    data-item-id="' . $row['id'] . '"
+                    value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
+    })
+        ->rawColumns(['item_name', 'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
+        ->with('headerDates', $headerDates)
+        ->make(true);
+    }
+    public function loadQcLqcTrainingItemsByQcSlipIdTEST(Request $request){
+        $qcSlipsId = $request->qc_slips_id;
+
+        // Header dates keyed by day_number
+        $headerDates = CLqcTrainingItemResult::where('qc_slips_id', $qcSlipsId)
+            ->whereNotNull('date')
+            ->orderBy('day_number')
+            ->get(['day_number', 'date'])
+            ->unique('day_number')
+            ->pluck('date', 'day_number');
+
+        $items = DropdownMasterDetail::with(['c_lqc_training_item_results' => function ($query) use ($qcSlipsId) {
+            $query->where('qc_slips_id', $qcSlipsId);
+        }])
+        ->where('dropdown_masters_id', 8)
+        ->orderBy('id', 'asc')
+        ->get();
+
+        $data = $items->map(function ($item) {
+            $resultsByDay = $item->c_lqc_training_item_results->keyBy('day_number');
+
+            return [
+                'id'              => $item->id,
+                'item_name'       => $item->dropdown_masters_details,
+                'sub_description' => $item->c_lqc_training_item_results->first()->sub_description ?? '',
+                'day_1_result'    => $resultsByDay->get(1)->result ?? '',
+                'day_2_result'    => $resultsByDay->get(2)->result ?? '',
+                'day_3_result'    => $resultsByDay->get(3)->result ?? '',
+                'day_4_result'    => $resultsByDay->get(4)->result ?? '',
+                'day_5_result'    => $resultsByDay->get(5)->result ?? '',
+                'item_remark'     => $item->c_lqc_training_item_results->first()->item_remark ?? '',
+            ];
+        });
+
+        return datatables()->of($data)
+        ->editColumn('item_name', function ($row) {
+            $html = '<strong>' . e($row['item_name']) . '</strong>';
+            $lower = strtolower($row['item_name']);
+            if (str_contains($lower, 'systems and procedure') || str_contains($lower, 'work instruction') || str_contains($lower,'point panel')) {
+                $html .= '<br><input type="text" class="form-control form-control-sm mt-1 input-sub-desc"
+                              data-item-id="' . $row['id'] . '"
+                              placeholder="Details..."
+                              value="' . e($row['sub_description']) . '">';
+            }
+            return $html;
+        })
+        ->addColumn('day_1', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="1"
+                        value="' . e($row['day_1_result']) . '">';
+        })
+        ->addColumn('day_2', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="2"
+                        value="' . e($row['day_2_result']) . '">';
+        })
+        ->addColumn('day_3', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="3"
+                        value="' . e($row['day_3_result']) . '">';
+        })
+        ->addColumn('day_4', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="4"
+                        value="' . e($row['day_4_result']) . '">';
+        })
+        ->addColumn('day_5', function ($row) {
+            return '<input type="text" class="form-control form-control-sm text-center input-result"
+                        data-item-id="' . $row['id'] . '"
+                        data-day="5"
+                        value="' . e($row['day_5_result']) . '">';
+        })
+        ->addColumn('remarks', function ($row) {
         // Return standard input for non-RESULT rows
         return '<input type="text" class="form-control form-control-sm input-remark"
                     data-item-id="' . $row['id'] . '"
