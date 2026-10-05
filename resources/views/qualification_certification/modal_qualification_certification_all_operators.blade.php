@@ -1,6 +1,6 @@
 <!-- FORMAT 1 MH -->
 <form id="formSubmitOperators">
-        <h3 class="mt-5 mb-3 text-center">Operators OPERATOR'S TRAINING / CERTIFICATION AND VALIDATION SLIP</h3>
+        <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / CERTIFICATION AND VALIDATION SLIP</h3>
      <h4 class="mt-5 mb-3 text-center">PRACTICAL ORIENTATION AND VALIDATION</h4>
         <div class="accordion" id="accordionExampleVisual">
             @include('qualification_certification.operator_prodn_training_items_table', [
@@ -28,7 +28,7 @@
             <div class="accordion-item">
             <h2 class="card-header">
             <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOneOperators" aria-expanded="true" aria-controls="collapseOneOperators">
-                <h5>2) PRODUCT ORIENTATION AND SAMPLE CHECK (QC)</h5>
+                <h5>D PRODUCT ORIENTATION AND SAMPLE CHECK (QC)</h5>
             </button>
             </h2>
             <div id="collapseOneOperators" class="accordion-collapse collapse show" data-parent="#accordionExampleOperators">
@@ -104,7 +104,7 @@
             <div class="accordion-item">
                 <h2 class="card-header">
                 <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoOperators" aria-expanded="true" aria-controls="collapseTwoOperators">
-                    <h5>3) PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS)</h5>
+                    <h5>E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS)</h5>
                 </button>
                 </h2>
                 <div id="collapseTwoOperators" class="accordion-collapse collapse show" data-parent="#accordionExampleOperators">

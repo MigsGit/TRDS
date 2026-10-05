@@ -9,7 +9,7 @@
 <div class="accordion-item">
     <h2 class="card-header">
     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{ $collapseId }}" aria-expanded="false" aria-controls="{{ $collapseId }}">
-        <h5>B QC SECTION</h5>
+        <h5>C QC SECTION</h5>
     </button>
     </h2>
     <div id="{{ $collapseId }}" class="accordion-collapse collapse" data-parent="{{ $accordionParent }}">

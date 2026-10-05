@@ -494,8 +494,8 @@
             ],17);
             $('#divAllOperators').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
-            $('#seriesDesignation').text('Designation');
             $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Series Name');
             initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 18);
             initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 19);
             initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 20);
