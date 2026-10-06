@@ -247,8 +247,7 @@ class ETRController extends Controller
                 $query->whereNull('deleted_at'); // Eager-load the deleted training_record model
             },
             'training_record.venue_details',
-            'training_record.type_of_training_details',
-            'training_record.result_details'
+            'training_record.type_of_training_details'
         ])
         ->where('employee_no', $employeeNo)
         ->whereNull('deleted_at')
@@ -413,16 +412,7 @@ class ETRController extends Controller
                 }
 
                 if (($row->record_type ?? null) === 'TrainingRecordEmployee') {
-                    if (strtolower($row->training_record->result_details->dropdown_masters_details) == 'passed') {
-                        return '<span class="badge badge-success">Passed</span>';
-                    }
-                    else if (strtolower($row->training_record->result_details->dropdown_masters_details) == 'failed') {
-                        return '<span class="badge badge-danger">Failed</span>';
-                    }
-                    else{
-                        return $row->training_record->result_details->dropdown_masters_details ? '<span class="badge badge-secondary">' . $row->training_record->result_details->dropdown_masters_details . '</span>' : '<span class="badge badge-secondary">N/A</span>';
-                    }
-
+                    return '<span class="badge badge-secondary">N/A</span>';
                 }
 
                 if ($row instanceof \App\Model\QcSlip) {
@@ -529,11 +519,11 @@ class ETRController extends Controller
                 return $employee;
             });
 
-        $employees = 
+        $employees =
             $hrisEmployees
             ->concat($subconEmployees)
             ->values();
-        
+
         // return $employees;
         $etr_records = SystemOneHrisTrainee::with([
             'employee_training_record_info'
@@ -574,7 +564,7 @@ class ETRController extends Controller
                 return $employee;
             });
 
-        $employeeInfo = 
+        $employeeInfo =
             $hrisEmployees
             ->concat($subconEmployees)
             ->values();
