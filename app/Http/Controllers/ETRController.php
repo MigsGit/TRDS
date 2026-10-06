@@ -178,7 +178,6 @@ class ETRController extends Controller
                 }
 
                 if( !empty($endorsementEmployee->hands_on_filename) ){
-
                     $handsOnRecord = (object) [
                         'trainingDate'    => $trainingEndorsement->date ?? '',
                         'title'           => 'Mag Plate Measurement',
@@ -197,7 +196,6 @@ class ETRController extends Controller
                         'attachment'      =>    $trainingEndorsement->get_training_endorsement_employees[0]->id . '.' .
                                                 $trainingEndorsement->get_training_endorsement_employees[0]->hands_on_filename_ext
                                                 ?? null,
-
                     ];
                     $qwe->push($handsOnRecord);
                 }
@@ -546,24 +544,9 @@ class ETRController extends Controller
     }
 
     public function getTRDSSummary($employeeId, $employeeNo){
-        /*
-        |--------------------------------------------------------------------------
-        | EMPLOYEE INFORMATION
-        |--------------------------------------------------------------------------
-        */
-
         $employeeInfo = null;
 
-        // Adjust this query/model according to your actual employee table/model.
-        // If you already have employee info query in your project,
-        // use that here.
-       
-        // return $employeeNo;
-        // $employeeInfo = DB::table('rapidx_system_one_hris_emp_infos')
-        //     ->where('EmpNo', $employeeNo)
-        //     ->first();
-
-         $hrisEmployees = SystemOneHrisEmpInfo::query()
+        $hrisEmployees = SystemOneHrisEmpInfo::query()
             ->where('EmpStatus', '!=', 'Resigned')
             ->where(function ($query) use ($employeeNo) {
                 $query->where('EmpNo', $employeeNo);
@@ -585,12 +568,6 @@ class ETRController extends Controller
             $hrisEmployees
             ->concat($subconEmployees)
             ->values();
-        // return $employeeInfo;
-        /*
-        |--------------------------------------------------------------------------
-        | TRAINING ENDORSEMENT
-        |--------------------------------------------------------------------------
-        */
 
         $test = ExamResult::with([
             'training_request_info.training_endorsement_info'
@@ -609,11 +586,8 @@ class ETRController extends Controller
         $trainingEndorsement = null;
 
         if ($getTrainingEndoresementId) {
-
             $trainingEndorsement = TrainingEndorsement::with([
-
                 'created_by_user_details',
-
                 'get_training_endorsement_employees.get_training_request_details_info.employee_exam_details.exam_result_details_info'
                     => function ($query) {
                         $query->where('exam_result_status', 1)
@@ -627,36 +601,19 @@ class ETRController extends Controller
                         $query->where('emp_no', $employeeNo)
                             ->whereNull('deleted_at');
                     }
-
             ])
             ->where('id', $getTrainingEndoresementId)
             ->select('id', 'date', 'created_by')
             ->first();
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | UNIFIED DATA
-        |--------------------------------------------------------------------------
-        */
-
         $data = collect();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | 1. TRAINING ENDORSEMENT
-        |--------------------------------------------------------------------------
-        */
-
         if ($trainingEndorsement) {
-
             foreach (
                 $trainingEndorsement->get_training_endorsement_employees
                 as $endorsementEmployee
             ) {
-
                 $trainingRequest =
                     $endorsementEmployee->get_training_request_details_info;
 
@@ -686,15 +643,7 @@ class ETRController extends Controller
                     $examResults = collect($examResults);
                 }
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | EXAM RESULTS
-                |--------------------------------------------------------------------------
-                */
-
                 foreach ($examResults as $examResult) {
-
                     $questionnaire = $examResult->questionnaire;
 
                     if (is_string($questionnaire)) {
@@ -709,7 +658,6 @@ class ETRController extends Controller
                     }
 
                     $data->push((object) [
-
                         'trainingDate' =>
                             $trainingEndorsement->date ?? '',
 
@@ -764,15 +712,7 @@ class ETRController extends Controller
                     ]);
                 }
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | HANDS ON
-                |--------------------------------------------------------------------------
-                */
-
                 if (!empty($endorsementEmployee->hands_on_filename)) {
-
                     $attachment = null;
 
                     if (
@@ -785,7 +725,6 @@ class ETRController extends Controller
                     }
 
                     $data->push((object) [
-
                         'trainingDate' =>
                             $trainingEndorsement->date ?? '',
 
@@ -840,13 +779,6 @@ class ETRController extends Controller
             }
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | 2. HR MEMO TRAINEE CATEGORY
-        |--------------------------------------------------------------------------
-        */
-
         $hrMemoData = HrMemoTraineeCategoryDetails::with([
             'exam_info_test',
             'employee_info_tist',
@@ -858,9 +790,7 @@ class ETRController extends Controller
         ->get();
 
         foreach ($hrMemoData as $row) {
-
             $data->push((object) [
-
                 'trainingDate' =>
                     ($row->date_start && $row->date_end)
                         ? $row->date_start . ' - ' . $row->date_end
@@ -912,23 +842,12 @@ class ETRController extends Controller
             ]);
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | 3. QC SLIP
-        |--------------------------------------------------------------------------
-        */
-
         $qcSlips = QcSlip::with([
-
             'qc_slip_employees' => function ($q) use ($employeeNo) {
                 $q->where('employee_no', $employeeNo);
             },
-
             'qc_slip_employees.get_station_to',
-
             'productLine',
-
             'qc_reason_certification.dropdown_reason'
 
         ])
@@ -940,10 +859,7 @@ class ETRController extends Controller
 
 
         foreach ($qcSlips as $row) {
-
-            $employee =
-                $row->qc_slip_employees->first();
-
+            $employee = $row->qc_slip_employees->first();
             $assessmentResult = null;
 
             if ($employee) {
@@ -955,7 +871,6 @@ class ETRController extends Controller
             $result = null;
 
             switch ($assessmentResult) {
-
                 case 'PASSED':
                     $result = 'Passed';
                     break;
@@ -969,9 +884,7 @@ class ETRController extends Controller
                     break;
             }
 
-
             $data->push((object) [
-
                 'trainingDate' =>
                     $row->created_at
                         ? $row->created_at->format('Y-m-d')
@@ -1027,27 +940,14 @@ class ETRController extends Controller
             ]);
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | 4. TRAINING RECORD EMPLOYEE
-        |--------------------------------------------------------------------------
-        */
-
         $trainingRecords = TrainingRecordEmployee::with([
-
             'employee_details',
-
             'training_record' => function ($query) {
                 $query->whereNull('deleted_at');
             },
-
             'training_record.venue_details',
-
             'training_record.type_of_training_details',
-
             'training_record.trainer_details'
-
         ])
         ->where('employee_no', $employeeNo)
         ->whereNull('deleted_at')
@@ -1056,60 +956,31 @@ class ETRController extends Controller
 
 
         foreach ($trainingRecords as $row) {
-
             $trainingRecord = $row->training_record;
-
             if (!$trainingRecord) {
                 continue;
             }
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | TRAINOR
-            |--------------------------------------------------------------------------
-            */
-
             $trainer = '';
-
             if ($trainingRecord->trainer_details) {
-
                 foreach ($trainingRecord->trainer_details as $trainor) {
 
                     $trainer .=
                         $trainor->FirstName . ' ' .
                         $trainor->LastName . ', ';
                 }
-
                 $trainer = rtrim($trainer, ', ');
             }
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | RESULT
-            |--------------------------------------------------------------------------
-            */
-
             $result = 'N/A';
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | PUSH NORMALIZED RECORD
-            |--------------------------------------------------------------------------
-            */
-
             $data->push((object) [
-
                 'trainingDate' =>
                     ($trainingRecord->start_date &&
                     $trainingRecord->end_date)
-
                         ? $trainingRecord->start_date .
                         ' - ' .
                         $trainingRecord->end_date
-
                         : '',
 
                 'title' =>
@@ -1160,26 +1031,9 @@ class ETRController extends Controller
             ]);
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | OPTIONAL: SORT BY TRAINING DATE
-        |--------------------------------------------------------------------------
-        |
-        | Since different tables are being merged, sorting in PHP is safer.
-        |
-        */
-
         $data = $data->sortBy(function ($row) {
             return $row->trainingDate ?? '';
         })->values();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUMMARY COUNTS
-        |--------------------------------------------------------------------------
-        */
 
         $passed = $data->filter(function ($row) {
             return strtolower($row->result ?? '') === 'passed';
@@ -1193,15 +1047,7 @@ class ETRController extends Controller
             return strtolower($row->result ?? '') === 'failed';
         })->count();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | ACTUAL HANDS ON
-        |--------------------------------------------------------------------------
-        */
-
         $actualHandsOn = $data->filter(function ($row) {
-
             return
                 ($row->title ?? '') === 'Mag Plate Measurement'
                 ||
@@ -1219,44 +1065,19 @@ class ETRController extends Controller
                     $row->objective ?? '',
                     'hands on'
                 ) !== false;
-
         })->count();
-
 
         $total = $data->count();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | PDF
-        |--------------------------------------------------------------------------
-        */
-
         $pdf = Pdf::loadView('TRDS_Summary', [
-
-            'employeeInfo' =>
-                $employeeInfo[0],
-
-            'records' =>
-                $data,
-
-            'passed' =>
-                $passed,
-
-            'complied' =>
-                $complied,
-
-            'failed' =>
-                $failed,
-
-            'actualHandsOn' =>
-                $actualHandsOn,
-
-            'total' =>
-                $total,
-
+            'employeeInfo'  =>  $employeeInfo[0],
+            'records'       =>  $data,
+            'passed'        =>  $passed,
+            'complied'      =>  $complied,
+            'failed'        =>  $failed,
+            'actualHandsOn' =>  $actualHandsOn,
+            'total'         =>  $total,
         ]);
-
 
         return $pdf->stream(
             'trds_summary_record_' . $employeeNo . '.pdf'
