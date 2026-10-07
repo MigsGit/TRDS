@@ -217,30 +217,9 @@
                                 </h5>
                             </div>
 
-                            {{-- <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="EmployeeTrainingRecord"
-                                        class="table table-hover table-striped w-100 mb-0">
-                                        <thead>
-                                            <tr class="text-center">
-                                                <th>Date</th>
-                                                <th>Title</th>
-                                                <th>Objective</th>
-                                                <th>Trainor</th>
-                                                <th>Results</th>
-                                                <th>Venue</th>
-                                                <th>Mechanics</th>
-                                                <th>Type of Training</th>
-                                                <th>Remark</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
-                            </div> --}}
                             <div class="card-body">
                                 <!-- Tabs -->
-                                <ul class="nav nav-tabs" id="trainingTabs" role="tablist">
+                                {{-- <ul class="nav nav-tabs" id="trainingTabs" role="tablist">
                                     <li class="nav-item">
                                         <button class="nav-link active"
                                             id="trdsSummary-tab"
@@ -253,14 +232,46 @@
 
                                     <li class="nav-item">
                                         <button class="nav-link"
-                                            id="training-tab"
+                                            id="employeeTrainingRecord-tab"
                                             data-toggle="tab"
-                                            data-target="#training"
+                                            data-target="#employeeTrainingRecord"
                                             type="button">
                                             Employee Training Record ( OLD FILES )
                                         </button>
                                     </li>
-                                </ul>
+                                </ul> --}}
+                                <div class="d-flex align-items-end justify-content-between">
+                                    <!-- Tabs -->
+                                    <ul class="nav nav-tabs" id="trainingTabs" role="tablist">
+                                        <li class="nav-item">
+                                            <button class="nav-link active"
+                                                id="trdsSummary-tab"
+                                                data-toggle="tab"
+                                                data-target="#trdsSummary"
+                                                type="button">
+                                                TRDS Summary
+                                            </button>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <button class="nav-link"
+                                                id="employeeTrainingRecord-tab"
+                                                data-toggle="tab"
+                                                data-target="#employeeTrainingRecord"
+                                                type="button">
+                                                Employee Training Record ( OLD FILES )
+                                            </button>
+                                        </li>
+                                    </ul>
+
+                                    <!-- Export Button -->
+                                    <a
+                                        href="#"
+                                        id="btnExportTraining"
+                                        class="btn btn-dark d-none"
+                                        target="_blank">
+                                    </a>
+                                </div>
 
                                 <!-- Tab Content -->
                                 <div class="tab-content mt-3">
@@ -290,7 +301,7 @@
                                     </div>
 
                                     <!-- Tab 2 -->
-                                    <div class="tab-pane fade" id="training">
+                                    <div class="tab-pane fade" id="employeeTrainingRecord">
                                         <div class="table-responsive">
                                             <table id="tableEmployeeTrainingRecord"
                                                 class="table table-hover table-striped w-100 mb-0">
@@ -328,6 +339,9 @@
         let getEmployeeNoForTrdsSummary = '';
 
         $(document).ready(function () {
+
+            UpdateExportButton();
+
             $('.get-employee-info').select2({
                 theme: 'bootstrap-5',
                 placeholder: 'Search Employee',
@@ -353,9 +367,9 @@
             $('.get-employee-info').on('select2:select', function (e) {
                 const data = e.params.data;
                 const hiringStatus = data.hiringStatus;
-                console.log(data);
-                console.log(hiringStatus);
-                console.log('employeeNo',data.employeeNo);
+                console.log('data:',data);
+                console.log('hiringStatus:',hiringStatus);
+                console.log('employeeNo:',data.employeeNo);
 
                 $('#displayEmployeeName').text(data.text);
                 $('#displayPosition').text(data.position);
@@ -364,6 +378,9 @@
                 $('#division').text(data.division);
                 $('#dateHired').text(data.dateHired);
                 $('#employmentStatus').text(data.employmentStatus);
+
+                $('#btnExportTraining').attr('data-employee-id', data.id).attr('data-employee-no', data.employeeNo).removeClass('d-none');
+                UpdateExportButton();
 
                 if(hiringStatus === 'Contractual'){
                     $('#hiringStatus').text('Contractual');
@@ -446,6 +463,24 @@
                     { data: 'attachment' },
                 ]
             });
+
+            $('#trainingTabs button[data-toggle="tab"]').on('shown.bs.tab', function () {
+                UpdateExportButton();
+            });
+
+            // $('#btnExportTraining').on('click', function () {
+            //     const activeTab = $('#trainingTabs .nav-link.active').attr('id');
+            //     const employeeNo = $('#btnExportTraining').attr('data-employee-no');
+            //     if (activeTab === 'trdsSummary-tab') {
+            //         console.log('Export TRDS Summary');
+
+            //     }
+            //     else if (activeTab === 'employeeTrainingRecord-tab') {
+            //         console.log('Export ETR');
+
+            //     }
+            // });
+
         });
     </script>
 @endsection

@@ -451,7 +451,7 @@ class QualificationCertificationController extends Controller
             $currentPositionCategory = $qcSlipDetails->position_category;
             $currentApprovalStatus = $qcSlipDetails->approval_status;
             $qcModelApprover = OpApprover::class;
-            
+
             if($currentPositionCategory === 'VisualOperator'){
                 // 'For Production Update Training and Orientation'; 'AOPERPRDN';
                 if($currentApprovalStatus !='PB'){
@@ -608,7 +608,7 @@ class QualificationCertificationController extends Controller
                                 'first_date'      => $this->getSafe($request, 'text_sec1_date_operator'),
                                 'first_time'      => $this->getSafe($request, 'text_sec1_time_operator'),
                                 'first_status'    => $this->getSafe($request, 'text_sel_result1_operator'),
-                                
+
                                 'second_approver'  => $this->getSafe($request, 'text_sec2_certified_operator'),
                                 'second_status'  => $this->getSafe($request, 'text_sel_result2_operator'),
                                 'second_date'      => $this->getSafe($request, 'text_sec2_date_operator'),
@@ -627,7 +627,7 @@ class QualificationCertificationController extends Controller
                                 'first_time'      => $this->getSafe($request, 'text_pv1_time_operator'),
                                 'first_status'    => $this->getSafe($request, 'text_pv_result1_operator'),
                                 'first_remarks'    => $this->getSafe($request, 'text_reason_disqualification'),
-                                
+
                                 'second_approver'  => $this->getSafe($request, 'text_pv2_certified_operator'),
                                 'second_status'  => $this->getSafe($request, 'text_pv_result2_operator'),
                                 'second_date'      => $this->getSafe($request, 'text_pv2_date_operator'),
@@ -1237,7 +1237,7 @@ class QualificationCertificationController extends Controller
             // $from_name = 'issinfoservice@pricon.ph';
             $message = $this->commonController->emailMsg($emailParams);
             $rapidxEmpNo =  session('global_user');
-           return $emailData = [
+            $emailData = [
                 "to" =>$to,
                 // "to" =>"mrronquez@pricon.ph",
                 "cc" =>$cc,
@@ -1257,7 +1257,7 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             DB::commit();
-        //    $this->commonController->sendEmail($emailData);
+           $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -1700,7 +1700,7 @@ class QualificationCertificationController extends Controller
                     data-item-id="' . $row['id'] . '"
                     value="' . e($row['item_remark']) . '" placeholder="Add remark...">';
     })
-        ->rawColumns(['item_name', 'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
+        ->rawColumns(['item_name','select_item', 'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'remarks'])
         ->with('headerDates', $headerDates)
         ->make(true);
     }
@@ -1929,63 +1929,80 @@ class QualificationCertificationController extends Controller
                 'op_approvers',
                 'op_approvers_pending',
                 'system_one_hris_subcon',
-                'qc_slip_employees',
-                'qc_slip_employees.system_one_hris_subcon',
             );
-            // if(filled($selectPosition) && $selectPosition != 'ALL'){
-            //     $data->where('position_category',$selectPosition);
-            // }
-            // if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
-            //     $data->where('section_category',$selectMhSortBySection);
-            // }
-            // if(filled($selectAccess)){
-            //     $selectedAccess = [
-            //         'PB',
-            //         'FORAPP',
-            //         'OK',
-            //     ];
-            //     if($selectAccess === 'ALL'){
-            //         $selectedAccess = [
-            //             'PB',
-            //             'FORAPP',
-            //             'OK',
-            //         ];
-            //     }
-            //     if($selectAccess === 'FORAPP'){
-            //         $selectedAccess = [
-            //             'FORAPP',
-            //         ];
-            //     }
-            //     if($selectAccess === 'OK'){
-            //         $selectedAccess = [
-            //             'OK',
-            //         ];
-            //     }
-            //     $data->whereIn('status',$selectedAccess);
-            // }
-            // if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
-            //     $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
-            //     $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
-            //         $query->orWhere('alert_prod_cc_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
-            //     });
-            // }
+
+
+            if(filled($selectPosition) && $selectPosition != 'ALL'){
+                $data->where('position_category',$selectPosition);
+            }
+
+            if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
+                $data->where('section_category',$selectMhSortBySection);
+            }
+            if(filled($selectAccess)){
+                $selectedAccess = [
+                    'PB',
+                    'FORAPP',
+                    'OK',
+                ];
+                if($selectAccess === 'ALL'){
+                    $selectedAccess = [
+                        'PB',
+                        'FORAPP',
+                        'OK',
+                    ];
+                }
+                if($selectAccess === 'FORAPP'){
+                    $selectedAccess = [
+                        'FORAPP',
+                    ];
+                }
+                if($selectAccess === 'OK'){
+                    $selectedAccess = [
+                        'OK',
+                    ];
+                }
+                $data->whereIn('status',$selectedAccess);
+            }
+            if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
+                $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
+                $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
+                    $query->orWhere('alert_prod_cc_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
+                });
+            }
             $data->whereNull('deleted_at');
             $data->orderBy('id','DESC');
-
-            // Keep the query as an Eloquent builder so Yajra v9 uses EloquentDataTable
-            // instead of CollectionDataTable and supports filterColumn().
-            $qcSlips = $data;
-            $allEmpIdsTo = []; // kept for later use if needed by other rows
-            $allEmpIdsCc = [];
+            $qclixx = $data;
+            $qcSlips = $data->get();
+            // Convert to a raw array for database handling
+            $allEmpIdsTo= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
+                ->flatten()                              // Flatten into a single layer of OpApprover models
+                ->pluck('alert_prod_sec')               // Pull out all the pipe-separated strings
+                ->filter()                               // Remove null or empty entries
+                ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
+                    return array_map('trim', explode('|', $item));
+                })
+                ->unique()                               // Drop duplicates
+                ->values()                               // Re-index array keys
+                ->all();                                 // Convert to a raw array for database handling
+            $allEmpIdsCc= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
+                ->flatten()                              // Flatten into a single layer of OpApprover models
+                ->pluck('alert_prod_cc_sec')               // Pull out all the pipe-separated strings
+                ->filter()                               // Remove null or empty entries
+                ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
+                    return array_map('trim', explode('|', $item));
+                })
+                ->unique()                               // Drop duplicates
+                ->values()                               // Re-index array keys
+                ->all();                                 // Convert to a raw array for database handling
 
             // 3. Fetch all matching names from HRIS into a quick-lookup map array
-            // This is kept only for the rawStatus display; the search itself is handled at query level.
-            $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', array_merge($allEmpIdsTo, $allEmpIdsCc))
+            $arrHrisSubconEmpNo = array_merge($allEmpIdsTo,$allEmpIdsCc);
+            $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', $arrHrisSubconEmpNo)
                 ->get()
                 ->pluck('empname', 'EmpNo');
-                            //QC-TSF1-1026-003 QC-TSF1-0826-001
-           $qcSlipsDetails=  $qcSlips->where('control_no','QC-TSF1-1026-003')->get();
-                return DataTables($qcSlipsDetails)
+
+            return DataTables($qcSlips)
             ->addColumn('rawAction',function ($row) use ($request){
                 $result = '';
                 $result .= '<center>';
@@ -2097,12 +2114,6 @@ class QualificationCertificationController extends Controller
                     ->filter()
                     ->implode(', ');
             })
-          
-            // ->filterColumn('employee_names', function ($query, $keyword) {
-            //     $query->whereHas('qc_slip_employees.system_one_hris_subcon', function ($subQuery) use ($keyword) {
-            //         $subQuery->where('name', 'like', '%' . $keyword . '%');
-            //     });
-            // })
             ->rawColumns(['rawAction','rawStatus','created_by','created_at','employee_names'])
             ->make(true);
         } catch (Exception $e) {
@@ -2347,7 +2358,7 @@ class QualificationCertificationController extends Controller
                     $statusName = 'B Inspector Training Certification And Validation';
                     break;
                 case ($params['approval_status'] === 'BMHQC'):
-                    $newStatus = 'LQCHEADAPP';
+                    $newStatus = 'LQCHEADAPP'; //MHHEADAPP
                     $statusName = 'For Section Head Approval';
                     break;
                 default:

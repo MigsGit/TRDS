@@ -18,7 +18,7 @@ class DropdownItemRequest extends FormRequest
         if(session('global_user')->user_level_id != 3 && in_array('23', $u_m_access)){ // 23 - Dropdown Maintenance on table user_module
             return true;
         }
-        
+
         return false;
     }
 

@@ -9,7 +9,7 @@
 <div class="accordion-item">
     <h2 class="card-header">
     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{ $collapseId }}" aria-expanded="false" aria-controls="{{ $collapseId }}">
-        <h5>QC</h5>
+        <h5>C QC SECTION</h5>
     </button>
     </h2>
     <div id="{{ $collapseId }}" class="accordion-collapse collapse" data-parent="{{ $accordionParent }}">
@@ -25,7 +25,7 @@
                     <tr>
                         <th rowspan="2" class="align-middle" style="width: 25%;">Training Items</th>
                         <th rowspan="2" class="align-middle text-center" style="width: 5%;">
-                            <input type="checkbox" class="chk-select-all" id="chkSelectAll_{{ $tableId }}" title="Select All">
+                            {{-- <input type="checkbox" class="chk-select-all" id="chkSelectAll_{{ $tableId }}" title="Select All"> --}}
                         </th>
                         <th colspan="5">Result</th>
                         <th rowspan="2" class="align-middle" style="width: 20%;">Remarks</th>

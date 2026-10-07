@@ -152,12 +152,12 @@
                                     <label for="text_select_position">Select Position</label>
                                     <select class="form-control select2bs4" style="width: 100%;" name="text_select_position" id="text_select_position">
                                         <option value="" disabled>Select Position</option>
+                                        <option value="Operator">Operator</option>
                                         <option value="VisualOperator" >Visual Operator</option>
-                                        <option value="Operator" >Operator</option>
                                         <option value="Inspector">Inspector</option>
                                         <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
-                                        <option value="MH">MH</option>
+                                        {{-- <option value="MH">MH</option> --}}
                                     </select>
                                 </div>
                             </div>
@@ -684,7 +684,7 @@
                 }
             });
         });
-        
+
         const saveInspectorDetails = ($forms = null) => {
             // 1. Serialize standard form inputs into an array
             var $form = form.formSubmitInspector ?? $forms;
@@ -764,7 +764,7 @@
             }
             getApprovalStatusToggle(params)
         }
-        
+
         const selectInspectorValidation = () => {
             let approvalStatus = $('#approval_status').val();
             let params = {
