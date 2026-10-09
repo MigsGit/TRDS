@@ -70,13 +70,13 @@
                                                 <div class="card-body overflow-auto">
                                                     <div class="row mt-2 mb-2">
                                                         <div class="col-md-3">
+                                                            <x-status-select name="select_access" id="select_access" />
+                                                        </div>
+                                                        <div class="col-md-3">
                                                             <x-position-select name="select_position" id="select_position" />
                                                         </div>
                                                         <div class="col-md-3">
                                                             <x-section-select name="select_mh_sort_by_section" id="select_mh_sort_by_section" />
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <x-status-select name="select_access" id="select_access" />
                                                         </div>
                                                     </div>
                                                     {{-- <div class="row mt-2 mb-2">
@@ -154,6 +154,7 @@
                                         <option value="" disabled>Select Position</option>
                                         <option value="Operator">Operator</option>
                                         <option value="VisualOperator" >Visual Operator</option>
+                                        <option value="PartsPrep" >Parts Prep / Assembly / Packing</option>
                                         <option value="Inspector">Inspector</option>
                                         <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
@@ -636,6 +637,9 @@
                     saveFormOper(form.formSubmitOper);
                     break;
                 case 'VisualOperator':
+                    saveFormOper(form.formSubmitOperators);
+                    break;
+                case 'PartsPrep':
                     saveFormOper(form.formSubmitOperators);
                     break;
                 default:

@@ -164,7 +164,7 @@ class QualificationCertificationController extends Controller
             $query->where('qc_slips_id', $qcSlipsId)->where('position', $position);
         }])
         ->where('dropdown_masters_id', $ddMastersId)
-        ->orderBy('id', 'asc')
+        ->orderBy('counter', 'asc')
         ->get();
 
         $data = $items->map(function ($item) {
@@ -452,7 +452,7 @@ class QualificationCertificationController extends Controller
             $currentApprovalStatus = $qcSlipDetails->approval_status;
             $qcModelApprover = OpApprover::class;
 
-            if($currentPositionCategory === 'VisualOperator'){
+            if($currentPositionCategory === 'VisualOperator' || $currentPositionCategory === 'PartsPrep' ){
                 // 'For Production Update Training and Orientation'; 'AOPERPRDN';
                 if($currentApprovalStatus !='PB'){
                     // $currentApprovalStatus = $qcSlipDetails->approval_status;
@@ -1119,6 +1119,7 @@ class QualificationCertificationController extends Controller
                 'selectedSection'=> $select_section,
                 'selectPosition'=> $select_position,
                 'isMachineOperatorExists'=> $isMachineOperatorExists,
+                // 'isMachineOperatorRequiredVisual'=> $isMachineOperatorRequiredVisual,
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
             if($currentApprovalStatus === 'FQCVVO'){ //OPERATOR FQCVVO to QCAPP Status - Final Approver QC Supervisor
@@ -1257,7 +1258,7 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             DB::commit();
-           $this->commonController->sendEmail($emailData);
+        //    $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -1931,14 +1932,6 @@ class QualificationCertificationController extends Controller
                 'system_one_hris_subcon',
             );
 
-
-            if(filled($selectPosition) && $selectPosition != 'ALL'){
-                $data->where('position_category',$selectPosition);
-            }
-
-            if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
-                $data->where('section_category',$selectMhSortBySection);
-            }
             if(filled($selectAccess)){
                 $selectedAccess = [
                     'PB',
@@ -1964,6 +1957,15 @@ class QualificationCertificationController extends Controller
                 }
                 $data->whereIn('status',$selectedAccess);
             }
+
+            if(filled($selectPosition) && $selectPosition != 'ALL'){
+                $data->where('position_category',$selectPosition);
+            }
+
+            if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
+                $data->where('section_category',$selectMhSortBySection);
+            }
+          
             if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
                 $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
                 $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
@@ -2221,7 +2223,7 @@ class QualificationCertificationController extends Controller
     public function changeApprovalStatus($params){
         $selectedSection = str_contains($params['selectedSection'], 'PPD');
         $isMachineOperatorExists = $params['isMachineOperatorExists'];
-       if ($params['selectPosition'] === 'VisualOperator') {
+         if ($params['selectPosition'] === 'VisualOperator' || $params['selectPosition'] === 'PartsPrep') {
             $currentStatus = $params['approval_status'] ?? '';
             switch ($currentStatus) {
 
@@ -2336,9 +2338,13 @@ class QualificationCertificationController extends Controller
                     $newStatus  = 'DOPEROSC';
                     $statusName = 'D PRODUCT ORIENTATION AND SAMPLE CHECK (QC)';
                     break;
-                case 'DOPEROSC':
+                case ($params['approval_status'] === 'DOPEROSC' && $params['selectPosition'] != 'PartsPrep'): 
                     $newStatus  = 'EOPERVISUAL';
                     $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
+                    break;
+                case ($params['approval_status'] === 'DOPEROSC' && $params['selectPosition'] === 'PartsPrep'): //PARTS PREP
+                    $newStatus  = 'LQCHEADAPP';
+                    $statusName = 'For Section Head Approval';
                     break;
                 case 'EOPERVISUAL':
                     $newStatus  = 'LQCHEADAPP';
