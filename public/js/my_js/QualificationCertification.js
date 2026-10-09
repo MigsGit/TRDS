@@ -309,15 +309,15 @@
         });
     
         //Visual Operator
-        if (!allChecked && $('#text_select_position').val() != 'VisualOperator') {
-            $input.val('');
-            Swal.fire({
-                icon: 'warning',
-                title: 'Incomplete Checklist',
-                text: 'Cannot scan Checkbox Trainer ID: All row checkboxes must be ticked first.'
-            });
-            return;
-        }
+        // if (!allChecked && $('#text_select_position').val() != 'VisualOperator' ) {
+        //     $input.val('');
+        //     Swal.fire({
+        //         icon: 'warning',
+        //         title: 'Incomplete Checklist',
+        //         text: 'Cannot scan Checkbox Trainer ID: All row checkboxes must be ticked first.'
+        //     });
+        //     return;
+        // }
 
         ajaxRequest({
             url: 'get_employee_details_by_no',
@@ -499,6 +499,36 @@
             initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 18);
             initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 19);
             initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 20);
+            $('.btnAllOperator').removeClass('d-none');
+
+
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+        }
+        if(positionCategory === 'PartsPrep'){ //TODO LOAD PER MASTELIST ID
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],17);
+            $('#divAllOperators').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Series Name');
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 21);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 22);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 23);
             $('.btnAllOperator').removeClass('d-none');
 
 
