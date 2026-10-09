@@ -1947,6 +1947,7 @@ class QualificationCertificationController extends Controller
                 }
                 if($selectAccess === 'FORAPP'){
                     $selectedAccess = [
+                        'PB',
                         'FORAPP',
                     ];
                 }
@@ -1965,7 +1966,7 @@ class QualificationCertificationController extends Controller
             if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
                 $data->where('section_category',$selectMhSortBySection);
             }
-          
+
             if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
                 $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
                 $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
@@ -2338,7 +2339,7 @@ class QualificationCertificationController extends Controller
                     $newStatus  = 'DOPEROSC';
                     $statusName = 'D PRODUCT ORIENTATION AND SAMPLE CHECK (QC)';
                     break;
-                case ($params['approval_status'] === 'DOPEROSC' && $params['selectPosition'] != 'PartsPrep'): 
+                case ($params['approval_status'] === 'DOPEROSC' && $params['selectPosition'] != 'PartsPrep'):
                     $newStatus  = 'EOPERVISUAL';
                     $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
                     break;

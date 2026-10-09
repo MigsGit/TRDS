@@ -7,7 +7,7 @@
 @php
     $statusOptions = [
         ['value' => '', 'label' => 'Select Status', 'disabled' => true, 'selected' => true],
-        ['value' => 'ALL', 'label' => 'Display All'],
+        // ['value' => 'ALL', 'label' => 'Display All'],
         ['value' => 'FORAPP', 'label' => 'PENDING'],
         ['value' => 'OK', 'label' => 'CLOSED'],
         // ['value' => 'MYAPPROVAL', 'label' => 'FOR MY APPROVAL'],

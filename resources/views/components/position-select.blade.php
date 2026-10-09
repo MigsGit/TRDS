@@ -9,10 +9,11 @@
         ['value' => '', 'label' => 'Select Position', 'disabled' => true, 'selected' => true],
         ['value' => 'ALL', 'label' => 'Display All'],
         ['value' => 'Operator', 'label' => 'Operator'],
+        ['value' => 'VisualOperator', 'label' => 'Visual Operator'],
+        ['value' => 'PartsPrep', 'label' => 'Parts Prep'],
         ['value' => 'Inspector', 'label' => 'Inspector'],
         ['value' => 'Technician', 'label' => 'Technician'],
         ['value' => 'MH', 'label' => 'MH'],
-        ['value' => 'VisualOperator', 'label' => 'Visual Operator'],
         ['value' => 'Supervisor', 'label' => 'Supervisor'],
     ];
 @endphp
