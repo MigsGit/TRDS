@@ -612,10 +612,7 @@ class ETRController extends Controller
         $data = collect();
 
         if ($trainingEndorsement) {
-            foreach (
-                $trainingEndorsement->get_training_endorsement_employees
-                as $endorsementEmployee
-            ) {
+            foreach ( $trainingEndorsement->get_training_endorsement_employees as $endorsementEmployee) {
                 $trainingRequest =
                     $endorsementEmployee->get_training_request_details_info;
 
@@ -791,57 +788,59 @@ class ETRController extends Controller
         })
         ->get();
 
-        foreach ($hrMemoData as $row) {
-            $data->push((object) [
-                'trainingDate' =>
-                    ($row->date_start && $row->date_end)
-                        ? $row->date_start . ' - ' . $row->date_end
+        if ($hrMemoData) {
+            foreach ($hrMemoData as $row) {
+                $data->push((object) [
+                    'trainingDate' =>
+                        ($row->date_start && $row->date_end)
+                            ? $row->date_start . ' - ' . $row->date_end
+                            : '',
+
+                    'title' =>
+                        optional($row->exam_info_test)->examination_name ?? '',
+
+                    'seriesName' =>
+                        'N/A',
+
+                    'department' =>
+                        'N/A',
+
+                    'station' =>
+                        'N/A',
+
+                    'detailedStation' =>
+                        'N/A',
+
+                    'objective' =>
+                        $row->objective ?? '',
+
+                    'trainor' => $row->rapidx_system_one_hris_emp_info
+                        ? trim(
+                            $row->rapidx_system_one_hris_emp_info->FirstName .
+                            ' ' .
+                            $row->rapidx_system_one_hris_emp_info->LastName
+                        )
                         : '',
 
-                'title' =>
-                    optional($row->exam_info_test)->examination_name ?? '',
+                    'result' =>
+                        $row->result ?? null,
 
-                'seriesName' =>
-                    'N/A',
+                    'record_type' =>
+                        'HrMemoTraineeCategoryDetails',
 
-                'department' =>
-                    'N/A',
+                    'training_remarks' =>
+                        $row->training_remarks ?? '',
 
-                'station' =>
-                    'N/A',
+                    'trainingVenue' =>
+                        $row->training_venue ?? '',
 
-                'detailedStation' =>
-                    'N/A',
+                    'typeOfTraining' =>
+                        $row->type_of_training ?? '',
 
-                'objective' =>
-                    $row->objective ?? '',
-
-                'trainor' => $row->rapidx_system_one_hris_emp_info
-                    ? trim(
-                        $row->rapidx_system_one_hris_emp_info->FirstName .
-                        ' ' .
-                        $row->rapidx_system_one_hris_emp_info->LastName
-                    )
-                    : '',
-
-                'result' =>
-                    $row->result ?? null,
-
-                'record_type' =>
-                    'HrMemoTraineeCategoryDetails',
-
-                'training_remarks' =>
-                    $row->training_remarks ?? '',
-
-                'trainingVenue' =>
-                    $row->training_venue ?? '',
-
-                'typeOfTraining' =>
-                    $row->type_of_training ?? '',
-
-                'attachment' =>
-                    null,
-            ]);
+                    'attachment' =>
+                        null,
+                ]);
+            }
         }
 
         $qcSlips = QcSlip::with([
@@ -859,87 +858,88 @@ class ETRController extends Controller
         ->where('status', 'OK')
         ->get();
 
+        if($qcSlips){
+            foreach ($qcSlips as $row) {
+                $employee = $row->qc_slip_employees->first();
+                $assessmentResult = null;
 
-        foreach ($qcSlips as $row) {
-            $employee = $row->qc_slip_employees->first();
-            $assessmentResult = null;
+                if ($employee) {
+                    $assessmentResult =
+                        $employee->second_take_ins_assessment_result
+                        ?: $employee->first_take_ins_assessment_result;
+                }
 
-            if ($employee) {
-                $assessmentResult =
-                    $employee->second_take_ins_assessment_result
-                    ?: $employee->first_take_ins_assessment_result;
-            }
+                $result = null;
 
-            $result = null;
+                switch ($assessmentResult) {
+                    case 'PASSED':
+                        $result = 'Passed';
+                        break;
 
-            switch ($assessmentResult) {
-                case 'PASSED':
-                    $result = 'Passed';
-                    break;
+                    case 'FAILED':
+                        $result = 'Failed';
+                        break;
 
-                case 'FAILED':
-                    $result = 'Failed';
-                    break;
+                    default:
+                        $result = 'N/A';
+                        break;
+                }
 
-                default:
-                    $result = 'N/A';
-                    break;
-            }
+                $data->push((object) [
+                    'trainingDate' =>
+                        $row->created_at
+                            ? $row->created_at->format('Y-m-d')
+                            : '',
 
-            $data->push((object) [
-                'trainingDate' =>
-                    $row->created_at
-                        ? $row->created_at->format('Y-m-d')
-                        : '',
+                    'title' =>
+                        'Qualification and Certification',
 
-                'title' =>
-                    'Qualification and Certification',
+                    'seriesName' =>
+                        optional($row->productLine)
+                            ->dropdown_masters_details ?? '',
 
-                'seriesName' =>
-                    optional($row->productLine)
-                        ->dropdown_masters_details ?? '',
+                    'department' =>
+                        '',
 
-                'department' =>
-                    '',
-
-                'station' =>
-                    optional(
-                        optional($employee)->get_station_to
-                    )->dropdown_masters_details ?? '',
-
-                'detailedStation' =>
-                    $employee
-                        ? ($employee->remarks ?? '')
-                        : '',
-
-                'objective' =>
-                    $row->objective ?? '',
-
-                'trainor' =>
-                    '',
-
-                'result' =>
-                    $result,
-
-                'record_type' =>
-                    'QcSlip',
-
-                'training_remarks' =>
-                    $row->training_remarks ?? '',
-
-                'trainingVenue' =>
-                    $row->training_venue ?? '',
-
-                'typeOfTraining' =>
-                    optional(
+                    'station' =>
                         optional(
-                            $row->qc_reason_certification
-                        )->dropdown_reason
-                    )->dropdown_masters_details ?? '',
+                            optional($employee)->get_station_to
+                        )->dropdown_masters_details ?? '',
 
-                'attachment' =>
-                    null,
-            ]);
+                    'detailedStation' =>
+                        $employee
+                            ? ($employee->remarks ?? '')
+                            : '',
+
+                    'objective' =>
+                        $row->objective ?? '',
+
+                    'trainor' =>
+                        '',
+
+                    'result' =>
+                        $result,
+
+                    'record_type' =>
+                        'QcSlip',
+
+                    'training_remarks' =>
+                        $row->training_remarks ?? '',
+
+                    'trainingVenue' =>
+                        $row->training_venue ?? '',
+
+                    'typeOfTraining' =>
+                        optional(
+                            optional(
+                                $row->qc_reason_certification
+                            )->dropdown_reason
+                        )->dropdown_masters_details ?? '',
+
+                    'attachment' =>
+                        null,
+                ]);
+            }
         }
 
         $trainingRecords = TrainingRecordEmployee::with([
@@ -949,88 +949,90 @@ class ETRController extends Controller
             },
             'training_record.venue_details',
             'training_record.type_of_training_details',
-            'training_record.trainer_details'
+            // 'training_record.trainer_details'
         ])
         ->where('employee_no', $employeeNo)
         ->whereNull('deleted_at')
         ->whereHas('training_record')
         ->get();
+        // return $trainingRecords;
+        // return $trainingRecords[0]->training_record->trainer_details[0]->empname ?? '';
 
-
-        foreach ($trainingRecords as $row) {
-            $trainingRecord = $row->training_record;
-            if (!$trainingRecord) {
-                continue;
-            }
-
-            $trainer = '';
-            if ($trainingRecord->trainer_details) {
-                foreach ($trainingRecord->trainer_details as $trainor) {
-
-                    $trainer .=
-                        $trainor->FirstName . ' ' .
-                        $trainor->LastName . ', ';
+        if($trainingRecords){
+            foreach ($trainingRecords as $row) {
+                $trainingRecord = $row->training_record;
+                if (!$trainingRecord) {
+                    continue;
                 }
-                $trainer = rtrim($trainer, ', ');
+
+                $trainer = '';
+
+                if ($trainingRecord->trainer_details) {
+                    foreach ($trainingRecord->trainer_details as $trainor) {
+
+                        $trainer .=
+                            $trainor->FirstName . ' ' .
+                            $trainor->LastName . ', ';
+                    }
+                    $trainer = rtrim($trainer, ', ');
+                }
+
+                $data->push((object) [
+                    'trainingDate' =>
+                        ($trainingRecord->start_date &&
+                        $trainingRecord->end_date)
+                            ? $trainingRecord->start_date .
+                            ' - ' .
+                            $trainingRecord->end_date
+                            : '',
+
+                    'title' =>
+                        $trainingRecord->training_title ?? '',
+
+                    'seriesName' =>
+                        $row->series ?? 'N/A',
+
+                    'department' =>
+                        'N/A',
+
+                    'station' =>
+                        $row->station ?? 'N/A',
+
+                    'detailedStation' =>
+                        'N/A',
+
+                    'objective' =>
+                        $trainingRecord->objective ?? '',
+
+                    'trainor' =>
+                        $trainer,
+
+                    'result' =>
+                        $row->result ?? null,
+
+                    'record_type' =>
+                        'TrainingRecordEmployee',
+
+                    'training_remarks' =>
+                        $trainingRecord->remarks ?? '',
+
+                    'trainingVenue' =>
+                        optional(
+                            $trainingRecord->venue_details
+                        )->dropdown_masters_details ?? 'N/A',
+
+                    'typeOfTraining' =>
+                        optional(
+                            $trainingRecord->type_of_training_details
+                        )->dropdown_masters_details ?? 'N/A',
+
+                    'attachment' =>
+                        !empty($trainingRecord->attachments)
+                            ? $trainingRecord->id . '/' .
+                            $trainingRecord->attachments
+                            : null,
+                ]);
             }
-
-            $result = 'N/A';
-
-            $data->push((object) [
-                'trainingDate' =>
-                    ($trainingRecord->start_date &&
-                    $trainingRecord->end_date)
-                        ? $trainingRecord->start_date .
-                        ' - ' .
-                        $trainingRecord->end_date
-                        : '',
-
-                'title' =>
-                    $trainingRecord->training_title ?? '',
-
-                'seriesName' =>
-                    $row->series ?? 'N/A',
-
-                'department' =>
-                    'N/A',
-
-                'station' =>
-                    $row->station ?? 'N/A',
-
-                'detailedStation' =>
-                    'N/A',
-
-                'objective' =>
-                    $trainingRecord->objective ?? '',
-
-                'trainor' =>
-                    $trainer,
-
-                'result' =>
-                    $result,
-
-                'record_type' =>
-                    'TrainingRecordEmployee',
-
-                'training_remarks' =>
-                    $trainingRecord->remarks ?? '',
-
-                'trainingVenue' =>
-                    optional(
-                        $trainingRecord->venue_details
-                    )->dropdown_masters_details ?? 'N/A',
-
-                'typeOfTraining' =>
-                    optional(
-                        $trainingRecord->type_of_training_details
-                    )->dropdown_masters_details ?? 'N/A',
-
-                'attachment' =>
-                    !empty($trainingRecord->attachments)
-                        ? $trainingRecord->id . '/' .
-                        $trainingRecord->attachments
-                        : null,
-            ]);
         }
 
         $data = $data->sortBy(function ($row) {
@@ -1038,15 +1040,15 @@ class ETRController extends Controller
         })->values();
 
         $passed = $data->filter(function ($row) {
-            return strtolower($row->result ?? '') === 'passed';
+            return strtolower($row->result ?? '') === '1';
         })->count();
 
         $complied = $data->filter(function ($row) {
-            return strtolower($row->result ?? '') === 'complied';
+            return strtolower($row->result ?? '') === '2';
         })->count();
 
         $failed = $data->filter(function ($row) {
-            return strtolower($row->result ?? '') === 'failed';
+            return strtolower($row->result ?? '') === '3';
         })->count();
 
         $actualHandsOn = $data->filter(function ($row) {
