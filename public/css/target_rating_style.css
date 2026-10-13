@@ -1,0 +1,23 @@
+#tblTargetRatings td .detail-line {
+    padding: 6px 0;
+    min-height: 36px;
+    line-height: 24px;
+    white-space: nowrap;
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* no border under the last target in a cell */
+#tblTargetRatings td .detail-line:last-child {
+    border-bottom: 0;
+}
+
+#tblTargetRatings td:nth-child(6),
+#tblTargetRatings td:nth-child(7) {
+    padding: 0;
+    vertical-align: middle;
+}
+
+#tblTargetRatings td .detail-line {
+    padding: 6px 12px;
+}

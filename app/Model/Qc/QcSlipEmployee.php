@@ -72,6 +72,4 @@ class QcSlipEmployee extends Model
         return $this->system_one_subcon_emp_info ?? $this->system_one_hris_emp_info;
     }
 
-
-
 }
