@@ -47,6 +47,17 @@
                     <a href="{{ route('target_ratings') }}"  class="nav-link">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>Target Ratings Settings</p>
+                    <a href="{{ route('dropdown_maintenance') }}"  class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Dropdown Maintenance</p>
+                    </a>
+                </li>
+
+                <li class="nav-header font-weight-bold">Modules</li>
+                {{-- <li class="nav-item has-treeview">
+                    <a href="{{ route('hr_memo') }}" class="nav-link">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>HR MEMO/Approval </p>
                     </a>
                 </li>
 
@@ -165,9 +176,9 @@
                 </li>
                 {{-- @if ( in_array(12,explode(',', $globalUser->user_modules_id)) ) --}}
                     <li class="nav-item has-treeview">
-                        <a href="{{ route('qualification_certification') }}" class="nav-link">
+                        <a href="{{ route('qualification_certification2') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
-                            <p>Qualification / Validation</p>
+                            <p>Qualification / Certification</p>
                         </a>
                     </li>
                     {{-- @endif --}}
@@ -189,6 +200,47 @@
                             </a>
                         </li>
                     <!-- </ul> -->
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('TRU') }}" class="nav-link">
+                        <i class="far fa-list-alt nav-icon"></i>
+                        <p>Training Record Update</p>
+                    </a>
+                </li>
+
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-book-open"></i>
+                        <p>
+                            Recertification
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('grr_attributes_settings') }}" class="nav-link">
+                                <i class="fas fa-cogs nav-icon"></i>
+                                <p>GRR Attributes Settings</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('blank') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Work Assignment</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('blank') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>GRR Attributes Examination</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('blank') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>GRR Variables</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <li class="nav-header font-weight-bold">Export</li>
@@ -196,6 +248,12 @@
                     <a id="btnListCertPersonnel" class="nav-link">
                         <i class="fas fa-file-excel"></i>
                         <p>List of Certified Personnel</p>
+                    </a>
+                </li>
+                <li class="nav-item has-treeview">
+                    <a id="btnInsCertMatrix" class="nav-link">
+                        <i class="fas fa-file-excel"></i>
+                        <p>Inspectors Certification Matrix</p>
                     </a>
                 </li>
             </ul>

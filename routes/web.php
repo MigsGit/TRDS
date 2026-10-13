@@ -1,15 +1,22 @@
 <?php
+use App\Http\Controllers\DropdownController;
+use App\Http\Controllers\ETRController;
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\ExaminationResultController;
 use App\Http\Controllers\ExamTitleController;
+use App\Http\Controllers\GrrQuestionnaireSettingsController;
+use App\Http\Controllers\GrrSettingsController;
 use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
+use App\Http\Controllers\InspCertMatrixController;
+use App\Http\Controllers\InspSkillChartSettingController;
 use App\Http\Controllers\ListOfCertPersonnelController;
 use App\Http\Controllers\PersonnelSkillMatrixController;
 use App\Http\Controllers\QualificationCertificationController;
 use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingEndorsementController;
+use App\Http\Controllers\TrainingRecordUpdateController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ETRController;
@@ -56,9 +63,9 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/hr_memo', function () {
         return view('hr_memo_approval');
     })->name('hr_memo');
-    Route::get('/qualification_certification', function () {
+    Route::get('/qualification_certification2', function () {
         return view('qualification_certification');
-    })->name('qualification_certification');
+    })->name('qualification_certification2');
 
     Route::get('/training_request_conformance', function () {
         return view('training_request_conformance');
@@ -96,6 +103,17 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/personnel_disqualification', function () {
         return view('personnel_disqualification');
     })->name('personnel_disqualification');
+    Route::get('/TRU', function () {
+        return view('training_record_update');
+    })->name('TRU');
+
+    Route::get('/grr_attributes_settings', function () {
+        return view('recertification/grr_attributes_settings');
+    })->name('grr_attributes_settings');
+
+    Route::get('/dropdown_maintenance', function () {
+        return view('dropdown_maintenance');
+    })->name('dropdown_maintenance');
 
     // TRAINING ENDORSEMENT CONTROLLER
     Route::controller(TrainingEndorsementController::class)->group(function () {
@@ -130,7 +148,8 @@ Route::middleware('checkSession')->group(function(){
         Route::post('save_first_take_ins_sequence', 'saveFirstTakeInsSequence');
         Route::post('update_approval', 'updateApproval');
         Route::post('save_qualification_certification_inspector', 'saveQualificationCertificationInspector');
-        Route::post('save_qc_lqc_training_items_by_qc_slip_id', 'saveQcLqcTrainingItemsByQcSlipId');
+        Route::post('save_qc_lqc_training_items_by_qc_slip_id', 'saveQcLqcTrainingItemsByQcSlipId')->name('save_qc_lqc_training_items_by_qc_slip_id');
+        Route::post('save_qc_lqc_training_items_by_position', 'saveQcLqcTrainingItemsByPosition')->name('save_qc_lqc_training_items_by_position');
 
         Route::get('load_qc_slip', 'loadQcSlip');
         Route::get('get_div_dept_sec', 'getDivDeptSec');
@@ -139,6 +158,8 @@ Route::middleware('checkSession')->group(function(){
         Route::get('load1st_qc_validation', 'load1stQcValidation');
         Route::get('load2nd_qc_validation', 'load2ndQcValidation');
         Route::get('/load_qc_lqc_training_items_by_qc_slip_id', 'loadQcLqcTrainingItemsByQcSlipId');
+        Route::get('/load_qc_lqc_training_items_by_position', 'loadQcLqcTrainingItemsByPosition');
+        Route::get('/get_employee_details_by_no', 'getEmployeeDetailsByNo');
     });
 
     Route::controller(QuestionnairesController::class)->group(function () {
@@ -356,10 +377,55 @@ Route::middleware('checkSession')->group(function(){
         Route::get('get_systemone_employee_training_details', 'getSystemoneEmployeeTrainingDetails');
 
         Route::get('view_trds_summary', 'viewTRDSSummary');
+        
+        Route::get('get_employee_training_record/{employeeId}/{employeeNo}', 'getEmployeeTrainingRecord');
+        Route::get('get_trds_summary/{employeeId}/{employeeNo}', 'getTRDSSummary');
     });
     Route::controller(ListOfCertPersonnelController::class)->group(function(){
         Route::get('/get_dropdown_select_certpersonnel', 'getDropdownSelectCertPersonnel')->name('get_dropdown_select_certpersonnel');
         Route::get('/export_list_cert_personnel', 'exportListCertPersonnel')->name('export_list_cert_personnel');
+        });
+
+    Route::controller(InspCertMatrixController::class)->group(function(){
+        Route::get('/export-inspector-cert-matrix', 'exportInspectorCertMatrix')->name('export-inspector-cert-matrix');
+    });
+
+    Route::controller(TrainingRecordUpdateController::class)->group(function () {
+        Route::get('/get_type_of_trainings', 'getTypeOfTrainings')->name('get_type_of_trainings');
+        Route::get('/get_venues', 'getVenue')->name('get_venues');
+        Route::get('/get_employees', 'getEmployees')->name('get_employees');
+        Route::post('/save_training_record', 'saveTrainingRecord')->name('save_training_record');
+        Route::get('/dt_get_training_records', 'dtGetTrainingRecords');
+        Route::get('/get_training_record_by_id', 'getTrainingRecordById');
+        Route::get('/get_trainee_details', 'getTraineeDetails')->name('get_trainee_details');
+        Route::post('/delete_training_record', 'deleteTrainingRecord')->name('delete_training_record');
+        Route::post('/import_trainees', 'importTrainees')->name('import_trainees');
+        Route::get('/get_result_list', 'getResultList')->name('get_result_list');
+    });
+
+    Route::controller(GrrSettingsController::class)->group(function () {
+        Route::get('/view_grr_attributes', 'viewGrrAttributes')->name('view_grr_attributes');
+        Route::post('/add_grr_sample', 'addGrrSample')->name('add_grr_sample');
+        Route::get('/get_grr_attributes_by_id', 'getGrrAttributesById')->name('get_grr_attributes_by_id');
+        Route::post('/update_grr_status', 'updateGrrStatus')->name('update_grr_status');
+
+    });
+
+    Route::controller(GrrQuestionnaireSettingsController::class)->group(function () {
+        Route::get('/view_grr_questionnaire', 'viewGrrQuestionnaire')->name('view_grr_questionnaire');
+        Route::get('/get_grr_sample_by_id', 'getGrrSampleById')->name('get_grr_sample_by_id');
+        Route::post('/add_grr_questionnaire', 'addGrrQuestionnaire')->name('add_grr_questionnaire');
+        Route::get('/get_grr_questionnaire_by_id', 'getGrrQuestionnaireById')->name('get_grr_questionnaire_by_id');
+        Route::post('/update_grr_questionnaire_status', 'updateGrrQuestionnaireStatus')->name('update_grr_questionnaire_status');
+    });
+
+    Route::controller(DropdownController::class)->group(function(){
+        Route::get('/get_dropdown_types', 'get_dropdown_types')->name('get_dropdown_types');
+        Route::post('/save_dropdown_type', 'save_dropdown_type')->name('save_dropdown_type');
+        Route::get('/dt_get_dropdown_items', 'dt_get_dropdown_items')->name('dt_get_dropdown_items');
+        Route::post('/save_dropdown_items', 'save_dropdown_items')->name('save_dropdown_items');
+        Route::get('/get_dropdown_item_by_id', 'get_dropdown_item_by_id')->name('get_dropdown_item_by_id');
+        Route::post('/change_status_dropdown_item', 'change_status_dropdown_item')->name('change_status_dropdown_item');
     });
 
 });

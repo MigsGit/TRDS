@@ -2,7 +2,7 @@
     <!-- Title -->
     <tr>
         <td colspan="8">
-            <strong>Employee Skill Matrix</strong>
+            <strong>Employee Skill Map</strong>
         </td>
     </tr>
 

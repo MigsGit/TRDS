@@ -14,11 +14,13 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
 {
     protected $category;
     protected $qcSlips;
+    protected $product_line;
 
-    public function __construct(string $category, $qcSlips)
+    public function __construct(string $category, $qcSlips, $product_line)
     {
         $this->category = $category;
         $this->qcSlips = $qcSlips;
+        $this->product_line = $product_line;
     }
 
     public function title(): string
@@ -44,7 +46,7 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
                     $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
                     $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
                     break;
-                case 'INSPECTOR':
+                case 'Inspector':
                     $qcApp = $approvers->firstWhere('approval_status', 'ALQCTQ');
                     break;
                 case 'OPTECH':
@@ -80,8 +82,7 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
 
                 // $dateStr = !empty($rawDate) ? Carbon::parse($rawDate)->format('F d, Y') : '';
 
-                $explodedNames = explode(' | ', $app->formatted['name'] ?? '');
-                // dd($explodedNames);
+                $explodedNames = explode(' | ', utf8_decode($app->formatted['name']) ?? '');
                 // $names = $app->formatted['name'] ?? '';
                 $dateStr = $app->formatted['date'] ?? '';
                 $rawRemarks = $app->formatted['remarks'] ?? '';
@@ -103,23 +104,51 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
                 $rows[] = [
                     'emp_no'       => $emp->employee_no,
                     'emp_name'     => $emp->employee_info->EmpName ?? '',
-                    'product_line' => $productLine,
+                    // 'product_line' => $productLine,
+                    'product_line' => $this->product_line,
                     'station'      => $emp->get_station_to->dropdown_masters_details ?? '',
                     // 'category'     => 'CERTIFICATION',
                     'category' => Str::contains(strtolower(json_encode($slip->reason_details ?? [])), 're-certification') 
                     ? 'RE-CERTIFICATION' 
                     : 'CERTIFICATION',
                     'date_hired'   => !empty($emp->employee_info->DateHired) ? Carbon::parse($emp->employee_info->DateHired)->format('F d, Y') : '',
-                    'prod_name'    => $prod['name'],
-                    'prod_date'    => $prod['date'],
-                    'eng_name'     => $eng['name'],
-                    'eng_date'     => $eng['date'],
-                    'qc_name'      => $qc['name'],
-                    'qc_date'      => $qc['date'],
+                    'prod_name'    => !empty($prod['name']) ? $prod['name'] : 'N/A',
+                    'prod_date'    => !empty($prod['date']) ? $prod['date'] : 'N/A',
+                    'eng_name'     => !empty($eng['name']) ? $eng['name'] : 'N/A',
+                    'eng_date'     => !empty($eng['date']) ? $eng['date'] : 'N/A',
+                    'qc_name'      => !empty($qc['name']) ? $qc['name'] : 'N/A',
+                    'qc_date'      => !empty($qc['date']) ? $qc['date'] : 'N/A',
                     'remarks'      => 'PASSED',
                 ];
             }
         }
+
+        usort($rows, function ($a, $b) {
+            // Helper function to extract valid Carbon date based on priority
+            $getDate = function ($row) {
+                if (!empty($row['qc_date']) && $row['qc_date'] !== 'N/A') {
+                    return Carbon::parse($row['qc_date']);
+                }
+                if (!empty($row['eng_date']) && $row['eng_date'] !== 'N/A') {
+                    return Carbon::parse($row['eng_date']);
+                }
+                if (!empty($row['prod_date']) && $row['prod_date'] !== 'N/A') {
+                    return Carbon::parse($row['prod_date']);
+                }
+                return null; // Fallback if all dates are N/A
+            };
+
+            $dateA = $getDate($a);
+            $dateB = $getDate($b);
+
+            // Handle cases where all dates are N/A (push them to the bottom)
+            if ($dateA === null && $dateB === null) return 0;
+            if ($dateA === null) return 1;
+            if ($dateB === null) return -1;
+
+            // Sort ascending (Oldest date on top)
+            return $dateA->timestamp <=> $dateB->timestamp;
+        });
         return view('exports.certified_personnel', [
             'rows'        => $rows,
             'updated_as'  => Carbon::now()->format('M-y'),
