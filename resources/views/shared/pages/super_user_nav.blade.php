@@ -43,13 +43,14 @@
                     </a>
                 </li>
 
-                <li class="nav-header font-weight-bold">Modules</li>
-                {{-- <li class="nav-item has-treeview">
-                    <a href="{{ route('hr_memo') }}" class="nav-link">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>HR MEMO/Approval </p>
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('target_ratings') }}"  class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Target Ratings Settings</p>
                     </a>
-                </li> --}}
+                </li>
+
+                <li class="nav-header font-weight-bold">Modules</li>
                 <?php
                     // if($globalUser != null){
                     //     $user_access = explode(',', $globalUser->user_modules_id);
@@ -57,25 +58,24 @@
                     // }
                 ?>
 
-
-                    <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p> HR Memo/Approval</p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('hr_memo_exam') }}" class="nav-link">
-                                    <p> Examinations</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('hr_memo') }}" class="nav-link">
-                                    <p> Memo/Approval</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p> HR Memo/Approval</p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('hr_memo_exam') }}" class="nav-link">
+                                <p> Examinations</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('hr_memo') }}" class="nav-link">
+                                <p> Memo/Approval</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
@@ -171,6 +171,26 @@
                         </a>
                     </li>
                     {{-- @endif --}}
+                    
+                <li class="nav-item has-treeview">
+                    <!-- <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p> Personnel Disqualification</p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
+                    </a> -->
+                    <!-- <ul class="nav nav-treeview"> -->
+                        <!-- <li class="nav-item">
+                            <a href="{{ route('hr_memo_exam') }}" class="nav-link">
+                                <p> Examinations</p>
+                            </a>
+                        </li> -->
+                        <li class="nav-item">
+                            <a href="{{ route('personnel_disqualification') }}" class="nav-link">
+                                <p> Personnel Disqualification</p>
+                            </a>
+                        </li>
+                    <!-- </ul> -->
+                </li>
+
                 <li class="nav-header font-weight-bold">Export</li>
                 <li class="nav-item has-treeview">
                     <a id="btnListCertPersonnel" class="nav-link">
