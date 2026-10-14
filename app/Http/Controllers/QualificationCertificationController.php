@@ -122,18 +122,6 @@ class QualificationCertificationController extends Controller
      */
     public function loadQcLqcTrainingItemsByPosition(Request $request){ //nmodify
         $qcSlipsId = $request->input('qc_slips_id');
-        // $getQcSlipsById = QcSlip::findOrFail($qcSlipsId);
-        //   $arrStatus = [
-        //     'AOPERPRDN',
-        //     'BOPERENGG',
-        //     'COPERQC',
-        // ];
-
-        // if(in_array($getQcSlipsById->approval_status,$arrStatus)){
-        //     return 'true';
-        // }else{
-        //     return 'false';
-        // }
         $position  = $request->input('position');
         $ddMastersId  = $request->input('dd_masters_id');
 
