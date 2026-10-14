@@ -104,7 +104,7 @@ class QualificationCertificationController extends Controller
                     }
                 }
             // });
-            DB::commit();
+            // DB::commit();
             return response()->json([
                 'is_success' => 'true',
                 'message'    => 'Training items matrix saved successfully!',
@@ -345,12 +345,12 @@ class QualificationCertificationController extends Controller
                         }
                     }
 
-                    $operPositionTransition = $this->determineNextOperPositionStatus($params['approval_status'], $params['selectPosition']);
-                    $newStatus = $operPositionTransition['newStatus'];
+                    // $operPositionTransition = $this->determineNextOperPositionStatus($params['approval_status'], $params['selectPosition']);
+                    // $newStatus = $operPositionTransition['newStatus'];
 
-                    if ($newStatus !== 'N/A') {
-                        $qcSlipDetails->update(['approval_status' => $newStatus]);
-                    }
+                    // if ($newStatus !== 'N/A') {
+                    //     $qcSlipDetails->update(['approval_status' => $newStatus]);
+                    // }
                 }
 
                 foreach ($matrixData as $row) {
@@ -497,12 +497,11 @@ class QualificationCertificationController extends Controller
             $currentApprovalStatus = $qcSlipDetails->approval_status;
             $qcModelApprover = OpApprover::class;
 
-            if($currentPositionCategory === 'VisualOperator' || $currentPositionCategory === 'PartsPrep' ){
+            if($currentPositionCategory === 'VisualOperator' || $currentPositionCategory === 'PartsPrep'  || $currentPositionCategory === 'MachineOperator' ){
                 // 'For Production Update Training and Orientation'; 'AOPERPRDN';
                 if($currentApprovalStatus !='PB'){
                     // $currentApprovalStatus = $qcSlipDetails->approval_status;
                     $cLqcTrainingItemResult = CLqcTrainingItemResult::where('qc_slips_id',$qcSlipId);
-                    // return $currentApprovalStatus;
                     switch ($currentApprovalStatus) {
                         case 'AOPERPRDN':
                             $cLqcTrainingItemResult->whereNotNull('chk_trainer_emp_no');
@@ -512,6 +511,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',1)
                             ->where('position','Production')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 2 Production Update';
                             break;
@@ -519,6 +519,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',2)
                             ->where('position','Production')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 2 Production Update';
                             break;
@@ -526,6 +527,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',3)
                             ->where('position','Production')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 3 Production Update';
                             break;
@@ -533,6 +535,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',4)
                             ->where('position','Production')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 4 Production Update';
                             break;
@@ -540,6 +543,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',5)
                             ->where('position','Production')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 5 Production Update';
                             break;
@@ -554,6 +558,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',1)
                             ->where('position','Engineer')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 2 ENGG Update';
                             break;
@@ -561,6 +566,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',2)
                             ->where('position','Engineer')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 2 ENGG Update';
                             break;
@@ -568,6 +574,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',3)
                             ->where('position','Engineer')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 3 ENGG Update';
                             break;
@@ -575,6 +582,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',4)
                             ->where('position','Engineer')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 4 ENGG Update';
                             break;
@@ -582,6 +590,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',5)
                             ->where('position','Engineer')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 5 Production Update';
                             break;
@@ -596,6 +605,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',1)
                             ->where('position','QC')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 2 QC Update';
                             break;
@@ -603,6 +613,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',2)
                             ->where('position','QC')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 2 QC Update';
                             break;
@@ -610,6 +621,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',3)
                             ->where('position','QC')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 3 QC Update';
                             break;
@@ -617,6 +629,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',4)
                             ->where('position','QC')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 4 QC Update';
                             break;
@@ -624,6 +637,7 @@ class QualificationCertificationController extends Controller
                             $cLqcTrainingItemResult
                             ->where('day_number',5)
                             ->where('position','QC')
+                            ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
                             $messageAlert = 'Day 5 QC Update';
                             break;
@@ -633,6 +647,7 @@ class QualificationCertificationController extends Controller
                             break;
                     }
                     $countCLqcTrainingItemResult = $cLqcTrainingItemResult->count();
+                //   return  $countCLqcTrainingItemResult = $cLqcTrainingItemResult->get(); //nmodify
                     if($countCLqcTrainingItemResult === 0 ){
                         return response()->json(['is_success' => 'false', "message" => 'Please input the '.$messageAlert.''],409);
                     }
@@ -987,7 +1002,7 @@ class QualificationCertificationController extends Controller
                         $ppdParams = [
                             'request' => $request->all()
                         ];
-                        DB::commit();
+                        // DB::commit();
                         $dPppdOnly=  $this->dPpdProcessOnly($ppdParams);
                         if($dPppdOnly === 'false'){
                             return response()->json(['is_success' => 'true']);
@@ -1194,7 +1209,7 @@ class QualificationCertificationController extends Controller
                     'qcModelApprover' => $qcModelApprover,
                 ];
             }
-            DB::commit();
+            // DB::commit();
             $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
@@ -1205,7 +1220,7 @@ class QualificationCertificationController extends Controller
     public function saveOperApprovers($params){
         try {
             OpApprover::insert($params);
-            DB::commit();
+            // DB::commit();
             return [
                 'is_success' => 'true'
             ];
@@ -1253,7 +1268,7 @@ class QualificationCertificationController extends Controller
                 //     $params['update_data']
                 // );
                 $opApprover =  $qcModelApprover::insert($params['update_data']);
-                DB::commit();
+                // DB::commit();
                 foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
                    $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
                 }
@@ -1303,7 +1318,7 @@ class QualificationCertificationController extends Controller
                 "created_by" => $rapidxEmpNo->name,
                 "system_name" => "rapidx_TRDS",
             ];
-            DB::commit();
+            // DB::commit();
         //    $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
@@ -1343,7 +1358,7 @@ class QualificationCertificationController extends Controller
                 'approval_status'=> $approvalStatus,
             ];
 
-            DB::commit();
+            // DB::commit();
             $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
@@ -1372,7 +1387,7 @@ class QualificationCertificationController extends Controller
             ->whereNull('deleted_at')
             // ->get();
             ->update($arrData);
-            DB::commit();
+            // DB::commit();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -2172,7 +2187,7 @@ class QualificationCertificationController extends Controller
 
     public function updateOperApprovers($params){
         try {
-            DB::commit();
+            // DB::commit();
             return [
                 'is_success' => 'true'
             ];
@@ -2185,7 +2200,7 @@ class QualificationCertificationController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            DB::commit();
+            // DB::commit();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -2237,7 +2252,7 @@ class QualificationCertificationController extends Controller
             $opApprover =  OpApprover::where('qc_slips_id',$qcSlipsId)->where('approval_status',$request['approval_status'])
             // ->get();
             ->update($dPpdCertificationCompletionApprover);
-            DB::commit();
+            // DB::commit();
             $dPpdCertificationCompletionQuery =  OpApprover::where('qc_slips_id',$qcSlipsId)->where('approval_status',$request['approval_status']);
 
             $requiredApprover = [
