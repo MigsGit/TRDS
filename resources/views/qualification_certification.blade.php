@@ -567,7 +567,7 @@
             formArray.push({ name: 'text_section_operator', value: $('#text_section_operator').val() });
             formArray.push({ name: 'text_series_operator', value: $('#text_series_operator').val() });
             formArray.push({ name: 'text_operator_product_line', value: $('#text_operator_product_line').val() });
-            // formArray.push({ name: 'text_date_of_transfer', value: $('#text_date_of_transfer').val() });
+            formArray.push({ name: 'text_date_of_transfer', value: $('#text_date_of_transfer').val() });
             formArray.push({ name: 'text_certification_operator', value: $('#text_certification_operator').val() });
             formArray.push({ name: 'transfer_flexibility', value: $('#transfer_flexibility').val() });
 

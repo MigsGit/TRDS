@@ -557,7 +557,7 @@
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],17);
+            ],1);
             $('.eVisualGrr').removeClass('d-none');
             $('#divAllOperators').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
@@ -588,7 +588,7 @@
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],17);
+            ],1);
             $('#divAllOperators').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
             $('#productLine').removeClass('d-none');
@@ -618,7 +618,7 @@
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],17);
+            ],1);
             $('.eVisualGrr').removeClass('d-none');
             $('.machineOpetorItemNo3').removeClass('d-none');
             $('#divAllOperators').removeClass('d-none');

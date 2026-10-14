@@ -29,10 +29,20 @@ class QcSlip extends Model
     protected $table = 'qc_slips';
 
     protected $fillable = [
-        'status',
+        'id',
+        'control_no',
         'status',
         'approval_status',
+        'section_category',
+        'position_category',
+        'section',
+        'product_line',
+        'dropdown_master_details',
+        'series_name',
+        'oper_approved_confirmed_by',
         'appproval_at',
+        'created_by',
+        'date_of_transfer',
     ];
     public function product_line_details() // Chris
     {
@@ -44,7 +54,7 @@ class QcSlip extends Model
         if (empty($this->product_line)) {
             return [];
         }
-        
+
         return array_map('trim', explode('|', $this->product_line));
     }
     // public function product_line()

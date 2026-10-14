@@ -104,7 +104,7 @@ class QualificationCertificationController extends Controller
                     }
                 }
             // });
-            // DB::commit();
+            DB::commit();
             return response()->json([
                 'is_success' => 'true',
                 'message'    => 'Training items matrix saved successfully!',
@@ -513,7 +513,7 @@ class QualificationCertificationController extends Controller
                             ->where('position','Production')
                             ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
-                            $messageAlert = 'Day 2 Production Update';
+                            $messageAlert = 'Day 1 Production Update';
                             break;
                         case 'AOPERPRDN2':
                             $cLqcTrainingItemResult
@@ -560,7 +560,7 @@ class QualificationCertificationController extends Controller
                             ->where('position','Engineer')
                             ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
-                            $messageAlert = 'Day 2 ENGG Update';
+                            $messageAlert = 'Day 1 ENGG Update';
                             break;
                         case 'BOPERENGG2':
                             $cLqcTrainingItemResult
@@ -607,7 +607,7 @@ class QualificationCertificationController extends Controller
                             ->where('position','QC')
                             ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
-                            $messageAlert = 'Day 2 QC Update';
+                            $messageAlert = 'Day 1 QC Update';
                             break;
                         case 'COPERQC2':
                             $cLqcTrainingItemResult
@@ -1004,7 +1004,7 @@ class QualificationCertificationController extends Controller
                         $ppdParams = [
                             'request' => $request->all()
                         ];
-                        // DB::commit();
+                        DB::commit();
                         $dPppdOnly=  $this->dPpdProcessOnly($ppdParams);
                         if($dPppdOnly === 'false'){
                             return response()->json(['is_success' => 'true']);
@@ -1211,7 +1211,7 @@ class QualificationCertificationController extends Controller
                     'qcModelApprover' => $qcModelApprover,
                 ];
             }
-            // DB::commit();
+            DB::commit();
             $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
@@ -1222,7 +1222,7 @@ class QualificationCertificationController extends Controller
     public function saveOperApprovers($params){
         try {
             OpApprover::insert($params);
-            // DB::commit();
+            DB::commit();
             return [
                 'is_success' => 'true'
             ];
@@ -1270,7 +1270,7 @@ class QualificationCertificationController extends Controller
                 //     $params['update_data']
                 // );
                 $opApprover =  $qcModelApprover::insert($params['update_data']);
-                // DB::commit();
+                DB::commit();
                 foreach (explode(' | ',$params['update_data']['alert_prod_sec']) as $key => $valueRowEmpNo) {
                    $arrTo[] = $this->commonController->getEmailByRapidxUserId($valueRowEmpNo);
                 }
@@ -1320,8 +1320,8 @@ class QualificationCertificationController extends Controller
                 "created_by" => $rapidxEmpNo->name,
                 "system_name" => "rapidx_TRDS",
             ];
-            // DB::commit();
-        //    $this->commonController->sendEmail($emailData);
+            DB::commit();
+            // $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -1360,7 +1360,7 @@ class QualificationCertificationController extends Controller
                 'approval_status'=> $approvalStatus,
             ];
 
-            // DB::commit();
+            DB::commit();
             $this->saveFormSendEmail($emailParams);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
@@ -1389,7 +1389,7 @@ class QualificationCertificationController extends Controller
             ->whereNull('deleted_at')
             // ->get();
             ->update($arrData);
-            // DB::commit();
+            DB::commit();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -2190,7 +2190,7 @@ class QualificationCertificationController extends Controller
 
     public function updateOperApprovers($params){
         try {
-            // DB::commit();
+            DB::commit();
             return [
                 'is_success' => 'true'
             ];
@@ -2203,7 +2203,7 @@ class QualificationCertificationController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             DB::beginTransaction();
-            // DB::commit();
+            DB::commit();
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -2255,7 +2255,7 @@ class QualificationCertificationController extends Controller
             $opApprover =  OpApprover::where('qc_slips_id',$qcSlipsId)->where('approval_status',$request['approval_status'])
             // ->get();
             ->update($dPpdCertificationCompletionApprover);
-            // DB::commit();
+            DB::commit();
             $dPpdCertificationCompletionQuery =  OpApprover::where('qc_slips_id',$qcSlipsId)->where('approval_status',$request['approval_status']);
 
             $requiredApprover = [
