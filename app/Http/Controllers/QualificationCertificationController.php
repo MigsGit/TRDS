@@ -315,7 +315,44 @@ class QualificationCertificationController extends Controller
             $trainerDays          = $request->input('trainer_days', []);           // e.g. ['day_1' => ['trainer_emp_no' => ..., 'trainer_name' => ..., 'validation_date' => ..., 'validation_time' => ..., 'overall_result' => ...], ...]
             $chkTrainerValidation = $request->input('chk_trainer_validation', []); // e.g. ['chk_trainer_emp_no' => ..., 'chk_trainer_name' => ..., 'chk_validation_date' => ..., 'chk_validation_time' => ...]
 
-            DB::transaction(function () use ($qcSlipsId, $position, $matrixData, $dayDates, $trainerDays, $chkTrainerValidation) {
+            $lockViolationMessage = null;
+
+            DB::transaction(function () use ($qcSlipsId, $position, $matrixData, $dayDates, $trainerDays, $chkTrainerValidation, &$lockViolationMessage) {
+                $qcSlipDetails = QcSlip::where('id', $qcSlipsId)->lockForUpdate()->first();
+                $params = [
+                    'selectPosition'  => $qcSlipDetails->position_category ?? null,
+                    'approval_status' => $qcSlipDetails->approval_status ?? 'PB',
+                ];
+
+                if (in_array($params['selectPosition'], ['VisualOperator', 'PartsPrep', 'MachineOperator'], true)) {
+                    // position-specific logic and status determination
+                    $editableSlot = $this->parseApprovalStatus($params['approval_status']);
+
+                    foreach ($matrixData as $row) {
+                        foreach (($row['day_results'] ?? []) as $dayKey => $resultValue) {
+                            if ($resultValue === null || $resultValue === '') {
+                                continue; // untouched/disabled input, nothing to validate or write
+                            }
+
+                            $dayNumber   = (int) str_replace('day_', '', $dayKey);
+                            $roleMatches = $editableSlot !== null && $editableSlot['role'] === $position;
+                            $dayMatches  = $editableSlot !== null && ($editableSlot['day'] === null || $editableSlot['day'] === $dayNumber);
+
+                            if (!$roleMatches || !$dayMatches) {
+                                $lockViolationMessage = 'This item is locked for editing at the current approval status.';
+                                return;
+                            }
+                        }
+                    }
+
+                    $operPositionTransition = $this->determineNextOperPositionStatus($params['approval_status'], $params['selectPosition']);
+                    $newStatus = $operPositionTransition['newStatus'];
+
+                    if ($newStatus !== 'N/A') {
+                        $qcSlipDetails->update(['approval_status' => $newStatus]);
+                    }
+                }
+
                 foreach ($matrixData as $row) {
                     $itemId         = $row['training_item_id'];
                     $remark         = $row['remark'] ?? null;
@@ -358,6 +395,13 @@ class QualificationCertificationController extends Controller
                     }
                 }
             });
+
+            if ($lockViolationMessage !== null) {
+                return response()->json([
+                    'is_success' => 'false',
+                    'message'    => $lockViolationMessage,
+                ], 422);
+            }
 
             return response()->json([
                 'is_success' => 'true',
@@ -2223,6 +2267,201 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
+    /**
+     * Single source of truth for the VisualOperator/PartsPrep/MachineOperator status grid,
+     * keyed by acting role then day (0 = checkbox phase, 1-5 = Day 1-5). Used by
+     * determineNextOperPositionStatus() to compute transitions and by parseApprovalStatus()
+     * to determine which role/day is currently editable for saveQcLqcTrainingItemsByPosition().
+     */
+    private const OPER_POSITION_DAY_STATUSES = [
+        'Production' => [0 => 'AOPERPRDN', 1 => 'AOPERPRDN1', 2 => 'AOPERPRDN2', 3 => 'AOPERPRDN3', 4 => 'AOPERPRDN4', 5 => 'AOPERPRDN5'],
+        'Engineer'   => [0 => 'BOPERENGG', 1 => 'BOPERENGG1', 2 => 'BOPERENGG2', 3 => 'BOPERENGG3', 4 => 'BOPERENGG4', 5 => 'BOPERENGG5'],
+        'QC'         => [0 => 'COPERQC',   1 => 'COPERQC1',   2 => 'COPERQC2',   3 => 'COPERQC3',   4 => 'COPERQC4',   5 => 'COPERQC5'],
+    ];
+
+    /**
+     * Shared status transition logic for the VisualOperator, PartsPrep, and MachineOperator
+     * positions. Used by changeApprovalStatus() and saveQcLqcTrainingItemsByPosition() so both
+     * methods produce identical status transitions.
+     *
+     * @return array{newStatus:string,statusName:string}
+     */
+    private function determineNextOperPositionStatus($currentStatus, $selectPosition, $isEopervisualRequired = ''){
+        $prod = self::OPER_POSITION_DAY_STATUSES['Production'];
+        $engg = self::OPER_POSITION_DAY_STATUSES['Engineer'];
+        $qc   = self::OPER_POSITION_DAY_STATUSES['QC'];
+
+        switch ($currentStatus) {
+
+            // ==========================================
+            // 1. CHECKBOX VALIDATION PHASE
+            // ==========================================
+            case 'PB':
+                $newStatus  = $prod[0];
+                $statusName = 'A Production Update Checklist';
+                break;
+
+            case $prod[0]:
+                $newStatus  = $engg[0];
+                $statusName = 'A Engineer Update Checklist';
+                break;
+
+            case $engg[0]:
+                $newStatus  = $qc[0];
+                $statusName = 'A QC Update Checklist';
+                break;
+
+            // ==========================================
+            // 2. DAY 1 PHASE
+            // ==========================================
+            case $qc[0]:
+                $newStatus  = $prod[1];
+                $statusName = 'A Production Day 1 Update';
+                break;
+
+            case $prod[1]:
+                $newStatus  = $engg[1];
+                $statusName = 'A Engineer Day 1 Update';
+                break;
+
+            case $engg[1]:
+                $newStatus  = $qc[1];
+                $statusName = 'A QC Day 1 Update';
+                break;
+
+            // ==========================================
+            // 3. DAY 2 PHASE
+            // ==========================================
+            case $qc[1]:
+                $newStatus  = $prod[2];
+                $statusName = 'A Production Day 2 Update';
+                break;
+
+            case $prod[2]:
+                $newStatus  = $engg[2];
+                $statusName = 'A Engineer Day 2 Update';
+                break;
+
+            case $engg[2]:
+                $newStatus  = $qc[2];
+                $statusName = 'A QC Day 2 Update';
+                break;
+
+            // ==========================================
+            // 4. DAY 3 PHASE
+            // ==========================================
+            case $qc[2]:
+                $newStatus  = $prod[3];
+                $statusName = 'A Production Day 3 Update';
+                break;
+
+            case $prod[3]:
+                $newStatus  = $engg[3];
+                $statusName = 'A Engineer Day 3 Update';
+                break;
+
+            case $engg[3]:
+                $newStatus  = $qc[3];
+                $statusName = 'A QC Day 3 Update';
+                break;
+
+            // ==========================================
+            // 5. DAY 4 PHASE
+            // ==========================================
+            case $qc[3]:
+                $newStatus  = $prod[4];
+                $statusName = 'A Production Day 4 Update';
+                break;
+
+            case $prod[4]:
+                $newStatus  = $engg[4];
+                $statusName = 'A Engineer Day 4 Update';
+                break;
+
+            case $engg[4]:
+                $newStatus  = $qc[4];
+                $statusName = 'A QC Day 4 Update';
+                break;
+
+            // ==========================================
+            // 6. DAY 5 PHASE
+            // ==========================================
+            case $qc[4]:
+                $newStatus  = $prod[5];
+                $statusName = 'A Production Day 5 Update';
+                break;
+
+            case $prod[5]:
+                $newStatus  = $engg[5];
+                $statusName = 'A Engineer Day 5 Update';
+                break;
+            case $engg[5]:
+                $newStatus  = $qc[5];
+                $statusName = 'A QC Day 5 Update';
+                break;
+            //Status For D & E   ==========
+            case $qc[5]:
+                $newStatus  = 'DOPEROSC';
+                $statusName = 'D PRODUCT ORIENTATION AND SAMPLE CHECK (QC)';
+                break;
+            //PartsPrep
+            case ($currentStatus === 'DOPEROSC' && $selectPosition != 'PartsPrep'):
+                $newStatus  = 'EOPERVISUAL';
+                $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
+                break;
+            //MachineOperator
+            case ($currentStatus === 'DOPEROSC' && $selectPosition != 'MachineOperator' && $isEopervisualRequired === 'YES'):
+                $newStatus  = 'EOPERVISUAL';
+                $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
+                break;
+            case ($currentStatus === 'DOPEROSC' && $selectPosition === 'MachineOperator' && $isEopervisualRequired === 'NO'): //
+                $newStatus  = 'LQCHEADAPP';
+                $statusName = 'For Section Head Approval';
+                break;
+            case 'EOPERVISUAL':
+                $newStatus  = 'LQCHEADAPP';
+                $statusName = 'For Section Head Approval';
+                break;
+            default:
+                  $newStatus = 'N/A';
+                $statusName = 'N/A';
+                break;
+        }
+
+        return [
+            'newStatus'  => $newStatus,
+            'statusName' => $statusName,
+        ];
+    }
+
+    /**
+     * Resolves which role/day is currently editable for a VisualOperator/PartsPrep/
+     * MachineOperator slip, based purely on the `approval_status` stored in the database.
+     * Returns null when nothing is editable (e.g. `PB`, `DOPEROSC`, or any status outside
+     * the OPER_POSITION_DAY_STATUSES grid).
+     *
+     * 'day' is null for the checkbox phase (AOPERPRDN/BOPERENGG/COPERQC), meaning any
+     * day_number (1-5) may be written for the matching role, since the checkbox fields are
+     * broadcast across all 5 day rows. 'day' is 1-5 for the Day N phases, meaning only that
+     * day_number may be written for the matching role.
+     *
+     * @return array{role:string,day:?int}|null
+     */
+    private function parseApprovalStatus(string $status): ?array
+    {
+        foreach (self::OPER_POSITION_DAY_STATUSES as $role => $dayStatuses) {
+            $day = array_search($status, $dayStatuses, true);
+            if ($day !== false) {
+                return [
+                    'role' => $role,
+                    'day'  => $day === 0 ? null : $day,
+                ];
+            }
+        }
+
+        return null;
+    }
+
     public function changeApprovalStatus($params){
         // return $params;
         $selectedSection = str_contains($params['selectedSection'], 'PPD');
@@ -2230,142 +2469,9 @@ class QualificationCertificationController extends Controller
         $isEopervisualRequired = $params['isEopervisualRequired'] ?? '';
         if ($params['selectPosition'] === 'VisualOperator' || $params['selectPosition'] === 'PartsPrep' || $params['selectPosition'] === 'MachineOperator' ) {
             $currentStatus = $params['approval_status'] ?? '';
-            switch ($currentStatus) {
-
-                // ==========================================
-                // 1. CHECKBOX VALIDATION PHASE
-                // ==========================================
-                case 'PB':
-                    $newStatus  = 'AOPERPRDN';
-                    $statusName = 'A Production Update Checklist';
-                    break;
-
-                case 'AOPERPRDN':
-                    $newStatus  = 'BOPERENGG';
-                    $statusName = 'A Engineer Update Checklist';
-                    break;
-
-                case 'BOPERENGG':
-                    $newStatus  = 'COPERQC';
-                    $statusName = 'A QC Update Checklist';
-                    break;
-
-                // ==========================================
-                // 2. DAY 1 PHASE
-                // ==========================================
-                case 'COPERQC':
-                    $newStatus  = 'AOPERPRDN1';
-                    $statusName = 'A Production Day 1 Update';
-                    break;
-
-                case 'AOPERPRDN1':
-                    $newStatus  = 'BOPERENGG1';
-                    $statusName = 'A Engineer Day 1 Update';
-                    break;
-
-                case 'BOPERENGG1':
-                    $newStatus  = 'COPERQC1';
-                    $statusName = 'A QC Day 1 Update';
-                    break;
-
-                // ==========================================
-                // 3. DAY 2 PHASE
-                // ==========================================
-                case 'COPERQC1':
-                    $newStatus  = 'AOPERPRDN2';
-                    $statusName = 'A Production Day 2 Update';
-                    break;
-
-                case 'AOPERPRDN2':
-                    $newStatus  = 'BOPERENGG2';
-                    $statusName = 'A Engineer Day 2 Update';
-                    break;
-
-                case 'BOPERENGG2':
-                    $newStatus  = 'COPERQC2';
-                    $statusName = 'A QC Day 2 Update';
-                    break;
-
-                // ==========================================
-                // 4. DAY 3 PHASE
-                // ==========================================
-                case 'COPERQC2':
-                    $newStatus  = 'AOPERPRDN3';
-                    $statusName = 'A Production Day 3 Update';
-                    break;
-
-                case 'AOPERPRDN3':
-                    $newStatus  = 'BOPERENGG3';
-                    $statusName = 'A Engineer Day 3 Update';
-                    break;
-
-                case 'BOPERENGG3':
-                    $newStatus  = 'COPERQC3';
-                    $statusName = 'A QC Day 3 Update';
-                    break;
-
-                // ==========================================
-                // 5. DAY 4 PHASE
-                // ==========================================
-                case 'COPERQC3':
-                    $newStatus  = 'AOPERPRDN4';
-                    $statusName = 'A Production Day 4 Update';
-                    break;
-
-                case 'AOPERPRDN4':
-                    $newStatus  = 'BOPERENGG4';
-                    $statusName = 'A Engineer Day 4 Update';
-                    break;
-
-                case 'BOPERENGG4':
-                    $newStatus  = 'COPERQC4';
-                    $statusName = 'A QC Day 4 Update';
-                    break;
-
-                // ==========================================
-                // 6. DAY 5 PHASE
-                // ==========================================
-                case 'COPERQC4':
-                    $newStatus  = 'AOPERPRDN5';
-                    $statusName = 'A Production Day 5 Update';
-                    break;
-
-                case 'AOPERPRDN5':
-                    $newStatus  = 'BOPERENGG5';
-                    $statusName = 'A Engineer Day 5 Update';
-                    break;
-                case 'BOPERENGG5':
-                    $newStatus  = 'COPERQC5';
-                    $statusName = 'A QC Day 5 Update';
-                    break;
-                //Status For D & E   ==========
-                case 'COPERQC5':
-                    $newStatus  = 'DOPEROSC';
-                    $statusName = 'D PRODUCT ORIENTATION AND SAMPLE CHECK (QC)';
-                    break;
-                //PartsPrep
-                case ($params['approval_status'] === 'DOPEROSC' && $params['selectPosition'] != 'PartsPrep'):
-                    $newStatus  = 'EOPERVISUAL';
-                    $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
-                    break;
-                //MachineOperator
-                case ($params['approval_status'] === 'DOPEROSC' && $params['selectPosition'] != 'MachineOperator' && $isEopervisualRequired === 'YES'):
-                    $newStatus  = 'EOPERVISUAL';
-                    $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
-                    break;
-                case ($params['approval_status'] === 'DOPEROSC' && $params['selectPosition'] === 'MachineOperator' && $isEopervisualRequired === 'NO'): //
-                    $newStatus  = 'LQCHEADAPP';
-                    $statusName = 'For Section Head Approval';
-                    break;
-                case 'EOPERVISUAL':
-                    $newStatus  = 'LQCHEADAPP';
-                    $statusName = 'For Section Head Approval';
-                    break;
-                default:
-                      $newStatus = 'N/A';
-                    $statusName = 'N/A';
-                    break;
-            }
+            $operPositionTransition = $this->determineNextOperPositionStatus($currentStatus, $params['selectPosition'], $isEopervisualRequired);
+            $newStatus  = $operPositionTransition['newStatus'];
+            $statusName = $operPositionTransition['statusName'];
         }
         if($params['selectPosition'] === 'MH'){
                 // CSEPHEAD
