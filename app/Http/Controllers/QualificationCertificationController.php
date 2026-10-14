@@ -120,7 +120,7 @@ class QualificationCertificationController extends Controller
      * a position ("Production" | "Engineer" | "QC") so the 3 new position-specific
      * tables can be tracked independently.
      */
-    public function loadQcLqcTrainingItemsByPosition(Request $request){
+    public function loadQcLqcTrainingItemsByPosition(Request $request){ //nmodify
         $qcSlipsId = $request->input('qc_slips_id');
         $position  = $request->input('position');
         $ddMastersId  = $request->input('dd_masters_id');

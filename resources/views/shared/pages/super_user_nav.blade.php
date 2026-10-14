@@ -53,13 +53,13 @@
                     </a>
                 </li>
 
-                <li class="nav-header font-weight-bold">Modules</li>
-                {{-- <li class="nav-item has-treeview">
+                <!-- <li class="nav-header font-weight-bold">Modules</li> -->
+                <!-- <li class="nav-item has-treeview">
                     <a href="{{ route('hr_memo') }}" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
                         <p>HR MEMO/Approval </p>
                     </a>
-                </li>
+                </li> -->
 
                 <li class="nav-header font-weight-bold">Modules</li>
                 <?php
