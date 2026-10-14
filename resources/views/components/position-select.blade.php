@@ -11,6 +11,8 @@
         ['value' => 'VisualOperator', 'label' => 'Visual Operator'],
         ['value' => 'PartsPrep', 'label' => 'Parts Prep / Assembly / Packing'],
         ['value' => 'Operator', 'label' => 'Operator'],
+        ['value' => 'VisualOperator', 'label' => 'Visual Operator'],
+        ['value' => 'PartsPrep', 'label' => 'Parts Prep'],
         ['value' => 'Inspector', 'label' => 'Inspector'],
         ['value' => 'Technician', 'label' => 'Technician'],
         ['value' => 'MH', 'label' => 'MH'],

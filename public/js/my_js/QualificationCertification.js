@@ -551,12 +551,14 @@
         $('#btnSaveMatrix_tblTrainingItemsPartsPrep').addClass('d-none');
         $('#btnSaveMatrix_tblTrainingItemsMachine').addClass('d-none');
         $('.machineOpetorItemNo3').addClass('d-none');
+        $('.eVisualGrr').addClass('d-none');
 
         if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
             ],17);
+            $('.eVisualGrr').removeClass('d-none');
             $('#divAllOperators').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
             $('#productLine').removeClass('d-none');
@@ -617,6 +619,7 @@
                 '#text_oper_station_to',
                 '#text_oper_station_from',
             ],17);
+            $('.eVisualGrr').removeClass('d-none');
             $('.machineOpetorItemNo3').removeClass('d-none');
             $('#divAllOperators').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');

@@ -355,29 +355,27 @@
                     {{-- RESULT --}}
                     <td class="text-center">
 
-                        @if (($record->result ?? '') === 'Passed')
+                        @if (($record->result ?? '') === '1')
 
-                            <span class="badge badge-success">
+                            {{-- <span class="badge badge-success"> --}}
                                 Passed
-                            </span>
+                            {{-- </span> --}}
+                        @elseif (($record->result ?? '') === '2')
 
-                        @elseif (($record->result ?? '') === 'Failed')
-
-                            <span class="badge badge-danger">
-                                Failed
-                            </span>
-
-                        @elseif (($record->result ?? '') === 'Complied')
-
-                            <span class="badge badge-primary">
+                            {{-- <span class="badge badge-primary"> --}}
                                 Complied
-                            </span>
+                            {{-- </span> --}}
+                        @elseif (($record->result ?? '') === '3')
+
+                            {{-- <span class="badge badge-danger"> --}}
+                                Failed
+                            {{-- </span> --}}
 
                         @else
 
-                            <span class="badge badge-secondary">
+                            {{-- <span class="badge badge-secondary"> --}}
                                 N/A
-                            </span>
+                            {{-- </span> --}}
 
                         @endif
 

@@ -2010,6 +2010,7 @@ class QualificationCertificationController extends Controller
                 }
                 if($selectAccess === 'FORAPP'){
                     $selectedAccess = [
+                        'PB',
                         'FORAPP',
                         'PB',
                     ];

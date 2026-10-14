@@ -22,6 +22,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cache;
 
+use App\Model\DropdownMasterDetail;
+use App\Model\DropdownMaster;
+
 class HrMemoController extends Controller
 {
     private function actionButton($class, $icon, $id, $extraClass = '', $approval = false, $remarks = ''){
@@ -689,18 +692,75 @@ class HrMemoController extends Controller
         ]);
     }
 
-    public function exportInspectorSkillChart(Request $request)
-    {
+    public function exportInspectorSkillChart(Request $request){
+        $data = $request->all();
+
+        $productLineId = $request->product_line;
+        $position = strtoupper($request->position);
+
+        $productLine = DropdownMasterDetail::where('id', $productLineId)->value('dropdown_masters_details');
+
+        $productStation = DropdownMasterDetail::whereHas('dropdown_master', function ($q) use ($position) {
+                $q->where('dropdown_masters', 'Stations')
+                ->where('category', $position);
+            })
+            ->where('dropdown_masters_details', '!=', 'N/A')
+            ->select('id', 'dropdown_masters_details')
+            ->get();
+
+        $employees = collect(json_decode($request->employees, true))
+            ->map(function ($employee) use ($productLineId) {
+
+                $empNo = $employee['empNo'] ?? '';
+
+                $records = QcSlipEmployee::where('employee_no', $empNo)
+                    ->whereHas('qcSlip', function ($q) use ($productLineId) {
+                        $q->where('product_line', $productLineId)
+                        ->where('status', 'OK');
+                    })
+                    ->get();
+
+                $assemblyCount  = $records->where('station_to', 3)->count();
+                $visualCount    = $records->where('station_to', 2)->count();
+                $partPrepCount  = $records->where('station_to', 1)->count();
+                $machineCount   = $records->where('station_to', 4)->count();
+
+                return [
+                    'empNo'     => $empNo,
+                    'empName'   => $employee['empName'] ?? '',
+                    'dateHired' => $employee['dateHired'] ?? '',
+
+                    'stations' => [
+                        1 => $partPrepCount,
+                        2 => $visualCount,
+                        3 => $assemblyCount,
+                        4 => $machineCount,
+                    ],
+                ];
+            })
+            ->values()
+            ->toArray();
+
+        return Excel::download(
+            new InspectorSkillChart(
+                $productLine,
+                $employees,
+                $productStation
+            ),
+            'QC Inspectors Skill Chart.xlsx'
+        );
+
+        //CLARK 
         $request->validate([
             'section_export'   => 'required',
         ]);
 
         $selectedSheets = $request->input('section_export', []);
 
-        return Excel::download(
-            new InspectorSkillChart($selectedSheets),
-            'QC Inspectors Skill Chart.xlsx'
-        );
+        // return Excel::download(
+        //     new InspectorSkillChart($selectedSheets),
+        //     'QC Inspectors Skill Chart.xlsx'
+        // );
     }
 
     public function exportEmployeeSkillCard(Request $request)

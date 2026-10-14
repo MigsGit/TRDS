@@ -19,6 +19,11 @@ use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRecordUpdateController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TargetRatingSettingController;
+use App\Http\Controllers\PersonnelDisqualification\DisqualificationController;
+use App\Http\Controllers\PersonnelDisqualification\DisqualificationRecordController;
+
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +49,10 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/insp_skill_chart_setting', function () {
         return view('inspector_skill_chart_settings');
     })->name('insp_skill_chart_setting');
+
+    Route::get('/target_ratings', function () {
+        return view('target_ratings_settings');
+    })->name('target_ratings');
 
     Route::get('/hr_memo_exam', function () {
         return view('hr_memo_examination');
@@ -89,6 +98,9 @@ Route::middleware('checkSession')->group(function(){
         return view('ETR');
     })->name('ETR');
 
+    Route::get('/personnel_disqualification', function () {
+        return view('personnel_disqualification');
+    })->name('personnel_disqualification');
     Route::get('/TRU', function () {
         return view('training_record_update');
     })->name('TRU');
@@ -317,14 +329,53 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_product_line', 'getProductLine')->name('get_product_line');
         Route::get('/get_employee_position', 'getEmployeePosition')->name('get_employee_position');
         Route::get('/get_employees', 'getEmployees')->name('get_employees');
+
+    Route::controller(DisqualificationController::class)->group(function () {
+        Route::get('/view_disqualification', 'viewDisqualificationInfo')->name('view_disqualification');
+        Route::get('/view_trainings', 'viewTrainings')->name('view_trainings');
+        Route::post('/add_disquali_part1', 'addDisqualiPart1')->name('add_disquali_part1');
+        Route::post('/add_disquali_part2', 'addDisqualiPart2')->name('add_disquali_part2');
+        Route::post('/add_part2_training', 'addPart2Training')->name('add_part2_training');
+        Route::get('/get_disqualification_by_id', 'getDisqualificationById')->name('get_disqualification_by_id');
+        Route::get('/get_emp_details_from_certification', 'getEmpDetailsFromCertification')->name('get_emp_details_from_certification');
+        // Route::get('/get_emp_no_dropdown_details', 'getEmpNoDropdownDetails')->name('get_emp_no_dropdown_details');
+        Route::get('/get_email_recipients_dropdown_details', 'getEmailRecipientsDropdownDetails')->name('get_email_recipients_dropdown_details');
+        Route::get('/get_mode_of_defect', 'getModeOfDefect')->name('get_mode_of_defect');
+        Route::get('/get_classification', 'getClassification')->name('get_classification');
+        Route::get('/get_sub_classification', 'getSubClassification')->name('get_sub_classification');
+        Route::get('/get_dropdown_from_master', 'getDropdownFromMaster')->name('get_dropdown_from_master');
+        Route::get('/get_dropdown_from_systemone', 'getDropdownFromSystemone')->name('get_dropdown_from_systemone');
+        Route::post('/update_disqualification_status', 'updateDisqualificationStatus')->name('update_disqualification_status');
+
+        // Route::get('/view_trainee_details', 'viewTraineeDetails')->name('view_trainee_details');
+        // Route::get('/get_users', 'getUsers')->name('get_users');
+        // Route::get('/get_employee_details', 'getEmployeeDetails')->name('get_employee_details');
+        // Route::get('/get_training_venue_dropdown_details', 'getTrainingVenueDropdownDetails')->name('get_training_venue_dropdown_details');
+        // Route::get('/send_hr_memo_mail', 'sendHrMemoMail')->name('send_hr_memo_mail');
+        // Route::get('/get_trainor_dropdown_details', 'getTrainorDropdownDetails')->name('get_trainor_dropdown_details');
+        // Route::get('/export_inspector_skill_chart', 'exportInspectorSkillChart')->name('export_inspector_skill_chart');
+        // Route::get('/view_emp_skill_card_pdf', 'viewEmpSkillCardPdf')->name('viewEmpSkillCardPdf');
+        // Route::get('/export_employee_skill_card', 'exportEmployeeSkillCard')->name('export_employee_skill_card');
     });
+
+    // =======================================================================================================
+    Route::controller(TargetRatingSettingController::class)->group(function () {
+        Route::get('/view_target_ratings', 'viewTargetRatingInfo')->name('view_target_ratings');
+        Route::post('/add_target_ratings', 'addTargetRatingInfo')->name('add_target_ratings');
+        Route::get('/get_target_rating_by_id', 'getTargetRatingById')->name('get_target_rating_by_id');
+        Route::post('/update_status', 'updateTargetRatingStatus')->name('update_status');
+        Route::get('/get_process_stations', 'getProcessStations')->name('get_process_stations');
+        Route::get('/get_process_count_per_category', 'getProcessCountPerCategory')->name('get_process_count_per_category');
+        Route::get('/get_product_line_fr_master', 'getProductLineFrMaster')->name('get_product_line_fr_master');
+    });
+});
 
     Route::controller(ETRController::class)->group(function () {
         Route::get('view_employee_training_record', 'viewEmployeeTrainingRecord');
         Route::get('get_systemone_employee_training_details', 'getSystemoneEmployeeTrainingDetails');
 
         Route::get('view_trds_summary', 'viewTRDSSummary');
-        
+
         Route::get('get_employee_training_record/{employeeId}/{employeeNo}', 'getEmployeeTrainingRecord');
         Route::get('get_trds_summary/{employeeId}/{employeeNo}', 'getTRDSSummary');
     });

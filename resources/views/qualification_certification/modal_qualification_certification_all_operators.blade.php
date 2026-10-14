@@ -109,7 +109,7 @@
                 </div>
             </div>
             </div>
-            <div class="accordion-item">
+            <div class="accordion-item eVisualGrr">
                 <h2 class="card-header">
                 <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwoOperators" aria-expanded="true" aria-controls="collapseTwoOperators">
                     <h5>E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS)</h5>

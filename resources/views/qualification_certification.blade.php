@@ -414,17 +414,33 @@
         // in QualificationCertification.js (called from getApprovalStatusToggle).
 
         // alert('dsad')
-        $('#select_position').change(function (e) {
+        // $('#select_position').change(function (e) {
+        //     e.preventDefault();
+        //     $('#select_access').val('').trigger('change');
+        //     $('#select_mh_sort_by_section').val('').trigger('change');
+        //     let selectSortBySection = $('#select_mh_sort_by_section').val();
+        //     let selectAccess = $('#select_access').val();
+        //     let selectPosition = $(this).val();
+        //     dataTable.operator.ajax.url("load_qc_slip?selectMhSortBySection="+selectSortBySection+"&selectAccess="+selectAccess+"&selectPosition="+selectPosition).draw();
+        // });
+
+        // $('#select_mh_sort_by_section, #select_access').on('change', function () {
+        //     let selectSortBySection = $('#select_mh_sort_by_section').val();
+        //     let selectAccess = $('#select_access').val();
+        //     let selectPosition = $('#select_position').val();
+        //     dataTable.operator.ajax.url("load_qc_slip?selectMhSortBySection="+selectSortBySection+"&selectAccess="+selectAccess+"&selectPosition="+selectPosition).draw();
+        // });
+        $('#select_access').change(function (e) {
             e.preventDefault();
-            $('#select_access').val('').trigger('change');
+            $('#select_position').val('').trigger('change');
             $('#select_mh_sort_by_section').val('').trigger('change');
             let selectSortBySection = $('#select_mh_sort_by_section').val();
-            let selectAccess = $('#select_access').val();
-            let selectPosition = $(this).val();
+            let selectAccess = $(this).val();
+            let selectPosition = $('#select_position').val();
             dataTable.operator.ajax.url("load_qc_slip?selectMhSortBySection="+selectSortBySection+"&selectAccess="+selectAccess+"&selectPosition="+selectPosition).draw();
         });
 
-        $('#select_mh_sort_by_section, #select_access').on('change', function () {
+        $('#select_mh_sort_by_section, #select_position').on('change', function () {
             let selectSortBySection = $('#select_mh_sort_by_section').val();
             let selectAccess = $('#select_access').val();
             let selectPosition = $('#select_position').val();
