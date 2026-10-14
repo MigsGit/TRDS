@@ -658,7 +658,8 @@ class QualificationCertificationController extends Controller
                             'decision_status' => 'APP',
                         ]
                     );
-                    if($currentApprovalStatus === 'DOPEROSC'){  //PRODUCT ORIENTATION AND SAMPLE CHECK (QC)
+                    if($currentApprovalStatus === 'DOPEROSC'){  //PRODUCT ORIENTATION AND SAMPLE CHECK (QC) DoperoscRequest
+                        $validatedData = app(DoperoscRequest::class)->validateResolved();
                         $qcModelApprover::updateOrCreate(
                             ['qc_slips_id' => $qcSlipId, 'approval_status' => $currentApprovalStatus],
                            [
@@ -676,8 +677,9 @@ class QualificationCertificationController extends Controller
                             ]
                         );
                     }
-                    if($currentApprovalStatus === 'EOPERVISUAL'){ //PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS)
-                         $qcModelApprover::updateOrCreate(
+                    if($currentApprovalStatus === 'EOPERVISUAL'){ //PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS) EopervisualRequest
+                        // $validatedData = app(EopervisualRequest::class)->validateResolved();
+                        $qcModelApprover::updateOrCreate(
                             ['qc_slips_id' => $qcSlipId, 'approval_status' => $currentApprovalStatus],
                            [
                                 "qc_slips_id"   => $qcSlipId,
