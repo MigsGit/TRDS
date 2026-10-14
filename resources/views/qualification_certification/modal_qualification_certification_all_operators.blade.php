@@ -66,6 +66,14 @@
                                     <option value="NG">NG</option>
                                 </select>
                             </div>
+                            <div class="col-md-6 machineOpetorItemNo3">
+                                <p class="ms-5" for="">3. Item No.(3) PRODUCT VALIDATION THROUGH GRR (FOR MACHINE WITH VISUAL):</p>
+                                <select class="form-control select2bs4" style="width: 100%;" name="text_sel_result3_operator" id="text_sel_result3_operator">
+                                    <option value="" selected disabled>Select Result</option>
+                                    <option value="YES">REQUIRED</option>
+                                    <option value="NO">NOT REQUIRED</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">

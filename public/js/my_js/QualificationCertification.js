@@ -486,6 +486,7 @@
         $('#btnSaveMatrix_tblTrainingItemsVisual').addClass('d-none');
         $('#btnSaveMatrix_tblTrainingItemsPartsPrep').addClass('d-none');
         $('#btnSaveMatrix_tblTrainingItemsMachine').addClass('d-none');
+        $('.machineOpetorItemNo3').addClass('d-none');
 
         if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
             initDropdownMasterDetailsByFkidCombos([
@@ -538,6 +539,36 @@
             if( approvalStatus.includes('OPERENGG')){
                 $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
 
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+        }
+        if(positionCategory === 'MachineOperator'){ 
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],17);
+            $('.machineOpetorItemNo3').removeClass('d-none');
+            $('#divAllOperators').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Series Name');
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 24);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 25);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 26);
+            $('.btnAllOperator').removeClass('d-none');
+
+
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
             }
             if( approvalStatus.includes('OPERQC')){
                 $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
