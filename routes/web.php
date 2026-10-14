@@ -19,8 +19,6 @@ use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRecordUpdateController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ETRController;
-use App\Http\Controllers\InspSkillChartSettingController;
 use App\Http\Controllers\TargetRatingSettingController;
 use App\Http\Controllers\PersonnelDisqualification\DisqualificationController;
 use App\Http\Controllers\PersonnelDisqualification\DisqualificationRecordController;
