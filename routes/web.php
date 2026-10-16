@@ -49,7 +49,7 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/insp_skill_chart_setting', function () {
         return view('inspector_skill_chart_settings');
     })->name('insp_skill_chart_setting');
-    
+
     Route::get('/target_ratings', function () {
         return view('target_ratings_settings');
     })->name('target_ratings');
@@ -375,7 +375,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('get_systemone_employee_training_details', 'getSystemoneEmployeeTrainingDetails');
 
         Route::get('view_trds_summary', 'viewTRDSSummary');
-        
+
         Route::get('get_employee_training_record/{employeeId}/{employeeNo}', 'getEmployeeTrainingRecord');
         Route::get('get_trds_summary/{employeeId}/{employeeNo}', 'getTRDSSummary');
     });
