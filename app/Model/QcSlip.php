@@ -43,7 +43,9 @@ class QcSlip extends Model
         'appproval_at',
         'created_by',
         'date_of_transfer',
+        'text_operator_product_area',
     ];
+
     public function product_line_details() // Chris
     {
         return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');

@@ -518,6 +518,9 @@
             '#text_operator_product_line',
         ],2);
         initDropdownMasterDetailsByFkidCombos([
+            '#text_operator_product_area',
+        ],32);
+        initDropdownMasterDetailsByFkidCombos([
                 '#text_certification_operator',
         ],3);
         initDropdownMasterDetailsByFkidCombos([
@@ -697,7 +700,6 @@
             //     '#text_operator_product_line',
             // ],2);
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
             if(approvalStatus ==='APRODTO'){
                 $('#collapseOneOper').addClass('show');
             }
@@ -750,7 +752,6 @@
             ],7);
 
             form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
             if(approvalStatus !='LQCHEADAPP'){
                 $('.inspectorSave').removeClass('d-none')
             }
@@ -1768,7 +1769,7 @@
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             const approvalStatus = data.approval_status ?? '';
 
-            $('#btnEmployeeOperator').prop('disabled', approvalStatus === 'APRODTO' ? false : true);
+            // $('#btnEmployeeOperator').prop('disabled', approvalStatus === 'APRODTO' ? false : true);
             dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
             dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
             let currentStatus = data.approval_status ??'';
@@ -1794,6 +1795,7 @@
             $('#textconno_new_operator').val(data.control_no);
             $('#text_section_operator').val(data.section).trigger('change');
             $('#text_date_of_transfer').val(data?.date_of_transfer);
+            // $('#text_operator_product_area').val(data?.production_area);
             $('#text_series_operator').val(data.series_name);
             $('#text_select_position').val(positionCategory).trigger('change');
             $('#select_section').val(data.section_category).trigger('change');
@@ -1809,6 +1811,14 @@
                 [productLine],
                 2,
                 editSelectionsMap2
+            );
+            const ProductArea = '#text_operator_product_area';
+            let editSelectionsMapProductionArea = {};
+            editSelectionsMapProductionArea[ProductArea] = response.rawProductionAreaCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [ProductArea],
+                32,
+                editSelectionsMapProductionArea
             );
             // ==== QC Reason Certification
             const textCertificationOperator = '#text_certification_operator';

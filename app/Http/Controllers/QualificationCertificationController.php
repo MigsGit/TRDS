@@ -446,8 +446,8 @@ class QualificationCertificationController extends Controller
                     'section' =>  $select_section_production,
                     'date_of_transfer' =>  $text_date_of_transfer,
                     'series_name' =>  $this->getSafe($request, 'text_series_operator'),
-
                     'product_line' =>  $this->joinSafe($request, 'text_operator_product_line'),
+                    'production_area' =>  $this->joinSafe($request, 'text_operator_product_area'),
                     'created_by' =>  $rapidxEmpNo->rapidx_emp_no,
                     'created_at' =>  now(),
                 ];
@@ -1321,7 +1321,7 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             DB::commit();
-            // $this->commonController->sendEmail($emailData);
+            $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -1633,10 +1633,17 @@ class QualificationCertificationController extends Controller
             ->filter()
             ->values()
             ->all();
+            $rawProductionAreaCollection =  collect(explode('|', $qcSlip->production_area))
+                ->map(function($id) {
+                    return trim($id);
+                })
+            ->filter()
+            ->values()
+            ->all();
             $arrApproversCollection =  [
                  'approversCollection' => $processedData ?? [],
                  'rawProductLineCollection' => $rawProductLineCollection ?? [],
-
+                 'rawProductionAreaCollection' => $rawProductionAreaCollection ?? [],
             ];
             return response()->json(array_merge( $json,$arrApproversCollection));
         } catch (Exception $e) {
@@ -1982,208 +1989,496 @@ class QualificationCertificationController extends Controller
             throw $e;
         }
     }
-    public function loadQcSlip(Request $request){ //nmodify
+
+    // public function loadQcSlip(Request $request){ //old
+    //     try {
+    //         $selectAccess = $request->selectAccess;
+    //         $selectMhSortBySection = $request->selectMhSortBySection;
+    //         $selectPosition = $request->selectPosition;
+    //         $rapidxEmpNo           = session('global_user');
+    //         $data = QcSlip::with(
+    //             'product_line',
+    //             'op_approvers',
+    //             'op_approvers_pending',
+    //             'system_one_hris_subcon',
+    //         );
+
+    //         if(filled($selectAccess)){
+    //             $selectedAccess = [
+    //                 'PB',
+    //                 'FORAPP',
+    //                 'OK',
+    //             ];
+    //             if($selectAccess === 'ALL'){
+    //                 $selectedAccess = [
+    //                     'PB',
+    //                     'FORAPP',
+    //                     'OK',
+    //                 ];
+    //             }
+    //             if($selectAccess === 'FORAPP'){
+    //                 $selectedAccess = [
+    //                     'PB',
+    //                     'FORAPP',
+    //                     'PB',
+    //                 ];
+    //             }
+    //             if($selectAccess === 'OK'){
+    //                 $selectedAccess = [
+    //                     'OK',
+    //                 ];
+    //             }
+    //             $data->whereIn('status',$selectedAccess);
+    //         }
+
+    //         if(filled($selectPosition) && $selectPosition != 'ALL'){
+    //             $data->where('position_category',$selectPosition);
+    //         }
+
+    //         if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
+    //             $data->where('section_category',$selectMhSortBySection);
+    //         }
+
+    //         if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
+    //             $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
+    //             $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
+    //                 $query->orWhere('alert_prod_cc_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
+    //             });
+    //         }
+    //         $data->whereNull('deleted_at');
+    //         $data->orderBy('id','DESC');
+    //         $qclixx = $data;
+    //         $qcSlips = $data->get();
+    //         // Convert to a raw array for database handling
+    //         $allEmpIdsTo= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
+    //             ->flatten()                              // Flatten into a single layer of OpApprover models
+    //             ->pluck('alert_prod_sec')               // Pull out all the pipe-separated strings
+    //             ->filter()                               // Remove null or empty entries
+    //             ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
+    //                 return array_map('trim', explode('|', $item));
+    //             })
+    //             ->unique()                               // Drop duplicates
+    //             ->values()                               // Re-index array keys
+    //             ->all();                                 // Convert to a raw array for database handling
+    //         $allEmpIdsCc= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
+    //             ->flatten()                              // Flatten into a single layer of OpApprover models
+    //             ->pluck('alert_prod_cc_sec')               // Pull out all the pipe-separated strings
+    //             ->filter()                               // Remove null or empty entries
+    //             ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
+    //                 return array_map('trim', explode('|', $item));
+    //             })
+    //             ->unique()                               // Drop duplicates
+    //             ->values()                               // Re-index array keys
+    //             ->all();                                 // Convert to a raw array for database handling
+
+    //         // 3. Fetch all matching names from HRIS into a quick-lookup map array
+    //         $arrHrisSubconEmpNo = array_merge($allEmpIdsTo,$allEmpIdsCc);
+    //         $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', $arrHrisSubconEmpNo)
+    //             ->get()
+    //             ->pluck('empname', 'EmpNo');
+
+    //         return DataTables($qcSlips)
+    //         ->addColumn('rawAction',function ($row) use ($request){
+    //             $result = '';
+    //             $result .= '<center>';
+    //             $result .= '<button class="btn btn-sm btn-outline-primary" type="button" qc-slips-id="'.$row->id.'" id="btnGetQcSlipsId"><i class="fa-solid fa fa-edit"></i></button> </br></br>';
+    //             $result .= '<button class="btn btn-sm btn-outline-info" type="button" qc-slips-id="'.$row->id.'" id="btnViewQcSlipsId"><i class="fa-solid fa fa-eye"></i></button>';
+    //             $result .= '</center>';
+    //             return $result;
+    //         })
+    //         ->addColumn('rawStatus', function ($row) use ($hrisSubcon) {
+
+    //             $approvalStatus = $row->approval_status;
+    //             $positionCategory = $row->position_category;
+    //             $current = [];
+    //             $current = $row->op_approvers_pending ?? [];
+
+    //             $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
+
+    //             $resultCurrentApprover = '';
+
+    //             if (filled($current)) {
+    //                 // Get THIS row's own emp IDs from alert_prod_sec (pipe-separated)
+    //                   // Option B: Using Collection Pipeline (Wrap $current in array brackets)
+    //                 $empIdsTo = collect([$current]) // Wrap in brackets so pluck works on a collection list
+    //                     ->pluck('alert_prod_sec')
+    //                     ->filter()
+    //                     ->flatMap(function ($item) {
+    //                         // Use preg_split to match '|', spaces, or both safely
+    //                         return preg_split('/\s*\|\s*/', trim($item));
+    //                     })
+    //                     ->values();
+    //                     $empIdsCc =
+    //                     collect([$current]) // Wrap in brackets so pluck works on a collection list
+    //                     ->pluck('alert_prod_cc_sec')
+    //                     ->filter()
+    //                     ->flatMap(function ($item) {
+    //                         // Use preg_split to match '|', spaces, or both safely
+    //                         return preg_split('/\s*\|\s*/', trim($item));
+    //                     })
+    //                     ->values();
+    //                 // Map emp IDs -> names using the lookup, drop unmatched
+    //                 $currentApproverTo = $empIdsTo
+    //                     ->map(function ($empId) use ($hrisSubcon) {
+    //                         return $hrisSubcon[$empId] ?? null;
+    //                     })
+    //                     ->filter()
+    //                     ->join(' <br> ');
+    //                 $currentApproverCc = $empIdsCc
+    //                     ->map(function ($empId) use ($hrisSubcon) {
+    //                         return $hrisSubcon[$empId] ?? null;
+    //                     })
+    //                     ->filter()
+    //                     ->join(' <br> ');
+    //             //    return $empIdsCc = array_merge($empIdsTo,$empIdsCc);
+
+    //                 if ($currentApproverTo !== '') {
+    //                     $resultCurrentApprover = '<span class="badge '.$getApprovalStatus['spanColor'].'">'.$currentApproverTo.' <br> '.$currentApproverCc.' </span></b></br>';
+    //                 }
+    //             }
+
+    //             return '<center><br>'
+    //                 . $resultCurrentApprover
+    //                 . '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> '.$getApprovalStatus['statusName'].' </span>'
+    //                 . '</center></br>';
+    //         })
+    //         ->addColumn('trained_by',function ($row){
+    //             $personInCharge = $row->rapid_x_user->name ?? '';
+    //             // $personInCharge = $row;
+    //             return  $result = '';
+    //             $result .= '<center>';
+    //             $result .= '<span> '.$personInCharge.' </span>';
+    //             $result .= '<br>';
+    //             $result .= '</br>';
+    //             return $result;
+    //         })
+    //         ->addColumn('certified_by',function ($row){
+    //             // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
+    //             // $personInCharge = $row;
+    //           return  $result = '';
+    //             $result .= '<center>';
+    //             $result .= '<span> '.$personInCharge.' </span>';
+    //             $result .= '<br>';
+    //             $result .= '</br>';
+    //             return $result;
+    //         })
+    //         ->addColumn('created_by',function ($row){
+    //             $personInCharge = $row->system_one_hris_subcon[0]['empname'] ?? '';
+    //             // $personInCharge = $row;
+    //             $result = '';
+    //             $result .= '<center>';
+    //             $result .= '<span> '.$personInCharge.' </span>';
+    //             $result .= '<br>';
+    //             $result .= '</br>';
+    //             return $result;
+    //         })
+    //         ->addColumn('created_at',function ($row){
+    //             // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
+    //             // $personInCharge = $row;
+    //             $result = '';
+    //             $result .= '<center>';
+    //             $result .= '<span> '.$row->created_at->format('F j, Y').' </span>';
+    //             $result .= '<br>';
+    //             $result .= '</br>';
+    //             return $result;
+    //         })
+    //         ->addColumn('employee_names', function ($row) {
+    //             // Join names into a single string for rendering if needed
+    //             return $row->qc_slip_employees
+    //                 ->pluck('system_one_hris_subcon.empname')
+    //                 ->filter()
+    //                 ->implode(', ');
+    //         })
+    //         ->rawColumns(['rawAction','rawStatus','created_by','created_at','employee_names'])
+    //         ->make(true);
+    //     } catch (Exception $e) {
+    //         throw $e;
+    //     }
+    // }
+
+    public function loadQcSlip(Request $request){ // new
         try {
             $selectAccess = $request->selectAccess;
             $selectMhSortBySection = $request->selectMhSortBySection;
             $selectPosition = $request->selectPosition;
-            $rapidxEmpNo           = session('global_user');
-            $data = QcSlip::with(
+
+            $rapidxEmpNo = session('global_user');
+
+            // 1. Get QC slips with the required relationships
+            $data = QcSlip::with([
                 'product_line',
                 'op_approvers',
                 'op_approvers_pending',
                 'system_one_hris_subcon',
-            );
+                'qc_slip_employees.system_one_hris_subcon',
+            ]);
 
-            if(filled($selectAccess)){
-                $selectedAccess = [
-                    'PB',
-                    'FORAPP',
-                    'OK',
-                ];
-                if($selectAccess === 'ALL'){
-                    $selectedAccess = [
-                        'PB',
-                        'FORAPP',
-                        'OK',
-                    ];
+            // 2. Filter by access
+            if (filled($selectAccess)) {
+                $selectedAccess = [];
+
+                if ($selectAccess === 'ALL') {
+                    $selectedAccess = ['PB', 'FORAPP', 'OK'];
+                } elseif ($selectAccess === 'FORAPP') {
+                    $selectedAccess = ['PB', 'FORAPP'];
+                } elseif ($selectAccess === 'OK') {
+                    $selectedAccess = ['OK'];
                 }
-                if($selectAccess === 'FORAPP'){
-                    $selectedAccess = [
-                        'PB',
-                        'FORAPP',
-                        'PB',
-                    ];
+
+                if ($selectedAccess) {
+                    $data->whereIn('status', $selectedAccess);
                 }
-                if($selectAccess === 'OK'){
-                    $selectedAccess = [
-                        'OK',
-                    ];
-                }
-                $data->whereIn('status',$selectedAccess);
             }
 
-            if(filled($selectPosition) && $selectPosition != 'ALL'){
-                $data->where('position_category',$selectPosition);
+            // 3. Filter by position
+            if (filled($selectPosition) && $selectPosition !== 'ALL') {
+                $data->where('position_category', $selectPosition);
             }
 
-            if(filled($selectMhSortBySection) && $selectMhSortBySection != 'ALL'){
-                $data->where('section_category',$selectMhSortBySection);
+            // 4. Filter by section
+            if (
+                filled($selectMhSortBySection) &&
+                $selectMhSortBySection !== 'ALL'
+            ) {
+                $data->where('section_category', $selectMhSortBySection);
             }
 
-            if($selectAccess === 'MYAPPROVAL' || blank($selectAccess) ){
-                $data->whereHas('op_approvers_pending',function($query) use ($rapidxEmpNo){
-                $query->where('alert_prod_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
-                    $query->orWhere('alert_prod_cc_sec','LIKE','%'.$rapidxEmpNo->rapidx_emp_no.'%');
+            // 5. Filter pending approvals
+            if (
+                $selectAccess === 'MYAPPROVAL' ||
+                blank($selectAccess)
+            ) {
+                $empNo = $rapidxEmpNo->rapidx_emp_no ?? null;
+
+                $data->whereHas('op_approvers_pending', function ($query) use ($empNo) {
+                    if ($empNo) {
+                        $query->where(function ($subQuery) use ($empNo) {
+                            $subQuery->where(
+                                'alert_prod_sec',
+                                'LIKE',
+                                '%' . $empNo . '%'
+                            )->orWhere(
+                                'alert_prod_cc_sec',
+                                'LIKE',
+                                '%' . $empNo . '%'
+                            );
+                        });
+                    }
                 });
             }
-            $data->whereNull('deleted_at');
-            $data->orderBy('id','DESC');
-            $qclixx = $data;
+
+            $data->whereNull('deleted_at')
+                ->orderByDesc('id');
+
+            // 6. Execute the QC slip query once
             $qcSlips = $data->get();
-            // Convert to a raw array for database handling
-            $allEmpIdsTo= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
-                ->flatten()                              // Flatten into a single layer of OpApprover models
-                ->pluck('alert_prod_sec')               // Pull out all the pipe-separated strings
-                ->filter()                               // Remove null or empty entries
-                ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
-                    return array_map('trim', explode('|', $item));
-                })
-                ->unique()                               // Drop duplicates
-                ->values()                               // Re-index array keys
-                ->all();                                 // Convert to a raw array for database handling
-            $allEmpIdsCc= $qcSlips->pluck('op_approvers_pending') // Grab all op_approvers collections
-                ->flatten()                              // Flatten into a single layer of OpApprover models
-                ->pluck('alert_prod_cc_sec')               // Pull out all the pipe-separated strings
-                ->filter()                               // Remove null or empty entries
-                ->flatMap(function ($item) {             // Split pipes and flatten the resulting array elements
-                    return array_map('trim', explode('|', $item));
-                })
-                ->unique()                               // Drop duplicates
-                ->values()                               // Re-index array keys
-                ->all();                                 // Convert to a raw array for database handling
 
-            // 3. Fetch all matching names from HRIS into a quick-lookup map array
-            $arrHrisSubconEmpNo = array_merge($allEmpIdsTo,$allEmpIdsCc);
-            $hrisSubcon = SystemOneHrisSubcon::whereIn('EmpNo', $arrHrisSubconEmpNo)
-                ->get()
-                ->pluck('empname', 'EmpNo');
+            if ($qcSlips->isEmpty()) {
+                return DataTables($qcSlips)
+                    ->make(true);
+            }
 
-            return DataTables($qcSlips)
-            ->addColumn('rawAction',function ($row) use ($request){
-                $result = '';
-                $result .= '<center>';
-                $result .= '<button class="btn btn-sm btn-outline-primary" type="button" qc-slips-id="'.$row->id.'" id="btnGetQcSlipsId"><i class="fa-solid fa fa-edit"></i></button> </br></br>';
-                $result .= '<button class="btn btn-sm btn-outline-info" type="button" qc-slips-id="'.$row->id.'" id="btnViewQcSlipsId"><i class="fa-solid fa fa-eye"></i></button>';
-                $result .= '</center>';
-                return $result;
-            })
-            ->addColumn('rawStatus', function ($row) use ($hrisSubcon) {
+            // 7. Collect all pending approver records
+            $allApprovers = $qcSlips->flatMap(function ($row) {
+                $pending = $row->op_approvers_pending;
 
-                $approvalStatus = $row->approval_status;
-                $positionCategory = $row->position_category;
-                $current = [];
-                $current = $row->op_approvers_pending ?? [];
-
-                $getApprovalStatus = $this->commonController->getApprovalStatus($approvalStatus);
-
-                $resultCurrentApprover = '';
-
-                if (filled($current)) {
-                    // Get THIS row's own emp IDs from alert_prod_sec (pipe-separated)
-                      // Option B: Using Collection Pipeline (Wrap $current in array brackets)
-                    $empIdsTo = collect([$current]) // Wrap in brackets so pluck works on a collection list
-                        ->pluck('alert_prod_sec')
-                        ->filter()
-                        ->flatMap(function ($item) {
-                            // Use preg_split to match '|', spaces, or both safely
-                            return preg_split('/\s*\|\s*/', trim($item));
-                        })
-                        ->values();
-                        $empIdsCc =
-                        collect([$current]) // Wrap in brackets so pluck works on a collection list
-                        ->pluck('alert_prod_cc_sec')
-                        ->filter()
-                        ->flatMap(function ($item) {
-                            // Use preg_split to match '|', spaces, or both safely
-                            return preg_split('/\s*\|\s*/', trim($item));
-                        })
-                        ->values();
-                    // Map emp IDs -> names using the lookup, drop unmatched
-                    $currentApproverTo = $empIdsTo
-                        ->map(function ($empId) use ($hrisSubcon) {
-                            return $hrisSubcon[$empId] ?? null;
-                        })
-                        ->filter()
-                        ->join(' <br> ');
-                    $currentApproverCc = $empIdsCc
-                        ->map(function ($empId) use ($hrisSubcon) {
-                            return $hrisSubcon[$empId] ?? null;
-                        })
-                        ->filter()
-                        ->join(' <br> ');
-                //    return $empIdsCc = array_merge($empIdsTo,$empIdsCc);
-
-                    if ($currentApproverTo !== '') {
-                        $resultCurrentApprover = '<span class="badge '.$getApprovalStatus['spanColor'].'">'.$currentApproverTo.' <br> '.$currentApproverCc.' </span></b></br>';
-                    }
+                if (!$pending) {
+                    return collect();
                 }
 
-                return '<center><br>'
-                    . $resultCurrentApprover
-                    . '<span class="badge rounded-pill '.$getApprovalStatus['spanColor'].'"> '.$getApprovalStatus['statusName'].' </span>'
-                    . '</center></br>';
-            })
-            ->addColumn('trained_by',function ($row){
-                $personInCharge = $row->rapid_x_user->name ?? '';
-                // $personInCharge = $row;
-              return  $result = '';
-                $result .= '<center>';
-                $result .= '<span> '.$personInCharge.' </span>';
-                $result .= '<br>';
-                $result .= '</br>';
-                return $result;
-            })
-            ->addColumn('certified_by',function ($row){
-                // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
-                // $personInCharge = $row;
-              return  $result = '';
-                $result .= '<center>';
-                $result .= '<span> '.$personInCharge.' </span>';
-                $result .= '<br>';
-                $result .= '</br>';
-                return $result;
-            })
-            ->addColumn('created_by',function ($row){
-                $personInCharge = $row->system_one_hris_subcon[0]['empname'] ?? '';
-                // $personInCharge = $row;
-                $result = '';
-                $result .= '<center>';
-                $result .= '<span> '.$personInCharge.' </span>';
-                $result .= '<br>';
-                $result .= '</br>';
-                return $result;
-            })
-            ->addColumn('created_at',function ($row){
-                // $personInCharge = $row->rapidx_user_person_in_charge->name ?? '';
-                // $personInCharge = $row;
-                $result = '';
-                $result .= '<center>';
-                $result .= '<span> '.$row->created_at->format('F j, Y').' </span>';
-                $result .= '<br>';
-                $result .= '</br>';
-                return $result;
-            })
-            ->addColumn('employee_names', function ($row) {
-                // Join names into a single string for rendering if needed
-                return $row->qc_slip_employees
-                    ->pluck('system_one_hris_subcon.empname')
-                    ->filter()
-                    ->implode(', ');
-            })
-            ->rawColumns(['rawAction','rawStatus','created_by','created_at','employee_names'])
-            ->make(true);
-        } catch (Exception $e) {
+                return $pending instanceof \Illuminate\Support\Collection
+                    ? $pending
+                    : collect([$pending]);
+            });
+
+            // 8. Extract unique employee IDs for TO and CC
+            $allEmpIds = $allApprovers
+                ->flatMap(function ($approver) {
+                    $to = preg_split(
+                        '/\s*\|\s*/',
+                        trim($approver->alert_prod_sec ?? ''),
+                        -1,
+                        PREG_SPLIT_NO_EMPTY
+                    );
+
+                    $cc = preg_split(
+                        '/\s*\|\s*/',
+                        trim($approver->alert_prod_cc_sec ?? ''),
+                        -1,
+                        PREG_SPLIT_NO_EMPTY
+                    );
+
+                    return array_merge($to ?: [], $cc ?: []);
+                })
+                ->map(function ($empId) {
+                    return trim($empId);
+                })
+                ->filter()
+                ->unique()
+                ->values();
+
+            // 9. Bulk-fetch all approver names from HRIS
+            $hrisSubcon = collect();
+
+            if ($allEmpIds->isNotEmpty()) {
+                $hrisSubcon = SystemOneHrisSubcon::query()
+                    ->whereIn('EmpNo', $allEmpIds->all())
+                    ->get(['EmpNo', 'empname'])
+                    ->pluck('empname', 'EmpNo');
+            }
+
+            // 10. Return DataTables
+            return DataTables($qcSlips)
+                ->addColumn('rawAction', function ($row) {
+                    return '
+                        <center>
+                            <button
+                                class="btn btn-sm btn-outline-primary"
+                                type="button"
+                                qc-slips-id="' . $row->id . '"
+                                id="btnGetQcSlipsId">
+                                <i class="fa-solid fa fa-edit"></i>
+                            </button>
+                            <br><br>
+                            <button
+                                class="btn btn-sm btn-outline-info"
+                                type="button"
+                                qc-slips-id="' . $row->id . '"
+                                id="btnViewQcSlipsId">
+                                <i class="fa-solid fa fa-eye"></i>
+                            </button>
+                        </center>
+                    ';
+                })
+
+                ->addColumn('rawStatus', function ($row) use ($hrisSubcon) {
+                    $approvalStatus = $row->approval_status;
+
+                    $status = $this->commonController
+                        ->getApprovalStatus($approvalStatus);
+
+                    $pending = $row->op_approvers_pending;
+
+                    $approvers = !$pending
+                        ? collect()
+                        : (
+                            $pending instanceof \Illuminate\Support\Collection
+                                ? $pending
+                                : collect([$pending])
+                        );
+
+                    $toNames = collect();
+                    $ccNames = collect();
+
+                    foreach ($approvers as $approver) {
+                        $toIds = preg_split(
+                            '/\s*\|\s*/',
+                            trim($approver->alert_prod_sec ?? ''),
+                            -1,
+                            PREG_SPLIT_NO_EMPTY
+                        );
+
+                        $ccIds = preg_split(
+                            '/\s*\|\s*/',
+                            trim($approver->alert_prod_cc_sec ?? ''),
+                            -1,
+                            PREG_SPLIT_NO_EMPTY
+                        );
+
+                        $toNames = $toNames->merge($toIds ?: []);
+                        $ccNames = $ccNames->merge($ccIds ?: []);
+                    }
+
+                    $currentApproverTo = $toNames
+                        ->map(function ($id) use ($hrisSubcon) {
+                            return $hrisSubcon[$id] ?? null;
+                        })
+                        ->filter()
+                        ->unique()
+                        ->implode('<br>');
+
+                    $currentApproverCc = $ccNames
+                        ->map(function ($id) use ($hrisSubcon) {
+                            return $hrisSubcon[$id] ?? null;
+                        })
+                        ->filter()
+                        ->unique()
+                        ->implode('<br>');
+
+                    $resultCurrentApprover = '';
+
+                    if ($currentApproverTo !== '') {
+                        $resultCurrentApprover =
+                            '<span class="badge ' .
+                            $status['spanColor'] . '">' .
+                            $currentApproverTo .
+                            ($currentApproverCc !== ''
+                                ? '<br>' . $currentApproverCc
+                                : '') .
+                            '</span><br>';
+                    }
+
+                    return '<center><br>' .
+                        $resultCurrentApprover .
+                        '<span class="badge rounded-pill ' .
+                        $status['spanColor'] . '">' .
+                        $status['statusName'] .
+                        '</span></center>';
+                })
+
+                ->addColumn('trained_by', function ($row) {
+                    $personInCharge = '';
+
+                    return '<center><span>' .
+                        e($personInCharge) .
+                        '</span></center>';
+                })
+
+                ->addColumn('certified_by', function ($row) {
+                    $personInCharge = '';
+
+                    return '<center><span>' .
+                        e($personInCharge) .
+                        '</span></center>';
+                })
+
+                ->addColumn('created_by', function ($row) {
+                    $personInCharge =
+                        $row->system_one_hris_subcon[0]['empname'] ?? '';
+
+                    return '<center><span>' .
+                        e($personInCharge) .
+                        '</span></center>';
+                })
+
+                ->addColumn('created_at', function ($row) {
+                    return '<center><span>' .
+                        ($row->created_at
+                            ? $row->created_at->format('F j, Y')
+                            : '') .
+                        '</span></center>';
+                })
+
+                ->addColumn('employee_names', function ($row) {
+                    return $row->qc_slip_employees
+                        ->pluck('system_one_hris_subcon.empname')
+                        ->filter()
+                        ->implode(', ');
+                })
+
+                ->rawColumns([
+                    'rawAction',
+                    'rawStatus',
+                    'trained_by',
+                    'certified_by',
+                    'created_by',
+                    'created_at',
+                    'employee_names',
+                ])
+
+                ->make(true);
+
+        } catch (\Exception $e) {
             throw $e;
         }
     }
