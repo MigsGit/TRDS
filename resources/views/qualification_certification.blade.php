@@ -167,40 +167,44 @@
 
                         {{-- GLOBAL INPUTS --}}
                         <hr style="height: 5px; background-color: black; border: none;">
-                          <div class="col-md-3 d-none">
+                          <div class="col-md-4 d-none">
                                 <label for="">QC Slip Id:</label>
                                     <input class="form-control" type="text" class="form-control" id="qc_slips_id" name="qc_slips_id" placeholder="Auto Generated" readonly>
                                 </div>
-                                <div class="col-md-3  d-none">
+                                <div class="col-md-4  d-none">
                                     <label for="">Approval Status:</label>
                                     <input class="form-control" type="text" class="form-control" id="approval_status" name="approval_status" placeholder="Auto Generated" readonly>
                                 </div>
                                 <div class="row mb-5">
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <label for="">Control No.:</label>
                                         <input class="form-control" type="text" class="form-control" id="textconno_new_operator" name="textconno_new_operator" placeholder="Auto Generated" readonly>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <label for="">Production Section:</label>
                                         <select class="form-control select2bs4" style="width: 100%;" name="text_section_operator" id="text_section_operator">
                                         </select>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <label for="" id="seriesDesignation">Series Name:</label>
                                         <input class="form-control" type="text" id="text_series_operator" name="text_series_operator" placeholder="Enter series name here">
                                     </div>
 
-                                    <div class="col-md-3" id="productLine">
+                                    <div class="col-md-4" id="productArea">
+                                        <label for="">Product Area:</label>
+                                         <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_area">
+                                        </select>
+                                    </div>
+                                      <div class="col-md-4" id="dateOfTransfer">
+                                        <label for="">Date of Transfer:</label>
+                                         <input type="date" class="form-control" style="width: 100%;" name="text_date_of_transfer" id="text_date_of_transfer">
+                                    </div>
+                                    <div class="col-md-4" id="productLine">
                                         <label for="">Product Line:</label>
                                          <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_line">
                                         </select>
-                                    </div>
-
-                                    <div class="col-md-3" id="dateOfTransfer">
-                                        <label for="">Date of Transfer:</label>
-                                         <input type="date" class="form-control" style="width: 100%;" name="text_date_of_transfer" id="text_date_of_transfer">
                                     </div>
                                 </div>
                                 <div class="row mt-2 mb-5">
@@ -511,6 +515,7 @@
                 qcSlipsId: qcSlipsId,
             };
             getQcSlipsById(params);
+            $('#btnEmployeeOperator').prop('disabled',false);
 
         });
         $(table.operator).on('click', '#btnViewQcSlipsId','tr',function (e) {
@@ -567,7 +572,8 @@
             formArray.push({ name: 'text_section_operator', value: $('#text_section_operator').val() });
             formArray.push({ name: 'text_series_operator', value: $('#text_series_operator').val() });
             formArray.push({ name: 'text_operator_product_line', value: $('#text_operator_product_line').val() });
-            // formArray.push({ name: 'text_date_of_transfer', value: $('#text_date_of_transfer').val() });
+            formArray.push({ name: 'text_date_of_transfer', value: $('#text_date_of_transfer').val() });
+            formArray.push({ name: 'text_operator_product_area', value: $('#text_operator_product_area').val() });
             formArray.push({ name: 'text_certification_operator', value: $('#text_certification_operator').val() });
             formArray.push({ name: 'transfer_flexibility', value: $('#transfer_flexibility').val() });
 
@@ -812,26 +818,6 @@
             initOperEmpModal();
             $('#tbl_certified_list_operator tbody').empty();
             $positionSections.addClass('d-none');
-            // text_operator_product_line
-            // text_series_operator
-            // text_certification_operator
-            // transfer_flexibility
-
-            initDropdownMasterDetailsByFkidCombos([
-                '#text_operator_product_line',
-            ],2);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#text_certification_operator',
-            ],3);
-            initDropdownMasterDetailsByFkidCombos([
-                    '#transfer_flexibility',
-            ],6);
-
-            // $('.inspectorSave').addClass('d-none');
-            // $('.operSave').addClass('d-none');
-            // $('.operApproved').addClass('d-none');
-            // $('.btnSaveInspector').addClass('d-none');
-
             switch (position) {
                 case 'MH':
                     // $('#divMH').removeClass('d-none');
