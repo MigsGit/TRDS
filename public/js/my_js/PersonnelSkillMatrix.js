@@ -331,7 +331,7 @@ $(document).ready(function() {
             url: 'get_employee_position',
             method: 'GET',
             success: function (response) {
-                console.log('response', response)
+                // console.log('response', response)
 
                 const $select = $('#selectPosition, #selectPositionPerProductLine');
 
@@ -396,7 +396,7 @@ $(document).ready(function() {
     }
 
     $.ajax({
-        url: 'get_employees',
+        url: 'get_employees_for_skill_map',
         method: 'GET',
         data: {
             product_line: productLines,
@@ -404,6 +404,7 @@ $(document).ready(function() {
         },
 
         success: function (response) {
+            console.log('rr', response)
 
             let options = '';
 
@@ -424,7 +425,6 @@ $(document).ready(function() {
                 `;
 
                 $.each(response, function (index, employee) {
-
                     options += `
                         <option value="${employee.EmpNo}|${employee.EmpName}|${employee.dateHired}">
                             ${employee.EmpNo} - ${employee.EmpName}

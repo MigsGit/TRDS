@@ -155,7 +155,8 @@
                         </div>
                          <div class="form-group col-md-6">
                             <label for="objective" class="font-weight-bold small text-muted">OBJECTIVE</label>
-                            <input type="text" class="form-control" id="objective" name="objective" placeholder="Main learning target or expected outcome...">
+                            {{-- <input type="text" class="form-control" id="objective" name="objective" placeholder="Main learning target or expected outcome..."> --}}
+                            <textarea class="form-control" id="objective" name="objective" rows="2" placeholder="Main learning target or expected outcome..."></textarea>
                         </div>
 
                     </div>

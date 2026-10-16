@@ -332,7 +332,7 @@ class PersonnelSkillMatrixController extends Controller
 
     }
 
-    public function getEmployees(Request $request)
+    public function getEmployeesForSkillMap(Request $request)
     {
         $productLines = (array) $request->product_line;
         $position = $request->position;
@@ -343,7 +343,8 @@ class PersonnelSkillMatrixController extends Controller
 
             $employees = QcSlipEmployee::with([
                 'system_one_hris_emp_info',
-                'system_one_subcon_emp_info'
+                'system_one_subcon_emp_info',
+                'system_one_hris_subcon'
             ])
             ->whereHas('qcSlip', function ($q) use ($productLines, $position) {
 
@@ -384,7 +385,8 @@ class PersonnelSkillMatrixController extends Controller
             // Custom logic for Operator
              $employees = QcSlipEmployee::with([
                 'system_one_hris_emp_info',
-                'system_one_subcon_emp_info'
+                'system_one_subcon_emp_info',
+                // 'system_one_hris_subcon'
             ])
             ->whereHas('qcSlip', function ($q) use ($productLines, $position) {
 
@@ -397,16 +399,20 @@ class PersonnelSkillMatrixController extends Controller
             ->map(function ($employee) {
 
                 $emp = $employee->system_one_hris_emp_info
-                    ?? $employee->system_one_subcon_emp_info;
+                    ?? $employee->system_one_subcon_emp_info ?? $employee->system_one_hris_subcon;
+
 
                 return [
                     'EmpNo'     => optional($emp)->EmpNo,
                     'EmpName'   => optional($emp)->EmpName,
                     'dateHired' => optional($emp)->DateHired,
+                    'test' => $emp,
                 ];
             })
             ->unique('EmpNo')
             ->values();
+
+            // return $employees;
 
             return response()->json($employees);
         }

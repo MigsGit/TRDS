@@ -328,7 +328,7 @@ Route::middleware('checkSession')->group(function(){
         // });
         Route::get('/get_product_line', 'getProductLine')->name('get_product_line');
         Route::get('/get_employee_position', 'getEmployeePosition')->name('get_employee_position');
-        Route::get('/get_employees', 'getEmployees')->name('get_employees');
+        Route::get('/get_employees_for_skill_map', 'getEmployeesForSkillMap')->name('get_employees_for_skill_map');
 
     Route::controller(DisqualificationController::class)->group(function () {
         Route::get('/view_disqualification', 'viewDisqualificationInfo')->name('view_disqualification');
