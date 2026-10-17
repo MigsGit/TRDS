@@ -25,11 +25,6 @@ class SkillCard implements WithEvents, WithTitle
     public function title(): string
     {
         return 'Skill Card';
-        // return substr(
-        //     $this->productLine->name,
-        //     0,
-        //     31
-        // );
     }
 
     private function setupSheet(Worksheet $sheet)
@@ -42,7 +37,6 @@ class SkillCard implements WithEvents, WithTitle
 
         $sheet->setShowGridlines(false);
 
-
         /*
         |--------------------------------------------------------------------------
         | PAGE SETUP
@@ -53,7 +47,6 @@ class SkillCard implements WithEvents, WithTitle
             ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
             ->setFitToWidth(1)
             ->setFitToHeight(1);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -69,63 +62,63 @@ class SkillCard implements WithEvents, WithTitle
             ->setHeader(0)
             ->setFooter(0);
 
-
         /*
         |--------------------------------------------------------------------------
-        | LEFT SIDE A:H
+        | LEFT SIDE A:L
         |--------------------------------------------------------------------------
         */
 
         $widths = [
-            'A' => 8,
-            'B' => 8,
-            'C' => 8,
-            'D' => 8,
-            'E' => 8,
-            'F' => 8,
-            'G' => 8,
-            'H' => 8,
+            'A' => 5.7,
+            'B' => 5.7,
+            'C' => 5.7,
+            'D' => 5.7,
+
+            'E' => 4,
+            'F' => 4,
+            'G' => 4,
+            'H' => 4,
+            'I' => 4,
+            'J' => 4,
+            'K' => 4,
+            'L' => 4,
 
             /*
             |--------------------------------------------------------------------------
-            | RIGHT SIDE I:P
+            | RIGHT SIDE M:T
             |--------------------------------------------------------------------------
             */
 
-            'I' => 8,
-            'J' => 8,
-            'K' => 8,
-            'L' => 8,
-            'M' => 8,
-            'N' => 8,
-            'O' => 8,
-            'P' => 8,
+            'M' => 6,
+            'N' => 6,
+            'O' => 6,
+            'P' => 6,
+            'Q' => 6,
+            'R' => 6,
+            'S' => 6,
+            'T' => 6,
         ];
 
         foreach ($widths as $column => $width) {
-
             $sheet
-                ->getColumnDimension($column)
-                ->setWidth($width);
+            ->getColumnDimension($column)
+            ->setWidth($width);
         }
 
         /*
         |--------------------------------------------------------------------------
         | COLUMN WIDTHS
         |
-        | A:H = LEFT SIDE
-        | I:P = RIGHT SIDE
+        | A:L = LEFT SIDE
+        | M:T = RIGHT SIDE
         |--------------------------------------------------------------------------
         */
 
         // foreach (range('A', 'P') as $column) {
-
         //     $sheet
         //         ->getColumnDimension($column)
         //         ->setWidth(4.5);
-
         // }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -134,13 +127,10 @@ class SkillCard implements WithEvents, WithTitle
         */
 
         for ($row = 1; $row <= 30; $row++) {
-
             $sheet
                 ->getRowDimension($row)
                 ->setRowHeight(15);
-
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -148,11 +138,10 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        $sheet->getStyle('A1:P30')
+        $sheet->getStyle('A1:T30')
             ->getFont()
             ->setName('Arial')
             ->setSize(7);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -160,7 +149,7 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        $sheet->getStyle('A1:P30')
+        $sheet->getStyle('A1:T30')
             ->getAlignment()
             ->setVertical(Alignment::VERTICAL_CENTER);
     }
@@ -175,9 +164,9 @@ class SkillCard implements WithEvents, WithTitle
 
         $this->createLeftHeader($sheet);
 
-        $this->createEmployeeSection($sheet);
+        // $this->createEmployeeSection($sheet);
 
-        $this->createStationSection($sheet);
+        // $this->createStationSection($sheet);
 
 
         /*
@@ -186,15 +175,15 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        $this->createRightHeader($sheet);
+        // $this->createRightHeader($sheet);
 
-        $this->createRatingsSection($sheet);
+        // $this->createRatingsSection($sheet);
 
-        $this->createFunctionalCompetencies($sheet);
+        // $this->createFunctionalCompetencies($sheet);
 
-        $this->createPerformanceLevel($sheet);
+        // $this->createPerformanceLevel($sheet);
 
-        $this->createApprovalSection($sheet);
+        // $this->createApprovalSection($sheet);
 
         $this->applyBorders($sheet);
     }
@@ -207,23 +196,15 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        $sheet->mergeCells('A1:H2');
+        $sheet->mergeCells('A1:L2');
 
-        $sheet->setCellValue(
-            'A1',
-            'PRICON MICROELECTRONICS, INC.'
+        $this->addImage(
+            $sheet,
+            public_path('images/skill_card/skill_card_pricon_logo_wide.jpg'),
+            'A1', //cell
+            340, //width
+            28 //height
         );
-
-        $sheet->getStyle('A1:H2')
-            ->getAlignment()
-            ->setVertical(Alignment::VERTICAL_CENTER)
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        $sheet->getStyle('A1:H2')
-            ->getFont()
-            ->setBold(true)
-            ->setSize(14);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -231,14 +212,14 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        $sheet->mergeCells('A3:H3');
+        $sheet->mergeCells('A3:L3');
 
         $sheet->setCellValue(
             'A3',
             'PERSONNEL SKILL CARD'
         );
 
-        $sheet->getStyle('A3:H3')
+        $sheet->getStyle('A3:L3')
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
@@ -246,7 +227,6 @@ class SkillCard implements WithEvents, WithTitle
         $sheet->getStyle('A3:H3')
             ->getFont()
             ->setBold(true);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -254,23 +234,23 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        $sheet->mergeCells('A4:H4');
+        $sheet->mergeCells('A4:L4');
 
         $sheet->setCellValue(
             'A4',
-            'TEST SOLUTION'
+            'SECTION'
         );
 
-        $sheet->getStyle('A4:H4')
+        $sheet->getStyle('A4:L4')
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
-        $sheet->getStyle('A4:H4')
+        $sheet->getStyle('A4:L4')
             ->getFont()
             ->setBold(true);
 
-        $sheet->getStyle('A4:H4')
+        $sheet->getStyle('A4:L4')
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
@@ -349,7 +329,6 @@ class SkillCard implements WithEvents, WithTitle
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
-
         /*
         |--------------------------------------------------------------------------
         | TOTAL RATING
@@ -369,94 +348,6 @@ class SkillCard implements WithEvents, WithTitle
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER);
     }
-
-    // private function createStationSection(Worksheet $sheet){
-    //     /*
-    //     |--------------------------------------------------------------------------
-    //     | TITLE
-    //     |--------------------------------------------------------------------------
-    //     */
-
-    //     $sheet->mergeCells('A12:H12');
-
-    //     $sheet->setCellValue(
-    //         'A12',
-    //         'STATION ASSIGNED'
-    //     );
-
-    //     $sheet->getStyle('A12:H12')
-    //         ->getAlignment()
-    //         ->setHorizontal(Alignment::HORIZONTAL_CENTER)
-    //         ->setVertical(Alignment::VERTICAL_CENTER);
-
-    //     $sheet->getStyle('A12:H12')
-    //         ->getFont()
-    //         ->setBold(true);
-
-
-    //     /*
-    //     |--------------------------------------------------------------------------
-    //     | STATION HEADER
-    //     |--------------------------------------------------------------------------
-    //     */
-
-    //     $sheet->mergeCells('A13:B14');
-
-    //     $sheet->mergeCells('C13:D14');
-
-
-    //     $sheet->setCellValue(
-    //         'A13',
-    //         'CERTIFICATION'
-    //     );
-
-
-    //     $sheet->setCellValue(
-    //         'C13',
-    //         'PRODUCT LINE'
-    //     );
-
-
-    //     $sheet->setCellValue(
-    //         'E13',
-    //         "ASSEMBLY\nPROCESS"
-    //     );
-
-
-    //     $sheet->setCellValue(
-    //         'F13',
-    //         "VISUAL\nINSPECTION"
-    //     );
-
-
-    //     $sheet->setCellValue(
-    //         'G13',
-    //         "PARTS\nPREP."
-    //     );
-
-
-    //     $sheet->setCellValue(
-    //         'H13',
-    //         "MACHINE\nOPERATION"
-    //     );
-
-
-    //     /*
-    //     |--------------------------------------------------------------------------
-    //     | STYLE HEADER
-    //     |--------------------------------------------------------------------------
-    //     */
-
-    //     $sheet->getStyle('A13:H14')
-    //         ->getAlignment()
-    //         ->setHorizontal(Alignment::HORIZONTAL_CENTER)
-    //         ->setVertical(Alignment::VERTICAL_CENTER)
-    //         ->setWrapText(true);
-
-    //     $sheet->getStyle('A13:H14')
-    //         ->getFont()
-    //         ->setBold(true);
-    // }
 
     private function createStationSection(Worksheet $sheet){
         $headerRow = 13;
@@ -739,67 +630,14 @@ class SkillCard implements WithEvents, WithTitle
             ]);
     }
 
-    private function addCompanyLogo(
-        Worksheet $sheet,
-        $coordinate
-    ) {
-        $logo = new Drawing();
-
-        $logo->setName('PRICON Logo');
-
-        $logo->setDescription('PRICON Logo');
-
-        $logo->setPath(
-            public_path('images/pricon-logo.png')
-        );
-
-        $logo->setCoordinates($coordinate);
-
-        $logo->setHeight(35);
-
-        $logo->setOffsetX(5);
-
-        $logo->setOffsetY(2);
-
-        $logo->setWorksheet($sheet);
-    }
-
-    private function addEmployeePhoto(
-        Worksheet $sheet,
-        $photoPath,
-        $coordinate
-    ) {
-        if (!$photoPath || !file_exists($photoPath)) {
-            return;
-        }
-
-        $photo = new Drawing();
-
-        $photo->setName('Employee Photo');
-
-        $photo->setDescription('Employee Photo');
-
-        $photo->setPath($photoPath);
-
-        $photo->setCoordinates($coordinate);
-
-        $photo->setHeight(75);
-
-        $photo->setOffsetX(5);
-
-        $photo->setOffsetY(5);
-
-        $photo->setWorksheet($sheet);
-    }
-
     private function addImage(
         Worksheet $sheet,
         string $path,
         string $coordinate,
         int $width = null,
         int $height = null,
-        int $offsetX = 0,
-        int $offsetY = 0
+        int $offsetX = 5,
+        int $offsetY = 5
     ) {
         if (!file_exists($path)) {
             return;
@@ -861,69 +699,52 @@ class SkillCard implements WithEvents, WithTitle
                 $this->setupSheet($sheet);
 
                 $this->createSkillCard($sheet);
-                // $this->addCompanyLogo($sheet, 'A1');
-                // $this->addCompanyLogo($sheet, 'I1');
+                
+                // $this->addImage(
+                //     $sheet,
+                //     public_path('images/skill_card/skill_card_pricon_logo_short.jpg'),
+                //     'I1',
+                //     220,
+                //     58,
+                // );
 
-                $this->addImage(
-                    $sheet,
-                    public_path('images/skill_card/skill_card_pricon_logo_wide.jpg'),
-                    'A1',
-                    80
-                );
-
-                $this->addImage(
-                    $sheet,
-                    public_path('images/skill_card/skill_card_pricon_logo_short.jpg'),
-                    'I1',
-                    80
-                );
-
-                $this->addImage(
-                    $sheet,
-                    public_path('images/skill_card/skill_card_emp_photo.jpg'),
-                    'H5',
-                    null,
-                    80
-                );
+                // $this->addImage(
+                //     $sheet,
+                //     public_path('images/skill_card/skill_card_emp_photo.jpg'),
+                //     'H5',
+                //     null,
+                //     80
+                // );
 
                 // $this->addImage(
                 //     $sheet,
                 //     public_path('images/skill_card/skill_card_approvers.jpg'),
-                //     'I25',
-                //     null,
-                //     70
+                //     'I26',
+                //     70,
+                //     70,
+                //     15,
+                //     8
                 // );
 
-                $this->addImage(
-                    $sheet,
-                    public_path('images/skill_card/skill_card_approvers.jpg'),
-                    'I26',
-                    70,
-                    70,
-                    15,
-                    8
-                );
+                // $this->addLevelImage(
+                //     $sheet,
+                //     1
+                // );
 
-                $this->addLevelImage(
-                    $sheet,
-                    1
-                );
+                // $this->addLevelImage(
+                //     $sheet,
+                //     2
+                // );
 
-                $this->addLevelImage(
-                    $sheet,
-                    2
-                );
+                // $this->addLevelImage(
+                //     $sheet,
+                //     3
+                // );
 
-                $this->addLevelImage(
-                    $sheet,
-                    3
-                );
-
-                $this->addLevelImage(
-                    $sheet,
-                    4
-                );
-
+                // $this->addLevelImage(
+                //     $sheet,
+                //     4
+                // );
 
             }
 

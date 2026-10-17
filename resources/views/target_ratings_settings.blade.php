@@ -51,11 +51,12 @@
                                                 <th rowspan="2" style="width: 5%;">Status</th>
                                                 <th rowspan="2" style="width: 10%;">Section</th>
                                                 <th rowspan="2" style="width: 10%;">Position</th>
+                                                <th rowspan="2" style="width: 10%;">Product Area</th>
                                                 <th rowspan="2" style="width: 15%;">Product Line</th>
                                                 <th colspan="2" class="text-center">Target Ratings</th>
                                             </tr>
                                             <tr>
-                                                <th style="width: 40%;" class="text-center">Functional Competencies</th>
+                                                <th style="width: 30%;" class="text-center">Functional Competencies</th>
                                                 <th style="width: 10%;" class="text-center">Rating</th>
                                             </tr>
                                         </thead>
@@ -115,15 +116,29 @@
                                             <option value="" disabled selected>Select Position</option>
                                             <option value="Operator">Operator</option>
                                             <option value="Inspector">Inspector</option>
-                                            <option value="Technician">Tecnnician</option>
+                                            <option value="Technician">Technician</option>
+                                            <option value="Material Handler">Material Handler</option>
+                                            <option value="Prod`n Jr. Supervisor">Prod`n Jr. Supervisor</option>
+                                            <option value="Prod`n Sr. Supervisor">Prod`n Sr. Supervisor</option>
+                                            <option value="QC Jr. Supervisor">QC Jr. Supervisor</option>
+                                            <option value="QC Sr. Supervisor">QC Sr. Supervisor</option>
+                                            <option value="Jr. Engineer">Jr. Engineer</option>
+                                            <option value="Sr. Engineer">Sr. Engineer</option>
                                         </select>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-4">
                                     <div class="form-group">
+                                        <label>Product Area</label>
+                                        <select class="form-control selectProductArea select2bs5" name="product_area" id="productArea" required></select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
                                         <label>Product Line</label>
-                                        <select class="form-control selectProductLine select2bs5" name="product_line" id="productLine" required></select>
+                                        <select class="form-control selectProductLine select2bs5" name="product_line[]" id="productLine" multiple required></select>
                                     </div>
                                 </div>
                             <!-- </div> -->
