@@ -44,7 +44,7 @@
                                 </div>
                                 
                                 <div class="float-sm-right mr-2">
-                                    <button class="btn btn-warning" hidden id="btnShowExportPDFModal">
+                                    <button class="btn btn-warning"  id="btnShowExportPDFModal">
                                         <i class="fa fa-initial-icon"></i> Export PDF <br> Employee Skill Card
                                     </button>
                                 </div>

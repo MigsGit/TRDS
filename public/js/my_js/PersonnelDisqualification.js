@@ -312,14 +312,18 @@ function bindEvents($table, $tableTrainings, $form, $formPart1, $formPart2, $for
         saveDisqualiPart($formPart2Trainings, 'add_part2_training', {
             modal: $modalTrainings,
             table: dtTrainings,
+            addModal: $modal,
+            addTable: dtDisqualification,
             addForm: $formPart2,
+            addButton: $formPart2.find('#btnAddTraining'),
             successMessage: 'Training saved.',
-            onSuccess: (response) => {
-                console.log('newstatus', response);
-                
-                $addForm.find('#btnAddTraining').attr('data-status', response.new_status);
-                console.log('data-status', $addForm.find('#btnAddTraining').data('status'));
-
+            onSuccess: (response, addForm, addButton) => {
+                // addForm.find('#btnAddTraining').data('status', response.new_status);
+                addButton.data('status', response.new_status);
+                // if(response.new_status == 4){
+                //     addButton.prop('disabled', true);
+                //     addButton.prop('hidden', true);
+                // }
                 // e.g. expand the next collapse card
                 // $('#collapsePart3').collapse('show');
             },
@@ -724,12 +728,12 @@ function selectClassification(cboElement, rapidxId = null){
     });
 }
 
-function selectSubClassification(cboElement, subClass, currentSubClass = null){
-    let result = '<option value="" disabled selected> Select Sub-Classification </option>';
+function selectDisqualiExam(cboElement, employeeNo, currentSubClass = null){
+    let result = '<option value="" disabled selected> Select Disqualification Exam </option>';
     $.ajax({
-        data: {sub_class: subClass },
+        data: {employee_no: employeeNo },
         method: "get",
-        url: "get_sub_classification",
+        url: "get_examination",
         dataType: "json",
         beforeSend: function(){
             result = '<option value="" disabled selected> -- Loading -- </option>';
@@ -739,9 +743,9 @@ function selectSubClassification(cboElement, subClass, currentSubClass = null){
                     // Enable the sub-classification dropdown since records are available
                     cboElement.prop('disabled', false);
 
-                    result = '<option value="" disabled selected> Select Sub-Classification </option>';
+                    result = '<option value="" disabled selected> Select Disqualification Exam </option>';
                 for (let i = 0; i < response.length; i++) {
-                    result += '<option value="' + response[i]['id'] + '">' + response[i]['dropdown_masters_details'] + '</option>';
+                    result += '<option value="' + response[i]['exam_result_details_info'][0]['id'] + '">' + response[i]['training_request_ctrl_no'] + '</option>';
                 }
             }else{
                 // Disable the sub-classification dropdown since no records are available
@@ -764,7 +768,7 @@ function selectSubClassification(cboElement, subClass, currentSubClass = null){
 }
 
 //Reusable Save Function
-function saveDisqualiPart($form, url, { modal = null, table = null, resetForm = true, successMessage = 'Successfully saved!', onSuccess = null, addForm } = {}) {
+function saveDisqualiPart($form, url, { modal = null, table = null, resetForm = true, successMessage = 'Successfully saved!', onSuccess = null, addModal = null, addTable = null, addForm = null, addButton = null } = {}) {
     const formData = new FormData($form[0]);
 
     $.ajax({
@@ -783,12 +787,14 @@ function saveDisqualiPart($form, url, { modal = null, table = null, resetForm = 
             if (response.result === 1) {
                 if (table) table.draw(false);
                 if (modal) modal.modal('hide');
+                if (addTable) addTable.draw(false);
+                if (addModal) addModal.modal('hide');
                 if (resetForm) $form[0].reset();
 
                 showSuccess(successMessage);
 
                 // if (typeof onSuccess === 'function'){
-                    onSuccess(response);
+                    onSuccess(response, addForm, addButton);
                 // }else{
                 //     console.log('not trigger success');
                 // }
@@ -932,7 +938,6 @@ function fetchDisqualificationById(id, $modal, dtTrainings, $formPart1, $formPar
             });
 
             selectEmailRecipients($('.selectAttentionToRecipients'), toIds);
-
             selectEmpDetailsFromCertification($('.selectEmployeeName'), response.disqualified_personnel);
 
             //required for passing data to onchange functions
@@ -946,11 +951,10 @@ function fetchDisqualificationById(id, $modal, dtTrainings, $formPart1, $formPar
             //form Part 2
             if(response.status >= 2){
                 $formPart2.find('#part1Id').val(response.id);
-                // loadDropdownFrMaster($('.selectTrainingScope'), 'trainingScope');
                 loadDropdownFrSystemOne($('.selectConductedBy'), 'conductedBy');
                 
                 let p2_status = '';
-                let personnel_pos = response.disqualified_personnel_info.qc_slip.position_category;
+                // let personnel_pos = response.disqualified_personnel_info.qc_slip.position_category;
                 if(response.part2_info != null){
                     
                     p2_id = response.part2_info.id;
@@ -960,22 +964,28 @@ function fetchDisqualificationById(id, $modal, dtTrainings, $formPart1, $formPar
                     loadDropdownFrSystemOne($('.selectConductedBy'), 'conductedBy', { selected: response.part2_info.conducted_by });
                     $formPart2.find('#counsellingDate').val(response.part2_info.counselling_date);
                     
-                    $('#btnSubmitDisqualificationPart2').prop('disabled', false);
-                    $('#btnSubmitDisqualificationPart2').prop('hidden', false);
+                    // $('#btnSubmitDisqualificationPart2').prop('disabled', false);
+                    // $('#btnSubmitDisqualificationPart2').prop('hidden', false);
 
-                    if(p2_status < 4){ //p2 status is 1 - 4, enable add training, disable save button
-                        $formPart2.find('#btnAddTraining').attr('data-part1_id', response.id);
-                        $formPart2.find('#btnAddTraining').attr('data-id', p2_id);
-                        $formPart2.find('#btnAddTraining').attr('data-status', p2_status);
+                    if(p2_status > 1){ //p2 status is 1 - 4, enable add training, disable save button
+                        $formPart2.find('#btnAddTraining').data('part1_id', response.id);
+                        $formPart2.find('#btnAddTraining').data('id', p2_id);
+                        $formPart2.find('#btnAddTraining').data('status', p2_status);
                         $('#btnAddTraining').prop('disabled', false);
                         $('#btnAddTraining').prop('hidden', false);
                         $('#btnSubmitDisqualificationPart2').prop('disabled', true);
                         $('#btnSubmitDisqualificationPart2').prop('hidden', true);
+
+                        if(p2_status == 4){
+                            $('#btnAddTraining').prop('disabled', true);
+                            $('#btnAddTraining').prop('hidden', true);
+                        }
+
                     }else{
                         $('#btnAddTraining').prop('disabled', true);
                         $('#btnAddTraining').prop('hidden', true);
-                        // $('#btnSubmitDisqualificationPart2').prop('disabled', false);
-                        // $('#btnSubmitDisqualificationPart2').prop('hidden', false);
+                        $('#btnSubmitDisqualificationPart2').prop('disabled', false);
+                        $('#btnSubmitDisqualificationPart2').prop('hidden', false);
                     }
                     
                 }else{
