@@ -69,6 +69,7 @@
         <head>
             <meta charset="utf-8">
             <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="storage-url" content="{{ asset('public/storage') }}">
             <title>TRDSv2 | @yield('title')</title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -108,6 +109,7 @@
                 @include('shared.pages.super_user_nav')
                 @yield('content_page')
                 @include('components.list_cert_personnel')
+                @include('components.insp_cert_matrix')
                 @include('shared.pages.admin_footer')
             </div>
 

@@ -290,7 +290,6 @@ class TrainingRequestController extends Controller
         $ctrlNumber = str_pad($ctrlNumber, 4, '0', STR_PAD_LEFT);
         $date = date('ym');
 
-
         $ctrlNumber = 'TR-' . $date . '-' . $ctrlNumber;
 
         $trainingRequest = new TrainingRequest();

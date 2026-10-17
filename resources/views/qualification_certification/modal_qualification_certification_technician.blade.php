@@ -668,7 +668,7 @@
 
     <div class="modal-footer techSave">
         <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark me-2" style="color: white"></i>Close</button>
-        <button type="submit" class="btn btn-success" id="addNew"><i class="fa-solid fa-file-import me-2" style="color: white"></i>Save Tech</button>
+        <button type="submit" class="btn btn-success" id="addNewTechnician"><i class="fa-solid fa-file-import me-2" style="color: white"></i>Save Tech</button>
     </div>
 
 </form>
