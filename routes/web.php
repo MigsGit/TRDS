@@ -346,6 +346,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_dropdown_from_master', 'getDropdownFromMaster')->name('get_dropdown_from_master');
         Route::get('/get_dropdown_from_systemone', 'getDropdownFromSystemone')->name('get_dropdown_from_systemone');
         Route::post('/update_disqualification_status', 'updateDisqualificationStatus')->name('update_disqualification_status');
+        Route::post('/get_examination', 'getExamination')->name('get_examination');
 
         // Route::get('/view_trainee_details', 'viewTraineeDetails')->name('view_trainee_details');
         // Route::get('/get_users', 'getUsers')->name('get_users');
@@ -367,6 +368,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_process_stations', 'getProcessStations')->name('get_process_stations');
         Route::get('/get_process_count_per_category', 'getProcessCountPerCategory')->name('get_process_count_per_category');
         Route::get('/get_product_line_fr_master', 'getProductLineFrMaster')->name('get_product_line_fr_master');
+        Route::get('/get_product_area_fr_master', 'getProductAreaFrMaster')->name('get_product_area_fr_master');
     });
 });
 

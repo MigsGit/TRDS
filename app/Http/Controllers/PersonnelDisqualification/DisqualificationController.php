@@ -21,6 +21,11 @@ use App\Model\DropdownMasterDetails;
 
 use App\Model\Qc\QcSlipEmployee;
 use App\Model\Qc\QcSlip;
+
+use App\Model\ExamResult;
+use App\Model\ExamResultDetails;
+use App\Model\Questionnaires;
+
 use App\RapidXUser;
 
 
@@ -216,7 +221,7 @@ class DisqualificationController extends Controller
             if($category == 1){
                 $result .= "<span class='badge rounded-pill bg-info'>Supervisor</span>";
             }else if($category == 2){
-                $result .= "<span class='badge rounded-pill bg-primary'>Engineer</span>";
+                $result .= "<span class='badge rounded-pill bg-warning'>Engineer</span>";
             }else if($category == 3){
                 $result .= "<span class='badge rounded-pill bg-primary'>LQC Supervisor</span>";
             }
@@ -594,24 +599,21 @@ class DisqualificationController extends Controller
         return response()->json($classifications->first()->dropdown_master_details);
     }
 
-    public function getSubClassification(Request $request){
-        $subClass = $request->sub_class;
+    //clark
+    public function getExamination(Request $request){
+        $examinations = ExamResult::with(['exam_result_details_info' => function ($query) {
+                                        $query->where('status', 0)
+                                            ->where('logdel', 0)
+                                            ->with(['questionnaires_info' => function ($q) {          // relation on exam result details model
+                                                $q->where('category', 0)->where('status', 0)->where('logdel', 0)->orderBy('created_at', 'desc');
+                                            }]);
+                                    }])
+                                    ->where('employee_no', $request->employee_no)
+                                    ->where('status', 0)
+                                    ->where('logdel', 0)
+                                    ->get();
 
-        if($subClass == 'subclass1'){
-            $subClassId = 13;
-        }else{
-            $subClassId = 0;
-        }
-
-        if($subClassId != 0){
-            $subClassifications = DropdownMaster::with(['dropdown_master_details'])
-                ->where('id', $subClassId) // actual ID for Sub-Classification
-                ->get();
-
-            return response()->json($subClassifications->first()->dropdown_master_details);
-        }else{
-            return response()->json([]);
-        }
+        return response()->json($examinations);
     }
 
     // type => DropdownMaster id
