@@ -43,23 +43,46 @@
                     </a>
                 </li>
 
-                <li class="nav-item has-treeview">
-                    <a href="{{ route('target_ratings') }}"  class="nav-link">
+                <!-- <li class="nav-item has-treeview">
+                    <a href="{{ route('target_ratings') }}" class="nav-link">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>Target Ratings Settings</p>
+                    </a>
+                </li> -->
+
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Target Ratings Settings</p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('target_ratings') }}" class="nav-link">
+                                <p> Target Ratings</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('ratings_descriptions') }}" class="nav-link">
+                                <p> Descriptions</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item has-treeview">
                     <a href="{{ route('dropdown_maintenance') }}"  class="nav-link">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>Dropdown Maintenance</p>
                     </a>
                 </li>
 
-                <li class="nav-header font-weight-bold">Modules</li>
-                {{-- <li class="nav-item has-treeview">
+                <!-- <li class="nav-header font-weight-bold">Modules</li>
+                <li class="nav-item has-treeview">
                     <a href="{{ route('hr_memo') }}" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
                         <p>HR MEMO/Approval </p>
                     </a>
-                </li>
+                </li> -->
 
                 <li class="nav-header font-weight-bold">Modules</li>
                 <?php
