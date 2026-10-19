@@ -15,20 +15,25 @@ use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
 class SkillCard implements WithEvents, WithTitle
 {
-    protected $productLine;
+    protected $employeeSkillCardData;
 
-    public function __construct($productLine = null)
-    {
-        $this->productLine = $productLine;
+    public function __construct($employeeSkillCardData = null){
+        $this->employeeSkillCardData = $employeeSkillCardData;
     }
 
-    public function title(): string
-    {
+    /**
+    * @return \Illuminate\Support\Collection
+    */
+    public function collection(){
+        // dd($this->employeeSkillCardData);
+        return $this->employeeSkillCardData;
+    }
+
+    public function title(): string{
         return 'Skill Card';
     }
 
-    private function setupSheet(Worksheet $sheet)
-    {
+    private function setupSheet(Worksheet $sheet){
         /*
         |--------------------------------------------------------------------------
         | GRIDLINES
@@ -74,14 +79,14 @@ class SkillCard implements WithEvents, WithTitle
             'C' => 5.7,
             'D' => 5.7,
 
-            'E' => 4,
-            'F' => 4,
-            'G' => 4,
-            'H' => 4,
-            'I' => 4,
-            'J' => 4,
-            'K' => 4,
-            'L' => 4,
+            'E' => 4.5,
+            'F' => 4.5,
+            'G' => 4.5,
+            'H' => 4.5,
+            'I' => 4.5,
+            'J' => 4.5,
+            'K' => 4.5,
+            'L' => 4.5,
 
             /*
             |--------------------------------------------------------------------------
@@ -89,14 +94,15 @@ class SkillCard implements WithEvents, WithTitle
             |--------------------------------------------------------------------------
             */
 
-            'M' => 6,
-            'N' => 6,
-            'O' => 6,
-            'P' => 6,
-            'Q' => 6,
-            'R' => 6,
-            'S' => 6,
-            'T' => 6,
+            'M' => 6.7,
+            'N' => 6.7,
+            'O' => 6.7,
+            'P' => 6.7,
+
+            'Q' => 7,
+            'R' => 7,
+            'S' => 7,
+            'T' => 7,
         ];
 
         foreach ($widths as $column => $width) {
@@ -114,7 +120,7 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        // foreach (range('A', 'P') as $column) {
+        // foreach (range('A', 'T') as $column) {
         //     $sheet
         //         ->getColumnDimension($column)
         //         ->setWidth(4.5);
@@ -128,9 +134,14 @@ class SkillCard implements WithEvents, WithTitle
 
         for ($row = 1; $row <= 30; $row++) {
             $sheet
-                ->getRowDimension($row)
-                ->setRowHeight(15);
+            ->getRowDimension($row)
+            ->setRowHeight(15);
         }
+
+        //SET CUSTOM ROW HEIGHT
+        $sheet->getRowDimension(12)->setRowHeight(32);
+
+        $sheet->getRowDimension(15)->setRowHeight(30);
 
         /*
         |--------------------------------------------------------------------------
@@ -138,7 +149,7 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        $sheet->getStyle('A1:T30')
+        $sheet->getStyle('A1:T21')
             ->getFont()
             ->setName('Arial')
             ->setSize(7);
@@ -149,13 +160,12 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        $sheet->getStyle('A1:T30')
+        $sheet->getStyle('A1:T21')
             ->getAlignment()
             ->setVertical(Alignment::VERTICAL_CENTER);
     }
 
-    private function createSkillCard(Worksheet $sheet)
-    {
+    private function createSkillCard(Worksheet $sheet, $employeeSkillCardData){
         /*
         |--------------------------------------------------------------------------
         | LEFT SIDE
@@ -164,9 +174,11 @@ class SkillCard implements WithEvents, WithTitle
 
         $this->createLeftHeader($sheet);
 
-        // $this->createEmployeeSection($sheet);
+        $this->createEmployeeSection($sheet, $employeeSkillCardData);
 
-        // $this->createStationSection($sheet);
+        $this->createProductLineSection($sheet, $employeeSkillCardData);
+
+        $this->createStationSection($sheet, $employeeSkillCardData);
 
 
         /*
@@ -175,21 +187,20 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        // $this->createRightHeader($sheet);
+        $this->createRightHeader($sheet);
 
-        // $this->createRatingsSection($sheet);
+        $this->createRatingsSection($sheet);
 
-        // $this->createFunctionalCompetencies($sheet);
+        $this->createFunctionalCompetencies($sheet);
 
-        // $this->createPerformanceLevel($sheet);
+        $this->createPerformanceLevel($sheet);
 
-        // $this->createApprovalSection($sheet);
+        $this->createApprovalSection($sheet);
 
         $this->applyBorders($sheet);
     }
 
-    private function createLeftHeader(Worksheet $sheet)
-    {
+    private function createLeftHeader(Worksheet $sheet){
         /*
         |--------------------------------------------------------------------------
         | COMPANY NAME
@@ -203,7 +214,7 @@ class SkillCard implements WithEvents, WithTitle
             public_path('images/skill_card/skill_card_pricon_logo_wide.jpg'),
             'A1', //cell
             340, //width
-            28 //height
+            30 //height
         );
 
         /*
@@ -230,7 +241,7 @@ class SkillCard implements WithEvents, WithTitle
 
         /*
         |--------------------------------------------------------------------------
-        | SECTION / TEST SOLUTION
+        | SECTION
         |--------------------------------------------------------------------------
         */
 
@@ -257,31 +268,26 @@ class SkillCard implements WithEvents, WithTitle
             ->setRGB('A8F3C6');
     }
 
-    private function createEmployeeSection(Worksheet $sheet)
-    {
+    private function createEmployeeSection(Worksheet $sheet, $employeeSkillCardData){
         $rows = [
-
             5 => 'Name',
             6 => 'Position',
             7 => 'Date Hired',
             8 => 'Section',
             9 => 'Date Certified',
             10 => 'Validity Period',
-
         ];
 
         foreach ($rows as $row => $label) {
-
-            $sheet->mergeCells("A{$row}:B{$row}");
-
-            $sheet->mergeCells("C{$row}:E{$row}");
+            $sheet->mergeCells("A{$row}:B{$row}"); //Merge label cells
+            $sheet->mergeCells("C{$row}:D{$row}"); //Merge value cells
 
             $sheet->setCellValue(
                 "A{$row}",
                 $label
             );
 
-            $sheet->getStyle("A{$row}:E{$row}")
+            $sheet->getStyle("A{$row}:D{$row}")
                 ->getAlignment()
                 ->setVertical(Alignment::VERTICAL_CENTER);
 
@@ -290,26 +296,51 @@ class SkillCard implements WithEvents, WithTitle
                 ->setHorizontal(Alignment::HORIZONTAL_CENTER);
         }
 
+        // Fill in employee skill card data
+            $sheet->setCellValue("C5", $employeeSkillCardData[0]['employee_name'] ?? '');
+            $sheet->setCellValue("C6", $employeeSkillCardData[0]['position'] ?? '');
+            $sheet->setCellValue("C7", $employeeSkillCardData[0]['date_hired'] ?? '');
+            $sheet->setCellValue("C8", $employeeSkillCardData[0]['section'] ?? '');
+            $sheet->setCellValue("C9", $employeeSkillCardData[0]['date_of_transfer'] ?? '');
+            $sheet->setCellValue("C10", $employeeSkillCardData[0]['validity_period'] ?? '');
 
+            $sheet->getStyle("C5:C10")
+                ->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER);
         /*
         |--------------------------------------------------------------------------
         | LEVEL
         |--------------------------------------------------------------------------
         */
 
-        $sheet->mergeCells('F5:G10');
+        $sheet->mergeCells('E5:H9');
 
-        $sheet->setCellValue(
-            'F5',
-            "LEVEL\n"
-        );
+        // $sheet->setCellValue(
+        //     'E5',
+        //     "LEVEL\n"
+        // );
 
-        $sheet->getStyle('F5:G10')
-            ->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
-            ->setVertical(Alignment::VERTICAL_CENTER)
-            ->setWrapText(true);
+        $overall_rating = [
+            'level1' => 'level_1',
+            'level2' => 'level_2',
+            'level3' => 'level_3',
+            'level4' => 'level_4',
+        ];
 
+        $this->addImage(
+                $sheet,
+                public_path('images/skill_card/skill_card_overall_'.$overall_rating['level1'].'.jpg'),
+                'E5', //cell
+                100, //width
+                95, //height
+                12
+            );
+
+        // $sheet->getStyle('E5:H9')
+        //     ->getAlignment()
+        //     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+        //     ->setVertical(Alignment::VERTICAL_CENTER)
+        //     ->setWrapText(true);
 
         /*
         |--------------------------------------------------------------------------
@@ -317,14 +348,14 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        $sheet->mergeCells('H5:H10');
+        $sheet->mergeCells('I5:L9');
 
         $sheet->setCellValue(
-            'H5',
+            'I5',
             'PHOTO'
         );
 
-        $sheet->getStyle('H5:H10')
+        $sheet->getStyle('I5:L9')
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
@@ -335,32 +366,155 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        $sheet->mergeCells('A11:E11');
-
-        $sheet->mergeCells('F11:H11');
+        $sheet->mergeCells('E10:H10');
 
         $sheet->setCellValue(
-            'F11',
+            'E10',
             'TOTAL RATINGS:'
         );
 
-        $sheet->getStyle('F11:H11')
+        $sheet->getStyle('E10:H10')
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->mergeCells('I10:L10');
+
+        $sheet->setCellValue(
+            'I10',
+            'POINTS'
+        );
+        $sheet->getStyle('I10:L10')
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER);
     }
 
-    private function createStationSection(Worksheet $sheet){
-        $headerRow = 13;
-        $stationHeaderRow = 14;
-        $dataStartRow = 15;
+    private function createProductLineSection(Worksheet $sheet, $employeeSkillCardData){
+        $prodAreastartRow = 11;
+        $prodAreaendRow = 12;
 
-        // Product line
-        $sheet->mergeCells("A{$headerRow}:D{$dataStartRow}");
-        $sheet->setCellValue("A{$headerRow}", $this->productLine->name ?? '');
+        //Static Positon 
+        $startRow2 = $prodAreastartRow + 2;
+        $startRow3 = $prodAreastartRow + 3;
+        $startRow4 = $prodAreastartRow + 4;
+        $startRow5 = $prodAreastartRow + 5;
+        $startRow6 = $prodAreastartRow + 6;
+        $startRow7 = $prodAreastartRow + 7;
+        $startRow8 = $prodAreastartRow + 8;
+        $startRow9 = $prodAreastartRow + 9;
+        $startRow10 = $prodAreastartRow + 10;
+        $startRow11 = $prodAreastartRow + 11;
+
+        /*
+        |--------------------------------------------------------------------------
+        | PRODUCT AREA
+        |--------------------------------------------------------------------------
+        */
+
+        $sheet->mergeCells("A{$prodAreastartRow}:D{$prodAreaendRow}");
+
+        $sheet->setCellValue("A{$prodAreastartRow}", $employeeSkillCardData[0]['product_line'][0]['product_line_name'] ?? 'NOT FOUND'); //Sample Data only
+
+        $sheet->getStyle("A{$prodAreastartRow}:D{$prodAreaendRow}")
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER);
+
+        $sheet->getStyle("A{$prodAreastartRow}:D{$prodAreaendRow}")
+            ->getFont()
+            ->setSize(10)
+            ->setBold(true);
+
+        /*
+        |--------------------------------------------------------------------------
+        | CERTIFICATION DETAILS
+        |--------------------------------------------------------------------------
+        */
+
+        $sheet->mergeCells("A{$startRow2}:B{$startRow4}");
+
+        $this->addImage(
+            $sheet,
+            public_path('images/skill_card/certification_image.png'),
+            'A13',
+            71,
+            69,
+        );
+
+        $sheet->getStyle("A{$startRow2}:B{$startRow10}")
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER)
+            ->setWrapText(true);
+
+        $sheet->mergeCells("A{$startRow5}:B{$startRow6}");
+        $sheet->setCellValue("A{$startRow5}", "Date\nCertified");
+
+        $sheet->mergeCells("A{$startRow7}:B{$startRow7}");
+        $sheet->setCellValue("A{$startRow7}", $employeeSkillCardData[0]['date_of_transfer'] ?? 'NOT FOUND');
+
+        $sheet->mergeCells("A{$startRow8}:B{$startRow9}");
+        $sheet->setCellValue("A{$startRow8}", "Valid\nUntil");
+
+        $sheet->mergeCells("A{$startRow10}:B{$startRow10}");
+        $sheet->setCellValue("A{$startRow10}", $employeeSkillCardData[0]['validity_period'] ?? 'NOT FOUND');
+
+        /*
+        |--------------------------------------------------------------------------
+        | PRODUCT LINES
+        |--------------------------------------------------------------------------
+        */
+        // $employeeSkillCardData[0]['validity_period']
+
+
+        $prodLineRow = $prodAreastartRow + 1;
+        $prodLineRow1 = $prodLineRow + 1;
+        $prodLineRow2 = $prodLineRow + 2;
+        $prodLineRow3 = $prodLineRow + 3;
+        $prodLineRow4 = $prodLineRow + 4;
+        $prodLineRow5 = $prodLineRow + 5;
+        $prodLineRow6 = $prodLineRow + 6;
+        $prodLineRow7 = $prodLineRow + 7;
+        $prodLineRow8 = $prodLineRow + 8;
+        $prodLineRow9 = $prodLineRow + 9;
+
+        $product_lines = [
+            "C{$prodLineRow1}:D{$prodLineRow2}" => 'PROD LINE 1',
+            "C{$prodLineRow3}:D{$prodLineRow4}" => 'PROD LINE 2',
+            "C{$prodLineRow5}:D{$prodLineRow6}" => 'PROD LINE 3',
+            "C{$prodLineRow7}:D{$prodLineRow9}" => 'PROD LINE 4',
+        ];
+
+        foreach ($product_lines as $product_line => $prod_line) {
+
+            $sheet->mergeCells($product_line);
+
+            $startCell = explode(':', $product_line)[0];
+
+            $sheet->setCellValue(
+                $startCell,
+                $prod_line
+            );
+
+            $sheet->getStyle($product_line)
+                ->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                ->setVertical(Alignment::VERTICAL_CENTER);
+        }
+    }
+
+    private function createStationSection(Worksheet $sheet){
+        $stationStartRow = 11;
+        $stationStartRow1 = $stationStartRow + 1;
 
         // Station Assigned title
-        $sheet->mergeCells("E{$headerRow}:L{$headerRow}");
-        $sheet->setCellValue("E{$headerRow}", 'STATION ASSIGNED');
+        $sheet->mergeCells("E{$stationStartRow}:L{$stationStartRow}");
+        $sheet->setCellValue("E{$stationStartRow}", 'STATION ASSIGNED');
+
+        $sheet->getStyle("E{$stationStartRow}:L{$stationStartRow}")
+                    ->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                    ->setVertical(Alignment::VERTICAL_CENTER)
+                    ->setWrapText(true);
 
         // Station columns
         $stations = [
@@ -375,13 +529,19 @@ class SkillCard implements WithEvents, WithTitle
             $endColumn = chr(ord($column) + 1);
 
             $sheet->mergeCells(
-                "{$column}{$stationHeaderRow}:{$endColumn}{$stationHeaderRow}"
+                "{$column}{$stationStartRow1}:{$endColumn}{$stationStartRow1}"
             );
 
             $sheet->setCellValue(
-                "{$column}{$stationHeaderRow}",
+                "{$column}{$stationStartRow1}",
                 $name
             );
+            
+            $sheet->getStyle("{$column}{$stationStartRow1}:{$endColumn}{$stationStartRow1}")
+                    ->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                    ->setVertical(Alignment::VERTICAL_CENTER)
+                    ->setWrapText(true);
         }
 
         // Example:
@@ -393,30 +553,22 @@ class SkillCard implements WithEvents, WithTitle
         // Dynamic station/process rows go here...
     }
 
-    private function createRightHeader(Worksheet $sheet)
-    {
+    private function createRightHeader(Worksheet $sheet){
         /*
         |--------------------------------------------------------------------------
         | PRICON
         |--------------------------------------------------------------------------
         */
 
-        $sheet->mergeCells('I1:L3');
+        $sheet->mergeCells('M1:P3');
 
-        $sheet->setCellValue(
-            'I1',
-            'PRICON MICROELECTRONICS, INC.'
+        $this->addImage(
+            $sheet,
+            public_path('images/skill_card/skill_card_pricon_logo_short.jpg'),
+            'M1',
+            220,
+            42,
         );
-
-        $sheet->getStyle('I1:L3')
-            ->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
-            ->setVertical(Alignment::VERTICAL_CENTER);
-
-        $sheet->getStyle('I1:L3')
-            ->getFont()
-            ->setBold(true);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -424,64 +576,61 @@ class SkillCard implements WithEvents, WithTitle
         |--------------------------------------------------------------------------
         */
 
-        $sheet->mergeCells('M1:P3');
+        $sheet->mergeCells('Q1:T3');
 
         $sheet->setCellValue(
-            'M1',
+            'Q1',
             "COMPETENCY SKILLS\nASSESSMENT"
         );
 
-        $sheet->getStyle('M1:P3')
+        $sheet->getStyle('Q1:T3')
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER)
             ->setWrapText(true);
+    }
 
-
-        /*
-        |--------------------------------------------------------------------------
+    private function createRatingsSection(Worksheet $sheet){
+        /*  
         | REFERENCE
         |--------------------------------------------------------------------------
         */
 
-        $sheet->mergeCells('I4:P5');
+        $sheet->mergeCells('Q4:T5');
 
         $sheet->setCellValue(
-            'I4',
+            'Q4',
             'REFERENCE'
         );
 
-        $sheet->getStyle('I4:P5')
+        $sheet->getStyle('Q4:T5')
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
-    }
 
-    private function createRatingsSection(Worksheet $sheet)
-    {
         /*
         |--------------------------------------------------------------------------
         | RATINGS TITLE
         |--------------------------------------------------------------------------
         */
 
-        $sheet->mergeCells('I6:P6');
+        $sheet->mergeCells('Q6:T6');
 
         $sheet->setCellValue(
-            'I6',
+            'Q6',
             'RATINGS'
         );
 
-        $sheet->getStyle('I6:P6')
+        $sheet->getStyle('Q6:T6')
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
-        $sheet->getStyle('I6:P6')
+        $sheet->getStyle('Q6:T6')
             ->getFont()
             ->setBold(true);
 
-        $sheet->getStyle('I6:P6')
+        $sheet->getStyle('Q6:T6')
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
@@ -495,17 +644,13 @@ class SkillCard implements WithEvents, WithTitle
         */
 
         $ratings = [
-
-            'I7:J7' => '1',
-            'K7:L7' => '2',
-            'M7:N7' => '3',
-            'O7:P7' => '4',
-
+            'Q7' => '1',
+            'R7' => '2',
+            'S7' => '3',
+            'T7' => '4',
         ];
 
         foreach ($ratings as $range => $rating) {
-
-            $sheet->mergeCells($range);
 
             $startCell = explode(':', $range)[0];
 
@@ -519,37 +664,118 @@ class SkillCard implements WithEvents, WithTitle
                 ->setHorizontal(Alignment::HORIZONTAL_CENTER)
                 ->setVertical(Alignment::VERTICAL_CENTER);
         }
-    }
 
-    private function createFunctionalCompetencies(Worksheet $sheet)
-    {
         /*
         |--------------------------------------------------------------------------
-        | HEADER
+        | 4 RATINGS VALUES IMAGE
         |--------------------------------------------------------------------------
         */
 
-        $sheet->mergeCells('I10:N11');
+        $rating_values = [
+            'Q8:Q9' => 'actual_1',
+            'R8:R9' => 'actual_2',
+            'S8:S9' => 'actual_3',
+            'T8:T9' => 'actual_4',
+        ];
+
+        foreach ($rating_values as $range_value => $rating_v) {
+
+            $sheet->mergeCells($range_value);
+
+            $startCell = explode(':', $range_value)[0];
+
+            $this->addImage(
+                $sheet,
+                public_path('images/skill_card/skill_card_'.$rating_v.'.png'),
+                $startCell, //cell
+                340, //width
+                30, //height
+                12
+            );
+
+            // $sheet->setCellValue(
+            //     $startCell,
+            //     $rating_v
+            // );
+
+            // $sheet->getStyle($range_value)
+            //     ->getAlignment()
+            //     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            //     ->setVertical(Alignment::VERTICAL_CENTER);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 4 RATINGS VALUES DESCRIPTION
+        |--------------------------------------------------------------------------
+        */
+
+        $rating_values_description = [
+            'Q10:Q12' => 'Certified (at least 1 series/product)',
+            'R10:R12' => 'Certified (at least 2-3 series/products)',
+            'S10:S12' => 'Certified (at least 4-6 series/products)',
+            'T10:T12' => 'Certified (more than 6 series/products)',
+        ];
+
+        foreach ($rating_values_description as $range_value_desk => $rating_description) {
+
+            $sheet->mergeCells($range_value_desk);
+
+            $startCell = explode(':', $range_value_desk)[0];
+
+            $sheet->setCellValue(
+                $startCell,
+                $rating_description
+            );
+
+            $sheet->getStyle($range_value_desk)
+                ->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                ->setVertical(Alignment::VERTICAL_CENTER)
+                ->setWrapText(true);
+        }
+    }
+
+    private function createFunctionalCompetencies(Worksheet $sheet){
+        /*
+        |--------------------------------------------------------------------------
+        | FUNCTIONAL COMPETENCIES
+        |--------------------------------------------------------------------------
+        */
+
+        $sheet->mergeCells('M4:O6');
 
         $sheet->setCellValue(
-            'I10',
-            "FUNCTIONAL\nCOMPETENCIES"
+            'M4',
+            'FUNCTIONAL COMPETENCIES'
         );
 
-        $sheet->mergeCells('O10:P11');
-
-        $sheet->setCellValue(
-            'O10',
-            "TARGET\nRATING"
-        );
-
-        $sheet->getStyle('I10:P11')
+        $sheet->getStyle('M4:O6')
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER)
             ->setWrapText(true);
 
-        $sheet->getStyle('I10:P11')
+        $sheet->getStyle('M4:O6')
+            ->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()
+            ->setRGB('A8F3C6');
+
+        $sheet->mergeCells('P4:P6');
+
+        $sheet->setCellValue(
+            'P4',
+            'TARGET RATING'
+        );
+
+        $sheet->getStyle('P4')
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER)
+            ->setWrapText(true);
+
+        $sheet->getStyle("P4:P6")
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
@@ -564,69 +790,181 @@ class SkillCard implements WithEvents, WithTitle
         // $functionalStartRow = 12;
     }
     
-    private function createPerformanceLevel(Worksheet $sheet)
-    {
-        $row = 20;
+    private function createPerformanceLevel(Worksheet $sheet){
 
-        $sheet->mergeCells("I{$row}:P{$row}");
+        /*
+        |--------------------------------------------------------------------------
+        | PERFORMANCE LEVEL (OVER ALL)
+        |--------------------------------------------------------------------------
+        */
+
+        $sheet->mergeCells('Q13:T13');
 
         $sheet->setCellValue(
-            "I{$row}",
+            'Q13',
             'PERFORMANCE LEVEL (OVER ALL)'
         );
 
-        $sheet->getStyle("I{$row}:P{$row}")
+        $sheet->getStyle('Q13:T13')
             ->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER);
 
-        $sheet->getStyle("I{$row}:P{$row}")
+        $sheet->getStyle('Q13:T13')
+            ->getFont()
+            ->setBold(true);
+
+        $sheet->getStyle('Q13:T13')
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
             ->setRGB('A8F3C6');
+
+        /*
+        |--------------------------------------------------------------------------
+        | 4 RATINGS OVERALL LABELS
+        |--------------------------------------------------------------------------
+        */
+
+        $rating_overall_labels = [
+            'Q14' => 'Level 1',
+            'R14' => 'Level 2',
+            'S14' => 'Level 3',
+            'T14' => 'Level 4',
+        ];
+
+        foreach ($rating_overall_labels as $overall_label => $rating_overall) {
+            $sheet->mergeCells($overall_label);
+            $startCell = explode(':', $overall_label)[0];
+            $sheet->setCellValue(
+                $startCell,
+                $rating_overall
+            );
+
+            $sheet->getStyle($overall_label)
+                ->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                ->setVertical(Alignment::VERTICAL_CENTER);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 4 RATINGS OVERALL IMAGES
+        |--------------------------------------------------------------------------
+        */
+
+        $rating_overall_images = [
+            'Q15' => 'level_1',
+            'R15' => 'level_2',
+            'S15' => 'level_3',
+            'T15' => 'level_4',
+        ];
+
+        foreach ($rating_overall_images as $overall_image => $rating_overall) {
+
+            $sheet->mergeCells($overall_image);
+
+            $startCell = explode(':', $overall_image)[0];
+
+            // $sheet->setCellValue(
+            //     $startCell,
+            //     $rating_overall
+            // );
+
+            $this->addImage(
+                $sheet,
+                public_path('images/skill_card/skill_card_'.$rating_overall.'_old.jpg'),
+                $startCell, //cell
+                340, //width
+                30, //height
+                10
+            );
+
+            // $sheet->getStyle($overall_image)
+            //     ->getAlignment()
+            //     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            //     ->setVertical(Alignment::VERTICAL_CENTER);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 4 RATINGS OVERALL RANGE
+        |--------------------------------------------------------------------------
+        */
+
+        $rating_overall_ranges = [
+            'Q16' => 'Range1',
+            'R16' => 'Range2',
+            'S16' => 'Range3',
+            'T16' => 'Range4',
+        ];
+
+        foreach ($rating_overall_ranges as $overall_range => $rating_overall_range) {
+
+            // $sheet->mergeCells($overall_image);
+
+            $startCell = explode(':', $overall_range)[0];
+
+            $sheet->setCellValue(
+                $startCell,
+                $rating_overall_range
+            );
+
+            $sheet->getStyle($overall_range)
+                ->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                ->setVertical(Alignment::VERTICAL_CENTER);
+        }
     }
 
-    private function createApprovalSection(Worksheet $sheet)
-    {
-        $row = 25;
+    private function createApprovalSection(Worksheet $sheet){
+        $row = 17;
+        $startRow = $row;
 
-        $sheet->mergeCells("I{$row}:P{$row}");
+        $sheet->mergeCells("M{$startRow}:T{$startRow}");
 
         $sheet->setCellValue(
-            "I{$row}",
+            "M{$startRow}",
             'APPROVED BY:'
         );
 
-        $sheet->getStyle("I{$row}:P{$row}")
+        $sheet->getStyle("M{$startRow}:T{$startRow}")
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $sheet->getStyle("I{$row}:P{$row}")
+        $sheet->getStyle("M{$startRow}:T{$startRow}")
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
             ->setRGB('A8F3C6');
+        
+        $row++;
+        $endRow = $row + 3;
+
+        $sheet->mergeCells("M{$row}:T{$endRow}");
+
+        $this->addImage(
+            $sheet,
+            public_path('images/skill_card/skill_card_approvers.jpg'),
+            "M{$row}",
+            319,
+            54,
+            15,
+            8
+        );
     }
 
-    private function applyBorders(Worksheet $sheet)
-    {
-        $sheet->getStyle('A1:P30')
+    private function applyBorders(Worksheet $sheet){
+        $sheet->getStyle('A1:T21')
             ->applyFromArray([
-
                 'borders' => [
-
                     'allBorders' => [
-
                         'borderStyle' => Border::BORDER_THIN,
-
                         'color' => [
                             'rgb' => '000000',
                         ],
-
                     ],
-
                 ],
-
             ]);
     }
 
@@ -694,19 +1032,13 @@ class SkillCard implements WithEvents, WithTitle
 
             AfterSheet::class => function (AfterSheet $event) {
 
+                $employeeSkillCardData = $this->employeeSkillCardData;
+
                 $sheet = $event->sheet->getDelegate();
 
                 $this->setupSheet($sheet);
 
-                $this->createSkillCard($sheet);
-                
-                // $this->addImage(
-                //     $sheet,
-                //     public_path('images/skill_card/skill_card_pricon_logo_short.jpg'),
-                //     'I1',
-                //     220,
-                //     58,
-                // );
+                $this->createSkillCard($sheet, $employeeSkillCardData);
 
                 // $this->addImage(
                 //     $sheet,

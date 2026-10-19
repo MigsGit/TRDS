@@ -741,14 +741,14 @@ class HrMemoController extends Controller
             ->values()
             ->toArray();
 
-        return Excel::download(
-            new InspectorSkillChart(
-                $productLine,
-                $employees,
-                $productStation
-            ),
-            'QC Inspectors Skill Chart.xlsx'
-        );
+        // return Excel::download(
+        //     new InspectorSkillChart(
+        //         $productLine,
+        //         $employees,
+        //         $productStation
+        //     ),
+        //     'QC Inspectors Skill Chart.xlsx'
+        // );
 
         //CLARK 
         $request->validate([
@@ -757,22 +757,20 @@ class HrMemoController extends Controller
 
         $selectedSheets = $request->input('section_export', []);
 
-        // return Excel::download(
-        //     new InspectorSkillChart($selectedSheets),
-        //     'QC Inspectors Skill Chart.xlsx'
-        // );
+        return Excel::download(
+            new InspectorSkillChart($selectedSheets),
+            'QC Inspectors Skill Chart.xlsx'
+        );
     }
 
     public function exportEmployeeSkillCard(Request $request)
     {
-        // $request->validate([
-        //     'section_export'   => 'required',
-        // ]);
-
-        // $selectedSheets = $request->input('section_export', []);
+        $employeeNo = 'P082';
 
         return Excel::download(
-            new EmployeeSkillCard(),
+            new EmployeeSkillCard(
+                $employeeNo
+            ),
             'Employee Skill Card.xlsx'
         );
     }
