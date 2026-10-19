@@ -74,13 +74,73 @@
     // ==========================================================================
 
     /**
+     * Single source of truth (UX mirror of the backend's OPER_POSITION_DAY_STATUSES
+     * grid / parseApprovalStatus()) for which role/day is currently editable on a
+     * VisualOperator/PartsPrep/MachineOperator slip. 0 = checkbox phase (any day
+     * editable for the matching role), 1-5 = Day 1-5 (only that day editable).
+     */
+    const OPER_POSITION_DAY_STATUSES = {
+        Production: { 0: 'AOPERPRDN', 1: 'AOPERPRDN1', 2: 'AOPERPRDN2', 3: 'AOPERPRDN3', 4: 'AOPERPRDN4', 5: 'AOPERPRDN5' },
+        Engineer:   { 0: 'BOPERENGG', 1: 'BOPERENGG1', 2: 'BOPERENGG2', 3: 'BOPERENGG3', 4: 'BOPERENGG4', 5: 'BOPERENGG5' },
+        QC:         { 0: 'COPERQC',   1: 'COPERQC1',   2: 'COPERQC2',   3: 'COPERQC3',   4: 'COPERQC4',   5: 'COPERQC5' }
+    };
+
+    /**
+     * Resolves which role/day is currently editable from an approval_status string.
+     * Returns null when nothing is editable (e.g. 'PB', 'DOPEROSC', or any status
+     * outside the grid). UX ONLY — the backend guard in
+     * saveQcLqcTrainingItemsByPosition() is the source of truth.
+     * @param  {string} approvalStatus
+     * @return {{role:string,day:?number}|null}
+     */
+    const parseApprovalStatus = (approvalStatus) => {
+        for (var role in OPER_POSITION_DAY_STATUSES) {
+            var dayStatuses = OPER_POSITION_DAY_STATUSES[role];
+            for (var day in dayStatuses) {
+                if (dayStatuses[day] === approvalStatus) {
+                    return { role: role, day: (day === '0') ? null : parseInt(day, 10) };
+                }
+            }
+        }
+        return null;
+    };
+
+    /**
+     * Disables (not hides) the checkbox/sub-description/day-result inputs of a
+     * position-specific training table body that fall outside the role/day
+     * currently editable for the given approval_status. UX ONLY.
+     * @param  {jQuery} $tableBody
+     * @param  {string} position        'Production' | 'Engineer' | 'QC'
+     * @param  {string} approvalStatus
+     */
+    const applyTrainingItemDayLock = ($tableBody, position, approvalStatus) => {
+        var editableSlot = parseApprovalStatus(approvalStatus);
+        var roleEditable = editableSlot !== null && editableSlot.role === position;
+
+        $tableBody.find('tr').each(function () {
+            var $row = $(this);
+
+            $row.find('.chk-select-item, .input-sub-desc, .input-remark').prop('disabled', !roleEditable);
+
+            $row.find('.input-result').each(function () {
+                var $input = $(this);
+                var day = parseInt($input.data('day'), 10);
+                var isEditable = roleEditable && (editableSlot.day === null || editableSlot.day === day);
+                $input.prop('disabled', !isEditable);
+            });
+        });
+    };
+
+    /**
      * Shared initializer used by the 3 position-specific wrapper functions below.
      * @param  {string} tableSelector  CSS ID selector for the target <table>.
      * @param  {string} position       'Production' | 'Engineering' | 'QC'
      * @param  {string} qcSlipsId      Optional explicit qc_slips_id override.
+     * @param  {string} approvalStatus Current qc_slips.approval_status, used to
+     *                                 compute which role/day is editable (UX only).
      * @return {DataTables.Api|null}
      */
-    const initPositionTrainingTable = (tableSelector, position, qcSlipsId,ddMastersId) => {
+    const initPositionTrainingTable = (tableSelector, position, qcSlipsId, ddMastersId, approvalStatus) => {
         var $table = $(tableSelector);
         if (!$table.length) { return null; }
 
@@ -143,6 +203,10 @@
                 $table.find('.input-chk-time').val(chkData.chk_validation_time || '');
                 $table.find('.select-chk-result').val(chkData.chk_overall_result || '');
             }
+        });
+
+        dtInstance.on('draw', function () {
+            applyTrainingItemDayLock($table.find('tbody'), position, approvalStatus);
         });
 
         return dtInstance;
@@ -454,6 +518,9 @@
             '#text_operator_product_line',
         ],2);
         initDropdownMasterDetailsByFkidCombos([
+            '#text_operator_product_area',
+        ],32);
+        initDropdownMasterDetailsByFkidCombos([
                 '#text_certification_operator',
         ],3);
         initDropdownMasterDetailsByFkidCombos([
@@ -486,6 +553,7 @@
         $('#btnSaveMatrix_tblTrainingItemsVisual').addClass('d-none');
         $('#btnSaveMatrix_tblTrainingItemsPartsPrep').addClass('d-none');
         $('#btnSaveMatrix_tblTrainingItemsMachine').addClass('d-none');
+        $('.machineOpetorItemNo3').addClass('d-none');
         $('.eVisualGrr').addClass('d-none');
 
         if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
@@ -498,9 +566,9 @@
             $('#dateOfTransfer').removeClass('d-none');
             $('#productLine').removeClass('d-none');
             $('#seriesDesignation').text('Series Name');
-            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 18);
-            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 19);
-            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 20);
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 18, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 19, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 20, approvalStatus);
             $('.btnAllOperator').removeClass('d-none');
 
 
@@ -528,9 +596,9 @@
             $('#dateOfTransfer').removeClass('d-none');
             $('#productLine').removeClass('d-none');
             $('#seriesDesignation').text('Series Name');
-            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 21);
-            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 22);
-            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 23);
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 21, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 22, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 23, approvalStatus);
             $('.btnAllOperator').removeClass('d-none');
 
 
@@ -540,6 +608,37 @@
             if( approvalStatus.includes('OPERENGG')){
                 $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
 
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+        }
+        if(positionCategory === 'MachineOperator'){
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],17);
+            $('.eVisualGrr').removeClass('d-none');
+            $('.machineOpetorItemNo3').removeClass('d-none');
+            $('#divAllOperators').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Series Name');
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 24, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 25, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 26, approvalStatus);
+            $('.btnAllOperator').removeClass('d-none');
+
+
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
             }
             if( approvalStatus.includes('OPERQC')){
                 $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
@@ -601,7 +700,6 @@
             //     '#text_operator_product_line',
             // ],2);
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
             if(approvalStatus ==='APRODTO'){
                 $('#collapseOneOper').addClass('show');
             }
@@ -654,7 +752,6 @@
             ],7);
 
             form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
             if(approvalStatus !='LQCHEADAPP'){
                 $('.inspectorSave').removeClass('d-none')
             }
@@ -1672,7 +1769,7 @@
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             const approvalStatus = data.approval_status ?? '';
 
-            $('#btnEmployeeOperator').prop('disabled', approvalStatus === 'APRODTO' ? false : true);
+            // $('#btnEmployeeOperator').prop('disabled', approvalStatus === 'APRODTO' ? false : true);
             dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
             dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
             let currentStatus = data.approval_status ??'';
@@ -1698,6 +1795,7 @@
             $('#textconno_new_operator').val(data.control_no);
             $('#text_section_operator').val(data.section).trigger('change');
             $('#text_date_of_transfer').val(data?.date_of_transfer);
+            // $('#text_operator_product_area').val(data?.production_area);
             $('#text_series_operator').val(data.series_name);
             $('#text_select_position').val(positionCategory).trigger('change');
             $('#select_section').val(data.section_category).trigger('change');
@@ -1713,6 +1811,14 @@
                 [productLine],
                 2,
                 editSelectionsMap2
+            );
+            const ProductArea = '#text_operator_product_area';
+            let editSelectionsMapProductionArea = {};
+            editSelectionsMapProductionArea[ProductArea] = response.rawProductionAreaCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [ProductArea],
+                32,
+                editSelectionsMapProductionArea
             );
             // ==== QC Reason Certification
             const textCertificationOperator = '#text_certification_operator';
