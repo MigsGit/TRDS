@@ -159,7 +159,7 @@
                                         <option value="Inspector">Inspector</option>
                                         <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
-                                        {{-- <option value="MH">MH</option> --}}
+                                        <option value="MH">MH</option>
                                     </select>
                                 </div>
                             </div>

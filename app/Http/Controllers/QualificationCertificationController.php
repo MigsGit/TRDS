@@ -17,6 +17,7 @@ use App\Http\Requests\EQcValidationProcessRequest;
 use App\Http\Requests\MachineOperatorRequest;
 use App\Http\Requests\QcSlipRequest;
 use App\Http\Requests\SendEmailRequest;
+use App\Http\Requests\DoperoscRequest;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
 use App\Model\Qc\AMhTrainingOrientation;
@@ -142,6 +143,8 @@ class QualificationCertificationController extends Controller
             ->get(['day_number', 'trainer_emp_no', 'trainer_name', 'validation_date', 'validation_time', 'overall_result'])
             ->unique('day_number')
             ->keyBy('day_number');
+        
+            // return $trainerValidations;
 
         // Existing single Checkbox Trainer Validation for the ENTIRE matrix
         // (not per-day/per-row). Since the same values are broadcast to every
@@ -171,6 +174,8 @@ class QualificationCertificationController extends Controller
             $resultsByDay = $item->c_lqc_training_item_results->keyBy('day_number');
             $firstResult  = $item->c_lqc_training_item_results->first();
 
+            // return $resultsByDay;
+
             return [
                 'id'              => $item->id,
                 'item_name'       => $item->dropdown_masters_details,
@@ -184,6 +189,8 @@ class QualificationCertificationController extends Controller
                 'item_remark'     => $firstResult->item_remark ?? '',
             ];
         });
+
+        // return $data;
 
         return datatables()->of($data)
         ->editColumn('item_name', function ($row) {
@@ -223,6 +230,8 @@ class QualificationCertificationController extends Controller
         })
         ->addColumn('day_3', function ($row) {
             $day3Val = $row['day_3_result'] ?? '';
+            // return $row['day_3_result'];
+            // return 'qwe';
             return '<select class="form-control form-control-sm  text-center input-result"
                         data-item-id="' . $row['id'] . '"
                         data-day="3">
@@ -306,7 +315,7 @@ class QualificationCertificationController extends Controller
     public function saveQcLqcTrainingItemsByPosition(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');
-//    return $request->all();
+            //    return $request->all();
             $qcSlipsId            = $request->input('qc_slips_id');
             // $qcSlipsId            = 212;
             $position             = $request->input('position');
@@ -323,11 +332,9 @@ class QualificationCertificationController extends Controller
                     'selectPosition'  => $qcSlipDetails->position_category ?? null,
                     'approval_status' => $qcSlipDetails->approval_status ?? 'PB',
                 ];
-
                 if (in_array($params['selectPosition'], ['VisualOperator', 'PartsPrep', 'MachineOperator'], true)) {
                     // position-specific logic and status determination
                     $editableSlot = $this->parseApprovalStatus($params['approval_status']);
-
                     foreach ($matrixData as $row) {
                         foreach (($row['day_results'] ?? []) as $dayKey => $resultValue) {
                             if ($resultValue === null || $resultValue === '') {
@@ -339,6 +346,7 @@ class QualificationCertificationController extends Controller
                             $dayMatches  = $editableSlot !== null && ($editableSlot['day'] === null || $editableSlot['day'] === $dayNumber);
 
                             if (!$roleMatches || !$dayMatches) {
+                            // if (!$roleMatches) {
                                 $lockViolationMessage = 'This item is locked for editing at the current approval status.';
                                 return;
                             }
@@ -1278,8 +1286,8 @@ class QualificationCertificationController extends Controller
                 //Send to Approver Attention To | CC is exclude the FQCVVO TO QCAPP Last Approver
                 $collectTo = collect($arrTo)->map(function($rowEmpNo){
                      return [
-                        'email' => $rowEmpNo['email'],
-                        'fullName' => $rowEmpNo['fullName'],
+                        'email' => $rowEmpNo['email'] ?? '', // add ''
+                        'fullName' => $rowEmpNo['fullName'] ?? '', // add ''
                     ];
                 });
                 if($params['approval_status'] != 'FQCVVO'){
@@ -1288,8 +1296,8 @@ class QualificationCertificationController extends Controller
                     }
                     $collectCc = collect($arrCc)->map(function($rowEmpNo){
                         return [
-                            'email' => $rowEmpNo['email'],
-                            'fullName' => $rowEmpNo['fullName'],
+                            'email' => $rowEmpNo['email'] ?? '', // add ''
+                            'fullName' => $rowEmpNo['fullName'] ?? '', // add ''
                         ];
                     });
                     $cc = $collectCc->pluck('email')->join(',');
@@ -1320,8 +1328,8 @@ class QualificationCertificationController extends Controller
                 "created_by" => $rapidxEmpNo->name,
                 "system_name" => "rapidx_TRDS",
             ];
-            DB::commit();
-            $this->commonController->sendEmail($emailData);
+            // DB::commit();
+            // $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -2213,6 +2221,8 @@ class QualificationCertificationController extends Controller
                 'qc_slip_employees.system_one_hris_subcon',
             ]);
 
+            // return $data;
+
             // 2. Filter by access
             if (filled($selectAccess)) {
                 $selectedAccess = [];
@@ -2604,7 +2614,11 @@ class QualificationCertificationController extends Controller
         $engg = self::OPER_POSITION_DAY_STATUSES['Engineer'];
         $qc   = self::OPER_POSITION_DAY_STATUSES['QC'];
 
+        // return $qc;
+
         switch ($currentStatus) {
+
+        // return $currentStatus;
 
             // ==========================================
             // 1. CHECKBOX VALIDATION PHASE
@@ -2722,6 +2736,11 @@ class QualificationCertificationController extends Controller
                 $newStatus  = 'EOPERVISUAL';
                 $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
                 break;
+            //PartsPrep
+            case ($currentStatus === 'DOPEROSC' && $selectPosition === 'PartsPrep'):
+                $newStatus  = 'LQCHEADAPP';
+                $statusName = 'For Section Head Approval';
+                break;
             //MachineOperator
             case ($currentStatus === 'DOPEROSC' && $selectPosition != 'MachineOperator' && $isEopervisualRequired === 'YES'):
                 $newStatus  = 'EOPERVISUAL';
@@ -2736,7 +2755,7 @@ class QualificationCertificationController extends Controller
                 $statusName = 'For Section Head Approval';
                 break;
             default:
-                  $newStatus = 'N/A';
+                $newStatus = 'N/A';
                 $statusName = 'N/A';
                 break;
         }
@@ -2975,6 +2994,7 @@ class QualificationCertificationController extends Controller
                         'text'=> $rowMasterDetails['dropdown_masters_details'],
                     ];
             });
+            // return 'qwe';
             return response()->json(['is_success' => 'true', 'data' => $masterDetails]);
         } catch (Exception $e) {
             throw $e;
