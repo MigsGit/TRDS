@@ -87,8 +87,6 @@ class InspectorSkillChart implements WithMultipleSheets{
             })
             ->values();   
 
-            // $class = $availableSheets[$sheet];
-            // $class = TSF1[$sheet];
             $sheets[] = new TSF1($categories, $group, $sheet);
         }
 

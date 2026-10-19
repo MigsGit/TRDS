@@ -20,7 +20,7 @@ use App\Model\DropdownMaster;
 use App\Model\DropdownMasterDetails;
 
 use App\Model\Qc\QcSlipEmployee;
-use App\Model\Qc\QcSlip;
+use App\Model\QcSlip;
 
 use App\Model\ExamResult;
 use App\Model\ExamResultDetails;
