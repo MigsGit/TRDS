@@ -8,6 +8,8 @@
     $positionOptions = [
         ['value' => '', 'label' => 'Select Position', 'disabled' => true, 'selected' => true],
         ['value' => 'ALL', 'label' => 'Display All'],
+        ['value' => 'VisualOperator', 'label' => 'Visual Operator'],
+        ['value' => 'PartsPrep', 'label' => 'Parts Prep / Assembly / Packing'],
         ['value' => 'Operator', 'label' => 'Operator'],
         ['value' => 'VisualOperator', 'label' => 'Visual Operator'],
         ['value' => 'PartsPrep', 'label' => 'Parts Prep'],
