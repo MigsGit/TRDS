@@ -41,7 +41,7 @@
                                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                                         <div class="mb-2 mb-md-0">
                                             <p class="text-uppercase text-muted small mb-1">Certification workspace</p>
-                                            <h5 class="card-title mb-0 text-secondary">Certification / Validation ssss</h5>
+                                            <h5 class="card-title mb-0 text-secondary">Certification / Validation</h5>
                                         </div>
                                         <button type="button" id="btnCreateCQForm" class="btn btn-primary" data-toggle="modal" data-target="#modalCreateCQForm"><i class="fa fa-plus fa-md mr-2"></i>Certify Employee</button>
                                     </div>
@@ -104,10 +104,11 @@
                                                                 <th>Status</th>
                                                                 <th>Ctrl No. / Doc No.</th>
                                                                 <th>Series Name</th>
-                                                                <th>Created by</th>
+                                                                <th>Production Section</th>
+                                                                <th>Production Line</th>
                                                                 <th>Section</th>
                                                                 <th>Position</th>
-                                                                <th>Date Filed</th>
+                                                                {{-- <th>Date Filed</th> --}}
                                                                 <th class='d-none'>Emp Name</th>
                                                                 <!-- <th>Qualified by</th> -->
                                                                 {{-- <th>Certified by</th> --}}
@@ -189,12 +190,12 @@
 
                                     <div class="col-md-4">
                                         <label for="" id="seriesDesignation">Series Name:</label>
-                                        <input class="form-control" type="text" id="text_series_operator" name="text_series_operator" placeholder="Enter series name here">
+                                        <input class="form-control" type="text" id="text_series_operator" name="text_series_operator" placeholder="Enter here">
                                     </div>
 
                                     <div class="col-md-4" id="productArea">
                                         <label for="">Product Area:</label>
-                                         <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_area">
+                                         <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_area" id="text_operator_product_area">
                                         </select>
                                     </div>
                                       <div class="col-md-4" id="dateOfTransfer">
@@ -369,10 +370,12 @@
                 { "data" : "rawStatus", orderable:false, searchable:false },
                 { "data" : "control_no" },
                 { "data" : "series_name" },
-                { "data" : "created_by" },
-                { "data" : "section_category" },
-                { "data" : "position_category" },
-                { "data" : "created_at" },
+                { "data" : "get_production_area" },
+                { "data" : "get_product_line" },
+                // { "data" : "created_by" },
+                // { "data" : "created_by" },
+                { "data" : "section" },
+     
                 { "data" : "employee_names",
                     visible: false,    // Hides column from display
                     searchable: true   // Keeps column indexed for searching
