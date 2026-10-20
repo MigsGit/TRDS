@@ -54,11 +54,12 @@ class EmployeeSkillCard implements WithMultipleSheets
                 '=',
                 'production_area_dm_details.id'
             )
-            //ongoing checking for connection
+            //connectiont to target rating settings
             ->join('target_rating_settings as target_ratings', function ($join) {
                 $join->on('qc_slips.section_category', '=', 'target_ratings.section')
                     ->on('qc_slips.position_category', '=', 'target_ratings.position')
                     ->on('qc_slips.production_area', '=', 'target_ratings.product_area')
+                    ->where('target_ratings.status', '=', 1)
                     ->whereRaw(
                         "CONCAT(',', REPLACE(target_ratings.product_line, ' ', ''), ',')
                         REGEXP CONCAT(',(', REPLACE(qc_slips.product_line, ' ', ''), '),')"
@@ -67,7 +68,29 @@ class EmployeeSkillCard implements WithMultipleSheets
                     //     "FIND_IN_SET(qc_slips.product_line, REPLACE(target_ratings.product_line, ' ', '')) > 0"
                     // );
             })
-            ->join('target_rating_details as rating_details', 'target_ratings.id', '=', 'rating_details.target_rating_id')
+            ->join('dropdown_master_details as target_product_line_dm_details', function ($join){
+                $join->whereRaw(
+                        "FIND_IN_SET(
+                            target_product_line_dm_details.id,
+                            REPLACE(target_ratings.product_line, ' ', '')
+                        ) > 0"
+                    );
+                // ->on('target_ratings.status', '=', DB::raw('1'))
+                //         ->whereRaw(
+                //             "FIND_IN_SET(target_product_line_dm_details.dropdown_masters_id, REPLACE(target_ratings.product_line, ' ', '')) > 0"
+                //         );
+            })
+            ->join('target_rating_details as target_details', 'target_ratings.id', '=', 'target_details.target_rating_id')
+
+            //connectiont to rating description settings
+            ->join('rating_description_settings as rating_descriptions', function ($join) {
+                $join->on('qc_slips.position_category', '=', 'rating_descriptions.position')
+                    ->where('rating_descriptions.status', '=', 1)
+                    ->whereRaw(
+                        "FIND_IN_SET(qc_slip_employees.station_to, REPLACE(rating_descriptions.designation, ' ', '')) > 0"
+                    );
+            })
+            ->join('rating_details as rating_description_details', 'rating_descriptions.id', '=', 'rating_description_details.rating_description_id')
 
             ->where('qc_slip_employees.employee_no', $this->employeeNo) //for specific employee number
             ->whereNull('qc_slip_employees.deleted_at')
@@ -84,8 +107,13 @@ class EmployeeSkillCard implements WithMultipleSheets
                 'station_dm_details.dropdown_masters_details as station_to_name',
                 'product_line_dm_details.dropdown_masters_details as product_line_name',
                 'production_area_dm_details.dropdown_masters_details as production_area_name',
-                'rating_details.target_name as target_rating_name',
-                'rating_details.rating as target_rating_value',
+                'target_product_line_dm_details.id as target_product_line_id',
+                'target_product_line_dm_details.dropdown_masters_details as target_product_line_name',
+                'target_ratings.product_line as target_product_line',
+                'target_details.target_name as target_rating_name',
+                'target_details.rating as target_rating_value',
+                'rating_description_details.level as target_rating_level',
+                'rating_description_details.description as target_rating_description',
             )
             ->get();
 
@@ -129,6 +157,16 @@ class EmployeeSkillCard implements WithMultipleSheets
                     'date_of_transfer' => $first->date_of_transfer,
                     'validity_period' => $first->date_of_transfer ? date('Y-m-d', strtotime('+6 months', strtotime($first->date_of_transfer))) : null,
 
+                    'target_rating_product_lines' => $records
+                    ->map(function ($record) {
+                        return [
+                            'target_product_line' => $record->target_product_line_id,
+                            'target_product_line_name' => $record->target_product_line_name,
+                        ];
+                    })
+                    ->unique('target_product_line')
+                    ->values(),
+
                     'target_ratings' => $records
                         ->map(function ($record) {
                             return [
@@ -137,6 +175,20 @@ class EmployeeSkillCard implements WithMultipleSheets
                             ];
                         })
                         ->unique('target_rating_name')
+                        ->values(),
+
+                    'target_rating_description' => $records
+                        ->map(function ($record) {
+                            return [
+                                'target_rating_level' => $record->target_rating_level ? $record->target_rating_level : null,
+                                'target_rating_description' => $record->target_rating_description ? $record->target_rating_description : null,
+                            ];
+                        })
+                        ->filter(function ($item) {
+                            return $item['target_rating_level'] !== null;
+                        })
+                        ->sortBy('target_rating_level')
+                        ->unique('target_rating_level')
                         ->values(),
 
                     'production_area' => $records
@@ -177,6 +229,33 @@ class EmployeeSkillCard implements WithMultipleSheets
                         })
                         ->unique('series_name')
                         ->values(),
+
+                    'actual_ratings' => $records
+                    ->groupBy('station_to')
+                    ->map(function ($stationGroup) {
+                        $first = $stationGroup->first();
+
+                        // distinct series for this station across ALL product lines
+                        $seriesCount = $stationGroup->pluck('series_name')
+                            ->filter()
+                            ->unique()
+                            ->count(); // 2
+
+                        // one row per product line, each carrying the station's series count
+                        return $stationGroup
+                            ->unique('product_line')
+                            ->map(function ($record) use ($first, $seriesCount) {
+                                return [
+                                    'product_line'               => $record->product_line,
+                                    'product_line_name'          => $record->product_line_name,
+                                    'functional_competency'      => $first->station_to,
+                                    'functional_competency_name' => $first->station_to_name,
+                                    'actual_rating'              => $seriesCount,
+                                ];
+                            });
+                    })
+                    ->flatten(1)
+                    ->values(),
                 ];
             })
             ->values();
@@ -199,6 +278,7 @@ class EmployeeSkillCard implements WithMultipleSheets
             $row['validity_period'],
 
             $row['target_ratings'],
+            $row['target_rating_description'],
 
             // Combine multiple stations into one Excel cell
             collect($row['stations'])
@@ -217,7 +297,7 @@ class EmployeeSkillCard implements WithMultipleSheets
     }
 
     public function sheets(): array{
-        dd($this->grouped);
+        // dd($this->grouped);
 
         $sheets = [];
 
