@@ -67,7 +67,9 @@
                     </div>
                     <div class="col-md-6">
                         <label for="">Remarks:</label>
-                        <input type="text" class="form-control" id="text_oper_remarks" name="text_oper_remarks" placeholder="Enter Remarks">
+                        {{-- <input type="text" class="form-control" id="text_oper_remarks" name="text_oper_remarks" placeholder="Enter Remarks"> --}}
+                        <select type="text" class="form-control select2bs4" id="text_oper_remarks" name="text_oper_remarks" placeholder="Enter Remarks">
+                        </select>
                     </div>
                 </div>
                 <button type="button" class="btn btn-primary btnAddOPEREmp" id="btnAddOPEREmp"><i class="fa-solid fa-plus"></i> Add to Table</button>

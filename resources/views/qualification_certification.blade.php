@@ -130,6 +130,33 @@
                 </div>
             </div>
         </section>
+        <!-- EDIT APPROVER MODAL -->
+    <div class="modal fade" id="modalEditOpApprover" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="editOpApproverLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editOpApproverLabel">Edit Approver</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="formEditOpApprover" autocomplete="off">
+                    <div class="modal-body">
+                        <input type="hidden" id="edit_op_approver_qc_slips_id" name="qc_slips_id">
+                        <div class="form-group">
+                            <label for="edit_alert_prod_sec">Attention To:</label>
+                            <select class="form-control select2bs4" style="width: 100%;" id="edit_alert_prod_sec" name="alert_prod_sec[]" multiple></select>
+                            <span class="text-danger small" data-error-for="alert_prod_sec"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success btn-sm" id="btnSaveOpApprover">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
         <!-- CREATE MODAL -->
     <div class="modal fade" id="modalCreateCQForm" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="createCQFormLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
@@ -529,6 +556,59 @@
                 qcSlipsId: qcSlipsId,
             };
             getQcSlipsById(params);
+        });
+        $(table.operator).on('click', '#btnEditSecHeadSlipsId','tr',function (e) {
+            e.preventDefault();
+            let qcSlipsId = $(this).attr('qc-slips-id');
+            let params = {
+                qcSlipsId: qcSlipsId,
+            };
+            $('#edit_op_approver_qc_slips_id').val(qcSlipsId);
+            $('#formEditOpApprover [data-error-for]').text('');
+            $.ajax({
+                url: "{{ route('load_op_approver') }}",
+                method: 'GET',
+                dataType: 'json',
+                data: { qc_slips_id: qcSlipsId },
+                success: function (response) {
+                    getSystemOneEmployeeDetails($('#edit_alert_prod_sec'), response.data.alert_prod_sec);
+                    $('#modalEditOpApprover').modal('show');
+                },
+                error: function (xhr) {
+                    let message = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Failed to load approver.';
+                    Swal.fire({ icon: 'error', title: 'Error', text: message });
+                }
+            });
+        });
+        $(document).on('submit', '#formEditOpApprover', function (e) {
+            e.preventDefault();
+            $('#formEditOpApprover [data-error-for]').text('');
+            $('#btnSaveOpApprover').prop('disabled', true);
+            $.ajax({
+                url: "{{ route('update_op_approver') }}",
+                method: 'POST',
+                dataType: 'json',
+                data: $(this).serialize() + '&_token={{ csrf_token() }}',
+                success: function (response) {
+                    Swal.fire({ icon: 'success', title: 'Success', text: response.message });
+                    $('#modalEditOpApprover').modal('hide');
+                    dataTable.operator.draw(false);
+                },
+                error: function (xhr) {
+                    if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                        $.each(xhr.responseJSON.errors, function (field, messages) {
+                            let key = field.split('.')[0];
+                            $('#formEditOpApprover [data-error-for="' + key + '"]').text(messages[0]);
+                        });
+                        return;
+                    }
+                    let message = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Failed to update approver.';
+                    Swal.fire({ icon: 'error', title: 'Error', text: message });
+                },
+                complete: function () {
+                    $('#btnSaveOpApprover').prop('disabled', false);
+                }
+            });
         });
         $(document).on('change', '#text_certification_operator',function (e) {
             e.preventDefault();
