@@ -526,6 +526,16 @@
             };
             getQcSlipsById(params);
         });
+        $(table.operator).on('click', '#btnEditSecHeadSlipsId','tr',function (e) {
+            e.preventDefault();
+            let qcSlipsId = $(this).attr('qc-slips-id');
+            let params = {
+                qcSlipsId: qcSlipsId,
+            };
+            //nmodify
+            
+            // getQcSlipsById(params);
+        });
         $(document).on('change', '#text_certification_operator',function (e) {
             e.preventDefault();
             // 1. Grab the value (fallback to empty string if null/undefined)
