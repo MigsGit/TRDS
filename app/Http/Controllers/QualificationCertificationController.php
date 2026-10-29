@@ -17,6 +17,7 @@ use App\Http\Requests\EQcValidationProcessRequest;
 use App\Http\Requests\MachineOperatorRequest;
 use App\Http\Requests\QcSlipRequest;
 use App\Http\Requests\SendEmailRequest;
+use App\Http\Requests\UpdateOpApproverRequest;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
 use App\Model\Qc\AMhTrainingOrientation;
@@ -64,6 +65,67 @@ class QualificationCertificationController extends Controller
             return $default;
         }
         return collect((array) $value)->filter()->join($separator);
+    }
+
+    /**
+     * Load the pending op_approver (alert_prod_sec) of a QC slip for the Edit Approver modal.
+     */
+    public function loadOpApprover(Request $request){
+        try {
+            $opApprover = OpApprover::where('qc_slips_id', $this->getSafe($request, 'qc_slips_id'))
+                ->where('approval_status', 'LQCHEADAPP')
+                ->first();
+
+            if (!$opApprover) {
+                return response()->json(['success' => false, 'message' => 'No pending approver found for this slip.'], 404);
+            }
+
+            $empNos = array_values(array_filter(array_map('trim', explode('|', (string) $opApprover->alert_prod_sec))));
+            $names = SystemOneHrisSubcon::whereIn('EmpNo', $empNos)->pluck('empname', 'EmpNo');
+
+            $alertProdSec = [];
+            foreach ($empNos as $empNo) {
+                $alertProdSec[] = ['id' => $empNo, 'text' => trim($names[$empNo] ?? $empNo)];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data'    => [
+                    'qc_slips_id'    => $opApprover->qc_slips_id,
+                    'alert_prod_sec' => $alertProdSec,
+                ],
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to load approver.'], 500);
+        }
+    }
+
+    /**
+     * Update alert_prod_sec of the pending op_approver of a QC slip.
+     */
+    public function updateOpApprover(UpdateOpApproverRequest $request){
+        try {
+            $validated = $request->validated();
+            DB::beginTransaction();
+            $opApprover = OpApprover::where('qc_slips_id', $validated['qc_slips_id'])
+                ->where('approval_status', 'LQCHEADAPP')
+                ->first();
+
+            if (!$opApprover) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'No pending approver found for this slip.'], 404);
+            }
+
+            $opApprover->update([
+                'alert_prod_sec' => implode(' | ', array_filter(array_map('trim', $validated['alert_prod_sec']))),
+            ]);
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Approver updated successfully.']);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Failed to update approver.'], 500);
+        }
     }
 
     public function saveQcLqcTrainingItemsByQcSlipId(Request $request){
@@ -445,7 +507,7 @@ class QualificationCertificationController extends Controller
                     'position_category' =>  $select_position,
                     'section' =>  $select_section_production,
                     'date_of_transfer' =>  $text_date_of_transfer,
-                    'series_name' =>  $this->getSafe($request, 'text_series_operator'),
+                    'series_name' =>  strtoupper($this->getSafe($request, 'text_series_operator')),
                     'product_line' =>  $this->joinSafe($request, 'text_operator_product_line'),
                     'production_area' =>  $this->joinSafe($request, 'text_operator_product_area'),
                     'created_by' =>  $rapidxEmpNo->rapidx_emp_no,
