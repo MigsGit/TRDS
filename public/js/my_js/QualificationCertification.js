@@ -681,7 +681,7 @@
             }
             initTrainingItemsTable('#tblTrainingItems_sep');
             $('#divSupervisor').removeClass('d-none');
-            if(approvalStatus === 'SEPHEADAPP'){
+            if(approvalStatus === 'LQCHEADAPP'){
                 $('.saveSep').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
             }
@@ -1643,7 +1643,7 @@
         let response = params.response;
         const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
         const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
-        const sepheadapp = response?.approversCollection?.SEPHEADAPP?.[0] ?? null;
+        const sepheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
 
 
         const aseptoToFirst     = asepto?.first_approver_exploded   ?? [];
@@ -1885,15 +1885,17 @@
                 });
 
             }
+            // alert(positionCategory)
             if(positionCategory === 'Supervisor'){
                 const sepTrainingOrientation = data.a_sep_training_orientation?.sep_training_orientation;
+                
                 syncCheckboxesWithDb('text_sep_training_orientation', sepTrainingOrientation,form.formSubmitSep);
                 const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
                 form.formSubmitSep.find('#text_a_sep_date').val(asepto?.first_date ?? '');
 
                 const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
                 form.formSubmitSep.find('#text_sep_date').val(btechengc?.first_date ?? '');
-                form.formSubmitSep.find('#text_sep_theoretical_result').val(btechengc?.first_status ?? '');
+                form.formSubmitSep.find('#text_sep_theoretical_result').val(btechengc?.first_status ?? '').trigger('change');
                 form.formSubmitSep.find('#text_sep_handson_result').val(btechengc?.first_status_2 ?? '');
 
 

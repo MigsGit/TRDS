@@ -11,7 +11,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>TRDSv2</h1>
+                    <h1>TRDSv2.1</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -50,7 +50,7 @@
                             {{-- <button type="button" class="btn btn-success" id="btnAddDropdownType">
                                 <i class="fas fa-plus mr-1"></i> Add Dropdown Type
                             </button> --}}
-                            
+
                         </div>
                     </div>
                 </div>
@@ -219,9 +219,9 @@
                 ],
                 "columnDefs": [
                     {"className": "dt-center", "targets": "_all"},
-                   
+
                 ],
-              
+
             });//end of dataTable
         }
 
@@ -312,7 +312,7 @@
             // 1. Check if the Optgroup (Category) label matches the search term
             if (data.children && data.children.length > 0) {
                 let categoryName = data.text.toLowerCase();
-                
+
                 if (categoryName.indexOf(searchTerm) > -1) {
                     // Category matches! Return the optgroup with ALL its children intact
                     return data;
@@ -372,7 +372,7 @@
                     if(xhr.status == 422){
                         handleValidatorErrors(xhr.responseJSON.errors);
                         toastr.error(xhr.responseJSON.message);
-                    } 
+                    }
                 },
                 complete: function () {
                     $('#btnSaveDropdownType').prop('disabled', false);
@@ -412,7 +412,7 @@
                     $('#dropdownItemParentType').val(response.dropdown_master.dropdown_masters);
                     $('#dropdownItemParentTypeId').val(response.dropdown_masters_id);
                     $('#dropdownItemName').val(response.dropdown_masters_details);
-                    
+
 
                     $('#modalDropdownItemLabel').html('<i class="fas fa-edit text-primary mr-2"></i> Edit Dropdown Item');
                     $('#modalDropdownItem').modal('show');
@@ -448,7 +448,7 @@
                     if(xhr.status == 403){
                         toastr.error('Super Admin or Admin privileges, along with specific module access, are required.', 'Access Denied');
                         return;
-                    } 
+                    }
 
                     toastr.error('Failed to save dropdown item.');
 

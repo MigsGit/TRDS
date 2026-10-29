@@ -45,7 +45,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>TRDSv2</h1>
+                    <h1>TRDS v2.1</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -194,7 +194,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
 
                     <!-- Section 2: Logistics & Instruction -->
                     <div class="section-divider mt-3">
@@ -259,7 +259,7 @@
                         </div>
                     </div>
 
-                  
+
                     <!-- Section 3: Trainees -->
                     <div class="section-divider mt-3">
                         <i class="fas fa-users text-primary mr-2"></i> Trainees
@@ -457,7 +457,7 @@
                 fixedHeader: true,
                 "columns":[
                     { "data" : "action","title": "Action", orderable:false, searchable:false },
-                    { "data" : "id", "title": "Date", 
+                    { "data" : "id", "title": "Date",
                         render: function(data, type, row) {
                             return row.start_date + ' - ' + row.end_date;
                         }
@@ -488,7 +488,7 @@
                 ],
                 "columnDefs": [
                     {"className": "dt-center", "targets": "_all"},
-                    
+
                 ],
             });//end of dataTable
 
@@ -507,7 +507,7 @@
                     { "data": "qcSlipSeries" },
                 ],
             });
-            
+
 
             $('#btnAddTraining').on('click', function() {
                 $('#modalTrainingRecordTitle').text('Add Training Record');
@@ -550,7 +550,7 @@
                 traineeArray.forEach(item => {
                     data.append("trainee[]", JSON.stringify(item));
                 });
-                
+
                 saveTrainingRecord(data);
             });
 

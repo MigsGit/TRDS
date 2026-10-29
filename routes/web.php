@@ -328,12 +328,14 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/export_skill_map_pdf', 'exportSkillMapPdf')->name('export_skill_map_pdf');
         Route::post('/export_skill_map_excel', 'exportSkillMapExcel')->name('export_skill_map_excel');
         Route::post('/export_skill_map_excel_per_product_line', 'exportSkillMapExcelPerProductLine')->name('export_skill_map_excel_per_product_line');
+        // Route::post('/export_skill_map_excel_per_product_line_test', 'exportSkillMapExcelPerProductLineTest')->name('export_skill_map_excel_per_product_line_test');
         // Route::get('/test-pdf', function () {
         //     dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
         // });
         Route::get('/get_product_line', 'getProductLine')->name('get_product_line');
         Route::get('/get_employee_position', 'getEmployeePosition')->name('get_employee_position');
         Route::get('/get_employees_for_skill_map', 'getEmployeesForSkillMap')->name('get_employees_for_skill_map');
+        Route::get('/get_employees_for_skill_matrix', 'getEmployeesForSkillMatrix')->name('get_employees_for_skill_matrix');
 
     Route::controller(DisqualificationController::class)->group(function () {
         Route::get('/view_disqualification', 'viewDisqualificationInfo')->name('view_disqualification');
@@ -360,8 +362,8 @@ Route::middleware('checkSession')->group(function(){
         Route::post('/add_target_ratings', 'addTargetRatingInfo')->name('add_target_ratings');
         Route::get('/get_target_rating_by_id', 'getTargetRatingById')->name('get_target_rating_by_id');
         Route::post('/update_status', 'updateTargetRatingStatus')->name('update_status');
-        // Route::get('/get_process_stations', 'getProcessStations')->name('get_process_stations');
-        // Route::get('/get_process_count_per_category', 'getProcessCountPerCategory')->name('get_process_count_per_category');
+        Route::get('/get_process_stations', 'getProcessStations')->name('get_process_stations');
+        Route::get('/get_process_count_per_category', 'getProcessCountPerCategory')->name('get_process_count_per_category');
         Route::get('/get_product_line_fr_master', 'getProductLineFrMaster')->name('get_product_line_fr_master');
         Route::get('/get_product_area_fr_master', 'getProductAreaFrMaster')->name('get_product_area_fr_master');
     });

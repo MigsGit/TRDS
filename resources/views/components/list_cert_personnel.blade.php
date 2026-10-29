@@ -9,12 +9,12 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-12">
+                    {{-- <div class="col-12">
                         <div class="form-group">
                             <label>Position:</label>
                             <select class="form-control select2bs4" id="selCertPersonnelPosition"></select>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="col-12">
                         <div class="form-group">
                             <label>Section:</label>
@@ -27,7 +27,7 @@
                             <select class="form-control select2bs4" id="selCertPersonnelProductLine"></select>
                         </div>
                     </div>
-                     <div class="col-12">
+                    <div class="col-12">
                         <div class="form-group mb-2">
                             <label>Series:</label>
                             <select class="form-control select2bs4" id="selCertPersonnelSeries" multiple></select>

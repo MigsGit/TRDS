@@ -59,3 +59,76 @@ const UpdateExportButton = () => {
             .removeClass('d-none');
     }
 };
+
+function selectEmpNo(cboElement, empId = null, mode = null){
+    let result = '<option value="" disabled selected> Select One </option>';
+    $.ajax({
+        method: "get",
+        url: "get_emp_no_dropdown_details",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value="" disabled selected>--Loading--</option>';
+        },
+        success: function (response) {
+            if(response.length > 0){
+                    result = '<option value="" disabled selected> Select Employee No </option>';
+
+                for (let di = 0; di < response.length; di++) {
+                    result += '<option value="' + response[di]['EmpNo'] + '" >' + response[di]['EmpName'] + '</option>';
+                            }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+            cboElement.html(result);
+            if(empId != null){
+                cboElement.val(empId).trigger('change');
+            }
+
+            if(mode == 'view'){
+                cboElement.prop('disabled', true).trigger('change.select2');
+            }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}
+
+function selectEmpDetailsFromCertification(cboElement, empId = null, mode = null){
+    let result = '<option value="" disabled selected> Select One </option>';
+    $.ajax({
+        method: "get",
+        url: "get_emp_details_from_certification",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value="" disabled selected>--Loading--</option>';
+        },
+        success: function (response) {
+            if(response.length > 0){
+                    result = '<option value="" disabled selected> Select Employee Name </option>';
+
+                for (let i = 0; i < response.length; i++) {
+                    result += '<option value="' + response[i]['employee_no'] + '" ';
+                    result += '>' + response[i]['employee_name'] + '</option> ';
+                }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+            cboElement.html(result);
+            // if(empId != null){
+            //     cboElement.val(empId).trigger('change');
+            // }
+
+            // if(mode == 'view'){
+            //     cboElement.prop('disabled', true).trigger('change.select2');
+            // }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}

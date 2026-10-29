@@ -291,6 +291,7 @@
             formSubmitTech: $('#formSubmit_Tech'),
             formSubmitSep: $('#formSubmit_SEP'),
             formSubmitOper: $('#formSubmitOper'),
+            // formSubmitAllOperators: $('#formSubmitAllOperators'),
             formSubmitMh: $('#formSubmit_MH'),
             formSubmitInspector: $('#formSubmit_Ins'),
             formSubmitOperators: $('#formSubmitOperators'),
@@ -649,8 +650,8 @@
                     // $('#divTechnician').removeClass('d-none');
                     break;
                case 'Supervisor':
-                    saveSupervisor();
-                    // saveFormOper();
+                    // saveSupervisor();
+                    saveFormOper(form.formSubmitSep);
                     break;
                 case 'Engineer':
                 // case 'Planner':
@@ -685,7 +686,6 @@
         $(document).on('submit', '#formSubmit_SEP', function (e) {
             e.preventDefault();
             var $form = $(this);
-
             // saveFormOper($form);
             $('#modalSendEmail').modal();
         });

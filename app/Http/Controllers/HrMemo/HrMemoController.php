@@ -255,6 +255,7 @@ class HrMemoController extends Controller
             SELECT
                 pkid,
                 EmpNo,
+                CONCAT(LastName, ' ', FirstName) AS EmpName,
                 1 AS emp_type
             FROM tbl_EmployeeInfo
             WHERE EmpStatus = 1
@@ -264,6 +265,7 @@ class HrMemoController extends Controller
             SELECT
                 pkid,
                 EmpNo,
+                CONCAT(LastName, ' ', FirstName) AS EmpName,
                 2 AS emp_type
             FROM tbl_EmployeeInfo
             WHERE EmpStatus = 1
@@ -765,8 +767,10 @@ class HrMemoController extends Controller
 
     public function exportEmployeeSkillCard(Request $request)
     {
-        $employeeNo = 'P082';
+        // return 'test';
+        // $employeeNo = 'P082';
 
+        $employeeNo = $request->input('employee_id');
         return Excel::download(
             new EmployeeSkillCard(
                 $employeeNo

@@ -8,20 +8,22 @@ use App\Http\Controllers\CommonController;
 use App\Http\Requests\ALqcTrainingQualificationRequest;
 use App\Http\Requests\AMhTrainingOrientationRequest;
 use App\Http\Requests\AOperProdTrainingOrientationRequest;
+use App\Http\Requests\ASepTrainingOrientationRequest;
 use App\Http\Requests\BLqcCertificationRequest;
 use App\Http\Requests\BOpEnggSectionTrainingOrientationRequest;
 use App\Http\Requests\CQcCertificationRequest;
+use App\Http\Requests\DoperoscRequest;
 use App\Http\Requests\DPpdCertificationCompletionRequest;
 use App\Http\Requests\EEngValidationProcessRequest;
 use App\Http\Requests\EQcValidationProcessRequest;
 use App\Http\Requests\MachineOperatorRequest;
 use App\Http\Requests\QcSlipRequest;
 use App\Http\Requests\SendEmailRequest;
-use App\Http\Requests\DoperoscRequest;
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
 use App\Model\Qc\AMhTrainingOrientation;
 use App\Model\Qc\AOperProdTrainingOrientation;
+use App\Model\Qc\ASepTrainingOrientation;
 use App\Model\Qc\ATechEngTrainingQualification;
 use App\Model\Qc\BLqcCertification;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
@@ -1427,6 +1429,8 @@ class QualificationCertificationController extends Controller
                 'a_tech_eng_training_qualification',
                 //MH
                 'a_mh_training_orientation',
+                //SUPV
+                'a_sep_training_orientation'
             ];
             $qcSlip = QcSlip::with($arrRelation)
             ->where('id',$request->qcSlipsId)
@@ -2631,8 +2635,7 @@ class QualificationCertificationController extends Controller
                 case ($params['approval_status'] === 'PB'):
                     $newStatus = 'CLQCOQC';
                     $statusName = 'C Inspector Training Certification And Validation';
-                    break;
-                case ($params['approval_status'] === 'CSEPHEAD'):
+                case ($params['approval_status'] === 'CLQCOQC'):
                     $newStatus = 'LQCHEADAPP';
                     $statusName = 'For Section Head Approval';
                     break;

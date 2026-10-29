@@ -67,7 +67,7 @@ const GetEmployeeExamResultById = (examResultDetailsId) => {
                 if(q.image && q.image.trim() !== ''){
                     html += `<div class="text-center mb-2">
                                 <img src="${protocol}//${hostname}/${firstSegment}/storage/app/public/questionnaire_attachment/${q.image}"
-                                    style="max-width:200px; cursor:pointer;"
+                                    style="max-width:555px; cursor:pointer;"
                                     data-toggle="modal" data-target="#imageModal" class="previewImage">
                             </div>`;
                 }

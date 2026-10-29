@@ -24,9 +24,11 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
         $this->position = $position;
     }
 
+   
+
     public function view(): View
     {
-        // dd($this->position);
+
         if($this->position == 'INSPECTOR') {
             // Custom logic for Inspector
             // dd($this->employees);
@@ -38,6 +40,27 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
             ]);
         }else if($this->position == 'OPERATOR') {
             return view('exports.skill_map_operator', [
+                'productLine'    => $this->productLine,
+                'employees'      => $this->employees,
+                'productStation' => $this->productStation,
+                'position'       => $this->position,
+            ]);
+        }else if($this->position == 'MACHINEOPERATOR') {
+            return view('exports.skill_map_machine_operator', [
+                'productLine'    => $this->productLine,
+                'employees'      => $this->employees,
+                'productStation' => $this->productStation,
+                'position'       => $this->position,
+            ]);
+        }else if($this->position == 'VISUALOPERATOR') {
+            return view('exports.skill_map_visual_operator', [
+                'productLine'    => $this->productLine,
+                'employees'      => $this->employees,
+                'productStation' => $this->productStation,
+                'position'       => $this->position,
+            ]);
+        }else if($this->position == 'PARTSPREP') {
+            return view('exports.skill_map_parts_prep', [
                 'productLine'    => $this->productLine,
                 'employees'      => $this->employees,
                 'productStation' => $this->productStation,
@@ -69,7 +92,7 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
                 6 => 'J',
             ];
 
-        } else {
+        } elseif ($this->position === 'OPERATOR' || $this->position === 'MACHINEOPERATOR' || $this->position === 'VISUALOPERATOR' || $this->position === 'PARTSPREP') {
 
             $stationColumns = [
                 1 => 'E',
@@ -83,6 +106,7 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
 
         foreach ($this->employees as $index => $employee) {
             // dd($employee);
+            // exit();
             // Employee starts at row 4
             $row = $index + 4;
 
@@ -139,6 +163,29 @@ class SkillMapExport implements FromView, WithDrawings, WithStyles
                 4 => 'I',
             ];
         } else if ($this->position === 'OPERATOR') {
+            $legendColumns = [
+                1 => 'A',
+                2 => 'C',
+                3 => 'E',
+                4 => 'G',
+            ];
+        }else if ($this->position === 'MACHINEOPERATOR') {
+            $legendColumns = [
+                1 => 'A',
+                2 => 'C',
+                3 => 'E',
+                4 => 'G',
+            ];
+        }
+        else if ($this->position === 'VISUALOPERATOR') {
+            $legendColumns = [
+                1 => 'A',
+                2 => 'C',
+                3 => 'E',
+                4 => 'G',
+            ];
+        }
+         else if ($this->position === 'PARTSPREP') {
             $legendColumns = [
                 1 => 'A',
                 2 => 'C',

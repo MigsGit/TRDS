@@ -141,6 +141,7 @@ $(document).ready(function() {
     });
 
     btnChooseFileToExport.on('click', function () {
+        // console.log('Choose Export Report button clicked');
         chooseExportReportModal.modal('show');
     });
 
@@ -177,16 +178,46 @@ $(document).ready(function() {
         );
 
     });
+    // Default: Per Employee Only
+    $('#toggleSkillMatrixPerProductLine').prop('checked', false);
+    modalGenerateSkillMatrixPerProductLine.on('show.bs.modal', function (e) {
+        // Toggle between export modes
+        getEmployeeSkillMatrix();
+        $(document).on('change', '#toggleSkillMatrixPerProductLine', function () {
 
-     modalGenerateSkillMatrixPerProductLine.on('show.bs.modal', function (e) {
-        getProductLine();
-        getEmployeePosition();
+            const isPerProductLine = $(this).is(':checked');
 
-        $('#selectedEmployeePerProductLine').html(
-            '<option value="" selected disabled>Please select Product Line and Position first</option>'
-        );
+            if (isPerProductLine) {
 
+                $('.productlineClass').show();
+
+                $('#lblSkillMatrixExportMode').text(
+                    'Per Product Line + Employee'
+                );
+
+                $('#selectedEmployeePerProductLine')
+                    .empty()
+                    .append(
+                        new Option('Please select Product Line first', '', true, true)
+                    )
+                    .trigger('change');
+
+                getProductLine();
+
+            } else {
+
+                $('.productlineClass').hide();
+
+                $('#lblSkillMatrixExportMode').text(
+                    'Per Employee Only'
+                );
+
+                getEmployeeSkillMatrix();
+            }
+        });
     });
+
+   
 
      function getDirectEmployeeInfo(empNo) {
         $.ajax({
@@ -308,6 +339,11 @@ $(document).ready(function() {
         });
     }
 
+    $('#selectedPerProductLine').on('change', function() {
+        const productLine = $(this).val();
+        getEmployeeSkillMatrix(productLine);
+    });
+
     // function getEmployeePosition(){
     //      $.ajax({
     //         url: 'get_employee_position',
@@ -359,106 +395,141 @@ $(document).ready(function() {
         });
     }
 
-    function getEmployee() {
+    function getEmployeeSkillMatrix(productLine = null) {
+        $.ajax({
+            url: 'get_employees_for_skill_matrix',
+            method: 'GET',
+            data: {
+                product_line: productLine
+            },
 
-    const productLine = $('#selectedProductLine').val();
-    const position = $('#selectPosition').val();
+            success: function (response) {
+                // console.log('rr', response)
 
-    const perProductLine = $('#selectedPerProductLine').val(); // ARRAY
-    const perPosition = $('#selectPositionPerProductLine').val();
+                let options = '';
 
-    let productLines = [];
-    let selectedPosition = null;
+                if (response.length === 0) {
 
-    // Normal Product Line
-    if (productLine && position) {
-
-        productLines = [productLine];
-        selectedPosition = position;
-
-    // Multiple Product Lines
-    } else if (perProductLine && perProductLine.length > 0 && perPosition) {
-
-        productLines = perProductLine;
-        selectedPosition = perPosition;
-
-    } else {
-
-        $('#selectEmployee')
-            .html(`
-                <option value="" selected disabled>
-                    Please select Product Line and Position first
-                </option>
-            `)
-            .trigger('change');
-
-        return;
-    }
-
-    $.ajax({
-        url: 'get_employees_for_skill_map',
-        method: 'GET',
-        data: {
-            product_line: productLines,
-            position: selectedPosition
-        },
-
-        success: function (response) {
-            console.log('rr', response)
-
-            let options = '';
-
-            if (response.length === 0) {
-
-                options = `
-                    <option value="" selected disabled>
-                        No employees found
-                    </option>
-                `;
-
-            } else {
-
-                options += `
-                    <option value="all">
-                        Select All Employees
-                    </option>
-                `;
-
-                $.each(response, function (index, employee) {
-                    options += `
-                        <option value="${employee.EmpNo}|${employee.EmpName}|${employee.dateHired}">
-                            ${employee.EmpNo} - ${employee.EmpName}
+                    options = `
+                        <option value="" selected disabled>
+                            No employees found
                         </option>
                     `;
 
-                });
+                } else {
+
+                    options += `
+                        <option value="all">
+                            Select All Employees
+                        </option>
+                    `;
+
+                    $.each(response, function (index, employee) {
+                        options += `
+                            <option value="${employee.EmpNo}|${employee.EmpName}|${employee.dateHired}|${employee.position}">
+                                ${employee.EmpNo} - ${employee.EmpName}
+                            </option>
+                        `;
+
+                    });
+                }
+
+                $('#selectEmployee, #selectedEmployeePerProductLine')
+                    .html(options)
+                    .trigger('change');
+            },
+
+            error: function (xhr, status, error) {
+                console.error('Error fetching employees:', error);
             }
+        });
+    }
 
-            $('#selectEmployee, #selectedEmployeePerProductLine')
-                .html(options)
-                .trigger('change');
-        },
+    function getEmployeesForSkillMap() {
 
-        error: function (xhr, status, error) {
-            console.error('Error fetching employees:', error);
-        }
-    });
-}
-
-    $('#selectedProductLine, #selectPosition, #selectedPerProductLine, #selectPositionPerProductLine').on('change', function () {
         const productLine = $('#selectedProductLine').val();
-        const perProductLine = $('#selectedPerProductLine').val();
+        const position = $('#selectPosition').val();
+
+        let productLines = [];
+        let selectedPosition = null;
+
+        // Normal Product Line
+        if (productLine && position) {
+
+            productLines = [productLine];
+            selectedPosition = position;
+
+        }  else {
+
+            $('#selectEmployee')
+                .html(`
+                    <option value="" selected disabled>
+                        Please select Product Line and Position first
+                    </option>
+                `)
+                .trigger('change');
+
+            return;
+        }
+
+        $.ajax({
+            url: 'get_employees_for_skill_map',
+            method: 'GET',
+            data: {
+                product_line: productLines,
+                position: selectedPosition
+            },
+
+            success: function (response) {
+                // console.log('response:', response);
+                let options = '';
+
+                if (response.length === 0) {
+                    console.log('No employees found');
+
+                    options = `
+                        <option value="" selected disabled>
+                            No employees found
+                        </option>
+                    `;
+
+                } else {
+                    console.log('Employees found:', response);
+                    options += `
+                        <option value="all">
+                            Select All Employees
+                        </option>
+                    `;
+
+                    $.each(response, function (index, employee) {
+                        options += `
+                            <option value="${employee.EmpNo}|${employee.EmpName}|${employee.dateHired}">
+                                ${employee.EmpNo} - ${employee.EmpName}
+                            </option>
+                        `;
+
+                    });
+                }
+
+                $('#selectedEmployees')
+                    .html(options)
+                    .trigger('change');
+            },
+
+            error: function (xhr, status, error) {
+                console.error('Error fetching employees:', error);
+            }
+        });
+    }
+
+    $('#selectedProductLine, #selectPosition').on('change', function () {
+        const productLine = $('#selectedProductLine').val();
 
         const position = $('#selectPosition').val();
-        const perPosition = $('#selectPositionPerProductLine').val();
 
         if (productLine && position) {
 
-            getEmployee(productLine, position);
-
-        } else if (perProductLine && perPosition) {
-
-            getEmployee(perProductLine, perPosition);
+            getEmployeesForSkillMap(productLine, position);
 
         } else {
 
@@ -576,7 +647,7 @@ $(document).ready(function() {
 
         let employees = [];
 
-        const selectedOptions = $('#selectEmployee option:selected');
+        const selectedOptions = $('#selectedEmployees option:selected');
 
         const selectAll = selectedOptions.filter(function () {
             return $(this).val() === 'all';
@@ -584,7 +655,7 @@ $(document).ready(function() {
 
         if (selectAll) {
 
-            $('#selectEmployee option').each(function () {
+            $('#selectedEmployees option').each(function () {
 
                 if ($(this).val() === 'all') {
                     return;
@@ -658,6 +729,8 @@ $(document).ready(function() {
         let employees = [];
 
         const selectedOptions = $('#selectedEmployeePerProductLine option:selected');
+        const toggleValue = $('#toggleSkillMatrixPerProductLine').is(':checked') ? 1 : 0;
+
 
         const selectAll = selectedOptions.filter(function () {
             return $(this).val() === 'all';
@@ -676,7 +749,9 @@ $(document).ready(function() {
                 employees.push({
                     empNo: details[0] || '',
                     empName: details[1] || '',
-                    dateHired: details[2] || ''
+                    dateHired: details[2] || '',
+                    position: details[3] || '',
+                    toggleValue: toggleValue
                 });
             });
 
@@ -689,7 +764,10 @@ $(document).ready(function() {
                 employees.push({
                     empNo: details[0] || '',
                     empName: details[1] || '',
-                    dateHired: details[2] || ''
+                    dateHired: details[2] || '',
+                    position: details[3] || '',
+                    toggleValue: toggleValue
+                    
                 });
             });
         }
