@@ -341,6 +341,98 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- ===================================================== -->
+                    <!-- PART 3: Results Monitoring -->
+                    <!-- ===================================================== -->
+
+                    <div class="card mb-3">
+                        <div class="card-header p-2">
+                            <button type="button" class="btn btn-link btn-block text-left" data-toggle="collapse" data-target="#collapsePart3" aria-expanded="false">
+                                <i class="fas fa-book-reader mr-2"></i>
+                                <strong>Part 3: Examination Result</strong>
+                                <i class="fa fa-chevron-down float-right"></i>
+                            </button>
+                        </div>
+
+                        <div id="collapsePart3" class="collapse show">
+                            <div class="card-body mx-5">
+                                <form method="post" id="formDisqualiPart3" enctype="multipart/form-data" autocomplete="off">
+                                    @csrf
+                                    <input type="hidden" name="part1_id" id="part1Id">
+                                    <input type="hidden" name="part2_id" id="part2Id">
+                                    <input type="hidden" name="part3_id" id="part3Id">
+
+                                    <div class="row mx-5 justify-content-between">
+                                        <!-- Disqualification Exam -->
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Disqualification Exam</label>
+                                                <select class="form-control select2bs5 selectDisqualiExam" name="disquali_exam" id="disqualiExam" required></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mx-5 justify-content-between">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>First Take</label>
+                                                <select class="form-control select2bs5" name="first_take_result" id="firstTakeResult" disabled>
+                                                    <option value="">Select First Take</option>
+                                                    <option value="1">Passed</option>
+                                                    <option value="0">Failed</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Second Take</label>
+                                                <select class="form-control select2bs5" name="second_take_result" id="secondTakeResult" disabled>
+                                                    <option value="">Select Second Take</option>
+                                                    <option value="1">Passed</option>
+                                                    <option value="0">Failed</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mx-5 justify-content-between">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>In-Charge (LQC Supv'r)</label>
+                                                <select class="form-control select2bs5 selectIncharged" name="first_take_incharged" id="firstTakeIncharged" disabled></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>In-Charge (LQC Supv'r)</label>
+                                                <select class="form-control select2bs5 selectIncharged" name="second_take_incharged" id="secondTakeIncharged" disabled></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mx-5 justify-content-between">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Date/Time</label>
+                                                <input type="datetime-local" class="form-control" name="first_take_date" id="firstTakeDate" disabled>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Date/Time</label>
+                                                <input type="datetime-local" class="form-control" name="second_take_date" id="secondTakeDate" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- MODAL FOOTER -->

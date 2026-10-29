@@ -18,11 +18,15 @@ class SkillMapExportPerProdLine implements FromView, WithStyles, WithDrawings
 {
     protected $productLines;
     protected $employees;
+    protected $position;
 
-    public function __construct($productLines, $employees)
+    public function __construct($productLines, $employees, $position)
     {
         $this->productLines = $productLines;
         $this->employees = $employees;
+        $this->position = $position;
+        // print_r($this->employees);
+        // exit();
     }
 
     public function view(): View
@@ -30,11 +34,14 @@ class SkillMapExportPerProdLine implements FromView, WithStyles, WithDrawings
         return view('exports.skill_map_per_prod_line', [
             'productLines' => $this->productLines,
             'employees'    => $this->employees,
+            'position'     => $this->position,
         ]);
     }
 
+    
     public function drawings()
 {
+    // $row = $index + 2;
     $drawings = [];
 
     /*
@@ -61,10 +68,82 @@ class SkillMapExportPerProdLine implements FromView, WithStyles, WithDrawings
             // Get skill level for this product line
            $level = $employee['productLines'][$productLineIndex] ?? 0;
 
-            if ($level < 0) {
+        //    print_r($level);
+        //    exit();
+
+            if (!in_array($level, [0, 1, 2, 3, 4, 5])) {
                 continue;
             }
+            // dd($position);
 
+            // if($this->position === 'INSPEOPCTOR') {
+            //     if ($level >= 1 && $level <= 12) {
+            //         $level = 1;
+            //     } elseif ($level >= 13 && $level <= 24) {
+            //         $level = 2;
+            //     } elseif ($level >= 25 && $level <= 36) {
+            //         $level = 3;
+            //     } elseif ($level >= 37 && $level <= 48) {
+            //         $level = 4;
+            //     }
+            // }
+            $level = (int) ($employee['productLines'][$productLineIndex] ?? 0);
+            $position = strtoupper(trim($employee['position'] ?? ''));
+
+            if ($position == 'OPERATOR') {
+                if ($level >= 1 && $level <= 12) {
+                    $level = 1;
+                } elseif ($level >= 13 && $level <= 24) {
+                    $level = 2;
+                } elseif ($level >= 25 && $level <= 36) {
+                    $level = 3;
+                } elseif ($level >= 37 && $level <= 48) {
+                    $level = 4;
+                } else {
+                    $level = 0;
+                }
+            } elseif ($position == 'INSPECTOR') {
+                if ($level >= 1 && $level <= 24) {
+                    $level = 1;
+                } elseif ($level >= 25 && $level <= 48) {
+                    $level = 2;
+                } elseif ($level >= 49 && $level <= 72) {
+                    $level = 3;
+                } elseif ($level >= 73 && $level <= 96) {
+                    $level = 4;
+                } else {
+                    $level = 0;
+                }
+            } elseif ($position == 'MATERIAL HANDLER') {
+                if ($level >= 1 && $level <= 24) {
+                    $level = 1;
+                } elseif ($level >= 25 && $level <= 48) {
+                    $level = 2;
+                } elseif ($level >= 49 && $level <= 72) {
+                    $level = 3;
+                } elseif ($level >= 73 && $level <= 96) {
+                    $level = 4;
+                } else {
+                    $level = 0;
+                }
+            }
+            elseif (str_contains($position, 'TECHNICIAN')) {
+                if ($level >= 1 && $level <= 24) {
+                    $level = 1;
+                } elseif ($level >= 25 && $level <= 48) {
+                    $level = 2;
+                } elseif ($level >= 49 && $level <= 72) {
+                    $level = 3;
+                } elseif ($level >= 73 && $level <= 96) {
+                    $level = 4;
+                } else {
+                    $level = 0;
+                }
+            }  
+            else {
+                $level = 0;
+            }
+            
             $image = public_path("images/level{$level}.png");
 
             if (!file_exists($image)) {
@@ -72,7 +151,6 @@ class SkillMapExportPerProdLine implements FromView, WithStyles, WithDrawings
             }
 
             $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
-
             $drawing->setName(
                 "Level {$level} - {$productLine}"
             );
@@ -352,7 +430,6 @@ class SkillMapExportPerProdLine implements FromView, WithStyles, WithDrawings
         | Freeze Header
         |--------------------------------------------------------------------------
         */
-
         $sheet->freezePane('A2');
 
         /*

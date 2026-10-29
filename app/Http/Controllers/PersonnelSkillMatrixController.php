@@ -332,18 +332,18 @@ class PersonnelSkillMatrixController extends Controller
 
     }
 
-    public function getEmployees(Request $request)
+    public function getEmployeesForSkillMap(Request $request)
     {
         $productLines = (array) $request->product_line;
         $position = $request->position;
-
-        // return $productLines;
-
+                    // return 'qwe';
+        // return $position;
        if ($position === 'Inspector') {
 
             $employees = QcSlipEmployee::with([
                 'system_one_hris_emp_info',
-                'system_one_subcon_emp_info'
+                'system_one_subcon_emp_info',
+                'system_one_hris_subcon'
             ])
             ->whereHas('qcSlip', function ($q) use ($productLines, $position) {
 
@@ -381,10 +381,49 @@ class PersonnelSkillMatrixController extends Controller
             return response()->json($employees);
         }
         else if($position === 'Operator') {
-            // Custom logic for Operator
+            $employees = QcSlipEmployee::with([
+                'system_one_hris_emp_info',
+                'system_one_subcon_emp_info',
+                // 'system_one_hris_subcon'
+            ])
+            ->whereHas('qcSlip', function ($q) use ($productLines, $position) {
+
+                $q->where('status', 'OK')
+                ->where('product_line', $productLines)
+                ->where(function ($subQuery) use ($position) {
+                    $subQuery->where('position_category', 'LIKE', "%{$position}%")
+                            ->orWhere('position_category', 'LIKE', '%Partsprep%');
+                });
+
+            })
+            ->get()
+            ->map(function ($employee) {
+
+                $emp = $employee->system_one_hris_emp_info
+                    ?? $employee->system_one_subcon_emp_info ?? $employee->system_one_hris_subcon;
+
+
+                return [
+                    'EmpNo'     => optional($emp)->EmpNo,
+                    'EmpName'   => optional($emp)->EmpName,
+                    'dateHired' => optional($emp)->DateHired,
+                    'test' => $emp,
+                ];
+            })
+            ->unique('EmpNo')
+            ->values();
+
+            // return $employees;
+
+            return response()->json($employees);
+        }else if($position === 'MachineOperator') {
+            // return 'asdasd';
+
+            // Custom logic for Machine Operator
              $employees = QcSlipEmployee::with([
                 'system_one_hris_emp_info',
-                'system_one_subcon_emp_info'
+                'system_one_subcon_emp_info',
+                // 'system_one_hris_subcon'
             ])
             ->whereHas('qcSlip', function ($q) use ($productLines, $position) {
 
@@ -393,6 +432,146 @@ class PersonnelSkillMatrixController extends Controller
                 ->where('position_category', $position);
 
             })
+            ->get()
+            // return $employees;
+            ->map(function ($employee) {
+
+                $emp = $employee->system_one_hris_emp_info
+                    ?? $employee->system_one_subcon_emp_info ?? $employee->system_one_hris_subcon;
+
+
+                return [
+                    'EmpNo'     => optional($emp)->EmpNo,
+                    'EmpName'   => optional($emp)->EmpName,
+                    'dateHired' => optional($emp)->DateHired,
+                    'test' => $emp,
+                ];
+            })
+            ->unique('EmpNo')
+            ->values();
+            // return $productLines;
+            return response()->json($employees);
+        }else if($position === 'VisualOperator') {
+            // return 'asdasd';
+
+            // Custom logic for Machine Operator
+             $employees = QcSlipEmployee::with([
+                'system_one_hris_emp_info',
+                'system_one_subcon_emp_info',
+                // 'system_one_hris_subcon'
+            ])
+            ->whereHas('qcSlip', function ($q) use ($productLines, $position) {
+
+                $q->where('status', 'OK')
+                ->whereIn('product_line', $productLines)
+                ->where('position_category', $position);
+
+            })
+            ->get()
+            // return $employees;
+            ->map(function ($employee) {
+
+                $emp = $employee->system_one_hris_emp_info
+                    ?? $employee->system_one_subcon_emp_info ?? $employee->system_one_hris_subcon;
+
+
+                return [
+                    'EmpNo'     => optional($emp)->EmpNo,
+                    'EmpName'   => optional($emp)->EmpName,
+                    'dateHired' => optional($emp)->DateHired,
+                    'test' => $emp,
+                ];
+            })
+            ->unique('EmpNo')
+            ->values();
+            // return $productLines;
+            return response()->json($employees);
+        }else if($position === 'PartsPrep') {
+            // return 'asdasd';
+
+            // Custom logic for Machine Operator
+             $employees = QcSlipEmployee::with([
+                'system_one_hris_emp_info',
+                'system_one_subcon_emp_info',
+                // 'system_one_hris_subcon'
+            ])
+            ->whereHas('qcSlip', function ($q) use ($productLines, $position) {
+
+                $q->where('status', 'OK')
+                ->whereIn('product_line', $productLines)
+                ->where('position_category', $position);
+
+            })
+            ->get()
+            // return $employees;
+            ->map(function ($employee) {
+
+                $emp = $employee->system_one_hris_emp_info
+                    ?? $employee->system_one_subcon_emp_info ?? $employee->system_one_hris_subcon;
+
+
+                return [
+                    'EmpNo'     => optional($emp)->EmpNo,
+                    'EmpName'   => optional($emp)->EmpName,
+                    'dateHired' => optional($emp)->DateHired,
+                    'test' => $emp,
+                ];
+            })
+            ->unique('EmpNo')
+            ->values();
+            // return $productLines;
+            return response()->json($employees);
+        }
+        // else if($position === 'Technician') {
+        //     // return 'asdasd';
+
+        //     // Custom logic for Machine Operator
+        //      $employees = QcSlipEmployee::with([
+        //         'system_one_hris_emp_info',
+        //         'system_one_subcon_emp_info',
+        //         // 'system_one_hris_subcon'
+        //     ])
+        //     ->whereHas('qcSlip', function ($q) use ($productLines, $position) {
+
+        //         $q->where('status', 'OK')
+        //         ->whereIn('product_line', $productLines)
+        //         ->where('position_category', $position);
+
+        //     })
+        //     ->get()
+        //     // return $employees;
+        //     ->map(function ($employee) {
+
+        //         $emp = $employee->system_one_hris_emp_info
+        //             ?? $employee->system_one_subcon_emp_info ?? $employee->system_one_hris_subcon;
+
+
+        //         return [
+        //             'EmpNo'     => optional($emp)->EmpNo,
+        //             'EmpName'   => optional($emp)->EmpName,
+        //             'dateHired' => optional($emp)->DateHired,
+        //             'test' => $emp,
+        //         ];
+        //     })
+        //     ->unique('EmpNo')
+        //     ->values();
+        //     // return $productLines;
+        //     return response()->json($employees);
+        // }
+        // return $employees;
+    }
+
+    public function getEmployeesForSkillMatrix(Request $request)
+    {
+        $productLines = (array) $request->product_line;
+        // return $productLines;
+
+        if(empty($productLines)) {
+            $employees = QcSlipEmployee::with([
+            'system_one_hris_emp_info',
+            'system_one_subcon_emp_info',
+            'system_one_hris_subcon'
+            ])
             ->get()
             ->map(function ($employee) {
 
@@ -403,6 +582,36 @@ class PersonnelSkillMatrixController extends Controller
                     'EmpNo'     => optional($emp)->EmpNo,
                     'EmpName'   => optional($emp)->EmpName,
                     'dateHired' => optional($emp)->DateHired,
+                    'position' => optional($emp)->Position,
+                ];
+            })
+            ->unique('EmpNo')
+            ->values();
+
+            return response()->json($employees);
+            // return 'empty product lines';
+        }else{
+            // return 'with product lines';
+            $employees = QcSlipEmployee::with([
+                'system_one_hris_emp_info',
+                'system_one_subcon_emp_info',
+                'system_one_hris_subcon'
+            ])
+            ->whereHas('qcSlip', function ($q) use ($productLines) {
+                $q->where('status', 'OK')
+                ->whereIn('product_line', $productLines);
+            })
+            ->get()
+            ->map(function ($employee) {
+
+                $emp = $employee->system_one_hris_emp_info
+                    ?? $employee->system_one_subcon_emp_info ?? $employee->system_one_hris_subcon;
+
+                return [
+                    'EmpNo'     => optional($emp)->EmpNo,
+                    'EmpName'   => optional($emp)->EmpName,
+                    'dateHired' => optional($emp)->DateHired,
+                    'position' => optional($emp)->Position,
                 ];
             })
             ->unique('EmpNo')
@@ -411,8 +620,7 @@ class PersonnelSkillMatrixController extends Controller
             return response()->json($employees);
         }
 
-
-
+        
     }
 
     // public function exportSkillMapPdf(Request $request)
@@ -486,9 +694,11 @@ class PersonnelSkillMatrixController extends Controller
     {
         $data = $request->all();
         // return $data;
-
+                    // return 'qwe';
         $productLineId = $request->product_line;
+        // return $productLineId;
         $position = strtoupper($request->position);
+        // return $position;
 
         $productLine = DropdownMasterDetail::where('id', $productLineId)
             ->value('dropdown_masters_details');
@@ -498,17 +708,23 @@ class PersonnelSkillMatrixController extends Controller
         $productStation = DropdownMasterDetail::whereHas('dropdown_master', function ($q) use ($position) {
                 $q->where('dropdown_masters', 'Stations')
                 ->where('category', $position);
+                // ->where('category', 'LIKE', "%$position%");
             })
             ->where('dropdown_masters_details', '!=', 'N/A')
             ->select('id', 'dropdown_masters_details')
             ->get();
 
-        // return $productStation;
+        // return $position;
+
+        // $employees = collect(json_decode($request->employees, true));
+        // return $employees;
 
        $employees = collect(json_decode($request->employees, true))
-        ->map(function ($employee) use ($productLineId, $position) {
+        ->unique('empNo')
+        ->map(function ($employee) use ($productLineId, $position) { 
 
             $empNo = $employee['empNo'] ?? '';
+            // dd($empNo);
 
             if ($position === 'INSPECTOR') {
               $records = QcSlipEmployee::where('employee_no', $empNo)
@@ -527,7 +743,7 @@ class PersonnelSkillMatrixController extends Controller
                 $functionTestCount = $records->where('station_to', 245)->count();
                 $auditingCount = $records->where('station_to', 246)->count();
 
-                // return $oqcCount;
+                //  dd($auditingCount);
 
                 return [
                     'empNo'     => $empNo,
@@ -542,6 +758,8 @@ class PersonnelSkillMatrixController extends Controller
                         6 => $this->getSkillLevel($auditingCount)
                     ]
                 ];
+
+                // dd($records);
 
             } elseif ($position === 'OPERATOR') {
 
@@ -569,14 +787,128 @@ class PersonnelSkillMatrixController extends Controller
                     ],
                 ];
             }
+            elseif ($position === 'MACHINEOPERATOR'){
+                // return 'aaa';
+                $records = QcSlipEmployee::where('employee_no', $empNo)
+                    ->whereHas('qcSlip', function ($q) use ($productLineId) {
+                        $q->where('product_line', $productLineId)
+                        ->where('status', 'OK');
+                    })
+                    ->get();
 
-            return null;
+                $machineOperatorcount  = $records->where('station_to', 4)->count();
+                $machinePartPrepCount = $records->where('station_to', 1)->count();
+                $machineVisualCount   = $records->where('station_to', 2)->count();
+                $machineAssemblyCount = $records->where('station_to', 3)->count();
+
+                // return $machineOperatorcount;
+
+                return [
+                    'empNo'     => $empNo,
+                    'empName'   => $employee['empName'] ?? '',
+                    'dateHired' => $employee['dateHired'] ?? '',
+                    'stations'  => [
+                        1 => $this->getSkillLevel($machinePartPrepCount),
+                        2 => $this->getSkillLevel($machineVisualCount),
+                        3 => $this->getSkillLevel($machineAssemblyCount),
+                        4 => $this->getSkillLevel($machineOperatorcount),
+                    ],
+                ];
+            }elseif ($position === 'VISUALOPERATOR'){
+                // return 'aaa';
+                $records = QcSlipEmployee::where('employee_no', $empNo)
+                    ->whereHas('qcSlip', function ($q) use ($productLineId) {
+                        $q->where('product_line', $productLineId)
+                        ->where('status', 'OK');
+                    })
+                    ->get();
+
+                $visualOperatorcount  = $records->where('station_to', 4)->count();
+                $visualPartPrepCount = $records->where('station_to', 1)->count();
+                $visualVisualCount   = $records->where('station_to', 2)->count();
+                $visualAssemblyCount = $records->where('station_to', 3)->count();
+
+                // return $visualOperatorcount;
+
+                return [
+                    'empNo'     => $empNo,
+                    'empName'   => $employee['empName'] ?? '',
+                    'dateHired' => $employee['dateHired'] ?? '',
+                    'stations'  => [
+                        1 => $this->getSkillLevel($visualPartPrepCount),
+                        2 => $this->getSkillLevel($visualVisualCount),
+                        3 => $this->getSkillLevel($visualAssemblyCount),
+                        4 => $this->getSkillLevel($visualOperatorcount),
+                    ],
+                ];
+            }
+            elseif ($position === 'PARTSPREP'){
+                // return 'aaa';
+                $records = QcSlipEmployee::where('employee_no', $empNo)
+                    ->whereHas('qcSlip', function ($q) use ($productLineId) {
+                        $q->where('product_line', $productLineId)
+                        ->where('status', 'OK');
+                    })
+                    ->get();
+
+                $partsPrepOperatorcount  = $records->where('station_to', 4)->count();
+                $partsPrepPartPrepCount = $records->where('station_to', 1)->count();
+                $partsPrepVisualCount   = $records->where('station_to', 2)->count();
+                $partsPrepAssemblyCount = $records->where('station_to', 3)->count();
+
+                // return $partsPrepOperatorcount;
+
+                return [
+                    'empNo'     => $empNo,
+                    'empName'   => $employee['empName'] ?? '',
+                    'dateHired' => $employee['dateHired'] ?? '',
+                    'stations'  => [
+                        1 => $this->getSkillLevel($partsPrepPartPrepCount),
+                        2 => $this->getSkillLevel($partsPrepVisualCount),
+                        3 => $this->getSkillLevel($partsPrepAssemblyCount),
+                        4 => $this->getSkillLevel($partsPrepOperatorcount),
+                    ],
+                ];
+            }
+            // elseif ($position === 'TECHNICIAN'){
+            //     // return 'aaa';
+            //     $records = QcSlipEmployee::where('employee_no', $empNo)
+            //         ->whereHas('qcSlip', function ($q) use ($productLineId) {
+            //             $q->where('product_line', $productLineId)
+            //             ->where('status', 'OK');
+            //         })
+            //         ->get();
+
+            //     $partsPrepOperatorcount  = $records->where('station_to', 268)->count();
+            //     $partsPrepPartPrepCount = $records->where('station_to', 267)->count();
+            //     $partsPrepVisualCount   = $records->where('station_to', 266)->count();
+            //     $partsPrepAssemblyCount = $records->where('station_to', 265)->count();
+
+            //     // return $partsPrepOperatorcount;
+
+            //     return [
+            //         'empNo'     => $empNo,
+            //         'empName'   => $employee['empName'] ?? '',
+            //         'dateHired' => $employee['dateHired'] ?? '',
+            //         'stations'  => [
+            //             1 => $this->getSkillLevel($partsPrepPartPrepCount),
+            //             2 => $this->getSkillLevel($partsPrepVisualCount),
+            //             3 => $this->getSkillLevel($partsPrepAssemblyCount),
+            //             4 => $this->getSkillLevel($partsPrepOperatorcount),
+            //         ],
+            //     ];
+            // }
+            
+
+            // return null;
         })
         ->filter()
         ->values()
         ->toArray();
 
         // return $employees;
+        // return $data;
+        // exit();
 
         // return $position;
         if($position === 'INSPECTOR') {
@@ -588,7 +920,7 @@ class PersonnelSkillMatrixController extends Controller
                     $productStation,
                     $position
                 ),
-                'skill_matrix_inspector.xlsx'
+                'skill_map_inspector.xlsx'
             );
         }
         else if($position === 'OPERATOR') {
@@ -600,7 +932,40 @@ class PersonnelSkillMatrixController extends Controller
                     $productStation,
                     $position
                 ),
-                'skill_matrix_operator.xlsx'
+                'skill_map_operator.xlsx'
+            );
+        }else if($position === 'MACHINEOPERATOR') {
+            // return 'qwe';
+            return Excel::download(
+                new SkillMapExport(
+                    $productLine,
+                    $employees,
+                    $productStation,
+                    $position
+                ),
+                'skill_map_machineoperator.xlsx'
+            );
+        }else if($position === 'VISUALOPERATOR') {
+            // return 'qwe';
+            return Excel::download(
+                new SkillMapExport(
+                    $productLine,
+                    $employees,
+                    $productStation,
+                    $position
+                ),
+                'skill_map_visualoperator.xlsx'
+            );
+        }else if($position === 'PARTSPREP') {
+            // return 'qwe';
+            return Excel::download(
+                new SkillMapExport(
+                    $productLine,
+                    $employees,
+                    $productStation,
+                    $position
+                ),
+                'skill_map_partsprep.xlsx'
             );
         }
 
@@ -627,94 +992,258 @@ class PersonnelSkillMatrixController extends Controller
         return 4;
     }
 
-     public function exportSkillMapExcelPerProductLine(Request $request)
-    {
-        // return 'asd';
-        $position = strtoupper($request->position);
-        $productLineIds = $request->product_line;
+    //  public function exportSkillMapExcelPerProductLine(Request $request)
+    // {
+    //     // return 'asd';
+    //     $position = strtoupper($request->position);
+    //     $productLineIds = $request->product_line;
 
-        if (is_string($productLineIds)) {
-            $productLineIds = explode(',', $productLineIds);
+    //     if (is_string($productLineIds)) {
+    //         $productLineIds = explode(',', $productLineIds);
+    //     }
+
+    //     $productLineIds = array_filter($productLineIds);
+
+    //     $productLines = DropdownMasterDetail::whereIn('id', $productLineIds)
+    //         ->pluck('dropdown_masters_details')
+    //         ->toArray();
+
+    //     $productStation = DropdownMasterDetail::whereHas('dropdown_master', function ($q) use ($position) {
+    //         $q->where('dropdown_masters', 'Stations')
+    //         // ->where('category', $position);
+    //         ->where('category', 'LIKE', "%$position%");
+    //     })
+    //     ->where('dropdown_masters_details', '!=', 'N/A')
+    //     ->select('id', 'dropdown_masters_details')
+    //     ->get();
+
+    //     // return $productStation;
+
+    //     $employees = collect(json_decode($request->employees, true))->map(function ($employee) use ($productLineIds) {
+
+    //         $empNo = $employee['empNo'] ?? '';
+
+    //         $productLineTotals = [];
+
+    //         foreach ($productLineIds as $productLineIndex => $productLineId) {
+                    
+    //             $records = QcSlipEmployee::where('employee_no', $empNo)
+    //                 ->whereHas('qcSlip', function ($q) use ($productLineId) {
+    //                     $q->where('product_line', $productLineId)
+    //                     ->where('status', 'OK');
+    //                 })
+    //                 ->get();
+
+    //             // Count all 4 stations for this employee + product line
+    //             $partPrepCount = $records->where('station_to', 1)->count();
+    //             $visualCount   = $records->where('station_to', 2)->count();
+    //             $assemblyCount = $records->where('station_to', 3)->count();
+    //             $machineCount  = $records->where('station_to', 4)->count();
+
+    //             // Overall total for this product line
+    //             $totalCount = $partPrepCount
+    //                 + $visualCount
+    //                 + $assemblyCount
+    //                 + $machineCount;
+
+
+    //             if ($totalCount == 0) {
+    //                 $level = 0;
+    //             } elseif ($totalCount <= 8) {
+    //                 $level = 1;
+    //             } elseif ($totalCount <= 16) {
+    //                 $level = 2;
+    //             } elseif ($totalCount <= 24) {
+    //                 $level = 3;
+    //             } elseif ($totalCount <= 35) {
+    //                 $level = 4;
+    //             } else {
+    //                 $level = 4; // 35+ remains Level 4
+    //             }
+
+    //             $productLineTotals[$productLineIndex] = $level;
+    //         }
+
+    //         return [
+    //             'empNo'     => $empNo,
+    //             'empName'   => $employee['empName'] ?? '',
+    //             'dateHired' => $employee['dateHired'] ?? '',
+    //             'productLines' => $productLineTotals,
+    //         ];
+    //     })
+    //     ->values()
+    //     ->toArray();
+    //         // return $records;
+
+    //     // return $employees;
+
+    //     return Excel::download(
+    //         new SkillMapExportPerProdLine(
+    //             $productLines,
+    //             $employees
+    //         ),
+    //         'skill_map_per_product_line.xlsx'
+    //     );
+    // }
+
+    public function exportSkillMapExcelPerProductLine(Request $request)
+    {
+        // return $request->toggle_value;
+        $data = $request->all();
+        // return $data;
+        $productLine = $request->product_line;
+        // return $productLine;
+        // $prodLine = implode(',', (array) $productLine);
+        // 1. Decode the selected employees from the request
+        $employeesInput = collect(json_decode($request->employees, true));
+        // return $employeesInput;
+        // dd($employeesInput);
+        $empNos = $employeesInput->pluck('empNo')->filter()->toArray();
+        // dd([
+        //     'employee_count' => count($empNos),
+        //     'employee_numbers' => $empNos,
+        //     'employees_input' => $employeesInput->toArray(),
+        // ]);
+        $toggleValue = collect($employeesInput->pluck('toggleValue'))->first();
+        // return $toggleValue;
+
+        if (empty($empNos)) {
+            return response()->json(['message' => 'No employees selected.'], 422);
         }
 
-        $productLineIds = array_filter($productLineIds);
+        $collectEmployeePosition = $employeesInput
+        ->pluck('position')
+        ->unique()
+        ->values()
+        ->toArray();
 
-        $productLines = DropdownMasterDetail::whereIn('id', $productLineIds)
-            ->pluck('dropdown_masters_details')
+        // return $productLine;
+        if($toggleValue == 1){
+            
+           $productLineIds = array_values(array_unique(
+                array_filter(
+                    array_map('intval', explode(',', $productLine))
+                )
+            ));
+        }else{
+             $productLineIds = QcSlipEmployee::whereIn('employee_no', $empNos)
+            ->whereHas('qcSlip', function ($q){
+                $q->where('status', 'OK');
+            })
+            ->with('qcSlip')
+            ->get()
+            ->pluck('qcSlip.product_line')
+            ->unique()
+            ->filter()
+            ->values()
             ->toArray();
+        }
+        
+        // return $productLineIds;
 
-        $productStation = DropdownMasterDetail::whereHas('dropdown_master', function ($q) use ($position) {
+        $productLineDetails = DropdownMasterDetail::whereIn('id', $productLineIds)
+        ->get()
+        ->keyBy('id');
+
+        // return $productLineDetails;
+
+        $productLines = collect($productLineIds)
+        ->map(function ($id) use ($productLineDetails) {
+            $detail = $productLineDetails->get($id);
+
+            return $detail ? $detail->dropdown_masters_details : null;
+        })
+        ->values()
+        ->toArray();
+        
+
+        $productStation = DropdownMasterDetail::whereHas('dropdown_master', function ($q) use ($collectEmployeePosition) {
             $q->where('dropdown_masters', 'Stations')
-            ->where('category', $position);
+            ->whereIn('category', $collectEmployeePosition);
         })
         ->where('dropdown_masters_details', '!=', 'N/A')
         ->select('id', 'dropdown_masters_details')
         ->get();
 
-        $employees = collect(json_decode($request->employees, true))->map(function ($employee) use ($productLineIds) {
+        // $position = strtoupper(trim($employeesInput->pluck('position')->first() ?? ''));
 
-            $empNo = $employee['empNo'] ?? '';
+        $position = $employeesInput
+        ->pluck('position')
+        ->map(function ($position) {
+            return strtoupper(trim($position));
+        })
+        ->unique()
+        ->values()
+        ->toArray();
+
+        $employees = $employeesInput->map(function ($employee) use ($productLineIds, $position) {
+
+            $empNo = trim($employee['empNo'] ?? '');
+            $position = strtoupper(trim($employee['position'] ?? ''));
 
             $productLineTotals = [];
 
             foreach ($productLineIds as $productLineIndex => $productLineId) {
 
                 $records = QcSlipEmployee::where('employee_no', $empNo)
-                    ->whereHas('qcSlip', function ($q) use ($productLineId) {
-                        $q->where('product_line', $productLineId)
-                        ->where('status', 'OK');
-                    })
-                    ->get();
+                ->whereHas('qcSlip', function ($q) use ($productLineId) {
+                    $q->where('product_line', $productLineId)
+                    ->where('status', 'OK');
+                })
+                ->get();
 
-                // Count all 4 stations for this employee + product line
-                $partPrepCount = $records->where('station_to', 1)->count();
-                $visualCount   = $records->where('station_to', 2)->count();
-                $assemblyCount = $records->where('station_to', 3)->count();
-                $machineCount  = $records->where('station_to', 4)->count();
+                // dd($records);
 
-                // Overall total for this product line
-                $totalCount = $partPrepCount
-                    + $visualCount
-                    + $assemblyCount
-                    + $machineCount;
+                // Count stations for this employee and product line only
+                $stationCounts = $records->countBy('station_to');
 
+                if ($position === 'INSPECTOR') {
+                    $allowedStations = [241, 242, 243, 244, 245, 246,7];
+                } elseif ($position === 'OPERATOR') { //VisualOperator,PartPrep,Machineo
+                    $allowedStations = [1, 2, 3, 4, 441];
 
-                if ($totalCount == 0) {
-                    $level = 0;
-                } elseif ($totalCount <= 8) {
-                    $level = 1;
-                } elseif ($totalCount <= 16) {
-                    $level = 2;
-                } elseif ($totalCount <= 24) {
-                    $level = 3;
-                } elseif ($totalCount <= 35) {
-                    $level = 4;
+                } elseif ($position === 'MATERIAL HANDLER') {
+                    // Replace with the actual Material Handler station IDs.
+                    $allowedStations = [524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537];
+                } elseif (str_contains($position, 'TECHNICIAN')) {
+                    $allowedStations = [268, 267, 266, 265];
                 } else {
-                    $level = 4; // 35+ remains Level 4
+                    $allowedStations = [];
                 }
 
-                $productLineTotals[$productLineIndex] = $level;
+                // Skill level
+                $totalCount = $records
+                ->whereIn('station_to', $allowedStations)
+                ->count();
+
+
+                $productLineTotals[$productLineIndex] = $totalCount;
             }
 
             return [
-                'empNo'     => $empNo,
-                'empName'   => $employee['empName'] ?? '',
-                'dateHired' => $employee['dateHired'] ?? '',
+                'empNo'        => trim($employee['empNo'] ?? ''),
+                'empName'      => $employee['empName'] ?? '',
+                'dateHired'    => $employee['dateHired'] ?? '',
+                'position'     => $employee['position'] ?? '',
                 'productLines' => $productLineTotals,
+                'allowedStations' => $allowedStations ?? [],
             ];
-        })
-        ->values()
-        ->toArray();
-            // return $records;
 
-        // return $employees;
 
+        });
+        
+        // dd($employees);
+
+        $employees = $employees->values()->toArray();
+
+        // 6. Download Excel Export
         return Excel::download(
             new SkillMapExportPerProdLine(
                 $productLines,
-                $employees
+                $employees,
+                $position
             ),
-            'skill_map_per_product_line.xlsx'
+            'skill_matrix.xlsx'
         );
     }
 

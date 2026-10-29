@@ -8,9 +8,11 @@ use App\Http\Controllers\CommonController;
 use App\Http\Requests\ALqcTrainingQualificationRequest;
 use App\Http\Requests\AMhTrainingOrientationRequest;
 use App\Http\Requests\AOperProdTrainingOrientationRequest;
+use App\Http\Requests\ASepTrainingOrientationRequest;
 use App\Http\Requests\BLqcCertificationRequest;
 use App\Http\Requests\BOpEnggSectionTrainingOrientationRequest;
 use App\Http\Requests\CQcCertificationRequest;
+use App\Http\Requests\DoperoscRequest;
 use App\Http\Requests\DPpdCertificationCompletionRequest;
 use App\Http\Requests\EEngValidationProcessRequest;
 use App\Http\Requests\EQcValidationProcessRequest;
@@ -22,6 +24,7 @@ use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
 use App\Model\Qc\AMhTrainingOrientation;
 use App\Model\Qc\AOperProdTrainingOrientation;
+use App\Model\Qc\ASepTrainingOrientation;
 use App\Model\Qc\ATechEngTrainingQualification;
 use App\Model\Qc\BLqcCertification;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
@@ -204,6 +207,8 @@ class QualificationCertificationController extends Controller
             ->get(['day_number', 'trainer_emp_no', 'trainer_name', 'validation_date', 'validation_time', 'overall_result'])
             ->unique('day_number')
             ->keyBy('day_number');
+        
+            // return $trainerValidations;
 
         // Existing single Checkbox Trainer Validation for the ENTIRE matrix
         // (not per-day/per-row). Since the same values are broadcast to every
@@ -233,6 +238,8 @@ class QualificationCertificationController extends Controller
             $resultsByDay = $item->c_lqc_training_item_results->keyBy('day_number');
             $firstResult  = $item->c_lqc_training_item_results->first();
 
+            // return $resultsByDay;
+
             return [
                 'id'              => $item->id,
                 'item_name'       => $item->dropdown_masters_details,
@@ -246,6 +253,8 @@ class QualificationCertificationController extends Controller
                 'item_remark'     => $firstResult->item_remark ?? '',
             ];
         });
+
+        // return $data;
 
         return datatables()->of($data)
         ->editColumn('item_name', function ($row) {
@@ -285,6 +294,8 @@ class QualificationCertificationController extends Controller
         })
         ->addColumn('day_3', function ($row) {
             $day3Val = $row['day_3_result'] ?? '';
+            // return $row['day_3_result'];
+            // return 'qwe';
             return '<select class="form-control form-control-sm  text-center input-result"
                         data-item-id="' . $row['id'] . '"
                         data-day="3">
@@ -368,7 +379,7 @@ class QualificationCertificationController extends Controller
     public function saveQcLqcTrainingItemsByPosition(Request $request){
         try {
             date_default_timezone_set('Asia/Manila');
-//    return $request->all();
+            //    return $request->all();
             $qcSlipsId            = $request->input('qc_slips_id');
             // $qcSlipsId            = 212;
             $position             = $request->input('position');
@@ -385,11 +396,9 @@ class QualificationCertificationController extends Controller
                     'selectPosition'  => $qcSlipDetails->position_category ?? null,
                     'approval_status' => $qcSlipDetails->approval_status ?? 'PB',
                 ];
-
                 if (in_array($params['selectPosition'], ['VisualOperator', 'PartsPrep', 'MachineOperator'], true)) {
                     // position-specific logic and status determination
                     $editableSlot = $this->parseApprovalStatus($params['approval_status']);
-
                     foreach ($matrixData as $row) {
                         foreach (($row['day_results'] ?? []) as $dayKey => $resultValue) {
                             if ($resultValue === null || $resultValue === '') {
@@ -400,10 +409,11 @@ class QualificationCertificationController extends Controller
                             $roleMatches = $editableSlot !== null && $editableSlot['role'] === $position;
                             $dayMatches  = $editableSlot !== null && ($editableSlot['day'] === null || $editableSlot['day'] === $dayNumber);
 
-                            if (!$roleMatches || !$dayMatches) {
-                                $lockViolationMessage = 'This item is locked for editing at the current approval status.';
-                                return;
-                            }
+                            // if (!$roleMatches || !$dayMatches) {
+                            // // if (!$roleMatches) {
+                            //     $lockViolationMessage = 'This item is locked for editing at the current approval status.';
+                            //     return;
+                            // }
                         }
                     }
 
@@ -458,12 +468,12 @@ class QualificationCertificationController extends Controller
                 }
             });
 
-            if ($lockViolationMessage !== null) {
-                return response()->json([
-                    'is_success' => 'false',
-                    'message'    => $lockViolationMessage,
-                ], 422);
-            }
+            // if ($lockViolationMessage !== null) {
+            //     return response()->json([
+            //         'is_success' => 'false',
+            //         'message'    => $lockViolationMessage,
+            //     ], 422);
+            // }
 
             return response()->json([
                 'is_success' => 'true',
@@ -575,7 +585,7 @@ class QualificationCertificationController extends Controller
                             ->where('position','Production')
                             ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
-                            $messageAlert = 'Day 2 Production Update';
+                            $messageAlert = 'Day 1 Production Update';
                             break;
                         case 'AOPERPRDN2':
                             $cLqcTrainingItemResult
@@ -622,7 +632,7 @@ class QualificationCertificationController extends Controller
                             ->where('position','Engineer')
                             ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
-                            $messageAlert = 'Day 2 ENGG Update';
+                            $messageAlert = 'Day 1 ENGG Update';
                             break;
                         case 'BOPERENGG2':
                             $cLqcTrainingItemResult
@@ -669,7 +679,7 @@ class QualificationCertificationController extends Controller
                             ->where('position','QC')
                             ->whereNotNull('date')
                             ->whereNotNull('trainer_emp_no');
-                            $messageAlert = 'Day 2 QC Update';
+                            $messageAlert = 'Day 1 QC Update';
                             break;
                         case 'COPERQC2':
                             $cLqcTrainingItemResult
@@ -1340,8 +1350,8 @@ class QualificationCertificationController extends Controller
                 //Send to Approver Attention To | CC is exclude the FQCVVO TO QCAPP Last Approver
                 $collectTo = collect($arrTo)->map(function($rowEmpNo){
                      return [
-                        'email' => $rowEmpNo['email'],
-                        'fullName' => $rowEmpNo['fullName'],
+                        'email' => $rowEmpNo['email'] ?? '', // add ''
+                        'fullName' => $rowEmpNo['fullName'] ?? '', // add ''
                     ];
                 });
                 if($params['approval_status'] != 'FQCVVO'){
@@ -1350,8 +1360,8 @@ class QualificationCertificationController extends Controller
                     }
                     $collectCc = collect($arrCc)->map(function($rowEmpNo){
                         return [
-                            'email' => $rowEmpNo['email'],
-                            'fullName' => $rowEmpNo['fullName'],
+                            'email' => $rowEmpNo['email'] ?? '', // add ''
+                            'fullName' => $rowEmpNo['fullName'] ?? '', // add ''
                         ];
                     });
                     $cc = $collectCc->pluck('email')->join(',');
@@ -1383,7 +1393,7 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             DB::commit();
-        //    $this->commonController->sendEmail($emailData);
+            $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -1481,6 +1491,8 @@ class QualificationCertificationController extends Controller
                 'a_tech_eng_training_qualification',
                 //MH
                 'a_mh_training_orientation',
+                //SUPV
+                'a_sep_training_orientation'
             ];
             $qcSlip = QcSlip::with($arrRelation)
             ->where('id',$request->qcSlipsId)
@@ -2061,13 +2073,16 @@ class QualificationCertificationController extends Controller
             $rapidxEmpNo = session('global_user');
 
             // 1. Get QC slips with the required relationships
-            $data = QcSlip::with([
+            $data = QcSlip::with([ //nmodify
                 'product_line',
                 'op_approvers',
                 'op_approvers_pending',
                 'system_one_hris_subcon',
+                'production_area',
                 'qc_slip_employees.system_one_hris_subcon',
             ]);
+
+            // return $data;
 
             // 2. Filter by access
             if (filled($selectAccess)) {
@@ -2339,6 +2354,12 @@ class QualificationCertificationController extends Controller
                         ->filter()
                         ->implode(', ');
                 })
+                ->addColumn('get_product_line', function ($row) {
+                    return $row->product_line_dropdown->dropdown_masters_details ?? '';
+                })
+                ->addColumn('get_production_area', function ($row) {
+                    return $row->production_area_dropdown->dropdown_masters_details ?? '';
+                })
 
                 ->rawColumns([
                     'rawAction',
@@ -2348,6 +2369,8 @@ class QualificationCertificationController extends Controller
                     'created_by',
                     'created_at',
                     'employee_names',
+                    'get_product_line',
+                    'get_production_area',
                 ])
 
                 ->make(true);
@@ -2478,7 +2501,11 @@ class QualificationCertificationController extends Controller
         $engg = self::OPER_POSITION_DAY_STATUSES['Engineer'];
         $qc   = self::OPER_POSITION_DAY_STATUSES['QC'];
 
+        // return $qc;
+
         switch ($currentStatus) {
+
+        // return $currentStatus;
 
             // ==========================================
             // 1. CHECKBOX VALIDATION PHASE
@@ -2596,6 +2623,11 @@ class QualificationCertificationController extends Controller
                 $newStatus  = 'EOPERVISUAL';
                 $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
                 break;
+            //PartsPrep
+            case ($currentStatus === 'DOPEROSC' && $selectPosition === 'PartsPrep'):
+                $newStatus  = 'LQCHEADAPP';
+                $statusName = 'For Section Head Approval';
+                break;
             //MachineOperator
             case ($currentStatus === 'DOPEROSC' && $selectPosition != 'MachineOperator' && $isEopervisualRequired === 'YES'):
                 $newStatus  = 'EOPERVISUAL';
@@ -2610,7 +2642,7 @@ class QualificationCertificationController extends Controller
                 $statusName = 'For Section Head Approval';
                 break;
             default:
-                  $newStatus = 'N/A';
+                $newStatus = 'N/A';
                 $statusName = 'N/A';
                 break;
         }
@@ -2683,8 +2715,7 @@ class QualificationCertificationController extends Controller
                 case ($params['approval_status'] === 'PB'):
                     $newStatus = 'CLQCOQC';
                     $statusName = 'C Inspector Training Certification And Validation';
-                    break;
-                case ($params['approval_status'] === 'CSEPHEAD'):
+                case ($params['approval_status'] === 'CLQCOQC'):
                     $newStatus = 'LQCHEADAPP';
                     $statusName = 'For Section Head Approval';
                     break;
@@ -2849,6 +2880,7 @@ class QualificationCertificationController extends Controller
                         'text'=> $rowMasterDetails['dropdown_masters_details'],
                     ];
             });
+            // return 'qwe';
             return response()->json(['is_success' => 'true', 'data' => $masterDetails]);
         } catch (Exception $e) {
             throw $e;

@@ -255,6 +255,7 @@ class HrMemoController extends Controller
             SELECT
                 pkid,
                 EmpNo,
+                CONCAT(LastName, ' ', FirstName) AS EmpName,
                 1 AS emp_type
             FROM tbl_EmployeeInfo
             WHERE EmpStatus = 1
@@ -264,6 +265,7 @@ class HrMemoController extends Controller
             SELECT
                 pkid,
                 EmpNo,
+                CONCAT(LastName, ' ', FirstName) AS EmpName,
                 2 AS emp_type
             FROM tbl_EmployeeInfo
             WHERE EmpStatus = 1
@@ -741,14 +743,14 @@ class HrMemoController extends Controller
             ->values()
             ->toArray();
 
-        return Excel::download(
-            new InspectorSkillChart(
-                $productLine,
-                $employees,
-                $productStation
-            ),
-            'QC Inspectors Skill Chart.xlsx'
-        );
+        // return Excel::download(
+        //     new InspectorSkillChart(
+        //         $productLine,
+        //         $employees,
+        //         $productStation
+        //     ),
+        //     'QC Inspectors Skill Chart.xlsx'
+        // );
 
         //CLARK 
         $request->validate([
@@ -757,22 +759,22 @@ class HrMemoController extends Controller
 
         $selectedSheets = $request->input('section_export', []);
 
-        // return Excel::download(
-        //     new InspectorSkillChart($selectedSheets),
-        //     'QC Inspectors Skill Chart.xlsx'
-        // );
+        return Excel::download(
+            new InspectorSkillChart($selectedSheets),
+            'QC Inspectors Skill Chart.xlsx'
+        );
     }
 
     public function exportEmployeeSkillCard(Request $request)
     {
-        // $request->validate([
-        //     'section_export'   => 'required',
-        // ]);
+        // return 'test';
+        // $employeeNo = 'P082';
 
-        // $selectedSheets = $request->input('section_export', []);
-
+        $employeeNo = $request->input('employee_id');
         return Excel::download(
-            new EmployeeSkillCard(),
+            new EmployeeSkillCard(
+                $employeeNo
+            ),
             'Employee Skill Card.xlsx'
         );
     }

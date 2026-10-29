@@ -8,7 +8,7 @@
             class="brand-image img-circle elevation-3"
             style="opacity: .8">
 
-        <span class="brand-text font-weight-light font-size"><h5>TRDSv2</h5></span>
+        <span class="brand-text font-weight-light font-size"><h5>TRDSv2.1</h5></span>
     </a> <!-- System title and logo -->
 
     <!-- Sidebar -->
@@ -43,18 +43,41 @@
                     </a>
                 </li>
 
-                <li class="nav-item has-treeview">
-                    <a href="{{ route('target_ratings') }}"  class="nav-link">
+                <!-- <li class="nav-item has-treeview">
+                    <a href="{{ route('target_ratings') }}" class="nav-link">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>Target Ratings Settings</p>
+                    </a>
+                </li> -->
+
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Target Ratings Settings</p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('target_ratings') }}" class="nav-link">
+                                <p> Target Ratings</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('ratings_descriptions') }}" class="nav-link">
+                                <p> Descriptions</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item has-treeview">
                     <a href="{{ route('dropdown_maintenance') }}"  class="nav-link">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>Dropdown Maintenance</p>
                     </a>
                 </li>
 
-                <!-- <li class="nav-header font-weight-bold">Modules</li> -->
-                <!-- <li class="nav-item has-treeview">
+                <!-- <li class="nav-header font-weight-bold">Modules</li>
+                <li class="nav-item has-treeview">
                     <a href="{{ route('hr_memo') }}" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
                         <p>HR MEMO/Approval </p>
@@ -146,12 +169,12 @@
                     </ul>
                 </li>
 
-                <li class="nav-item has-treeview">
+                {{-- <li class="nav-item has-treeview">
                     <a href="{{ route('personnel_skill_matrix') }}"  class="nav-link">
                         <i class="fas fa-chart-line"></i>
                         <p>Personnel Skill Matrix</p>
                     </a>
-                </li>
+                </li> --}}
                 @if ( in_array(16,explode(',', $globalUser->user_modules_id)) )
                     <li class="nav-item has-treeview">
                         <a href="{{ route('training_endorsement') }}"  class="nav-link">
@@ -178,11 +201,11 @@
                     <li class="nav-item has-treeview">
                         <a href="{{ route('qualification_certification2') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
-                            <p>Qualification / Certification</p>
+                            <p>Certification & Validation Form</p>
                         </a>
                     </li>
                     {{-- @endif --}}
-                    
+
                 <li class="nav-item has-treeview">
                     <!-- <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
@@ -208,13 +231,13 @@
                 </li>
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {{-- <a href="#" class="nav-link">
                         <i class="fas fa-book-open"></i>
                         <p>
                             Recertification
                             <i class="fas fa-angle-left right"></i>
                         </p>
-                    </a>
+                    </a> --}}
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ route('grr_attributes_settings') }}" class="nav-link">
@@ -242,20 +265,21 @@
                         </li>
                     </ul>
                 </li>
-
-                <li class="nav-header font-weight-bold">Export</li>
-                <li class="nav-item has-treeview">
-                    <a id="btnListCertPersonnel" class="nav-link">
-                        <i class="fas fa-file-excel"></i>
-                        <p>List of Certified Personnel</p>
-                    </a>
-                </li>
-                <li class="nav-item has-treeview">
-                    <a id="btnInsCertMatrix" class="nav-link">
-                        <i class="fas fa-file-excel"></i>
-                        <p>Inspectors Certification Matrix</p>
-                    </a>
-                </li>
+                {{-- @if($globalUser->rapidx_emp_id == 216) --}}
+                    <li class="nav-header font-weight-bold">Export</li>
+                    <li class="nav-item has-treeview">
+                        <a id="btnListCertPersonnel" class="nav-link">
+                            <i class="fas fa-file-excel"></i>
+                            <p>List of Certified Personnel</p>
+                        </a>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a id="btnInsCertMatrix" class="nav-link">
+                            <i class="fas fa-file-excel"></i>
+                            <p>Inspectors Certification Matrix</p>
+                        </a>
+                    </li>
+                {{-- @endif --}}
             </ul>
         </nav>
     </div><!-- Sidebar -->
