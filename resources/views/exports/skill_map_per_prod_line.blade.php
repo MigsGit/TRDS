@@ -1,6 +1,6 @@
 <table>
 
-    
+
     <!-- Header -->
     <tr>
         <th>No.</th>
@@ -32,9 +32,9 @@
             @endforeach
 
             {{-- @foreach($productLines as $productLineIndex => $productLine)
-                <td></td> 
+                <td></td>
             @endforeach --}}
-            
+
         </tr>
 
     @endforeach

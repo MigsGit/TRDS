@@ -145,7 +145,7 @@ class QualificationCertificationController extends Controller
             ->get(['day_number', 'trainer_emp_no', 'trainer_name', 'validation_date', 'validation_time', 'overall_result'])
             ->unique('day_number')
             ->keyBy('day_number');
-        
+
             // return $trainerValidations;
 
         // Existing single Checkbox Trainer Validation for the ENTIRE matrix
@@ -675,6 +675,7 @@ class QualificationCertificationController extends Controller
                            [
                                 "qc_slips_id"   => $qcSlipId,
                                 'decision_status' => 'APP',
+                                'is_eopervisual_required' => $isEopervisualRequired,
                                 'first_approver'  => $this->joinSafe($request, 'text_sec1_certified_operator'),
                                 'first_date'      => $this->getSafe($request, 'text_sec1_date_operator'),
                                 'first_time'      => $this->getSafe($request, 'text_sec1_time_operator'),
@@ -1191,7 +1192,7 @@ class QualificationCertificationController extends Controller
                 'selectedSection'=> $select_section,
                 'selectPosition'=> $select_position,
                 'isMachineOperatorExists'=> $isMachineOperatorExists,
-                // 'isMachineOperatorRequiredVisual'=> $isMachineOperatorRequiredVisual,
+                'isEopervisualRequired'=> $isEopervisualRequired,
             ];
             $getNewStatus =  $this->changeApprovalStatus($changeApprovalStatusParams);
             if($currentApprovalStatus === 'FQCVVO'){ //OPERATOR FQCVVO to QCAPP Status - Final Approver QC Supervisor
@@ -1202,7 +1203,6 @@ class QualificationCertificationController extends Controller
                         'approval_status'=> $getNewStatus['newStatus'],
                         'alert_prod_sec' => $this->joinSafe($request, 'text_oper_approved_confirmed_by'),
                         'alert_prod_cc_sec' => '',
-                        'isEopervisualRequired' => $isEopervisualRequired,
                     ],
                     'approval_status'=> $currentApprovalStatus,
                     'qcModelApprover' => $qcModelApprover,
@@ -1331,7 +1331,7 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             DB::commit();
-            $this->commonController->sendEmail($emailData);
+            // $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
@@ -2538,24 +2538,29 @@ class QualificationCertificationController extends Controller
                 $newStatus  = 'DOPEROSC';
                 $statusName = 'D PRODUCT ORIENTATION AND SAMPLE CHECK (QC)';
                 break;
-            //PartsPrep
-            case ($currentStatus === 'DOPEROSC' && $selectPosition != 'PartsPrep'):
-                $newStatus  = 'EOPERVISUAL';
-                $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
-                break;
+            // //PartsPrep
+            // case ($currentStatus === 'DOPEROSC' && $selectPosition != 'PartsPrep'):
+            //     $newStatus  = 'EOPERVISUAL';
+            //     $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
+            //     break;
             //PartsPrep
             case ($currentStatus === 'DOPEROSC' && $selectPosition === 'PartsPrep'):
                 $newStatus  = 'LQCHEADAPP';
                 $statusName = 'For Section Head Approval';
                 break;
             //MachineOperator
-            case ($currentStatus === 'DOPEROSC' && $selectPosition != 'MachineOperator' && $isEopervisualRequired === 'YES'):
+            case ($currentStatus === 'DOPEROSC' && $selectPosition === 'MachineOperator' && $isEopervisualRequired === 'YES'):
                 $newStatus  = 'EOPERVISUAL';
                 $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
                 break;
             case ($currentStatus === 'DOPEROSC' && $selectPosition === 'MachineOperator' && $isEopervisualRequired === 'NO'): //
                 $newStatus  = 'LQCHEADAPP';
                 $statusName = 'For Section Head Approval';
+                break;
+            //Visual
+            case ($currentStatus === 'DOPEROSC' && $selectPosition === 'VisualOperator'):
+                $newStatus  = 'EOPERVISUAL';
+                $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
                 break;
             case 'EOPERVISUAL':
                 $newStatus  = 'LQCHEADAPP';

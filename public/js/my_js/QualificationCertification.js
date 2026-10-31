@@ -586,6 +586,10 @@
                 $('.btnAllOperator').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
             }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
         }
         if(positionCategory === 'PartsPrep'){ //TODO LOAD PER MASTELIST ID
             initDropdownMasterDetailsByFkidCombos([
@@ -615,6 +619,10 @@
             if(approvalStatus === 'LQCHEADAPP'){
                 $('.btnAllOperator').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
             }
         }
         if(positionCategory === 'MachineOperator'){
@@ -647,6 +655,10 @@
                 $('.btnAllOperator').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
             }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
         }
         if(positionCategory === 'MH'){
             initDropdownMasterDetailsByFkidCombos([
@@ -664,6 +676,10 @@
             if(approvalStatus === 'LQCHEADAPP'){
                 $('.btnMh').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                $('.operApproved').addClass('d-none');
+                $('.btnMh').addClass('d-none');
             }
         }
         if(positionCategory === 'Supervisor'){
@@ -1848,9 +1864,11 @@
             );
 
             if(positionCategory === 'VisualOperator' || positionCategory === 'PartsPrep' || positionCategory === 'MachineOperator'){
-                
+
                 const doperosc = response?.approversCollection?.DOPEROSC?.[0] ?? null;
-                console.log('doperosc',doperosc);
+
+                form.formSubmitOperators.find('#text_sel_result3_operator').val(doperosc?.is_eopervisual_required ?? '').trigger('change');
+
                 form.formSubmitOperators.find('#text_sel_result1_operator').val(doperosc?.first_status ?? '').trigger('change');
                 form.formSubmitOperators.find('#text_sec1_date_operator').val(doperosc?.first_date ?? '');
                 form.formSubmitOperators.find('#text_sec1_time_operator').val(doperosc?.first_time ?? '');
@@ -1888,7 +1906,7 @@
             // alert(positionCategory)
             if(positionCategory === 'Supervisor'){
                 const sepTrainingOrientation = data.a_sep_training_orientation?.sep_training_orientation;
-                
+
                 syncCheckboxesWithDb('text_sep_training_orientation', sepTrainingOrientation,form.formSubmitSep);
                 const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
                 form.formSubmitSep.find('#text_a_sep_date').val(asepto?.first_date ?? '');

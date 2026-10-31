@@ -103,11 +103,11 @@
                                                                 <th>Action</th>
                                                                 <th>Status</th>
                                                                 <th>Ctrl No. / Doc No.</th>
+                                                                <th>Position</th>
                                                                 <th>Series Name</th>
                                                                 <th>Production Section</th>
                                                                 <th>Production Line</th>
                                                                 <th>Section</th>
-                                                                <th>Position</th>
                                                                 {{-- <th>Date Filed</th> --}}
                                                                 <th class='d-none'>Emp Name</th>
                                                                 <!-- <th>Qualified by</th> -->
@@ -370,13 +370,14 @@
                 { "data" : "rawAction", orderable:false, searchable:false },
                 { "data" : "rawStatus", orderable:false, searchable:false },
                 { "data" : "control_no" },
+                { "data" : "position_category" },
                 { "data" : "series_name" },
                 { "data" : "get_production_area" },
                 { "data" : "get_product_line" },
                 // { "data" : "created_by" },
                 // { "data" : "created_by" },
                 { "data" : "section" },
-     
+
                 { "data" : "employee_names",
                     visible: false,    // Hides column from display
                     searchable: true   // Keeps column indexed for searching

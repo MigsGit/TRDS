@@ -38,7 +38,7 @@ class SkillMapExportPerProdLine implements FromView, WithStyles, WithDrawings
         ]);
     }
 
-    
+
     public function drawings()
 {
     // $row = $index + 2;
@@ -71,7 +71,7 @@ class SkillMapExportPerProdLine implements FromView, WithStyles, WithDrawings
         //    print_r($level);
         //    exit();
 
-            if (!in_array($level, [0, 1, 2, 3, 4, 5])) {
+            if ($level < 0 || $level > 200) {
                 continue;
             }
             // dd($position);
@@ -89,6 +89,8 @@ class SkillMapExportPerProdLine implements FromView, WithStyles, WithDrawings
             // }
             $level = (int) ($employee['productLines'][$productLineIndex] ?? 0);
             $position = strtoupper(trim($employee['position'] ?? ''));
+
+            // dd($level);
 
             if ($position == 'OPERATOR') {
                 if ($level >= 1 && $level <= 12) {
@@ -139,11 +141,11 @@ class SkillMapExportPerProdLine implements FromView, WithStyles, WithDrawings
                 } else {
                     $level = 0;
                 }
-            }  
+            }
             else {
                 $level = 0;
             }
-            
+
             $image = public_path("images/level{$level}.png");
 
             if (!file_exists($image)) {
