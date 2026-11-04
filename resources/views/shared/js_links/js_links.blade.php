@@ -26,16 +26,19 @@
 <script src="{{ asset('public/template/plugins/select2/js/select2.min.js') }}"></script>
 
 <!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script> --}}
+<script src="{{ asset('public/template/plugins/sweetalert/js/sweetalert.js') }}"></script>
 
 <!-- Toastr -->
 <script src="{{ asset('public/template/plugins/toastr/toastr.min.js') }}"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script> --}}
+<script src="{{ asset('public/template/plugins/moment/moment.min.js') }}"></script>
 {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script> --}}
 
 <!-- Datepicker -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script> --}}
+<script src="{{ asset('public/template/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 
 
 {{--

@@ -144,10 +144,26 @@
                             <div class="card-header border-0 text-white rounded-top-4 bg-secondary">
                                 <div class="d-flex align-items-center">
                                     <!-- Avatar -->
-                                    <div class="rounded-circle bg-white text-primary d-flex justify-content-center align-items-center shadow"
-                                        style="width:85px;height:85px;">
-                                        <i class="fa fa-user fa-3x"></i>
-                                    </div>
+                                    <escape><!-- Avatar -->
+                                        <div class="rounded-circle bg-white text-primary d-flex justify-content-center align-items-center shadow"
+                                        style="width:85px;height:85px;overflow:hidden;">
+
+
+                                        <a id="employeeAvatarLink"
+                                            href="#"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style="display:none;width:100%;height:100%;">
+
+                                            <img id="employeeAvatar"
+                                                src=""
+                                                alt="Employee Photo"
+                                                style="width:100%;height:100%;object-fit:cover;cursor:pointer;">
+                                        </a>
+
+                                        <i id="defaultEmployeeAvatar" class="fa fa-user fa-3x"></i>
+                                        </div>
+                                    </escape>
 
                                     <!-- Employee Name -->
                                     <div class="ml-4">
@@ -1340,11 +1356,15 @@
             });
 
             $('.get-employee-info').on('select2:select', function (e) {
-                const data = e.params.data;
-                const hiringStatus = data.hiringStatus;
+                const data          = e.params.data;
+                const hiringStatus  = data.hiringStatus;
+                const employeeNo    = data.employeeNo;
+                const userType      = data.userType;
+
                 console.log('data:',data);
                 console.log('hiringStatus:',hiringStatus);
                 console.log('employeeNo:',data.employeeNo);
+                console.log('userType:',data.userType);
 
                 $('#displayEmployeeName').text(data.text);
                 $('#displayPosition').text(data.position);
@@ -1376,6 +1396,9 @@
 
                 getEmployeeTrainingRecordId = data.id
                 getEmployeeNoForTrdsSummary = data.employeeNo;
+
+                PmiSubconPicture(employeeNo,userType);
+
                 dataEmployeeTrainingRecord.draw();
                 dataTRDSSummary.draw();
             });

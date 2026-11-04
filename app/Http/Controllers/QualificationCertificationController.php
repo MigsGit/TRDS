@@ -670,6 +670,7 @@ class QualificationCertificationController extends Controller
                     );
                     if($currentApprovalStatus === 'DOPEROSC'){  //PRODUCT ORIENTATION AND SAMPLE CHECK (QC) DoperoscRequest
                         $validatedData = app(DoperoscRequest::class)->validateResolved();
+
                         $qcModelApprover::updateOrCreate(
                             ['qc_slips_id' => $qcSlipId, 'approval_status' => $currentApprovalStatus],
                            [
@@ -1331,7 +1332,7 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             DB::commit();
-            // $this->commonController->sendEmail($emailData);
+            $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();

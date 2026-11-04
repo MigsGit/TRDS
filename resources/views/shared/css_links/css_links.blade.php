@@ -40,7 +40,8 @@
 {{-- <link href="https://emoji-css.afeld.me/emoji.css" rel="stylesheet"> --}}
 
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"/>
+{{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"/> --}}
+<link rel="stylesheet" href="{{ asset('public/template/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}">
 
 {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@latest/pace-theme-default.min.css"> --}}
 
@@ -52,7 +53,8 @@
 <link href="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1581152091/smartwizard/smart_wizard_theme_arrows.min.css" rel="stylesheet" type="text/css" /> --}}
 
 
-<link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.5.0/css/rowReorder.dataTables.min.css">
+{{-- <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.5.0/css/rowReorder.dataTables.min.css"> --}}
+<link rel="stylesheet" href="{{ asset('public/template/plugins/rowreorder/css/rowReorder-dataTables.min.css') }}">
 
 <link href="{{ asset('public/css/flash.css') }}" rel="stylesheet">
 
