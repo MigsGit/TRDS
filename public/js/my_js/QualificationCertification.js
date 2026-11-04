@@ -532,6 +532,7 @@
         initDropdownMasterDetailsByFkidCombos([
                 '#transfer_flexibility',
         ],6);
+
         $('.inspectorSave').addClass('d-none');
         $('.operSave').addClass('d-none');
         $('.operApproved').addClass('d-none');
@@ -560,7 +561,10 @@
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],1);
+            ],17);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],27);
             $('.eVisualGrr').removeClass('d-none');
             $('#divAllOperators').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
@@ -595,7 +599,10 @@
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],1);
+            ],17);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],28);
             $('#divAllOperators').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
             $('#productLine').removeClass('d-none');
@@ -629,7 +636,10 @@
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],1);
+            ],17);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],28);
             $('.eVisualGrr').removeClass('d-none');
             $('.machineOpetorItemNo3').removeClass('d-none');
             $('#divAllOperators').removeClass('d-none');
@@ -1336,7 +1346,7 @@
             const empName = emp.system_one_hris_subcon?.empname ?? ''; // Use fallback if name is in relation
             const stFrom = emp.get_station_from?.dropdown_masters_details ??'';
             const stTo = emp.get_station_to?.dropdown_masters_details ?? '';
-            const remarks = emp.remarks || '';
+            const remarks = emp.remarks_dropdown_master_detail?.dropdown_masters_details || emp.remarks || '';
             let remove =``;
             if(approvalStatus === 'APRODTO'){
                 remove += ` <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpMain">

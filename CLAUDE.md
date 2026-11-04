@@ -121,3 +121,8 @@ Each stage has a matching Form Request with the same name + `Request`. Approvers
 - Section names in `section_category` may be group-level (`TS`) or sheet-level (`TSF1`). Check `SELECT DISTINCT section_category FROM qc_slips WHERE position_category = 'Inspector'` before relying on exact matches.
 - `employee_info` can be null when the System One lookup finds nothing. Read it with `isset` or `optional`.
 - Present Allocation (column G) isn't in the query data. Don't invent it.
+   @.github/copilot-instructions.md
+<!-- 
+   ## Claude-specific
+   - Plan first for changes touching 3+ files.
+   - Skills live in .claude/skills/. -->
