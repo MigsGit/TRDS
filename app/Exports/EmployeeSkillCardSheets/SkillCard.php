@@ -14,8 +14,44 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
+use App\Exports\EmployeeSkillCard;
+
 class SkillCard implements WithEvents, WithTitle
 {
+    /**
+     * Series count -> rating level (Rating reference Q10:T10).
+     * level => [min series, max series]; null max means "and above".
+     */
+    const SERIES_LEVEL_RULES = [
+        4 => [7, null],
+        3 => [4, 6],
+        2 => [2, 3],
+        1 => [1, 1],
+    ];
+
+    /**
+     * Total actual rating points -> overall performance level (Q16:T16).
+     * level => [min points, max points]
+     */
+    const OVERALL_LEVEL_RANGES = [
+        1 => [1, 24],
+        2 => [25, 48],
+        3 => [49, 72],
+        4 => [73, 96],
+    ];
+
+    /**
+     * Overall level photos shown in E5:H9, relative to public_path().
+     * 0 is the placeholder used when the employee has no actual ratings yet.
+     */
+    const OVERALL_LEVEL_PHOTOS = [
+        0 => 'images/skill_card/skill_card_overall_level_1.jpg',
+        1 => 'images/skill_card/skill_card_overall_level_1.jpg',
+        2 => 'images/skill_card/skill_card_overall_level_2.jpg',
+        3 => 'images/skill_card/skill_card_overall_level_3.jpg',
+        4 => 'images/skill_card/skill_card_overall_level_4.jpg',
+    ];
+
     protected $employeeSkillCardData;
 
     public function __construct($employeeSkillCardData = null){
@@ -369,16 +405,13 @@ class SkillCard implements WithEvents, WithTitle
         //     "LEVEL\n"
         // );
 
-        $overall_rating = [
-            'level1' => 'level_1',
-            'level2' => 'level_2',
-            'level3' => 'level_3',
-            'level4' => 'level_4',
-        ];
+        $totalActualRating = $this->calculateTotalActualRating($employeeSkillCardData);
+        $overallLevel = $this->resolveOverallLevel($totalActualRating);
 
+        // Only one drawing is ever anchored at E5, so the level photo replaces the placeholder instead of stacking on it
         $this->addImage(
                 $sheet,
-                public_path('images/skill_card/skill_card_overall_'.$overall_rating['level1'].'.jpg'),
+                $this->resolveOverallLevelPhotoPath($overallLevel),
                 'E5', //cell
                 100, //width
                 95, //height
@@ -430,7 +463,7 @@ class SkillCard implements WithEvents, WithTitle
 
         $sheet->setCellValue(
             'I10',
-            'POINTS'
+            "{$totalActualRating} pts"
         );
         $sheet->getStyle("I10:{$leftEndColumn}10")
             ->getAlignment()
@@ -568,8 +601,7 @@ class SkillCard implements WithEvents, WithTitle
                 }
 
                 $competencyName = $station['target_rating_name'] ?? null;
-                $actualRating = $actualRatingsLookup[$productLineName][$competencyName] ?? null;
-                $rating = $this->resolveRatingLevel($actualRating);
+                $rating = $actualRatingsLookup[$productLineName][$competencyName] ?? 0;
 
                 $this->applyQuadrantRating($sheet, $col1, $col2, $topRow, $bottomRow, $rating);
 
@@ -583,8 +615,8 @@ class SkillCard implements WithEvents, WithTitle
     }
 
     /**
-     * Indexes actual_ratings by [product_line_name][functional_competency_name] => actual_rating
-     * for O(1) lookups while rendering the quadrant matrix grid.
+     * Indexes actual_ratings by [product_line_name][functional_competency_name] => 0-4 rating level
+     * for O(1) lookups while rendering the quadrant matrix grid and summing the total rating.
      */
     private function buildActualRatingsLookup($employeeSkillCardData): array{
         $lookup = [];
@@ -597,35 +629,98 @@ class SkillCard implements WithEvents, WithTitle
                 continue;
             }
 
-            $lookup[$productLineName][$competencyName] = $actualRating['actual_rating'] ?? null;
+            $lookup[$productLineName][$competencyName] = $this->resolveActualRatingLevel($actualRating);
         }
 
         return $lookup;
     }
 
     /**
-     * Maps a raw actual_rating value to a 1-4 quadrant level using grading thresholds.
-     * Adjust the ranges below if the grading criteria changes.
+     * Series counts (Operator) go through SERIES_LEVEL_RULES; training results are already the level itself.
+     * Rows without a rating_source are treated as series counts (the original behavior).
+     */
+    private function resolveActualRatingLevel(array $actualRating): int{
+        $value = $actualRating['actual_rating'] ?? null;
+        $source = $actualRating['rating_source'] ?? EmployeeSkillCard::RATING_SOURCE_SERIES_COUNT;
+
+        if ($source !== EmployeeSkillCard::RATING_SOURCE_TRAINING_RESULT) {
+            return $this->resolveRatingLevel($value);
+        }
+
+        $level = is_numeric($value) ? (int) $value : 0;
+
+        return ($level >= 1 && $level <= 4) ? $level : 0;
+    }
+
+    /**
+     * Maps a raw actual_rating (distinct series count) to a 1-4 quadrant level using SERIES_LEVEL_RULES.
      */
     private function resolveRatingLevel($actualRating): int{
         if ($actualRating === null || $actualRating === '') {
             return 0;
         }
 
-        $value = (float) $actualRating;
+        return $this->resolveLevelFromRanges((float) $actualRating, self::SERIES_LEVEL_RULES);
+    }
 
-        switch (true) {
-            case $value > 36:
-                return 4;
-            case $value >= 25:
-                return 3;
-            case $value >= 13:
-                return 2;
-            case $value >= 1:
-                return 1;
-            default:
-                return 0;
+    /**
+     * Sums the rating level of every product line + station cell rendered in the quadrant grid.
+     * Walks the same product lines x stations as createProductLineSection so the total matches the filled cells.
+     */
+    private function calculateTotalActualRating($employeeSkillCardData): int{
+        $productLines = $employeeSkillCardData[0]['target_rating_product_lines'] ?? [];
+        $stations = $employeeSkillCardData[0]['target_ratings'] ?? [];
+        $actualRatingsLookup = $this->buildActualRatingsLookup($employeeSkillCardData);
+
+        $total = 0;
+
+        foreach ($productLines as $productLine) {
+            $productLineName = $productLine['target_product_line_name'] ?? 'NOT FOUND';
+
+            foreach ($stations as $station) {
+                $competencyName = $station['target_rating_name'] ?? null;
+                $total += $actualRatingsLookup[$productLineName][$competencyName] ?? 0;
+            }
         }
+
+        return $total;
+    }
+
+    /**
+     * Maps total actual rating points to a 1-4 overall level using OVERALL_LEVEL_RANGES (0 when no points).
+     * Totals above the highest range are capped at the highest level.
+     */
+    private function resolveOverallLevel(int $totalActualRating): int{
+        if ($totalActualRating <= 0) {
+            return 0;
+        }
+
+        $level = $this->resolveLevelFromRanges($totalActualRating, self::OVERALL_LEVEL_RANGES);
+
+        return $level > 0 ? $level : max(array_keys(self::OVERALL_LEVEL_RANGES));
+    }
+
+    /**
+     * Returns the level whose [min, max] range contains $value (null max = no upper bound), or 0 if none match.
+     */
+    private function resolveLevelFromRanges(float $value, array $ranges): int{
+        foreach ($ranges as $level => [$min, $max]) {
+            if ($value >= $min && ($max === null || $value <= $max)) {
+                return $level;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * Absolute path of the overall level photo, falling back to the placeholder if the file is missing
+     * (Drawing::setPath throws on a missing file and would abort the whole export).
+     */
+    private function resolveOverallLevelPhotoPath(int $overallLevel): string{
+        $path = public_path(self::OVERALL_LEVEL_PHOTOS[$overallLevel] ?? self::OVERALL_LEVEL_PHOTOS[0]);
+
+        return is_file($path) ? $path : public_path(self::OVERALL_LEVEL_PHOTOS[0]);
     }
 
     /**

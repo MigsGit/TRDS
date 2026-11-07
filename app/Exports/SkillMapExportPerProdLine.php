@@ -138,7 +138,7 @@ class SkillMapExportPerProdLine implements FromView, WithStyles, WithDrawings
                     $level = 3;
                 } elseif ($level >= 73 && $level <= 96) {
                     $level = 4;
-                } else {
+                } else { 
                     $level = 0;
                 }
             }

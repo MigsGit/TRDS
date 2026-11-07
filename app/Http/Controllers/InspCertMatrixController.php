@@ -12,8 +12,8 @@ class InspCertMatrixController extends Controller
 {
     public function exportInspectorCertMatrix(Request $request){
 
-        $exploded_product_line = explode(',', $request->product_line);
-        $exploded_product_line = array_map('trim', (array) $exploded_product_line);
+        $exploded_product_area = explode(',', $request->product_area);
+        $exploded_product_area = array_map('trim', (array) $exploded_product_area);
 
         $personel = QcSlip::with([
             'op_approvers',
@@ -28,14 +28,15 @@ class InspCertMatrixController extends Controller
         ->whereNull('deleted_at')
         ->where('status', 'OK')
         ->where('section_category', $request->section)
-        ->where(function ($query) use ($exploded_product_line) {
-            foreach ($exploded_product_line as $productLine) {
-                $query->orWhere('product_line', 'LIKE', '%' . trim($productLine) . '%');
+        ->where(function ($query) use ($exploded_product_area) {
+            foreach ($exploded_product_area as $productArea) {
+                // $query->orWhere('product_line', 'LIKE', '%' . trim($productArea) . '%');
+                $query->orWhere('production_area', 'LIKE', '%' . trim($productArea) . '%');
             }
         })
         ->where('position_category', 'Inspector')
         ->get()
-        ->map(function ($slip) use ($exploded_product_line) {
+        ->map(function ($slip) use ($exploded_product_area) {
             // 1. Transform qc_slip_employees to single Object
             $slip->setRelation('qc_slip_employees', $slip->qc_slip_employees->first());
 
@@ -46,15 +47,15 @@ class InspCertMatrixController extends Controller
                 : [];
             
             // 3. Handle Product Line IDs
-            $rawProductLineIds = $slip->product_line 
-                ? array_map('trim', explode('|', $slip->product_line)) 
+            $rawProductAreaIds = $slip->production_area 
+                ? array_map('trim', explode('|', $slip->production_area)) 
                 : [];
 
-            // FILTER: Keep ONLY the IDs that were selected in the request ($exploded_product_line)
-            $filteredProductLineIds = array_intersect($rawProductLineIds, $exploded_product_line);
+            // FILTER: Keep ONLY the IDs that were selected in the request ($exploded_product_area)
+            $filteredProductAreaIds = array_intersect($rawProductAreaIds, $exploded_product_area);
 
-            $slip->product_line_details = !empty($filteredProductLineIds)
-                ? DropdownMasterDetail::whereIn('id', $filteredProductLineIds)->get()
+            $slip->product_line_details = !empty($filteredProductAreaIds)
+                ? DropdownMasterDetail::whereIn('id', $filteredProductAreaIds)->get()
                 : collect();
 
             return $slip;
@@ -88,7 +89,7 @@ class InspCertMatrixController extends Controller
             return $earliestTimestamp;
         });
         
-        $prod_line = DropdownMasterDetail::whereIn('id', $exploded_product_line)->get();
+        $prod_line = DropdownMasterDetail::whereIn('id', $exploded_product_area)->get();
         $product_line = $prod_line->pluck('dropdown_masters_details')->flatten()->toArray();
         $filename_prod_line = implode('_', $product_line);
         // return gettype($product_line);

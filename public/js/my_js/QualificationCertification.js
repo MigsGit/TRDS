@@ -561,7 +561,7 @@
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],17);
+            ],1);
             initDropdownMasterDetailsByFkidCombos([
                     '#text_oper_remarks',
             ],27);
@@ -599,7 +599,7 @@
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],17);
+            ],1);
             initDropdownMasterDetailsByFkidCombos([
                     '#text_oper_remarks',
             ],28);
@@ -636,10 +636,10 @@
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],17);
+            ],1);
             initDropdownMasterDetailsByFkidCombos([
                     '#text_oper_remarks',
-            ],28);
+            ],29);
             $('.eVisualGrr').removeClass('d-none');
             $('.machineOpetorItemNo3').removeClass('d-none');
             $('#divAllOperators').removeClass('d-none');
@@ -1202,6 +1202,11 @@
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please Add 1 Employee Per Station.' });
             return;
         }
+        if (stFrom.length > 1) {
+            Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please Add 1 Station From Only.' });
+            return;
+        }
+
         if (empId.length === 0) {
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select an Employee.' });
             return;

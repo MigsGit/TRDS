@@ -435,7 +435,7 @@
                         <div class="modal-body p-4" style="background: #f7f9fc;">
 
                             <!-- 3-Column Section -->
-                            <div class="row">
+                            {{-- <div class="row">
                                 <!-- Column 1 -->
                                 <div class="col-md-4 mb-3">
                                     <a href="{{ asset('public/manual/List of Certified Personnel_CN201P_October 2026.xlsx') }}" download
@@ -516,7 +516,54 @@
                                         </div>
                                     </a>
                                 </div>
-                            </div>
+                            </div> --}}
+                            <button type="button" class="btn btn-light border w-100 text-left p-3 mb-3 shadow-sm"
+                                id="btnListCertPersonnel"
+                                title="Generate the List of Certified Personnel"
+                                style="border-radius: 10px; white-space: normal;">
+
+                                <div class="d-flex align-items-center">
+                                    <div class="d-flex align-items-center justify-content-center mr-3 flex-shrink-0"
+                                        style="width: 48px; height: 48px; background: #fff0d9; border-radius: 12px;">
+                                        <i class="fas fa-clipboard-list fa-lg text-primary"></i>
+                                    </div>
+
+                                    <div class="flex-grow-1">
+                                        <div class="font-weight-bold text-dark mb-1">
+                                            List of Certified Personnel
+                                        </div>
+                                        <small class="text-muted">
+                                            Generate a list of certified personnel with section, product area and series filtering.
+                                        </small>
+                                    </div>
+
+                                    <i class="fas fa-chevron-right text-muted ml-2"></i>
+                                </div>
+                            </button>
+
+                             <button type="button" class="btn btn-light border w-100 text-left p-3 mb-3 shadow-sm"
+                                id="btnInsCertMatrix"
+                                title="Generate the List of Inspector Certification Matrix
+                                style="border-radius: 10px; white-space: normal;">
+
+                                <div class="d-flex align-items-center">
+                                    <div class="d-flex align-items-center justify-content-center mr-3 flex-shrink-0"
+                                        style="width: 48px; height: 48px; background: #fff0d9; border-radius: 12px;">
+                                        <i class="fas fa-user-shield fa-lg text-primary"></i>
+                                    </div>
+
+                                    <div class="flex-grow-1">
+                                        <div class="font-weight-bold text-dark mb-1">
+                                            Inspector Certification Matrix
+                                        </div>
+                                        <small class="text-muted">
+                                            Generate inspector certification matrix with section and product area filtering.
+                                        </small>
+                                    </div>
+
+                                    <i class="fas fa-chevron-right text-muted ml-2"></i>
+                                </div>
+                            </button>
 
                             <!-- Employee Skill Matrix (Full Width) -->
                             <button type="button" class="btn btn-light border w-100 text-left p-3 mb-3 shadow-sm"
@@ -569,7 +616,7 @@
                             </button>
 
                             <!-- Employee Skill Card (Full Width) -->
-                            <button type="button" class="btn btn-light border w-100 text-left p-3 shadow-sm"
+                            <button type="button" class="btn btn-light border w-100 text-left p-3 mb-3 shadow-sm"
                                 data-toggle="modal" data-target="#modalGenerateSkillCardDetails"
                                 title="Generate the Employee Skill Card"
                                 style="border-radius: 10px; white-space: normal;">

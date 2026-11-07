@@ -52,6 +52,10 @@ class QcSlip extends Model
         return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');
 
     }
+    public function production_area_details() // Chris
+    {
+        return $this->hasOne(DropdownMasterDetail::class, 'id', 'production_area');
+    }
     public function getProductLineIdsAttribute() // Chris
     {
         if (empty($this->product_line)) {

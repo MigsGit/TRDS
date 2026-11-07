@@ -96,13 +96,13 @@
                                     <label>Section</label>
                                     <select class="form-control select2bs5" name="section" id="section" required>
                                         <option value="" disabled selected>Select Section</option>
-                                        <option value="TS-F1">TS-F1</option>
-                                        <option value="TS-F3">TS-F3</option>
+                                        <option value="TSF1">TSF1</option>
+                                        <option value="TSF3">TSF3</option>
                                         <option value="CN">CN</option>
-                                        <option value="CN-F3">CN-F3</option>
-                                        <option value="PPD-CN">PPD-CN</option>
-                                        <option value="PPD-TS">PPD-TS</option>
-                                        <option value="PPD-F3">PPD-F3</option>
+                                        <option value="CNF3">CNF3</option>
+                                        <option value="PPDCN">PPDCN</option>
+                                        <option value="PPDTS">PPDTS</option>
+                                        <option value="PPDF3">PPDF3</option>
                                         <option value="YF">YF</option>
                                     </select>
                                 </div>

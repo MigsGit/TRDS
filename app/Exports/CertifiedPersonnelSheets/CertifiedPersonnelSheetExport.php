@@ -128,7 +128,8 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
                     'emp_name'     => $emp->employee_info->EmpName ?? '',
                     // 'product_line' => $productLine,
                     'product_line' => $this->product_line,
-                    'station'      => $emp->get_station_to->dropdown_masters_details ?? '',
+                    // 'station'      => $emp->get_station_to->dropdown_masters_details ?? '',
+                    'station'      => $emp->remarks ?? '',
                     // 'category'     => 'CERTIFICATION',
                     'category' => Str::contains(strtolower(json_encode($slip->reason_details ?? [])), 're-certification') 
                     ? 'RE-CERTIFICATION' 
