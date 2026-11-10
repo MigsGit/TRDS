@@ -40,6 +40,24 @@ class TSF1Layout
      */
     const OTHER_SECTIONS_DATA_ENABLED = false;
 
+    /**
+     * OTHER PROCESS / SYSTEM SKILLS processes (AG:AO), in column order.
+     * Each maps to the station_to_name values (trimmed, exact) that count as that process.
+     */
+    const OTHER_PROCESSES = array(
+        'IQC' => array('IQC'),
+        'IPQC' => array('IPQC'),
+        'OQC' => array('OQC'),
+    );
+
+    /**
+     * How one other-process cell total is computed:
+     * 'sum'     - sum of sub-station ratings, or the station's own rating when it has none;
+     * 'max'     - highest of those ratings;
+     * 'station' - the station's own rating only.
+     */
+    const OTHER_CELL_MODE = 'sum';
+
     /** Legend scale shown under "Total number of certified QC Inspectors per skill". */
     const LEGEND = array(
         1 => 'Awareness and understanding only',
