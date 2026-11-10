@@ -41,7 +41,7 @@
                                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                                         <div class="mb-2 mb-md-0">
                                             <p class="text-uppercase text-muted small mb-1">Certification workspace</p>
-                                            <h5 class="card-title mb-0 text-secondary">Certification / Validation ssss</h5>
+                                            <h5 class="card-title mb-0 text-secondary">Certification / Validation</h5>
                                         </div>
                                         <button type="button" id="btnCreateCQForm" class="btn btn-primary" data-toggle="modal" data-target="#modalCreateCQForm"><i class="fa fa-plus fa-md mr-2"></i>Certify Employee</button>
                                     </div>
@@ -103,11 +103,12 @@
                                                                 <th>Action</th>
                                                                 <th>Status</th>
                                                                 <th>Ctrl No. / Doc No.</th>
-                                                                <th>Series Name</th>
-                                                                <th>Created by</th>
-                                                                <th>Section</th>
                                                                 <th>Position</th>
-                                                                <th>Date Filed</th>
+                                                                <th>Series Name</th>
+                                                                <th>Production Section</th>
+                                                                <th>Production Line</th>
+                                                                <th>Section</th>
+                                                                {{-- <th>Date Filed</th> --}}
                                                                 <th class='d-none'>Emp Name</th>
                                                                 <!-- <th>Qualified by</th> -->
                                                                 {{-- <th>Certified by</th> --}}
@@ -129,6 +130,33 @@
                 </div>
             </div>
         </section>
+        <!-- EDIT APPROVER MODAL -->
+    <div class="modal fade" id="modalEditOpApprover" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="editOpApproverLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editOpApproverLabel">Edit Approver</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="formEditOpApprover" autocomplete="off">
+                    <div class="modal-body">
+                        <input type="hidden" id="edit_op_approver_qc_slips_id" name="qc_slips_id">
+                        <div class="form-group">
+                            <label for="edit_alert_prod_sec">Attention To:</label>
+                            <select class="form-control select2bs4" style="width: 100%;" id="edit_alert_prod_sec" name="alert_prod_sec[]" multiple></select>
+                            <span class="text-danger small" data-error-for="alert_prod_sec"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success btn-sm" id="btnSaveOpApprover">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
         <!-- CREATE MODAL -->
     <div class="modal fade" id="modalCreateCQForm" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="createCQFormLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-xl" style="width: 95% !important; min-width: 95% !important;">
@@ -159,7 +187,7 @@
                                         <option value="Inspector">Inspector</option>
                                         <option value="Technician">Technician</option>
                                         <option value="Supervisor">Supervisor</option>
-                                        {{-- <option value="MH">MH</option> --}}
+                                        <option value="MH">MH</option>
                                     </select>
                                 </div>
                             </div>
@@ -189,12 +217,12 @@
 
                                     <div class="col-md-4">
                                         <label for="" id="seriesDesignation">Series Name:</label>
-                                        <input class="form-control" type="text" id="text_series_operator" name="text_series_operator" placeholder="Enter series name here">
+                                        <input class="form-control" type="text" id="text_series_operator" name="text_series_operator" placeholder="Enter here">
                                     </div>
 
                                     <div class="col-md-4" id="productArea">
                                         <label for="">Product Area:</label>
-                                         <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_line" id="text_operator_product_area">
+                                         <select class="form-control select2bs4" style="width: 100%;" name="text_operator_product_area" id="text_operator_product_area">
                                         </select>
                                     </div>
                                       <div class="col-md-4" id="dateOfTransfer">
@@ -290,6 +318,7 @@
             formSubmitTech: $('#formSubmit_Tech'),
             formSubmitSep: $('#formSubmit_SEP'),
             formSubmitOper: $('#formSubmitOper'),
+            // formSubmitAllOperators: $('#formSubmitAllOperators'),
             formSubmitMh: $('#formSubmit_MH'),
             formSubmitInspector: $('#formSubmit_Ins'),
             formSubmitOperators: $('#formSubmitOperators'),
@@ -309,6 +338,26 @@
             // resetFormValues({'frmId'  :   form.formSubmitOper})
             // resetFormValues({'frmId'  :   form.formSubmitMh})
             // resetFormValues({'frmId'  :   form.formSubmitInspector})
+            // resetFormValues({'frmId'  :   form.formSubmitOperators})
+
+            $('#qc_slips_id').val('');
+            $('#textconno_new_operator').val('');
+            $('#text_section_operator').val('').trigger('change');
+            $('#text_date_of_transfer').val('');
+            $('#text_series_operator').val('');
+            $('#text_select_position').val('').trigger('change');
+            $('#select_section').val('').trigger('change');
+            $('#text_operator_product_line').val('');
+            $('#text_operator_product_area').val('');
+            $('#text_certification_operator').val('');
+            $('#transfer_flexibility').val('');
+
+            resetFormValues({'frmId'  :$('#formSubmit_Tech')});
+            resetFormValues({'frmId'  :$('#formSubmit_SEP')});
+            resetFormValues({'frmId'  :$('#formSubmitOper')});
+            resetFormValues({'frmId'  :$('#formSubmit_MH')});
+            resetFormValues({'frmId'  :$('#formSubmit_Ins')});
+            resetFormValues({'frmId'  :  $('#formSubmitOperators')});
         });
         const updateApproval = (params) => {
             let data = {
@@ -368,11 +417,14 @@
                 { "data" : "rawAction", orderable:false, searchable:false },
                 { "data" : "rawStatus", orderable:false, searchable:false },
                 { "data" : "control_no" },
-                { "data" : "series_name" },
-                { "data" : "created_by" },
-                { "data" : "section_category" },
                 { "data" : "position_category" },
-                { "data" : "created_at" },
+                { "data" : "series_name" },
+                { "data" : "get_production_area" },
+                { "data" : "get_product_line" },
+                // { "data" : "created_by" },
+                // { "data" : "created_by" },
+                { "data" : "section" },
+
                 { "data" : "employee_names",
                     visible: false,    // Hides column from display
                     searchable: true   // Keeps column indexed for searching
@@ -526,6 +578,59 @@
             };
             getQcSlipsById(params);
         });
+        $(table.operator).on('click', '#btnEditSecHeadSlipsId','tr',function (e) {
+            e.preventDefault();
+            let qcSlipsId = $(this).attr('qc-slips-id');
+            let params = {
+                qcSlipsId: qcSlipsId,
+            };
+            $('#edit_op_approver_qc_slips_id').val(qcSlipsId);
+            $('#formEditOpApprover [data-error-for]').text('');
+            $.ajax({
+                url: "{{ route('load_op_approver') }}",
+                method: 'GET',
+                dataType: 'json',
+                data: { qc_slips_id: qcSlipsId },
+                success: function (response) {
+                    getSystemOneEmployeeDetails($('#edit_alert_prod_sec'), response.data.alert_prod_sec);
+                    $('#modalEditOpApprover').modal('show');
+                },
+                error: function (xhr) {
+                    let message = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Failed to load approver.';
+                    Swal.fire({ icon: 'error', title: 'Error', text: message });
+                }
+            });
+        });
+        $(document).on('submit', '#formEditOpApprover', function (e) {
+            e.preventDefault();
+            $('#formEditOpApprover [data-error-for]').text('');
+            $('#btnSaveOpApprover').prop('disabled', true);
+            $.ajax({
+                url: "{{ route('update_op_approver') }}",
+                method: 'POST',
+                dataType: 'json',
+                data: $(this).serialize() + '&_token={{ csrf_token() }}',
+                success: function (response) {
+                    Swal.fire({ icon: 'success', title: 'Success', text: response.message });
+                    $('#modalEditOpApprover').modal('hide');
+                    dataTable.operator.draw(false);
+                },
+                error: function (xhr) {
+                    if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                        $.each(xhr.responseJSON.errors, function (field, messages) {
+                            let key = field.split('.')[0];
+                            $('#formEditOpApprover [data-error-for="' + key + '"]').text(messages[0]);
+                        });
+                        return;
+                    }
+                    let message = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Failed to update approver.';
+                    Swal.fire({ icon: 'error', title: 'Error', text: message });
+                },
+                complete: function () {
+                    $('#btnSaveOpApprover').prop('disabled', false);
+                }
+            });
+        });
         $(document).on('change', '#text_certification_operator',function (e) {
             e.preventDefault();
             // 1. Grab the value (fallback to empty string if null/undefined)
@@ -646,8 +751,8 @@
                     // $('#divTechnician').removeClass('d-none');
                     break;
                case 'Supervisor':
-                    saveSupervisor();
-                    // saveFormOper();
+                    // saveSupervisor();
+                    saveFormOper(form.formSubmitSep);
                     break;
                 case 'Engineer':
                 // case 'Planner':
@@ -682,7 +787,6 @@
         $(document).on('submit', '#formSubmit_SEP', function (e) {
             e.preventDefault();
             var $form = $(this);
-
             // saveFormOper($form);
             $('#modalSendEmail').modal();
         });

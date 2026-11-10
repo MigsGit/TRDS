@@ -38,8 +38,8 @@ class TrainingRecordUpdateRequest extends FormRequest
                 'venue'             => 'nullable|string|max:255',
                 'type_of_training'  => 'nullable|string|max:255',
                 'result'            => 'nullable|string|max:255',
-                'objective'         => 'nullable|string|max:255',
-                'remarks'           => 'nullable|string|max:255',
+                'objective'         => 'nullable',
+                'remarks'           => 'nullable',
                 'trainee'           => 'nullable',
             ];
         }

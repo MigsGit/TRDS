@@ -27,7 +27,6 @@ class EopervisualRequest extends FormRequest
             'text_pv1_certified_operator' => ['required'],
             'text_pv1_date_operator' => ['required'],
             'text_pv1_time_operator' => ['required'],
-            'text_pv_result1_operator' => ['required'],
         ];
     }
 }

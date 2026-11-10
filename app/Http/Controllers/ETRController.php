@@ -54,7 +54,11 @@ class ETRController extends Controller
                 ->orWhere('EmpName', 'LIKE', "%{$search}%");
         })
         ->limit(50)
-        ->get();
+        ->get()->map(function ($employee) {
+            $employee->userType = 'PMI';
+
+            return $employee;
+        });
 
         $subconEmployees = SystemOneSubconEmpInfo::query()
         ->where(function ($query) use ($search) {
@@ -65,7 +69,7 @@ class ETRController extends Controller
         ->get()
         ->map(function ($employee) {
             $employee->pkid = 'SUB' . $employee->pkid;
-
+            $employee->userType = 'SUBCON';
             return $employee;
         });
 
@@ -310,8 +314,10 @@ class ETRController extends Controller
 
                 if ($row instanceof \App\Model\QcSlip) {
                     return optional(
-                        $row->productLine
-                    )->dropdown_masters_details;
+                        // $row->productLine
+                        $row
+                    // )->dropdown_masters_details;
+                    )->series_name;
                 }
 
                 return 'N/A';

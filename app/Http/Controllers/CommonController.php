@@ -524,6 +524,7 @@ class CommonController extends Controller
     }
 
     public function getApprovalStatus($approvalStatus){
+        // return $approvalStatus;
         try {
             
              $spanColor = 'bg-danger';

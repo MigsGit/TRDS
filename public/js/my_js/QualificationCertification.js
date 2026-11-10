@@ -532,6 +532,7 @@
         initDropdownMasterDetailsByFkidCombos([
                 '#transfer_flexibility',
         ],6);
+
         $('.inspectorSave').addClass('d-none');
         $('.operSave').addClass('d-none');
         $('.operApproved').addClass('d-none');
@@ -560,7 +561,10 @@
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],17);
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],27);
             $('.eVisualGrr').removeClass('d-none');
             $('#divAllOperators').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
@@ -586,12 +590,19 @@
                 $('.btnAllOperator').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
             }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
         }
         if(positionCategory === 'PartsPrep'){ //TODO LOAD PER MASTELIST ID
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],17);
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],28);
             $('#divAllOperators').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
             $('#productLine').removeClass('d-none');
@@ -616,12 +627,19 @@
                 $('.btnAllOperator').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
             }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
         }
         if(positionCategory === 'MachineOperator'){
             initDropdownMasterDetailsByFkidCombos([
                 '#text_oper_station_to',
                 '#text_oper_station_from',
-            ],17);
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],29);
             $('.eVisualGrr').removeClass('d-none');
             $('.machineOpetorItemNo3').removeClass('d-none');
             $('#divAllOperators').removeClass('d-none');
@@ -647,8 +665,16 @@
                 $('.btnAllOperator').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
             }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
         }
         if(positionCategory === 'MH'){
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],34);
             initTrainingItemsTable('#tblTrainingItems_mh');
             $('.btnMh').removeClass('d-none');
             $('.btnSaveMatrix').removeClass('d-none');
@@ -661,8 +687,16 @@
                 $('.btnMh').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
             }
+            if(approvalStatus ==='OK'){
+                $('.operApproved').addClass('d-none');
+                $('.btnMh').addClass('d-none');
+            }
         }
         if(positionCategory === 'Supervisor'){
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],35);
             $('.saveSep').removeClass('d-none');
             $('#dateOfTransfer').removeClass('d-none');
             $('#seriesDesignation').text('Designation');
@@ -673,7 +707,7 @@
             }
             initTrainingItemsTable('#tblTrainingItems_sep');
             $('#divSupervisor').removeClass('d-none');
-            if(approvalStatus === 'SEPHEADAPP'){
+            if(approvalStatus === 'LQCHEADAPP'){
                 $('.saveSep').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
             }
@@ -1168,6 +1202,11 @@
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please Add 1 Employee Per Station.' });
             return;
         }
+        if (stFrom.length > 1) {
+            Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please Add 1 Station From Only.' });
+            return;
+        }
+
         if (empId.length === 0) {
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select an Employee.' });
             return;
@@ -1312,7 +1351,7 @@
             const empName = emp.system_one_hris_subcon?.empname ?? ''; // Use fallback if name is in relation
             const stFrom = emp.get_station_from?.dropdown_masters_details ??'';
             const stTo = emp.get_station_to?.dropdown_masters_details ?? '';
-            const remarks = emp.remarks || '';
+            const remarks = emp.remarks_dropdown_master_detail?.dropdown_masters_details || emp.remarks || '';
             let remove =``;
             if(approvalStatus === 'APRODTO'){
                 remove += ` <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpMain">
@@ -1635,7 +1674,7 @@
         let response = params.response;
         const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
         const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
-        const sepheadapp = response?.approversCollection?.SEPHEADAPP?.[0] ?? null;
+        const sepheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
 
 
         const aseptoToFirst     = asepto?.first_approver_exploded   ?? [];
@@ -1838,8 +1877,13 @@
                 6,
                 editSelectionsMap6
             );
-            if(positionCategory === 'VisualOperator'){
+
+            if(positionCategory === 'VisualOperator' || positionCategory === 'PartsPrep' || positionCategory === 'MachineOperator'){
+
                 const doperosc = response?.approversCollection?.DOPEROSC?.[0] ?? null;
+
+                form.formSubmitOperators.find('#text_sel_result3_operator').val(doperosc?.is_eopervisual_required ?? '').trigger('change');
+
                 form.formSubmitOperators.find('#text_sel_result1_operator').val(doperosc?.first_status ?? '').trigger('change');
                 form.formSubmitOperators.find('#text_sec1_date_operator').val(doperosc?.first_date ?? '');
                 form.formSubmitOperators.find('#text_sec1_time_operator').val(doperosc?.first_time ?? '');
@@ -1874,15 +1918,17 @@
                 });
 
             }
+            // alert(positionCategory)
             if(positionCategory === 'Supervisor'){
                 const sepTrainingOrientation = data.a_sep_training_orientation?.sep_training_orientation;
+
                 syncCheckboxesWithDb('text_sep_training_orientation', sepTrainingOrientation,form.formSubmitSep);
                 const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
                 form.formSubmitSep.find('#text_a_sep_date').val(asepto?.first_date ?? '');
 
                 const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
                 form.formSubmitSep.find('#text_sep_date').val(btechengc?.first_date ?? '');
-                form.formSubmitSep.find('#text_sep_theoretical_result').val(btechengc?.first_status ?? '');
+                form.formSubmitSep.find('#text_sep_theoretical_result').val(btechengc?.first_status ?? '').trigger('change');
                 form.formSubmitSep.find('#text_sep_handson_result').val(btechengc?.first_status_2 ?? '');
 
 

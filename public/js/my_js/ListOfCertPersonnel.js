@@ -16,6 +16,7 @@ $(document).ready(function () {
             success: function(response) {
                 let section = response.section;
                 let prodLine = response.product_line;
+                let prodArea = response.production_area;
                 let series = response.series;
                 let position = response.position;
 
@@ -35,7 +36,8 @@ $(document).ready(function () {
                 $('#selCertPersonnelSection').append(sectionOption);
 
 
-                prodLine.forEach(function(item) {
+                // prodLine.forEach(function(item) {
+                prodArea.forEach(function(item) {
                     prodLineOption += `<option value="${item.id}">${item.dropdown_masters_details}</option>`;
                 });
 
@@ -61,15 +63,17 @@ $(document).ready(function () {
 
     $("#btnExportListCertPersonnel").on('click', function() {
         let section = $('#selCertPersonnelSection').val();
-        let productLine = $('#selCertPersonnelProductLine').val();
+        // let productLine = $('#selCertPersonnelProductLine').val();
+        let productArea = $('#selCertPersonnelProductLine').val();
         let series = $('#selCertPersonnelSeries').val();
         let position = $('#selCertPersonnelPosition').val();
 
-        if (!section || !productLine) {
+        if (!section || !productArea) {
             toastr.warning('Please select both Section and Product Line before exporting.');
             return;
         }
 
-        window.open(`export_list_cert_personnel?section=${section}&product_line=${productLine}&series=${series}&position=${position}`, '_blank');
+        // window.open(`export_list_cert_personnel?section=${section}&product_line=${productLine}&series=${series}&position=${position}`, '_blank');
+        window.open(`export_list_cert_personnel?section=${section}&product_area=${productArea}&series=${series}&position=${position}`, '_blank');
     });
 });

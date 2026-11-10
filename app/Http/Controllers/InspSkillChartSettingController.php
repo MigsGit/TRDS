@@ -58,10 +58,10 @@ class InspSkillChartSettingController extends Controller
         }else{
             DB::beginTransaction();
             
-            if($request->product_line != 'N/A'){
-                $product_lines = implode(',', $request->product_line);
+            if($request->sub_station != 'N/A'){
+                $sub_stations = implode(',', $request->sub_station);
             }else{
-                $product_lines = $request->product_line;
+                $sub_stations = $request->sub_station;
             }
                   
             try{
@@ -70,7 +70,7 @@ class InspSkillChartSettingController extends Controller
                     'skill_category' => $request->skill_category,
                     'process_station' => $request->process_station,
                     'process_order' => $request->process_order,
-                    'product_line' => $product_lines
+                    'sub_station' => $sub_stations
                 );
 
                 if(isset($request->id)){ // EDIT

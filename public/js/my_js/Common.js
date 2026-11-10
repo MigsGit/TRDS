@@ -202,6 +202,7 @@ const showSwalLoading = (params) => {
 
 const resetFormValues = (params) => {
     // Reset values
+
     params.frmId[0].reset();
 
     // Remove invalid & title validation

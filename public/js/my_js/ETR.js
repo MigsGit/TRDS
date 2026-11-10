@@ -12,16 +12,17 @@ const GetEmployeeDetails = (element, searchTerm, successCallback, errorCallback)
 
             successCallback(
                 response.map(item => ({
-                    id: item.pkid,
-                    employeeNo: item.EmpNo,
-                    position: item.Position,
-                    department: item.Department,
-                    division: item.Division,
-                    section: item.Section,
-                    employmentStatus: item.EmpStatus,
-                    hiringStatus: item.HiringStatus,
-                    dateHired: item.DateHired,
-                    text: `${item.EmpNo} - ${decodeURIComponent(escape(item.EmpName))}`,
+                    id                  : item.pkid,
+                    employeeNo          : item.EmpNo,
+                    position            : item.Position,
+                    department          : item.Department,
+                    division            : item.Division,
+                    section             : item.Section,
+                    employmentStatus    : item.EmpStatus,
+                    hiringStatus        : item.HiringStatus,
+                    dateHired           : item.DateHired,
+                    text                : `${item.EmpNo} - ${decodeURIComponent(escape(item.EmpName))}`,
+                    userType            : item.userType,
                 }))
             );
 
@@ -57,5 +58,130 @@ const UpdateExportButton = () => {
             .attr('target', '_blank')
             .html('<i class="fa fa-file-excel-o mr-1"></i> Export Employee Training Record')
             .removeClass('d-none');
+    }
+};
+
+function selectEmpNo(cboElement, empId = null, mode = null){
+    let result = '<option value="" disabled selected> Select One </option>';
+    $.ajax({
+        method: "get",
+        url: "get_emp_no_dropdown_details",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value="" disabled selected>--Loading--</option>';
+        },
+        success: function (response) {
+            if(response.length > 0){
+                    result = '<option value="" disabled selected> Select Employee No </option>';
+
+                for (let di = 0; di < response.length; di++) {
+                    result += '<option value="' + response[di]['EmpNo'] + '" >' + response[di]['EmpName'] + '</option>';
+                            }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+            cboElement.html(result);
+            if(empId != null){
+                cboElement.val(empId).trigger('change');
+            }
+
+            if(mode == 'view'){
+                cboElement.prop('disabled', true).trigger('change.select2');
+            }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}
+
+function selectEmpDetailsFromCertification(cboElement, empId = null, mode = null){
+    let result = '<option value="" disabled selected> Select One </option>';
+    $.ajax({
+        method: "get",
+        url: "get_emp_details_from_certification",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value="" disabled selected>--Loading--</option>';
+        },
+        success: function (response) {
+            if(response.length > 0){
+                    result = '<option value="" disabled selected> Select Employee Name </option>';
+
+                for (let i = 0; i < response.length; i++) {
+                    result += '<option value="' + response[i]['employee_no'] + '" ';
+                    result += '>' + response[i]['employee_name'] + '</option> ';
+                }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+            cboElement.html(result);
+            // if(empId != null){
+            //     cboElement.val(empId).trigger('change');
+            // }
+
+            // if(mode == 'view'){
+            //     cboElement.prop('disabled', true).trigger('change.select2');
+            // }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}
+
+const PmiSubconPicture = (employeeNo,userType) => {
+    let imageFolder = ''
+    if(userType == 'PMI'){
+        imageFolder = 'http://systemone/otks_main/otks_attendance/pmi_pictures/';
+        console.log('PMI');
+    }
+
+    if(userType == 'SUBCON'){
+        console.log('SUBCON');
+    }
+
+    const jpgUrl            = employeeNo? `${imageFolder}${encodeURIComponent(employeeNo)}.jpg`: '';
+    const pngUrl            = employeeNo? `${imageFolder}${encodeURIComponent(employeeNo)}.png`: '';
+    const version           = Date.now();
+    const $avatar           = $('#employeeAvatar');
+    const $avatarLink       = $('#employeeAvatarLink');
+    const $defaultAvatar    = $('#defaultEmployeeAvatar');
+
+    $avatar.off('load error');
+    $avatar.attr('src', '').hide();
+    $avatarLink.hide().attr('href', '#');
+    $defaultAvatar.show();
+
+    if(employeeNo){
+        $avatar.one('load', function () {
+            $avatarLink.attr('href', jpgUrl + '?v=' + version)
+                .css({
+                    display: 'block',
+                    width: '100%',
+                    height: '100%'
+                });
+            $avatar.show();
+            $defaultAvatar.hide();
+        }).one('error', function () {
+            $avatar.off('load error').one('load', function () {
+                $avatarLink.attr('href', pngUrl + '?v=' + version)
+                    .css({
+                        display: 'block',
+                        width: '100%',
+                        height: '100%'
+                    });
+                $avatar.show();
+                $defaultAvatar.hide();
+            }).one('error', function () {
+                $avatar.attr('src', '').hide();
+                $avatarLink.hide().attr('href', '#');
+                $defaultAvatar.show();
+            }).attr('src', pngUrl + '?v=' + version);
+        }).attr('src', jpgUrl + '?v=' + version);
     }
 };

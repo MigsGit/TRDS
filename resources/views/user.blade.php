@@ -381,6 +381,7 @@
         dtUserModuleAccess = $("#tblUserModuleAccess").DataTable({
         "processing" : false,
             "serverSide" : true,
+            "paging" : false,
             "ajax" : {
             url: "view_user_module_access",
             // data: function (param){
