@@ -3,7 +3,8 @@
 namespace App\Exports;
 
 use App\Model\InspectorSkillChart\InspectorSkillChartSetting;
-// use Illuminate\Support\Collection;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 // use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use App\Exports\InspectorSkillChartSheets\TSF1;
@@ -358,7 +359,7 @@ class InspectorSkillChart implements WithMultipleSheets{
 
             foreach (TSF1Layout::OTHER_PROCESSES as $process => $names) {
                 $matched = $stations->filter(function ($station) use ($names) {
-                    return in_array(trim((string) $station['station_to_name']), $names, true);
+                    return $this->isOtherProcessStation($station, $names);
                 })->values()->all();
 
                 $subStations = [];
@@ -369,7 +370,7 @@ class InspectorSkillChart implements WithMultipleSheets{
                 }
 
                 $processes[$process] = [
-                    'total'        => $this->otherProcessTotal($matched),
+                    'total'        => $this->otherProcessTotal($stations, $names),
                     'stations'     => $matched,
                     'sub_stations' => $subStations,
                 ];
@@ -382,20 +383,28 @@ class InspectorSkillChart implements WithMultipleSheets{
     }
 
     /**
-     * Integer total of one other-process cell, by TSF1Layout::OTHER_CELL_MODE.
-     * Per station: 'sum' = its sub-station ratings summed, or its own rating when it
-     * has none (never both); 'max' = highest of those; 'station' = its own rating only.
-     * Several matched stations are added together ('max' keeps the highest).
+     * Integer total of one other-process cell (one process x one other group).
+     * Only stations whose trimmed station_to_name is in $processNames (exact match)
+     * count. With TSF1Layout::OTHER_CELL_MODE = 'sum' (default), a station with
+     * sub-stations adds its sub-stations' training_result, a station without adds
+     * its own training_result - never both. ('max' = highest rating instead,
+     * 'station' = own rating only.) Null, empty, whitespace and non-numeric
+     * ratings count as 0. Never throws on bad data.
      *
-     * @param array $stations de-duplicated stations of one process in one group
+     * @param Collection $stations     the group's stations, already de-duplicated per station_to (newest kept)
+     * @param string[]   $processNames station_to_name values for this process (TSF1Layout::OTHER_PROCESSES)
      * @return int
      */
-    private function otherProcessTotal(array $stations)
+    private function otherProcessTotal(Collection $stations, array $processNames): int
     {
         $mode = TSF1Layout::OTHER_CELL_MODE;
         $total = 0;
 
         foreach ($stations as $station) {
+            if (!$this->isOtherProcessStation($station, $processNames)) {
+                continue;
+            }
+
             $own = $this->ratingToInt(isset($station['training_result']) ? $station['training_result'] : null);
             $subs = array_map(function ($sub) {
                 return $this->ratingToInt(isset($sub['training_result']) ? $sub['training_result'] : null);
@@ -413,6 +422,77 @@ class InspectorSkillChart implements WithMultipleSheets{
         }
 
         return $total;
+    }
+
+    /**
+     * True when the station's trimmed station_to_name is one of $processNames (exact).
+     *
+     * @param array    $station
+     * @param string[] $processNames
+     * @return bool
+     */
+    private function isOtherProcessStation($station, array $processNames)
+    {
+        $name = isset($station['station_to_name']) ? trim((string) $station['station_to_name']) : '';
+
+        return $name !== '' && in_array($name, $processNames, true);
+    }
+
+    /**
+     * Debug only (never written to the sheet): for the employees on $sheet, lists
+     * non-main stations whose name matches no TSF1Layout::OTHER_PROCESSES entry,
+     * and sections that have no SHEET_GROUPS mapping. Also sent to Log::debug.
+     *
+     * @param string $sheet sheet name, a key of self::SHEET_GROUPS
+     * @return array employee_no => ['unmatched_stations' => [section => names[]], 'unmapped_sections' => names[]]
+     */
+    public function debugOtherStations($sheet)
+    {
+        if (!isset(self::SHEET_GROUPS[$sheet])) {
+            return [];
+        }
+
+        $allNames = [];
+        foreach (TSF1Layout::OTHER_PROCESSES as $names) {
+            $allNames = array_merge($allNames, $names);
+        }
+
+        $report = [];
+
+        foreach ($this->withMainSection($sheet) as $employee) {
+            if (!$employee['sections']->has('main')) {
+                continue;
+            }
+
+            $entry = ['unmatched_stations' => [], 'unmapped_sections' => []];
+
+            foreach ($employee['sections'] as $sectionName => $section) {
+                if ($sectionName === 'main') {
+                    continue;
+                }
+
+                if (!is_string($sectionName) || !isset(self::SHEET_GROUPS[$sectionName])) {
+                    $entry['unmapped_sections'][] = (string) $sectionName;
+                    continue;
+                }
+
+                foreach ($section['stations'] as $station) {
+                    if (!$this->isOtherProcessStation($station, $allNames)) {
+                        $entry['unmatched_stations'][$sectionName][] = isset($station['station_to_name']) ? (string) $station['station_to_name'] : '';
+                    }
+                }
+            }
+
+            if (!empty($entry['unmatched_stations']) || !empty($entry['unmapped_sections'])) {
+                $report[$employee['employee_no']] = $entry;
+            }
+        }
+
+        if (!empty($report)) {
+            Log::debug('InspectorSkillChart other-process: unmatched stations / unmapped sections on ' . $sheet, $report);
+        }
+
+        return $report;
     }
 
     /**
