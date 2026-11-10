@@ -54,6 +54,7 @@ class EmployeeSkillCard implements WithMultipleSheets
                 '=',
                 'production_area_dm_details.id'
             )
+
             //connectiont to target rating settings
             ->join('target_rating_settings as target_ratings', function ($join) {
                 $join->on('qc_slips.section_category', '=', 'target_ratings.section')
@@ -116,6 +117,8 @@ class EmployeeSkillCard implements WithMultipleSheets
                 'rating_description_details.description as target_rating_description',
             )
             ->get();
+
+            dd($certEmpDetails);
 
         // Get unique employee numbers
         $employeeNos = $certEmpDetails
