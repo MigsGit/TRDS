@@ -34,11 +34,10 @@ class TSF1Layout
     const OTHER_SECTIONS = array('TS', 'CN', 'PPD', 'YF');
 
     /**
-     * Per-employee "also trained in other sections" data has no column in the
-     * template yet. Hook exists (see TSF1::renderOtherSectionsHook()) but stays
-     * a no-op until a real column mapping is designed and this flips to true.
+     * Writes each employee's other_sections totals into the OTHER PROCESS /
+     * SYSTEM SKILLS matrix (AG:AO) via TSF1::renderOtherSectionsHook().
      */
-    const OTHER_SECTIONS_DATA_ENABLED = false;
+    const OTHER_SECTIONS_DATA_ENABLED = true;
 
     /**
      * OTHER PROCESS / SYSTEM SKILLS processes (AG:AO), in column order.
