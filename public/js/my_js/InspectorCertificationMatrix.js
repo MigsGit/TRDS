@@ -7,8 +7,8 @@ $(document).ready(function () {
     $('#btnExportInspectorCertMatrix').on('click', function(){
         let productLine = $('#selInsCertMatrixProductLine').val();
         let section = $('#selInsCertMatrixSection').val();
-        // window.open('export-inspector-cert-matrix?product_line=' + productLine + '&section=' + section, '_blank');
-        window.open('export-inspector-cert-matrix?product_area=' + productLine + '&section=' + section, '_blank');
+        window.open('export-inspector-cert-matrix?product_line=' + productLine + '&section=' + section, '_blank');
+        // window.open('export-inspector-cert-matrix?product_area=' + productLine + '&section=' + section, '_blank');
     });
 });
 
@@ -29,9 +29,9 @@ const loadDropdownSelInspCertMatrix = () => {
             let productAreas = response.production_area;
 
 
-            // productLines.forEach(function(productLine){
-            productAreas.forEach(function(data){
-                productLineOptions += '<option value="' + data.id + '">' + data.dropdown_masters_details + '</option>';
+            productLines.forEach(function(productLine){
+            // productAreas.forEach(function(data){
+                productLineOptions += '<option value="' + productLine.id + '">' + productLine.dropdown_masters_details + '</option>';
             });
             sections.forEach(function(section){
                 sectionOptions += '<option value="' + section + '">' + section + '</option>';

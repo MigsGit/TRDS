@@ -41,7 +41,7 @@
                                 <div class="form-group mb-0">
                                     <label class="font-weight-bold text-dark">
                                         <i class="fas fa-industry text-muted mr-1"></i>
-                                        Product Area
+                                        Product Line
                                     </label>
                                     <select class="form-control select2bs4" id="selInsCertMatrixProductLine" multiple></select>
                                 </div>
