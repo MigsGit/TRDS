@@ -728,12 +728,12 @@ function selectClassification(cboElement, rapidxId = null){
     });
 }
 
-function selectDisqualiExam(cboElement, employeeNo, currentSubClass = null){
+function selectDisqualiExam(cboElement, employeeNo, currentExam = null){
     let result = '<option value="" disabled selected> Select Disqualification Exam </option>';
     $.ajax({
         data: {employee_no: employeeNo },
         method: "get",
-        url: "get_examination",
+        url: "get_examinations",
         dataType: "json",
         beforeSend: function(){
             result = '<option value="" disabled selected> -- Loading -- </option>';
@@ -755,8 +755,8 @@ function selectDisqualiExam(cboElement, employeeNo, currentSubClass = null){
 
             cboElement.html(result);
 
-            if(currentSubClass != null){
-                cboElement.val(currentSubClass).trigger('change');
+            if(currentExam != null){
+                cboElement.val(currentExam).trigger('change');
             }
         },
         error: function(data, xhr, status) {
@@ -995,6 +995,12 @@ function fetchDisqualificationById(id, $modal, dtTrainings, $formPart1, $formPar
                 }
 
                 dtTrainings.draw();
+            }
+
+            //form part 3
+            if(response.status >= 3){
+                selectDisqualiExam($('.selectDisqualiExam'), response.employee_no);
+
             }
 
             $modal.modal('show');
