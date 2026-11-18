@@ -270,7 +270,7 @@ class QualificationCertificationController extends Controller
         })
         ->addColumn('select_item', function ($row) {
             $isChecked = ((int) $row['is_checked'] === 1) ? 'checked' : '';
-            return '<input type="checkbox" class="chk-select-item" '.$isChecked.' data-item-id="' . $row['id'] . '" value="' . $row['id'] . '">';
+            return '<input type="checkbox" class="chk-select-item" '.$isChecked.' data-item-id="' . $row['id'] . '" value="' . $row['id'] .'"> COMPLETED';
         })
         ->addColumn('day_1', function ($row) {
             $day1Val = $row['day_1_result'] ?? '';
