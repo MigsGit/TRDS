@@ -266,7 +266,7 @@
                     </ul>
                 </li>
                 {{-- @if($globalUser->rapidx_emp_id == 216) --}}
-                    <li class="nav-header font-weight-bold">Export</li>
+                    {{-- <li class="nav-header font-weight-bold">Export</li>
                     <li class="nav-item has-treeview">
                         <a id="btnListCertPersonnel" class="nav-link">
                             <i class="fas fa-file-excel"></i>
@@ -278,7 +278,7 @@
                             <i class="fas fa-file-excel"></i>
                             <p>Inspectors Certification Matrix</p>
                         </a>
-                    </li>
+                    </li> --}}
                 {{-- @endif --}}
             </ul>
         </nav>

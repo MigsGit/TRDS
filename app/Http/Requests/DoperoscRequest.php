@@ -28,7 +28,7 @@ class DoperoscRequest extends FormRequest
             'text_sec1_date_operator' => ['required'],
             'text_sec1_time_operator' => ['required'],
             'text_sel_result1_operator' => ['required'],
-
+            'text_sel_result3_operator'  => 'required_if:text_select_position,MachineOperator',
         ];
     }
 }

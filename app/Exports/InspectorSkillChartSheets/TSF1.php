@@ -336,11 +336,12 @@ class TSF1 implements FromArray, WithTitle, WithEvents, WithCustomStartCell
 
         $row = TSF1Layout::EMPLOYEE_START_ROW;
         $no = 1;
+        $otherStart = $this->otherStartColumn($columns);
 
         foreach ($employees as $employee) {
             $this->renderEmployeeCard($sheet, $row, $no, $employee);
             $this->renderResults($sheet, $row, $employee, $columns);
-            $this->renderOtherSectionsHook($sheet, $row, $employee);
+            $this->renderOtherSectionsHook($sheet, $row, $employee, $otherStart);
             $row++;
             $no++;
         }
@@ -492,18 +493,63 @@ class TSF1 implements FromArray, WithTitle, WithEvents, WithCustomStartCell
     }
 
     /**
-     * Disabled hook for the employee's non-"main" sections (sections[] except
-     * 'main'). No column exists for this in the template yet - flip
-     * TSF1Layout::OTHER_SECTIONS_DATA_ENABLED once one is designed.
+     * Writes $employee['other_sections'][group][process]['total'] into the
+     * OTHER PROCESS / SYSTEM SKILLS matrix (template AG:AO), in the same
+     * process x group order as renderOtherProcessHeader(). A total of 0 leaves
+     * the cell blank unless self::ZERO_DEFAULT_OTHER is on. Gated by
+     * TSF1Layout::OTHER_SECTIONS_DATA_ENABLED.
      */
-    private function renderOtherSectionsHook(Worksheet $sheet, int $row, array $employee): void
+    private function renderOtherSectionsHook(Worksheet $sheet, int $row, array $employee, int $otherStart): void
     {
         if (!TSF1Layout::OTHER_SECTIONS_DATA_ENABLED) {
             return;
         }
 
-        // TODO(enable): map $employee['sections'] (all keys except 'main') to
-        // the OTHER PROCESS SKILLS columns rendered by renderOtherProcessHeader().
+        $otherSections = $employee['other_sections'] ?? null;
+        $groups = $this->otherGroups();
+        $processIndex = 0;
+
+        foreach (array_keys(TSF1Layout::OTHER_PROCESSES) as $process) {
+            foreach ($groups as $groupIndex => $group) {
+                $total = isset($otherSections[$group][$process]['total']) ? (int) $otherSections[$group][$process]['total'] : 0;
+                $column = $otherStart + $processIndex * count($groups) + $groupIndex;
+
+                if ($total !== 0) {
+                    $sheet->setCellValue($this->cell($column, $row), $total);
+                } elseif (self::ZERO_DEFAULT_OTHER) {
+                    $sheet->setCellValue($this->cell($column, $row), 0);
+                }
+            }
+
+            $processIndex++;
+        }
+    }
+
+    /**
+     * Read-only: the other groups in header order, same expression as
+     * renderOtherProcessHeader().
+     *
+     * @return string[]
+     */
+    private function otherGroups(): array
+    {
+        return array_values(array_diff(TSF1Layout::OTHER_SECTIONS, [$this->group]));
+    }
+
+    /**
+     * Read-only: first column of the OTHER PROCESS matrix, derived exactly as
+     * render() derives $otherStartColumn (skill headers end + 1 = legend start,
+     * renderLegendHeader() spans start..start+3 and returns end + 1, then + 1).
+     *
+     * @param array<int,array> $columns
+     */
+    private function otherStartColumn(array $columns): int
+    {
+        $skillNext = empty($columns) ? TSF1Layout::DYNAMIC_START_COLUMN : end($columns)['column'] + 1;
+        $legendStart = $skillNext + 1;
+        $legendNext = $legendStart + 3 + 1;
+
+        return $legendNext + 1;
     }
 
     private function formatDateHired(?string $dateHired): string

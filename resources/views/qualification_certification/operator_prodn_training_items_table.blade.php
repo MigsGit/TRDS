@@ -89,8 +89,8 @@
                        <td class="text-center">
                             <select class="form-control form-control-sm select-chk-result">
                                     <option value="">--</option>
-                                    <option value="Passed">Passed</option>
-                                    <option value="Failed">Failed</option>
+                                    <option value="Passed">COMPLETED</option>
+                                    {{-- <option value="Failed">Failed</option> --}}
                             </select>
                         </td>
                         @for ($day = 1; $day <= 5; $day++)

@@ -103,11 +103,11 @@
                                                                 <th>Action</th>
                                                                 <th>Status</th>
                                                                 <th>Ctrl No. / Doc No.</th>
+                                                                <th>Position</th>
                                                                 <th>Series Name</th>
                                                                 <th>Production Section</th>
                                                                 <th>Production Line</th>
                                                                 <th>Section</th>
-                                                                <th>Position</th>
                                                                 {{-- <th>Date Filed</th> --}}
                                                                 <th class='d-none'>Emp Name</th>
                                                                 <!-- <th>Qualified by</th> -->
@@ -338,6 +338,26 @@
             // resetFormValues({'frmId'  :   form.formSubmitOper})
             // resetFormValues({'frmId'  :   form.formSubmitMh})
             // resetFormValues({'frmId'  :   form.formSubmitInspector})
+            // resetFormValues({'frmId'  :   form.formSubmitOperators})
+
+            $('#qc_slips_id').val('');
+            $('#textconno_new_operator').val('');
+            $('#text_section_operator').val('').trigger('change');
+            $('#text_date_of_transfer').val('');
+            $('#text_series_operator').val('');
+            $('#text_select_position').val('').trigger('change');
+            $('#select_section').val('').trigger('change');
+            $('#text_operator_product_line').val('');
+            $('#text_operator_product_area').val('');
+            $('#text_certification_operator').val('');
+            $('#transfer_flexibility').val('');
+
+            resetFormValues({'frmId'  :$('#formSubmit_Tech')});
+            resetFormValues({'frmId'  :$('#formSubmit_SEP')});
+            resetFormValues({'frmId'  :$('#formSubmitOper')});
+            resetFormValues({'frmId'  :$('#formSubmit_MH')});
+            resetFormValues({'frmId'  :$('#formSubmit_Ins')});
+            resetFormValues({'frmId'  :  $('#formSubmitOperators')});
         });
         const updateApproval = (params) => {
             let data = {
@@ -397,13 +417,14 @@
                 { "data" : "rawAction", orderable:false, searchable:false },
                 { "data" : "rawStatus", orderable:false, searchable:false },
                 { "data" : "control_no" },
+                { "data" : "position_category" },
                 { "data" : "series_name" },
                 { "data" : "get_production_area" },
                 { "data" : "get_product_line" },
                 // { "data" : "created_by" },
                 // { "data" : "created_by" },
                 { "data" : "section" },
-     
+
                 { "data" : "employee_names",
                     visible: false,    // Hides column from display
                     searchable: true   // Keeps column indexed for searching

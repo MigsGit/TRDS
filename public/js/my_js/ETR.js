@@ -12,16 +12,17 @@ const GetEmployeeDetails = (element, searchTerm, successCallback, errorCallback)
 
             successCallback(
                 response.map(item => ({
-                    id: item.pkid,
-                    employeeNo: item.EmpNo,
-                    position: item.Position,
-                    department: item.Department,
-                    division: item.Division,
-                    section: item.Section,
-                    employmentStatus: item.EmpStatus,
-                    hiringStatus: item.HiringStatus,
-                    dateHired: item.DateHired,
-                    text: `${item.EmpNo} - ${decodeURIComponent(escape(item.EmpName))}`,
+                    id                  : item.pkid,
+                    employeeNo          : item.EmpNo,
+                    position            : item.Position,
+                    department          : item.Department,
+                    division            : item.Division,
+                    section             : item.Section,
+                    employmentStatus    : item.EmpStatus,
+                    hiringStatus        : item.HiringStatus,
+                    dateHired           : item.DateHired,
+                    text                : `${item.EmpNo} - ${decodeURIComponent(escape(item.EmpName))}`,
+                    userType            : item.userType,
                 }))
             );
 
@@ -132,3 +133,55 @@ function selectEmpDetailsFromCertification(cboElement, empId = null, mode = null
         }
     });
 }
+
+const PmiSubconPicture = (employeeNo,userType) => {
+    let imageFolder = ''
+    if(userType == 'PMI'){
+        imageFolder = 'http://systemone/otks_main/otks_attendance/pmi_pictures/';
+        console.log('PMI');
+    }
+
+    if(userType == 'SUBCON'){
+        console.log('SUBCON');
+    }
+
+    const jpgUrl            = employeeNo? `${imageFolder}${encodeURIComponent(employeeNo)}.jpg`: '';
+    const pngUrl            = employeeNo? `${imageFolder}${encodeURIComponent(employeeNo)}.png`: '';
+    const version           = Date.now();
+    const $avatar           = $('#employeeAvatar');
+    const $avatarLink       = $('#employeeAvatarLink');
+    const $defaultAvatar    = $('#defaultEmployeeAvatar');
+
+    $avatar.off('load error');
+    $avatar.attr('src', '').hide();
+    $avatarLink.hide().attr('href', '#');
+    $defaultAvatar.show();
+
+    if(employeeNo){
+        $avatar.one('load', function () {
+            $avatarLink.attr('href', jpgUrl + '?v=' + version)
+                .css({
+                    display: 'block',
+                    width: '100%',
+                    height: '100%'
+                });
+            $avatar.show();
+            $defaultAvatar.hide();
+        }).one('error', function () {
+            $avatar.off('load error').one('load', function () {
+                $avatarLink.attr('href', pngUrl + '?v=' + version)
+                    .css({
+                        display: 'block',
+                        width: '100%',
+                        height: '100%'
+                    });
+                $avatar.show();
+                $defaultAvatar.hide();
+            }).one('error', function () {
+                $avatar.attr('src', '').hide();
+                $avatarLink.hide().attr('href', '#');
+                $defaultAvatar.show();
+            }).attr('src', pngUrl + '?v=' + version);
+        }).attr('src', jpgUrl + '?v=' + version);
+    }
+};

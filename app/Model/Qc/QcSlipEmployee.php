@@ -28,7 +28,7 @@ class QcSlipEmployee extends Model
         'second_take_ins_assessment_result',
     ];
 
-    
+
 
     /**
      * Get the user associated with the QcSlipEmployee
@@ -60,12 +60,16 @@ class QcSlipEmployee extends Model
     {
        return $this->dropdown_master_detail('station_to');
     }
+    public function remarks_dropdown_master_detail()
+    {
+       return $this->dropdown_master_detail('remarks');
+    }
 
     public function qcSlip()
     {
         return $this->belongsTo(QcSlip::class, 'qc_slips_id');
     }
-    
+
     public function getEmployeeInfoAttribute() // Chris
     {
         // Returns subcon if present; otherwise falls back to hris

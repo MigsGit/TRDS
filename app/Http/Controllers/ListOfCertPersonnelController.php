@@ -15,17 +15,19 @@ class ListOfCertPersonnelController extends Controller
 {
     public function getDropdownSelectCertPersonnel(Request $request){
         $qcslips = QcSlip::with([
-            'product_line_details'
+            'product_line_details',
+            'production_area_details'
         ])
         ->whereNull('deleted_at')->get();
 
         $section = $qcslips->pluck('section_category')->filter()->unique()->values()->toArray();
         $series = $qcslips->pluck('series_name')->filter()->unique()->values()->toArray();
         $product_line = $qcslips->pluck('product_line_details')->filter()->unique()->values()->toArray();
+        $production_area = $qcslips->pluck('production_area_details')->filter()->unique()->values()->toArray();
         $position = $qcslips->pluck('position_category')->filter()->unique()->values()->toArray();
 
 
-        return response()->json(['section' => $section, 'series' => $series, 'product_line' => $product_line, 'qcslips' => $qcslips, 'position' => $position]);
+        return response()->json(['section' => $section, 'series' => $series, 'product_line' => $product_line, 'production_area' => $production_area, 'qcslips' => $qcslips, 'position' => $position]);
     }
 
     // public function exportListCertPersonnel(Request $request){
@@ -243,7 +245,7 @@ class ListOfCertPersonnelController extends Controller
             ->whereNull('deleted_at')
             ->where('status', 'OK')
             ->where('section_category', $request->section)
-            ->where('product_line', 'like', '%' . $request->product_line . '%')
+            ->where('production_area', 'like', '%' . $request->product_area . '%')
             ->whereIn('position_category', $positionsWithTraining)
             // ->whereIn('series_name', $exploded_series)
             ->get();
@@ -253,7 +255,7 @@ class ListOfCertPersonnelController extends Controller
             ->whereNull('deleted_at')
             ->where('status', 'OK')
             ->where('section_category', $request->section)
-            ->where('product_line', 'like', '%' . $request->product_line . '%')
+            ->where('production_area', 'like', '%' . $request->product_area . '%')
             ->whereIn('position_category', $otherCategories)
             // ->whereIn('series_name', $exploded_series)
             ->get();
@@ -440,13 +442,13 @@ class ListOfCertPersonnelController extends Controller
         
 
 
-        $prod_line = DropdownMasterDetail::where('id', $request->product_line)->first();
-        $product_line = $prod_line->dropdown_masters_details ?? '';
-        $filename = "Certified_Personnel_List_{$request->section}_{$product_line}({$request->series}).xlsx";
+        $prod_line = DropdownMasterDetail::where('id', $request->product_area)->first();
+        $product_area = $prod_line->dropdown_masters_details ?? '';
+        $filename = "Certified_Personnel_List_{$request->section}_{$product_area}({$request->series}).xlsx";
         // return response()->json(['personel_toexport' => $personel]);
         if($personel->isEmpty()){
             return view('errors.404', ['message' => 'No data found for the selected criteria. Please adjust your filters and try again.']);
         }
-        return Excel::download(new CertifiedPersonnelExport($personel, $product_line, $positionsWithTraining), $filename);
+        return Excel::download(new CertifiedPersonnelExport($personel, $product_area, $positionsWithTraining), $filename);
     }
 }

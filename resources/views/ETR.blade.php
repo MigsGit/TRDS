@@ -144,10 +144,26 @@
                             <div class="card-header border-0 text-white rounded-top-4 bg-secondary">
                                 <div class="d-flex align-items-center">
                                     <!-- Avatar -->
-                                    <div class="rounded-circle bg-white text-primary d-flex justify-content-center align-items-center shadow"
-                                        style="width:85px;height:85px;">
-                                        <i class="fa fa-user fa-3x"></i>
-                                    </div>
+                                    <escape><!-- Avatar -->
+                                        <div class="rounded-circle bg-white text-primary d-flex justify-content-center align-items-center shadow"
+                                        style="width:85px;height:85px;overflow:hidden;">
+
+
+                                        <a id="employeeAvatarLink"
+                                            href="#"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style="display:none;width:100%;height:100%;">
+
+                                            <img id="employeeAvatar"
+                                                src=""
+                                                alt="Employee Photo"
+                                                style="width:100%;height:100%;object-fit:cover;cursor:pointer;">
+                                        </a>
+
+                                        <i id="defaultEmployeeAvatar" class="fa fa-user fa-3x"></i>
+                                        </div>
+                                    </escape>
 
                                     <!-- Employee Name -->
                                     <div class="ml-4">
@@ -419,7 +435,7 @@
                         <div class="modal-body p-4" style="background: #f7f9fc;">
 
                             <!-- 3-Column Section -->
-                            <div class="row">
+                            {{-- <div class="row">
                                 <!-- Column 1 -->
                                 <div class="col-md-4 mb-3">
                                     <a href="{{ asset('public/manual/List of Certified Personnel_CN201P_October 2026.xlsx') }}" download
@@ -500,7 +516,54 @@
                                         </div>
                                     </a>
                                 </div>
-                            </div>
+                            </div> --}}
+                            <button type="button" class="btn btn-light border w-100 text-left p-3 mb-3 shadow-sm"
+                                id="btnListCertPersonnel"
+                                title="Generate the List of Certified Personnel"
+                                style="border-radius: 10px; white-space: normal;">
+
+                                <div class="d-flex align-items-center">
+                                    <div class="d-flex align-items-center justify-content-center mr-3 flex-shrink-0"
+                                        style="width: 48px; height: 48px; background: #fff0d9; border-radius: 12px;">
+                                        <i class="fas fa-clipboard-list fa-lg text-primary"></i>
+                                    </div>
+
+                                    <div class="flex-grow-1">
+                                        <div class="font-weight-bold text-dark mb-1">
+                                            List of Certified Personnel
+                                        </div>
+                                        <small class="text-muted">
+                                            Generate a list of certified personnel with section, product area and series filtering.
+                                        </small>
+                                    </div>
+
+                                    <i class="fas fa-chevron-right text-muted ml-2"></i>
+                                </div>
+                            </button>
+
+                             <button type="button" class="btn btn-light border w-100 text-left p-3 mb-3 shadow-sm"
+                                id="btnInsCertMatrix"
+                                title="Generate the List of Inspector Certification Matrix
+                                style="border-radius: 10px; white-space: normal;">
+
+                                <div class="d-flex align-items-center">
+                                    <div class="d-flex align-items-center justify-content-center mr-3 flex-shrink-0"
+                                        style="width: 48px; height: 48px; background: #fff0d9; border-radius: 12px;">
+                                        <i class="fas fa-user-shield fa-lg text-primary"></i>
+                                    </div>
+
+                                    <div class="flex-grow-1">
+                                        <div class="font-weight-bold text-dark mb-1">
+                                            Inspector Certification Matrix
+                                        </div>
+                                        <small class="text-muted">
+                                            Generate inspector certification matrix with section and product area filtering.
+                                        </small>
+                                    </div>
+
+                                    <i class="fas fa-chevron-right text-muted ml-2"></i>
+                                </div>
+                            </button>
 
                             <!-- Employee Skill Matrix (Full Width) -->
                             <button type="button" class="btn btn-light border w-100 text-left p-3 mb-3 shadow-sm"
@@ -553,7 +616,7 @@
                             </button>
 
                             <!-- Employee Skill Card (Full Width) -->
-                            <button type="button" class="btn btn-light border w-100 text-left p-3 shadow-sm"
+                            <button type="button" class="btn btn-light border w-100 text-left p-3 mb-3 shadow-sm"
                                 data-toggle="modal" data-target="#modalGenerateSkillCardDetails"
                                 title="Generate the Employee Skill Card"
                                 style="border-radius: 10px; white-space: normal;">
@@ -1340,11 +1403,15 @@
             });
 
             $('.get-employee-info').on('select2:select', function (e) {
-                const data = e.params.data;
-                const hiringStatus = data.hiringStatus;
+                const data          = e.params.data;
+                const hiringStatus  = data.hiringStatus;
+                const employeeNo    = data.employeeNo;
+                const userType      = data.userType;
+
                 console.log('data:',data);
                 console.log('hiringStatus:',hiringStatus);
                 console.log('employeeNo:',data.employeeNo);
+                console.log('userType:',data.userType);
 
                 $('#displayEmployeeName').text(data.text);
                 $('#displayPosition').text(data.position);
@@ -1376,6 +1443,9 @@
 
                 getEmployeeTrainingRecordId = data.id
                 getEmployeeNoForTrdsSummary = data.employeeNo;
+
+                PmiSubconPicture(employeeNo,userType);
+
                 dataEmployeeTrainingRecord.draw();
                 dataTRDSSummary.draw();
             });

@@ -36,6 +36,7 @@ class OpApprover extends Model
         'second_remarks',
         'second_date_2',
         'oper_approved_confirmed_by',
+        'is_eopervisual_required',
     ];
     public function system_one_subcon_emp_info()
     {
