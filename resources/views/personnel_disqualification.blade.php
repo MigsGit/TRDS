@@ -433,6 +433,329 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- ===================================================== -->
+                    <!-- PART 4: QC Sample Check Result (Operator & QC Inspector only) -->
+                    <!-- ===================================================== -->
+
+                    <div class="card mb-3 d-none" id="cardPart4">
+                        <div class="card-header p-2">
+                            <button type="button" class="btn btn-link btn-block text-left" data-toggle="collapse" data-target="#collapsePart4" aria-expanded="true">
+                                <i class="fas fa-clipboard-check mr-2"></i>
+                                <strong>Part 4: QC Sample Check Result (n = 10pcs)</strong>
+                                <i class="fa fa-chevron-down float-right"></i>
+                            </button>
+                        </div>
+
+                        <div id="collapsePart4" class="collapse show">
+                            <div class="card-body">
+                                <form method="post" id="formDisqualiPart4" enctype="multipart/form-data" autocomplete="off">
+                                    @csrf
+                                    <input type="hidden" name="part1_id" class="js-part1-id">
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <h6><strong>First Take</strong></h6>
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>OK (pcs)</label>
+                                                        <input type="number" class="form-control" name="qc_first_ok" min="0" max="10">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>NG (pcs)</label>
+                                                        <input type="number" class="form-control" name="qc_first_ng" min="0" max="10">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Certified by (QC)</label>
+                                                <select class="form-control select2bs5 js-people" name="qc_first_certified_by"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Date/Time</label>
+                                                <input type="datetime-local" class="form-control" name="qc_first_date">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <h6><strong>Second Take</strong></h6>
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>OK (pcs)</label>
+                                                        <input type="number" class="form-control" name="qc_second_ok" min="0" max="10">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>NG (pcs)</label>
+                                                        <input type="number" class="form-control" name="qc_second_ng" min="0" max="10">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Certified by (QC)</label>
+                                                <select class="form-control select2bs5 js-people" name="qc_second_certified_by"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Date/Time</label>
+                                                <input type="datetime-local" class="form-control" name="qc_second_date">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Overall Result</label>
+                                                <select class="form-control select2bs5" name="qc_overall_result" required>
+                                                    <option value="">Select Overall Result</option>
+                                                    <option value="1">Passed</option>
+                                                    <option value="0">Failed</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-right">
+                                        <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================================================== -->
+                    <!-- PART 5: Monitoring Result (6 days, depends on designation) -->
+                    <!-- ===================================================== -->
+
+                    <div class="card mb-3 d-none" id="cardPart5">
+                        <div class="card-header p-2">
+                            <button type="button" class="btn btn-link btn-block text-left" data-toggle="collapse" data-target="#collapsePart5" aria-expanded="true">
+                                <i class="fas fa-calendar-check mr-2"></i>
+                                <strong>Part 5: Monitoring Result (6 days, n = min 1pc, max 10pcs)</strong>
+                                <i class="fa fa-chevron-down float-right"></i>
+                            </button>
+                        </div>
+
+                        <div id="collapsePart5" class="collapse show">
+                            <div class="card-body">
+                                <form method="post" id="formDisqualiPart5" enctype="multipart/form-data" autocomplete="off">
+                                    @csrf
+                                    <input type="hidden" name="part1_id" class="js-part1-id">
+                                    <input type="hidden" name="designation" id="monitoringDesignation">
+
+                                    {{-- Operator: 6-day table. Day rows are added by JS. --}}
+                                    <div id="monitoringOperator" class="d-none">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered" id="tblMonitoring" style="min-width: 1100px;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Time</th>
+                                                        <th>P.O No./Series name</th>
+                                                        <th>Sample</th>
+                                                        <th>Accept</th>
+                                                        <th>Reject</th>
+                                                        <th>Mode of defect/qty</th>
+                                                        <th>QC Inspector</th>
+                                                        <th style="width: 50px;"></th>
+                                                    </tr>
+                                                </thead>
+                                                @for ($day = 1; $day <= 6; $day++)
+                                                    <tbody class="monitoring-day" data-day="{{ $day }}">
+                                                        <tr class="table-secondary">
+                                                            <td colspan="9">
+                                                                <strong>Day {{ $day }}</strong>
+                                                                <span class="badge bg-danger ml-2 day-count">0 / 10 samples</span>
+                                                                <button type="button" class="btn btn-primary btn-sm float-right btnAddRow">
+                                                                    <i class="fa fa-plus"></i> Add Row
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                @endfor
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    {{-- Material Handler & Technician: upload only --}}
+                                    <div id="monitoringMhTech" class="d-none">
+                                        <div class="form-group">
+                                            <label>Employee Quality Card <small class="text-muted">(updated by the immediate superior)</small></label>
+                                            <input type="file" class="form-control" name="employee_quality_card">
+                                            <small class="text-muted js-current-file" id="employeeQualityCardCurrent"></small>
+                                        </div>
+                                    </div>
+
+                                    {{-- QC Inspector: upload only --}}
+                                    <div id="monitoringInspector" class="d-none">
+                                        <div class="form-group">
+                                            <label>Line QC Supervisor Spot Audit Report <small class="text-muted">(updated by the QC supervisor)</small></label>
+                                            <input type="file" class="form-control" name="spot_audit_report">
+                                            <small class="text-muted js-current-file" id="spotAuditReportCurrent"></small>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-right">
+                                        <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================================================== -->
+                    <!-- PART 6: Inspection Result (Operator & QC Inspector only) -->
+                    <!-- ===================================================== -->
+
+                    <div class="card mb-3 d-none" id="cardPart6">
+                        <div class="card-header p-2">
+                            <button type="button" class="btn btn-link btn-block text-left" data-toggle="collapse" data-target="#collapsePart6" aria-expanded="true">
+                                <i class="fas fa-search mr-2"></i>
+                                <strong>Part 6: Inspection Result (5 lots / 5 frequency, severity-tightened inspection)</strong>
+                                <i class="fa fa-chevron-down float-right"></i>
+                            </button>
+                        </div>
+
+                        <div id="collapsePart6" class="collapse show">
+                            <div class="card-body">
+                                <form method="post" id="formDisqualiPart6" enctype="multipart/form-data" autocomplete="off">
+                                    @csrf
+                                    <input type="hidden" name="part1_id" class="js-part1-id">
+
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered" id="tblInspection" style="min-width: 1200px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Part/Product name</th>
+                                                    <th>Lot No.</th>
+                                                    <th>Lot Qty/Sample (for IPQC)</th>
+                                                    <th>Sample (for IQC/OQC)</th>
+                                                    <th>Accept (no. of OK)</th>
+                                                    <th>Reject (no. of NG)</th>
+                                                    <th>Mode of defect/qty</th>
+                                                    <th>QC Inspector/Supervisor/Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for ($i = 0; $i < 5; $i++)
+                                                    <tr>
+                                                        <td><input type="text" class="form-control form-control-sm" name="inspection[{{ $i }}][part_name]" data-field="part_name"></td>
+                                                        <td><input type="text" class="form-control form-control-sm" name="inspection[{{ $i }}][lot_no]" data-field="lot_no"></td>
+                                                        <td><input type="number" min="0" class="form-control form-control-sm" name="inspection[{{ $i }}][lot_qty_ipqc]" data-field="lot_qty_ipqc"></td>
+                                                        <td><input type="number" min="0" class="form-control form-control-sm" name="inspection[{{ $i }}][sample_iqc_oqc]" data-field="sample_iqc_oqc"></td>
+                                                        <td><input type="number" min="0" class="form-control form-control-sm" name="inspection[{{ $i }}][accept]" data-field="accept"></td>
+                                                        <td><input type="number" min="0" class="form-control form-control-sm" name="inspection[{{ $i }}][reject]" data-field="reject"></td>
+                                                        <td><input type="text" class="form-control form-control-sm" name="inspection[{{ $i }}][mode_of_defect]" data-field="mode_of_defect"></td>
+                                                        <td>
+                                                            <select class="form-control form-control-sm js-people mb-1" name="inspection[{{ $i }}][qc_inspector]" data-field="qc_inspector"></select>
+                                                            <input type="date" class="form-control form-control-sm" name="inspection[{{ $i }}][qc_date]" data-field="qc_date">
+                                                        </td>
+                                                    </tr>
+                                                @endfor
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="text-right">
+                                        <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================================================== -->
+                    <!-- PART 7: Overall Disposition & Sign-off -->
+                    <!-- ===================================================== -->
+
+                    <div class="card mb-3" id="cardPart7">
+                        <div class="card-header p-2">
+                            <button type="button" class="btn btn-link btn-block text-left" data-toggle="collapse" data-target="#collapsePart7" aria-expanded="true">
+                                <i class="fas fa-gavel mr-2"></i>
+                                <strong>Part 7: Overall Disposition</strong>
+                                <i class="fa fa-chevron-down float-right"></i>
+                            </button>
+                        </div>
+
+                        <div id="collapsePart7" class="collapse show">
+                            <div class="card-body">
+                                <form method="post" id="formDisqualiPart7" enctype="multipart/form-data" autocomplete="off">
+                                    @csrf
+                                    <input type="hidden" name="part1_id" class="js-part1-id">
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Overall Disposition</label>
+                                                <select class="form-control select2bs5" name="disposition" id="dispositionResult" required>
+                                                    <option value="">Select Overall Disposition</option>
+                                                    <option value="1">Employee may go back to normal operation</option>
+                                                    <option value="2">Employee may transfer to less critical station</option>
+                                                    <option value="3">Failed qualification/certification</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6 d-none" id="recertifiedDateGroup">
+                                            <div class="form-group">
+                                                <label>Re-certified Date</label>
+                                                <input type="date" class="form-control" name="recertified_date" id="recertifiedDate">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6 d-none" id="transferDateGroup">
+                                            <div class="form-group">
+                                                <label>Date of Transfer</label>
+                                                <input type="date" class="form-control" name="transfer_date" id="transferDate">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @php
+                                        $signOffs = [
+                                            'lqc_supervisor' => 'LQC Supervisor',
+                                            'conformed_by'   => 'Conformed by (Immediate Superior of Disqualified Personnel)',
+                                            'section_head'   => 'Approved by (Section Head)',
+                                            'lqc_head'       => 'Approved by (LQC Head)',
+                                        ];
+                                    @endphp
+
+                                    @foreach ($signOffs as $key => $label)
+                                        <h6 class="mt-3"><strong>{{ $label }}</strong></h6>
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <div class="form-group">
+                                                    <label>Name</label>
+                                                    <select class="form-control select2bs5 js-people" name="{{ $key }}_name"></select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <label>Sign</label>
+                                                    <input type="text" class="form-control" name="{{ $key }}_sign" placeholder="Type full name as signature">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label>Date</label>
+                                                    <input type="date" class="form-control" name="{{ $key }}_date">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                    <div class="text-right">
+                                        <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- MODAL FOOTER -->
@@ -528,5 +851,6 @@
 @section('js_content')
     <!-- {{-- <script type="text/javascript"> --}} -->
     <script src="{{ asset('public/js/my_js/PersonnelDisqualification.js') }}?<?=time()?>"></script>
+    <script src="{{ asset('public/js/my_js/PersonnelDisqualificationParts.js') }}?<?=time()?>"></script>
     <!-- {{-- </script> --}} -->
 @endsection
