@@ -529,11 +529,6 @@ class CommonController extends Controller
              $spanColor = 'bg-danger';
              switch ($approvalStatus) {
                 //VISUAL OPERATOR
-                // Initial State
-                case 'PB':
-                    $statusName = 'Pending Initial Checklist';
-                    break;
-
                 // Checkbox Validation Phase
                 case 'AOPERPRDN':
                     $statusName = 'A Production Update Checklist';
@@ -623,7 +618,7 @@ class CommonController extends Controller
                     break;
                 case 'LQCHEADAPP':
                     $newStatus = 'LQCHEADAPP';
-                    $statusName = 'For Section Head Approval';
+                    $statusName = 'For Section Head Approval'; // or QC Supervisor Approval
                 break;
                 //TECHNICIAN
                 case 'ATECHENGTQ':
@@ -655,11 +650,6 @@ class CommonController extends Controller
                     $newStatus = 'CLQCOQC';
                     $statusName = 'C VALIDATION PROCESS: QUALITY CONTROL SECTION <> OQC only';
                     break;
-                case 'LQCHEADAPP':
-                    $newStatus = 'LQCHEADAPP';
-                    $statusName = 'LQC HEAD APPROVAL';
-                    break;
-
                 // ==== OPERATOR
                 case 'PB':
                     $approvalStatus = 'APRODTO';
