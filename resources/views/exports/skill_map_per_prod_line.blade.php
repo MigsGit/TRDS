@@ -1,5 +1,6 @@
 <table>
 
+    
     <!-- Header -->
     <tr>
         <th>No.</th>
@@ -18,17 +19,22 @@
         <tr>
             <td>{{ $loop->iteration }}</td>
 
-            <td>{{ $employee['empName'] }}</td>
+            {{-- <td>{{ $employee['empName'] }}</td> --}}
+            <td>{{ str_replace(['Ã±', 'Ã‘', 'ñ', 'Ñ'], ['n', 'N', 'n', 'N'], $employee['empName']) }}</td>
+
 
             <td>{{ $employee['empNo'] }}</td>
 
             <td>{{ $employee['dateHired'] }}</td>
 
            @foreach($productLines as $productLineIndex => $productLine)
-                {{-- <td>qweqweqwe</td> --}}
-                {{-- {{ $productLineIndex }} --}}
+            <td>{{ $employee['productLines'][$productLineIndex] ?? 0 }}</td>
             @endforeach
 
+            {{-- @foreach($productLines as $productLineIndex => $productLine)
+                <td></td> 
+            @endforeach --}}
+            
         </tr>
 
     @endforeach
@@ -66,5 +72,4 @@
             Can mentor co-employee
         </td>
     </tr>
-
 </table>

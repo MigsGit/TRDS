@@ -7,7 +7,7 @@ use DataTables;
 use App\Model\TargetRatingSetting;
 use App\Model\TargetRatingDetails;
 use App\Model\DropdownMaster;
-use App\Model\DropdownMastersDetails;
+use App\Model\DropdownMasterDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Validator;
 class TargetRatingSettingController extends Controller
 {
     public function viewTargetRatingInfo(Request $request){
-        $target_ratings = TargetRatingSetting::with(['rating_details', 'product_line_info'])->whereNull('deleted_at')->get();
+        $target_ratings = TargetRatingSetting::with(['rating_details', 'product_line_info', 'product_area_info'])->whereNull('deleted_at')->get();
+        $product_lines = DropdownMaster::with('dropdown_master_details')->where('id', 2)->first()->dropdown_master_details->keyBy('id'); //2 = id of Product Lines
 
         return DataTables::of($target_ratings)
         ->addColumn('action', function($target_rating){
@@ -27,6 +28,18 @@ class TargetRatingSettingController extends Controller
             }else{
                 $result .= "<button class='btn btn-success btn-sm btnEnable' data-id='$target_rating->id'><i class='fas fa-undo'></i></button>";
             }
+            $result .= "</center>";
+            return $result;
+        })
+        ->addColumn('product_line_label', function($target_rating) use ($product_lines){
+            $selected_prod_lines = explode(',', $target_rating->product_line);
+            $result = "";
+            $result .= "<center>";
+                foreach ($selected_prod_lines as $curr_product_line) {
+                    if (isset($product_lines[$curr_product_line])) {
+                        $result .= "<span class='badge rounded-pill bg-primary'>" . e($product_lines[$curr_product_line]->dropdown_masters_details) . "</span> ";
+                    }
+                }
             $result .= "</center>";
             return $result;
         })
@@ -43,7 +56,7 @@ class TargetRatingSettingController extends Controller
 
             return $result;
         })
-        ->rawColumns(['action', 'status_label'])
+        ->rawColumns(['action', 'product_line_label', 'status_label'])
         ->make(true);
     }
 
@@ -51,12 +64,14 @@ class TargetRatingSettingController extends Controller
         $validation = array(
             'section' => ['required', 'string', 'max:255'],
             'position' => ['required', 'string', 'max:255'],
-            'product_line' => ['required', 'string', 'max:255'],
+            'product_area' => ['required', 'string', 'max:255'],
+            'product_line.*' => 'required',
             'target_name.*' => ['required', 'string', 'max:255'],
             'rating.*' => ['required', 'string', 'max:255']
         );
         
         $data = $request->all();
+
         $validator = Validator::make($data, $validation);
         if ($validator->fails()) {
             return response()->json(['result' => '0', 'error' => $validator->messages()]);
@@ -64,21 +79,24 @@ class TargetRatingSettingController extends Controller
             DB::beginTransaction();
 
             try{
+            
+                $prod_lines = implode(',', $request->product_line);
                 $data_array = array(
                     'section' => $request->section,
                     'position' => $request->position,
-                    'product_line' => $request->product_line
+                    'product_line' => $prod_lines,
+                    'product_area' => $request->product_area
                 );
 
                 if(isset($request->id)){ // EDIT
                     $target_rating_id = $request->id;
-                    TargetRatingSetting::where('id', $request->target_rating_id)->update($data_array);
+                    TargetRatingSetting::where('id', $target_rating_id)->update($data_array);
                 }else{ // ADD
                     $target_rating_id = TargetRatingSetting::insertGetId($data_array);
                 }
 
                 // DELETE OLD Target Ratings ON UPDATE
-                TargetRatingDetails::where('target_rating_id', $request->id)->delete();
+                TargetRatingDetails::where('target_rating_id', $target_rating_id)->delete();
 
                 // SAVE NEW Target Ratings
                 if ($request->target_name){
@@ -108,6 +126,16 @@ class TargetRatingSettingController extends Controller
                             ->get();
 
         return response()->json($product_lines->first()->dropdown_master_details);
+    }
+    
+    public function getProductAreaFrMaster(Request $request){
+        $product_areas = DropdownMaster::with(['dropdown_master_details'])
+                            ->where('status', 1) // active status
+                            ->whereNull('deleted_at') // null soft delete
+                            ->where('id', 32) // actual ID for Product Area
+                            ->get();
+
+        return response()->json($product_areas->first()->dropdown_master_details);
     }
 
     public function getTargetRatingById(Request $request){

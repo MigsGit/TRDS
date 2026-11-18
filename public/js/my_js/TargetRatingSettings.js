@@ -103,7 +103,8 @@ function initTargetRatingsTable($table, url = 'view_target_ratings') {
             { data: 'status_label' },
             { data: 'section' },
             { data: 'position' },
-            { data: 'product_line_info.dropdown_masters_details' },
+            { data: 'product_area_info.dropdown_masters_details' },
+            { data: 'product_line_label' },
             { data: 'rating_details', name: 'rating_details.target_name',
                 orderable: false, render: renderDetails('target_name', false) },
             { data: 'rating_details', name: 'rating_details.rating',
@@ -120,6 +121,7 @@ function bindTargetRatingEvents($table, $tableTRDetails, $form, $modal, dtTarget
     $addTargetRating.on('click', function () {
         resetTargetRatingForm($form, $tableTRDetails, rowIndex);
 
+        loadProductArea($('.selectProductArea'));
         loadProductLines($('.selectProductLine'));
         $modal.modal('show');
     });
@@ -215,10 +217,10 @@ function getRow(index) {
                 </center>
             </td>
             <td>
-                <textarea class="form-control form-control-sm" name="target_name[${index}]" required></textarea>
+                <input type="text" class="form-control" name="target_name[${index}]" required></input>
             </td>
             <td>
-                <textarea class="form-control form-control-sm" name="rating[${index}]" required></textarea>
+                <input type="number" class="form-control" name="rating[${index}]" required></input>
             </td>
         </tr>
     `;
@@ -263,6 +265,8 @@ function fetchTargetRatingsById(id, $modal, tableTRDetails) {
             $('#targetRatingId').val(response.id);
             $('#section').val(response.section);
             $('#position').val(response.position);
+
+            loadProductArea($('.selectProductArea'), response.product_area);
             loadProductLines($('.selectProductLine'), response.product_line);
 
             rowIndex = 0;
@@ -274,10 +278,10 @@ function fetchTargetRatingsById(id, $modal, tableTRDetails) {
                             <center><button class="btn btn-md btn-danger removeRow" title="Remove Row" type="button"><i class="fa fa-times"></i></button></center>
                         </td>
                         <td>
-                            <textarea class="form-control form-control-sm" name="target_name[${rowIndex}]">${response.rating_details[index].target_name}</textarea>
+                            <input type="text" class="form-control" name="target_name[${rowIndex}]" value="${response.rating_details[index].target_name}" />
                         </td>
                         <td>
-                            <textarea class="form-control form-control-sm" name="rating[${rowIndex}]">${response.rating_details[index].rating}</textarea>
+                            <input type="number" class="form-control" name="rating[${rowIndex}]" value="${response.rating_details[index].rating}" />
                         </td>
                     </tr>
                 `;
@@ -325,6 +329,40 @@ function updateStatus(id, dtTargetRatings) {
     });
 }
 
+function loadProductArea(cboElement, currentProductAreaId = null){
+    let result = '<option value="" disabled selected> Select Product Area </option>';
+    $.ajax({
+        // data: { hr_only },
+        method: "get",
+        url: "get_product_area_fr_master",
+        dataType: "json",
+        beforeSend: function(){
+            result = '<option value="" disabled selected> -- Loading -- </option>';
+        },
+        success: function (response) {
+            if(response.length > 0){
+                    result = '<option value="" disabled selected> Select Product Area </option>';
+                for (let i = 0; i < response.length; i++) {
+                    result += '<option value="' + response[i]['id'] + '">' + response[i]['dropdown_masters_details'] + '</option>';
+                }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+
+            cboElement.html(result);
+
+            if(currentProductAreaId != null){
+                cboElement.val(currentProductAreaId).trigger('change');
+            }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}
+
 function loadProductLines(cboElement, currentProductLineId = null){
     let result = '<option value="" disabled selected> Select Product Line </option>';
     $.ajax({
@@ -347,9 +385,15 @@ function loadProductLines(cboElement, currentProductLineId = null){
 
             cboElement.html(result);
 
-            if(currentProductLineId != null){
-                cboElement.val(currentProductLineId).trigger('change');
-            }
+            prodLineSplitted = currentProductLineId.split(',');
+            prodLineSplitted.forEach(element => {
+                cboElement.find('option[value="' + element + '"]').prop('selected', true);
+                cboElement.trigger('change');
+            });
+            
+            // if(currentProductLineId != null){
+            //     cboElement.val(currentProductLineId).trigger('change');
+            // }
         },
         error: function(data, xhr, status) {
             result = '<option value="0" selected disabled> -- Reload Again -- </option>';

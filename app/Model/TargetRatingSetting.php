@@ -5,6 +5,7 @@ namespace App\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Model\TargetRatingDetails;
+use App\Model\DropdownMasterDetail;
 
 class TargetRatingSetting extends Model
 {
@@ -16,7 +17,12 @@ class TargetRatingSetting extends Model
         return $this->hasMany(TargetRatingDetails::class, 'target_rating_id', 'id');
     }
 
+    public function product_area_info(){
+        return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_area'); //ID from DropdownMaster for operator station
+    }
+    
     public function product_line_info(){
         return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line'); //ID from DropdownMaster for operator station
     }
+    
 }

@@ -18,16 +18,23 @@ class CreateTargetRatingSettingsTable extends Migration
             $table->unsignedTinyInteger('status')->default(1)->comment('1-Active, 0-Inactive');
             $table->string('section')->nullable();
             $table->string('position')->nullable();
-            $table->unsignedBigInteger('product_line')->comment('dropdown_master_details.id');
+            $table->unsignedBigInteger('product_area')->comment('dropdown_master_details.id');
+            $table->string('product_line')->comment('dropdown_master_details.id');
             $table->unsignedBigInteger('created_by')->nullable()->comment('db_rapidx.id');
             $table->softDeletes();
             $table->timestamps();
 
             // Foreign key to main table
-            $table->foreign('product_line')
+            $table->foreign('product_area')
                 ->references('id')
                 ->on('dropdown_master_details')
                 ->onDelete('cascade');
+
+            //disable foreign key for product_line
+            // $table->foreign('product_line')
+            //     ->references('id')
+            //     ->on('dropdown_master_details')
+            //     ->onDelete('cascade');
                 
             $table->foreign('created_by')
                 ->references('id')

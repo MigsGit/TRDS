@@ -32,8 +32,8 @@
         <tr>
             <td>{{ $loop->iteration }}</td>
 
-            <td>{{ $employee['empName'] }}</td>
-
+            {{-- <td>{{ $employee['empName'] }}</td> --}}
+            <td>{{ str_replace(['Ã±', 'Ã‘', 'ñ', 'Ñ'], ['n', 'N', 'n', 'N'], $employee['empName']) }}</td>
             <td>{{ $employee['empNo'] }}</td>
 
             <td>{{ $employee['dateHired'] }}</td>

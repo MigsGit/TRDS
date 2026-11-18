@@ -15,12 +15,14 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
     protected $category;
     protected $qcSlips;
     protected $product_line;
+    protected $positions_with_training;
 
-    public function __construct(string $category, $qcSlips, $product_line)
+    public function __construct(string $category, $qcSlips, $product_line, $positions_with_training)
     {
         $this->category = $category;
         $this->qcSlips = $qcSlips;
         $this->product_line = $product_line;
+        $this->positions_with_training = $positions_with_training;
     }
 
     public function title(): string
@@ -31,7 +33,6 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
     public function view(): View
     {
         $rows = [];
-
         foreach ($this->qcSlips as $slip) {
             $productLine = $slip->product_line_details->dropdown_masters_details ?? '';
 
@@ -39,65 +40,86 @@ class CertifiedPersonnelSheetExport implements FromView, WithTitle, ShouldAutoSi
             $engApp  = null;
             $qcApp   = null;
             // Map Approvers
-            $approvers = collect($slip->op_approvers);
-            switch ($this->category) {
-                case 'Operator':
-                    $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
-                    $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
-                    $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
-                    break;
-                case 'Inspector':
-                    $qcApp = $approvers->firstWhere('approval_status', 'ALQCTQ');
-                    break;
-                case 'OPTECH':
-                    // $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
-                    // $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
-                    // $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
-                    break;
-                case 'TECHNICIAN':
-                    // $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
-                    // $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
-                    // $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
-                    break;
-                default:
-                    // Default to OPERATOR approvers if category doesn't match
-                    // $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
-                    // $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
-                    // $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
+            // if (in_array($this->category, $this->positions_with_training)) {
+            if ($this->category == 'Operator') {
+                // Perform any specific logic for positions with training
+                $approvers = collect($slip->c_lqc_training_item_results_details);
+
+                
+                $prodApp = $approvers->first(function ($item) {
+                    return stripos($item->position, 'prod') !== false;
+                });
+
+                $engApp  = $approvers->first(function ($item) {
+                    return stripos($item->position, 'eng') !== false;
+                });
+
+                $qcApp   = $approvers->first(function ($item) {
+                    return stripos($item->position, 'qc') !== false;
+                });
+
+                // 2. Extract Name and Validation Date safely
+                $prod = [
+                    'name'           => $prodApp ? $prodApp->trainer_name : null,
+                    'date'=> $prodApp ? $prodApp->validation_date : null,
+                ];
+
+                $eng = [
+                    'name'           => $engApp ? $engApp->trainer_name : null,
+                    'date'=> $engApp ? $engApp->validation_date : null,
+                ];
+
+                $qc = [
+                    'name'           => $qcApp ? $qcApp->trainer_name : null,
+                    'date'=> $qcApp ? $qcApp->validation_date : null,
+                ];
+
+            }
+            else{
+                $approvers = collect($slip->op_approvers);
+                switch ($this->category) {
+                    case 'Inspector':
+                        $qcApp = $approvers->firstWhere('approval_status', 'ALQCTQ');
+                        break;
+                    case 'OPTECH':
+                        // $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
+                        // $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
+                        // $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
+                        break;
+                    case 'TECHNICIAN':
+                        $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
+                        $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
+                        $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
+                        break;
+                    default:
+                        // Default to OPERATOR approvers if category doesn't match
+                        // $prodApp = $approvers->firstWhere('approval_status', 'APRODTO');
+                        // $engApp  = $approvers->firstWhere('approval_status', 'BENGGTQ');
+                        // $qcApp   = $approvers->firstWhere('approval_status', 'CQCC');
+                }
+
+                $formatApprover = function ($app) {
+                    if (!$app) return ['name' => '', 'date' => ''];
+
+                    $explodedNames = explode(' | ', utf8_decode($app->formatted['name']) ?? '');
+                    // $names = $app->formatted['name'] ?? '';
+                    $dateStr = $app->formatted['date'] ?? '';
+                    $rawRemarks = $app->formatted['remarks'] ?? '';
+
+                    return [
+                        'name' => implode("\n", $explodedNames),
+                        'date' => $dateStr,
+                        'remarks' => $rawRemarks
+                    ];
+                };
+
+
+                $prod = $formatApprover($prodApp);
+                $eng  = $formatApprover($engApp);
+                $qc   = $formatApprover($qcApp);
             }
 
-            $formatApprover = function ($app) {
-                if (!$app) return ['name' => '', 'date' => ''];
-
-                // Check if second approver exists and is not empty
-                // $hasSecond = !empty($app->second_approver) || !empty($app->second_approver_2);
-
-                // if ($hasSecond) {
-                //     $names = array_filter([$app->second_approver ?? null, $app->second_approver_2 ?? null]);
-                //     $rawDate = $app->second_date ?? $app->second_approver_ddate ?? null;
-                // } else {
-                //     $names = array_filter([$app->first_approver ?? null, $app->first_approver_2 ?? null]);
-                //     $rawDate = $app->first_date ?? $app->first_approver_ddate ?? null;
-                // }
-
-                // $dateStr = !empty($rawDate) ? Carbon::parse($rawDate)->format('F d, Y') : '';
-
-                $explodedNames = explode(' | ', utf8_decode($app->formatted['name']) ?? '');
-                // $names = $app->formatted['name'] ?? '';
-                $dateStr = $app->formatted['date'] ?? '';
-                $rawRemarks = $app->formatted['remarks'] ?? '';
-
-                return [
-                    'name' => implode("\n", $explodedNames),
-                    'date' => $dateStr,
-                    'remarks' => $rawRemarks
-                ];
-            };
-
-
-            $prod = $formatApprover($prodApp);
-            $eng  = $formatApprover($engApp);
-            $qc   = $formatApprover($qcApp);
+            
 
             foreach ($slip->qc_slip_employees as $emp) {
                     // dd('reason_details', $slip->reason_details);
