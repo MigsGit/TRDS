@@ -1,6 +1,6 @@
 <!-- FORMAT 3 Supervisor, Engineer, Planner -->
 <form id="formSubmit_SEP">
-    <h3 class="mt-5 mb-3 text-center">SUPERVISOR/ENGINEER/PLANNER TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
+    <h3 class="mt-5 mb-3 text-center">SUPERVISOR/ENGINEER/PLANNER TRAINING / CERTIFICATION AND VALIDATION SLIP</h3>
 
     <div class="accordion" id="accordionExampleSEP">
           {{-- <div class="accordion-item">

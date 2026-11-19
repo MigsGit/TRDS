@@ -1,7 +1,7 @@
 <!-- FORMAT 1 MH -->
 <form id="formSubmit_MH">
-        <h3 class="mt-5 mb-3 text-center">MATERIAL HANDLER'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
-    
+        <h3 class="mt-5 mb-3 text-center">MATERIAL HANDLER'S TRAINING / CERTIFICATION AND VALIDATION SLIP</h3>
+
         <div class="accordion" id="accordionExampleMH">
             <div class="accordion-item">
                 <h2 class="card-header">
@@ -322,7 +322,7 @@
         <hr style="height: 5px; background-color: black; border: none;">
 
         <div class="col-md-6">
-            <label for="">Approved / Confirmed by:</label> 
+            <label for="">Approved / Confirmed by:</label>
              <select class="form-control select2bs4" style="width: 100%;" name="text_mh_approved_confirmed_by" id="text_mh_approved_confirmed_by" multiple>
             </select>
             {{-- nmodify <input class="form-control" type="text" id="text_mh_approved_confirmed_by" name="text_mh_approved_confirmed_by" list="list_display_empno" placeholder="Select Certified by">

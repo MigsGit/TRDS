@@ -34,7 +34,7 @@ class TrainingEndorsementController extends Controller
      * @param int $training_endorsement_id
      * @param int $rapidx_id
      * @param string $approval_type ('approved_by' or 'checked_by')
-     * @return void
+    * @return void
      */
     protected function insertApproval($training_endorsement_id, $rapidx_id, $approval_type)
     {
@@ -64,14 +64,14 @@ class TrainingEndorsementController extends Controller
         ])
         ->whereNull('deleted_at')
         ->get();
-        
+
         // return $_SESSION['rapidx_user_id'];
         $user_access = User::with(['user_access_module'])
         ->where('rapidx_emp_id', $_SESSION['rapidx_user_id'])->first();
 
         // $exploded_u_access = 17 for approver
         $exploded_u_access = explode(',', $user_access->user_access_module->user_modules_id);
-        
+
         if($request->status != ''){
            $data = $data->where('status', $request->status);
         }
@@ -102,7 +102,7 @@ class TrainingEndorsementController extends Controller
             $result = "";
             $result .= '<center>';
             $result .= '<button class="btn btn-sm mr-1 btn-info btnViewEndorsement" data-id="' . $row->id . '" data-tr-ctrl-no="'.$row->training_request_details->ctrl_number.'" title="View Endorsement"><i class="fa fa-eye"></i></button>';
-                
+
             if($row->created_by == $_SESSION['rapidx_user_id'] && $row->status != 3){
                 $result .= '<button class="btn btn-sm mr-1 btn-danger btnDeleteEndorsement" data-id="' . $row->id . '" title="Delete Endorsement"><i class="fa fa-trash"></i></button>';
                 $result .= '<button class="btn btn-sm mr-1 btn-warning btnAddNotEndorsement" data-id="' . $row->id . '" data-tr-id="'.$row->training_request_id.'" title="Add Not Endorsed Employee"><i class="fa fa-plus"></i></button>';
@@ -172,8 +172,8 @@ class TrainingEndorsementController extends Controller
             if($checker){
                 foreach($checker as $checker){
                     // $format_updated_at = $checker['updated_at'] ? Carbon::parse($checker['updated_at'])->format('Y-m-d H:i:s') : null;
-                    $format_updated_at = $checker['updated_at'] 
-                    ? Carbon::parse($checker['updated_at'])->setTimezone('Asia/Manila')->format('Y-m-d H:i:s') 
+                    $format_updated_at = $checker['updated_at']
+                    ? Carbon::parse($checker['updated_at'])->setTimezone('Asia/Manila')->format('Y-m-d H:i:s')
                     : null;
                     if($checker['updated_at'] != null){
                         if($row->disapprove_by == $checker['approver_details']['id']) {
@@ -205,8 +205,8 @@ class TrainingEndorsementController extends Controller
             if($approver){
                 foreach($approver as $approver){
                     // $format_updated_at = $approver['updated_at'] ? Carbon::parse($approver['updated_at'])->format('Y-m-d H:i:s') : null;
-                    $format_updated_at = $approver['updated_at'] 
-                    ? Carbon::parse($approver['updated_at'])->setTimezone('Asia/Manila')->format('Y-m-d H:i:s') 
+                    $format_updated_at = $approver['updated_at']
+                    ? Carbon::parse($approver['updated_at'])->setTimezone('Asia/Manila')->format('Y-m-d H:i:s')
                     : null;
                     if($approver['updated_at'] != null){
                         if($row->disapprove_by == $approver['approver_details']['id']) {
@@ -230,7 +230,7 @@ class TrainingEndorsementController extends Controller
 
             return $result;
         })
-        
+
         ->rawColumns(['action', 'raw_status', 'prepared_by', 'raw_checker', 'raw_approver'])
         ->make(true);
     }

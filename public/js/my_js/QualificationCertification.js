@@ -819,7 +819,10 @@
                 // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
                 $('.btnSaveMatrix').removeClass('d-none');
             }
-            initTrainingItemsTable('#tblTrainingItems_tech');
+            // initTrainingItemsTable('#tblTrainingItems_tech');
+            initPositionTrainingTable('#tblTrainingItemsTechOperator', 'Production', params.qcSlipsId, 37, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsTechEngg', 'Engineer', params.qcSlipsId, 38, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsTechQC', 'QC', params.qcSlipsId, 39, approvalStatus);
             $('#divTechnician').removeClass('d-none');
             $('.techSave').removeClass('d-none');
              initDropdownMasterDetailsByFkidCombos([
