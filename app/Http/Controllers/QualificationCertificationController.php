@@ -376,7 +376,7 @@ class QualificationCertificationController extends Controller
      * belongs to this qc_slips_id + position, mirroring how `date` is already
      * broadcast per day.
      */
-    public function saveQcLqcTrainingItemsByPosition(Request $request){
+    public function saveQcLqcTrainingItemsByPosition(Request $request){ //nmodify
         try {
             date_default_timezone_set('Asia/Manila');
             //    return $request->all();
@@ -2013,7 +2013,6 @@ class QualificationCertificationController extends Controller
                 'qc_slip_employees.system_one_hris_subcon',
             ]);
 
-            // return $data;
 
             // 2. Filter by access
             if (filled($selectAccess)) {
@@ -2070,6 +2069,7 @@ class QualificationCertificationController extends Controller
             }
 
             $data->whereNull('deleted_at')
+                // ->where('status','LQCHEADAPP')
                 ->orderByDesc('id');
 
             // 6. Execute the QC slip query once
@@ -2579,8 +2579,8 @@ class QualificationCertificationController extends Controller
         if ($selectPosition === 'Technician' ) {
             switch ($currentStatus) {
                 case ($currentStatus === 'DOPEROSC'):
-                $newStatus  = 'ENGHEADAPP';
-                $statusName = 'For Section Head Approval';
+                $newStatus  = 'ENGGHEADAPP';
+                $statusName = 'For Engineering Head Approval';
                 break;
             }
         }

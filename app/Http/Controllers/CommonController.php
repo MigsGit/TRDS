@@ -133,111 +133,111 @@ class CommonController extends Controller
                     $statusName = 'A Production Update Checklist';
                     break;
 
-                case 'BOPERENGG':
+                case $approvalStatus === 'BOPERENGG':
                     $statusName = 'B Engineer Update Checklist';
                     break;
 
-                case 'COPERQC':
+                case $approvalStatus === 'COPERQC':
                     $statusName = 'C QC Update Checklist';
                     break;
 
                 // Day 1 Phase
-                case 'AOPERPRDN1':
+                case $approvalStatus === 'AOPERPRDN1':
                     $statusName = 'A Production Day 1 Update';
                     break;
 
-                case 'BOPERENGG1':
+                case $approvalStatus === 'BOPERENGG1':
                     $statusName = 'B Engineer Day 1 Update';
                     break;
 
-                case 'COPERQC1':
+                case $approvalStatus === 'COPERQC1':
                     $statusName = 'C QC Day 1 Update';
                     break;
 
                 // Day 2 Phase
-                case 'AOPERPRDN2':
+                case $approvalStatus === 'AOPERPRDN2':
                     $statusName = 'A Production Day 2 Update';
                     break;
 
-                case 'BOPERENGG2':
+                case $approvalStatus === 'BOPERENGG2':
                     $statusName = 'B Engineer Day 2 Update';
                     break;
 
-                case 'COPERQC2':
+                case $approvalStatus === 'COPERQC2':
                     $statusName = 'C QC Day 2 Update';
                     break;
 
                 // Day 3 Phase
-                case 'AOPERPRDN3':
+                case $approvalStatus === 'AOPERPRDN3':
                     $statusName = 'A Production Day 3 Update';
                     break;
 
-                case 'BOPERENGG3':
+                case $approvalStatus === 'BOPERENGG3':
                     $statusName = 'B Engineer Day 3 Update';
                     break;
 
-                case 'COPERQC3':
+                case $approvalStatus === 'COPERQC3':
                     $statusName = 'C QC Day 3 Update';
                     break;
 
                 // Day 4 Phase
-                case 'AOPERPRDN4':
+                case $approvalStatus === 'AOPERPRDN4':
                     $statusName = 'A Production Day 4 Update';
                     break;
 
-                case 'BOPERENGG4':
+                case $approvalStatus === 'BOPERENGG4':
                     $statusName = 'B Engineer Day 4 Update';
                     break;
 
-                case 'COPERQC4':
+                case $approvalStatus === 'COPERQC4':
                     $statusName = 'C QC Day 4 Update';
                     break;
 
                 // Day 5 Phase
-                case 'AOPERPRDN5':
+                case $approvalStatus === 'AOPERPRDN5':
                     $statusName = 'A Production Day 5 Update';
                     break;
 
-                case 'BOPERENGG5':
+                case $approvalStatus === 'BOPERENGG5':
                     $statusName = 'B Engineer Day 5 Update';
                     break;
-                case 'COPERQC5':
+                case $approvalStatus === 'COPERQC5':
                     $statusName = 'C QC Day 5 Update';
                     break;
-                case 'DOPEROSC':
+                case $approvalStatus === 'DOPEROSC':
                     $statusName = 'D PRODUCT ORIENTATION AND SAMPLE CHECK (QC)';
                     break;
-                case 'EOPERVISUAL':
+                case $approvalStatus === 'EOPERVISUAL':
                     $statusName = 'E PRODUCT VALIDATION THROUGH GRR (FOR VISUAL STATIONS';
                     break;
                 //MH - QCAPP
                 //TECHNICIAN
-                 case 'ENGHEADAPP':
+                 case $approvalStatus === 'ENGHEADAPP':
                     $newStatus = 'ENGHEADAPP';
                     $statusName = 'Engineer Head Approval';
                     break;
                 // ==== OPERATOR
-                case 'PB':
+                case $approvalStatus === 'PB':
                     $approvalStatus = 'APRODTO';
                     $statusName = 'PREPARED BY';
                     break;
-                case 'APRODTO':
+                case $approvalStatus === 'APRODTO':
                     $approvalStatus = 'APRODTO';
                     $statusName = 'A Production Training Orientation';
                     break;
-                case 'BENGGTQ':
+                case $approvalStatus === 'BENGGTQ':
                     $approvalStatus = 'BENGGTQ';
                     $statusName = 'B Engineer Training Qualification';
                     break;
-                case 'CQCC':
+                case $approvalStatus === 'CQCC':
                     $approvalStatus = 'CQCC';
                     $statusName = 'C Qc Certification';
                     break;
-                case 'DPPDONLY':
+                case $approvalStatus === 'DPPDONLY':
                     $newStatus = 'DPPDONLY';
                     $statusName = 'D PPD Update';
                     break;
-                case 'EENGVP':
+                case $approvalStatus === 'EENGVP':
                     $approvalStatus = 'EENGVP';
                     $statusName = 'E Engineering Validation Process';
                     break;
@@ -253,23 +253,35 @@ class CommonController extends Controller
                 //     $newStatus = 'DQCPPDONLY';
                 //     $statusName = 'D QC Update';
                 //     break;
-                case 'EQCVP':
+                case $approvalStatus === 'EQCVP':
                     $approvalStatus = 'EQCVP';
                     $statusName = 'E Qc Validation Process';
                     break;
-                case 'FQCVVO':
+                case $approvalStatus === 'FQCVVO':
                     $approvalStatus = 'FQCVVO';
                     $statusName = 'F Qc Validation Visual Operator';
+                    break; //CLQCOQC
+                case ($approvalStatus === 'CLQCOQC'):
+                    $newStatus = 'CLQCOQC';
+                    $statusName = 'C VALIDATION PROCESS: QUALITY CONTROL SECTION <> OQC only';
                     break;
-                case 'QCAPP':
+                case $approvalStatus === 'QCAPP':
                     $approvalStatus = 'QCAPP'; //QC Supervisor Appoval
                     $statusName = 'QC Supervisor Approval';
                     break;
-                case ($params['approval_status'] === 'LQCHEADAPP') :
+                case $approvalStatus === 'ENGGHEADAPP':
+                    $approvalStatus = 'ENGGHEADAPP'; //QC Supervisor Appoval
+                    $statusName = 'For Engineering Head Approval';
+                    break;
+                case $approvalStatus === 'LQCHEADAPP' &&$positionCategory != 'Inspector' ||$positionCategory != 'Supervisor':
                     $approvalStatus = 'QCAPP'; //QC Supervisor Appoval
                     $statusName = 'QC Supervisor Approval';
                     break;
-                case 'OK':
+                case $approvalStatus === 'LQCHEADAPP' &&$positionCategory === 'Inspector' ||$positionCategory === 'Supervisor' :
+                    $approvalStatus = 'QCAPP'; //QC Supervisor Appoval
+                    $statusName = 'LQC Head Approval';
+                    break;
+                case $approvalStatus === 'OK':
                     $approvalStatus = 'CLOSED';
                     $statusName = 'CLOSED';
                     $spanColor = 'bg-success';
