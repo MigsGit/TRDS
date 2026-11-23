@@ -260,7 +260,8 @@ class QualificationCertificationController extends Controller
         ->editColumn('item_name', function ($row) {
             $html = '<strong>' . e($row['item_name']) . '</strong>';
             $lower = strtolower($row['item_name']);
-            if (str_contains($lower, 'systems and procedure') || str_contains($lower, '2) work instruction') || str_contains($lower,'point panel') || str_contains($lower,'1) standard operating procedur') || str_contains($lower,'2) process flow') || str_contains($lower,'3) product drawing') ) {
+            if (str_contains($lower, '1) step-by-step') || str_contains($lower, '2) work instruction') || str_contains($lower,'point panel') || str_contains($lower,'1) standard operating procedur') || str_contains($lower,'2) process flow') || str_contains($lower,'3) product drawing') ) {
+            // if (str_contains($lower, 'systems and procedure') || str_contains($lower, '2) work instruction') || str_contains($lower,'point panel') || str_contains($lower,'1) standard operating procedur') || str_contains($lower,'2) process flow') || str_contains($lower,'3) product drawing') ) {
                 $html .= '<br><input type="text" class="form-control form-control-sm mt-1 input-sub-desc"
                               data-item-id="' . $row['id'] . '"
                               placeholder="Details..."
@@ -1324,7 +1325,7 @@ class QualificationCertificationController extends Controller
                 "system_name" => "rapidx_TRDS",
             ];
             DB::commit();
-        //    $this->commonController->sendEmail($emailData);
+            // $this->commonController->sendEmail($emailData);
             return response()->json(['is_success' => 'true']);
         } catch (Exception $e) {
             DB::rollback();
