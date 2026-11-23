@@ -675,6 +675,9 @@
                 '#text_oper_station_to',
                 '#text_oper_station_from',
             ],34);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],36);
             initTrainingItemsTable('#tblTrainingItems_mh');
             $('.btnMh').removeClass('d-none');
             $('.btnSaveMatrix').removeClass('d-none');
@@ -718,6 +721,9 @@
                 '#text_oper_station_to',
                 '#text_oper_station_from',
             ],9);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],31);
             initPositionTrainingTable('#tblTrainingItemsTechOperator', 'Production', params.qcSlipsId, 40, approvalStatus);
             initPositionTrainingTable('#tblTrainingItemsTechEngg', 'Engineer', params.qcSlipsId, 41, approvalStatus);
             initPositionTrainingTable('#tblTrainingItemsTechQC', 'QC', params.qcSlipsId, 42, approvalStatus);
