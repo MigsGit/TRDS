@@ -776,7 +776,7 @@ class QualificationCertificationController extends Controller
 
                 }
             }
-           if($currentPositionCategory === 'MH'){
+           if($currentPositionCategory === 'MHS'){
                 // ASepTrainingOrientationRequest
                 $operToApprovers = [];
                 $currentApprovalStatus = 'AMHTO';
@@ -2729,7 +2729,7 @@ class QualificationCertificationController extends Controller
                     break;
 
                 case ($params['approval_status'] === 'FQCVVO'):
-                    $newStatus = 'QCAPP'; // QC Supervisor Approval
+                    $newStatus = 'LQCHEADAPP'; // QC Supervisor Approval
                     $statusName = 'CLOSED';
                     break;
 

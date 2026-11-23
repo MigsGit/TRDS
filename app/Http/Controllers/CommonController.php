@@ -265,8 +265,8 @@ class CommonController extends Controller
                     $newStatus = 'CLQCOQC';
                     $statusName = 'C VALIDATION PROCESS: QUALITY CONTROL SECTION <> OQC only';
                     break;
-                case $approvalStatus === 'QCAPP':
-                    $approvalStatus = 'QCAPP'; //QC Supervisor Appoval
+                case $approvalStatus === 'LQCSUPVAPP':
+                    $approvalStatus = 'LQCSUPVAPP'; //QC Supervisor Appoval
                     $statusName = 'QC Supervisor Approval';
                     break;
                 case $approvalStatus === 'ENGGHEADAPP':
@@ -274,11 +274,11 @@ class CommonController extends Controller
                     $statusName = 'For Engineering Head Approval';
                     break;
                 case $approvalStatus === 'LQCHEADAPP' &&$positionCategory != 'Inspector' ||$positionCategory != 'Supervisor':
-                    $approvalStatus = 'QCAPP'; //QC Supervisor Appoval
+                    $approvalStatus = 'LQCHEADAPP'; //QC Supervisor Appoval
                     $statusName = 'QC Supervisor Approval';
                     break;
                 case $approvalStatus === 'LQCHEADAPP' &&$positionCategory === 'Inspector' ||$positionCategory === 'Supervisor' :
-                    $approvalStatus = 'QCAPP'; //QC Supervisor Appoval
+                    $approvalStatus = 'LQCHEADAPP'; //QC Supervisor Appoval
                     $statusName = 'LQC Head Approval';
                     break;
                 case $approvalStatus === 'OK':

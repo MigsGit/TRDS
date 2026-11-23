@@ -586,7 +586,7 @@
             if( approvalStatus.includes('OPERQC')){
                 $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
             }
-            if(approvalStatus === 'LQCHEADAPP'){
+            if(approvalStatus === 'LQCHEADAPP'){ //ENGGHEADAPP
                 $('.btnAllOperator').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
             }
@@ -682,14 +682,64 @@
             $('#dateOfTransfer').removeClass('d-none');
             $('#seriesDesignation').text('Designation');
             $('#productLine').removeClass('d-none');
+            initPositionTrainingTable('#tblTrainingItemsMhOperator', 'Production', params.qcSlipsId, 37, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMhEngg', 'Engineer', params.qcSlipsId, 38, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMhQC', 'QC', params.qcSlipsId, 39, approvalStatus);
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
 
-            if(approvalStatus === 'LQCHEADAPP'){
-                $('.btnMh').addClass('d-none');
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCSUPVAPP'){
+                // $('.btnSaveInspector').addClass('d-none');
+                // $('.operSave').addClass('d-none');
+                $('.techSave').addClass('d-none');
                 $('.operApproved').removeClass('d-none');
             }
-            if(approvalStatus ==='OK'){
+              if(approvalStatus ==='OK'){
                 $('.operApproved').addClass('d-none');
-                $('.btnMh').addClass('d-none');
+                $('.techSave').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'Technician'){
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            // initTrainingItemsTable('#tblTrainingItems_tech');
+
+            $('#divTechnician').removeClass('d-none');
+            $('.techSave').removeClass('d-none');
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],9);
+            initPositionTrainingTable('#tblTrainingItemsTechOperator', 'Production', params.qcSlipsId, 40, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsTechEngg', 'Engineer', params.qcSlipsId, 41, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsTechQC', 'QC', params.qcSlipsId, 42, approvalStatus);
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'ENGGHEADAPP'){
+                // $('.btnSaveInspector').addClass('d-none');
+                // $('.operSave').addClass('d-none');
+                $('.techSave').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+              if(approvalStatus ==='OK'){
+                $('.operApproved').addClass('d-none');
+                $('.techSave').addClass('d-none');
             }
         }
         if(positionCategory === 'Supervisor'){
@@ -756,7 +806,7 @@
             if(approvalStatus ==='FQCVVO'){
                 $('#collapseSevenOper').addClass('show');
             } //LQCHEADAPP
-            if(approvalStatus ==='QCAPP'){
+            if(approvalStatus ==='LQCSUPVAPP'){
                 $('.btnSaveInspector').addClass('d-none');
                 $('.operSave').addClass('d-none');
                 // $('.inspectorSave').addClass('d-none');
@@ -809,41 +859,7 @@
                 $('.inspectorSave').addClass('d-none');
             }
         }
-        if(positionCategory === 'Technician'){
-            $('#dateOfTransfer').removeClass('d-none');
-            $('#seriesDesignation').text('Designation');
-            $('#productLine').removeClass('d-none');
 
-            if(approvalStatus ==='CLQCOQC'){
-
-                // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
-                $('.btnSaveMatrix').removeClass('d-none');
-            }
-            // initTrainingItemsTable('#tblTrainingItems_tech');
-            initPositionTrainingTable('#tblTrainingItemsTechOperator', 'Production', params.qcSlipsId, 37, approvalStatus);
-            initPositionTrainingTable('#tblTrainingItemsTechEngg', 'Engineer', params.qcSlipsId, 38, approvalStatus);
-            initPositionTrainingTable('#tblTrainingItemsTechQC', 'QC', params.qcSlipsId, 39, approvalStatus);
-            $('#divTechnician').removeClass('d-none');
-            $('.techSave').removeClass('d-none');
-             initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-            ],9);
-            if(approvalStatus ==='CTECHQCC'){
-                // $('#btnSaveMatrix_tblTrainingItems_tech').removeClass('d-none');
-                $('.btnSaveMatrix').removeClass('d-none');
-            }
-            if(approvalStatus === 'TECHHEADAPP'){
-                // $('.btnSaveInspector').addClass('d-none');
-                // $('.operSave').addClass('d-none');
-                $('.techSave').addClass('d-none');
-                $('.operApproved').removeClass('d-none');
-            }
-              if(approvalStatus ==='OK'){
-                $('.operApproved').addClass('d-none');
-                $('.techSave').addClass('d-none');
-            }
-        }
     }
 
     const saveFirstTakeInsSequence = (params) =>{
