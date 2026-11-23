@@ -1694,7 +1694,7 @@ class QualificationCertificationController extends Controller
             $html = '<strong>' . e($row['item_name']) . '</strong>';
             $lower = strtolower($row['item_name']);
             if (str_contains($lower, 'systems and procedure') || str_contains($lower, 'work instruction') || str_contains($lower,'point panel')) {
-                $html .= '<br><input type="text" class="form-control form-control-sm mt-1 input-sub-desc"
+                $html .= '<br><input type="text" class=""
                               data-item-id="' . $row['id'] . '"
                               placeholder="Details..."
                               value="' . e($row['sub_description']) . '">';
@@ -1818,7 +1818,7 @@ class QualificationCertificationController extends Controller
         ->editColumn('item_name', function ($row) {
             $html = '<strong>' . e($row['item_name']) . '</strong>';
             $lower = strtolower($row['item_name']);
-            if (str_contains($lower, 'systems and procedure') || str_contains($lower, 'work instruction') || str_contains($lower,'point panel')) {
+            if (str_contains($lower, 'step-by-step process') || str_contains($lower, 'work instruction') || str_contains($lower,'point panel')) {
                 $html .= '<br><input type="text" class="form-control form-control-sm mt-1 input-sub-desc"
                               data-item-id="' . $row['id'] . '"
                               placeholder="Details..."
