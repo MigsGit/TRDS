@@ -4,11 +4,14 @@ namespace App\Model;
 
 use App\Model\DropdownMasterDetail;
 use App\Model\Qc\ALqcTrainingQualification;
+use App\Model\Qc\AMhTrainingOrientation;
 use App\Model\Qc\AOperProdTrainingOrientation;
+use App\Model\Qc\ASepTrainingOrientation;
 use App\Model\Qc\ATechEngTrainingQualification;
 use App\Model\Qc\BLqcCertification;
 use App\Model\Qc\BOpEnggSectionTrainingOrientation;
 use App\Model\Qc\CLqcOqcValidation;
+use App\Model\Qc\CLqcTrainingItemResult;
 use App\Model\Qc\CQcCertification;
 use App\Model\Qc\DPpdCertificationCompletion;
 use App\Model\Qc\EQcValidationProcess;
@@ -27,22 +30,38 @@ class QcSlip extends Model
     protected $table = 'qc_slips';
 
     protected $fillable = [
-        'status',
+        'id',
+        'control_no',
         'status',
         'approval_status',
+        'section_category',
+        'position_category',
+        'section',
+        'product_line',
+        'dropdown_master_details',
+        'series_name',
+        'oper_approved_confirmed_by',
         'appproval_at',
+        'created_by',
+        'date_of_transfer',
+        'text_operator_product_area',
     ];
+
     public function product_line_details() // Chris
     {
         return $this->hasOne(DropdownMasterDetail::class, 'id', 'product_line');
 
+    }
+    public function production_area_details() // Chris
+    {
+        return $this->hasOne(DropdownMasterDetail::class, 'id', 'production_area');
     }
     public function getProductLineIdsAttribute() // Chris
     {
         if (empty($this->product_line)) {
             return [];
         }
-        
+
         return array_map('trim', explode('|', $this->product_line));
     }
     // public function product_line()
@@ -81,10 +100,23 @@ class QcSlip extends Model
     {
         return $this->hasOne(DropdownMasterDetail::class, 'id', $column);
     }
+    public function production_area()
+    {
+       return $this->dropdown_master_detail('production_area');
+    }
     public function product_line()
     {
        return $this->dropdown_master_detail('product_line');
     }
+    public function product_line_dropdown()
+    {
+       return $this->dropdown_master_detail('product_line');
+    }
+    public function production_area_dropdown()
+    {
+       return $this->dropdown_master_detail('production_area');
+    }
+   
     public function qc_reason_certification()
     {
         return $this->hasOne(QcReasonCertification::class, 'qc_slips_id',  'id')->where('deleted_at');
@@ -132,6 +164,18 @@ class QcSlip extends Model
     public function a_tech_eng_training_qualification()
     {
         return $this->hasOne(ATechEngTrainingQualification::class, 'qc_slips_id',  'id')->where('deleted_at');
+    }
+    public function a_mh_training_orientation (){
+        return $this->hasOne(AMhTrainingOrientation::class, 'qc_slips_id',  'id')->where('deleted_at');
+    //SERP
+    }
+    public function a_sep_training_orientation()
+    {
+        return $this->hasOne(ASepTrainingOrientation::class, 'qc_slips_id',  'id')->where('deleted_at');
+    }
+
+    public function c_lqc_training_item_results_details(){
+        return $this->hasMany(CLqcTrainingItemResult::class, 'qc_slips_id',  'id')->where('deleted_at');
     }
 
 

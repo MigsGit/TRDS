@@ -36,7 +36,7 @@
                             </div>
 
 
-                            <ul class="nav nav-tabs" id="employeeTab" role="tablist">
+                            {{-- <ul class="nav nav-tabs" id="employeeTab" role="tablist">
 
                                 <li class="nav-item">
                                     <a class="nav-link active" id="grrSample-tab" data-toggle="tab" href="#grrSample" role="tab" aria-controls="grrSample" aria-selected="true">
@@ -45,8 +45,8 @@
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link" id="grrExamGroupings-tab" data-toggle="tab" href="#grrExamGroupings" role="tab" aria-controls="grrExamGroupings" aria-selected="false">
-                                        GRR Exam Settings
+                                    <a class="nav-link" id="grrQuestionnaire-tab" data-toggle="tab" href="#grrQuestionnaire" role="tab" aria-controls="grrQuestionnaire" aria-selected="false">
+                                        GRR Questionnaire Settings
                                     </a>
                                 </li>
 
@@ -81,8 +81,8 @@
 
                                 </div>
 
-                                <!-- GRR Exam Groupings -->
-                                <div class="tab-pane fade" id="grrExamGroupings" role="tabpanel" aria-labelledby="grrExamGroupings-tab">
+                                <!-- GRR Questionnaire Settings -->
+                                {{-- <div class="tab-pane fade" id="grrQuestionnaire" role="tabpanel" aria-labelledby="grrQuestionnaire-tab">
 
                                     <div class="mr-2" style="float: right;">
                                         <button type="button" class="btn btn-dark" id="btnShowAddGRRExamGroupingsModal">

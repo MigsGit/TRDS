@@ -38,6 +38,6 @@ class TrainingEndorsement extends Model
 
     // TRDS SUMMARY
     public function get_training_endorsement_employees(){
-        return $this->hasMany(TrainingEndorsementEmployee::class, 'training_endorsement_id', 'id')->select(['emp_no','training_endorsement_id','training_request_detail_id']);
+        return $this->hasMany(TrainingEndorsementEmployee::class, 'training_endorsement_id', 'id')->select(['id','emp_no','training_endorsement_id','training_request_detail_id', 'hands_on_filename', 'hands_on_filename_ext']);
     }
 }

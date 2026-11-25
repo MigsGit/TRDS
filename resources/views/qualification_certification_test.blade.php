@@ -98,7 +98,7 @@
                                                                 <th>Actionxxxx</th>
                                                                 <th>Status</th>
                                                                 <th>Ctrl No. / Doc No.</th>
-                                                                <th>Series Name</th>
+                                                                {{-- <th>Series Name</th> --}}
                                                                 <th>Created by</th>
                                                                 <th>Section</th>
                                                                 <th>Position</th>

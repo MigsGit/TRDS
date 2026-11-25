@@ -376,7 +376,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
         Swal.fire({
             title: 'Disapprove HR Memo',
             input: 'textarea',
-            id: 'tuDisapproveRemarks',
+            id: 'hrDisapproveRemarks',
             inputLabel: 'Remarks',
             inputPlaceholder: 'Enter reason for disapproval...',
             inputAttributes: {
@@ -720,7 +720,7 @@ function bindEvents($table, $form, $modal, $addButtonMemo, dtHMA, dtTraineeDetai
 
     //Employee Skill Card
     $('#btnShowExportPDFModal').on('click', function (){
-        window.open(`view_emp_skill_card_pdf`, '_blank');
+        window.open(`export_employee_skill_card`, '_blank');
     });
 }
 
