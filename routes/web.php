@@ -66,7 +66,7 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/hr_memo', function () {
         return view('hr_memo_approval');
     })->name('hr_memo');
-    Route::get('/qualification_certification2', function () {
+    Route::get('/qualification_certification', function () {
         return view('qualification_certification');
     })->name('qualification_certification2');
 
