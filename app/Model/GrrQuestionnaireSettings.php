@@ -13,4 +13,8 @@ class GrrQuestionnaireSettings extends Model
     public function grrSample(){
         return $this->hasMany(GrrSettings::class, 'id', 'grr_setting_id');
     }
+
+    public function scopeOrdered($query){
+        return $query->orderBy('sort_order')->orderBy('id');
+    }
 }
