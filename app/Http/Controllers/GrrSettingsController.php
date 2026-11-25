@@ -59,6 +59,7 @@ class GrrSettingsController extends Controller
             return response()->json(['result' => 0, 'message' => 'Validation failed.', 'errors' => $validator->errors()]);
         }
         if($request->id != NULL || $request->id != ''){
+            // return 'here';
             $grrSample = GrrSettings::find($request->input('id'));
             if($grrSample){
                 $grrSample->grr_no = $data['grr_no'];
@@ -69,14 +70,18 @@ class GrrSettingsController extends Controller
                 return response()->json(['result' => 1, 'message' => 'Successfully updated!']);
             }
         }else{
+            // return 'dito';
             $grrSample = new GrrSettings();
             $grrSample->grr_no = $data['grr_no'];
             $grrSample->grr_sample = $data['grr_sample'];
             $grrSample->section = $data['section'];
             $grrSample->status = 0; // Default to active
-            $grrSample->save();
+
+            if($grrSample->save()){
+                return response()->json(['result' => 1, 'message' => 'Successfully added!']);
+            }
         }
-        
+
 
         return response()->json(['result' => 0, 'message' => 'Failed to save data.']);
     }

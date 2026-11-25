@@ -194,7 +194,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('examDashboard') }}" class="nav-link">
+                            <a href="{{ route('grr_examination_dashboard') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>GRR Attributes Examination</p>
                             </a>

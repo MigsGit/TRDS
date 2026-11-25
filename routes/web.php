@@ -17,6 +17,8 @@ use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GrrSettingsController;
 use App\Http\Controllers\GrrQuestionnaireSettingsController;
+use App\Http\Controllers\GrrExamSettingsController;
+use App\Http\Controllers\GrrExaminationDashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -90,6 +92,15 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/grr_attributes_settings', function () {
         return view('recertification/grr_attributes_settings');
     })->name('grr_attributes_settings');
+
+    Route::controller(GrrExaminationDashboardController::class)->group(function () {
+        Route::get('/grr_examination_dashboard', 'index')->name('grr_examination_dashboard');
+        Route::get('/fetch_grr_examinations_by_section', 'fetchExaminationsBySection')->name('fetch_grr_examinations_by_section');
+        Route::get('/fetch_grr_exam_settings_by_grr', 'fetchExamSettingsByGrr')->name('fetch_grr_exam_settings_by_grr');
+        Route::get('/fetch_grr_exam_employees_by_exam', 'fetchExamEmployeesByExamSetting')->name('fetch_grr_exam_employees_by_exam');
+        Route::get('/fetch_grr_examination_for_employee', 'fetchExaminationForEmployee')->name('fetch_grr_examination_for_employee');
+        Route::post('/save_grr_exam_answers', 'saveExamAnswers')->name('save_grr_exam_answers');
+    });
 
     // TRAINING ENDORSEMENT CONTROLLER
     Route::controller(TrainingEndorsementController::class)->group(function () {
@@ -335,6 +346,16 @@ Route::middleware('checkSession')->group(function(){
         Route::post('/add_grr_questionnaire', 'addGrrQuestionnaire')->name('add_grr_questionnaire');
         Route::get('/get_grr_questionnaire_by_id', 'getGrrQuestionnaireById')->name('get_grr_questionnaire_by_id');
         Route::post('/update_grr_questionnaire_status', 'updateGrrQuestionnaireStatus')->name('update_grr_questionnaire_status');
+        Route::post('/update_grr_questionnaire_order', 'updateGrrQuestionnaireOrder')->name('update_grr_questionnaire_order');
+    });
+
+    Route::controller(GrrExamSettingsController::class)->group(function () {
+        Route::get('/view_grr_exam_groupings', 'viewGrrExamGroupings')->name('view_grr_exam_groupings');
+        Route::get('/fetch_grr_no_list', 'fetchGrrNoList')->name('fetch_grr_no_list');
+        Route::get('/fetch_employees_by_grr_no', 'fetchEmployeesByGrrNo')->name('fetch_employees_by_grr_no');
+        Route::post('/add_exam_groupings', 'saveExamGroupings')->name('add_exam_groupings');
+        Route::get('/get_grr_exam_groupings_by_id', 'getGrrExamGroupingsById')->name('get_grr_exam_groupings_by_id');
+
     });
 
 });
