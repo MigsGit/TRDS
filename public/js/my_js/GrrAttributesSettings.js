@@ -2,11 +2,11 @@
     // --------------------------------------
     // Cache DOM elements
     // --------------------------------------
-    const $GRRSampleTable = $('#tblGRRSamples');        
-    const $GRRQuestionnaireTable = $('#tblGrrQuestionnaire');        
-    const $form = $('#formGRRSamples');        
+    const $GRRSampleTable = $('#tblGRRSamples');
+    const $GRRQuestionnaireList = $('#grrQuestionnaireList');
+    const $form = $('#formGRRSamples');
     const $modal = $('#modalAddGRRSamples');
-    const $formQuestionnaire = $('#formGRRQuestionnaire');        
+    const $formQuestionnaire = $('#formGRRQuestionnaire');
     const $modalViewQuestionnaire = $('#modalViewQuestionnaire');
     const $modalAddQuestionnaire = $('#modalAddQuestionnaire');
 
@@ -20,16 +20,16 @@
     });
 
     // --------------------------------------
-    // Initialize DataTable
+    // Initialize DataTable / sortable list
     // --------------------------------------
     const dtGrrSettings = initGrrSampleTable($GRRSampleTable);
-    const dtGrrQuestionnaire = initGrrQuestionnaireTable($GRRQuestionnaireTable);
+    initGrrQuestionnaireSortable($GRRQuestionnaireList);
 
     // --------------------------------------
     // Bind all event handlers
     // --------------------------------------
-    bindGrrSampleEvents($GRRSampleTable, $form, $modal, $modalViewQuestionnaire, dtGrrSettings, dtGrrQuestionnaire);
-    bindGrrQuestionnaireEvents($GRRQuestionnaireTable, $formQuestionnaire, $modalAddQuestionnaire, dtGrrSettings, dtGrrQuestionnaire);
+    bindGrrSampleEvents($GRRSampleTable, $form, $modal, $modalViewQuestionnaire, dtGrrSettings);
+    bindGrrQuestionnaireEvents($modalViewQuestionnaire, $formQuestionnaire, $modalAddQuestionnaire, dtGrrSettings);
 });
 
 /**
@@ -75,29 +75,151 @@ function initGrrSampleTable($GRRSampleTable, url = 'view_grr_attributes') {
     });
 }
 
-function initGrrQuestionnaireTable($GRRQuestionnaireTable, url = 'view_grr_questionnaire') {
+function initGrrQuestionnaireSortable($list) {
+    $list.sortable({
+        items: '> .grr-q-card',
+        handle: '.grr-q-handle',
+        cancel: 'input, textarea, select, option, button, a, .btn',
+        axis: 'y',
+        tolerance: 'pointer',
+        placeholder: 'grr-q-placeholder',
+        forcePlaceholderSize: true,
+        scroll: true,
+        update: function (e, ui) {
+            renumberGrrQuestionnaire($list);
+            saveGrrQuestionnaireOrder($list);
+        }
+    });
+}
 
-    if ($.fn.DataTable.isDataTable($GRRQuestionnaireTable[0])) {
-        return $GRRQuestionnaireTable.DataTable();
+function renumberGrrQuestionnaire($list) {
+    const $cards = $list.children('.grr-q-card');
+    const inactiveCount = $('#grrQuestionnaireInactiveList').children('.grr-q-card').length;
+
+    $cards.each(function (index) {
+        $(this).find('.grr-q-number').text(index + 1);
+    });
+
+    $('#grrQuestionnaireCount').text($cards.length);
+    $('#grrQuestionnaireInactiveWrap').toggle(inactiveCount > 0);
+    $('#grrQuestionnaireEmpty').toggle($cards.length + inactiveCount === 0);
+}
+
+function escapeHtml(value) {
+    return $('<div>').text(value == null ? '' : value).html();
+}
+
+function buildGrrQuestionnaireCard(item) {
+    const isActive = Number(item.status) === 0;
+    const statusBadge = isActive
+        ? '<span class="badge badge-success">Active</span>'
+        : '<span class="badge badge-danger">Inactive</span>';
+    const toggleButton = isActive
+        ? `<button type="button" class="btn btn-danger btn-sm btnDisable" data-id="${item.id}" title="Disable"><i class="fas fa-ban"></i></button>`
+        : `<button type="button" class="btn btn-success btn-sm btnEnable" data-id="${item.id}" title="Enable"><i class="fas fa-undo"></i></button>`;
+    const handle = isActive
+        ? '<div class="grr-q-handle" title="Drag to reorder"><i class="fas fa-grip-vertical"></i></div>'
+        : '<div class="grr-q-handle-spacer"><i class="fas fa-ban"></i></div>';
+    const number = isActive ? '<div class="grr-q-number"></div>' : '<div class="grr-q-number text-muted">&ndash;</div>';
+
+    return `
+        <div class="grr-q-card ${isActive ? '' : 'is-inactive'}" data-id="${item.id}">
+            ${handle}
+            ${number}
+            <div class="grr-q-body">
+                <div class="grr-q-field grr-q-field-wide">
+                    <span class="grr-q-label">Defect</span>
+                    <div class="grr-q-value font-weight-bold">${escapeHtml(item.defect)}</div>
+                </div>
+                <div class="grr-q-field grr-q-field-wide">
+                    <span class="grr-q-label">Location</span>
+                    <div class="grr-q-value">${escapeHtml(item.location)}</div>
+                </div>
+                <div class="grr-q-field">
+                    <span class="grr-q-label">Reference</span>
+                    <div class="grr-q-value">${escapeHtml(item.reference)}</div>
+                </div>
+                <div class="grr-q-field">
+                    <span class="grr-q-label">Status</span>
+                    <div class="grr-q-value">${statusBadge}</div>
+                </div>
+            </div>
+            <div class="grr-q-actions">
+                <button type="button" class="btn btn-secondary btn-sm btnEdit mr-1" data-id="${item.id}" title="Edit"><i class="fas fa-edit"></i></button>
+                ${toggleButton}
+            </div>
+        </div>`;
+}
+
+function loadGrrQuestionnaireList() {
+    const $list = $('#grrQuestionnaireList');
+    const $loading = $('#grrQuestionnaireLoading');
+    const settingId = $('#viewGrrSampleId').val();
+
+    if (!settingId) {
+        return;
     }
 
-    return $GRRQuestionnaireTable.DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: url,
-            data: function (d) {
-                d.grr_setting_id = $('#viewGrrSampleId').val();
+    $loading.show();
+
+    return $.ajax({
+        type: 'GET',
+        url: 'view_grr_questionnaire',
+        data: { grr_setting_id: settingId },
+        dataType: 'json',
+        success: function (response) {
+            // Ignore stale responses if another sample was opened meanwhile
+            if ($('#viewGrrSampleId').val() !== settingId) {
+                return;
             }
+            const items = response.data || [];
+            const isActive = function (item) { return Number(item.status) === 0; };
+
+            $list.html(items.filter(isActive).map(buildGrrQuestionnaireCard).join(''));
+            $('#grrQuestionnaireInactiveList').html(
+                items.filter(function (item) { return !isActive(item); }).map(buildGrrQuestionnaireCard).join('')
+            );
+            renumberGrrQuestionnaire($list);
         },
-        fixedHeader: true,
-        columns: [
-            { data: 'action', orderable: false, searchable: false },
-            { data: 'reference' },
-            { data: 'defect' },
-            { data: 'location' },
-            { data: 'status_label' }
-        ]
+        error: function (xhr) {
+            console.error('Load failed:', xhr.responseText);
+            showError('Failed to load questionnaire.');
+        },
+        complete: function () {
+            $loading.hide();
+        }
+    });
+}
+
+function saveGrrQuestionnaireOrder($list) {
+    const orderedIds = $list.children('.grr-q-card').map(function () {
+        return $(this).data('id');
+    }).get();
+
+    // Block further drags until the server confirms, so saves can't interleave
+    $list.addClass('is-saving').sortable('disable');
+
+    $.ajax({
+        type: 'POST',
+        url: 'update_grr_questionnaire_order',
+        data: {
+            grr_setting_id: $('#viewGrrSampleId').val(),
+            ordered_ids: orderedIds
+        },
+        dataType: 'json',
+        success: function () {
+            toastr.success('Questionnaire order saved.');
+        },
+        error: function (xhr) {
+            console.error('Reorder failed:', xhr.responseText);
+            const message = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to save the new order.';
+            showError(message);
+            // Restore the order that is actually stored in the database
+            loadGrrQuestionnaireList();
+        },
+        complete: function () {
+            $list.removeClass('is-saving').sortable('enable');
+        }
     });
 }
 
@@ -105,7 +227,7 @@ function initGrrQuestionnaireTable($GRRQuestionnaireTable, url = 'view_grr_quest
 /**
  * Bind events for buttons, forms, etc.
  */
-function bindGrrSampleEvents($GRRSampleTable, $form, $modal, $modalViewQuestionnaire, dtGrrSettings, dtGrrQuestionnaire){
+function bindGrrSampleEvents($GRRSampleTable, $form, $modal, $modalViewQuestionnaire, dtGrrSettings){
 
     $('#btnShowAddGRRSamplesModal').on('click', function () {
         resetGRRSamplesForm($form);
@@ -117,7 +239,7 @@ function bindGrrSampleEvents($GRRSampleTable, $form, $modal, $modalViewQuestionn
         e.preventDefault();
 
         if($form.find('#grrNo').val() != "" && $form.find('#grrSample').val() != "" && $form.find('#section').val() != ""){
-            saveGrrSample($form, $modal, dtGrrSettings, dtGrrQuestionnaire);
+            saveGrrSample($form, $modal, dtGrrSettings);
         }else{
             showError('Failed to save data, Please Select Product Line');
         }
@@ -157,41 +279,44 @@ function bindGrrSampleEvents($GRRSampleTable, $form, $modal, $modalViewQuestionn
         $('#viewGrrSample').val(GrrNoAndSample);
         $('#viewGrrSampleId').val(id);
 
+        // Clear the previous sample's items so they never flash while loading
+        $('#grrQuestionnaireList').empty();
+        $('#grrQuestionnaireInactiveList').empty();
+        renumberGrrQuestionnaire($('#grrQuestionnaireList'));
+        $('#grrQuestionnaireEmpty').hide();
+
         $modalViewQuestionnaire.modal('show');
-        dtGrrQuestionnaire.ajax.reload();
-        
+        loadGrrQuestionnaireList();
+
     });
 
 }
 
-function bindGrrQuestionnaireEvents($GRRQuestionnaireTable,$formQuestionnaire,$modalAddQuestionnaire,dtGrrSettings,dtGrrQuestionnaire) {
+function bindGrrQuestionnaireEvents($modalViewQuestionnaire,$formQuestionnaire,$modalAddQuestionnaire,dtGrrSettings) {
 
-    $('#btnShowAddGRRQuestionnaireModal').off('click.grrQuestionnaire').on('click.grrQuestionnaire', function () { 
+    $('#btnShowAddGRRQuestionnaireModal').off('click.grrQuestionnaire').on('click.grrQuestionnaire', function () {
         resetGRRQuestionnaireForm($formQuestionnaire);
         const sampleId = $('#viewGrrSampleId').val();
         $('#qSampleId').val(sampleId);
-        console.log("add button clicked")
         $modalAddQuestionnaire.modal('show');
     });
 
-
-    $formQuestionnaire.off('submit.grrQuestionnaire').on('submit.grrQuestionnaire', function (e) {
-        e.preventDefault();
-
-        if ($formQuestionnaire.find('#grrNo').val() != "" &&$formQuestionnaire.find('#grrSample').val() != "" &&$formQuestionnaire.find('#section').val() != "") {
-
-            saveGrrQuestionnaire($formQuestionnaire,$modalAddQuestionnaire,dtGrrSettings,dtGrrQuestionnaire);
-
-        } else {
-            showError('Failed to save data, Please Select Product Line');
+    // Closing the stacked "add/edit" modal removes Bootstrap's body flag, which breaks scrolling of the modal underneath
+    $modalAddQuestionnaire.off('hidden.bs.modal.grrQuestionnaire').on('hidden.bs.modal.grrQuestionnaire', function () {
+        if ($('#modalViewQuestionnaire').hasClass('show')) {
+            $('body').addClass('modal-open');
         }
     });
 
+    $formQuestionnaire.off('submit.grrQuestionnaire').on('submit.grrQuestionnaire', function (e) {
+        e.preventDefault();
+        saveGrrQuestionnaire($formQuestionnaire,$modalAddQuestionnaire,dtGrrSettings);
+    });
 
-    $GRRQuestionnaireTable.off('click.grrQuestionnaire', '.btnEdit').on('click.grrQuestionnaire', '.btnEdit', function () {
+
+    $modalViewQuestionnaire.off('click.grrQuestionnaire', '.grr-q-card .btnEdit').on('click.grrQuestionnaire', '.grr-q-card .btnEdit', function () {
 
         const id = $(this).data('id');
-        console.log('id', id);
 
         fetchGrrQuestionnaireById(
             id,
@@ -200,24 +325,24 @@ function bindGrrQuestionnaireEvents($GRRQuestionnaireTable,$formQuestionnaire,$m
     });
 
 
-    $GRRQuestionnaireTable.off('click.grrQuestionnaire', '.btnDisable').on('click.grrQuestionnaire', '.btnDisable', function () {
+    $modalViewQuestionnaire.off('click.grrQuestionnaire', '.grr-q-card .btnDisable').on('click.grrQuestionnaire', '.grr-q-card .btnDisable', function () {
         const id = $(this).data('id');
 
         confirmAction(
             'Are you sure you want to disable this questionnaire?',
             function () {
-                updateQuestionnaireStatus(id, dtGrrQuestionnaire);
+                updateQuestionnaireStatus(id);
             }
         );
     });
 
 
-    $GRRQuestionnaireTable.off('click.grrQuestionnaire', '.btnEnable').on('click.grrQuestionnaire', '.btnEnable', function () {
+    $modalViewQuestionnaire.off('click.grrQuestionnaire', '.grr-q-card .btnEnable').on('click.grrQuestionnaire', '.grr-q-card .btnEnable', function () {
         const id = $(this).data('id');
         confirmAction(
             'Are you sure you want to enable this examination?',
             function () {
-                updateQuestionnaireStatus(id, dtGrrQuestionnaire);
+                updateQuestionnaireStatus(id);
             }
         );
     });
@@ -246,7 +371,9 @@ function saveGrrSample($form, $modal, dtGrrSettings) {
     });
 }
 
-function saveGrrQuestionnaire($formQuestionnaire, $modalViewQuestionnaire, dtGrrSettings, dtGrrQuestionnaire) {
+function saveGrrQuestionnaire($formQuestionnaire, $modalAddQuestionnaire, dtGrrSettings) {
+    const $btnSave = $('#btnSaveQuestionnaire').prop('disabled', true);
+
     $.ajax({
         type: 'POST',
         url: 'add_grr_questionnaire',
@@ -255,8 +382,8 @@ function saveGrrQuestionnaire($formQuestionnaire, $modalViewQuestionnaire, dtGrr
         success: function (response) {
             if (response.result === 1) {
                 dtGrrSettings.draw(false);
-                dtGrrQuestionnaire.draw(false);
-                $modalViewQuestionnaire.modal('hide');
+                loadGrrQuestionnaireList();
+                $modalAddQuestionnaire.modal('hide');
                 $formQuestionnaire[0].reset();
                 showSuccess('Successfully saved!');
             }
@@ -264,6 +391,9 @@ function saveGrrQuestionnaire($formQuestionnaire, $modalViewQuestionnaire, dtGrr
         error: function (xhr) {
             console.error('Save failed:', xhr.responseText);
             showError('Failed to save data.');
+        },
+        complete: function () {
+            $btnSave.prop('disabled', false);
         }
     });
 }
@@ -350,7 +480,7 @@ function updateGrrStatus(id, dtGrrSettings) {
     });
 }
 
-function updateQuestionnaireStatus(id, dtGrrQuestionnaire) {
+function updateQuestionnaireStatus(id) {
     $.ajax({
         type: 'POST',
         url: 'update_grr_questionnaire_status',
@@ -359,7 +489,7 @@ function updateQuestionnaireStatus(id, dtGrrQuestionnaire) {
         success: function (response) {
             if (response.success) {
                 showSuccess('Status updated successfully.');
-                dtGrrQuestionnaire.draw(false);
+                loadGrrQuestionnaireList();
             }else {
                 // ⚠️ If success is false
                 Swal.fire({
