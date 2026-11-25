@@ -2808,4 +2808,3 @@ class QualificationCertificationController extends Controller
         ];
     }
 }
-
