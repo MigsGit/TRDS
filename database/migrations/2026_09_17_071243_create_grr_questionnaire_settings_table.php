@@ -16,6 +16,7 @@ class CreateGrrQuestionnaireSettingsTable extends Migration
         Schema::create('grr_questionnaire_settings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('grr_setting_id');
+            $table->unsignedBigInteger('sort_order');
             $table->integer('reference');
             $table->string('defect');
             $table->string('location');
