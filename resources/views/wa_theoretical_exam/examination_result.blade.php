@@ -335,7 +335,7 @@
                     "lengthMenu": "Show _MENU_ Exam Result",
                 },
                 "ajax" : {
-                    url: "view_exam_result",
+                    url: "wa_view_exam_result",
                 },
                 "columns":[
                     { "data" : "action", orderable:false, searchable:false},
@@ -393,7 +393,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: 'view_exam_result_details',
+                    url: 'wa_view_exam_result_details',
                     data: function (param) {
                         param.examStatus = filters.examStatus;
                         param.questionnaireId = filters.questionnaireId;

@@ -96,7 +96,7 @@ const WAGetSystemOneHrisSection = (element) => {
 
 const WAGetExamTitle = (element) => {
     const ajaxGetExamTitle = {
-        url: 'get_exam_title',
+        url: 'wa_get_exam_title',
         method: 'GET',
 
         successCallback: (response) => {
@@ -386,7 +386,7 @@ function WARenderTable() {
     $('#gridChoicesHidden').val(JSON.stringify(getOptions));
 }
 
-const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRevision) => {
+const WAGetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRevision) => {
     const ajaxGetQuestionnaireDetailsById = {
         url: "get_questionnaire_details_by_id",
         method: "GET",

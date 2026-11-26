@@ -691,7 +691,7 @@
                     "lengthMenu": "Show _MENU_ Questionnaire Record",
                 },
                 "ajax" : {
-                    url: "view_questionnaire",
+                    url: "wa_view_questionnaire",
                 },
                 "columns":[
                     { "data" : "action", orderable:false, searchable:false},
@@ -799,7 +799,7 @@
                     lengthMenu: "Show _MENU_ Questionnaire Record"
                 },
                 ajax: {
-                    url: "view_questionnaire_details",
+                    url: "wa_view_questionnaire_details",
                     type: "GET",
                     data: function (data) {
                         data.questionnaireId = questionnaireId;
@@ -1524,7 +1524,7 @@
                 $('#txtCreateUpdateQuestionnaireDetailsPkid').val(questionnaireDetailsId);
                 $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireDetailRevision);
 
-                GetQuestionnaireDetailsById(questionnaireDetailsId,questionnaireDetailRevision)
+                WAGetQuestionnaireDetailsById(questionnaireDetailsId,questionnaireDetailRevision)
             });
 
             $('#btnReUploadFile').click(function (e) {
@@ -1569,7 +1569,7 @@
                     lengthMenu: "Show _MENU_ User Record",
                 },
                 ajax: {
-                    url: "view_exam_title",
+                    url: "wa_view_exam_title",
                 },
                 columns: [
                     { data: "action", orderable: false, searchable: false },

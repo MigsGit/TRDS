@@ -658,7 +658,7 @@
             <!-- <input class="form-control" type="text" id="text_tech_approved_by" name="text_tech_approved_by" list="list_display_empno" placeholder="Select Approved by"> -->
             <!-- <datalist id="list_display_empno"></datalist> -->
             <select class="form-control select2bs4" style="width: 100%;" id="text_tech_approved_by" name="text_tech_approved_by">
-                <option value="" selected disabled>Select Approved by</option>
+                <option value="" selected disabled>Select Engineering Head</option>
             </select>
         </div>
         <div class="col-md-6"></div>

@@ -261,13 +261,13 @@
                 </li>
 
                 <li class="nav-item has-treeview">
-                    {{-- <a href="#" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="fas fa-book-open"></i>
                         <p>
                             Recertification
                             <i class="fas fa-angle-left right"></i>
                         </p>
-                    </a> --}}
+                    </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ route('grr_attributes_settings') }}" class="nav-link">

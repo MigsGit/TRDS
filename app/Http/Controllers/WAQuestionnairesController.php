@@ -74,7 +74,6 @@ class WAQuestionnairesController extends Controller
             return $result;
         })
 
-
         ->rawColumns(['action','status'])
         ->make(true);
     }
