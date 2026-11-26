@@ -1,4 +1,4 @@
-const GetEmployeeExamResultById = (examResultDetailsId) => {
+const WAGetEmployeeExamResultById = (examResultDetailsId) => {
     ajaxRequest({
         url: "get_employee_exam_result_by_id",
         method: "GET",
@@ -351,7 +351,7 @@ $(document).on('input', '.score-input', function () {
     $('#ratingInput').val(percentage);
 });
 
-const UpdateExamScoreForEmployee = () => {
+const WAUpdateExamScoreForEmployee = () => {
     let formData = $('#formUpdateScoreForIdentificationEssay').serialize();
 
     const ajaxGetUpdateExamScoreForEmployee = {
@@ -385,7 +385,7 @@ const UpdateExamScoreForEmployee = () => {
     ajaxRequest(ajaxGetUpdateExamScoreForEmployee);
 };
 
-const UpdateExaminationDate = () => {
+const WAUpdateExaminationDate = () => {
     let form = $('#formChangeExaminationDate')
     let formData = new FormData(form[0]);
     const ajaxGetUpdateExaminationDate = {
@@ -421,7 +421,7 @@ const UpdateExaminationDate = () => {
     ajaxRequest(ajaxGetUpdateExaminationDate);
 };
 
-const ChangeExaminationResultStatus = (examResultDetailsId) => {
+const WAChangeExaminationResultStatus = (examResultDetailsId) => {
     let formData = $('#formChangeExamResultStatus').serialize();
 
     const ajaxChangeExamResultStatus = {

@@ -482,8 +482,8 @@ Route::middleware('checkSession')->group(function(){
     });
 
     Route::controller(WAExaminationResultController::class)->group(function () {
-        Route::get('view_exam_result', 'viewExamResult');
-        Route::get('view_exam_result_details', 'viewExamResultDetails');
+        Route::get('wa_view_exam_result', 'viewExamResult');
+        Route::get('wa_view_exam_result_details', 'viewExamResultDetails');
         Route::get('get_employee_exam_result_by_id', 'getEmployeeExamResultById');
         Route::post('update_exam_score_for_employee', 'updateExamScoreForEmployee');
 
@@ -494,7 +494,7 @@ Route::middleware('checkSession')->group(function(){
     });
 
     Route::controller(WAExamTitleController::class)->group(function () {
-        Route::get('view_exam_title', 'viewExamTitle');
+        Route::get('wa_view_exam_title', 'viewExamTitle');
         Route::post('create_update_exam_title', 'createUpdateExamTitle');
         Route::get('get_exam_title_by_id', 'getExamTitleById');
         Route::post('change_exam_title_status', 'changeExamTitleStatus');
@@ -502,11 +502,11 @@ Route::middleware('checkSession')->group(function(){
     
     Route::controller(WAQuestionnairesController::class)->group(function () {
         // Questionnaires main routes
-        Route::get('view_questionnaire', 'viewQuestionnaire');
+        Route::get('wa_view_questionnaire', 'viewQuestionnaire');
         Route::get('get_systemone_hris_department', 'getSystemoneHrisDepartment');
         Route::get('get_systemone_hris_position', 'getSystemoneHrisPosition');
         Route::get('get_systemone_hris_section', 'getSystemoneHrisSection');
-        Route::get('get_exam_title', 'getExamTitle');
+        Route::get('wa_get_exam_title', 'getExamTitle');
         Route::post('create_update_questionnaire', 'createUpdateQuestionnaire');
         Route::get('get_questionnaire_by_id', 'getQuestionnaireById');
         Route::post('change_questionnaire_status', 'changeQuestionnaireStatus');
@@ -515,7 +515,7 @@ Route::middleware('checkSession')->group(function(){
         Route::post('copy_questionnaire', 'copyQuestionnaire');
 
         // Questionnaires details routes
-        Route::get('view_questionnaire_details', 'viewQuestionnaireDetails');
+        Route::get('wa_view_questionnaire_details', 'viewQuestionnaireDetails');
         Route::post('create_update_questionnaire_details', 'createUpdateQuestionnaireDetails');
         Route::get('get_questionnaire_details_by_id', 'getQuestionnaireDetailsById');
         Route::post('change_questionnaire_details_status', 'changeQuestionnaireDetailsStatus');

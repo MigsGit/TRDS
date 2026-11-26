@@ -1,4 +1,4 @@
-const CreateUpdateExamTitle = () => {
+const WACreateUpdateExamTitle = () => {
     let form = $('#formCreateUpdateExamTitle')
     let formData = new FormData(form[0]);
     const ajaxGetCreateUpdateExamTitle = {
@@ -32,7 +32,7 @@ const CreateUpdateExamTitle = () => {
     ajaxRequest(ajaxGetCreateUpdateExamTitle);
 };
 
-const GetExamTitleById = (examTitleId) => {
+const WAGetExamTitleById = (examTitleId) => {
     const ajaxGetExamTitleById = {
         url: "get_exam_title_by_id",
         method: "GET",
@@ -59,7 +59,7 @@ const GetExamTitleById = (examTitleId) => {
     ajaxRequest(ajaxGetExamTitleById);
 };
 
-const ChangeExamTitleStatus = (examTitleId) => {
+const WAChangeExamTitleStatus = (examTitleId) => {
     let formData = $('#formChangeExamTitleStatus').serialize() + '&examTitleId=' + examTitleId;
 
     const ajaxChangeExamTitleStatus = {

@@ -1,4 +1,4 @@
-const GetExamTrainingRequestControlNo = (element) => {
+const WAGetExamTrainingRequestControlNo = (element) => {
     try{
         const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';
@@ -48,7 +48,7 @@ const GetExamTrainingRequestControlNo = (element) => {
     }
 };
 
-const GetExamTrainingRequestEmployeeNo = (element, selectedControlNo) => {
+const WAGetExamTrainingRequestEmployeeNo = (element, selectedControlNo) => {
     try{
         const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';
@@ -100,7 +100,7 @@ const GetExamTrainingRequestEmployeeNo = (element, selectedControlNo) => {
     }
 };
 
-const GetExamTrainingRequestEmployeeInfo = (employeeNo, controlNo) => {
+const WAGetExamTrainingRequestEmployeeInfo = (employeeNo, controlNo) => {
     const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';
         const baseUrl = systemName
@@ -148,7 +148,7 @@ const GetExamTrainingRequestEmployeeInfo = (employeeNo, controlNo) => {
     ajaxRequest(ajaxGetExamTrainingRequestEmployeeInfo);
 };
 
-const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo, getexamTitleId) => {
+const WACountExamTrainingRequestExaminationTake = (employeeNo, controlNo, getexamTitleId) => {
     const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';
         const baseUrl = systemName
@@ -249,7 +249,7 @@ const CountExamTrainingRequestExaminationTake = (employeeNo, controlNo, getexamT
     ajaxRequest(ajaxCountExamTrainingRequestExaminationTake);
 };
 
-const LinkForIdAndRevision = (linkIdRevision) => {
+const WALinkForIdAndRevision = (linkIdRevision) => {
     try{
         const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';
@@ -347,7 +347,7 @@ const LinkForIdAndRevision = (linkIdRevision) => {
     }
 };
 
-const ExamSubmission = () => {
+const WAExamSubmission = () => {
     try{
         const folderPath = window.location.pathname.split('/').filter(Boolean);
         const systemName = folderPath.length > 1 ? folderPath[0] : '';

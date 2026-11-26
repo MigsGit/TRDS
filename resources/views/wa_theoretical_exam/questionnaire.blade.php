@@ -671,14 +671,14 @@
             // ===============================================================================================================================================
             // ================================================================ QUESTIONNAIRE ================================================================
             // ===============================================================================================================================================
-            GetSystemOneHrisDepartment($('.get-systemone-hris-department'))
-            GetSystemOneHrisPosition($('.get-systemone-hris-position'))
-            GetSystemOneHrisSection($('.get-systemone-hris-section'))
-            GetExamTitle($('.get-exam-title'))
+            WAGetSystemOneHrisDepartment($('.get-systemone-hris-department'))
+            WAGetSystemOneHrisPosition($('.get-systemone-hris-position'))
+            WAGetSystemOneHrisSection($('.get-systemone-hris-section'))
+            WAGetExamTitle($('.get-exam-title'))
 
             $('#questionnaire-tab').click(function (e) {
                 e.preventDefault();
-                GetExamTitle($('.get-exam-title'))
+                WAGetExamTitle($('.get-exam-title'))
             });
 
             dataQuestionnaire = $("#tableQuestionnaire").DataTable({
@@ -691,7 +691,7 @@
                     "lengthMenu": "Show _MENU_ Questionnaire Record",
                 },
                 "ajax" : {
-                    url: "view_questionnaire",
+                    url: "wa_view_questionnaire",
                 },
                 "columns":[
                     { "data" : "action", orderable:false, searchable:false},
@@ -727,7 +727,7 @@
 
             $("#formCreateUpdateQuestionnaire").submit(function(event){
                 event.preventDefault();
-                CreateUpdateQuestionnaire();
+                WACreateUpdateQuestionnaire();
             });
 
             $(document).on('click', '.actionUpdateQuestionnaire',function(e){
@@ -736,7 +736,7 @@
                 questionnaireId = $(this).attr('questionnaire-id');
 
                 $('#txtCreateUpdateQuestionnaireId').val(questionnaireId);
-                GetQuestionnaireById(questionnaireId);
+                WAGetQuestionnaireById(questionnaireId);
             });
 
             $(document).on('click', '.actionChangeQuestionnaireStatus',function(e){
@@ -759,7 +759,7 @@
 
             $("#formChangeQuestionnaireStatus").submit(function(event){
                 event.preventDefault();
-                ChangeQuestionnaireStatus();
+                WAChangeQuestionnaireStatus();
             });
 
             // ===============================================================================================================================================
@@ -799,7 +799,7 @@
                     lengthMenu: "Show _MENU_ Questionnaire Record"
                 },
                 ajax: {
-                    url: "view_questionnaire_details",
+                    url: "wa_view_questionnaire_details",
                     type: "GET",
                     data: function (data) {
                         data.questionnaireId = questionnaireId;
@@ -995,7 +995,7 @@
                             }
                         }).then(result=>{
                             if(result.isConfirmed){
-                                CopyQuestionnaire(
+                                WACopyQuestionnaire(
                                     questionnaire.id,
                                     result.value
                                 );
@@ -1512,7 +1512,7 @@
 
             $("#formCreateUpdateQuestionnaireDetails").submit(function(event){
                 event.preventDefault();
-                CreateUpdateQuestionnaireDetails();
+                WACreateUpdateQuestionnaireDetails();
             });
 
             $(document).on('click', '.actionUpdateQuestionnaireDetails',function(e){
@@ -1524,7 +1524,7 @@
                 $('#txtCreateUpdateQuestionnaireDetailsPkid').val(questionnaireDetailsId);
                 $('#txtCreateUpdateQuestionnaireDetailsRevision').val(questionnaireDetailRevision);
 
-                GetQuestionnaireDetailsById(questionnaireDetailsId,questionnaireDetailRevision)
+                WAGetQuestionnaireDetailsById(questionnaireDetailsId,questionnaireDetailRevision)
             });
 
             $('#btnReUploadFile').click(function (e) {
@@ -1553,7 +1553,7 @@
 
             $("#formChangeQuestionnaireDetailsStatus").submit(function(event){
                 event.preventDefault();
-                ChangeQuestionnaireDetailsStatus();
+                WAChangeQuestionnaireDetailsStatus();
             });
 
             // ====================================================================================================
@@ -1569,7 +1569,7 @@
                     lengthMenu: "Show _MENU_ User Record",
                 },
                 ajax: {
-                    url: "view_exam_title",
+                    url: "wa_view_exam_title",
                 },
                 columns: [
                     { data: "action", orderable: false, searchable: false },
@@ -1596,7 +1596,7 @@
 
             $("#formCreateUpdateExamTitle").submit(function(event){
                 event.preventDefault();
-                CreateUpdateExamTitle();
+                WACreateUpdateExamTitle();
             });
 
             $(document).on('click', '.actionCreateUpdateExamTitle',function(e){
@@ -1605,7 +1605,7 @@
                 examTitleId = $(this).attr('exam-title-id');
                 $('#txtExamTitleId').val(examTitleId);
 
-                GetExamTitleById(examTitleId);
+                WAGetExamTitleById(examTitleId);
             });
 
             $(document).on('click', '.actionChangeExamTitleStatus',function(e){
@@ -1628,7 +1628,7 @@
 
             $("#formChangeExamTitleStatus").submit(function(event){
                 event.preventDefault();
-                ChangeExamTitleStatus();
+                WAChangeExamTitleStatus();
             });
 
         });

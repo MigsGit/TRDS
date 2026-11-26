@@ -201,7 +201,7 @@ class WAExaminationResultController extends Controller
         $questions = json_decode($exam_result_detail[0]->exam_result, true);
         // return $questionnaire_info;
 
-        $pdf = Pdf::loadView('theoretical_exam.examination_result_pdf', [
+        $pdf = Pdf::loadView('wa_theoretical_exam.examination_result_pdf', [
             'examResultDetails' => $exam_result_detail,
             'questionnaireInfo' => $questionnaire_info,
             'questions' => $questions,

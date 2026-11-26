@@ -92,5 +92,12 @@
 <script src="{{ asset('public/js/my_js/GrrExamSettings.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/GrrExaminationDashboard.js') }}?<?=time()?>"></script>
 
+<script src="{{ asset('public/js/my_js/WAQuestionnaires.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/WAExamination.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/WAExamResult.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/WAExamTitle.js') }}?<?=time()?>"></script>
+
+
+
 
 {{-- <script src="https://cdn.jsdelivr.net/npm/@coreui/coreui@4.0.2/dist/js/coreui.bundle.min.js"></script> --}}
