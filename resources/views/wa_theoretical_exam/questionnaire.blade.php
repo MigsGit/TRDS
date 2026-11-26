@@ -1470,7 +1470,7 @@
                 let question = $('#txtQuestion').val().trim();
                 if (!question) return alert("Please enter a question!");
                 getQuestions.push(question);
-                RenderTable();
+                WARenderTable();
                 $('#txtQuestion').val('');
             });
 
@@ -1479,7 +1479,7 @@
                 let index = $(this).data('index');
                 getQuestions.splice(index, 1);
                 getSelectedAnswers.splice(index, 1);
-                RenderTable();
+                WARenderTable();
             });
 
             // Add option
@@ -1487,7 +1487,7 @@
                 let optionBtn = $('#txtOption').val().trim();
                 if (!optionBtn) return alert("Please enter an option!");
                 getOptions.push(optionBtn);
-                RenderTable();
+                WARenderTable();
                 $('#txtOption').val('');
             });
 
@@ -1495,7 +1495,7 @@
             $(document).on('click', '.removeOption', function() {
                 let index = $(this).data('index');
                 getOptions.splice(index, 1);
-                RenderTable();
+                WARenderTable();
             });
 
             // Handle radio click per row

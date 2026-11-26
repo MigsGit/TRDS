@@ -345,7 +345,7 @@ const WACreateUpdateQuestionnaireDetails = () => {
     ajaxRequest(ajaxGetCreateUpdateQuestionnaireDetails);
 };
 
-function RenderTable() {
+function WARenderTable() {
     // Table header
     $('#questionTable thead tr').html('<th>Question</th>');
 
@@ -480,7 +480,7 @@ const WAGetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetail
                     });
                     console.log('getData',getData);
 
-                    RenderTable();
+                    WARenderTable();
 
                     getSelectedAnswers.forEach((ans, rowIndex) => {
                     console.log('getData',ans);
