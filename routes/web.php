@@ -4,8 +4,6 @@ use App\Http\Controllers\ETRController;
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\ExaminationResultController;
 use App\Http\Controllers\ExamTitleController;
-use App\Http\Controllers\GrrQuestionnaireSettingsController;
-use App\Http\Controllers\GrrSettingsController;
 use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
 use App\Http\Controllers\InspCertMatrixController;

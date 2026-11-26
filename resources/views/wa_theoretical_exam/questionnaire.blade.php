@@ -671,14 +671,14 @@
             // ===============================================================================================================================================
             // ================================================================ QUESTIONNAIRE ================================================================
             // ===============================================================================================================================================
-            GetSystemOneHrisDepartment($('.get-systemone-hris-department'))
-            GetSystemOneHrisPosition($('.get-systemone-hris-position'))
-            GetSystemOneHrisSection($('.get-systemone-hris-section'))
-            GetExamTitle($('.get-exam-title'))
+            WAGetSystemOneHrisDepartment($('.get-systemone-hris-department'))
+            WAGetSystemOneHrisPosition($('.get-systemone-hris-position'))
+            WAGetSystemOneHrisSection($('.get-systemone-hris-section'))
+            WAGetExamTitle($('.get-exam-title'))
 
             $('#questionnaire-tab').click(function (e) {
                 e.preventDefault();
-                GetExamTitle($('.get-exam-title'))
+                WAGetExamTitle($('.get-exam-title'))
             });
 
             dataQuestionnaire = $("#tableQuestionnaire").DataTable({
@@ -727,7 +727,7 @@
 
             $("#formCreateUpdateQuestionnaire").submit(function(event){
                 event.preventDefault();
-                CreateUpdateQuestionnaire();
+                WACreateUpdateQuestionnaire();
             });
 
             $(document).on('click', '.actionUpdateQuestionnaire',function(e){
@@ -736,7 +736,7 @@
                 questionnaireId = $(this).attr('questionnaire-id');
 
                 $('#txtCreateUpdateQuestionnaireId').val(questionnaireId);
-                GetQuestionnaireById(questionnaireId);
+                WAGetQuestionnaireById(questionnaireId);
             });
 
             $(document).on('click', '.actionChangeQuestionnaireStatus',function(e){
@@ -759,7 +759,7 @@
 
             $("#formChangeQuestionnaireStatus").submit(function(event){
                 event.preventDefault();
-                ChangeQuestionnaireStatus();
+                WAChangeQuestionnaireStatus();
             });
 
             // ===============================================================================================================================================
@@ -995,7 +995,7 @@
                             }
                         }).then(result=>{
                             if(result.isConfirmed){
-                                CopyQuestionnaire(
+                                WACopyQuestionnaire(
                                     questionnaire.id,
                                     result.value
                                 );
@@ -1470,7 +1470,7 @@
                 let question = $('#txtQuestion').val().trim();
                 if (!question) return alert("Please enter a question!");
                 getQuestions.push(question);
-                RenderTable();
+                WARenderTable();
                 $('#txtQuestion').val('');
             });
 
@@ -1479,7 +1479,7 @@
                 let index = $(this).data('index');
                 getQuestions.splice(index, 1);
                 getSelectedAnswers.splice(index, 1);
-                RenderTable();
+                WARenderTable();
             });
 
             // Add option
@@ -1487,7 +1487,7 @@
                 let optionBtn = $('#txtOption').val().trim();
                 if (!optionBtn) return alert("Please enter an option!");
                 getOptions.push(optionBtn);
-                RenderTable();
+                WARenderTable();
                 $('#txtOption').val('');
             });
 
@@ -1495,7 +1495,7 @@
             $(document).on('click', '.removeOption', function() {
                 let index = $(this).data('index');
                 getOptions.splice(index, 1);
-                RenderTable();
+                WARenderTable();
             });
 
             // Handle radio click per row
@@ -1512,7 +1512,7 @@
 
             $("#formCreateUpdateQuestionnaireDetails").submit(function(event){
                 event.preventDefault();
-                CreateUpdateQuestionnaireDetails();
+                WACreateUpdateQuestionnaireDetails();
             });
 
             $(document).on('click', '.actionUpdateQuestionnaireDetails',function(e){
@@ -1553,7 +1553,7 @@
 
             $("#formChangeQuestionnaireDetailsStatus").submit(function(event){
                 event.preventDefault();
-                ChangeQuestionnaireDetailsStatus();
+                WAChangeQuestionnaireDetailsStatus();
             });
 
             // ====================================================================================================
@@ -1596,7 +1596,7 @@
 
             $("#formCreateUpdateExamTitle").submit(function(event){
                 event.preventDefault();
-                CreateUpdateExamTitle();
+                WACreateUpdateExamTitle();
             });
 
             $(document).on('click', '.actionCreateUpdateExamTitle',function(e){
@@ -1605,7 +1605,7 @@
                 examTitleId = $(this).attr('exam-title-id');
                 $('#txtExamTitleId').val(examTitleId);
 
-                GetExamTitleById(examTitleId);
+                WAGetExamTitleById(examTitleId);
             });
 
             $(document).on('click', '.actionChangeExamTitleStatus',function(e){
@@ -1628,7 +1628,7 @@
 
             $("#formChangeExamTitleStatus").submit(function(event){
                 event.preventDefault();
-                ChangeExamTitleStatus();
+                WAChangeExamTitleStatus();
             });
 
         });

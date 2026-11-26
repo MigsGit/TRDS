@@ -1,7 +1,7 @@
 // =================================================================================================================================
 // ======================================================== QUESTIONNAIRES =========================================================
 // =================================================================================================================================
-const GetSystemOneHrisDepartment = (element) => {
+const WAGetSystemOneHrisDepartment = (element) => {
     const ajaxGetSystemOneHrisDepartment = {
         url: 'get_systemone_hris_department',
         method: 'GET',
@@ -32,7 +32,7 @@ const GetSystemOneHrisDepartment = (element) => {
     ajaxRequest(ajaxGetSystemOneHrisDepartment);
 };
 
-const GetSystemOneHrisPosition = (element) => {
+const WAGetSystemOneHrisPosition = (element) => {
     const ajaxGetSystemOneHrisPosition = {
         url: 'get_systemone_hris_position',
         method: 'GET',
@@ -63,7 +63,7 @@ const GetSystemOneHrisPosition = (element) => {
     ajaxRequest(ajaxGetSystemOneHrisPosition);
 };
 
-const GetSystemOneHrisSection = (element) => {
+const WAGetSystemOneHrisSection = (element) => {
     const ajaxGetSystemOneHrisSection = {
         url: 'get_systemone_hris_section',
         method: 'GET',
@@ -94,7 +94,7 @@ const GetSystemOneHrisSection = (element) => {
     ajaxRequest(ajaxGetSystemOneHrisSection);
 };
 
-const GetExamTitle = (element) => {
+const WAGetExamTitle = (element) => {
     const ajaxGetExamTitle = {
         url: 'get_exam_title',
         method: 'GET',
@@ -125,7 +125,7 @@ const GetExamTitle = (element) => {
     ajaxRequest(ajaxGetExamTitle);
 };
 
-const CreateUpdateQuestionnaire = () => {
+const WACreateUpdateQuestionnaire = () => {
     let formData = $('#formCreateUpdateQuestionnaire').serialize();
 
     const ajaxGetCreateUpdateQuestionnaire = {
@@ -159,7 +159,7 @@ const CreateUpdateQuestionnaire = () => {
     ajaxRequest(ajaxGetCreateUpdateQuestionnaire);
 };
 
-const GetQuestionnaireById = (questionnaireId) => {
+const WAGetQuestionnaireById = (questionnaireId) => {
     const ajaxGetQuestionnaireById = {
         url: "get_questionnaire_by_id",
         method: "GET",
@@ -194,7 +194,7 @@ const GetQuestionnaireById = (questionnaireId) => {
     ajaxRequest(ajaxGetQuestionnaireById);
 };
 
-const ChangeQuestionnaireStatus = (questionnaireId) => {
+const WAChangeQuestionnaireStatus = (questionnaireId) => {
     let formData = $('#formChangeQuestionnaireStatus').serialize() + '&questionnaireId' + questionnaireId;
 
     const ajaxGetQuestionnaireStatus = {
@@ -245,7 +245,7 @@ const ChangeQuestionnaireStatus = (questionnaireId) => {
     ajaxRequest(ajaxGetQuestionnaireStatus);
 };
 
-function CopyQuestionnaire(id, description){
+function WACopyQuestionnaire(id, description){
     $.ajax({
         url: 'copy_questionnaire',
         type: 'POST',
@@ -302,7 +302,7 @@ function CopyQuestionnaire(id, description){
 // =================================================================================================================================
 // ===================================================== QUESTIONNAIRE DETAILS =====================================================
 // =================================================================================================================================
-const CreateUpdateQuestionnaireDetails = () => {
+const WACreateUpdateQuestionnaireDetails = () => {
     let form = $('#formCreateUpdateQuestionnaireDetails')
     let formData = new FormData(form[0]);
     const ajaxGetCreateUpdateQuestionnaireDetails = {
@@ -345,7 +345,7 @@ const CreateUpdateQuestionnaireDetails = () => {
     ajaxRequest(ajaxGetCreateUpdateQuestionnaireDetails);
 };
 
-function RenderTable() {
+function WARenderTable() {
     // Table header
     $('#questionTable thead tr').html('<th>Question</th>');
 
@@ -480,7 +480,7 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
                     });
                     console.log('getData',getData);
 
-                    RenderTable();
+                    WARenderTable();
 
                     getSelectedAnswers.forEach((ans, rowIndex) => {
                     console.log('getData',ans);
@@ -508,7 +508,7 @@ const GetQuestionnaireDetailsById = (questionnaireDetailId,questionnaireDetailRe
     ajaxRequest(ajaxGetQuestionnaireDetailsById);
 };
 
-const ChangeQuestionnaireDetailsStatus = (questionnaireId) => {
+const WAChangeQuestionnaireDetailsStatus = (questionnaireId) => {
     let formData = $('#formChangeQuestionnaireDetailsStatus').serialize() + '&questionnaireId' + questionnaireId;
 
     const ajaxChangeQuestionnaireDetailsStatus = {

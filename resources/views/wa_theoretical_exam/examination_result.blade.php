@@ -435,7 +435,7 @@
                 examResultDetailsId = $(this).attr('exam_result_details-id');
                 $('#examResultDetailsId').val(examResultDetailsId);
 
-                GetEmployeeExamResultById(examResultDetailsId);
+                WAGetEmployeeExamResultById(examResultDetailsId);
             });
 
             $('#btnNext').click(function (e) {
@@ -457,7 +457,7 @@
 
             $(document).on('submit', '#formUpdateScoreForIdentificationEssay', function(event){
                 event.preventDefault();
-                UpdateExamScoreForEmployee();
+                WAUpdateExamScoreForEmployee();
             });
 
             $(document).on('click', '.actionChangeExaminationDate',function(e){
@@ -471,7 +471,7 @@
 
             $("#formChangeExaminationDate").submit(function(event){
                 event.preventDefault();
-                UpdateExaminationDate();
+                WAUpdateExaminationDate();
             });
 
             $(document).on('click', '.actionChangeExamResultStatus',function(e){
@@ -495,7 +495,7 @@
 
             $("#formChangeExamResultStatus").submit(function(event){
                 event.preventDefault();
-                ChangeExaminationResultStatus();
+                WAChangeExaminationResultStatus();
             });
         });
     </script>

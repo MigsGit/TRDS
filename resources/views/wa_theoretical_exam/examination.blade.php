@@ -261,14 +261,14 @@
             $('#getQuestionnaireId').val(linkIdRevision[0]);
             $('.select2bs5').select2({ theme: 'bootstrap-5' });
 
-            GetExamTrainingRequestControlNo($('.get-training_request-ctrl_no'));
+            WAGetExamTrainingRequestControlNo($('.get-training_request-ctrl_no'));
 
             $('#slctExamTrainingRequestCtrlNo').change(function (e) {
                 e.preventDefault();
                 const selectedControlNo = $(this).val();
 
                 $('#slctExamTrainingRequestEmployeeNo').prop('disabled', false);
-                GetExamTrainingRequestEmployeeNo($('.get-training_request-employee_no'), selectedControlNo);
+                WAGetExamTrainingRequestEmployeeNo($('.get-training_request-employee_no'), selectedControlNo);
             });
 
             $('#slctExamTrainingRequestEmployeeNo').change(function (e) {
@@ -277,8 +277,8 @@
                 let getData = $(this).val()
                 let getControlNo = $('#slctExamTrainingRequestCtrlNo').val()
 
-                GetExamTrainingRequestEmployeeInfo(getData, getControlNo);
-                CountExamTrainingRequestExaminationTake(getData, getControlNo, getexamTitleId);
+                WAGetExamTrainingRequestEmployeeInfo(getData, getControlNo);
+                WACountExamTrainingRequestExaminationTake(getData, getControlNo, getexamTitleId);
             });
 
             $('#btnNext').click(function (e) {
@@ -316,7 +316,7 @@
 
                     console.log('linkIdRevision: ', linkIdRevision);
 
-                    LinkForIdAndRevision(linkIdRevision);
+                    WALinkForIdAndRevision(linkIdRevision);
                 }
             });
 
@@ -405,7 +405,7 @@
                     return;
                 }
 
-                ExamSubmission();
+                WAExamSubmission();
             });
         });
     </script>
