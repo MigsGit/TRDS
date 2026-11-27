@@ -30,4 +30,10 @@ class UserRequest extends FormRequest
             'systemone_emp_id'=> 'required',
         ];
     }
+    public function messages()
+    {
+        return [
+            'rapidx_emp_id' => 'Rapidx Employee Number is not match! Please contact the ISS to check the RAPIDX User Module!',
+        ];
+    }
 }

@@ -3,7 +3,7 @@
 body {
     margin: 0;
     padding: 0;
-    overflow: hidden !important;
+    overflow-x: hidden !important;
 }
 
 hr {
@@ -45,4 +45,17 @@ hr {
 
 .sw-theme-arrows>ul.step-anchor>li.done>a:after {
     border-left: 30px solid #343a40!important;
+}
+
+.modal-semi-full {
+    max-width: 95%;
+    margin: 1rem auto;
+}
+
+.modal-semi-full .modal-content {
+    height: calc(100vh - 2rem);
+}
+
+.modal-semi-full .modal-body {
+    overflow-y: auto;
 }

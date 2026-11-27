@@ -10,16 +10,17 @@ use App\Model\TrainingRequest;
 use App\Model\TrainingRequestDetails;
 use App\Model\User;
 use App\RapidXUser;
+use App\Model\RapidXDepartment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 class TrainingRequestController extends Controller
 {
 
     public function getTrainingRequests(Request $request){
-        $trainingRequests = TrainingRequest::with(['section_head_user'])
-        ->where('logdel', 0)
-        ->get();
+        $trainingRequests = TrainingRequest::with('section_head_user')
+        ->where('logdel', 0);
 
         $receiverUsers = User::with(['user_access_module'])
         ->whereHas('user_access_module', function ($query) {
@@ -34,15 +35,14 @@ class TrainingRequestController extends Controller
             })
             ->first();
 
-        if(!$tuHeadApproverUser){
-            $tuHeadApproverUser = null;
-        }else{
-            $tuHeadApproverUser->pluck('rapidx_emp_id');
-        }
-
         $receiverUsers->pluck('rapidx_emp_id');
 
         $filter = $request->filter;
+
+        // Default to TU Head Approval if the logged-in user is a TU Head
+        if ($tuHeadApproverUser && ($filter === null || $filter === '')) {
+            $filter = 2;
+        }
 
         if ($filter == 0) {
             $trainingRequests = $trainingRequests->where('status', 0); // For Conformance
@@ -54,8 +54,23 @@ class TrainingRequestController extends Controller
             $trainingRequests = $trainingRequests->whereIn('status', [0, 1, 2,3]); // All
         }
 
+        $trainingRequests->orderByDesc('created_at');
+
+        // return $trainingRequests;
+
+
         return DataTables()->of($trainingRequests)
         ->addColumn('action', function($trainingRequest) use ($receiverUsers, $tuHeadApproverUser){
+            // $trainingRequestDept = RapidXDepartment::where('department_id', $trainingRequest->department_id)->first();
+            $sectionHeadDeptId = $trainingRequest->section_head_user->department_id;
+            $trainingRequestDept = RapidXDepartment::where('department_id', $sectionHeadDeptId)->first();
+            $dept = $trainingRequestDept->department_name;
+
+            $sectionHeadDeptId = $trainingRequest->section_head_user->department_id;
+            $trainingRequestDept = RapidXDepartment::where('department_id', $sectionHeadDeptId)->first();
+            $dept = $trainingRequestDept->department_name;
+            // return $dept;
+            // return $trainingRequest->department_id;
             $result = '';
             $result .= '<center>';
 
@@ -63,15 +78,31 @@ class TrainingRequestController extends Controller
 
             if($trainingRequest->status == 0) {
                 if($trainingRequest->section_head_user && $trainingRequest->section_head_user->id == $_SESSION['rapidx_user_id']){
-                     $result .= '<button class="btn btn-sm btn-success btnConformTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
-                }
+                    $result .= '<button class="btn btn-sm btn-success btnConformTrainingRequest"
+                        data-id="' . $trainingRequest->id . '"
+                        data-ctrl="' . $trainingRequest->ctrl_number . '"
+                        data-dept="' . $dept . '">
+                        <i class="fas fa-check"></i>
+                    </button>';                }
             }else if($trainingRequest->status == 1){
                 if($receiverUsers->contains('rapidx_emp_id', $_SESSION['rapidx_user_id'])){
-                    $result .= '<button class="btn btn-sm btn-success btnReceiveTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
-                }
+                    // $result .= '<button class="btn btn-sm btn-success btnReceiveTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
+                    $result .= '<button class="btn btn-sm btn-success btnReceiveTrainingRequest"
+                        data-id="' . $trainingRequest->id . '"
+                        data-ctrl="' . $trainingRequest->ctrl_number . '"
+                        data-dept="' . $dept . '">
+                        <i class="fas fa-check"></i>
+                    </button>';
+                    }
             }else if($trainingRequest->status == 2){
                 if($tuHeadApproverUser){
-                    $result .= '<button class="btn btn-sm btn-success btnApproveTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
+                    // $result .= '<button class="btn btn-sm btn-success btnApproveTrainingRequest" data-id="' . $trainingRequest->id . '"><i class="fas fa-check"></i></button>';
+                    $result .= '<button class="btn btn-sm btn-success btnApproveTrainingRequest"
+                        data-id="' . $trainingRequest->id . '"
+                        data-ctrl="' . $trainingRequest->ctrl_number . '"
+                        data-dept="' . $dept . '">
+                        <i class="fas fa-check"></i>
+                    </button>';
                 }
             }
 
@@ -135,8 +166,13 @@ class TrainingRequestController extends Controller
                 $result .= "<br><small class='text-muted'>$date $time</small>";
             }
             else if ($trainingRequest->status == 1) {
-                $result .= '<span class="badge badge-secondary">Pending</span>';
-                $result .= "<br><small class='text-muted'>$date $time</small>";
+                // if(!$trainingRequest->section_head_date){
+                    $forReceiveDate = date('h:i:s A', strtotime($trainingRequest->section_head_date));
+                    $forReceiveTime = date('h:i:s A', strtotime($trainingRequest->section_head_date));
+                    //  $result .= '<span class="badge badge-secondary">Pending</span>';
+                    $result .= '<span class="badge badge-secondary">Pending</span>';
+                    $result .= "<br><small class='text-muted'>$forReceiveDate $forReceiveTime</small>";
+                // }
             }else if($trainingRequest->status == 2){
                 $receiverName = $trainingRequest->received_by ? RapidXUser::where('id', $trainingRequest->received_by)->first()->name : 'Unknown User';
                 $receivedDate = date('M d, Y', strtotime($trainingRequest->received_date));
@@ -172,8 +208,14 @@ class TrainingRequestController extends Controller
                 $result .= "<br><small class='text-muted'>$date $time</small>";
             }
             else if ($trainingRequest->status == 1) {
+                // $result .= '<span class="badge badge-secondary">Pending</span>';
+                // $result .= "<br><small class='text-muted'>$date $time</small>";
+                $forReceiveDate = date('h:i:s A', strtotime($trainingRequest->section_head_date));
+                $forReceiveTime = date('h:i:s A', strtotime($trainingRequest->section_head_date));
+                //  $result .= '<span class="badge badge-secondary">Pending</span>';
                 $result .= '<span class="badge badge-secondary">Pending</span>';
-                $result .= "<br><small class='text-muted'>$date $time</small>";
+                $result .= "<br><small class='text-muted'>$forReceiveDate $forReceiveTime</small>";
+
             }else if($trainingRequest->status == 2 || $trainingRequest->status == 3){
                 if(!$trainingRequest->tu_head_approver && $trainingRequest->received_by){
                     $receivedDate = date('M d, Y', strtotime($trainingRequest->received_date));
@@ -207,6 +249,7 @@ class TrainingRequestController extends Controller
                         <small class="text-muted">'.$time.'</small>
                     </div>';
         })
+
         ->rawColumns(['action', 'status', 'section_head_user','receiving', 'tu_head_approval','date_filed'])
         ->make(true);
     }
@@ -220,16 +263,22 @@ class TrainingRequestController extends Controller
 
     public function getHRISSections(Request $request){
         // return 'asd';
-        $systemOneSection = SystemOneHrisSection::with(['department'])
-        ->where('isActive', 0)
-        ->get();
+       $systemOneSection = SystemOneHrisSection::with(['department'])
+    ->where('isActive', 1)
+    // ->select('section', 'department_id')
+    ->distinct()
+    ->get();
+
+    // return $systemOneSection;
+        // $systemOneSection = SystemOneHrisSection::where('isActive', 1)
+        // ->get();
         return response()->json($systemOneSection);
     }
 
     public function getHRISSectionByDepartment(Request $request){
         $systemOneDepartment = SystemOneHrisDepartment::where('isActive', 1)
         ->get();
-        return $systemOneDepartment;
+        // return $systemOneDepartment;
         return response()->json($systemOneDepartment);
     }
 
@@ -237,12 +286,9 @@ class TrainingRequestController extends Controller
         date_default_timezone_set('Asia/Manila');
         $data = $request->all();
 
-        // return $data;
-
         $ctrlNumber = TrainingRequest::max('id') + 1;
         $ctrlNumber = str_pad($ctrlNumber, 4, '0', STR_PAD_LEFT);
         $date = date('ym');
-
 
         $ctrlNumber = 'TR-' . $date . '-' . $ctrlNumber;
 
@@ -258,6 +304,13 @@ class TrainingRequestController extends Controller
         $trainingRequest->created_by = $_SESSION["rapidx_user_id"] ?? 0;
 
         $trainingRequest->save();
+        $result = $trainingRequest->save();
+
+        // dd([
+        //     'saved' => $result,
+        //     'id' => $trainingRequest->id,
+        //     'attributes' => $trainingRequest->getAttributes(),
+        // ]);
 
         $trainingRequestId = $trainingRequest->id;
 
@@ -271,8 +324,11 @@ class TrainingRequestController extends Controller
             ]);
         }
 
+        // dd($employees);
+
 
         foreach($employees as $emp){
+            // dd($emp);
             $empPosDeptSec = $emp['position'];
             $hrmemoDocsId = $emp['id'];
             $trainingTitle = $emp['training_title'];
@@ -292,33 +348,72 @@ class TrainingRequestController extends Controller
             $department = isset($explodedEmpPosDeptSec[1]) ? trim($explodedEmpPosDeptSec[1]) : '';
             $section    = isset($explodedEmpPosDeptSec[2]) ? trim($explodedEmpPosDeptSec[2]) : '';
 
-            TrainingRequestDetails::updateOrCreate(
-                [
+            // dd($trainingRequestId);
+            try {
 
-                    'training_request_id' => $trainingRequestId,
-                    'training_memo_doc_id' => $memoDocId,
-                    'hr_memo_trainee_details_id' => $hrmemoDocsId,
-                    'emp_no' => $emp['emp_no']
-                ],
-                [
-                    'date_hired' => $emp['date_hired'],
-                    'name' => $emp['name'],
-                    'position' => $position,
-                    'department' => $department,
-                    'section' => $section,
-                    'training_title' => $implodedTrainingTitle,
-                    'training_result' => $implodedResult,
-                    'remarks' => $implodedRemarks,
-                    'training_venue' => $emp['training_venue'],
-                    'training_endorsement_date' => $emp['training_endorsement_date']
-                ]
-            );
+                $detail = TrainingRequestDetails::updateOrCreate(
+                    [
+                        'training_request_id' => $trainingRequestId,
+                        'training_memo_doc_id' => $memoDocId,
+                        'hr_memo_trainee_details_id' => $hrmemoDocsId,
+                        'emp_no' => $emp['emp_no']
+                    ],
+                    [
+                        'date_hired' => $emp['date_hired'],
+                        'name' => $emp['name'],
+                        'position' => $position,
+                        'department' => $department,
+                        'section' => $section,
+                        'training_title' => $implodedTrainingTitle,
+                        'training_result' => $implodedResult,
+                        'remarks' => $implodedRemarks,
+                        'training_venue' => $emp['training_venue'],
+                        'training_endorsement_date' => $emp['training_endorsement_date']
+                    ]
+                );
+
+            } catch (\Exception $e) {
+                dd($e->getMessage(), $e->getTraceAsString());
+            }
 
             $savedEmployees[] = [
                 'name' => $emp['name'],
                 'emp_no' => $emp['emp_no'],
                 'training_result' => implode(',', $explodedResult),
             ];
+        }
+
+
+        // email notification
+        $recipient = RapidXUser::where('id', $trainingRequest->section_head)->first();
+        $bcc = RapidXUser::find($trainingRequest->created_by);
+        $hrMemoDoc = HrMemo::where('id', $memoDocId)->get();
+
+        if ($recipient) {
+            $recipientEmail = $recipient->email;
+            $recipientName = $recipient->name;
+            $bccEmail = $bcc ? $bcc->email : null;
+            $documentNo = $hrMemoDoc[0]->document_no;
+
+            // return $documentNo;
+
+            $data = [
+                'ctrl_number' => $ctrlNumber,
+                'documentNo' => $documentNo,
+                'dateFiled' => $data['date_filed'],
+                'recipientName' => $recipientName,
+            ];
+
+
+            Mail::send('mail.new_training_request_notification', $data, function ($message) use ($recipientEmail, $recipientName, $bccEmail) {
+                $message->to($recipientEmail, $recipientName);
+                $message->cc(['kcalcantara@pricon.ph', 'cnpoblete@pricon.ph']);
+                    if ($bccEmail) {
+                        $message->bcc($bccEmail);
+                    }
+                $message->subject('New Training Request Notification');
+            });
+
         }
 
 
@@ -332,12 +427,19 @@ class TrainingRequestController extends Controller
 
     public function getUserConformance(Request $request){
         // return 'asd';
-        $trainingRequest = User::whereHas('user_access_module', function ($query) {
-            $query->where('user_modules_id', 6);
+       $modules = [3, 5, 6];
+
+        $trainingRequest = User::whereHas('user_access_module', function ($query) use ($modules) {
+            $query->where(function ($q) use ($modules) {
+                foreach ($modules as $module) {
+                    $q->orWhereRaw("FIND_IN_SET(?, user_modules_id)", [$module]);
+                }
+            });
         })
-        ->with(['users'])
+        ->with('users')
         ->get();
 
+        // return $trainingRequest;
         return response()->json($trainingRequest);
     }
 
@@ -360,23 +462,33 @@ class TrainingRequestController extends Controller
     }
 
     public function getMemoDocs(Request $request){
-        // Get memo
-        $memo = HrMemo::with([
-            'trainee_details',
-            'trainee_details.hris_emp_info',
-            'trainee_details.emp_exam_details',
-            'trainee_details.emp_exam_details.exam_info'
-        ])
-        ->whereHas('trainee_details', function ($query) {
-            $query->whereNotIn('id', function ($subquery) {
-                $subquery->select('hr_memo_trainee_details_id')
-                    ->from('training_request_details')
-                    ->whereNotNull('hr_memo_trainee_details_id');
-            });
-        })
-        ->get();
+        $selectedMemoId = $request->selectedMemoId;
 
-    return response()->json($memo);
+        $memo = HrMemo::with([
+                'trainee_details',
+                'trainee_details.hris_emp_info',
+                'trainee_details.emp_exam_details',
+                'trainee_details.emp_exam_details.exam_info'
+            ])
+            ->where(function ($query) use ($selectedMemoId) {
+
+                $query->whereHas('trainee_details', function ($q) {
+                    $q->whereNotIn('id', function ($subquery) {
+                        $subquery->select('hr_memo_trainee_details_id')
+                            ->from('training_request_details')
+                            ->whereNotNull('hr_memo_trainee_details_id');
+                    });
+                });
+
+                if ($selectedMemoId) {
+                    $query->orWhere('id', $selectedMemoId); // ✅ FIX: use HrMemo.id
+                }
+
+            })
+            ->where('status', 6)
+            ->get();
+
+        return response()->json($memo);
     }
 
     public function getMemoDocsDetails(Request $request){
@@ -397,7 +509,12 @@ class TrainingRequestController extends Controller
             'trainee_details.emp_exam_details.exam_info'
         ])
         ->where('id', $memoDocId)
+        ->where('status', 6)
         ->first();
+
+        // return $memo;
+
+        // return $memo;
 
 
 
@@ -420,18 +537,21 @@ class TrainingRequestController extends Controller
 
             if ($td->employment_type == 1) {
                 $td->load(['hris_emp_info' => function ($q) {
-                    $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
-                    ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                    ->select('vw_employeeinfo.*', 'tbl_Training.Venue as Venue');
+                    // $q->join('vw_Trainee', 'vw_employeeinfo.pkid', '=', 'vw_Trainee.fkEmployee')
+                    // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                    $q->select('vw_employeeinfo.*');
                 }]);
             } else {
                 $td->load(['subcon_emp_info' => function ($q) {
-                    $q->join('vw_Trainee', 'vw_subcon_employeeinfo.pkid', '=', 'vw_Trainee.fkSubconEmployee')
-                    ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
-                    ->select('vw_subcon_employeeinfo.*', 'tbl_Training.Venue as Venue');
+                    // $q->join('vw_Trainee', 'vw_subcon_employeeinfo.pkid', '=', 'vw_Trainee.fkSubconEmployee')
+                    // ->join('tbl_Training', 'vw_Trainee.fkTraining', '=', 'tbl_Training.pkid')
+                    // $q->select('vw_subcon_employeeinfo.*');
                 }]);
             }
         }
+
+        // return $td;
+
 
         return DataTables()->of($traineeDetails)
         ->addColumn('id', function($td){
@@ -491,7 +611,9 @@ class TrainingRequestController extends Controller
                 ($td->hris_emp_info->Department ?? '') . ' / ' .
                 ($td->hris_emp_info->Section ?? '');
             }else{
-                return $td->subcon_emp_info->Position ?? '';
+                return ($td->subcon_emp_info->Position ?? '') . ' / ' .
+                ($td->subcon_emp_info->Department ?? '') . ' / ' .
+                ($td->subcon_emp_info->Section ?? '');
 
             }
 
@@ -529,36 +651,121 @@ class TrainingRequestController extends Controller
         ->make(true);
     }
 
-    public function confirmTrainingRequest(Request $request){
+     public function confirmTrainingRequest(Request $request){ // email
         date_default_timezone_set('Asia/Manila');
 
         $trainingRequest = TrainingRequest::find($request->id);
+        // $trainingRequestDept = RapidXDepartment::where('department_id', $trainingRequest->department_id)->first();
+        $systemOneDepartment = SystemOneHrisDepartment::where('pkid',  $trainingRequest->department_id)
+        ->where('isActive', 1)
+        ->get();
+        $trainingRequestMemoDocId = TrainingRequest::with('training_request_details')
+            ->find($request->id);
+
+        $documentNoId = $trainingRequestMemoDocId->training_request_details->first()->training_memo_doc_id;
+
+        $hrMemoDoc = HrMemo::where('id', $documentNoId)->get();
+
+        $documentNo = $hrMemoDoc[0]->document_no;
+
+        $receivingRecipients = [];
         if($trainingRequest){
             $trainingRequest->status = 1; // Update status to "Conformed"
             $trainingRequest->section_head_date = date('Y-m-d H:i:s');
             $trainingRequest->save();
+            $departmentName = strtoupper($systemOneDepartment[0]->Department);
+
+            if (str_contains($departmentName, 'F3')) {
+                // F3 recipient
+                $receivingRecipients = RapidXUser::whereIn('id', [82,976, 965])->pluck('email')
+                ->toArray();
+
+            } elseif ( str_contains($departmentName, 'TS-F1') || str_contains($departmentName, 'TS - PRODUCTION') || str_contains($departmentName, 'YF')){
+                // F1/Regular TS recipient
+                $receivingRecipients = RapidXUser::whereIn('id', [102, 965])->pluck('email')
+                ->toArray();
+
+            } elseif ( str_contains($departmentName, 'CN')) {
+
+                // CN/PPS recipient
+                $receivingRecipients = RapidXUser::whereIn('id', [76, 75, 965])->pluck('email')
+                ->toArray();
+
+            }elseif(str_contains($departmentName, 'PPD')){
+                $receivingRecipients = RapidXUser::whereIn('id', [102, 76, 965])->pluck('email')
+                ->toArray();
+            }
+
+            $emailData = [
+                'ctrlNumber'  => $trainingRequest->ctrl_number,
+                'documentNo'  => $documentNo,
+                'dateFiled'   => $trainingRequest->date_filed,
+                'receivingRecipients' => $receivingRecipients
+            ];
+
+            Mail::send(
+                'mail.for_receive_training_request_notification',
+                $emailData,
+                function ($message) use ($receivingRecipients) {
+
+                    $message->to($receivingRecipients)
+                            ->subject('Training Request for Receiving');
+                }
+            );
+
             return response()->json(['result' => 1, 'message' => 'Training request conformed successfully']);
         } else {
             return response()->json(['result' => 0, 'message' => 'Training request not found']);
         }
     }
 
-    public function receiveTrainingRequest(Request $request){
+    public function receiveTrainingRequest(Request $request){ // email notification
         date_default_timezone_set('Asia/Manila');
 
         $trainingRequest = TrainingRequest::find($request->id);
+        $trainingRequestMemoDocId = TrainingRequest::with('training_request_details')
+        ->find($request->id);
+
+        $documentNoId = $trainingRequestMemoDocId->training_request_details->first()->training_memo_doc_id;
+
+        $hrMemoDoc = HrMemo::where('id', $documentNoId)->get();
+
+        $documentNo = $hrMemoDoc[0]->document_no;
+
         if($trainingRequest){
             $trainingRequest->status = 2; // Update status to "Received"
             $trainingRequest->received_by = $_SESSION['rapidx_user_id'];
             $trainingRequest->received_date = date('Y-m-d H:i:s');
             $trainingRequest->save();
+
+            $tuHeadRecipient = RapidXUser::where('id', 74)
+                ->get();
+
+            $emailData = [
+                'ctrlNumber'  => $trainingRequest->ctrl_number,
+                'documentNo'  => $documentNo,
+                'dateFiled'   => $trainingRequest->date_filed,
+                'tuHeadRecipient' => $tuHeadRecipient[0]->name
+            ];
+
+            Mail::send(
+                'mail.tu_head_approval_request_notification',
+                $emailData,
+                function ($message) use ($tuHeadRecipient) {
+
+                    $message->to($tuHeadRecipient[0]->email)
+                            ->cc(['kcalcantara@pricon.ph','havasquez@pricon.ph'])
+                            ->subject('Training Request for TU Head Approval');
+                }
+            );
+
             return response()->json(['result' => 1, 'message' => 'Training request received successfully']);
         } else {
             return response()->json(['result' => 0, 'message' => 'Training request not found']);
         }
     }
 
-    public function approveTrainingRequest(Request $request){
+    public function approveTrainingRequest(Request $request){ // email notification to TU Head Approver
         date_default_timezone_set('Asia/Manila');
 
         $trainingRequest = TrainingRequest::find($request->id);

@@ -43,12 +43,12 @@
                                 </div>
 
                                 <div class="float-sm-left mb-4 col-2">
-                                    {{-- <select class="form-control selectFilter" id="selectFilterId">
+                                    <select class="form-control selectFilter" id="selectFilterId">
                                         <option value="3" {{ $defaultFilter == 3 ? 'selected' : '' }}>All Training Request</option>
                                         <option value="0" {{ $defaultFilter == 0 ? 'selected' : '' }}>Conformance</option>
                                         <option value="1" {{ $defaultFilter == 1 ? 'selected' : '' }}>Receiving</option>
                                         <option value="2" {{ $defaultFilter == 2 ? 'selected' : '' }}>TU Head Approval</option>
-                                    </select> --}}
+                                    </select>
                                 </div>
 
                                 <div class="table-responsive">
@@ -267,7 +267,7 @@
                             </div>
 
                             <div class="col-sm-6">
-                                 <div class="input-group  mb-3">
+                                <div class="input-group  mb-3">
                                     <div class="input-group-prepend w-50">
                                         <span class="input-group-text w-100" id="basic-addon1">Section Head</span>
                                     </div>

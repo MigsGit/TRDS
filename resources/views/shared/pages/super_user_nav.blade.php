@@ -8,7 +8,7 @@
             class="brand-image img-circle elevation-3"
             style="opacity: .8">
 
-        <span class="brand-text font-weight-light font-size"><h5>System Title</h5></span>
+        <span class="brand-text font-weight-light font-size"><h5>TRDSv2.1</h5></span>
     </a> <!-- System title and logo -->
 
     <!-- Sidebar -->
@@ -32,21 +32,70 @@
                 <li class="nav-item has-treeview">
                     <a href="{{ route('user_master') }}"  class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
-                        <p>[Migz] User list</p>
+                        <p>User list</p>
                     </a>
                 </li>
 
-                <li class="nav-header font-weight-bold">Modules</li>
-                {{-- <li class="nav-item has-treeview">
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('insp_skill_chart_setting') }}"  class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Inspector Skill Chart Settings</p>
+                    </a>
+                </li>
+
+                <!-- <li class="nav-item has-treeview">
+                    <a href="{{ route('target_ratings') }}" class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Target Ratings Settings</p>
+                    </a>
+                </li> -->
+
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Target Ratings Settings</p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('target_ratings') }}" class="nav-link">
+                                <p> Target Ratings</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('ratings_descriptions') }}" class="nav-link">
+                                <p> Descriptions</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('dropdown_maintenance') }}"  class="nav-link">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Dropdown Maintenance</p>
+                    </a>
+                </li>
+
+                <!-- <li class="nav-header font-weight-bold">Modules</li>
+                <li class="nav-item has-treeview">
                     <a href="{{ route('hr_memo') }}" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
                         <p>HR MEMO/Approval </p>
                     </a>
-                </li> --}}
+                </li> -->
+
+                <li class="nav-header font-weight-bold">Modules</li>
+                <?php
+                    // if($globalUser != null){
+                    //     $user_access = explode(',', $globalUser->user_modules_id);
+                    //     $hr_memo_access = in_array(1, $user_access); //HR Memorandum
+                    // }
+                ?>
+
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
-                        <p> HR Memo/Approval </p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
+                        <p> HR Memo/Approval</p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
@@ -67,65 +116,200 @@
                         <i class="nav-icon fas fa-users"></i>
                         <p> Training Request/Approval  </p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
                     </a>
-
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ route('training_request') }}" class="nav-link">
                                 <p> Training Request</p>
                             </a>
                         </li>
-                        {{-- <p>{{ $globalUser }}</p> --}}
-                        {{-- <li class="nav-item">
-                            <a href="{{ route('training_request_conformance') }}" class="nav-link">
-                                <p> Traning Conformance</p>
+                    </ul>
+                </li>
+                {{-- http://rapidx/TRDSv2_attendance/ --}}
+                @if ( in_array(7,explode(',', $globalUser->user_modules_id)) )
+                    <li class="nav-item">
+                        <a href="{{ route('training_attendance') }}"  class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <p>Training Attendance Summary   </p>
+                        </a>
+                    </li>
+                @endif
+                 <li class="nav-item">
+                     <a href="http://rapidx/TRDSv2_attendance/"  class="nav-link">
+                        <i class="fas fa-user"></i>
+                        <p>Training Attendance  </p>
+                    </a>
+                </li>
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cogs"></i>
+                        <p>
+                            Theoretical Exam
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('questionnaire') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Questionnaire</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('training_request_approval') }}" class="nav-link">
-                                <p> Traning Approval</p>
+                            <a href="{{ route('examDashboard') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Examination</p>
                             </a>
-                        </li> --}}
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('examination_result') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Exam Result</p>
+                            </a>
+                        </li>
                     </ul>
-
                 </li>
 
-                <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-users"></i>
-                        <a href="{{ route('training_attendance') }}"  class="nav-link">
+                {{-- <li class="nav-item has-treeview">
+                    <a href="{{ route('personnel_skill_matrix') }}"  class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <p>Personnel Skill Matrix</p>
+                    </a>
+                </li> --}}
+                @if ( in_array(16,explode(',', $globalUser->user_modules_id)) )
+                    <li class="nav-item has-treeview">
+                        <a href="{{ route('training_endorsement') }}"  class="nav-link">
                             <i class="nav-icon fas fa-users"></i>
-                            <p>[Migz] Training Attendance </p>
+                            <p>Training Endorsement </p>
                         </a>
+                    </li>
+                @endif
+
+                {{-- <li class="nav-item has-treeview">
+                    <a href="{{ route('qualification_certification') }}" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Qualification / Certification</p>
                     </a>
-                </li>
+                </li> --}}
 
                 <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-list-alt"></i>
-                        <p>[Chan] Theoretical Exam </p>
+                    <a href="{{ route('ETR') }}" class="nav-link">
+                        <i class="fas fa-cogs"></i>
+                        <p>TRDS Summary <br>Dashboard</p>
                     </a>
                 </li>
+                {{-- @if ( in_array(12,explode(',', $globalUser->user_modules_id)) ) --}}
+                    <li class="nav-item has-treeview">
+                        <a href="{{ route('qualification_certification2') }}" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Certification & Validation Form</p>
+                        </a>
+                    </li>
+                    {{-- @endif --}}
 
                 <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
+                    <!-- <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
-                        <p>[Nessa] Personal Skill Matrix </p>
+                        <p> Personnel Disqualification</p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
+                    </a> -->
+                    <!-- <ul class="nav nav-treeview"> -->
+                        <!-- <li class="nav-item">
+                            <a href="{{ route('hr_memo_exam') }}" class="nav-link">
+                                <p> Examinations</p>
+                            </a>
+                        </li> -->
+                        <li class="nav-item">
+                            <a href="{{ route('personnel_disqualification') }}" class="nav-link">
+                                <p> Personnel Disqualification</p>
+                            </a>
+                        </li>
+                    <!-- </ul> -->
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('TRU') }}" class="nav-link">
+                        <i class="far fa-list-alt nav-icon"></i>
+                        <p>Training Record Update</p>
                     </a>
                 </li>
 
                 <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-list-alt"></i>
-                        <p> Training Endorsement </p>
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cogs"></i>
+                        <p>
+                            Work Assignment
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('wa_questionnaire') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Questionnaire</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('examDashboard') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Examination</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('wa_examination_result') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Exam Result</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <li class="nav-item has-treeview">
-                    <a href="" data-toggle="modal" data-target="#modalOnGoing" class="nav-link">
-                        <i class="nav-icon fas fa-list-alt"></i>
-                        <p>[Chris] Qualification / Certification </p>
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-book-open"></i>
+                        <p>
+                            Recertification
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('grr_attributes_settings') }}" class="nav-link">
+                                <i class="fas fa-cogs nav-icon"></i>
+                                <p>GRR Attributes Settings</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('blank') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Work Assignment</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('grr_examination_dashboard') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>GRR Attributes Examination</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('blank') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>GRR Variables</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
+                {{-- @if($globalUser->rapidx_emp_id == 216) --}}
+                    {{-- <li class="nav-header font-weight-bold">Export</li>
+                    <li class="nav-item has-treeview">
+                        <a id="btnListCertPersonnel" class="nav-link">
+                            <i class="fas fa-file-excel"></i>
+                            <p>List of Certified Personnel</p>
+                        </a>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a id="btnInsCertMatrix" class="nav-link">
+                            <i class="fas fa-file-excel"></i>
+                            <p>Inspectors Certification Matrix</p>
+                        </a>
+                    </li> --}}
+                {{-- @endif --}}
             </ul>
         </nav>
     </div><!-- Sidebar -->

@@ -1,6 +1,4 @@
-@php $layout = 'layouts.layout'; @endphp
-
-{{-- Here I removed the @auth because the dashboard isn't loading properly --}}
+@php $layout = 'layouts.super_user_layout'; @endphp
 @extends($layout)
 @section('title', 'Dashboard')
 

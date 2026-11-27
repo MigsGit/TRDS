@@ -1,0 +1,2278 @@
+// $(document).ready(function () {
+
+/**
+     * Synchronizes a group of checkboxes with a piped string value from the database.
+     * @param {string} nameAttribute - The HTML name attribute of the checkbox group.
+     * @param {string} rawDbValue - The piped string from your database (e.g., "Visual | Assembly").
+     */
+    /**
+     * Initialize (or re-initialize) a training-items DataTable scoped to the given table selector.
+     * Destroys any existing DataTable instance on that selector first to prevent
+     * "DataTables warning: table already initialized" errors when the modal is re-opened.
+     *
+     * @param  {string} tableSelector  CSS ID selector for the target <table>, e.g. '#tblTrainingItems_ins'
+     * @return {DataTables.Api|null}    The new DataTable instance, or null if the element is not in the DOM.
+     */
+    const initTrainingItemsTable = (tableSelector) => {
+        var $table = $(tableSelector);
+        if (!$table.length) { return null; }
+
+        // Destroy existing instance before re-initializing to prevent ID collision errors
+        if ($.fn.DataTable.isDataTable(tableSelector)) {
+            $(tableSelector).DataTable().destroy();
+        }
+
+        var dtInstance = $table.DataTable({
+            processing: true,
+            serverSide: true,
+            paging:    false,
+            searching: false,
+            info:      false,
+            ordering:  false,
+            ajax: {
+                url:  'load_qc_lqc_training_items_by_qc_slip_id',
+                type: 'GET',
+                data: function (params) {
+                    params.qc_slips_id = $('#qc_slips_id').val() || '';
+                }
+            },
+            columns: [
+                { data: 'item_name', name: 'item_name' },
+                {   data: 'select_item',
+                    visible: false,    // Hides column from display
+                    name: 'select_item',
+                    className: 'text-center'
+                },
+                { data: 'day_1',   name: 'day_1',   className: 'text-center' },
+                { data: 'day_2',   name: 'day_2',   className: 'text-center' },
+                { data: 'day_3',   name: 'day_3',   className: 'text-center' },
+                { data: 'day_4',   name: 'day_4',   className: 'text-center' },
+                { data: 'day_5',   name: 'day_5',   className: 'text-center' },
+                { data: 'remarks', name: 'remarks' }
+            ]
+        });
+
+        // Pre-fill Day 1–5 header date inputs from the server response
+        dtInstance.on('xhr', function () {
+            var json = dtInstance.ajax.json();
+            if (json && json.headerDates) {
+                $.each(json.headerDates, function (dayNumber, dateValue) {
+                    $table.closest('.table-responsive')
+                        .find('.header-date-input[data-day="' + dayNumber + '"]')
+                        .val(dateValue || '');
+                });
+            }
+        });
+
+        return dtInstance;
+    };
+
+    // ==========================================================================
+    // NEW standalone position-specific training tables (Production / Engineering
+    // / QC). These are entirely separate from the legacy
+    // initTrainingItemsTable()/.btnSaveMatrix flow above, which is left intact.
+    // ==========================================================================
+
+    /**
+     * Single source of truth (UX mirror of the backend's OPER_POSITION_DAY_STATUSES
+     * grid / parseApprovalStatus()) for which role/day is currently editable on a
+     * VisualOperator/PartsPrep/MachineOperator slip. 0 = checkbox phase (any day
+     * editable for the matching role), 1-5 = Day 1-5 (only that day editable).
+     */
+    const OPER_POSITION_DAY_STATUSES = {
+        Production: { 0: 'AOPERPRDN', 1: 'AOPERPRDN1', 2: 'AOPERPRDN2', 3: 'AOPERPRDN3', 4: 'AOPERPRDN4', 5: 'AOPERPRDN5' },
+        Engineer:   { 0: 'BOPERENGG', 1: 'BOPERENGG1', 2: 'BOPERENGG2', 3: 'BOPERENGG3', 4: 'BOPERENGG4', 5: 'BOPERENGG5' },
+        QC:         { 0: 'COPERQC',   1: 'COPERQC1',   2: 'COPERQC2',   3: 'COPERQC3',   4: 'COPERQC4',   5: 'COPERQC5' }
+    };
+
+    /**
+     * Resolves which role/day is currently editable from an approval_status string.
+     * Returns null when nothing is editable (e.g. 'PB', 'DOPEROSC', or any status
+     * outside the grid). UX ONLY — the backend guard in
+     * saveQcLqcTrainingItemsByPosition() is the source of truth.
+     * @param  {string} approvalStatus
+     * @return {{role:string,day:?number}|null}
+     */
+    const parseApprovalStatus = (approvalStatus) => {
+        for (var role in OPER_POSITION_DAY_STATUSES) {
+            var dayStatuses = OPER_POSITION_DAY_STATUSES[role];
+            for (var day in dayStatuses) {
+                if (dayStatuses[day] === approvalStatus) {
+                    return { role: role, day: (day === '0') ? null : parseInt(day, 10) };
+                }
+            }
+        }
+        return null;
+    };
+
+    /**
+     * Disables (not hides) the checkbox/sub-description/day-result inputs of a
+     * position-specific training table body that fall outside the role/day
+     * currently editable for the given approval_status. UX ONLY.
+     * @param  {jQuery} $tableBody
+     * @param  {string} position        'Production' | 'Engineer' | 'QC'
+     * @param  {string} approvalStatus
+     */
+    const applyTrainingItemDayLock = ($tableBody, position, approvalStatus) => {
+        var editableSlot = parseApprovalStatus(approvalStatus);
+        var roleEditable = editableSlot !== null && editableSlot.role === position;
+
+        $tableBody.find('tr').each(function () {
+            var $row = $(this);
+
+            $row.find('.chk-select-item, .input-sub-desc, .input-remark').prop('disabled', !roleEditable);
+
+            $row.find('.input-result').each(function () {
+                var $input = $(this);
+                var day = parseInt($input.data('day'), 10);
+                var isEditable = roleEditable && (editableSlot.day === null || editableSlot.day === day);
+                $input.prop('disabled', !isEditable);
+            });
+        });
+    };
+
+    /**
+     * Shared initializer used by the 3 position-specific wrapper functions below.
+     * @param  {string} tableSelector  CSS ID selector for the target <table>.
+     * @param  {string} position       'Production' | 'Engineering' | 'QC'
+     * @param  {string} qcSlipsId      Optional explicit qc_slips_id override.
+     * @param  {string} approvalStatus Current qc_slips.approval_status, used to
+     *                                 compute which role/day is editable (UX only).
+     * @return {DataTables.Api|null}
+     */
+    const initPositionTrainingTable = (tableSelector, position, qcSlipsId, ddMastersId, approvalStatus) => {
+        var $table = $(tableSelector);
+        if (!$table.length) { return null; }
+
+        if ($.fn.DataTable.isDataTable(tableSelector)) {
+            $(tableSelector).DataTable().destroy();
+        }
+
+        var dtInstance = $table.DataTable({
+            processing: true,
+            serverSide: true,
+            paging:    false,
+            searching: false,
+            info:      false,
+            ordering:  false,
+            ajax: {
+                url:  'load_qc_lqc_training_items_by_position',
+                type: 'GET',
+                data: function (params) {
+                    params.qc_slips_id = qcSlipsId || $('#qc_slips_id').val() || '';
+                    params.position    = position;
+                    params.dd_masters_id = ddMastersId;
+                }
+            },
+            columns: [
+                { data: 'item_name', name: 'item_name' },
+                { data: 'select_item',   name: 'select_item',   className: 'text-center' },
+                { data: 'day_1',   name: 'day_1',   className: 'text-center' },
+                { data: 'day_2',   name: 'day_2',   className: 'text-center' },
+                { data: 'day_3',   name: 'day_3',   className: 'text-center' },
+                { data: 'day_4',   name: 'day_4',   className: 'text-center' },
+                { data: 'day_5',   name: 'day_5',   className: 'text-center' },
+                { data: 'remarks', name: 'remarks' }
+            ]
+        });
+
+        dtInstance.on('xhr', function () {
+            var json = dtInstance.ajax.json();
+            if (json && json.headerDates) {
+                $.each(json.headerDates, function (dayNumber, dateValue) {
+                    $table.closest('.table-responsive')
+                        .find('.header-date-input[data-day="' + dayNumber + '"]')
+                        .val(dateValue || '');
+                });
+            }
+            if (json && json.trainerValidations) {
+                $.each(json.trainerValidations, function (dayNumber, trainerRow) {
+                    var $dayScope = $table.find('[data-day="' + dayNumber + '"]');
+                    $dayScope.filter('.trainer-emp-no').val(trainerRow.trainer_emp_no || '');
+                    $dayScope.filter('.trainer-name-display').text(trainerRow.trainer_name || '');
+                    $dayScope.filter('.input-day-date').val(trainerRow.validation_date || '');
+                    $dayScope.filter('.input-day-time').val(trainerRow.validation_time || '');
+                    $dayScope.filter('.select-day-result').val(trainerRow.overall_result || '');
+                });
+            }
+            if (json && json.chkTrainerValidation) {
+                var chkData = json.chkTrainerValidation;
+                $table.find('.chk-trainer-emp-no').val(chkData.chk_trainer_emp_no || '');
+                $table.find('.chk-trainer-name-display').text(chkData.chk_trainer_name || '');
+                $table.find('.input-chk-date').val(chkData.chk_validation_date || '');
+                $table.find('.input-chk-time').val(chkData.chk_validation_time || '');
+                $table.find('.select-chk-result').val(chkData.chk_overall_result || '');
+            }
+        });
+
+        dtInstance.on('draw', function () {
+            applyTrainingItemDayLock($table.find('tbody'), position, approvalStatus);
+        });
+
+        return dtInstance;
+    };
+
+    /**
+
+    /**
+     * Reads every row of a position-specific training table body into a plain
+     * array of row objects ready to be posted to save_qc_lqc_training_items_by_position.
+     * @param  {jQuery} $tableBody
+     * @return {Array<Object>}
+     */
+    const gatherPositionMatrixRows = ($tableBody) => {
+        var rows = [];
+        $tableBody.find('tr').each(function () {
+            var $row = $(this);
+            var $checkbox = $row.find('.chk-select-item');
+            if (!$checkbox.length) { return; }
+
+            var dayResults = {};
+            $row.find('.input-result').each(function () {
+                var $input = $(this);
+                dayResults['day_' + $input.data('day')] = $input.val();
+            });
+
+            rows.push({
+                training_item_id: $checkbox.data('item-id'),
+                is_checked:       $checkbox.is(':checked') ? 1 : null,
+                remark:           $row.find('.input-remark').val() || null,
+                sub_description:  $row.find('.input-sub-desc').val() || null,
+                day_results:      dayResults
+            });
+        });
+        return rows;
+    };
+
+    /**
+     * Reads the embedded Trainer Verification tfoot rows (Day 1-5) of a
+     * position-specific training table into a plain day-keyed object ready to
+     * be posted to save_qc_lqc_training_items_by_position as `trainer_days`.
+     * @param  {jQuery} $table
+     * @return {Object}
+     */
+    const gatherTrainerDays = ($table) => {
+        var trainerDays = {};
+        for (var day = 1; day <= 5; day++) {
+            trainerDays['day_' + day] = {
+                trainer_emp_no:  $table.find('.trainer-emp-no[data-day="' + day + '"]').val() || null,
+                trainer_name:    $table.find('.trainer-name-display[data-day="' + day + '"]').text().trim() || null,
+                validation_date: $table.find('.input-day-date[data-day="' + day + '"]').val() || null,
+                validation_time: $table.find('.input-day-time[data-day="' + day + '"]').val() || null,
+                overall_result:  $table.find('.select-day-result[data-day="' + day + '"]').val() || null
+            };
+        }
+        return trainerDays;
+    };
+
+    /**
+     * Reads the single Global/Checkbox Trainer Validation fields of a
+     * position-specific training table (not day-scoped — one set of values
+     * per table) ready to be posted as `chk_trainer_validation`.
+     * @param  {jQuery} $table
+     * @return {Object}
+     */
+    const gatherChkTrainerValidation = ($table) => {
+        return {
+            chk_trainer_emp_no:  $table.find('.chk-trainer-emp-no').val() || null,
+            chk_trainer_name:    $table.find('.chk-trainer-name-display').text().trim() || null,
+            chk_validation_date: $table.find('.input-chk-date').val() || null,
+            chk_validation_time: $table.find('.input-chk-time').val() || null,
+            chk_overall_result:  $table.find('.select-chk-result').val() || null
+        };
+    };
+
+    /**
+     * Generic save handler for any of the 3 new position-specific matrices.
+     * Collects both the item-row matrix AND the embedded Trainer Verification
+     * fields (Day 1-5) in a single combined payload.
+     * @param {string} tableSelector  CSS ID selector for the target <table>.
+     * @param {string} position       'Production' | 'Engineering' | 'QC'
+     * @param {string} qcSlipsId      Optional explicit qc_slips_id override.
+     */
+    const savePositionMatrix = (tableSelector, position, qcSlipsId) => {
+        var $table = $(tableSelector);
+        if (!$table.length) { return; }
+
+        var matrix               = gatherPositionMatrixRows($table.find('tbody'));
+        var trainerDays          = gatherTrainerDays($table);
+        var chkTrainerValidation = gatherChkTrainerValidation($table);
+        var dayDates    = {};
+        $table.closest('.table-responsive').find('.header-date-input').each(function () {
+            dayDates['day_' + $(this).data('day')] = $(this).val();
+        });
+
+        ajaxRequest({
+            url: 'save_qc_lqc_training_items_by_position',
+            method: 'POST',
+            data: {
+                qc_slips_id:            qcSlipsId || $('#qc_slips_id').val() || '',
+                position:               position,
+                matrix:                 matrix,
+                day_dates:              dayDates,
+                trainer_days:           trainerDays,
+                chk_trainer_validation: chkTrainerValidation
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            successCallback: function (response) {
+                toastr.success(response.message || 'Matrix saved successfully!');
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                toastr.error('Failed to save matrix.');
+            }
+        });
+    };
+
+    $(document).on('click', '.btnSavePositionMatrix', function () {
+        var $btn          = $(this);
+        var tableSelector = '#' + $btn.data('table-id');
+        var position      = $btn.data('position');
+
+        savePositionMatrix(tableSelector, position);
+    });
+
+    /**
+     * Trainer barcode scan handler (Enter/KeyCode 13) for the embedded Trainer
+     * Verification row of any of the 3 new position-specific tables.
+     *
+     * STRICT COMPLETION VALIDATION RULE BEFORE SCANNING:
+     *   1. Every .chk-select-item checkbox in the active table must be checked.
+     *   2. Every .input-result for the scanned day_number must be filled.
+     * If either check fails, scanning is blocked, the input is cleared, and a
+     * SweetAlert warning is shown.
+     */
+    /**
+     * Checkbox/Global Trainer barcode scan handler (Enter/KeyCode 13).
+     *
+     * GATING RULE 1: every .chk-select-item in the active table must be
+     * checked before this scan is allowed. If not, the scan is blocked, the
+     * input is cleared, and a SweetAlert warning is shown.
+     */
+    $(document).on('keypress', '.chk-trainer-scan-input', function (e) {
+        if (e.which !== 13 && e.keyCode !== 13) { return; }
+        e.preventDefault();
+
+        var $input = $(this);
+        var empNo  = $.trim($input.val());
+        var $table = $input.closest('table');
+        var $tbody = $table.find('tbody');
+
+        if (!empNo) { return; }
+
+        var allChecked  = true;
+        var $checkboxes = $tbody.find('.chk-select-item');
+        if (!$checkboxes.length) { allChecked = false; }
+        $checkboxes.each(function () {
+            if (!$(this).is(':checked')) {
+                allChecked = false;
+                return false;
+            }
+        });
+
+        //Visual Operator
+        // if (!allChecked && $('#text_select_position').val() != 'VisualOperator' ) {
+        //     $input.val('');
+        //     Swal.fire({
+        //         icon: 'warning',
+        //         title: 'Incomplete Checklist',
+        //         text: 'Cannot scan Checkbox Trainer ID: All row checkboxes must be ticked first.'
+        //     });
+        //     return;
+        // }
+
+        ajaxRequest({
+            url: 'get_employee_details_by_no',
+            method: 'GET',
+            data: { emp_no: empNo },
+            successCallback: function (response) {
+                if (!response || !response.emp_no) {
+                    Swal.fire({ icon: 'error', title: 'Not Found', text: 'No employee found for Trainer ID "' + empNo + '".' });
+                    return;
+                }
+
+                var now         = new Date();
+                var pad         = function (n) { return String(n).padStart(2, '0'); };
+                var currentDate = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+                var currentTime = pad(now.getHours()) + ':' + pad(now.getMinutes());
+
+                $table.find('.chk-trainer-emp-no').val(response.emp_no);
+                $table.find('.chk-trainer-name-display').text(response.name || '');
+
+                var $dateInput = $table.find('.input-chk-date');
+                var $timeInput = $table.find('.input-chk-time');
+                var $resultSelect = $table.find('.select-chk-result');
+                if (!$.trim($dateInput.val())) { $dateInput.val(currentDate); }
+                if (!$.trim($timeInput.val())) { $timeInput.val(currentTime); }
+                if (!$.trim($resultSelect.val())) { $resultSelect.val(''); }
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                Swal.fire({ icon: 'error', title: 'Scan Failed', text: 'Unable to look up Trainer ID.' });
+            }
+        });
+
+        $input.val('');
+    });
+    /**
+     * Day 1-5 Trainer barcode scan handler (Enter/KeyCode 13).
+     *
+     * GATING RULE 2: the Checkbox/Global Trainer must already be validated
+     * (i.e. .chk-trainer-emp-no is populated) AND every .input-result for the
+     * scanned day must be filled before this scan is allowed.
+     */
+    $(document).on('keypress', '.trainer-scan-input', function (e) {
+        if (e.which !== 13 && e.keyCode !== 13) { return; }
+        e.preventDefault();
+
+        var $input   = $(this);
+        var day      = $input.data('day');
+        var empNo    = $.trim($input.val());
+        var $table   = $input.closest('table');
+        var $tbody   = $table.find('tbody');
+
+        if (!empNo) { return; }
+
+        var chkTrainerValidated = !!$.trim($table.find('.chk-trainer-emp-no').val());
+
+        var allResultsFilled = true;
+        var $dayResultInputs = $tbody.find('.input-result[data-day="' + day + '"]');
+        if (!$dayResultInputs.length) { allResultsFilled = false; }
+        $dayResultInputs.each(function () {
+            if (!$.trim($(this).val())) {
+                allResultsFilled = false;
+                return false;
+            }
+        });
+
+        if (!chkTrainerValidated || !allResultsFilled) {
+            $input.val('');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Incomplete Matrix',
+                text: 'Cannot scan Trainer ID: Checkbox Trainer validation and Day ' + day + ' item results must be completed first.'
+            });
+            return;
+        }
+
+        ajaxRequest({
+            url: 'get_employee_details_by_no',
+            method: 'GET',
+            data: { emp_no: empNo },
+            successCallback: function (response) {
+                if (!response || !response.emp_no) {
+                    $input.val('');
+                    Swal.fire({ icon: 'error', title: 'Not Found', text: 'No employee found for Trainer ID "' + empNo + '".' });
+                    return;
+                }
+
+                var now         = new Date();
+                var pad         = function (n) { return String(n).padStart(2, '0'); };
+                var currentDate = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+                var currentTime = pad(now.getHours()) + ':' + pad(now.getMinutes());
+
+                var $dayScope = $table.find('[data-day="' + day + '"]');
+                $dayScope.filter('.trainer-emp-no').val(response.emp_no);
+                $dayScope.filter('.trainer-name-display').text(response.name || '');
+                $dayScope.filter('.input-day-date').val(currentDate);
+                $dayScope.filter('.input-day-time').val(currentTime);
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                $input.val('');
+                Swal.fire({ icon: 'error', title: 'Scan Failed', text: 'Unable to look up Trainer ID.' });
+            }
+        });
+
+        $input.val('');
+    });
+
+    function syncCheckboxesWithDb(nameAttribute, rawDbValue,$comboId=form.formSubmitOper) {
+        // 1. Explode and clean your database values into an array of clean strings
+        // If the database value is null/empty, fall back to an empty array
+        const activeValues = rawDbValue
+            ? rawDbValue.split('|').map(item => item.trim())
+            : [];
+        console.log('Active Values:', activeValues);
+
+        // 2. Query all checkboxes with that specific name attribute inside your form container
+        $comboId.find(`input[type="checkbox"][name="${nameAttribute}"]`).each(function() {
+            const checkbox = $(this);
+            const checkboxValue = checkbox.val(); // e.g., "Visual", "Assembly", "Others"
+
+            // 3. Set prop to true if it matches, false if it does not.
+            // This automatically handles BOTH checking and unchecking!
+            checkbox.prop('checked', activeValues.includes(checkboxValue));
+        });
+    }
+    // ==========================================
+    // HOW TO EXECUTE IT FOR YOUR TWO TABLES:
+    // ==========================================
+
+    const getApprovalStatusToggle = (params) => {
+        let approvalStatus = params.approvalStatus;
+        let positionCategory = params.positionCategory;
+        initDropdownMasterDetailsByFkidCombos([
+            '#text_operator_product_line',
+        ],2);
+        initDropdownMasterDetailsByFkidCombos([
+            '#text_operator_product_area',
+        ],32);
+        initDropdownMasterDetailsByFkidCombos([
+                '#text_certification_operator',
+        ],3);
+        initDropdownMasterDetailsByFkidCombos([
+                '#text_training_orientation_ps_oper',
+        ],4);
+        initDropdownMasterDetailsByFkidCombos([
+                '#text_training_orientation_es_oper',
+        ],5);
+        initDropdownMasterDetailsByFkidCombos([
+                '#transfer_flexibility',
+        ],6);
+
+        $('.inspectorSave').addClass('d-none');
+        $('.operSave').addClass('d-none');
+        $('.operApproved').addClass('d-none');
+        $('.btnSaveInspector').addClass('d-none')
+        $('#productLine').addClass('d-none');
+        $('#seriesDesignation').text('Series Name');
+        $('#dateOfTransfer').addClass('d-none');
+        $('.techSave').addClass('d-none');
+        $('.btnSaveMatrix').addClass('d-none');
+        $('.saveSep').addClass('d-none');
+        $('#div_Oper').addClass('d-none');
+        $('#divInspector').addClass('d-none');
+        $('#divSupervisor').addClass('d-none');
+        $('#divTechnician').addClass('d-none');
+        $('#divMH').addClass('d-none');
+        $('#divAllOperators').addClass('d-none');
+        $('.btnSaveMatrix').addClass('d-none');
+        $('.btnAllOperator').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsVisual').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsPartsPrep').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsMachine').addClass('d-none');
+        $('.machineOpetorItemNo3').addClass('d-none');
+        $('.eVisualGrr').addClass('d-none');
+
+        if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],27);
+            $('.eVisualGrr').removeClass('d-none');
+            $('#divAllOperators').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Series Name');
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 18, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 19, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 20, approvalStatus);
+            $('.btnAllOperator').removeClass('d-none');
+
+
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCHEADAPP'){ //ENGGHEADAPP
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'PartsPrep'){ //TODO LOAD PER MASTELIST ID
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],28);
+            $('#divAllOperators').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Series Name');
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 21, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 22, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 23, approvalStatus);
+            $('.btnAllOperator').removeClass('d-none');
+
+
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'MachineOperator'){
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],29);
+            $('.eVisualGrr').removeClass('d-none');
+            $('.machineOpetorItemNo3').removeClass('d-none');
+            $('#divAllOperators').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Series Name');
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 24, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 25, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 26, approvalStatus);
+            $('.btnAllOperator').removeClass('d-none');
+
+
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'MH'){
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],34);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],36);
+            initTrainingItemsTable('#tblTrainingItems_mh');
+            $('.btnMh').removeClass('d-none');
+            $('.btnSaveMatrix').removeClass('d-none');
+            $('#divMH').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            initPositionTrainingTable('#tblTrainingItemsMhOperator', 'Production', params.qcSlipsId, 37, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMhEngg', 'Engineer', params.qcSlipsId, 38, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMhQC', 'QC', params.qcSlipsId, 39, approvalStatus);
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCSUPVAPP'){
+                // $('.btnSaveInspector').addClass('d-none');
+                // $('.operSave').addClass('d-none');
+                $('.techSave').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+              if(approvalStatus ==='OK'){
+                $('.operApproved').addClass('d-none');
+                $('.techSave').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'Technician'){
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            // initTrainingItemsTable('#tblTrainingItems_tech');
+
+            $('#divTechnician').removeClass('d-none');
+            $('.techSave').removeClass('d-none');
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],9);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],31);
+            initPositionTrainingTable('#tblTrainingItemsTechOperator', 'Production', params.qcSlipsId, 40, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsTechEngg', 'Engineer', params.qcSlipsId, 41, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsTechQC', 'QC', params.qcSlipsId, 42, approvalStatus);
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'ENGGHEADAPP'){
+                // $('.btnSaveInspector').addClass('d-none');
+                // $('.operSave').addClass('d-none');
+                $('.techSave').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+              if(approvalStatus ==='OK'){
+                $('.operApproved').addClass('d-none');
+                $('.techSave').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'Supervisor'){
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],35);
+            $('.saveSep').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            if(approvalStatus ==='CLQCOQC'){
+                // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
+                $('.btnSaveMatrix').removeClass('d-none');
+            }
+            initTrainingItemsTable('#tblTrainingItems_sep');
+            $('#divSupervisor').removeClass('d-none');
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.saveSep').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                $('.operApproved').addClass('d-none');
+                $('.saveSep').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'Operator'){
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            $('#div_Oper').removeClass('d-none');
+            $('.btn-link').removeClass('show');
+            $('#collapseOneOper').removeClass('show');
+            $('.operSave').removeClass('d-none');
+            $('#seriesDesignation').text('Series Name');
+
+            form.formSubmitOper[0].reset();
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            // initDropdownMasterDetailsByFkidCombos([
+            //     '#text_operator_product_line',
+            // ],2);
+            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            if(approvalStatus ==='APRODTO'){
+                $('#collapseOneOper').addClass('show');
+            }
+            if(approvalStatus ==='BENGGTQ'){
+                $('#collapseTwoOper').addClass('show');
+            }
+            if(approvalStatus ==='CQCC'){
+                $('#collapseThreeOper').addClass('show');
+
+            }
+            if(approvalStatus ==='DPPDONLY'){
+                $('#collapseFourOper').addClass('show');
+            }
+            if(approvalStatus ==='ENGVP'){
+                $('#collapseFiveOper').addClass('show');
+            }
+            if(approvalStatus ==='EQCVP'){
+                $('#collapseSixOper').addClass('show');
+            }
+            if(approvalStatus ==='FQCVVO'){
+                $('#collapseSevenOper').addClass('show');
+            } //LQCHEADAPP
+            if(approvalStatus ==='LQCSUPVAPP'){
+                $('.btnSaveInspector').addClass('d-none');
+                $('.operSave').addClass('d-none');
+                // $('.inspectorSave').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                // $('#operDisapproved').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+                // $('#operClosed').addClass('d-none');
+                $('.operSave').addClass('d-none');
+                // $('.inspectorSave').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'Inspector'){
+            initTrainingItemsTable('#tblTrainingItems_ins');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            $('#divInspector').removeClass('d-none');
+            $('.btnSaveInspector').removeClass('d-none');
+            // $('#productLine').removeClass('d-none');
+            form.formSubmitInspector[0].reset();
+
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],7);
+
+            form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            if(approvalStatus !='LQCHEADAPP'){
+                $('.inspectorSave').removeClass('d-none')
+            }
+            if(approvalStatus ==='CLQCOQC'){
+
+                // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
+                $('.btnSaveMatrix').removeClass('d-none');
+            }
+
+            if( approvalStatus ==='LQCHEADAPP'){
+                $('.btnSaveInspector').addClass('d-none');
+                $('.operSave').addClass('d-none');
+                // $('.inspectorSave').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                // $('#operDisapproved').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+                // $('#operClosed').addClass('d-none');
+                $('.operSave').addClass('d-none');
+                $('.inspectorSave').addClass('d-none');
+            }
+        }
+
+    }
+
+    const saveFirstTakeInsSequence = (params) =>{
+        let data = {
+            qcSlipsId : params.qcSlipsId,
+            qcSlipEmployeesId : params.QcSlipEmployeesId,
+            category : params.category,
+            value : params.value,
+        }
+        call_ajax_serialize(data, {}, 'save_first_take_ins_sequence', function (response) {
+            if (response && response.is_success === 'true') {
+                // dataTable.fvi_operator.ajax.reload(null, false);
+            } else {
+                // alert((response && response.message) ? response.message : 'Failed to save. Please try again.');
+            }
+        });
+    }
+
+    const getDivDeptSec = (params) => {
+        let data = {
+        };
+
+        call_ajax(data,'get_div_dept_sec',function(response){
+
+            let paramsGetSelect2Value = {
+                comboId : params.comboId,
+                dataValue : response['section']
+            }
+            fnGetSelect2Value(paramsGetSelect2Value)
+        });
+    }
+    // const selectPassFail = (comboId) => {
+    //     let data = [
+    //             { id : 'PASSED', text : 'PASSED' },
+    //             { id : 'FAILED', text : 'FAILED' }  ,
+    //     ]
+    //     let paramsGetSelect2Value = {
+    //         comboId : comboId,
+    //         dataValue : data
+    //     }
+
+    //     fnGetSelect2Value(paramsGetSelect2Value)
+    // }
+
+    const initDropdownMasterDetailsByFkidCombos = (comboSelectors,dropdownMastersId,specificValues ={}) => {
+        comboSelectors.forEach(function(selector) {
+                getDropdownMasterDetailsByFkid({
+                    comboId: $(selector),
+                    dropdownMastersId: dropdownMastersId,
+                    selectedValues : (specificValues && specificValues[selector]) ? specificValues[selector] : null
+                });
+        });
+    }
+    const getDropdownMasterDetailsByFkid = (params) => {
+        let data = {
+            dropdown_masters_id : params.dropdownMastersId
+        };
+
+        call_ajax(data,'get_dropdown_master_details_by_fkid',function(response){
+            let paramsGetSelect2Value = {
+                comboId : params.comboId,
+                dataValue : response['data'],
+                selectedValues : params.selectedValues ?? []
+            }
+            fnGetSelect2ValueMultiple(paramsGetSelect2Value)
+        });
+
+    }
+
+    // const initGetSystemOneEmployeeDetailsCombos = (comboSelectors) => {
+    //     comboSelectors.forEach(function(selector) {
+    //             getSystemOneEmployeeDetails($(selector));
+    //     });
+    // }
+    /**
+     * Initialize multiple AJAX employee dropdowns with optional pre-selected user objects
+    */
+    const initGetSystemOneEmployeeDetailsCombos = (comboSelectors, selectedValuesMap = {}) => {
+        comboSelectors.forEach(function(selector) {
+            // Fetch the pre-selected employee objects specifically for this selector
+            const preSelectedEmployees = selectedValuesMap[selector] || []; // Expected array: [{id: 'R152', text: 'John Doe'}, ...]
+
+            getSystemOneEmployeeDetails($(selector), preSelectedEmployees);
+        });
+    }
+      /**
+     * Setup Select2 AJAX search AND append pre-selected options if they exist
+     */
+    const getSystemOneEmployeeDetails = (comboId, preSelectedEmployees = []) => {
+        // Reset element completely to avoid initialization memory leaks
+        if (comboId.hasClass("select2-hidden-accessible")) {
+            comboId.select2('destroy').empty();
+        } else {
+            comboId.empty();
+        }
+
+        // Initialize Select2 with dynamic AJAX configuration
+        comboId.select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Search Employee Name or ID...',
+            minimumInputLength: 2,
+            multiple: true, // Crucial for handling array selections
+            ajax: {
+                url: "get_system_one_employee_details",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+
+        // 💡 THE FIX: If we have pre-selected values, append their DOM options, select them, and trigger change
+        if (preSelectedEmployees && preSelectedEmployees.length > 0) {
+            const selectedIds = [];
+
+            preSelectedEmployees.forEach(function(employee) {
+                // Only proceed if employee object has both id and text properties
+                if (employee.id && employee.text) {
+                    const empId = String(employee.id).trim();
+                    selectedIds.push(empId);
+
+                    // Create the option element if it doesn't exist in the HTML structure yet
+                    if (comboId.find("option[value='" + empId + "']").length === 0) {
+                        const newOption = new Option(employee.text, empId, true, true);
+                        comboId.append(newOption);
+                    }
+                }
+            });
+
+            // Set the selected array and trigger change so Select2 renders the tag pills immediately!
+            comboId.val(selectedIds).trigger('change');
+        } else {
+            comboId.val(null).trigger('change');
+        }
+    }
+
+    //EmpNo only
+    const initGetSystemOneEmployeeDetailsCombosTest = (comboSelectors, selectedValuesMap = {}) => {
+    console.log('selectedValuesMap', selectedValuesMap);
+
+    comboSelectors.forEach(function(selector) {
+        // Fetch raw input array (Can be simple string IDs like ["R152", "R131"] or objects [{id, text}])
+        const rawInputData = selectedValuesMap[selector] || [];
+
+        // Normalize the array to ensure it consists of clean Select2 structures {id, text}
+        const preSelectedEmployees = rawInputData.map(function(item) {
+            if (typeof item === 'object' && item !== null) {
+                return {
+                    id: String(item.id || item.value || '').trim(),
+                    text: String(item.text || item.name || item.id || '').trim()
+                };
+            }
+
+            // If it's a flat string ID (e.g., "R152"), fallback safely by using it as both ID and text
+            // until the user triggers a remote server search query.
+            let cleanId = String(item).trim();
+            return {
+                id: cleanId,
+                text: cleanId
+            };
+        });
+
+        getSystemOneEmployeeDetails($(selector), preSelectedEmployees);
+    });
+}
+
+    const getSystemOneEmployeeDetailsTest  = (comboId, preSelectedEmployees = []) => {
+        // Reset element completely to avoid initialization memory leaks
+        if (comboId.hasClass("select2-hidden-accessible")) {
+            comboId.select2('destroy').empty();
+        } else {
+            comboId.empty();
+        }
+
+        // Initialize Select2 with dynamic AJAX configuration
+        comboId.select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Search Employee Name or ID...',
+            minimumInputLength: 2,
+            multiple: true, // Crucial for handling array selections
+            ajax: {
+                url: "get_system_one_employee_details",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results, // Backend must format this to match: [{id: "R152", text: "Abdul"}]
+                        pagination: {
+                            more: data.pagination.more
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+
+        // If we have pre-selected values, append their DOM options, select them, and trigger change
+        if (preSelectedEmployees && preSelectedEmployees.length > 0) {
+            const selectedIds = [];
+
+            preSelectedEmployees.forEach(function(employee) {
+                if (employee.id && employee.text) {
+                    const empId = String(employee.id).trim();
+                    selectedIds.push(empId);
+
+                    // Create the option element if it doesn't exist in the HTML structure yet
+                    if (comboId.find("option[value='" + empId + "']").length === 0) {
+                        const newOption = new Option(employee.text, empId, true, true);
+                        comboId.append(newOption);
+                    }
+                }
+            });
+
+            // Set the selected array and trigger change so Select2 renders the tag pills immediately!
+            comboId.val(selectedIds).trigger('change');
+        } else {
+            comboId.val(null).trigger('change');
+        }
+    }
+
+    const fnGetSelect2ValueMultiple = (params) => {
+        if (params.comboId.hasClass("select2-hidden-accessible")) {
+            params.comboId.select2('destroy').empty();
+        } else {
+            params.comboId.empty();
+        }
+
+        const mappedSelect2Data = $.map(params.dataValue || [], function(obj) {
+            let displayId = obj.id !== undefined ? String(obj.id) : '';
+
+            let displayText = '';
+            if (typeof obj === 'object') {
+                // Priority list of known column names
+                displayText = obj.dropdown_masters_details || obj.dropdown_master_details || obj.text || obj.value;
+
+                if (!displayText) {
+                    for (let key in obj) {
+                        if (key !== 'id' && typeof obj[key] === 'string' && obj[key].trim().length > 0) {
+                            displayText = obj[key];
+                            break;
+                        }
+                    }
+                }
+            } else if (typeof obj === 'string') {
+                return { id: obj, text: obj };
+            }
+
+            return {
+                id: displayId,
+                text: displayText || 'Missing Label'
+            };
+        });
+
+
+        // 4. Initialize Select2
+        params.comboId.select2({
+            data: mappedSelect2Data,
+            theme: 'bootstrap-5',
+            multiple: true,
+            placeholder: 'Select Reason...',
+            allowClear: true
+        });
+
+        // 5. Force the selected pills into view
+        if (params.selectedValues && Array.isArray(params.selectedValues)) {
+            const cleanStringIds = params.selectedValues.map(id => String(id).trim());
+            params.comboId.val(cleanStringIds).trigger('change');
+        } else {
+            params.comboId.val(null).trigger('change');
+        }
+    }
+    const fnGetSelect2Value = (params) =>  {
+        params.comboId.select2({
+            data : params.dataValue,
+            theme: 'bootstrap-5',
+        });
+        params.comboId.on('change', function() {
+            let selectedObjects = $(this).select2('data');
+
+            let extractedData = selectedObjects.map(function(item) {
+                return {
+                    id: item.id,
+                    text: item.text
+                };
+            });
+
+        });
+        var arrValue = [];
+        $.each(params.dataValue, function(key, value){
+            arrValue.push(value.id); // Push the ID to pre-select it
+        });
+    }
+
+    /* =========================================================
+    Operator Employee Modal — Add Multiple Employees to Table
+    ========================================================= */
+
+    // In-memory array that holds employees staged in the modal
+
+    /**
+     * Initialise the modal:
+     *  - (re-)attach select2 to the employee combo
+     *  - clear the staging table & array
+    */
+    const initOperEmpModal = () => {
+        getSystemOneEmployeeDetails($('#text_oper_emp_number'));
+        operEmpArray = [];
+        $('#tbl_oper_add_emp tbody').empty();
+        $('#text_oper_emp_number').val(null).trigger('change');
+        $('#text_oper_station_from').val(null).trigger('change');
+        $('#text_oper_station_to').val(null).trigger('change');
+    }
+    const initDivDeptSecCombos = (comboSelectors) => {
+        comboSelectors.forEach(function(selector) {
+                getDivDeptSec({ comboId: $(selector) });
+        });
+    }
+
+    /**
+     * Add the currently selected employee + stations as one row
+     * in the staging table.
+     */
+    const addOperEmpToTable = () => { //nmodify
+        const $empSelect    = $('#text_oper_emp_number');
+        const $stationFrom  = $('#text_oper_station_from');
+        const $stationTo    = $('#text_oper_station_to');
+        const $optRemarks    = $('#text_oper_remarks');
+
+        const empId   = $empSelect.val();
+        const empName = $empSelect.find('option:selected').text().trim();
+        const stFrom  = $stationFrom.val();
+        const stFromText = $stationFrom.find('option:selected').text().trim();
+        const stTo    = $stationTo.val();
+        const stToText = $stationTo.find('option:selected').text().trim();
+        // const optRemarks = $optRemarks.val();
+        const optRemarks = $optRemarks.find('option:selected').text().trim();
+        // --- validation ---
+        if (empId.length > 1) {
+            Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please Add 1 Employee Per Station.' });
+            return;
+        }
+        if (stFrom.length > 1) {
+            Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please Add 1 Station From Only.' });
+            return;
+        }
+
+        if (empId.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select an Employee.' });
+            return;
+        }
+        if (stFrom.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select Station (From).' });
+            return;
+        }
+        if (stTo.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select Station (To).' });
+            return;
+        }
+
+        const normalize = (val) => {
+            if (val && typeof val === 'object') {
+                // Most common cases: String wrapper object, or {value: ...} style object
+                if ('value' in val) return String(val.value).trim();
+                return String(val).trim(); // falls back to toString(), e.g. new String("R131") -> "R131"
+            }
+            return String(val ?? '').trim();
+        };
+
+        const targetId = normalize(empId);
+        const alreadyStaged = operEmpArray.some(e => normalize(e.empId) === targetId);
+
+        if (alreadyStaged) {
+            Swal.fire({ icon: 'info', title: 'Duplicate', text: 'This employee is already in the list.' });
+            return;
+        }
+
+        // Push to in-memory array
+        const entry = { empId, empName, stFrom, stFromText, stTo, stToText, optRemarks };
+        operEmpArray.push(entry);
+
+        // Append row to staging table
+        const idx = operEmpArray.length - 1;
+        const row = `<tr data-index="${idx}">
+            <td>
+                <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpRow"
+                        data-index="${idx}">
+                    <i class="fa-solid fa fa-trash"></i>
+                </button>
+            </td>
+            <td>${empId}</td>
+            <td>${empName}</td>
+            <td>${stFromText}</td>
+            <td>${stToText}</td>
+            <td>${optRemarks}</td>
+        </tr>`;
+
+        $('#tbl_oper_add_emp tbody').append(row);
+
+        // Reset combos for the next entry
+        $empSelect.val(null).trigger('change');
+    }
+
+    /**
+     * Move all staged employees into the main certification table
+     * (tbl_certified_list_operator) and close the modal.
+     */
+    const addSelectedOperEmpToMain = () => { //nmodify
+
+        if (operEmpArray.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'No Employees', text: 'Please add at least one employee first.' });
+            return;
+        }
+
+        operEmpArray.forEach(function(entry) {
+            // Prevent the same employee appearing twice in the main table
+            let alreadyInMain = false;
+            const normalize = (val) => {
+                if (val && typeof val === 'object') {
+                    // Most common cases: String wrapper object, or {value: ...} style object
+                    if ('value' in val) return String(val.value).trim();
+                    return String(val).trim(); // falls back to toString(), e.g. new String("R131") -> "R131"
+                }
+                return String(val ?? '').trim();
+            };
+
+            const targetId = normalize(entry.empId);
+            $('#tbl_certified_list_operator tbody tr').each(function() {
+                if ($(this).data('empid') === targetId) {
+                    alreadyInMain = true;
+                }
+            });
+            if (alreadyInMain) return;
+
+            const row = `<tr data-empid="${entry.empId}">
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpMain">
+                        <i class="fa-solid fa fa-trash"></i>
+                    </button>
+                </td>
+                <td>${entry.empId}</td>
+                <td>${entry.empName}</td>
+                <td data-value="${entry.stFrom}">${entry.stFromText}</td>
+                <td data-value="${entry.stTo}">${entry.stToText}</td>
+                <td>${entry.optRemarks}</td>
+            </tr>`;
+
+            $('#tbl_certified_list_operator tbody').append(row);
+        });
+
+        // Close modal and clean up
+        $('#select_Employee_operator').modal('hide');
+        operEmpArray = [];
+        $('#tbl_oper_add_emp tbody').empty();
+    }
+
+    /**
+     * Collect the main certification table rows into a plain array
+     * (useful when building the payload for form submission).
+     */
+    const getOperEmpTableData = () => {
+        const employees = [];
+        $('#tbl_certified_list_operator tbody tr').each(function() {
+            employees.push({
+                empId    : $(this).find('td:eq(1)').text().trim(),
+                empName  : $(this).find('td:eq(2)').text().trim(),
+                stFrom   : $(this).find('td:eq(3)').data('value'),
+                stTo     : $(this).find('td:eq(4)').data('value'),
+                optRemarks     : $(this).find('td:eq(5)').text().trim(),
+            });
+        });
+        return employees;
+    }
+
+    /**
+     * Best Practice: Populates the main table and synchronizes state during an Edit AJAX request.
+     * @param {Array} qcSlipEmployees - The response payload array containing employee details
+     */
+    const populateEditOperEmpTable = (qcSlipEmployees,approvalStatus) => { //nmodify
+        // 1. Clear the main table to prevent old leftovers
+        const $mainTableBody = $('#tbl_certified_list_operator tbody');
+        console.log($mainTableBody);
+
+        $mainTableBody.empty();
+        // 2. Loop through your incoming collection using jQuery $.each
+        $.each(qcSlipEmployees, function(index, emp) {
+            // Match your application's data-attribute structure
+            const empId = emp.employee_no;
+            const empName = emp.system_one_hris_subcon?.empname ?? ''; // Use fallback if name is in relation
+            const stFrom = emp.get_station_from?.dropdown_masters_details ??'';
+            const stTo = emp.get_station_to?.dropdown_masters_details ?? '';
+            const remarks = emp.remarks_dropdown_master_detail?.dropdown_masters_details || emp.remarks || '';
+            let remove =``;
+            if(approvalStatus === 'APRODTO'){
+                remove += ` <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpMain">
+                            <i class="fa-solid fa fa-trash"></i>
+                        </button>`;
+            }
+
+            // 3. Build your standard row HTML precisely matching your creation architecture
+            // CRITICAL: We append data attributes so your "remove" and "get data" functions work perfectly
+            const row = `
+                <tr data-empid="${empId}">
+                    <td>
+                       ${remove}
+                    </td>
+                    <td>${empId}</td>
+                    <td>${empName}</td>
+                    <td data-value="${stFrom}">${stFrom}</td>
+                    <td data-value="${stTo}">${stTo}</td>
+                    <td>${remarks}</td>
+                </tr>
+            `;
+
+            $mainTableBody.append(row);
+        });
+    };
+
+    const getEmployeeDetailsByEmpNoSelect2 = (params) => {
+        let response = params.response;
+        // Safe access: optional chaining prevents crash if approversCollection is missing from response
+        const approversCollection = response?.approversCollection ?? null;
+        const rawOperApprovedConfirmedBy = response?.rawOperApprovedConfirmedBy ?? null;
+
+
+        // Guard: exit early if the entire approvers collection is absent
+        if (!approversCollection || typeof approversCollection !== 'object') {
+            return;
+        }
+
+        const aProd = approversCollection?.APRODTO?.[0] ?? null;
+        const eQcvp = approversCollection?.EQCVP?.[0]  ?? null;
+        const dPpdOnly = approversCollection?.DPPDONLY?.[0]  ?? null;
+
+
+        const operApprovedConfirmedBy = rawOperApprovedConfirmedBy   ?? [];
+        const aProdToFirst            = aProd?.first_approver_exploded   ?? [];
+        const aProdToFirstMentoredBy  = aProd?.first_approver2_exploded  ?? [];
+        const aProdToSecond           = aProd?.second_approver_exploded  ?? [];
+        const aProdToSecondMentoredBy = aProd?.second_approver2_exploded ?? [];
+
+        const bEnggTqFirst  = approversCollection?.BENGGTQ?.[0]?.first_approver_exploded  ?? [];
+        const bEnggTqSecond = approversCollection?.BENGGTQ?.[0]?.second_approver_exploded ?? [];
+
+        const cQcFirst  = approversCollection?.CQCC?.[0]?.first_approver_exploded  ?? [];
+        const cQcSecond = approversCollection?.CQCC?.[0]?.second_approver_exploded ?? [];
+
+        const eQcvpToFirst   = eQcvp?.first_approver_exploded   ?? [];
+        const eQcvpToFirst2  = eQcvp?.first_approver2_exploded  ?? [];
+        const eQcvpToSecond  = eQcvp?.second_approver_exploded  ?? [];
+        const eQcvpToSecond2 = eQcvp?.second_approver2_exploded ?? [];
+
+        const dPpdOnlyToFirst   = dPpdOnly?.first_approver_exploded   ?? [];
+        const dPpdOnlyToFirst2  = dPpdOnly?.first_approver2_exploded  ?? [];
+        const dPpdOnlyToFirst3  = dPpdOnly?.first_approver3_exploded  ?? [];
+        const dPpdOnlyToSecond  = dPpdOnly?.second_approver_exploded  ?? [];
+        const dPpdOnlyToSecond2 = dPpdOnly?.second_approver2_exploded ?? [];
+        const dPpdOnlyToSecond3 = dPpdOnly?.second_approver3_exploded ?? [];
+
+        const eEngvpToFirst   = approversCollection?.EENGVP?.[0]?.first_approver_exploded   ?? [];
+        const eEngvpToSecond  = approversCollection?.EENGVP?.[0]?.second_approver_exploded  ?? [];
+
+        const fQcvvoFirst  = approversCollection?.FQCVVO?.[0]?.first_approver_exploded  ?? [];
+        const fQcvvoSecond = approversCollection?.FQCVVO?.[0]?.second_approver_exploded ?? [];
+
+        const qCappApprover = approversCollection?.QCAPP?.[0]?.oper_approved_confirmed_by ?? [];
+
+        // 1. Map them to a standard format Select2 expects: {id, text}
+        const mappedOperApprovedConfirmedBy = operApprovedConfirmedBy.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedaProdToFirst = aProdToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedaProdToFirstMentoredBy = aProdToFirstMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedaProdToSecond = aProdToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedaProdToSecondMentoredBy = aProdToSecondMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedbEnggTqFirst= bEnggTqFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedbEnggTqSecond = bEnggTqSecond.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedcQcFirst = cQcFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedcQcSecond = cQcSecond.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappeddPpdOnlyToFirst = dPpdOnlyToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappeddPpdOnlyToFirst2 = dPpdOnlyToFirst2.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappeddPpdOnlyToSecond = dPpdOnlyToFirst3.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappeddPpdOnlyToSecond2 = dPpdOnlyToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappeddPpdOnlyToSecond3 = dPpdOnlyToSecond2.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappeddPpdOnlyToSecond4 = dPpdOnlyToSecond3.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedeQcvpToFirst = eQcvpToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedeQcvpToFirst2 = eQcvpToFirst2.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedeQcvpToSecond = eQcvpToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedeQcvpToSecond2 = eQcvpToSecond2.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedeEngvpToFirst = eEngvpToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedeEngvpToSecond = eEngvpToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+
+
+        const mappedfQcvvoFirst = fQcvvoFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedfQcvvoSecond = fQcvvoSecond.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedqCappApprover = qCappApprover.map(emp => ({ id: emp.id, text: emp.name }));
+
+        // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        //A
+        editSelectionsMap['#text_first_trainedby_oper'] = mappedaProdToFirst;
+        editSelectionsMap['#text_first_mentoredby_oper'] = mappedaProdToFirstMentoredBy;
+        editSelectionsMap['#text_second_trainedby_oper'] = mappedaProdToSecond;
+        editSelectionsMap['#text_second_mentoredby_oper'] = mappedaProdToSecondMentoredBy;
+
+        editSelectionsMap['#text_1st_qualifiedby_es_oper'] = mappedbEnggTqFirst;
+        editSelectionsMap['#text_2nd_qualifiedby_es_oper'] = mappedbEnggTqSecond;
+
+        editSelectionsMap['#text_1st_certifiedby_qcs_oper'] = mappedcQcFirst;
+        editSelectionsMap['#text_2nd_certifiedby_qcs_oper'] = mappedcQcSecond;
+        editSelectionsMap['#text_1st_certified_prod_peqcs_oper'] = mappeddPpdOnlyToFirst;
+        editSelectionsMap['#text_1st_certified_eng_peqcs_oper'] = mappeddPpdOnlyToFirst2;
+        editSelectionsMap['#text_1st_certified_qc_peqcs_oper'] = mappeddPpdOnlyToSecond;
+        editSelectionsMap['#text_2nd_certified_prod_peqcs_oper'] = mappeddPpdOnlyToSecond2;
+        editSelectionsMap['#text_2nd_certified_eng_peqcs_oper'] = mappeddPpdOnlyToSecond3;
+        editSelectionsMap['#text_2nd_certified_qc_peqcs_oper'] = mappeddPpdOnlyToSecond4;
+
+        editSelectionsMap['#text_1st_validatedby_vpes_oper'] = mappedeEngvpToFirst;
+        editSelectionsMap['#text_2nd_validatedby_vpes_oper'] = mappedeEngvpToSecond;
+
+        editSelectionsMap['#text_1st_validatedby_vpqcs_oper'] = mappedeQcvpToFirst;
+        editSelectionsMap['#text_1st_validatedby_vpes_oper_2'] = mappedeQcvpToFirst2;
+        editSelectionsMap['#text_2nd_validatedby_vpqcs_oper'] = mappedeQcvpToSecond;
+        editSelectionsMap['#text_2nd_validatedby_vpes_oper_2'] = mappedeQcvpToSecond2;
+
+
+        editSelectionsMap['#text_validated1_qcvvo_oper'] = mappedfQcvvoFirst;
+        editSelectionsMap['#text_validated2_qcvvo_oper'] = mappedfQcvvoSecond;
+
+        editSelectionsMap['#text_oper_approved_confirmed_by'] = mappedOperApprovedConfirmedBy;
+
+
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                //A
+                '#text_first_trainedby_oper',
+                '#text_first_mentoredby_oper',
+                '#text_second_trainedby_oper',
+                '#text_second_mentoredby_oper',
+                //B
+                '#text_1st_qualifiedby_es_oper',
+                '#text_2nd_qualifiedby_es_oper',
+                //C
+                '#text_1st_certifiedby_qcs_oper',
+                '#text_2nd_certifiedby_qcs_oper',
+                //D
+                '#text_1st_certified_prod_peqcs_oper',
+                '#text_1st_certified_eng_peqcs_oper',
+                '#text_1st_certified_qc_peqcs_oper',
+                '#text_2nd_certified_prod_peqcs_oper',
+                '#text_2nd_certified_eng_peqcs_oper',
+                '#text_2nd_certified_qc_peqcs_oper',
+                //E ENGG
+                '#text_1st_validatedby_vpes_oper',
+                '#text_2nd_validatedby_vpes_oper',
+                //E QC
+                '#text_1st_validatedby_vpqcs_oper',
+                '#text_1st_validatedby_vpes_oper_2',
+                '#text_2nd_validatedby_vpqcs_oper',
+                '#text_2nd_validatedby_vpes_oper_2',
+                //F
+                '#text_validated1_qcvvo_oper',
+                '#text_validated2_qcvvo_oper',
+
+                '#text_oper_approved_confirmed_by',
+            ],
+            editSelectionsMap
+        );
+    }
+
+    const getEmployeeDetailsByEmpNoSelect2Technician = (params) => {
+        let response = params.response;
+        // Safe access: optional chaining prevents crash if approversCollection is missing from response
+        const approversCollection = response?.approversCollection ?? null;
+        // console.log('approversCollection', approversCollection);
+        // return;
+        // Guard: exit early if the entire approvers collection is absent
+        if (!approversCollection || typeof approversCollection !== 'object') {
+            return;
+        }
+
+        const atechtq = approversCollection?.ATECHENGTQ?.[0] ?? null;
+        const btechc = approversCollection?.BTECHENGC?.[0]  ?? null;
+        const ctechc = approversCollection?.CTECHQCC?.[0]  ?? null;
+        const techheadapp = approversCollection?.TECHHEADAPP?.[0]  ?? null;
+
+        // const operApprovedConfirmedBy = rawOperApprovedConfirmedBy   ?? [];
+        const atechtqToFirst            = atechtq?.first_approver_exploded   ?? [];
+        const atechtqToFirstMentoredBy  = atechtq?.first_approver2_exploded  ?? [];
+
+        const btechcToFirst = btechc?.first_approver_exploded  ?? [];
+        const btechcToSecond = btechc?.second_approver_exploded  ?? [];
+
+        const ctechcToFirst= ctechc?.first_approver_exploded  ?? [];
+        const ctechcToSecond= ctechc?.second_approver_exploded  ?? [];
+
+        const techheadappToFirst  = techheadapp?.alert_prod_sec_exploded  ?? [];
+
+
+        // 1. Map them to a standard format Select2 expects: {id, text}
+        // const mappedOperApprovedConfirmedBy = operApprovedConfirmedBy.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedAtechtqToFirst = atechtqToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedAtechtqToFirstMentoredBy = atechtqToFirstMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedBtechcToFirst= btechcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedBtechcToSecond= btechcToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedCtechcToFirst= ctechcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedCtechcToSecond= ctechcToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedTechheadappToFirst = techheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+
+        // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        //A
+        editSelectionsMap['#text_tech_trained_qualified_by'] = mappedAtechtqToFirst;
+        editSelectionsMap['#text_tech_mentored_by'] = mappedAtechtqToFirstMentoredBy;
+
+        editSelectionsMap['#text_tech_es_1st_certified_by'] = mappedBtechcToFirst;
+        editSelectionsMap['#text_tech_es_2nd_certified_by'] = mappedBtechcToSecond;
+
+        editSelectionsMap['#text_tech_qcs_1st_certified_by'] = mappedCtechcToFirst;
+        editSelectionsMap['#text_tech_qcs_2nd_certified_by'] = mappedCtechcToSecond;
+
+        editSelectionsMap['#text_tech_approved_by'] = mappedTechheadappToFirst;
+
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_tech_trained_qualified_by',
+                '#text_tech_mentored_by',
+                '#text_tech_es_1st_certified_by',
+                '#text_tech_es_2nd_certified_by',
+                '#text_tech_qcs_1st_certified_by',
+                '#text_tech_qcs_2nd_certified_by',
+                '#text_tech_approved_by',
+            ],
+            editSelectionsMap
+        );
+    }
+    const getEmployeeDetailsByEmpNoSelect2Operators = (params) => {
+        let response = params.response;
+        const doperosc = response?.approversCollection?.DOPEROSC?.[0] ?? null;
+        const eopervisual = response?.approversCollection?.EOPERVISUAL?.[0] ?? null;
+        const opheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
+
+        const doperoscToFirst = doperosc?.first_approver_exploded ?? [];
+        const doperoscToSecond = doperosc?.second_approver_exploded ?? [];
+        const eopervisualToFirst = eopervisual?.first_approver_exploded ?? [];
+        const eopervisualToSecond = eopervisual?.second_approver_exploded ?? [];
+        const opheadappToFirst = opheadapp?.alert_prod_sec_exploded ?? [];
+
+        const mappedEopervisualToFirst = eopervisualToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedEopervisualToSecond = eopervisualToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedDoperoscToFirst = doperoscToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedDoperoscToSecond = doperoscToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedOpheadappToFirst = opheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+
+         // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        editSelectionsMap['#text_pv1_certified_operator'] = mappedEopervisualToFirst;
+        editSelectionsMap['#text_pv2_certified_operator'] = mappedEopervisualToSecond;
+        editSelectionsMap['#text_sec1_certified_operator'] = mappedDoperoscToFirst;
+        editSelectionsMap['#text_sec2_certified_operator'] = mappedDoperoscToSecond;
+        editSelectionsMap['#text_visual_approved_confirmed_by'] = mappedOpheadappToFirst;
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_pv1_certified_operator',
+                '#text_pv2_certified_operator',
+                '#text_sec1_certified_operator',
+                '#text_sec2_certified_operator',
+                '#text_visual_approved_confirmed_by',
+            ],
+            editSelectionsMap
+        );
+
+    }
+    const getEmployeeDetailsByEmpNoSelect2Mh = (params) => {
+        let response = params.response;
+
+        //MH
+        const amhto = response?.approversCollection?.AMHTO?.[0] ?? null;
+        const mhheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
+
+        const amhtoToFirst = amhto?.first_approver_exploded ?? [];
+        const mhheadappToFirst = mhheadapp?.alert_prod_sec_exploded ?? [];
+
+        const mappedAmhtoToFirst = amhtoToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedMhheadappToFirst = mhheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+
+         // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        editSelectionsMap['#text_mh_first_trained_by'] = mappedAmhtoToFirst;
+        editSelectionsMap['#text_mh_approved_confirmed_by'] = mappedMhheadappToFirst;
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_mh_first_trained_by',
+                '#text_mh_approved_confirmed_by',
+            ],
+            editSelectionsMap
+        );
+
+    }
+    const getEmployeeDetailsByEmpNoSelect2Sep = (params) => {
+        let response = params.response;
+        const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
+        const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
+        const sepheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
+
+
+        const aseptoToFirst     = asepto?.first_approver_exploded   ?? [];
+        const btechengcToFirst  = btechengc?.first_approver_exploded  ?? [];
+        const sepheadappToFirst = sepheadapp?.alert_prod_sec_exploded  ?? [];
+
+        const mappedAseptoToFirst = aseptoToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedBtechengcToFirst = btechengcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedSepheadappToFirst = sepheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+
+
+         // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        //A
+        editSelectionsMap['#text_a_sep_trained_certified_by'] = mappedAseptoToFirst;
+        editSelectionsMap['#text_sep_trained_certified_by'] = mappedBtechengcToFirst;
+        editSelectionsMap['#text_sep_approved_inspector'] = mappedSepheadappToFirst;
+
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_a_sep_trained_certified_by',
+                '#text_sep_trained_certified_by',
+                '#text_sep_approved_inspector',
+            ],
+            editSelectionsMap
+        );
+    }
+    const getEmployeeDetailsByEmpNoSelect2Inspector = (params) => {
+        let response = params.response;
+        // Safe access: optional chaining prevents crash if approversCollection is missing from response
+        const approversCollection = response?.approversCollection ?? null;
+        // console.log('approversCollection', approversCollection);
+        // return;
+        // Guard: exit early if the entire approvers collection is absent
+        if (!approversCollection || typeof approversCollection !== 'object') {
+            return;
+        }
+
+        const alqctq = approversCollection?.ALQCTQ?.[0] ?? null;
+        const blqctc = approversCollection?.BLQCTC?.[0]  ?? null;
+        const lqcheadapp = approversCollection?.LQCHEADAPP?.[0]  ?? null;
+
+        const alqctqToFirst            = alqctq?.first_approver_exploded   ?? [];
+        const alqctqToFirstMentoredBy  = alqctq?.first_approver2_exploded  ?? [];
+        const blqctcToFirst = blqctc?.first_approver_exploded  ?? [];
+        const lqcheadappToFirst  = lqcheadapp?.alert_prod_sec_exploded  ?? [];
+
+
+        // 1. Map them to a standard format Select2 expects: {id, text}
+        // const mappedOperApprovedConfirmedBy = operApprovedConfirmedBy.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedAlqctqToFirst = alqctqToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedAlqctqToFirstMentoredBy = alqctqToFirstMentoredBy.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedbBlqctcFirst= blqctcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+
+        const mappedLqcAppFirst = lqcheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+
+        // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        //A
+        editSelectionsMap['#text_certified_inspector'] = mappedAlqctqToFirst;
+        editSelectionsMap['#text_mentored'] = mappedAlqctqToFirstMentoredBy;
+
+        editSelectionsMap['#text_sec2_certified_inspector'] = mappedbBlqctcFirst;
+
+        editSelectionsMap['#text_sec3_approved_inspector'] = mappedLqcAppFirst;
+
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                //A
+                '#text_certified_inspector',
+                '#text_mentored',
+
+                '#text_sec2_certified_inspector',
+
+                '#text_sec3_approved_inspector',
+            ],
+            editSelectionsMap
+        );
+    }
+
+    function checkCheckboxesFromColumn(rawString, prefix = 'chk',$comboId) {
+        if (!rawString || rawString.trim() === '') return;
+
+        // Explode by '|' and trim whitespace
+        const codes = rawString.split('|').map(item => item.trim());
+
+        codes.forEach(function(code) {
+            // Convert "PP-MDGEN-135" to lowercase and swap dashes with underscores -> "pp_mdgen_135"
+            let formattedId = code.toLowerCase().replace(/-/g, '_');
+
+            // Target your element (e.g., "#chk_pp_mdgen_135" or "#chk_other_pp_mdgen_135")
+            let checkboxSelector = `#${prefix}_${formattedId}`;
+
+            // Find and check the element
+
+            $comboId.find(checkboxSelector).prop('checked', true);
+        });
+    }
+    function select2Value(params) {
+        // value = "1 | 2" from DB
+        const selected = (params.value ?? '')
+            .split('|')
+            .map(v => v.trim())
+            .filter(v => v !== '');
+
+        params.combo.val(selected).trigger('change');
+    }
+    // ---- Get Data for Edit Operator
+    const getQcSlipsById  = (params) => {
+        let data = {
+            qcSlipsId :  params.qcSlipsId
+        }
+        call_ajax(data, 'get_qc_slips_by_id', function(response){
+            let data = response.qcSlip;
+            let qcSlipEmployeeData = response.qcSlipEmployee;
+            let qcReasonCertification = data.qc_reason_certification;
+
+            //OPER
+            let aLqcTrainingQualification = data.a_lqc_training_qualification ?? [];
+            let bLqcCertifications = data.b_lqc_certification ?? [];
+            let cLqcOqcValidations = data.c_lqc_oqc_validation ?? [];
+            //INSPECTOR
+            let aOperProdTrainingOrientation = data.a_oper_prod_training_orientation ?? [];
+            let bOpEnggSectionTrainingOrientation = data.b_op_engg_section_training_orientation ?? [];
+            let cQcCertification = data.c_qc_certification ?? [];
+            let opApprovers = data.op_approvers?? [];
+
+            form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
+            const approvalStatus = data.approval_status ?? '';
+
+            // $('#btnEmployeeOperator').prop('disabled', approvalStatus === 'APRODTO' ? false : true);
+            dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
+            dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
+            let currentStatus = data.approval_status ??'';
+            let positionCategory = data.position_category ??   '';
+
+            // $('#operDisapproved').addClass('d-none');
+            // $('#operApproved').addClass('d-none');
+            // $('#operClosed').removeClass('d-none');
+            // $('#operSave').removeClass('d-none');
+            $('#approval_status').val(currentStatus);
+
+            // ==== Toggle Collapse based on approval status
+            getApprovalStatusToggle({
+                approvalStatus: currentStatus,
+                positionCategory : positionCategory,
+                qcSlipsId : data.id,
+
+             });
+
+
+            // ==== QC Slip Details
+            $('#qc_slips_id').val(data.id);
+            $('#textconno_new_operator').val(data.control_no);
+            $('#text_section_operator').val(data.section).trigger('change');
+            $('#text_date_of_transfer').val(data?.date_of_transfer);
+            // $('#text_operator_product_area').val(data?.production_area);
+            $('#text_series_operator').val(data.series_name);
+            $('#text_select_position').val(positionCategory).trigger('change');
+            $('#select_section').val(data.section_category).trigger('change');
+
+            populateEditOperEmpTable(data.qc_slip_employees, approvalStatus);
+
+            // const arrProductLine = Array.isArray(data.product_line) ? data.product_line : [data.product_line];
+
+            const productLine = '#text_operator_product_line';
+            let editSelectionsMap2 = {};
+            editSelectionsMap2[productLine] = response.rawProductLineCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [productLine],
+                2,
+                editSelectionsMap2
+            );
+            const ProductArea = '#text_operator_product_area';
+            let editSelectionsMapProductionArea = {};
+            editSelectionsMapProductionArea[ProductArea] = response.rawProductionAreaCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [ProductArea],
+                32,
+                editSelectionsMapProductionArea
+            );
+            // ==== QC Reason Certification
+            const textCertificationOperator = '#text_certification_operator';
+            let editSelectionsMap3 = {};
+            editSelectionsMap3[textCertificationOperator] = response.rawReasonsStringCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [textCertificationOperator],
+                3,
+                editSelectionsMap3
+            );
+            // ==== Flexibility
+            const transferFlexibility = '#transfer_flexibility';
+            let editSelectionsMap6 = {};
+            editSelectionsMap6[transferFlexibility] = response.rawReasonsStringCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [transferFlexibility],
+                6,
+                editSelectionsMap6
+            );
+
+            if(positionCategory === 'VisualOperator' || positionCategory === 'PartsPrep' || positionCategory === 'MachineOperator'){
+
+                const doperosc = response?.approversCollection?.DOPEROSC?.[0] ?? null;
+
+                form.formSubmitOperators.find('#text_sel_result3_operator').val(doperosc?.is_eopervisual_required ?? '').trigger('change');
+
+                form.formSubmitOperators.find('#text_sel_result1_operator').val(doperosc?.first_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_sec1_date_operator').val(doperosc?.first_date ?? '');
+                form.formSubmitOperators.find('#text_sec1_time_operator').val(doperosc?.first_time ?? '');
+
+                form.formSubmitOperators.find('#text_sel_result2_operator').val(doperosc?.second_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_sec2_date_operator').val(doperosc?.second_date ?? '');
+                form.formSubmitOperators.find('#text_sec2_time_operator').val(doperosc?.second_time ?? '');
+
+                const eopervisual = response?.approversCollection?.EOPERVISUAL?.[0] ?? null;
+
+                form.formSubmitOperators.find('#text_pv_result1_operator').val(eopervisual?.first_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_pv1_date_operator').val(eopervisual?.first_date ?? '');
+                form.formSubmitOperators.find('#text_pv1_time_operator').val(eopervisual?.first_time ?? '');
+                form.formSubmitOperators.find('#text_reason_disqualification').val(eopervisual?.first_remarks ?? '');
+
+                form.formSubmitOperators.find('#text_pv_result2_operator').val(eopervisual?.second_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_pv2_date_operator').val(eopervisual?.second_date ?? '');
+                form.formSubmitOperators.find('#text_pv2_time_operator').val(eopervisual?.second_time ?? '');
+                getEmployeeDetailsByEmpNoSelect2Operators({
+                      response : response,
+                })
+            }
+            if(positionCategory === 'MH'){
+                const mhTrainingOrientation = data.a_mh_training_orientation?.mh_training_orientation;
+                syncCheckboxesWithDb('text_mh_training_orientation', mhTrainingOrientation,form.formSubmitMh);
+
+                const amhto = response?.approversCollection?.AMHTO?.[0] ?? null;
+                form.formSubmitMh.find('#text_mh_first_date').val(amhto?.first_date ?? '');
+
+                getEmployeeDetailsByEmpNoSelect2Mh({
+                    response : response,
+                });
+
+            }
+            // alert(positionCategory)
+            if(positionCategory === 'Supervisor'){
+                const sepTrainingOrientation = data.a_sep_training_orientation?.sep_training_orientation;
+
+                syncCheckboxesWithDb('text_sep_training_orientation', sepTrainingOrientation,form.formSubmitSep);
+                const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
+                form.formSubmitSep.find('#text_a_sep_date').val(asepto?.first_date ?? '');
+
+                const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
+                form.formSubmitSep.find('#text_sep_date').val(btechengc?.first_date ?? '');
+                form.formSubmitSep.find('#text_sep_theoretical_result').val(btechengc?.first_status ?? '').trigger('change');
+                form.formSubmitSep.find('#text_sep_handson_result').val(btechengc?.first_status_2 ?? '');
+
+
+                getEmployeeDetailsByEmpNoSelect2Sep({
+                    response : response,
+                });
+            }
+            if(positionCategory === 'Technician'){
+                 //TECHNICIAN
+                let aTechEngTrainingQualification = data.a_tech_eng_training_qualification ?? [];
+                syncCheckboxesWithDb('text_es_tech_training_orientation', aTechEngTrainingQualification?.es_tech_training_orientation,form.formSubmitTech); //es_tech_training_orientation
+                form.formSubmitTech.find('#text_es_tech_training_orientation_14').val(aTechEngTrainingQualification?.es_tech_training_orientation_14);
+                form.formSubmitTech.find('#text_es_tech_training_orientation_15').val(aTechEngTrainingQualification?.es_tech_training_orientation_15);
+                form.formSubmitTech.find('#text_es_tech_training_orientation_16').val(aTechEngTrainingQualification?.es_tech_training_orientation_16);
+                getEmployeeDetailsByEmpNoSelect2Technician({
+                    response : response,
+                });
+                const atechengtq = response?.approversCollection?.ATECHENGTQ?.[0] ?? null;
+                form.formSubmitTech.find('#text_tech_date').val(atechengtq?.first_date ?? '');
+                form.formSubmitTech.find('#text_tech_time').val(atechengtq?.first_time ?? '');
+
+                const btechengc = response?.approversCollection?.BTECHENGC?.[0] ?? null;
+                form.formSubmitTech.find('#text_tech_es_1st_take_result').val(btechengc?.first_status ?? '').trigger('change');
+                form.formSubmitTech.find('#text_tech_es_1st_date').val(btechengc?.first_date ?? '');
+                form.formSubmitTech.find('#text_tech_es_1st_time').val(btechengc?.first_time ?? '');
+                form.formSubmitTech.find('#text_tech_es_2nd_take_result').val(btechengc?.second_status ?? '').trigger('change');
+                form.formSubmitTech.find('#text_tech_es_2nd_date').val(btechengc?.second_date ?? '');
+                form.formSubmitTech.find('#text_tech_es_2nd_time').val(btechengc?.second_time ?? '');
+                const ctechqcc = response?.approversCollection?.CTECHQCC?.[0] ?? null;
+                form.formSubmitTech.find('#text_tech_qcs_1st_take_result').val(ctechqcc?.first_status ?? '').trigger('change');
+                form.formSubmitTech.find('#text_tech_qcs_1st_date').val(ctechqcc?.first_date ?? '');
+                form.formSubmitTech.find('#text_tech_qcs_1st_time').val(ctechqcc?.first_time ?? '');
+
+                form.formSubmitTech.find('#text_tech_qcs_2nd_take_result').val(ctechqcc?.second_status ?? '').trigger('change');
+                form.formSubmitTech.find('#text_tech_qcs_2nd_date').val(ctechqcc?.second_date ?? '');
+                form.formSubmitTech.find('#text_tech_qcs_2nd_time').val(ctechqcc?.second_time ?? '');
+                // dtInstance.ajax.url(`load_qc_lqc_training_items_by_qc_slip_id?qcSlipsId=${data.id}`).draw();
+            }
+            if(positionCategory === 'Inspector'){
+                const trainingOrientationInspector = aLqcTrainingQualification?.training_orientation_inspector;
+                form.formSubmitInspector.find('#text_training_orientation_ins_4').val(aLqcTrainingQualification?.training_orientation_ins_4);
+                form.formSubmitInspector.find('#text_training_orientation_ins_13').val(aLqcTrainingQualification?.training_orientation_ins_13);
+                form.formSubmitInspector.find('#text_training_orientation_ins_21').val(aLqcTrainingQualification?.training_orientation_ins_21);
+                form.formSubmitInspector.find('#text_training_orientation_ins_54').val(aLqcTrainingQualification?.training_orientationns_54);
+                // dtInstance.ajax.url(`load_qc_lqc_training_items_by_qc_slip_id?qcSlipsId=${data.id}`).draw();
+                syncCheckboxesWithDb('text_training_orientation_inspector', trainingOrientationInspector,form.formSubmitInspector);
+
+                let paramsGetEmpNo = {
+                    response : response,
+                };
+                getEmployeeDetailsByEmpNoSelect2Inspector(paramsGetEmpNo);
+                const approversCollection = response?.approversCollection ?? null;
+                const alqctq = approversCollection?.ALQCTQ?.[0] ?? null;
+
+                form.formSubmitInspector.find('#text_date_inspector').val(alqctq?.first_date ?? '');
+                form.formSubmitInspector.find('#text_time_inspector').val(alqctq?.first_time ?? '');
+
+                //B
+                const handsOnInspector = bLqcCertifications?.hands_on_inspector;
+                const blqctc = approversCollection?.BLQCTC?.[0]  ?? null;
+                form.formSubmitInspector.find('#result_input1_inspector').val(bLqcCertifications?.result_input1_inspector ?? '');
+
+                form.formSubmitInspector.find('#text_sel_result1_inspector').val(blqctc?.first_status ?? '').trigger('change');
+                form.formSubmitInspector.find('#text_sec2_result_inspector').val(blqctc?.first_status_2 ?? '').trigger('change');
+                form.formSubmitInspector.find('#text_sel_result2_inspector').val(blqctc?.second_status ?? '').trigger('change');
+                form.formSubmitInspector.find('#text_result_input1_inspector').val(blqctc?.first_remarks ?? '');
+                form.formSubmitInspector.find('#text_result_input2_inspector').val(blqctc?.second_remarks ?? '');
+                form.formSubmitInspector.find('#text_sec2_date_inspector').val(blqctc?.first_date ?? '');
+                form.formSubmitInspector.find('#text_sec2_time_inspector').val(blqctc?.first_time ?? '');
+                console.log('handsOnInspector',bLqcCertifications);
+                syncCheckboxesWithDb('text_hands_on_inspector', handsOnInspector,form.formSubmitInspector);
+
+
+                // const lqcheadapp = approversCollection?.LQCHEADAPP?.[0]  ?? null; //employee
+            }
+            if(positionCategory === 'Operator'){
+                // ==== Get All Approvers / Validated by/ Mentored by
+                let paramsGetEmpNo = {
+                    response : response,
+                };
+                getEmployeeDetailsByEmpNoSelect2(paramsGetEmpNo);
+                // ==== OPERATOR
+                // Safe access: optional chaining prevents "Cannot read properties of undefined" if API shape changes
+                const aProdData = response?.approversCollection?.APRODTO?.[0] ?? null;
+                const arraProdTrainingItems = Array.isArray(response.rawAOperProdTrainingOrientationCollection) ? response.rawAOperProdTrainingOrientationCollection : [response.rawAOperProdTrainingOrientationCollection];
+                const aProdTrainingItems = '#text_training_orientation_ps_oper';
+                let editSelectionsMap4 = {};
+                editSelectionsMap4[aProdTrainingItems] = arraProdTrainingItems;
+                initDropdownMasterDetailsByFkidCombos(
+                    [aProdTrainingItems],
+                    4,
+                    editSelectionsMap4
+                );
+                let defectParams =
+                select2Value({
+                    combo : form.formSubmitOper.find('#defect_escalation'),
+                    value : aOperProdTrainingOrientation?.defect_escalation,
+                });
+                select2Value({
+                    combo : form.formSubmitOper.find('#production_abnormality'),
+                    value : aOperProdTrainingOrientation?.production_abnormality,
+                });
+                // Guard: validate aProdData exists and has properties before reading from it
+                if (aProdData && typeof aProdData === 'object') {
+                    const approverFirstStatus  = aProdData?.first_status  ?? '';
+                    const approverSecondStatus  = aProdData?.second_status  ?? '';
+                    const approverFirstDate  = aProdData?.first_date  ?? '';
+                    const approverFirstTime  = aProdData?.first_time  ?? '';
+                    const approverSecondDate = aProdData?.second_date ?? '';
+                    const approverSecondTime = aProdData?.second_time ?? '';
+
+                    form.formSubmitOper.find('#text_first_a_prod_result').val(approverFirstStatus).trigger('change');
+                    form.formSubmitOper.find('#text_second_a_prod_result').val(approverSecondStatus).trigger('change');
+                    form.formSubmitOper.find('#text_first_date_oper').val(approverFirstDate);
+                    form.formSubmitOper.find('#text_first_time_oper').val(approverFirstTime);
+                    form.formSubmitOper.find('#text_second_date_oper').val(approverSecondDate);
+                    form.formSubmitOper.find('#text_second_time_oper').val(approverSecondTime);
+                }
+
+                // 1. Let's say this is your raw string from the database response
+                const orientationDocs = aOperProdTrainingOrientation?.orientation_docs;
+                const enggTqOrientationDocs = aOperProdTrainingOrientation?.engg_tq_orientation_docs;
+                // 2. Uncheck ALL checkboxes in the form first to have a clean state
+                form.formSubmitOper.find('input[type="checkbox"]').prop('checked', false);
+                // 3. Check ALL checkboxes in the form based on the orientation docs or
+                checkCheckboxesFromColumn(orientationDocs,'chk',form.formSubmitOper);
+                checkCheckboxesFromColumn(enggTqOrientationDocs,'chk',form.formSubmitOper);
+                checkCheckboxesFromColumn(enggTqOrientationDocs,'chk',form.formSubmitOper);
+
+                //=== B ENGG
+                const aEnggData = response?.approversCollection?.BENGGTQ?.[0] ?? null;
+                //  initDropdownMasterDetailsByFkidCombos([
+                //         '#transfer_flexibility',
+                //         '#text_training_orientation_es_oper',
+                // ],5);
+
+                const arraBEnggTrainingItems = Array.isArray( response.rawBEnggTrainingItemsCollection) ?  response.rawBEnggTrainingItemsCollection : [ response.rawBEnggTrainingItemsCollection];
+                console.log('rawBEnggTrainingItemsCollection',arraBEnggTrainingItems  );
+
+                const aBEnggTrainingItems = '#text_training_orientation_es_oper';
+                let editSelectionsMap5 = {};
+                editSelectionsMap5[aBEnggTrainingItems] =  response.rawBEnggTrainingItemsCollection;
+                initDropdownMasterDetailsByFkidCombos(
+                    [aBEnggTrainingItems],
+                    5,
+                    editSelectionsMap5
+                );
+                checkCheckboxesFromColumn(bOpEnggSectionTrainingOrientation?.engg_orientation_docs,'chk',form.formSubmitOper);
+
+                form.formSubmitOper.find('#text_engg_orientation_docs').val(bOpEnggSectionTrainingOrientation?.engg_orientation_docs);
+                form.formSubmitOper.find('#text_obs_first_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_first_result_es_oper).trigger('change');;
+                form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
+                form.formSubmitOper.find('#text_first_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.first_sample_es_oper);
+                form.formSubmitOper.find('#text_first_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ok_es_oper);
+                form.formSubmitOper.find('#text_first_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.first_ng_es_oper);
+                form.formSubmitOper.find('#text_oa_1st_result_es_oper').val(bOpEnggSectionTrainingOrientation?.oa_1st_result_es_oper);
+
+
+                form.formSubmitOper.find('#text_obs_second_result_es_oper').val(bOpEnggSectionTrainingOrientation?.obs_second_result_es_oper).trigger('change');;
+                form.formSubmitOper.find('#text_second_sample_es_oper').val(bOpEnggSectionTrainingOrientation?.second_sample_es_oper);
+                form.formSubmitOper.find('#text_second_ok_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ok_es_oper);
+                form.formSubmitOper.find('#text_second_ng_es_oper').val(bOpEnggSectionTrainingOrientation?.second_ng_es_oper);
+                if (aEnggData && typeof aEnggData === 'object') {
+                    form.formSubmitOper.find('#text_1st_disqualification_es_oper').val(aEnggData?.first_remarks ?? '');
+                    form.formSubmitOper.find('#text_2nd_disqualification_es_oper').val(aEnggData?.second_remarks ?? '');
+                    form.formSubmitOper.find('#text_qc_1st_date_es_oper').val(aEnggData?.first_date ?? '');
+                    form.formSubmitOper.find('#text_qc_1st_time_es_oper').val(aEnggData?.first_time ?? '');
+                    form.formSubmitOper.find('#text_qc_2nd_date_es_oper').val(aEnggData?.second_date ?? '');
+                    form.formSubmitOper.find('#text_qc_2nd_time_es_oper').val(aEnggData?.second_time ?? '');
+                }
+                // ==== C QC Certification
+                const cQcData = response?.approversCollection?.CQCC?.[0] ?? null;
+                form.formSubmitOper.find('#text_obs_first_result_qcs_oper').val(cQcCertification?.obs_first_result_qcs_oper ?? '').trigger('change');
+                form.formSubmitOper.find('#text_first_sample_qcs_oper').val(cQcCertification?.first_sample_qcs_oper ?? '').trigger('change');
+                form.formSubmitOper.find('#text_first_ok_qcs_oper').val(cQcCertification?.first_ok_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_first_ng_qcs_oper').val(cQcCertification?.first_ng_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_obs_second_result_qcs_oper').val(cQcCertification?.obs_second_result_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_second_ok_qcs_oper').val(cQcCertification?.second_ok_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_second_sample_qcs_oper').val(cQcCertification?.second_sample_qcs_oper ?? '');
+                form.formSubmitOper.find('#text_second_ng_qcs_oper').val(cQcCertification?.second_ng_qcs_oper ?? '');
+
+                // Execute for the first table (1st Oper)
+                syncCheckboxesWithDb('text_qcs_station_1st_oper', cQcCertification?.qcs_station_1st_oper);
+                // Execute for the second table (2nd Oper)
+                syncCheckboxesWithDb('text_qcs_station_2nd_oper', cQcCertification?.qcs_station_2nd_oper);
+                if (cQcData && typeof cQcData === 'object') {
+
+                    form.formSubmitOper.find('#text_oa_1st_result_qcs_oper').val(cQcData?.first_status ?? '').trigger('change');
+                    form.formSubmitOper.find('#text_oa_2nd_result_qcs_oper').val(cQcData?.second_status ?? '').trigger('change');
+                    form.formSubmitOper.find('#text_1st_disapproval_qcs_oper').val(cQcData?.first_remarks ?? '');
+                    form.formSubmitOper.find('#text_2nd_disapproval_qcs_oper').val(cQcData?.second_remarks ?? '');
+                    form.formSubmitOper.find('#text_1st_date_qcs_oper').val(cQcData?.first_date ?? '');
+                    form.formSubmitOper.find('#text_1st_time_qcs_oper').val(cQcData?.first_time ?? '');
+                    form.formSubmitOper.find('#text_2nd_date_qcs_oper').val(cQcData?.second_date ?? '');
+                    form.formSubmitOper.find('#text_2nd_time_qcs_oper').val(cQcData?.second_time ?? '');
+                }
+
+                // D PPD ONLY Process
+                const dPpdOnly = response?.approversCollection?.DPPDONLY?.[0] ?? null;
+                const dPpdCertificationCompletion = data.d_ppd_certification_completion;
+                if (dPpdOnly && typeof dPpdOnly === 'object') {
+                    form.formSubmitOper.find('#text_lot_1st_sample_peqcs_oper').val(dPpdCertificationCompletion?.lot_1st_sample_peqcs_oper ?? '');
+
+                    form.formSubmitOper.find('#text_1st_injected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_injected_ng_peqcs_oper'] ?? '');
+                    form.formSubmitOper.find('#1st_detected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_detected_ng_peqcs_oper'] ?? '');
+                    form.formSubmitOper.find('#text_1st_detected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['1st_detected_ng_peqcs_oper'] ?? '');form.formSubmitOper.find('#text_2nd_sample_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_sample_peqcs_oper'] ?? '');
+                    form.formSubmitOper.find('#2nd_sample_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_sample_peqcs_oper'] ?? '');
+                    form.formSubmitOper.find('#text_2nd_injected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_injected_ng_peqcs_oper'] ?? '');
+                    form.formSubmitOper.find('#text_2nd_detected_ng_peqcs_oper').val(dPpdCertificationCompletion?.['2nd_detected_ng_peqcs_oper'] ?? '');
+                    form.formSubmitOper.find('#text_oa_1st_result_peqcs_oper').val(dPpdOnly?.first_status ?? '').trigger('change');
+                    form.formSubmitOper.find('#text_oa_2nd_result_peqcs_oper').val(dPpdOnly?.second_status ?? '').trigger('change');
+                    form.formSubmitOper.find('#text_oa_1st_result_peqcs_oper').val(dPpdOnly?.first_remarks ?? '');
+                    form.formSubmitOper.find('#text_oa_2nd_result_peqcs_oper').val(dPpdOnly?.second_remarks ?? '');
+                    form.formSubmitOper.find('#text_1st_date_peqcs_oper').val(dPpdOnly?.first_date ?? '');
+                    form.formSubmitOper.find('#text_1st_time_peqcs_oper').val(dPpdOnly?.first_time ?? '');
+                    form.formSubmitOper.find('#text_2nd_date_peqcs_oper').val(dPpdOnly?.second_date ?? '');
+                    form.formSubmitOper.find('#text_2nd_time_peqcs_oper').val(dPpdOnly?.second_time ?? '');
+                }
+                // E ENGG Validation Process
+                const eQcValidationProcess = data.e_qc_validation_process;
+                const eEngvpData = response?.approversCollection?.EENGVP?.[0] ?? null;
+                form.formSubmitOper.find('#text_application_vpes_oper').val(eQcValidationProcess?.engg_application_vpes_oper ?? '').trigger('change');
+                let vpesOper = eQcValidationProcess?.engg_vpes_oper ?? '';
+                if(vpesOper != ""){
+                    form.formSubmitOper.find('#text_vpes_oper_1').prop('checked', true);
+                }
+                form.formSubmitOper.find('#text_vpes_oper').val(eQcValidationProcess?.engg_vpes_oper ?? '').trigger('change');
+                form.formSubmitOper.find('#text_first_result_vpes_oper').val(eEngvpData?.first_status ?? '').trigger('change');
+                form.formSubmitOper.find('#text_second_result_vpes_oper').val(eEngvpData?.engg_vpes_oper ?? '').trigger('change');
+                form.formSubmitOper.find('#text_1st_date_vpes_oper').val(eEngvpData?.first_date ?? '');
+                form.formSubmitOper.find('#text_2nd_date_vpes_oper').val(eEngvpData?.second_date ?? '');
+                form.formSubmitOper.find('#text_remarks_vpes_oper').val(eEngvpData?.first_remarks ?? '');
+
+                //E Qc Validation Process
+                const eQcvpData = response?.approversCollection?.EQCVP?.[0] ?? null;
+
+                form.formSubmitOper.find('#text_vpqcs_oper').val(eQcValidationProcess?.vpqcs_oper ?? '').trigger('change');
+                form.formSubmitOper.find('#text_application_vpqcs_oper').val(eQcValidationProcess?.application_vpqcs_oper ?? '').trigger('change');
+
+                form.formSubmitOper.find('#text_first_result_vpqcs_oper').val(eQcvpData?.first_status ?? '').trigger('change');
+                form.formSubmitOper.find('#text_first_result_vpes_oper_2').val(eQcvpData?.first_status_2 ?? '').trigger('change');
+                form.formSubmitOper.find('#text_second_result_vpqcs_oper').val(eQcvpData?.second_status ?? '').trigger('change');
+                form.formSubmitOper.find('#text_second_result_vpes_oper_2').val(eQcvpData?.second_status_2 ?? '').trigger('change');
+                form.formSubmitOper.find('#text_remarks_vpqcs_oper').val(eQcvpData?.first_remarks ?? '');
+                form.formSubmitOper.find('#text_remarks_vpes_oper_2').val(eQcvpData?.second_remarks ?? '');
+                form.formSubmitOper.find('#text_1st_date_vpqcs_oper').val(eQcvpData?.first_date ?? '');
+                form.formSubmitOper.find('#text_1st_date_vpes_oper_2').val(eQcvpData?.first_date_2 ?? '');
+                form.formSubmitOper.find('#text_2nd_date_vpqcs_oper').val(eQcvpData?.second_date ?? '');
+                form.formSubmitOper.find('#text_2nd_date_vpes_oper_2').val(eQcvpData?.second_date_2 ?? '');
+
+                //F QC Validation
+                const fQcVvo = response?.approversCollection?.FQCVVO?.[0] ?? {};
+                const fQcValidation = data.f_qc_validation ?? {};
+
+                form.formSubmitOper.find('#text_date1_qcvvo_oper').val(fQcVvo.first_date ?? '');
+                form.formSubmitOper.find('#text_date2_qcvvo_oper').val(fQcVvo.second_date ?? '');
+
+                let refdocnoInputQcvvoOper = fQcValidation?.refdocno_input_qcvvo_oper ?? '';
+                let refdocnoInputQcvvoOper2 = fQcValidation?.refdocno_input_qcvvo_oper_2 ?? '';
+                form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper').val(refdocnoInputQcvvoOper);
+                form.formSubmitOper.find('#text_refdocno_input_qcvvo_oper_2').val(refdocnoInputQcvvoOper2);
+                if(refdocnoInputQcvvoOper != ""){
+                    form.formSubmitOper.find('#text_refdoc_qcvvo_oper').prop('checked', true);
+                }
+                if(refdocnoInputQcvvoOper2 != ""){
+                    form.formSubmitOper.find('#text_refdoc_qcvvo_oper_2').prop('checked', true);
+                }
+
+            }
+
+            $('#modalCreateCQForm').modal();
+
+        })
+    }
+
+    /* ---- Event bindings ---- */
+
+    // Open modal → reinitialise
+    $(document).on('show.bs.modal', '#select_Employee_operator', () => {
+        initOperEmpModal();
+    });
+
+    // "Add to Table" button inside the modal
+    $(document).on('click', '#btnAddOPEREmp', () => {
+        addOperEmpToTable();
+    });
+
+    // Remove row from staging table
+    // $(document).on('click', '.btnRemoveOperEmpRow', () => { //nmodifys
+    //     idx = $(this).data('index');
+    //     operEmpArray.splice(idx, 1);
+    //     $(this).closest('tr').remove();
+    //     // Re-index remaining rows
+    //     $('#tbl_oper_add_emp tbody tr').each(function(i) {
+    //         $(this).attr('data-index', i);
+    //         $(this).find('.btnRemoveOperEmpRow').attr('data-index', i);
+    //     });
+    // });
+    $(document).on('click', '.btnRemoveOperEmpRow', function () {
+        const idx = $(this).data('index');
+        operEmpArray.splice(idx, 1);
+        $(this).closest('tr').remove();
+
+        // Re-index remaining rows
+        $('#tbl_oper_add_emp tbody tr').each(function (i) {
+            $(this).attr('data-index', i);
+            $(this).find('.btnRemoveOperEmpRow').attr('data-index', i);
+        });
+    });
+
+    // "Add" button in modal footer → move to main table
+    $(document).on('click', '#btnAddSelectedOPEREmp', ()=> {
+        addSelectedOperEmpToMain();
+    });
+
+    // Remove row from the main certification table
+    $(document).on('click', '.btnRemoveOperEmpMain', () => {
+        $(this).closest('tr').remove();
+        //  nmodifys
+    });
+// });

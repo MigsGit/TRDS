@@ -8,7 +8,6 @@ use App\Model\SystemOneHrisEmpInfo;
 use App\Model\SystemOneSubconEmpInfo;
 
 class HrMemoTraineeDetails extends Model
-
 {
 
     protected $table = 'hr_memo_trainee_details';

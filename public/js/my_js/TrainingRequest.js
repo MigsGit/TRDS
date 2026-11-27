@@ -1,6 +1,6 @@
 
 
-$(document).ready(function() {    
+$(document).ready(function() {
     // Apply Select2 to all select elements inside any modal dynamically
     $('.modal').on('shown.bs.modal', function () {
         $(this).find('.select2bs5').each(function() {
@@ -11,7 +11,7 @@ $(document).ready(function() {
         });
     });
 
-    
+
 
     const $trainingRequestTable = $('#tblTrainingRequest');
     const AddTrainingform = $('#formAddTrainingRequest');
@@ -44,7 +44,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: false,
         autoWidth: false, // Disable default autoWidth
-        responsive: true, // Enable responsive behavior
+        responsive: false, // Enable responsive behavior
         ajax: {
             url: 'get_employee_list_by_memo_doc',
             type: 'GET',
@@ -69,7 +69,7 @@ $(document).ready(function() {
         ]
     });
 
-    
+
 
 
     selectFilterId.change(function(){
@@ -155,9 +155,9 @@ $(document).ready(function() {
                             { data: 'date_hired', name: 'date_hired' },
                             { data: 'emp_no', name: 'emp_no' },
                             { data: 'name', name: 'name' },
-                            { 
-                                data: 'pos_dept_section', 
-                                name: 'pos_dept_section', 
+                            {
+                                data: 'pos_dept_section',
+                                name: 'pos_dept_section',
                                 render : function(data, type, row) {
                                     return `${row.position} / ${row.department} / ${row.section}`;
                                 }
@@ -171,17 +171,21 @@ $(document).ready(function() {
                     });
                 }
             }
-            
+
         });
 
     });
 
     $trainingRequestTable.on('click', '.btnConformTrainingRequest', function () {
         const requestId = $(this).data('id');
+        const ctrlNumber = $(this).data('ctrl');
+        const dept = $(this).data('dept');
+
+        // console.log(dept)
 
         Swal.fire({
             title: 'Are you sure?',
-            text: "You are about to conform this training request?",
+            html: "You are about to conform this training request " + '<b>' + ctrlNumber + '</b> for ' + '<b>' + dept + '</b>?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -229,10 +233,13 @@ $(document).ready(function() {
 
     $trainingRequestTable.on('click', '.btnReceiveTrainingRequest', function () {
         const requestId = $(this).data('id');
+        const ctrlNumber = $(this).data('ctrl');
+        const dept = $(this).data('dept');
 
         Swal.fire({
             title: 'Are you sure?',
-            text: "You are about to receive this training request?",
+            // text: "You are about to receive this training request?",
+            html: "You are about to receive this training request " + '<b>' + ctrlNumber + '</b> for ' + '<b>' + dept + '</b>?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -280,10 +287,13 @@ $(document).ready(function() {
 
     $trainingRequestTable.on('click', '.btnApproveTrainingRequest', function () {
         const requestId = $(this).data('id');
+        const ctrlNumber = $(this).data('ctrl');
+        const dept = $(this).data('dept');
 
         Swal.fire({
             title: 'Are you sure?',
-            text: "You are about to approve this training request?",
+            // text: "You are about to approve this training request?",
+            html: "You are about to approve this training request " + '<b>' + ctrlNumber + '</b> for ' + '<b>' + dept + '</b>?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -330,6 +340,7 @@ $(document).ready(function() {
     });
 
     AddTrainingform.on('submit', function(e) {
+        console.log('Form submission triggered');
         e.preventDefault();
 
         let table = $('#tblEmployeeListByMemoDoc').DataTable();
@@ -349,16 +360,19 @@ $(document).ready(function() {
             training_endorsement_date: row.training_endorsement_date
         }));
 
+        console.log('Sending AJAX request');
+
         $.ajax({
             url: 'add_training_request',
             method: 'POST',
             data: {
-                ...formData,   
+                ...formData,
                 employees: employees,
                 memo_doc_id: $('#selectMemoDocNo').val(),
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
+                console.log('works');
                 if(response.result == 1){
                     toastr.success(response.message);
                     trainingRequestTable.draw(); // Refresh the DataTable
@@ -373,7 +387,7 @@ $(document).ready(function() {
             }
         });
 
-        
+
     });
 
     $('#selectMemoDocNo').on('change', function(){
@@ -386,11 +400,22 @@ $(document).ready(function() {
 
     });
 
-    $('#tblEmployeeListByMemoDoc').on('click', '.btnRemoveEmployeeFromMemoDoc', function(){
-        let table = $('#tblEmployeeListByMemoDoc').DataTable();
-        let row = $(this).closest('tr');
+   $('#tblEmployeeListByMemoDoc').on('click', '.btnRemoveEmployeeFromMemoDoc', function (e) {
+        e.preventDefault();
 
-        table.row(row).remove().draw(false); // no reload
+        const table = $('#tblEmployeeListByMemoDoc').DataTable();
+
+        let tr = $(this).closest('tr');
+        if (tr.hasClass('child')) {
+            tr = tr.prev();
+        }
+
+        const modalBody = $(this).closest('.modal-body');
+        const scrollTop = modalBody.scrollTop();
+
+        table.row(tr).remove().draw(false);
+
+        modalBody.scrollTop(scrollTop);
     });
 
 
@@ -417,7 +442,7 @@ $(document).ready(function() {
     }
 
     function getHrisSection(selectedSectionId = null, isViewMode = false) {
-
+        // console.log('section_id',selectedSectionId)
         $.ajax({
             url: 'get_hris_sections',
             method: 'GET',
@@ -427,7 +452,16 @@ $(document).ready(function() {
                 $select.append('<option value="" disabled selected>Select Section</option>');
 
                 $.each(response, function(index, section) {
-                    $select.append('<option value="' + section.pkid + '">' + section.Section + ' - ' + section.department.Department + '</option>');
+
+                    let department = section.department && section.department.Department
+                        ? section.department.Department
+                        : '-';
+
+                    $select.append(
+                        '<option value="' + section.pkid + '">'
+                        + section.Section + ' - ' + department +
+                        '</option>'
+                    );
                 });
 
                 if (selectedSectionId) {
@@ -480,8 +514,12 @@ $(document).ready(function() {
         $.ajax({
             url: 'get_memo_docs',
             method: 'GET',
+            data: {
+                selectedMemoId: selectedMemoId // ✅ send it
+            },
             success: function(response) {
                 const $select = $('#selectMemoDocNo');
+                // console.log('clarkyyyboy', selectedMemoId);
                 $select.empty();
                 $select.append('<option value="" disabled>Select Memo Document</option>');
 

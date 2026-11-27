@@ -47,9 +47,10 @@
                                         style="width: 100%;">
                                         <thead>
                                             <tr>
-                                                <th>Action</th>
-                                                <th>Examination Name</th>
-                                                <th>Status</th>
+                                                <th style="width: 10%;">Action</th>
+                                                <th style="width: 20%;">Examination Name</th>
+                                                <th style="width: 60%;">Objective</th>
+                                                <th style="width: 10%;">Status</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -87,7 +88,12 @@
 
                                 <div class="form-group">
                                     <label>Examination Name</label>
-                                    <input type="text" class="form-control" name="exam_name" id="txtExaminationName">
+                                    <input type="text" class="form-control" name="exam_name" id="txtExaminationName" placeholder="Enter Exam Name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Objective</label>
+                                    <textarea class="form-control" name="objective" id="txtObjective" placeholder="Enter Objective"></textarea>
                                 </div>
                             </div>
                         </div>

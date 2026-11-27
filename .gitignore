@@ -3,11 +3,13 @@
 /public/storage
 /storage
 /vendor
+/vendor_1x
 .env
-.env.backup
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
 .composer-lock
+.vscode/
+/vendor_1x
