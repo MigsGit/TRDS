@@ -36,7 +36,7 @@
                             </div>
 
 
-                            {{-- <ul class="nav nav-tabs" id="employeeTab" role="tablist">
+                           <ul class="nav nav-tabs" id="employeeTab" role="tablist">
 
                                 <li class="nav-item">
                                     <a class="nav-link active" id="grrSeries-tab" data-toggle="tab" href="#grrSeries" role="tab" aria-controls="grrSeries" aria-selected="true">
@@ -90,7 +90,7 @@
                                 </div>
 
                                 <!-- GRR Questionnaire Settings -->
-                                {{-- <div class="tab-pane fade" id="grrQuestionnaire" role="tabpanel" aria-labelledby="grrQuestionnaire-tab">
+                         <div class="tab-pane fade" id="grrQuestionnaire" role="tabpanel" aria-labelledby="grrQuestionnaire-tab">
 
                                     <div class="mr-2" style="float: right;">
                                         <button type="button" class="btn btn-dark" id="btnShowAddGRRExamGroupingsModal">

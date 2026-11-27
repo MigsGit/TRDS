@@ -4,8 +4,6 @@ use App\Http\Controllers\ETRController;
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\ExaminationResultController;
 use App\Http\Controllers\ExamTitleController;
-use App\Http\Controllers\GrrQuestionnaireSettingsController;
-use App\Http\Controllers\GrrSettingsController;
 use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
 use App\Http\Controllers\InspCertMatrixController;
@@ -28,6 +26,11 @@ use App\Http\Controllers\TargetRatingSettingController;
 use App\Http\Controllers\RatingDescriptionSettingController;
 use App\Http\Controllers\PersonnelDisqualification\DisqualificationController;
 use App\Http\Controllers\PersonnelDisqualification\DisqualificationRecordController;
+
+use App\Http\Controllers\WAExaminationController;
+use App\Http\Controllers\WAExaminationResultController;
+use App\Http\Controllers\WAExamTitleController;
+use App\Http\Controllers\WAQuestionnairesController;
 
 
 use Illuminate\Http\Request;
@@ -71,7 +74,7 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/hr_memo', function () {
         return view('hr_memo_approval');
     })->name('hr_memo');
-    Route::get('/qualification_certification2', function () {
+    Route::get('/qualification_certification', function () {
         return view('qualification_certification');
     })->name('qualification_certification2');
 
@@ -131,6 +134,14 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/dropdown_maintenance', function () {
         return view('dropdown_maintenance');
     })->name('dropdown_maintenance');
+
+    Route::get('/wa_questionnaire', function () {
+        return view('wa_theoretical_exam/questionnaire');
+    })->name('wa_questionnaire');
+
+    Route::get('/wa_examination_result', function () {
+        return view('wa_theoretical_exam/examination_result');
+    })->name('wa_examination_result');
 
     // TRAINING ENDORSEMENT CONTROLLER
     Route::controller(TrainingEndorsementController::class)->group(function () {
@@ -468,4 +479,57 @@ Route::middleware('checkSession')->group(function(){
         Route::post('/change_status_dropdown_item', 'change_status_dropdown_item')->name('change_status_dropdown_item');
     });
 
+    Route::controller(WAExaminationController::class)->group(function () {
+        Route::get('exam', 'examDashboard')->name('examDashboard');
+        Route::get('exam/startExam/{id}/{revision}', 'startExam')->name('startExam');
+
+        Route::get('get_exam_training_request_control_no', 'getExamTrainingRequestControlNo')->name('get_exam_training_request_control_no');
+        Route::get('get_exam_training_request_employee_no', 'getExamTrainingRequestEmployeeNo')->name('get_exam_training_request_employee_no');
+        Route::get('count_exam_training_request_examination_take', 'countExamTrainingRequestExaminationTake')->name('count_exam_training_request_examination_take');
+
+        Route::post('exam_submission', 'examSubmission');
+        Route::get('get_exam_training_request_details_by_revision_id', 'getExamTrainingRequestDetailsByRevisionId');
+    });
+
+    Route::controller(WAExaminationResultController::class)->group(function () {
+        Route::get('wa_view_exam_result', 'viewExamResult');
+        Route::get('wa_view_exam_result_details', 'viewExamResultDetails');
+        Route::get('get_employee_exam_result_by_id', 'getEmployeeExamResultById');
+        Route::post('update_exam_score_for_employee', 'updateExamScoreForEmployee');
+
+        Route::get('/view_pdf_examination_result/{id}', 'viewPdfExaminationResult');
+        Route::post('update_examination_date', 'updateExaminationDate');
+        Route::post('update_examination_date', 'updateExaminationDate');
+        Route::post('change_exam_result_status', 'changeExamResultStatus');
+    });
+
+    Route::controller(WAExamTitleController::class)->group(function () {
+        Route::get('wa_view_exam_title', 'viewExamTitle');
+        Route::post('create_update_exam_title', 'createUpdateExamTitle');
+        Route::get('get_exam_title_by_id', 'getExamTitleById');
+        Route::post('change_exam_title_status', 'changeExamTitleStatus');
+    });
+    
+    Route::controller(WAQuestionnairesController::class)->group(function () {
+        // Questionnaires main routes
+        Route::get('wa_view_questionnaire', 'viewQuestionnaire');
+        Route::get('get_systemone_hris_department', 'getSystemoneHrisDepartment');
+        Route::get('get_systemone_hris_position', 'getSystemoneHrisPosition');
+        Route::get('get_systemone_hris_section', 'getSystemoneHrisSection');
+        Route::get('wa_get_exam_title', 'getExamTitle');
+        Route::post('create_update_questionnaire', 'createUpdateQuestionnaire');
+        Route::get('get_questionnaire_by_id', 'getQuestionnaireById');
+        Route::post('change_questionnaire_status', 'changeQuestionnaireStatus');
+        Route::get('/view_pdf_questionnaire/{id}', 'viewPdfQuestionnaire');
+        Route::get('copy_preview', 'copyPreview');
+        Route::post('copy_questionnaire', 'copyQuestionnaire');
+
+        // Questionnaires details routes
+        Route::get('wa_view_questionnaire_details', 'viewQuestionnaireDetails');
+        Route::post('create_update_questionnaire_details', 'createUpdateQuestionnaireDetails');
+        Route::get('get_questionnaire_details_by_id', 'getQuestionnaireDetailsById');
+        Route::post('change_questionnaire_details_status', 'changeQuestionnaireDetailsStatus');
+        Route::post('reorder','reorder')->name('reorder');
+    });
+    
 });
