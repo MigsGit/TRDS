@@ -84,7 +84,7 @@ class ExaminationResultController extends Controller
             if($exam_result_detail->exam_result_status == 0){
                 $result .= '<button type="button" class="btn btn-warning btn-sm text-center actionEmployeeExamResult" exam_result_details-id="' . $exam_result_detail->id . '" data-toggle="modal" data-target="#modalEmployeeExamResult" title="Exam Results"><i class="fa fa-list-ul"></i> Details</button>';
             }else{
-                $result .= '<a  href="view_pdf_examination_result/' . $exam_result_detail->id . '" target="_blank"
+                $result .= '<a  href="view_pdf_examination_result/' . $exam_result_detail->id . '"
                                 class="btn btn-dark btn-sm"
                                 target="_blank"
                                 title="View Exam Results">

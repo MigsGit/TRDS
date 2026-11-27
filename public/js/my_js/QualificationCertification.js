@@ -1,5 +1,6 @@
 // $(document).ready(function () {
-    /**
+
+/**
      * Synchronizes a group of checkboxes with a piped string value from the database.
      * @param {string} nameAttribute - The HTML name attribute of the checkbox group.
      * @param {string} rawDbValue - The piped string from your database (e.g., "Visual | Assembly").
@@ -37,6 +38,11 @@
             },
             columns: [
                 { data: 'item_name', name: 'item_name' },
+                {   data: 'select_item',
+                    visible: false,    // Hides column from display
+                    name: 'select_item',
+                    className: 'text-center'
+                },
                 { data: 'day_1',   name: 'day_1',   className: 'text-center' },
                 { data: 'day_2',   name: 'day_2',   className: 'text-center' },
                 { data: 'day_3',   name: 'day_3',   className: 'text-center' },
@@ -60,6 +66,428 @@
 
         return dtInstance;
     };
+
+    // ==========================================================================
+    // NEW standalone position-specific training tables (Production / Engineering
+    // / QC). These are entirely separate from the legacy
+    // initTrainingItemsTable()/.btnSaveMatrix flow above, which is left intact.
+    // ==========================================================================
+
+    /**
+     * Single source of truth (UX mirror of the backend's OPER_POSITION_DAY_STATUSES
+     * grid / parseApprovalStatus()) for which role/day is currently editable on a
+     * VisualOperator/PartsPrep/MachineOperator slip. 0 = checkbox phase (any day
+     * editable for the matching role), 1-5 = Day 1-5 (only that day editable).
+     */
+    const OPER_POSITION_DAY_STATUSES = {
+        Production: { 0: 'AOPERPRDN', 1: 'AOPERPRDN1', 2: 'AOPERPRDN2', 3: 'AOPERPRDN3', 4: 'AOPERPRDN4', 5: 'AOPERPRDN5' },
+        Engineer:   { 0: 'BOPERENGG', 1: 'BOPERENGG1', 2: 'BOPERENGG2', 3: 'BOPERENGG3', 4: 'BOPERENGG4', 5: 'BOPERENGG5' },
+        QC:         { 0: 'COPERQC',   1: 'COPERQC1',   2: 'COPERQC2',   3: 'COPERQC3',   4: 'COPERQC4',   5: 'COPERQC5' }
+    };
+
+    /**
+     * Resolves which role/day is currently editable from an approval_status string.
+     * Returns null when nothing is editable (e.g. 'PB', 'DOPEROSC', or any status
+     * outside the grid). UX ONLY — the backend guard in
+     * saveQcLqcTrainingItemsByPosition() is the source of truth.
+     * @param  {string} approvalStatus
+     * @return {{role:string,day:?number}|null}
+     */
+    const parseApprovalStatus = (approvalStatus) => {
+        for (var role in OPER_POSITION_DAY_STATUSES) {
+            var dayStatuses = OPER_POSITION_DAY_STATUSES[role];
+            for (var day in dayStatuses) {
+                if (dayStatuses[day] === approvalStatus) {
+                    return { role: role, day: (day === '0') ? null : parseInt(day, 10) };
+                }
+            }
+        }
+        return null;
+    };
+
+    /**
+     * Disables (not hides) the checkbox/sub-description/day-result inputs of a
+     * position-specific training table body that fall outside the role/day
+     * currently editable for the given approval_status. UX ONLY.
+     * @param  {jQuery} $tableBody
+     * @param  {string} position        'Production' | 'Engineer' | 'QC'
+     * @param  {string} approvalStatus
+     */
+    const applyTrainingItemDayLock = ($tableBody, position, approvalStatus) => {
+        var editableSlot = parseApprovalStatus(approvalStatus);
+        var roleEditable = editableSlot !== null && editableSlot.role === position;
+
+        $tableBody.find('tr').each(function () {
+            var $row = $(this);
+
+            $row.find('.chk-select-item, .input-sub-desc, .input-remark').prop('disabled', !roleEditable);
+
+            $row.find('.input-result').each(function () {
+                var $input = $(this);
+                var day = parseInt($input.data('day'), 10);
+                var isEditable = roleEditable && (editableSlot.day === null || editableSlot.day === day);
+                $input.prop('disabled', !isEditable);
+            });
+        });
+    };
+
+    /**
+     * Shared initializer used by the 3 position-specific wrapper functions below.
+     * @param  {string} tableSelector  CSS ID selector for the target <table>.
+     * @param  {string} position       'Production' | 'Engineering' | 'QC'
+     * @param  {string} qcSlipsId      Optional explicit qc_slips_id override.
+     * @param  {string} approvalStatus Current qc_slips.approval_status, used to
+     *                                 compute which role/day is editable (UX only).
+     * @return {DataTables.Api|null}
+     */
+    const initPositionTrainingTable = (tableSelector, position, qcSlipsId, ddMastersId, approvalStatus) => {
+        var $table = $(tableSelector);
+        if (!$table.length) { return null; }
+
+        if ($.fn.DataTable.isDataTable(tableSelector)) {
+            $(tableSelector).DataTable().destroy();
+        }
+
+        var dtInstance = $table.DataTable({
+            processing: true,
+            serverSide: true,
+            paging:    false,
+            searching: false,
+            info:      false,
+            ordering:  false,
+            ajax: {
+                url:  'load_qc_lqc_training_items_by_position',
+                type: 'GET',
+                data: function (params) {
+                    params.qc_slips_id = qcSlipsId || $('#qc_slips_id').val() || '';
+                    params.position    = position;
+                    params.dd_masters_id = ddMastersId;
+                }
+            },
+            columns: [
+                { data: 'item_name', name: 'item_name' },
+                { data: 'select_item',   name: 'select_item',   className: 'text-center' },
+                { data: 'day_1',   name: 'day_1',   className: 'text-center' },
+                { data: 'day_2',   name: 'day_2',   className: 'text-center' },
+                { data: 'day_3',   name: 'day_3',   className: 'text-center' },
+                { data: 'day_4',   name: 'day_4',   className: 'text-center' },
+                { data: 'day_5',   name: 'day_5',   className: 'text-center' },
+                { data: 'remarks', name: 'remarks' }
+            ]
+        });
+
+        dtInstance.on('xhr', function () {
+            var json = dtInstance.ajax.json();
+            if (json && json.headerDates) {
+                $.each(json.headerDates, function (dayNumber, dateValue) {
+                    $table.closest('.table-responsive')
+                        .find('.header-date-input[data-day="' + dayNumber + '"]')
+                        .val(dateValue || '');
+                });
+            }
+            if (json && json.trainerValidations) {
+                $.each(json.trainerValidations, function (dayNumber, trainerRow) {
+                    var $dayScope = $table.find('[data-day="' + dayNumber + '"]');
+                    $dayScope.filter('.trainer-emp-no').val(trainerRow.trainer_emp_no || '');
+                    $dayScope.filter('.trainer-name-display').text(trainerRow.trainer_name || '');
+                    $dayScope.filter('.input-day-date').val(trainerRow.validation_date || '');
+                    $dayScope.filter('.input-day-time').val(trainerRow.validation_time || '');
+                    $dayScope.filter('.select-day-result').val(trainerRow.overall_result || '');
+                });
+            }
+            if (json && json.chkTrainerValidation) {
+                var chkData = json.chkTrainerValidation;
+                $table.find('.chk-trainer-emp-no').val(chkData.chk_trainer_emp_no || '');
+                $table.find('.chk-trainer-name-display').text(chkData.chk_trainer_name || '');
+                $table.find('.input-chk-date').val(chkData.chk_validation_date || '');
+                $table.find('.input-chk-time').val(chkData.chk_validation_time || '');
+                $table.find('.select-chk-result').val(chkData.chk_overall_result || '');
+            }
+        });
+
+        dtInstance.on('draw', function () {
+            applyTrainingItemDayLock($table.find('tbody'), position, approvalStatus);
+        });
+
+        return dtInstance;
+    };
+
+    /**
+
+    /**
+     * Reads every row of a position-specific training table body into a plain
+     * array of row objects ready to be posted to save_qc_lqc_training_items_by_position.
+     * @param  {jQuery} $tableBody
+     * @return {Array<Object>}
+     */
+    const gatherPositionMatrixRows = ($tableBody) => {
+        var rows = [];
+        $tableBody.find('tr').each(function () {
+            var $row = $(this);
+            var $checkbox = $row.find('.chk-select-item');
+            if (!$checkbox.length) { return; }
+
+            var dayResults = {};
+            $row.find('.input-result').each(function () {
+                var $input = $(this);
+                dayResults['day_' + $input.data('day')] = $input.val();
+            });
+
+            rows.push({
+                training_item_id: $checkbox.data('item-id'),
+                is_checked:       $checkbox.is(':checked') ? 1 : null,
+                remark:           $row.find('.input-remark').val() || null,
+                sub_description:  $row.find('.input-sub-desc').val() || null,
+                day_results:      dayResults
+            });
+        });
+        return rows;
+    };
+
+    /**
+     * Reads the embedded Trainer Verification tfoot rows (Day 1-5) of a
+     * position-specific training table into a plain day-keyed object ready to
+     * be posted to save_qc_lqc_training_items_by_position as `trainer_days`.
+     * @param  {jQuery} $table
+     * @return {Object}
+     */
+    const gatherTrainerDays = ($table) => {
+        var trainerDays = {};
+        for (var day = 1; day <= 5; day++) {
+            trainerDays['day_' + day] = {
+                trainer_emp_no:  $table.find('.trainer-emp-no[data-day="' + day + '"]').val() || null,
+                trainer_name:    $table.find('.trainer-name-display[data-day="' + day + '"]').text().trim() || null,
+                validation_date: $table.find('.input-day-date[data-day="' + day + '"]').val() || null,
+                validation_time: $table.find('.input-day-time[data-day="' + day + '"]').val() || null,
+                overall_result:  $table.find('.select-day-result[data-day="' + day + '"]').val() || null
+            };
+        }
+        return trainerDays;
+    };
+
+    /**
+     * Reads the single Global/Checkbox Trainer Validation fields of a
+     * position-specific training table (not day-scoped — one set of values
+     * per table) ready to be posted as `chk_trainer_validation`.
+     * @param  {jQuery} $table
+     * @return {Object}
+     */
+    const gatherChkTrainerValidation = ($table) => {
+        return {
+            chk_trainer_emp_no:  $table.find('.chk-trainer-emp-no').val() || null,
+            chk_trainer_name:    $table.find('.chk-trainer-name-display').text().trim() || null,
+            chk_validation_date: $table.find('.input-chk-date').val() || null,
+            chk_validation_time: $table.find('.input-chk-time').val() || null,
+            chk_overall_result:  $table.find('.select-chk-result').val() || null
+        };
+    };
+
+    /**
+     * Generic save handler for any of the 3 new position-specific matrices.
+     * Collects both the item-row matrix AND the embedded Trainer Verification
+     * fields (Day 1-5) in a single combined payload.
+     * @param {string} tableSelector  CSS ID selector for the target <table>.
+     * @param {string} position       'Production' | 'Engineering' | 'QC'
+     * @param {string} qcSlipsId      Optional explicit qc_slips_id override.
+     */
+    const savePositionMatrix = (tableSelector, position, qcSlipsId) => {
+        var $table = $(tableSelector);
+        if (!$table.length) { return; }
+
+        var matrix               = gatherPositionMatrixRows($table.find('tbody'));
+        var trainerDays          = gatherTrainerDays($table);
+        var chkTrainerValidation = gatherChkTrainerValidation($table);
+        var dayDates    = {};
+        $table.closest('.table-responsive').find('.header-date-input').each(function () {
+            dayDates['day_' + $(this).data('day')] = $(this).val();
+        });
+
+        ajaxRequest({
+            url: 'save_qc_lqc_training_items_by_position',
+            method: 'POST',
+            data: {
+                qc_slips_id:            qcSlipsId || $('#qc_slips_id').val() || '',
+                position:               position,
+                matrix:                 matrix,
+                day_dates:              dayDates,
+                trainer_days:           trainerDays,
+                chk_trainer_validation: chkTrainerValidation
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            successCallback: function (response) {
+                toastr.success(response.message || 'Matrix saved successfully!');
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                toastr.error('Failed to save matrix.');
+            }
+        });
+    };
+
+    $(document).on('click', '.btnSavePositionMatrix', function () {
+        var $btn          = $(this);
+        var tableSelector = '#' + $btn.data('table-id');
+        var position      = $btn.data('position');
+
+        savePositionMatrix(tableSelector, position);
+    });
+
+    /**
+     * Trainer barcode scan handler (Enter/KeyCode 13) for the embedded Trainer
+     * Verification row of any of the 3 new position-specific tables.
+     *
+     * STRICT COMPLETION VALIDATION RULE BEFORE SCANNING:
+     *   1. Every .chk-select-item checkbox in the active table must be checked.
+     *   2. Every .input-result for the scanned day_number must be filled.
+     * If either check fails, scanning is blocked, the input is cleared, and a
+     * SweetAlert warning is shown.
+     */
+    /**
+     * Checkbox/Global Trainer barcode scan handler (Enter/KeyCode 13).
+     *
+     * GATING RULE 1: every .chk-select-item in the active table must be
+     * checked before this scan is allowed. If not, the scan is blocked, the
+     * input is cleared, and a SweetAlert warning is shown.
+     */
+    $(document).on('keypress', '.chk-trainer-scan-input', function (e) {
+        if (e.which !== 13 && e.keyCode !== 13) { return; }
+        e.preventDefault();
+
+        var $input = $(this);
+        var empNo  = $.trim($input.val());
+        var $table = $input.closest('table');
+        var $tbody = $table.find('tbody');
+
+        if (!empNo) { return; }
+
+        var allChecked  = true;
+        var $checkboxes = $tbody.find('.chk-select-item');
+        if (!$checkboxes.length) { allChecked = false; }
+        $checkboxes.each(function () {
+            if (!$(this).is(':checked')) {
+                allChecked = false;
+                return false;
+            }
+        });
+
+        //Visual Operator
+        // if (!allChecked && $('#text_select_position').val() != 'VisualOperator' ) {
+        //     $input.val('');
+        //     Swal.fire({
+        //         icon: 'warning',
+        //         title: 'Incomplete Checklist',
+        //         text: 'Cannot scan Checkbox Trainer ID: All row checkboxes must be ticked first.'
+        //     });
+        //     return;
+        // }
+
+        ajaxRequest({
+            url: 'get_employee_details_by_no',
+            method: 'GET',
+            data: { emp_no: empNo },
+            successCallback: function (response) {
+                if (!response || !response.emp_no) {
+                    Swal.fire({ icon: 'error', title: 'Not Found', text: 'No employee found for Trainer ID "' + empNo + '".' });
+                    return;
+                }
+
+                var now         = new Date();
+                var pad         = function (n) { return String(n).padStart(2, '0'); };
+                var currentDate = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+                var currentTime = pad(now.getHours()) + ':' + pad(now.getMinutes());
+
+                $table.find('.chk-trainer-emp-no').val(response.emp_no);
+                $table.find('.chk-trainer-name-display').text(response.name || '');
+
+                var $dateInput = $table.find('.input-chk-date');
+                var $timeInput = $table.find('.input-chk-time');
+                var $resultSelect = $table.find('.select-chk-result');
+                if (!$.trim($dateInput.val())) { $dateInput.val(currentDate); }
+                if (!$.trim($timeInput.val())) { $timeInput.val(currentTime); }
+                if (!$.trim($resultSelect.val())) { $resultSelect.val(''); }
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                Swal.fire({ icon: 'error', title: 'Scan Failed', text: 'Unable to look up Trainer ID.' });
+            }
+        });
+
+        $input.val('');
+    });
+    /**
+     * Day 1-5 Trainer barcode scan handler (Enter/KeyCode 13).
+     *
+     * GATING RULE 2: the Checkbox/Global Trainer must already be validated
+     * (i.e. .chk-trainer-emp-no is populated) AND every .input-result for the
+     * scanned day must be filled before this scan is allowed.
+     */
+    $(document).on('keypress', '.trainer-scan-input', function (e) {
+        if (e.which !== 13 && e.keyCode !== 13) { return; }
+        e.preventDefault();
+
+        var $input   = $(this);
+        var day      = $input.data('day');
+        var empNo    = $.trim($input.val());
+        var $table   = $input.closest('table');
+        var $tbody   = $table.find('tbody');
+
+        if (!empNo) { return; }
+
+        var chkTrainerValidated = !!$.trim($table.find('.chk-trainer-emp-no').val());
+
+        var allResultsFilled = true;
+        var $dayResultInputs = $tbody.find('.input-result[data-day="' + day + '"]');
+        if (!$dayResultInputs.length) { allResultsFilled = false; }
+        $dayResultInputs.each(function () {
+            if (!$.trim($(this).val())) {
+                allResultsFilled = false;
+                return false;
+            }
+        });
+
+        if (!chkTrainerValidated || !allResultsFilled) {
+            $input.val('');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Incomplete Matrix',
+                text: 'Cannot scan Trainer ID: Checkbox Trainer validation and Day ' + day + ' item results must be completed first.'
+            });
+            return;
+        }
+
+        ajaxRequest({
+            url: 'get_employee_details_by_no',
+            method: 'GET',
+            data: { emp_no: empNo },
+            successCallback: function (response) {
+                if (!response || !response.emp_no) {
+                    $input.val('');
+                    Swal.fire({ icon: 'error', title: 'Not Found', text: 'No employee found for Trainer ID "' + empNo + '".' });
+                    return;
+                }
+
+                var now         = new Date();
+                var pad         = function (n) { return String(n).padStart(2, '0'); };
+                var currentDate = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+                var currentTime = pad(now.getHours()) + ':' + pad(now.getMinutes());
+
+                var $dayScope = $table.find('[data-day="' + day + '"]');
+                $dayScope.filter('.trainer-emp-no').val(response.emp_no);
+                $dayScope.filter('.trainer-name-display').text(response.name || '');
+                $dayScope.filter('.input-day-date').val(currentDate);
+                $dayScope.filter('.input-day-time').val(currentTime);
+            },
+            errorCallback: function (xhr, status, error) {
+                console.log('Ajax Error:', xhr.responseText);
+                $input.val('');
+                Swal.fire({ icon: 'error', title: 'Scan Failed', text: 'Unable to look up Trainer ID.' });
+            }
+        });
+
+        $input.val('');
+    });
 
     function syncCheckboxesWithDb(nameAttribute, rawDbValue,$comboId=form.formSubmitOper) {
         // 1. Explode and clean your database values into an array of clean strings
@@ -90,6 +518,9 @@
             '#text_operator_product_line',
         ],2);
         initDropdownMasterDetailsByFkidCombos([
+            '#text_operator_product_area',
+        ],32);
+        initDropdownMasterDetailsByFkidCombos([
                 '#text_certification_operator',
         ],3);
         initDropdownMasterDetailsByFkidCombos([
@@ -101,27 +532,249 @@
         initDropdownMasterDetailsByFkidCombos([
                 '#transfer_flexibility',
         ],6);
+
         $('.inspectorSave').addClass('d-none');
         $('.operSave').addClass('d-none');
         $('.operApproved').addClass('d-none');
         $('.btnSaveInspector').addClass('d-none')
-        $('#div_Oper').addClass('d-none');
-        $('#divInspector').addClass('d-none');
-        // $('#productLine').addClass('d-none');
+        $('#productLine').addClass('d-none');
         $('#seriesDesignation').text('Series Name');
         $('#dateOfTransfer').addClass('d-none');
         $('.techSave').addClass('d-none');
         $('.btnSaveMatrix').addClass('d-none');
+        $('.saveSep').addClass('d-none');
+        $('#div_Oper').addClass('d-none');
+        $('#divInspector').addClass('d-none');
         $('#divSupervisor').addClass('d-none');
         $('#divTechnician').addClass('d-none');
+        $('#divMH').addClass('d-none');
+        $('#divAllOperators').addClass('d-none');
+        $('.btnSaveMatrix').addClass('d-none');
+        $('.btnAllOperator').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsVisual').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsPartsPrep').addClass('d-none');
+        $('#btnSaveMatrix_tblTrainingItemsMachine').addClass('d-none');
+        $('.machineOpetorItemNo3').addClass('d-none');
+        $('.eVisualGrr').addClass('d-none');
 
+        if(positionCategory === 'VisualOperator'){ //TODO LOAD PER MASTELIST ID
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],27);
+            $('.eVisualGrr').removeClass('d-none');
+            $('#divAllOperators').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Series Name');
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 18, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 19, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 20, approvalStatus);
+            $('.btnAllOperator').removeClass('d-none');
+
+
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCHEADAPP'){ //ENGGHEADAPP
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'PartsPrep'){ //TODO LOAD PER MASTELIST ID
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],28);
+            $('#divAllOperators').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Series Name');
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 21, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 22, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 23, approvalStatus);
+            $('.btnAllOperator').removeClass('d-none');
+
+
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'MachineOperator'){
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],1);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],29);
+            $('.eVisualGrr').removeClass('d-none');
+            $('.machineOpetorItemNo3').removeClass('d-none');
+            $('#divAllOperators').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Series Name');
+            initPositionTrainingTable('#tblTrainingItemsVisual', 'Production', params.qcSlipsId, 24, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsPartsPrep', 'Engineer', params.qcSlipsId, 25, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMachine', 'QC', params.qcSlipsId, 26, approvalStatus);
+            $('.btnAllOperator').removeClass('d-none');
+
+
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                $('.btnAllOperator').addClass('d-none');
+                $('.operApproved').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'MH'){
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],34);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],36);
+            initTrainingItemsTable('#tblTrainingItems_mh');
+            $('.btnMh').removeClass('d-none');
+            $('.btnSaveMatrix').removeClass('d-none');
+            $('#divMH').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            initPositionTrainingTable('#tblTrainingItemsMhOperator', 'Production', params.qcSlipsId, 37, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMhEngg', 'Engineer', params.qcSlipsId, 38, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsMhQC', 'QC', params.qcSlipsId, 39, approvalStatus);
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'LQCSUPVAPP'){
+                // $('.btnSaveInspector').addClass('d-none');
+                // $('.operSave').addClass('d-none');
+                $('.techSave').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+              if(approvalStatus ==='OK'){
+                $('.operApproved').addClass('d-none');
+                $('.techSave').addClass('d-none');
+            }
+        }
+        if(positionCategory === 'Technician'){
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            // initTrainingItemsTable('#tblTrainingItems_tech');
+
+            $('#divTechnician').removeClass('d-none');
+            $('.techSave').removeClass('d-none');
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],9);
+            initDropdownMasterDetailsByFkidCombos([
+                    '#text_oper_remarks',
+            ],31);
+            initPositionTrainingTable('#tblTrainingItemsTechOperator', 'Production', params.qcSlipsId, 40, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsTechEngg', 'Engineer', params.qcSlipsId, 41, approvalStatus);
+            initPositionTrainingTable('#tblTrainingItemsTechQC', 'QC', params.qcSlipsId, 42, approvalStatus);
+            if( approvalStatus.includes('OPERPRDN')){
+                $('#btnSaveMatrix_tblTrainingItemsVisual').removeClass('d-none');
+            }
+            if( approvalStatus.includes('OPERENGG')){
+                $('#btnSaveMatrix_tblTrainingItemsPartsPrep').removeClass('d-none');
+
+            }
+            if( approvalStatus.includes('OPERQC')){
+                $('#btnSaveMatrix_tblTrainingItemsMachine').removeClass('d-none');
+            }
+            if(approvalStatus === 'ENGGHEADAPP'){
+                // $('.btnSaveInspector').addClass('d-none');
+                // $('.operSave').addClass('d-none');
+                $('.techSave').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+              if(approvalStatus ==='OK'){
+                $('.operApproved').addClass('d-none');
+                $('.techSave').addClass('d-none');
+            }
+        }
         if(positionCategory === 'Supervisor'){
+            initDropdownMasterDetailsByFkidCombos([
+                '#text_oper_station_to',
+                '#text_oper_station_from',
+            ],35);
+            $('.saveSep').removeClass('d-none');
+            $('#dateOfTransfer').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
+            if(approvalStatus ==='CLQCOQC'){
+                // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
+                $('.btnSaveMatrix').removeClass('d-none');
+            }
             initTrainingItemsTable('#tblTrainingItems_sep');
             $('#divSupervisor').removeClass('d-none');
-            $('#productLine').removeClass('d-none');
+            if(approvalStatus === 'LQCHEADAPP'){
+                $('.saveSep').addClass('d-none');
+                $('.operApproved').removeClass('d-none');
+            }
+            if(approvalStatus ==='OK'){
+                $('.operApproved').addClass('d-none');
+                $('.saveSep').addClass('d-none');
+            }
         }
         if(positionCategory === 'Operator'){
-            // $('#productLine').removeClass('d-none');
+            $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
             $('#div_Oper').removeClass('d-none');
             $('.btn-link').removeClass('show');
             $('#collapseOneOper').removeClass('show');
@@ -137,7 +790,6 @@
             //     '#text_operator_product_line',
             // ],2);
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
             if(approvalStatus ==='APRODTO'){
                 $('#collapseOneOper').addClass('show');
             }
@@ -160,7 +812,7 @@
             if(approvalStatus ==='FQCVVO'){
                 $('#collapseSevenOper').addClass('show');
             } //LQCHEADAPP
-            if(approvalStatus ==='QCAPP'){
+            if(approvalStatus ==='LQCSUPVAPP'){
                 $('.btnSaveInspector').addClass('d-none');
                 $('.operSave').addClass('d-none');
                 // $('.inspectorSave').addClass('d-none');
@@ -178,6 +830,7 @@
             initTrainingItemsTable('#tblTrainingItems_ins');
             $('#dateOfTransfer').removeClass('d-none');
             $('#seriesDesignation').text('Designation');
+            $('#productLine').removeClass('d-none');
             $('#divInspector').removeClass('d-none');
             $('.btnSaveInspector').removeClass('d-none');
             // $('#productLine').removeClass('d-none');
@@ -189,14 +842,13 @@
             ],7);
 
             form.formSubmitInspector.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
-            $('#btnEmployeeOperator').prop('disabled',false);
             if(approvalStatus !='LQCHEADAPP'){
                 $('.inspectorSave').removeClass('d-none')
             }
             if(approvalStatus ==='CLQCOQC'){
+
                 // $('#btnSaveMatrix_tblTrainingItems_ins').removeClass('d-none');
                 $('.btnSaveMatrix').removeClass('d-none');
-
             }
 
             if( approvalStatus ==='LQCHEADAPP'){
@@ -213,27 +865,7 @@
                 $('.inspectorSave').addClass('d-none');
             }
         }
-        if(positionCategory === 'Technician'){
-            initTrainingItemsTable('#tblTrainingItems_tech');
-            $('#divTechnician').removeClass('d-none');
-            $('#dateOfTransfer').removeClass('d-none');
-            $('#seriesDesignation').text('Designation');
-            $('.techSave').removeClass('d-none');
-             initDropdownMasterDetailsByFkidCombos([
-                '#text_oper_station_to',
-                '#text_oper_station_from',
-            ],9);
-            if(approvalStatus ==='CTECHQCC'){
-                // $('#btnSaveMatrix_tblTrainingItems_tech').removeClass('d-none');
-                $('.btnSaveMatrix').removeClass('d-none');
-            }
-            if(approvalStatus === 'TECHHEADAPP'){
-                // $('.btnSaveInspector').addClass('d-none');
-                // $('.operSave').addClass('d-none');
-                $('.techSave').addClass('d-none');
-                $('.operApproved').removeClass('d-none');
-            }
-        }
+
     }
 
     const saveFirstTakeInsSequence = (params) =>{
@@ -595,6 +1227,11 @@
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please Add 1 Employee Per Station.' });
             return;
         }
+        if (stFrom.length > 1) {
+            Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please Add 1 Station From Only.' });
+            return;
+        }
+
         if (empId.length === 0) {
             Swal.fire({ icon: 'warning', title: 'Missing Field', text: 'Please select an Employee.' });
             return;
@@ -739,7 +1376,7 @@
             const empName = emp.system_one_hris_subcon?.empname ?? ''; // Use fallback if name is in relation
             const stFrom = emp.get_station_from?.dropdown_masters_details ??'';
             const stTo = emp.get_station_to?.dropdown_masters_details ?? '';
-            const remarks = emp.remarks || '';
+            const remarks = emp.remarks_dropdown_master_detail?.dropdown_masters_details || emp.remarks || '';
             let remove =``;
             if(approvalStatus === 'APRODTO'){
                 remove += ` <button type="button" class="btn btn-danger btn-sm btnRemoveOperEmpMain">
@@ -993,6 +1630,104 @@
             editSelectionsMap
         );
     }
+    const getEmployeeDetailsByEmpNoSelect2Operators = (params) => {
+        let response = params.response;
+        const doperosc = response?.approversCollection?.DOPEROSC?.[0] ?? null;
+        const eopervisual = response?.approversCollection?.EOPERVISUAL?.[0] ?? null;
+        const opheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
+
+        const doperoscToFirst = doperosc?.first_approver_exploded ?? [];
+        const doperoscToSecond = doperosc?.second_approver_exploded ?? [];
+        const eopervisualToFirst = eopervisual?.first_approver_exploded ?? [];
+        const eopervisualToSecond = eopervisual?.second_approver_exploded ?? [];
+        const opheadappToFirst = opheadapp?.alert_prod_sec_exploded ?? [];
+
+        const mappedEopervisualToFirst = eopervisualToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedEopervisualToSecond = eopervisualToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedDoperoscToFirst = doperoscToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedDoperoscToSecond = doperoscToSecond.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedOpheadappToFirst = opheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+
+         // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        editSelectionsMap['#text_pv1_certified_operator'] = mappedEopervisualToFirst;
+        editSelectionsMap['#text_pv2_certified_operator'] = mappedEopervisualToSecond;
+        editSelectionsMap['#text_sec1_certified_operator'] = mappedDoperoscToFirst;
+        editSelectionsMap['#text_sec2_certified_operator'] = mappedDoperoscToSecond;
+        editSelectionsMap['#text_visual_approved_confirmed_by'] = mappedOpheadappToFirst;
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_pv1_certified_operator',
+                '#text_pv2_certified_operator',
+                '#text_sec1_certified_operator',
+                '#text_sec2_certified_operator',
+                '#text_visual_approved_confirmed_by',
+            ],
+            editSelectionsMap
+        );
+
+    }
+    const getEmployeeDetailsByEmpNoSelect2Mh = (params) => {
+        let response = params.response;
+
+        //MH
+        const amhto = response?.approversCollection?.AMHTO?.[0] ?? null;
+        const mhheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
+
+        const amhtoToFirst = amhto?.first_approver_exploded ?? [];
+        const mhheadappToFirst = mhheadapp?.alert_prod_sec_exploded ?? [];
+
+        const mappedAmhtoToFirst = amhtoToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedMhheadappToFirst = mhheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+
+         // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        editSelectionsMap['#text_mh_first_trained_by'] = mappedAmhtoToFirst;
+        editSelectionsMap['#text_mh_approved_confirmed_by'] = mappedMhheadappToFirst;
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_mh_first_trained_by',
+                '#text_mh_approved_confirmed_by',
+            ],
+            editSelectionsMap
+        );
+
+    }
+    const getEmployeeDetailsByEmpNoSelect2Sep = (params) => {
+        let response = params.response;
+        const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
+        const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
+        const sepheadapp = response?.approversCollection?.LQCHEADAPP?.[0] ?? null;
+
+
+        const aseptoToFirst     = asepto?.first_approver_exploded   ?? [];
+        const btechengcToFirst  = btechengc?.first_approver_exploded  ?? [];
+        const sepheadappToFirst = sepheadapp?.alert_prod_sec_exploded  ?? [];
+
+        const mappedAseptoToFirst = aseptoToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedBtechengcToFirst = btechengcToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+        const mappedSepheadappToFirst = sepheadappToFirst.map(emp => ({ id: emp.id, text: emp.name }));
+
+
+         // 2. Assign those formatted arrays to their target selectors inside the map
+        let editSelectionsMap = {};
+        //A
+        editSelectionsMap['#text_a_sep_trained_certified_by'] = mappedAseptoToFirst;
+        editSelectionsMap['#text_sep_trained_certified_by'] = mappedBtechengcToFirst;
+        editSelectionsMap['#text_sep_approved_inspector'] = mappedSepheadappToFirst;
+
+        // 3. Initialize all employee selectors simultaneously
+        initGetSystemOneEmployeeDetailsCombos(
+            [
+                '#text_a_sep_trained_certified_by',
+                '#text_sep_trained_certified_by',
+                '#text_sep_approved_inspector',
+            ],
+            editSelectionsMap
+        );
+    }
     const getEmployeeDetailsByEmpNoSelect2Inspector = (params) => {
         let response = params.response;
         // Safe access: optional chaining prevents crash if approversCollection is missing from response
@@ -1008,12 +1743,9 @@
         const blqctc = approversCollection?.BLQCTC?.[0]  ?? null;
         const lqcheadapp = approversCollection?.LQCHEADAPP?.[0]  ?? null;
 
-        // const operApprovedConfirmedBy = rawOperApprovedConfirmedBy   ?? [];
         const alqctqToFirst            = alqctq?.first_approver_exploded   ?? [];
         const alqctqToFirstMentoredBy  = alqctq?.first_approver2_exploded  ?? [];
-
         const blqctcToFirst = blqctc?.first_approver_exploded  ?? [];
-
         const lqcheadappToFirst  = lqcheadapp?.alert_prod_sec_exploded  ?? [];
 
 
@@ -1101,7 +1833,7 @@
             form.formSubmitOper.find('.form-control, .form-select').removeClass('is-invalid is-valid').attr('title', '');
             const approvalStatus = data.approval_status ?? '';
 
-            $('#btnEmployeeOperator').prop('disabled', approvalStatus === 'APRODTO' ? false : true);
+            // $('#btnEmployeeOperator').prop('disabled', approvalStatus === 'APRODTO' ? false : true);
             dataTable.fvi_operator.ajax.url(`load1st_qc_validation?qcSlipsId=${data.id} `).draw();
             dataTable.tbl_fvi_operator_2.ajax.url(`load2nd_qc_validation?qcSlipsId=${data.id} `).draw();
             let currentStatus = data.approval_status ??'';
@@ -1117,6 +1849,8 @@
             getApprovalStatusToggle({
                 approvalStatus: currentStatus,
                 positionCategory : positionCategory,
+                qcSlipsId : data.id,
+
              });
 
 
@@ -1125,6 +1859,7 @@
             $('#textconno_new_operator').val(data.control_no);
             $('#text_section_operator').val(data.section).trigger('change');
             $('#text_date_of_transfer').val(data?.date_of_transfer);
+            // $('#text_operator_product_area').val(data?.production_area);
             $('#text_series_operator').val(data.series_name);
             $('#text_select_position').val(positionCategory).trigger('change');
             $('#select_section').val(data.section_category).trigger('change');
@@ -1140,6 +1875,14 @@
                 [productLine],
                 2,
                 editSelectionsMap2
+            );
+            const ProductArea = '#text_operator_product_area';
+            let editSelectionsMapProductionArea = {};
+            editSelectionsMapProductionArea[ProductArea] = response.rawProductionAreaCollection;
+            initDropdownMasterDetailsByFkidCombos(
+                [ProductArea],
+                32,
+                editSelectionsMapProductionArea
             );
             // ==== QC Reason Certification
             const textCertificationOperator = '#text_certification_operator';
@@ -1160,6 +1903,64 @@
                 editSelectionsMap6
             );
 
+            if(positionCategory === 'VisualOperator' || positionCategory === 'PartsPrep' || positionCategory === 'MachineOperator'){
+
+                const doperosc = response?.approversCollection?.DOPEROSC?.[0] ?? null;
+
+                form.formSubmitOperators.find('#text_sel_result3_operator').val(doperosc?.is_eopervisual_required ?? '').trigger('change');
+
+                form.formSubmitOperators.find('#text_sel_result1_operator').val(doperosc?.first_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_sec1_date_operator').val(doperosc?.first_date ?? '');
+                form.formSubmitOperators.find('#text_sec1_time_operator').val(doperosc?.first_time ?? '');
+
+                form.formSubmitOperators.find('#text_sel_result2_operator').val(doperosc?.second_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_sec2_date_operator').val(doperosc?.second_date ?? '');
+                form.formSubmitOperators.find('#text_sec2_time_operator').val(doperosc?.second_time ?? '');
+
+                const eopervisual = response?.approversCollection?.EOPERVISUAL?.[0] ?? null;
+
+                form.formSubmitOperators.find('#text_pv_result1_operator').val(eopervisual?.first_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_pv1_date_operator').val(eopervisual?.first_date ?? '');
+                form.formSubmitOperators.find('#text_pv1_time_operator').val(eopervisual?.first_time ?? '');
+                form.formSubmitOperators.find('#text_reason_disqualification').val(eopervisual?.first_remarks ?? '');
+
+                form.formSubmitOperators.find('#text_pv_result2_operator').val(eopervisual?.second_status ?? '').trigger('change');
+                form.formSubmitOperators.find('#text_pv2_date_operator').val(eopervisual?.second_date ?? '');
+                form.formSubmitOperators.find('#text_pv2_time_operator').val(eopervisual?.second_time ?? '');
+                getEmployeeDetailsByEmpNoSelect2Operators({
+                      response : response,
+                })
+            }
+            if(positionCategory === 'MH'){
+                const mhTrainingOrientation = data.a_mh_training_orientation?.mh_training_orientation;
+                syncCheckboxesWithDb('text_mh_training_orientation', mhTrainingOrientation,form.formSubmitMh);
+
+                const amhto = response?.approversCollection?.AMHTO?.[0] ?? null;
+                form.formSubmitMh.find('#text_mh_first_date').val(amhto?.first_date ?? '');
+
+                getEmployeeDetailsByEmpNoSelect2Mh({
+                    response : response,
+                });
+
+            }
+            // alert(positionCategory)
+            if(positionCategory === 'Supervisor'){
+                const sepTrainingOrientation = data.a_sep_training_orientation?.sep_training_orientation;
+
+                syncCheckboxesWithDb('text_sep_training_orientation', sepTrainingOrientation,form.formSubmitSep);
+                const asepto = response?.approversCollection?.ASEPTO?.[0] ?? null;
+                form.formSubmitSep.find('#text_a_sep_date').val(asepto?.first_date ?? '');
+
+                const btechengc = response?.approversCollection?.BSEPC?.[0] ?? null;
+                form.formSubmitSep.find('#text_sep_date').val(btechengc?.first_date ?? '');
+                form.formSubmitSep.find('#text_sep_theoretical_result').val(btechengc?.first_status ?? '').trigger('change');
+                form.formSubmitSep.find('#text_sep_handson_result').val(btechengc?.first_status_2 ?? '');
+
+
+                getEmployeeDetailsByEmpNoSelect2Sep({
+                    response : response,
+                });
+            }
             if(positionCategory === 'Technician'){
                  //TECHNICIAN
                 let aTechEngTrainingQualification = data.a_tech_eng_training_qualification ?? [];
@@ -1198,7 +1999,6 @@
                 form.formSubmitInspector.find('#text_training_orientation_ins_21').val(aLqcTrainingQualification?.training_orientation_ins_21);
                 form.formSubmitInspector.find('#text_training_orientation_ins_54').val(aLqcTrainingQualification?.training_orientationns_54);
                 // dtInstance.ajax.url(`load_qc_lqc_training_items_by_qc_slip_id?qcSlipsId=${data.id}`).draw();
-
                 syncCheckboxesWithDb('text_training_orientation_inspector', trainingOrientationInspector,form.formSubmitInspector);
 
                 let paramsGetEmpNo = {

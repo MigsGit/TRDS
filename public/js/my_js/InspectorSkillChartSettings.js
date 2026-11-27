@@ -52,7 +52,7 @@ function initProcessStationsTable($table, url = 'view_process_stations') {
             { data: 'skill_category' },    // customize this per process_stations
             { data: 'process_order' },    // customize this per process_stations
             { data: 'process_station' },    // customize this per process_stations
-            { data: 'product_line' },    // customize this per process_stations
+            { data: 'sub_station' },    // customize this per process_stations
             { data: 'status_label' }
         ]
     });
@@ -74,7 +74,7 @@ function bindProcessStationsEvents($table, $form, $modal, dtProcessStation, $add
 
         if($form.find('#naProductLineCheckbox').is(":checked")){
             saveProcessStations($form, $modal, dtProcessStation);
-        }else if($form.find('#productLine').val() != ""){
+        }else if($form.find('#subStation').val() != ""){
             saveProcessStations($form, $modal, dtProcessStation);
         }else{
             showError('Failed to save data, Please Select Product Line');
@@ -105,13 +105,13 @@ function bindProcessStationsEvents($table, $form, $modal, dtProcessStation, $add
 
     $form.on('change', '#naProductLineCheckbox', function (e) {
         if ($(this).is(":checked")){
-            $("#productLine").val('N/A').prop("disabled", true).trigger('change');
+            $("#subStation").val('N/A').prop("disabled", true).trigger('change');
                 // .val("N/A")
                 // .prop("readonly", true)
                 // .prop("required", false)
                 // .attr("placeholder", "Not Applicable");
         }else{
-            $("#productLine").val('').prop("disabled", false).trigger('change');
+            $("#subStation").val('').prop("disabled", false).trigger('change');
                 // .val("")
                 // .prop("readonly", false)
                 // .prop("required", true)
@@ -181,8 +181,8 @@ function fetchProcessStationsById(id, $modal) {
             $('#skillCategory').val(response.skill_category);
             $('#processStation').val(response.process_station);
 
-            let selected_product_line = response.product_line.split(",");
-            $('#productLine').val(selected_product_line).trigger("change");
+            let selected_sub_station = response.sub_station.split(",");
+            $('#subStation').val(selected_sub_station).trigger("change");
 
             $modal.modal('show');
         },

@@ -93,13 +93,13 @@
                                     <label>Section</label>
                                     <select class="form-control select2bs5" name="section" id="section" required>
                                         <option value="" disabled selected>Select One</option>
-                                        <option value="TS-F1">TS-F1</option>
-                                        <option value="TS-F3">TS-F3</option>
+                                        <option value="TSF1">TS-F1</option>
+                                        <option value="TSF3">TS-F3</option>
                                         <option value="CN">CN</option>
-                                        <option value="CN-F3">CN-F3</option>
-                                        <option value="PPD-CN">PPD-CN</option>
-                                        <option value="PPD-TS">PPD-TS</option>
-                                        <option value="PPD-F3">PPD-F3</option>
+                                        <option value="CNF3">CN-F3</option>
+                                        <option value="PPDCN">PPD-CN</option>
+                                        <option value="PPDTS">PPD-TS</option>
+                                        <option value="PPDF3">PPD-F3</option>
                                         <option value="YF">YF</option>
                                     </select>
                                 </div>
@@ -147,9 +147,9 @@
 
                                 <div class="form-group">
                                     <label>Product Line (Select In-order)</label>
-                                    <!-- <input type="text" class="form-control" name="product_line" id="productLine" placeholder="Enter Product Line" required> -->
+                                    <!-- <input type="text" class="form-control" name="product_line" id="subStation" placeholder="Enter Product Line" required> -->
 
-                                    <select class="form-control select2bs5" name="product_line[]" id="productLine" multiple required>
+                                    <select class="form-control select2bs5" name="sub_station[]" id="subStation" multiple required>
                                         <option value="" disabled selected>Select One</option>
                                         <option value="N/A" disabled>Not Applicable</option>
                                         <option value="Appearance">Appearance</option>
@@ -181,7 +181,7 @@
                                     </select>
 
                                     <label>
-                                        <input type="checkbox" id="naProductLineCheckbox" name="product_line" value="N/A"> Not Applicable
+                                        <input type="checkbox" id="nasubStationCheckbox" name="product_line" value="N/A"> Not Applicable
                                     </label>
                                 </div>
                                 

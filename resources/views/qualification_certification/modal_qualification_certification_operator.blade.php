@@ -2,7 +2,7 @@
 
 <form  id="formSubmitOper" >
     @csrf
-    <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / QUALIFICATION / CERTIFICATION SLIP</h3>
+    <h3 class="mt-5 mb-3 text-center">OPERATOR'S TRAINING / CERTIFICATION AND VALIDATION SLIP</h3>
 
     <div class="accordion" id="accordionExampleOper">
             <div class="card APRODTO">

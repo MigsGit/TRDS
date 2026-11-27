@@ -1,8 +1,11 @@
 <?php
+use App\Http\Controllers\DropdownController;
 use App\Http\Controllers\ETRController;
 use App\Http\Controllers\ExaminationController;
 use App\Http\Controllers\ExaminationResultController;
 use App\Http\Controllers\ExamTitleController;
+use App\Http\Controllers\GrrQuestionnaireSettingsController;
+use App\Http\Controllers\GrrSettingsController;
 use App\Http\Controllers\HrMemo\HrMemoController;
 use App\Http\Controllers\HrMemo\HrMemoExaminationController;
 use App\Http\Controllers\InspCertMatrixController;
@@ -13,6 +16,7 @@ use App\Http\Controllers\QualificationCertificationController;
 use App\Http\Controllers\QuestionnairesController;
 use App\Http\Controllers\TrainingAttendanceController;
 use App\Http\Controllers\TrainingEndorsementController;
+use App\Http\Controllers\TrainingRecordUpdateController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GrrSettingsController;
@@ -20,6 +24,12 @@ use App\Http\Controllers\GrrSeriesSettingsController;
 use App\Http\Controllers\GrrQuestionnaireSettingsController;
 use App\Http\Controllers\GrrExamSettingsController;
 use App\Http\Controllers\GrrExaminationDashboardController;
+use App\Http\Controllers\TargetRatingSettingController;
+use App\Http\Controllers\RatingDescriptionSettingController;
+use App\Http\Controllers\PersonnelDisqualification\DisqualificationController;
+use App\Http\Controllers\PersonnelDisqualification\DisqualificationRecordController;
+
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +55,14 @@ Route::middleware('checkSession')->group(function(){
     Route::get('/insp_skill_chart_setting', function () {
         return view('inspector_skill_chart_settings');
     })->name('insp_skill_chart_setting');
+
+    Route::get('/target_ratings', function () {
+        return view('target_ratings_settings');
+    })->name('target_ratings');
+
+    Route::get('/ratings_descriptions', function () {
+        return view('rating_description_settings');
+    })->name('ratings_descriptions');
 
     Route::get('/hr_memo_exam', function () {
         return view('hr_memo_examination');
@@ -90,6 +108,13 @@ Route::middleware('checkSession')->group(function(){
         return view('ETR');
     })->name('ETR');
 
+    Route::get('/personnel_disqualification', function () {
+        return view('personnel_disqualification');
+    })->name('personnel_disqualification');
+    Route::get('/TRU', function () {
+        return view('training_record_update');
+    })->name('TRU');
+
     Route::get('/grr_attributes_settings', function () {
         return view('recertification/grr_attributes_settings');
     })->name('grr_attributes_settings');
@@ -103,6 +128,9 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/fetch_grr_exam_result', 'fetchExamResultForEmployee')->name('fetch_grr_exam_result');
         Route::post('/save_grr_exam_answers', 'saveExamAnswers')->name('save_grr_exam_answers');
     });
+    Route::get('/dropdown_maintenance', function () {
+        return view('dropdown_maintenance');
+    })->name('dropdown_maintenance');
 
     // TRAINING ENDORSEMENT CONTROLLER
     Route::controller(TrainingEndorsementController::class)->group(function () {
@@ -137,7 +165,8 @@ Route::middleware('checkSession')->group(function(){
         Route::post('save_first_take_ins_sequence', 'saveFirstTakeInsSequence');
         Route::post('update_approval', 'updateApproval');
         Route::post('save_qualification_certification_inspector', 'saveQualificationCertificationInspector');
-        Route::post('save_qc_lqc_training_items_by_qc_slip_id', 'saveQcLqcTrainingItemsByQcSlipId');
+        Route::post('save_qc_lqc_training_items_by_qc_slip_id', 'saveQcLqcTrainingItemsByQcSlipId')->name('save_qc_lqc_training_items_by_qc_slip_id');
+        Route::post('save_qc_lqc_training_items_by_position', 'saveQcLqcTrainingItemsByPosition')->name('save_qc_lqc_training_items_by_position');
 
         Route::get('load_qc_slip', 'loadQcSlip');
         Route::get('get_div_dept_sec', 'getDivDeptSec');
@@ -146,6 +175,10 @@ Route::middleware('checkSession')->group(function(){
         Route::get('load1st_qc_validation', 'load1stQcValidation');
         Route::get('load2nd_qc_validation', 'load2ndQcValidation');
         Route::get('/load_qc_lqc_training_items_by_qc_slip_id', 'loadQcLqcTrainingItemsByQcSlipId');
+        Route::get('/load_qc_lqc_training_items_by_position', 'loadQcLqcTrainingItemsByPosition');
+        Route::get('/get_employee_details_by_no', 'getEmployeeDetailsByNo');
+        Route::get('load_op_approver', 'loadOpApprover')->name('load_op_approver');
+        Route::post('update_op_approver', 'updateOpApprover')->name('update_op_approver');
     });
 
     Route::controller(QuestionnairesController::class)->group(function () {
@@ -226,6 +259,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/get_trainor_dropdown_details', 'getTrainorDropdownDetails')->name('get_trainor_dropdown_details');
         Route::get('/export_inspector_skill_chart', 'exportInspectorSkillChart')->name('export_inspector_skill_chart');
         Route::get('/view_emp_skill_card_pdf', 'viewEmpSkillCardPdf')->name('viewEmpSkillCardPdf');
+        Route::get('/export_employee_skill_card', 'exportEmployeeSkillCard')->name('export_employee_skill_card');
     });
 
     // =======================================================================================================
@@ -310,19 +344,64 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/export_skill_map_pdf', 'exportSkillMapPdf')->name('export_skill_map_pdf');
         Route::post('/export_skill_map_excel', 'exportSkillMapExcel')->name('export_skill_map_excel');
         Route::post('/export_skill_map_excel_per_product_line', 'exportSkillMapExcelPerProductLine')->name('export_skill_map_excel_per_product_line');
+        // Route::post('/export_skill_map_excel_per_product_line_test', 'exportSkillMapExcelPerProductLineTest')->name('export_skill_map_excel_per_product_line_test');
         // Route::get('/test-pdf', function () {
         //     dd(class_exists(\Barryvdh\DomPDF\Facade\Pdf::class));
         // });
         Route::get('/get_product_line', 'getProductLine')->name('get_product_line');
         Route::get('/get_employee_position', 'getEmployeePosition')->name('get_employee_position');
-        Route::get('/get_employees', 'getEmployees')->name('get_employees');
+        Route::get('/get_employees_for_skill_map', 'getEmployeesForSkillMap')->name('get_employees_for_skill_map');
+        Route::get('/get_employees_for_skill_matrix', 'getEmployeesForSkillMatrix')->name('get_employees_for_skill_matrix');
+
+    Route::controller(DisqualificationController::class)->group(function () {
+        Route::get('/view_disqualification', 'viewDisqualificationInfo')->name('view_disqualification');
+        Route::get('/view_trainings', 'viewTrainings')->name('view_trainings');
+        Route::post('/add_disquali_part1', 'addDisqualiPart1')->name('add_disquali_part1');
+        Route::post('/add_disquali_part2', 'addDisqualiPart2')->name('add_disquali_part2');
+        Route::post('/add_part2_training', 'addPart2Training')->name('add_part2_training');
+        Route::get('/get_disqualification_by_id', 'getDisqualificationById')->name('get_disqualification_by_id');
+        Route::get('/get_emp_details_from_certification', 'getEmpDetailsFromCertification')->name('get_emp_details_from_certification');
+        // Route::get('/get_emp_no_dropdown_details', 'getEmpNoDropdownDetails')->name('get_emp_no_dropdown_details');
+        Route::get('/get_email_recipients_dropdown_details', 'getEmailRecipientsDropdownDetails')->name('get_email_recipients_dropdown_details');
+        Route::get('/get_mode_of_defect', 'getModeOfDefect')->name('get_mode_of_defect');
+        Route::get('/get_classification', 'getClassification')->name('get_classification');
+        Route::get('/get_sub_classification', 'getSubClassification')->name('get_sub_classification');
+        Route::get('/get_dropdown_from_master', 'getDropdownFromMaster')->name('get_dropdown_from_master');
+        Route::get('/get_dropdown_from_systemone', 'getDropdownFromSystemone')->name('get_dropdown_from_systemone');
+        Route::post('/update_disqualification_status', 'updateDisqualificationStatus')->name('update_disqualification_status');
+        Route::post('/get_examination', 'getExamination')->name('get_examination');
     });
+
+    // =======================================================================================================
+    Route::controller(TargetRatingSettingController::class)->group(function () {
+        Route::get('/view_target_ratings', 'viewTargetRatingInfo')->name('view_target_ratings');
+        Route::post('/add_target_ratings', 'addTargetRatingInfo')->name('add_target_ratings');
+        Route::get('/get_target_rating_by_id', 'getTargetRatingById')->name('get_target_rating_by_id');
+        Route::post('/update_status', 'updateTargetRatingStatus')->name('update_status');
+        Route::get('/get_process_stations', 'getProcessStations')->name('get_process_stations');
+        Route::get('/get_process_count_per_category', 'getProcessCountPerCategory')->name('get_process_count_per_category');
+        Route::get('/get_product_line_fr_master', 'getProductLineFrMaster')->name('get_product_line_fr_master');
+        Route::get('/get_product_area_fr_master', 'getProductAreaFrMaster')->name('get_product_area_fr_master');
+    });
+
+    // =======================================================================================================
+    Route::controller(RatingDescriptionSettingController::class)->group(function () {
+        Route::get('/view_rating_descriptions', 'viewRatingDescriptionInfo')->name('view_rating_descriptions');
+        Route::post('/add_rating_descriptions', 'addRatingDescriptionInfo')->name('add_rating_descriptions');
+        Route::get('/get_rating_description_by_id', 'getRatingDescriptionById')->name('get_rating_description_by_id');
+        Route::post('/update_rating_description_status', 'updateRatingDescriptionStatus')->name('update_rating_description_status');
+        Route::get('/get_designation_fr_master', 'getDesignationFrMaster')->name('get_designation_fr_master');
+    });
+});
 
     Route::controller(ETRController::class)->group(function () {
         Route::get('view_employee_training_record', 'viewEmployeeTrainingRecord');
         Route::get('get_systemone_employee_training_details', 'getSystemoneEmployeeTrainingDetails');
 
         Route::get('view_trds_summary', 'viewTRDSSummary');
+
+        Route::get('get_employee_training_record/{employeeId}/{employeeNo}', 'getEmployeeTrainingRecord');
+        Route::get('get_trds_summary/{employeeId}/{employeeNo}', 'getTRDSSummary');
     });
     Route::controller(ListOfCertPersonnelController::class)->group(function(){
         Route::get('/get_dropdown_select_certpersonnel', 'getDropdownSelectCertPersonnel')->name('get_dropdown_select_certpersonnel');
@@ -333,6 +412,18 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/export-inspector-cert-matrix', 'exportInspectorCertMatrix')->name('export-inspector-cert-matrix');
     });
 
+    Route::controller(TrainingRecordUpdateController::class)->group(function () {
+        Route::get('/get_type_of_trainings', 'getTypeOfTrainings')->name('get_type_of_trainings');
+        Route::get('/get_venues', 'getVenue')->name('get_venues');
+        Route::get('/get_employees', 'getEmployees')->name('get_employees');
+        Route::post('/save_training_record', 'saveTrainingRecord')->name('save_training_record');
+        Route::get('/dt_get_training_records', 'dtGetTrainingRecords');
+        Route::get('/get_training_record_by_id', 'getTrainingRecordById');
+        Route::get('/get_trainee_details', 'getTraineeDetails')->name('get_trainee_details');
+        Route::post('/delete_training_record', 'deleteTrainingRecord')->name('delete_training_record');
+        Route::post('/import_trainees', 'importTrainees')->name('import_trainees');
+        Route::get('/get_result_list', 'getResultList')->name('get_result_list');
+    });
 
     Route::controller(GrrSettingsController::class)->group(function () {
         Route::get('/view_grr_attributes', 'viewGrrAttributes')->name('view_grr_attributes');
@@ -366,6 +457,15 @@ Route::middleware('checkSession')->group(function(){
         Route::post('/add_exam_groupings', 'saveExamGroupings')->name('add_exam_groupings');
         Route::get('/get_grr_exam_groupings_by_id', 'getGrrExamGroupingsById')->name('get_grr_exam_groupings_by_id');
 
+    });
+
+    Route::controller(DropdownController::class)->group(function(){
+        Route::get('/get_dropdown_types', 'get_dropdown_types')->name('get_dropdown_types');
+        Route::post('/save_dropdown_type', 'save_dropdown_type')->name('save_dropdown_type');
+        Route::get('/dt_get_dropdown_items', 'dt_get_dropdown_items')->name('dt_get_dropdown_items');
+        Route::post('/save_dropdown_items', 'save_dropdown_items')->name('save_dropdown_items');
+        Route::get('/get_dropdown_item_by_id', 'get_dropdown_item_by_id')->name('get_dropdown_item_by_id');
+        Route::post('/change_status_dropdown_item', 'change_status_dropdown_item')->name('change_status_dropdown_item');
     });
 
 });

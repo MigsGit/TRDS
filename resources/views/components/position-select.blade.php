@@ -9,9 +9,13 @@
         ['value' => '', 'label' => 'Select Position', 'disabled' => true, 'selected' => true],
         ['value' => 'ALL', 'label' => 'Display All'],
         ['value' => 'Operator', 'label' => 'Operator'],
+        ['value' => 'VisualOperator', 'label' => 'Visual Operator'],
+        ['value' => 'PartsPrep', 'label' => 'Parts Prep / Assembly / Packing'],
+        ['value' => 'MachineOperator', 'label' => 'Machine Operator'],
         ['value' => 'Inspector', 'label' => 'Inspector'],
         ['value' => 'Technician', 'label' => 'Technician'],
-        // ['value' => 'Supervisor', 'label' => 'Supervisor'],
+        ['value' => 'MH', 'label' => 'MH'],
+        ['value' => 'Supervisor', 'label' => 'Supervisor'],
     ];
 @endphp
 

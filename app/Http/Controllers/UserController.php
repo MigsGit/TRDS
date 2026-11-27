@@ -125,6 +125,7 @@ class UserController extends Controller
         } else {
             $userAccessModule = [];
         }
+        
         return DataTables::of($userModule)
             ->addColumn('rawBulkCheckBox', function($row) use($userAccessModule,$usersId){
                 $isChecked = "";
