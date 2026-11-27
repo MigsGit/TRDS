@@ -86,6 +86,7 @@
 <script src="{{ asset('public/js/my_js/InspectorCertificationMatrix.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/GrrAttributesSettings.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/GrrExamSettings.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/GrrSeriesSettings.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/GrrExaminationDashboard.js') }}?<?=time()?>"></script>
 
 

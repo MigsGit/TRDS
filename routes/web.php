@@ -16,6 +16,7 @@ use App\Http\Controllers\TrainingEndorsementController;
 use App\Http\Controllers\TrainingRequestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GrrSettingsController;
+use App\Http\Controllers\GrrSeriesSettingsController;
 use App\Http\Controllers\GrrQuestionnaireSettingsController;
 use App\Http\Controllers\GrrExamSettingsController;
 use App\Http\Controllers\GrrExaminationDashboardController;
@@ -99,6 +100,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/fetch_grr_exam_settings_by_grr', 'fetchExamSettingsByGrr')->name('fetch_grr_exam_settings_by_grr');
         Route::get('/fetch_grr_exam_employees_by_exam', 'fetchExamEmployeesByExamSetting')->name('fetch_grr_exam_employees_by_exam');
         Route::get('/fetch_grr_examination_for_employee', 'fetchExaminationForEmployee')->name('fetch_grr_examination_for_employee');
+        Route::get('/fetch_grr_exam_result', 'fetchExamResultForEmployee')->name('fetch_grr_exam_result');
         Route::post('/save_grr_exam_answers', 'saveExamAnswers')->name('save_grr_exam_answers');
     });
 
@@ -340,8 +342,16 @@ Route::middleware('checkSession')->group(function(){
 
     });
 
+    Route::controller(GrrSeriesSettingsController::class)->group(function () {
+        Route::get('/view_grr_series', 'viewGrrSeries')->name('view_grr_series');
+        Route::post('/save_grr_series', 'saveGrrSeries')->name('save_grr_series');
+        Route::get('/get_grr_series_by_id', 'getGrrSeriesById')->name('get_grr_series_by_id');
+        Route::post('/update_grr_series_status', 'updateGrrSeriesStatus')->name('update_grr_series_status');
+    });
+
     Route::controller(GrrQuestionnaireSettingsController::class)->group(function () {
         Route::get('/view_grr_questionnaire', 'viewGrrQuestionnaire')->name('view_grr_questionnaire');
+        Route::get('/fetch_grr_series_by_sample', 'fetchSeriesBySample')->name('fetch_grr_series_by_sample');
         Route::get('/get_grr_sample_by_id', 'getGrrSampleById')->name('get_grr_sample_by_id');
         Route::post('/add_grr_questionnaire', 'addGrrQuestionnaire')->name('add_grr_questionnaire');
         Route::get('/get_grr_questionnaire_by_id', 'getGrrQuestionnaireById')->name('get_grr_questionnaire_by_id');

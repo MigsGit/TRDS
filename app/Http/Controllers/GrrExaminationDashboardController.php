@@ -178,7 +178,6 @@ class GrrExaminationDashboardController extends Controller
             $employees = GrrExamEmployees::with('getEmployeeAttribute')
                 ->where('exam_grouping_id', $request->exam_grouping_id)
                 ->where('status', 0)
-                ->where('exam_status', '!=', 2)
                 ->orderBy('id')
                 ->get();
 
@@ -196,7 +195,7 @@ class GrrExaminationDashboardController extends Controller
                         'emp_id'      => $employee->emp_id,
                         'name'        => str_replace('Ã±', 'ñ', $name),
                         'exam_status' => (int) $employee->exam_status,
-                        'trial'       => (int) ($lastTrials[$employee->id] ?? 0) + 1,
+                        'trial'       => min(self::MAX_TRIAL, (int) ($lastTrials[$employee->id] ?? 0) + 1),
                     ];
                 })
                 ->values();
@@ -254,17 +253,18 @@ class GrrExaminationDashboardController extends Controller
             }
 
             $questions = $this->orderQuestionsForTrial(
-                GrrQuestionnaireSettings::where('grr_setting_id', $exam->grr_setting_id)
+                GrrQuestionnaireSettings::with('series:id,series_name')
+                    ->where('grr_setting_id', $exam->grr_setting_id)
                     ->where('status', 0)
                     ->ordered()
-                    ->get(['id', 'defect', 'location'])
+                    ->get(['id', 'series_id', 'defect', 'location'])
                     ->values()
                     ->map(function ($question, $index) {
                         return [
-                            'id'       => $question->id,
-                            'number'   => $index + 1,
-                            'defect'   => $question->defect,
-                            'location' => $question->location,
+                            'id'          => $question->id,
+                            'number'      => $index + 1,
+                            'series_name' => $question->series ? $question->series->series_name : '',
+                            'location'    => $question->location,
                         ];
                     }),
                 $trial
@@ -294,6 +294,111 @@ class GrrExaminationDashboardController extends Controller
             return response()->json([
                 'result'  => 0,
                 'message' => 'Unable to load the examination. Please try again.',
+            ], 500);
+        }
+    }
+
+    public function fetchExamResultForEmployee(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'exam_grouping_id' => [
+                'required',
+                'integer',
+                Rule::exists('grr_exam_settings', 'id')->where('status', 0),
+            ],
+            'exam_employee_id' => ['required', 'integer'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['result' => 0, 'message' => $validator->errors()->first()], 422);
+        }
+
+        try {
+            $employee = GrrExamEmployees::with('getEmployeeAttribute')
+                ->where('id', $request->exam_employee_id)
+                ->where('exam_grouping_id', $request->exam_grouping_id)
+                ->where('status', 0)
+                ->first();
+
+            if (!$employee) {
+                return response()->json([
+                    'result'  => 0,
+                    'message' => 'This employee is not assigned to the selected examination.',
+                ], 422);
+            }
+
+            if ((int) $employee->exam_status !== 2) {
+                return response()->json([
+                    'result'  => 0,
+                    'message' => 'The results are available once all 3 trials are completed.',
+                ], 422);
+            }
+
+            $exam = GrrExamSettings::findOrFail($request->exam_grouping_id);
+
+            $answers = GrrExamAnswers::where('exam_employee_id', $employee->id)
+                ->get(['trial', 'questionnaire_id', 'answer'])
+                ->groupBy('trial')
+                ->map(function ($rows) {
+                    return $rows->pluck('answer', 'questionnaire_id');
+                });
+
+            $rows = GrrQuestionnaireSettings::with('series:id,series_name')
+                ->where('grr_setting_id', $exam->grr_setting_id)
+                ->where('status', 0)
+                ->ordered()
+                ->get(['id', 'series_id', 'reference', 'defect', 'location'])
+                ->values()
+                ->map(function ($question, $index) use ($answers) {
+                    $reference = trim((string) $question->reference);
+                    $trials = [];
+                    $allMatch = true;
+
+                    foreach ([1, 2, 3] as $trial) {
+                        $answer = isset($answers[$trial][$question->id])
+                            ? trim((string) $answers[$trial][$question->id])
+                            : null;
+                        $trials[$trial] = $answer;
+
+                        if ($answer === null || $answer !== $reference) {
+                            $allMatch = false;
+                        }
+                    }
+
+                    return [
+                        'number'      => $index + 1,
+                        'reference'   => $reference,
+                        'series_name' => $question->series ? $question->series->series_name : '',
+                        'defect'      => $question->defect,
+                        'location'    => $question->location,
+                        'trial_1'     => $trials[1],
+                        'trial_2'     => $trials[2],
+                        'trial_3'     => $trials[3],
+                        'score'       => $allMatch ? 'Yes' : 'No',
+                    ];
+                })
+                ->values();
+
+            return response()->json([
+                'result' => 1,
+                'data'   => [
+                    'exam' => [
+                        'ctrl_number' => $exam->ctrl_number,
+                        'description' => $exam->description,
+                    ],
+                    'employee' => [
+                        'emp_id' => $employee->emp_id,
+                        'name'   => str_replace('Ã±', 'ñ', $employee->getEmployeeAttribute->empname ?? ''),
+                    ],
+                    'rows' => $rows,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('fetchExamResultForEmployee failed: ' . $e->getMessage());
+
+            return response()->json([
+                'result'  => 0,
+                'message' => 'Unable to load the examination result. Please try again.',
             ], 500);
         }
     }

@@ -136,8 +136,16 @@ function buildGrrQuestionnaireCard(item) {
                     <div class="grr-q-value">${escapeHtml(item.location)}</div>
                 </div>
                 <div class="grr-q-field">
+                    <span class="grr-q-label">Series</span>
+                    <div class="grr-q-value">${escapeHtml(item.series ? item.series.series_name : '')}</div>
+                </div>
+                <div class="grr-q-field">
                     <span class="grr-q-label">Reference</span>
                     <div class="grr-q-value">${escapeHtml(item.reference)}</div>
+                </div>
+                <div class="grr-q-field">
+                    <span class="grr-q-label">Judgement</span>
+                    <div class="grr-q-value">${escapeHtml(item.judgement)}</div>
                 </div>
                 <div class="grr-q-field">
                     <span class="grr-q-label">Status</span>
@@ -298,7 +306,9 @@ function bindGrrQuestionnaireEvents($modalViewQuestionnaire,$formQuestionnaire,$
         resetGRRQuestionnaireForm($formQuestionnaire);
         const sampleId = $('#viewGrrSampleId').val();
         $('#qSampleId').val(sampleId);
-        $modalAddQuestionnaire.modal('show');
+        loadGrrSeriesOptions(sampleId).always(function () {
+            $modalAddQuestionnaire.modal('show');
+        });
     });
 
     // Closing the stacked "add/edit" modal removes Bootstrap's body flag, which breaks scrolling of the modal underneath
@@ -390,11 +400,36 @@ function saveGrrQuestionnaire($formQuestionnaire, $modalAddQuestionnaire, dtGrrS
         },
         error: function (xhr) {
             console.error('Save failed:', xhr.responseText);
-            showError('Failed to save data.');
+            const errors = xhr.responseJSON && xhr.responseJSON.errors;
+            const first = errors ? Object.values(errors)[0][0] : null;
+            showError(first || 'Failed to save data.');
         },
         complete: function () {
             $btnSave.prop('disabled', false);
         }
+    });
+}
+
+function loadGrrSeriesOptions(sampleId, selectedId) {
+    const $select = $('#qSeries');
+
+    return $.ajax({
+        type: 'GET',
+        url: 'fetch_grr_series_by_sample',
+        data: { grr_setting_id: sampleId, selected_id: selectedId || '' },
+        dataType: 'json'
+    }).done(function (response) {
+        const items = response.data || [];
+        $select.empty().append('<option value="" disabled selected>Select One</option>');
+        items.forEach(function (item) {
+            $select.append($('<option>', { value: item.id, text: item.series_name }));
+        });
+        if (items.length === 0) {
+            showError('No active series name found for this section. Add one in the Series Name Settings tab first.');
+        }
+    }).fail(function (xhr) {
+        console.error('Series load failed:', xhr.responseText);
+        showError('Failed to load series names.');
     });
 }
 
@@ -438,9 +473,12 @@ function fetchGrrQuestionnaireById(id, $modalViewQuestionnaire) {
             $('#reference').val(response.reference);
             $('#defect').val(response.defect);
             $('#location').val(response.location);
+            $('#judgement').val(response.judgement);
 
-
-            $modalViewQuestionnaire.modal('show');
+            loadGrrSeriesOptions(response.grr_setting_id, response.series_id).always(function () {
+                $('#qSeries').val(response.series_id);
+                $modalViewQuestionnaire.modal('show');
+            });
         },
 
         error: function (xhr) {
