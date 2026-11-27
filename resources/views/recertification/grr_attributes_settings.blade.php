@@ -39,7 +39,13 @@
                            <ul class="nav nav-tabs" id="employeeTab" role="tablist">
 
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="grrSample-tab" data-toggle="tab" href="#grrSample" role="tab" aria-controls="grrSample" aria-selected="true">
+                                    <a class="nav-link active" id="grrSeries-tab" data-toggle="tab" href="#grrSeries" role="tab" aria-controls="grrSeries" aria-selected="true">
+                                        Series Name Settings
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" id="grrSample-tab" data-toggle="tab" href="#grrSample" role="tab" aria-controls="grrSample" aria-selected="false">
                                         GRR Sample Settings
                                     </a>
                                 </li>
@@ -49,6 +55,8 @@
                                         GRR Questionnaire Settings
                                     </a>
                                 </li>
+
+
 
                             </ul>
 
@@ -101,6 +109,32 @@
                                                     <th class="text-center">GRR No. - GRR Sample</th>
                                                     <th class="text-center">Employees</th>
                                                     <th class="text-center">Description</th>
+                                                    <th class="text-center">Status</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                                <!-- Series Name Settings -->
+                                <div class="tab-pane fade" id="grrSeries" role="tabpanel" aria-labelledby="grrSeries-tab">
+
+                                    <div class="mr-2" style="float: right;">
+                                        <button type="button" class="btn btn-dark" id="btnShowAddGRRSeriesModal">
+                                            <i class="fa fa-plus"></i> Add Series Name
+                                        </button>
+                                    </div>
+
+                                    <br><br>
+
+                                    <div class="table-responsive">
+                                        <table id="tblGRRSeries" class="table table-bordered table-striped table-hover" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">Action</th>
+                                                    <th class="text-center">Section</th>
+                                                    <th class="text-center">Series Name</th>
                                                     <th class="text-center">Status</th>
                                                 </tr>
                                             </thead>
@@ -179,6 +213,44 @@
         <!-- /.modal-dialog -->
     </div>
 
+
+    <div class="modal fade" id="modalAddGRRSeries">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> Add/Edit Series Name</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post" id="formGRRSeries" autocomplete="off">
+                    @csrf
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="txtGRRSeriesId">
+
+                        <div class="form-group">
+                            <label>Section</label>
+                            <select class="form-control select2bs5" name="section" id="seriesSection" style="width: 100%;" required>
+                                <option value="" disabled selected>Select One</option>
+                                @foreach (\App\Model\GrrSettings::SECTIONS as $sectionOption)
+                                    <option value="{{ $sectionOption }}">{{ $sectionOption }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Series Name</label>
+                            <input type="text" class="form-control" name="series_name" id="seriesName" maxlength="255" placeholder="Enter Series Name" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" id="btnSaveGRRSeries" class="btn btn-dark"><i class="fa fa-check"></i> Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade" id="modalAddGRRExamGroupings">
         <div class="modal-dialog  modal-lg">
@@ -359,6 +431,14 @@
                             <input type="hidden" class="form-control" name="q_sample_id" id="qSampleId">
                             <div class="col-sm-12">
                                 <input type="hidden" class="form-control" name="questionnaire_id" id="questionnaireId">
+
+                                <div class="form-group">
+                                    <label>Series Name</label>
+                                    <select class="form-control" name="series_id" id="qSeries" required>
+                                        <option value="" disabled selected>Select One</option>
+                                    </select>
+                                </div>
+
                                 <div class="form-group">
                                     <label>Reference</label>
                                     <select class="form-control" name="reference" id="reference" required>
@@ -376,6 +456,16 @@
                                 <div class="form-group">
                                     <label>Location</label>
                                     <input type="text" class="form-control" name="location" id="location" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Judgement</label>
+                                    <select class="form-control" name="judgement" id="judgement" required>
+                                        <option value="" disabled selected>Select One</option>
+                                        @foreach (\App\Model\GrrQuestionnaireSettings::JUDGEMENTS as $judgementOption)
+                                            <option value="{{ $judgementOption }}">{{ $judgementOption }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
 
@@ -446,14 +536,18 @@
         }
 
         .grr-q-body {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: .75rem 1rem;
+            align-items: start;
             flex: 1 1 auto;
             min-width: 0;
-            padding: .75rem .5rem;
+            padding: .75rem 1rem;
         }
-        .grr-q-field { flex: 1 1 10rem; min-width: 0; padding: 0 .5rem; }
-        .grr-q-field.grr-q-field-wide { flex: 3 1 14rem; }
+        @media (max-width: 767.98px) {
+            .grr-q-body { grid-template-columns: 1fr 1fr; }
+        }
+        .grr-q-field { min-width: 0; }
         .grr-q-label {
             display: block;
             font-size: .7rem;
@@ -461,8 +555,9 @@
             letter-spacing: .04em;
             text-transform: uppercase;
             color: #6c757d;
+            margin-bottom: .1rem;
         }
-        .grr-q-value { word-break: break-word; }
+        .grr-q-value { word-break: break-word; min-height: 1.5rem; }
 
         .grr-q-actions {
             display: flex;

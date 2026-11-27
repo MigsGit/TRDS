@@ -10,8 +10,14 @@ class GrrQuestionnaireSettings extends Model
 {
     use HasFactory;
 
+    public const JUDGEMENTS = ['Good', 'Marginal Good', 'NG', 'Marginal NG'];
+
     public function grrSample(){
         return $this->hasMany(GrrSettings::class, 'id', 'grr_setting_id');
+    }
+
+    public function series(){
+        return $this->belongsTo(GrrSeriesSettings::class, 'series_id', 'id');
     }
 
     public function scopeOrdered($query){

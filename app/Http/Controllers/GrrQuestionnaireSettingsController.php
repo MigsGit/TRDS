@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Model\GrrQuestionnaireSettings;
+use App\Model\GrrSeriesSettings;
 use App\Model\GrrSettings;
 use DataTables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class GrrQuestionnaireSettingsController extends Controller
 {
@@ -21,12 +23,40 @@ class GrrQuestionnaireSettingsController extends Controller
         }
 
         // Active items first in sequence order; inactive items (not sequenced) after them
-        $questionnaires = GrrQuestionnaireSettings::where('grr_setting_id', $request->grr_setting_id)
+        $questionnaires = GrrQuestionnaireSettings::with('series:id,series_name')
+            ->where('grr_setting_id', $request->grr_setting_id)
             ->orderBy('status')
             ->ordered()
-            ->get(['id', 'reference', 'defect', 'location', 'status']);
+            ->get(['id', 'series_id', 'reference', 'defect', 'location', 'judgement', 'status']);
 
         return response()->json(['data' => $questionnaires]);
+    }
+
+    public function fetchSeriesBySample(Request $request){
+        $validator = Validator::make($request->all(), [
+            'grr_setting_id' => 'required|integer|exists:grr_settings,id',
+            'selected_id' => 'nullable|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['result' => 0, 'message' => $validator->errors()->first()], 422);
+        }
+
+        $section = GrrSettings::where('id', $request->grr_setting_id)->value('section');
+
+        // Active series of the sample's section; keep the currently saved one so editing never drops it
+        $series = GrrSeriesSettings::where(function ($query) use ($section, $request) {
+                $query->where(function ($q) use ($section) {
+                    $q->where('section', $section)->where('status', 0);
+                });
+                if ($request->filled('selected_id')) {
+                    $query->orWhere('id', $request->selected_id);
+                }
+            })
+            ->orderBy('series_name')
+            ->get(['id', 'series_name']);
+
+        return response()->json(['result' => 1, 'data' => $series]);
     }
 
     public function updateGrrQuestionnaireOrder(Request $request){
@@ -90,18 +120,48 @@ class GrrQuestionnaireSettingsController extends Controller
         $data = $request->all();
         // return $data;
         Validator::make($data, [
-            'q_sample_id' => 'required',
+            'q_sample_id' => 'required|integer|exists:grr_settings,id',
+            'series_id' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) use ($data) {
+                    $section = GrrSettings::where('id', $data['q_sample_id'] ?? 0)->value('section');
+
+                    $valid = GrrSeriesSettings::where('id', $value)
+                        ->where('section', $section)
+                        ->where('status', 0)
+                        ->exists();
+
+                    // An item may keep the series it already has, even if that series was disabled later
+                    if (!$valid && !empty($data['questionnaire_id'])) {
+                        $valid = GrrQuestionnaireSettings::where('id', $data['questionnaire_id'])
+                            ->where('series_id', $value)
+                            ->exists();
+                    }
+
+                    if (!$valid) {
+                        $fail('The selected series is not available for this GRR sample.');
+                    }
+                },
+            ],
             'reference' => 'required|string',
             'defect' => 'required|string',
             'location' => 'required|string',
+            'judgement' => ['required', 'string', Rule::in(GrrQuestionnaireSettings::JUDGEMENTS)],
+        ], [
+            'series_id.required' => 'Please select a series name.',
+            'judgement.required' => 'Please select a judgement.',
+            'judgement.in' => 'The selected judgement is invalid.',
         ])->validate();
 
         if($request->questionnaire_id != NULL || $request->questionnaire_id != ''){
             $grrQuestionnaire = GrrQuestionnaireSettings::find($request->questionnaire_id);
             $grrQuestionnaire->grr_setting_id = $data['q_sample_id'];
+            $grrQuestionnaire->series_id = $data['series_id'];
             $grrQuestionnaire->reference = $data['reference'];
             $grrQuestionnaire->defect = $data['defect'];
             $grrQuestionnaire->location = $data['location'];
+            $grrQuestionnaire->judgement = $data['judgement'];
             $grrQuestionnaire->save();
             return response()->json(['result' => 1, 'message' => 'Successfully updated!']);
         }else{
@@ -112,9 +172,11 @@ class GrrQuestionnaireSettingsController extends Controller
 
                 $grrQuestionnaire = new GrrQuestionnaireSettings();
                 $grrQuestionnaire->grr_setting_id = $data['q_sample_id'];
+                $grrQuestionnaire->series_id = $data['series_id'];
                 $grrQuestionnaire->reference = $data['reference'];
                 $grrQuestionnaire->defect = $data['defect'];
                 $grrQuestionnaire->location = $data['location'];
+                $grrQuestionnaire->judgement = $data['judgement'];
                 $grrQuestionnaire->status = 0;
                 $grrQuestionnaire->sort_order = ((int) $lastOrder) + 1;
                 $grrQuestionnaire->save();

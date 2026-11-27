@@ -90,6 +90,7 @@
 <script src="{{ asset('public/js/my_js/TrainingRecordUpdate.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/GrrAttributesSettings.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/GrrExamSettings.js') }}?<?=time()?>"></script>
+<script src="{{ asset('public/js/my_js/GrrSeriesSettings.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/GrrExaminationDashboard.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/WAQuestionnaires.js') }}?<?=time()?>"></script>
 <script src="{{ asset('public/js/my_js/WAExamination.js') }}?<?=time()?>"></script>

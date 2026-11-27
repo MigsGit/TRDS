@@ -7,11 +7,8 @@ $(document).ready(function () {
     const $loading = $('#grrDashboardLoading');
     const $trail = $('#grrDashboardTrail');
     const $trailText = $('#grrDashboardTrailText');
-    const EXAM_STATUS = {
-        0: { text: 'Not Started', css: 'badge-secondary' },
-        1: { text: 'In Progress', css: 'badge-warning' },
-        2: { text: 'Completed', css: 'badge-success' }
-    };
+    const TRIAL_BADGE = { 1: 'badge-secondary', 2: 'badge-warning', 3: 'badge-primary' };
+    const TRIAL_HEADER = { 1: 'bg-secondary text-white', 2: 'bg-warning', 3: 'bg-primary text-white' };
 
     let currentRequest = null;
     let grrItems = [];
@@ -155,20 +152,86 @@ $(document).ready(function () {
 
         $cards.empty();
         employeeItems.forEach(function (employee) {
-            const status = EXAM_STATUS[employee.exam_status] || EXAM_STATUS[0];
-            const statusText = employee.exam_status === 1
-                ? status.text + ' - Trial ' + employee.trial
-                : 'Not Started - Trial ' + (employee.trial || 1);
+            const isDone = employee.exam_status === 2;
+            const trial = employee.trial || 1;
+            const badgeCss = isDone ? 'badge-success' : (TRIAL_BADGE[trial] || 'badge-secondary');
+            const statusText = isDone ? 'Done' : 'Trial ' + trial + (employee.exam_status === 1 ? ' - In Progress' : ' - Not Started');
             const isSelected = selectedEmployee && selectedEmployee.id === employee.id;
 
             const $card = $('<div>', { class: 'exam-card is-clickable' + (isSelected ? ' is-selected' : ''), 'data-id': employee.id })
                 .append($('<div>', { class: 'exam-title', text: employee.name || employee.emp_id }))
                 .append($('<div>', { class: 'exam-subtitle', text: 'Employee No.: ' + employee.emp_id }))
                 .append(
-                    $('<div>', { class: 'text-center' }).append($('<span>', { class: 'badge ' + status.css, text: statusText }))
+                    $('<div>', { class: 'text-center' }).append($('<span>', { class: 'badge p-2 ' + badgeCss, text: statusText }))
                 );
             $cards.append(cardColumn($card));
         });
+    }
+
+    function renderResult(data) {
+        const exam = data.exam || {};
+        const employee = data.employee || {};
+        const rows = data.rows || [];
+        const passed = rows.filter(function (row) { return row.score === 'Yes'; }).length;
+
+        const $header = $('<div>', { class: 'card' }).append(
+            $('<div>', { class: 'card-body' })
+                .append($('<h4>', { class: 'mb-3', text: 'Examination ' + (exam.ctrl_number || '') + ' - Result' }))
+                .append($('<span>', { class: 'badge badge-success p-2 mb-3', text: 'Done' }))
+                .append($('<div>', { class: 'mb-1' }).append($('<strong>', { text: 'Examinee: ' })).append(document.createTextNode((employee.name || '') + ' (' + (employee.emp_id || '') + ')')))
+                .append($('<div>', { class: 'mb-1' }).append($('<strong>', { text: 'Description: ' })).append(document.createTextNode(exam.description || '-')))
+                .append($('<div>').append($('<strong>', { text: 'Score: ' })).append(document.createTextNode(passed + ' / ' + rows.length)))
+        );
+
+        function answerCell(answer, reference) {
+            const $td = $('<td>', { class: 'text-center' });
+            if (answer === null || answer === undefined) return $td.text('-');
+            return $td.text(answer).addClass(answer === reference ? '' : 'text-danger font-weight-bold');
+        }
+
+        const $head = $('<tr>')
+            .append($('<th>', { text: 'Sample No' }))
+            .append($('<th>', { text: 'Reference' }))
+            .append($('<th>', { text: 'Series Name' }))
+            .append($('<th>', { text: 'Defect' }))
+            .append($('<th>', { text: 'Location' }))
+            .append($('<th>', { class: 'text-center ' + TRIAL_HEADER[1], text: 'Trial 1 Answer' }))
+            .append($('<th>', { class: 'text-center ' + TRIAL_HEADER[2], text: 'Trial 2 Answer' }))
+            .append($('<th>', { class: 'text-center ' + TRIAL_HEADER[3], text: 'Trial 3 Answer' }))
+            .append($('<th>', { class: 'text-center', text: 'Score' }));
+
+        const $body = $('<tbody>');
+        if (rows.length === 0) {
+            $body.append($('<tr>').append($('<td>', { colspan: 9, class: 'text-center text-muted', text: 'No questionnaire items found.' })));
+        }
+        rows.forEach(function (row) {
+            $body.append(
+                $('<tr>')
+                    .append($('<td>', { text: row.number }))
+                    .append($('<td>', { class: 'text-center', text: row.reference || '-' }))
+                    .append($('<td>', { text: row.series_name || '-' }))
+                    .append($('<td>', { text: row.defect || '-' }))
+                    .append($('<td>', { text: row.location || '-' }))
+                    .append(answerCell(row.trial_1, row.reference))
+                    .append(answerCell(row.trial_2, row.reference))
+                    .append(answerCell(row.trial_3, row.reference))
+                    .append(
+                        $('<td>', { class: 'text-center' }).append(
+                            $('<span>', { class: 'badge ' + (row.score === 'Yes' ? 'badge-success' : 'badge-danger'), text: row.score })
+                        )
+                    )
+            );
+        });
+
+        const $table = $('<table>', { class: 'table table-bordered table-sm table-hover bg-white mb-0' })
+            .append($('<thead>', { class: 'thead-light' }).append($head))
+            .append($body);
+
+        $cards.empty().append(
+            $('<div>', { class: 'col-12 mt-3' })
+                .append($header)
+                .append($('<div>', { class: 'card mt-3' }).append($('<div>', { class: 'table-responsive' }).append($table)))
+        );
     }
 
     function renderExamination(data) {
@@ -188,7 +251,7 @@ $(document).ready(function () {
                 .append($('<h4>', { class: 'mb-3', text: 'Examination ' + (exam.ctrl_number || '') }))
                 .append(
                     $('<div>', { class: 'mb-3' }).append(
-                        $('<span>', { class: 'badge badge-info p-2', text: 'Trial ' + currentTrial + ' of 3 - ' + (data.trial_label || '') })
+                        $('<span>', { class: 'badge p-2 ' + (TRIAL_BADGE[currentTrial] || 'badge-secondary'), text: 'Trial ' + currentTrial + ' of 3 - ' + (data.trial_label || '') })
                     )
                 )
                 .append(infoRow('Examinee', (employee.name || '') + ' (' + (employee.emp_id || '') + ')'))
@@ -212,24 +275,23 @@ $(document).ready(function () {
                                 .append($('<span>', { class: 'badge badge-dark mr-3 mt-1', text: question.number }))
                                 .append(
                                     $('<div>', { class: 'flex-grow-1' })
-                                        .append(infoRow('Defect', question.defect))
+                                        .append(infoRow('Series Name', question.series_name))
                                         .append(infoRow('Location', question.location))
                                         .append(
                                             $('<div>', { class: 'form-group mt-2 mb-0' })
-                                                .append($('<label>', { for: inputId, class: 'font-weight-bold', text: 'Answer (0 or 1)' }))
-                                                .append($('<input>', {
-                                                    type: 'text',
-                                                    id: inputId,
-                                                    class: 'form-control grr-answer-input',
-                                                    maxlength: 1,
-                                                    inputmode: 'numeric',
-                                                    pattern: '[01]',
-                                                    autocomplete: 'off',
-                                                    placeholder: '0 or 1',
-                                                    style: 'max-width: 120px;',
-                                                    'data-question-id': question.id,
-                                                    required: true
-                                                }))
+                                                .append($('<label>', { for: inputId, class: 'font-weight-bold', text: 'Answer' }))
+                                                .append(
+                                                    $('<select>', {
+                                                        id: inputId,
+                                                        class: 'form-control grr-answer-input',
+                                                        style: 'max-width: 120px;',
+                                                        'data-question-id': question.id,
+                                                        required: true
+                                                    })
+                                                        .append($('<option>', { value: '', text: '-- Select --' }))
+                                                        .append($('<option>', { value: '0', text: '0' }))
+                                                        .append($('<option>', { value: '1', text: '1' }))
+                                                )
                                         )
                                 )
                         )
@@ -290,11 +352,6 @@ $(document).ready(function () {
             }).done(function (response) {
                 Swal.fire({ icon: 'success', text: response.message || 'Answers saved successfully!', timer: 2000, showConfirmButton: false });
 
-                if (response.completed) {
-                    const exam = examItems.find(function (item) { return item.id === selectedExam.id; });
-                    if (exam && exam.employees_count > 0) exam.employees_count--;
-                }
-
                 // Return to the examinee list; remaining trials are taken from there.
                 selectedEmployee = null;
                 currentTrial = 0;
@@ -316,10 +373,6 @@ $(document).ready(function () {
             });
         });
     }
-
-    $cards.on('input paste', '.grr-answer-input', function () {
-        $(this).val($(this).val().replace(/[^01]/g, '').slice(0, 1));
-    });
 
     $cards.on('submit', '#formGrrExamAnswers', function (e) {
         e.preventDefault();
@@ -397,10 +450,13 @@ $(document).ready(function () {
             updateTrail();
             notifyFilterChanged();
 
-            load('fetch_grr_examination_for_employee', {
-                exam_grouping_id: selectedExam.id,
-                exam_employee_id: employee.id
-            }, renderExamination);
+            const params = { exam_grouping_id: selectedExam.id, exam_employee_id: employee.id };
+
+            if (employee.exam_status === 2) {
+                load('fetch_grr_exam_result', params, function (data) { renderResult(Array.isArray(data) ? {} : data); });
+            } else {
+                load('fetch_grr_examination_for_employee', params, renderExamination);
+            }
         }
     });
 
