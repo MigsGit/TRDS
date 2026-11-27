@@ -16,6 +16,7 @@ class CreateHrMemoExaminationsTable extends Migration
         Schema::create('hr_memo_examinations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('examination_name');
+            $table->longText('objective')->nullable();
             $table->text('description')->nullable();
             $table->string('status')->default(0)->comment('0 - Active, 1 - Inactive');
             $table->timestamps();
