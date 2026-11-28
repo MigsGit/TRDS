@@ -467,6 +467,7 @@ Route::middleware('checkSession')->group(function(){
         Route::get('/fetch_employees_by_grr_no', 'fetchEmployeesByGrrNo')->name('fetch_employees_by_grr_no');
         Route::post('/add_exam_groupings', 'saveExamGroupings')->name('add_exam_groupings');
         Route::get('/get_grr_exam_groupings_by_id', 'getGrrExamGroupingsById')->name('get_grr_exam_groupings_by_id');
+        Route::post('/update_grr_exam_groupings_status', 'updateGrrExamGroupingsStatus')->name('update_grr_exam_groupings_status');
 
     });
 
