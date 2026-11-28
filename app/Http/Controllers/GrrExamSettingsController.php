@@ -11,6 +11,7 @@ use App\Model\SystemOneHrisSubcon;
 use DataTables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class GrrExamSettingsController extends Controller
 {
@@ -83,17 +84,17 @@ class GrrExamSettingsController extends Controller
 
     public function fetchEmployeesByGrrNo(Request $request){
         $grrNo = $request->grr_no;
+        $examId = $request->exam_id;
 
-        // Get employees already assigned to the current GRR
-        $existingEmployees = GrrSettings::with('GrrExamSettings', 'GrrExamSettings.examEmployees')
-            ->where('id', $grrNo)
-            ->get();
-        
-        $existingEmployeeIds = $existingEmployees
-            ->pluck('GrrExamSettings')
-            ->flatten()
-            ->pluck('examEmployees')
-            ->flatten()
+        // Employees already assigned to this GRR (the exam being edited is ignored so its own employees stay available)
+        $examIds = GrrExamSettings::where('grr_setting_id', $grrNo)
+            ->when($examId, function ($query) use ($examId) {
+                $query->where('id', '!=', $examId);
+            })
+            ->pluck('id');
+
+        $existingEmployeeIds = GrrExamEmployees::whereIn('exam_grouping_id', $examIds)
+            ->where('exam_status', '!=', 2)
             ->pluck('emp_id')
             ->filter()
             ->unique();
@@ -114,66 +115,181 @@ class GrrExamSettingsController extends Controller
         return response()->json($subconUsers);
     }
 
-    public function saveExamGroupings(Request $request){
-        date_default_timezone_set('Asia/Manila');
-        $section = $request->section;
-        $data = $request->except('_token');
-        $employee = $data['employee'];
-
-        // return $employee;
-
-        $explodedEmployee = implode(',', $employee);
-        // return $explodedEmployee;
-        
-        // return $data;
-
-        // Get the latest control number for this section
+    private function nextControlNumber($section)
+    {
         $lastRecord = GrrExamSettings::where('section', $section)
             ->orderByDesc('id')
             ->first();
 
         if (!$lastRecord) {
-            // No existing record for this section
-            $ctrlNumber = $section . '-001';
-        } else {
-            // Get the numeric part of the last control number
-            $lastNumber = (int) substr($lastRecord->ctrl_number, strrpos($lastRecord->ctrl_number, '-') + 1);
-
-            // Increment
-            $nextNumber = $lastNumber + 1;
-
-            // Format as 001, 002, 003...
-            $ctrlNumber = $section . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+            return $section . '-001';
         }
 
-        // Save
-        $grrExamSettings = new GrrExamSettings();
-        $grrExamSettings->section = $data['section'];
-        $grrExamSettings->grr_setting_id = $data['exam_grr_no'];
-        $grrExamSettings->ctrl_number = $ctrlNumber;
-        $grrExamSettings->description = $data['exam_description'];
-        $grrExamSettings->purpose = $data['exam_purpose'];
-        $grrExamSettings->instructions = $data['exam_instruction'];
-        $grrExamSettings->status = 0;
-        $grrExamSettings->save();
+        $lastNumber = (int) substr($lastRecord->ctrl_number, strrpos($lastRecord->ctrl_number, '-') + 1);
 
-        // Save exam employees
-        foreach ($employee as $empId) {
-            $grrExamEmployee = new GrrExamEmployees();
-            $grrExamEmployee->exam_grouping_id = $grrExamSettings->id;
-            $grrExamEmployee->emp_id = $empId;
-            $grrExamEmployee->status = 0;
-            $grrExamEmployee->exam_status = 0;
-            $grrExamEmployee->save();
+        return $section . '-' . str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+    }
+
+    public function saveExamGroupings(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
+        $validator = Validator::make($request->all(), [
+            'id'               => ['nullable', 'integer', 'exists:grr_exam_settings,id'],
+            'section'          => ['required', 'string', Rule::in(GrrSettings::SECTIONS)],
+            'exam_grr_no'      => ['required', 'integer', 'exists:grr_settings,id'],
+            'employee'         => ['required', 'array', 'min:1', 'max:3'],
+            'employee.*'       => ['required', 'string', 'distinct'],
+            'exam_description' => ['nullable', 'string'],
+            'exam_purpose'     => ['nullable', 'string'],
+            'exam_instruction' => ['nullable', 'string'],
+        ], [
+            'employee.required' => 'Please select at least 1 employee.',
+            'employee.max'      => 'You can only select a maximum of 3 employees.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['result' => 0, 'message' => $validator->errors()->first()], 422);
         }
+
+        $data = $request->except('_token');
+        $employee = array_values($data['employee']);
+
+        if (!empty($data['id'])) {
+            $error = DB::transaction(function () use ($data, $employee) {
+                $exam = GrrExamSettings::lockForUpdate()->find($data['id']);
+                $current = GrrExamEmployees::where('exam_grouping_id', $exam->id)->lockForUpdate()->get();
+
+                // Employees who already started cannot be removed, and the GRR/section they answered cannot change
+                $started = $current->filter(function ($row) { return (int) $row->exam_status !== 0; });
+
+                if ($started->isNotEmpty()) {
+                    if ((int) $exam->grr_setting_id !== (int) $data['exam_grr_no'] || $exam->section !== $data['section']) {
+                        return 'The section and GRR cannot be changed because an examinee has already started this examination.';
+                    }
+
+                    $missing = $started->pluck('emp_id')->diff($employee);
+                    if ($missing->isNotEmpty()) {
+                        return 'Employee ' . $missing->first() . ' has already started the examination and cannot be removed.';
+                    }
+                }
+
+                if ($exam->section !== $data['section']) {
+                    $exam->ctrl_number = $this->nextControlNumber($data['section']);
+                }
+
+                $exam->section = $data['section'];
+                $exam->grr_setting_id = $data['exam_grr_no'];
+                $exam->description = $data['exam_description'] ?? null;
+                $exam->purpose = $data['exam_purpose'] ?? null;
+                $exam->instructions = $data['exam_instruction'] ?? null;
+                $exam->save();
+
+                // Remove examinees who were unselected (only not-started ones can reach here)
+                GrrExamEmployees::where('exam_grouping_id', $exam->id)
+                    ->whereNotIn('emp_id', $employee)
+                    ->delete();
+
+                $existingIds = $current->pluck('emp_id')->all();
+                foreach ($employee as $empId) {
+                    if (in_array($empId, $existingIds, true)) {
+                        continue;
+                    }
+                    $grrExamEmployee = new GrrExamEmployees();
+                    $grrExamEmployee->exam_grouping_id = $exam->id;
+                    $grrExamEmployee->emp_id = $empId;
+                    $grrExamEmployee->status = 0;
+                    $grrExamEmployee->exam_status = 0;
+                    $grrExamEmployee->save();
+                }
+
+                return null;
+            });
+
+            if ($error) {
+                return response()->json(['result' => 0, 'message' => $error], 422);
+            }
+
+            return response()->json(['result' => 1, 'message' => 'Successfully updated!']);
+        }
+
+        DB::transaction(function () use ($data, $employee) {
+            $grrExamSettings = new GrrExamSettings();
+            $grrExamSettings->section = $data['section'];
+            $grrExamSettings->grr_setting_id = $data['exam_grr_no'];
+            $grrExamSettings->ctrl_number = $this->nextControlNumber($data['section']);
+            $grrExamSettings->description = $data['exam_description'] ?? null;
+            $grrExamSettings->purpose = $data['exam_purpose'] ?? null;
+            $grrExamSettings->instructions = $data['exam_instruction'] ?? null;
+            $grrExamSettings->status = 0;
+            $grrExamSettings->save();
+
+            foreach ($employee as $empId) {
+                $grrExamEmployee = new GrrExamEmployees();
+                $grrExamEmployee->exam_grouping_id = $grrExamSettings->id;
+                $grrExamEmployee->emp_id = $empId;
+                $grrExamEmployee->status = 0;
+                $grrExamEmployee->exam_status = 0;
+                $grrExamEmployee->save();
+            }
+        });
 
         return response()->json(['result' => 1, 'message' => 'Successfully added!']);
+    }
 
+    public function updateGrrExamGroupingsStatus(Request $request){
+        $validator = Validator::make($request->all(), [
+            'id' => ['required', 'integer'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'ID is required.']);
+        }
+
+        $exam = GrrExamSettings::find($request->id);
+
+        if (!$exam) {
+            return response()->json(['success' => false, 'message' => 'Record not found.']);
+        }
+
+        $exam->status = (int) $exam->status === 0 ? 1 : 0;
+        $exam->save();
+
+        return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
     }
 
     public function getGrrExamGroupingsById(Request $request){
-        $id = $request->id;
-        $examGrouping = GrrExamSettings::find($id);
-        return response()->json($examGrouping);
+        $examGrouping = GrrExamSettings::find($request->id);
+
+        if (!$examGrouping) {
+            return response()->json(['message' => 'Record not found.'], 404);
+        }
+
+        $employees = GrrExamEmployees::with('getEmployeeAttribute')
+            ->where('exam_grouping_id', $examGrouping->id)
+            ->orderBy('id')
+            ->get()
+            ->map(function ($row) {
+                $name = $row->getEmployeeAttribute
+                    ? trim($row->getEmployeeAttribute->FirstName . ' ' . $row->getEmployeeAttribute->LastName)
+                    : $row->emp_id;
+
+                return [
+                    'emp_id'  => $row->emp_id,
+                    'name'    => str_replace('Ã±', 'ñ', $name),
+                    'started' => (int) $row->exam_status !== 0,
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'id'             => $examGrouping->id,
+            'ctrl_number'    => $examGrouping->ctrl_number,
+            'section'        => $examGrouping->section,
+            'grr_setting_id' => $examGrouping->grr_setting_id,
+            'description'    => $examGrouping->description,
+            'purpose'        => $examGrouping->purpose,
+            'instructions'   => $examGrouping->instructions,
+            'employees'      => $employees,
+        ]);
     }
 }

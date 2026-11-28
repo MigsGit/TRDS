@@ -177,10 +177,10 @@ $(document).ready(function () {
         const $header = $('<div>', { class: 'card' }).append(
             $('<div>', { class: 'card-body' })
                 .append($('<h4>', { class: 'mb-3', text: 'Examination ' + (exam.ctrl_number || '') + ' - Result' }))
-                .append($('<span>', { class: 'badge badge-success p-2 mb-3', text: 'Done' }))
+                .append($('<span>', { class: 'badge badge-success p-2 mb-3', text: 'Done - ' + (data.date_taken || '-') }))
                 .append($('<div>', { class: 'mb-1' }).append($('<strong>', { text: 'Examinee: ' })).append(document.createTextNode((employee.name || '') + ' (' + (employee.emp_id || '') + ')')))
                 .append($('<div>', { class: 'mb-1' }).append($('<strong>', { text: 'Description: ' })).append(document.createTextNode(exam.description || '-')))
-                .append($('<div>').append($('<strong>', { text: 'Score: ' })).append(document.createTextNode(passed + ' / ' + rows.length)))
+                .append($('<div>', { class: 'mb-1' }).append($('<strong>', { text: 'Score: ' })).append(document.createTextNode(passed + ' / ' + rows.length)))
         );
 
         function answerCell(answer, reference) {

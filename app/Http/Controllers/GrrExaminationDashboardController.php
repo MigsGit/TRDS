@@ -343,6 +343,10 @@ class GrrExaminationDashboardController extends Controller
                     return $rows->pluck('answer', 'questionnaire_id');
                 });
 
+            $completedAt = GrrExamAnswers::where('exam_employee_id', $employee->id)
+                ->where('trial', self::MAX_TRIAL)
+                ->max('updated_at');
+
             $rows = GrrQuestionnaireSettings::with('series:id,series_name')
                 ->where('grr_setting_id', $exam->grr_setting_id)
                 ->where('status', 0)
@@ -390,6 +394,7 @@ class GrrExaminationDashboardController extends Controller
                         'emp_id' => $employee->emp_id,
                         'name'   => str_replace('Ã±', 'ñ', $employee->getEmployeeAttribute->empname ?? ''),
                     ],
+                    'date_taken' => $completedAt ? \Carbon\Carbon::parse($completedAt)->format('F d, Y') : null,
                     'rows' => $rows,
                 ],
             ]);

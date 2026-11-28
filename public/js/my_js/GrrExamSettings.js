@@ -64,7 +64,7 @@ $(document).ready(function () {
 function bindGrrExamGroupingsEvents($GrrExamTable, $form, $modal, dtExamTable){
 
     $('#btnShowAddGRRExamGroupingsModal').on('click', function () {
-        resetGRRExamGroupingsForm($form);;
+        resetGRRExamGroupingsForm($form);
         $modal.modal('show');
     });
 
@@ -72,18 +72,18 @@ function bindGrrExamGroupingsEvents($GrrExamTable, $form, $modal, dtExamTable){
         const section = $(this).val();
 
         fetchGrrNoList(section);
-       
+        fetchEmployeesByGrrNo('');
     });
 
     $form.find('#examGrrNo').on('change', function() {
         const grrNo = $(this).val();
-        fetchEmployeesByGrrNo(grrNo);
+        fetchEmployeesByGrrNo(grrNo, $form.find('#txtGRRExamGroupingsId').val());
     });
     // Submit form (Add / Edit)
     $form.on('submit', function (e) {
         e.preventDefault();
-        
-        if($form.find('#grrNo').val() != "" && $form.find('#grrSample').val() != "" && $form.find('#section').val() != ""){
+
+        if($form.find('#examGrrNo').val() && $form.find('#section').val()){
             const selectedEmployees = $form.find('#employee').val() || [];
 
             if (selectedEmployees.length === 0) {
@@ -106,16 +106,16 @@ function bindGrrExamGroupingsEvents($GrrExamTable, $form, $modal, dtExamTable){
     // Disable button
     $GrrExamTable.on('click', '.btnDisable', function () {
         const id = $(this).data('id');
-        confirmAction('Are you sure you want to disable this sample?', function () {
-            updateGrrStatus(id, dtExamTable);
+        confirmAction('Are you sure you want to disable this examination?', function () {
+            updateGrrExamGroupingStatus(id, dtExamTable);
         });
     });
 
     // Enable button
     $GrrExamTable.on('click', '.btnEnable', function () {
         const id = $(this).data('id');
-        confirmAction('Are you sure you want to enable this sample?', function () {
-            updateGrrStatus(id, dtExamTable);
+        confirmAction('Are you sure you want to enable this examination?', function () {
+            updateGrrExamGroupingStatus(id, dtExamTable);
         });
     });
 
@@ -138,90 +138,70 @@ function bindGrrExamGroupingsEvents($GrrExamTable, $form, $modal, dtExamTable){
 
 }
 
-function fetchGrrNoList(section) {
-    if (section != "") {
-        $.ajax({
-            url: 'fetch_grr_no_list',
-            type: 'GET',
-            data: {
-                section: section
-            },
-            success: function(response) {
+function fetchGrrNoList(section, selectedId) {
+    const $grrNo = $('#examGrrNo');
 
-                $('#examGrrNo').empty();
+    $grrNo.empty().append($('<option>', { value: '', text: 'Select One', disabled: true, selected: true }));
+    $grrNo.val('').trigger('change.select2');
 
-                $('#examGrrNo').append(
-                    $('<option>', {
-                        value: '',
-                        text: 'Select One',
-                        disabled: true,
-                        selected: true
-                    })
-                );
-
-                response.forEach(function(item) {
-                    $('#examGrrNo').append(
-                        $('<option>', {
-                            value: item.id,
-                            text: item.grr_no + ' - ' + item.grr_sample
-                        })
-                    );
-                });
-
-                // Reset without triggering change event
-                $('#examGrrNo').val('');
-            },
-            error: function() {
-                showError('Failed to fetch GRR numbers.');
-            }
-        });
+    if (!section) {
+        return $.Deferred().resolve().promise();
     }
+
+    return $.ajax({
+        url: 'fetch_grr_no_list',
+        type: 'GET',
+        data: { section: section }
+    }).done(function (response) {
+        response.forEach(function (item) {
+            $grrNo.append($('<option>', { value: item.id, text: item.grr_no + ' - ' + item.grr_sample }));
+        });
+
+        // Select without firing the user "change" handler (it would reload/reset the employees)
+        $grrNo.val(selectedId ? String(selectedId) : '').trigger('change.select2');
+    }).fail(function () {
+        showError('Failed to fetch GRR numbers.');
+    });
 }
 
-function fetchEmployeesByGrrNo(grrNo) {
-    if (grrNo != "") {
-        $.ajax({
-            url: 'fetch_employees_by_grr_no',
-            type: 'GET',
-            data: {
-                grr_no: grrNo
-            },
-            success: function(response) {
+function fetchEmployeesByGrrNo(grrNo, examId, selectedEmployees) {
+    const $employee = $('#employee');
 
-                // Clear existing employees
-                $('#employee').empty();
+    $employee.empty();
 
-                console.log(response)
+    if (!grrNo) {
+        $employee.val(null).trigger('change.select2');
+        return $.Deferred().resolve().promise();
+    }
 
-                // Add employees
-                response.forEach(function(item) {
+    return $.ajax({
+        url: 'fetch_employees_by_grr_no',
+        type: 'GET',
+        data: { grr_no: grrNo, exam_id: examId || '' }
+    }).done(function (response) {
+        response.forEach(function (item) {
+            const lastName = (item.LastName || '').replace(/Ã±/g, 'ñ');
+            const firstName = (item.FirstName || '').replace(/Ã±/g, 'ñ');
 
-                    let lastName = item.LastName.replace(/Ã±/g, 'ñ');
-                    let firstName = item.FirstName.replace(/Ã±/g, 'ñ');
+            $employee.append($('<option>', { value: item.EmpNo, text: firstName + ' ' + lastName }));
+        });
 
-                    $('#employee').append(
-                        $('<option>', {
-                            value: item.EmpNo,
-                            text: firstName + ' ' + lastName 
-                        })
-                    );
-                });
-
-                // Reset selection
-                $('#employee').val(null).trigger('change');
-            },
-            error: function() {
-                showError('Failed to fetch employees.');
+        // Keep already-assigned examinees selectable even if they are no longer in the HRIS list
+        (selectedEmployees || []).forEach(function (emp) {
+            if ($employee.find('option').filter(function () { return this.value === String(emp.emp_id); }).length === 0) {
+                $employee.append($('<option>', { value: emp.emp_id, text: emp.name || emp.emp_id }));
             }
         });
-    } else {
-        $('#employee').empty();
-        $('#employee').val(null).trigger('change');
-    }
+
+        $employee.val((selectedEmployees || []).map(function (emp) { return String(emp.emp_id); }));
+        $employee.trigger('change.select2');
+    }).fail(function () {
+        showError('Failed to fetch employees.');
+    });
 }
 
 /**
- * Fetch grr_attributes by ID
+ * Fetch grr exam grouping by ID and fill the form
  */
 function fetchGrrExamGroupingsById(id, $modal) {
     $.ajax({
@@ -230,19 +210,46 @@ function fetchGrrExamGroupingsById(id, $modal) {
         data: { id },
         dataType: 'json',
         success: function (response) {
-            $('#txtGRRExamGroupingsId').val(response.id);
-            $('#controlNumber').val(response.ctrl_number);
-            $('#examDescription').val(response.description);
-            $('#examPurpose').val(response.purpose);
-            $('#examInstruction').val(response.instructions);
-            $('#section').val(response.section);
+            const $form = $('#formGRRExamGroupings');
 
+            // "#section" also exists in the GRR sample modal, so always scope to this form
+            $form.find('#txtGRRExamGroupingsId').val(response.id);
+            $form.find('#controlNumber').val(response.ctrl_number);
+            $form.find('#examDescription').val(response.description);
+            $form.find('#examPurpose').val(response.purpose);
+            $form.find('#examInstruction').val(response.instructions);
+            $form.find('#section').val(response.section).trigger('change.select2');
 
-            $modal.modal('show');
+            fetchGrrNoList(response.section, response.grr_setting_id).always(function () {
+                fetchEmployeesByGrrNo(response.grr_setting_id, response.id, response.employees).always(function () {
+                    $modal.modal('show');
+                });
+            });
         },
         error: function (xhr) {
             console.error('Fetch failed:', xhr.responseText);
             showError('Failed to fetch data.');
+        }
+    });
+}
+
+function updateGrrExamGroupingStatus(id, dtExamTable) {
+    $.ajax({
+        type: 'POST',
+        url: 'update_grr_exam_groupings_status',
+        data: { id },
+        dataType: 'json',
+        success: function (response) {
+            if (response.success) {
+                showSuccess('Status updated successfully.');
+                dtExamTable.draw(false);
+            } else {
+                Swal.fire({ title: 'Error', text: response.message, icon: 'error' });
+            }
+        },
+        error: function (xhr) {
+            console.error('Status update failed:', xhr.responseText);
+            showError('Failed to update status.');
         }
     });
 }
@@ -299,7 +306,7 @@ function saveExamGroupings($form, $modal, dtGrrSettings) {
         },
         error: function (xhr) {
             console.error('Save failed:', xhr.responseText);
-            showError('Failed to save data.');
+            showError((xhr.responseJSON && xhr.responseJSON.message) || 'Failed to save data.');
         }
     });
 }
@@ -312,6 +319,11 @@ function resetGRRExamGroupingsForm(formSelector) {
     const $form = $(formSelector);
     $form[0].reset();
     $form.find('input[type="hidden"]').val('');
+
+    // select2 does not follow form.reset(), so clear the selects explicitly
+    $form.find('#section').val('').trigger('change.select2');
+    fetchGrrNoList('');
+    fetchEmployeesByGrrNo('');
 }
 
 /**
